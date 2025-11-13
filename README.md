@@ -78,10 +78,8 @@ iou-architectuur/
 │   │   ├── part-2-implementation.md
 │   │   ├── part-3-roadmap.md
 │   │   └── assets/
-│   ├── overrides/                  # Custom theme overrides
-│   │   ├── main.html
-│   │   └── stylesheets/
-│   │       └── extra.css
+│   ├── stylesheets/
+│   │   └── extras.css
 │   └── javascripts/                # Custom JavaScript
 ├── mkdocs.yml                      # MkDocs configuration
 ├── .gitlab-ci.yml                  # CI/CD pipeline
