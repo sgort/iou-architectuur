@@ -16,7 +16,6 @@ copyright: Copyright &copy; 2025 Provincie Flevoland
 theme:
   name: material
   language: nl
-  custom_dir: docs/overrides
   
   # Colors matching NL Design System
   palette:
