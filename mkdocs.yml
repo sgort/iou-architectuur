@@ -35,8 +35,6 @@ theme:
   
   # Features
   features:
-    - navigation.instant          # Fast page loading
-    - navigation.instant.progress # Progress indicator
     - navigation.tracking         # URL updates with scroll
     - navigation.tabs             # Top-level tabs
     - navigation.tabs.sticky      # Sticky tabs
@@ -53,21 +51,6 @@ theme:
     - content.code.copy           # Copy code button
     - content.code.annotate       # Code annotations
     - content.tabs.link           # Link content tabs
-  
-  # Logo and favicon
-  logo: assets/logo.png
-  favicon: assets/favicon.ico
-  
-  # Fonts
-  font:
-    text: Roboto
-    code: Roboto Mono
-  
-  # Icons
-  icon:
-    repo: fontawesome/brands/gitlab
-    edit: material/pencil
-    view: material/eye
 
 # Plugins
 plugins:
@@ -97,9 +80,6 @@ plugins:
             Deel 1 - Ontologische Architectuur: Part 1 - Ontological Architecture
             Deel 2 - Implementatie Architectuur: Part 2 - Implementation Architecture
             Deel 3 - Roadmap en Evaluatie: Part 3 - Roadmap and Evaluation
-  
-  - tags:
-      tags_file: tags.md
   
   - git-revision-date-localized:
       enable_creation_date: true
@@ -137,9 +117,7 @@ markdown_extensions:
   - pymdownx.keys
   - pymdownx.mark
   - pymdownx.smartsymbols
-  - pymdownx.snippets:
-      auto_append:
-        - includes/abbreviations.md
+  - pymdownx.snippets
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -151,29 +129,16 @@ markdown_extensions:
       custom_checkbox: true
   - pymdownx.tilde
 
-# Extra CSS and JavaScript
+# Extra CSS (path is relative to docs/ and will be copied by custom_dir)
 extra_css:
-  - stylesheets/extra.css
-
-extra_javascript:
-  - javascripts/mathjax.js
-  - https://polyfill.io/v3/polyfill.min.js?features=es6
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - overrides/stylesheets/extra.css
 
 # Extra configuration
 extra:
-  analytics:
-    provider: custom
-    property: !ENV ANALYTICS_PROPERTY
-  
   social:
     - icon: fontawesome/brands/gitlab
       link: https://git.open-regels.nl/your-group/iou-architectuur
       name: GitLab Repository
-  
-  version:
-    provider: mike
-    default: latest
   
   # Language selector
   alternate:
@@ -187,22 +152,6 @@ extra:
 # Navigation structure
 nav:
   - Home: index.md
-  - Deel 1 - Ontologische Architectuur:
-    - nl/deel-1-ontologie.md
-    - Namespace Strategie: nl/deel-1-ontologie.md#11-namespace-strategie-en-governance
-    - Kern Ontologie: nl/deel-1-ontologie.md#12-kern-ontologie-klassen
-    - Properties: nl/deel-1-ontologie.md#13-properties-en-relaties
-  - Deel 2 - Implementatie Architectuur:
-    - nl/deel-2-implementatie.md
-    - Standaarden Collectie: nl/deel-2-implementatie.md#2-standards-collection--annotation
-    - Begrippenkader: nl/deel-2-implementatie.md#3-concept-framework-mim-level-1
-    - Informatiemodel: nl/deel-2-implementatie.md#4-information-model-mim-levels-2-3
-    - Process Blueprint: nl/deel-2-implementatie.md#5-process-blueprint
-    - Rollen en Toegang: nl/deel-2-implementatie.md#6-roles-tasks--access-control
-    - Demonstrator: nl/deel-2-implementatie.md#7-demonstrator-architecture
-  - Deel 3 - Roadmap en Evaluatie:
-    - nl/deel-3-roadmap.md
-    - Implementatie Roadmap: nl/deel-3-roadmap.md#8-technical-implementation-roadmap
-    - Success Metrics: nl/deel-3-roadmap.md#9-success-metrics--evaluation
-    - Volgende Stappen: nl/deel-3-roadmap.md#10-next-steps--decision-points
-  - Tags: tags.md
+  - Deel 1 - Ontologische Architectuur: deel-1-ontologie.md
+  - Deel 2 - Implementatie Architectuur: deel-2-implementatie.md
+  - Deel 3 - Roadmap en Evaluatie: deel-3-roadmap.md
