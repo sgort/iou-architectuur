@@ -131,13 +131,13 @@ markdown_extensions:
 
 # Extra CSS (path is relative to docs/ and will be copied by custom_dir)
 extra_css:
-  - overrides/stylesheets/extra.css
+  - stylesheets/extra.css
 
 # Extra configuration
 extra:
   social:
     - icon: fontawesome/brands/gitlab
-      link: https://git.open-regels.nl/your-group/iou-architectuur
+      link: https://git.open-regels.nl/showcases/iou-architectuur
       name: GitLab Repository
   
   # Language selector
