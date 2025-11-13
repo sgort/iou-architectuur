@@ -1,0 +1,153 @@
+# GitLab CI/CD Pipeline for Azure Static Web Apps
+# Deploys MkDocs documentation site to iou-architectuur.open-regels.nl
+
+image: python:3.11-slim
+
+stages:
+  - build
+  - deploy
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  GIT_DEPTH: 0  # Full clone for git-revision-date-localized
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+# Install dependencies
+before_script:
+  - apt-get update && apt-get install -y git curl
+  - python -m venv venv
+  - source venv/bin/activate
+  - pip install --upgrade pip
+  - pip install -r requirements.txt
+
+# Build the documentation
+build:
+  stage: build
+  script:
+    - source venv/bin/activate
+    - mkdocs build --strict --verbose
+    - ls -la site/
+  artifacts:
+    paths:
+      - site/
+    expire_in: 1 day
+  only:
+    - main
+    - merge_requests
+  tags:
+    - docker
+
+# Test build on merge requests
+test:build:
+  stage: build
+  script:
+    - source venv/bin/activate
+    - mkdocs build --strict --verbose
+  only:
+    - merge_requests
+  except:
+    - main
+  tags:
+    - docker
+
+# Deploy to Azure Static Web Apps
+deploy:azure:
+  stage: deploy
+  image: mcr.microsoft.com/azure-cli:latest
+  before_script:
+    - apt-get update && apt-get install -y nodejs npm
+    - npm install -g @azure/static-web-apps-cli
+  script:
+    # Install Azure CLI extensions if needed
+    - az extension add --name staticwebapp --yes || true
+    
+    # Deploy using SWA CLI
+    - |
+      swa deploy \
+        --deployment-token $AZURE_STATIC_WEB_APPS_API_TOKEN \
+        --app-location site \
+        --output-location . \
+        --env production
+    
+    # Alternative: Direct deployment using Azure CLI
+    # - az staticwebapp upload --name iou-architectuur --resource-group rg-iou-architectuur --source site/ --token $AZURE_STATIC_WEB_APPS_API_TOKEN
+  dependencies:
+    - build
+  only:
+    - main
+  environment:
+    name: production
+    url: https://iou-architectuur.open-regels.nl
+  tags:
+    - docker
+
+# Optional: Deploy to staging
+deploy:staging:
+  stage: deploy
+  image: mcr.microsoft.com/azure-cli:latest
+  before_script:
+    - apt-get update && apt-get install -y nodejs npm
+    - npm install -g @azure/static-web-apps-cli
+  script:
+    - |
+      swa deploy \
+        --deployment-token $AZURE_STATIC_WEB_APPS_STAGING_TOKEN \
+        --app-location site \
+        --output-location . \
+        --env staging
+  dependencies:
+    - build
+  only:
+    - develop
+  environment:
+    name: staging
+    url: https://staging-iou-architectuur.open-regels.nl
+  tags:
+    - docker
+  when: manual
+
+# Preview deployments for merge requests
+deploy:preview:
+  stage: deploy
+  image: mcr.microsoft.com/azure-cli:latest
+  before_script:
+    - apt-get update && apt-get install -y nodejs npm
+    - npm install -g @azure/static-web-apps-cli
+  script:
+    - |
+      swa deploy \
+        --deployment-token $AZURE_STATIC_WEB_APPS_API_TOKEN \
+        --app-location site \
+        --output-location . \
+        --env preview
+  dependencies:
+    - build
+  only:
+    - merge_requests
+  environment:
+    name: preview/$CI_MERGE_REQUEST_IID
+    url: https://preview-$CI_MERGE_REQUEST_IID.iou-architectuur.open-regels.nl
+    on_stop: cleanup:preview
+  tags:
+    - docker
+  when: manual
+
+# Cleanup preview environments
+cleanup:preview:
+  stage: deploy
+  image: mcr.microsoft.com/azure-cli:latest
+  script:
+    - echo "Cleaning up preview environment"
+    # Azure automatically cleans up preview environments
+  only:
+    - merge_requests
+  environment:
+    name: preview/$CI_MERGE_REQUEST_IID
+    action: stop
+  tags:
+    - docker
+  when: manual
