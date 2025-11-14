@@ -64,11 +64,13 @@ Implementatie planning en evaluatie:
 
 **Project**: Lelystad-Zuid Ringweg  
 **Provincie**: Flevoland, Nederland  
-**Componenten**: 
+**Componenten**:
+
 - Provinciale sectie (Laan van Nieuw Land)
 - Gemeentelijke sectie (Verlengde Westerdreef)
 
 **Regelgevend Kader**:
+
 - Omgevingswet
 - Natuurbeschermingswet (NNN, Natura 2000)
 - DSO/RTR (Digitaal Stelsel Omgevingswet)
@@ -116,10 +118,10 @@ Raadpleeg [Deel 3: Roadmap en Evaluatie](deel-3-roadmap.md) voor implementatie p
 
 ## Demonstrator
 
-Een werkende demonstrator is beschikbaar op:  
-**https://iou.open-regels.nl**
+Een werkende demonstrator is beschikbaar op: [https://iou.open-regels.nl](https://iou.open-regels.nl)
 
 De demonstrator toont:
+
 - ✅ Compliance Dashboard met 19 requirements
 - ✅ Interactieve kaart met jurisdictie-overlaps
 - ✅ Knowledge Graph explorer met SPARQL queries
