@@ -18,7 +18,7 @@ This framework defines the information architecture for managing regulatory comp
 
 The framework consists of three main parts:
 
-### [:material-file-document-outline: Part 1 - Ontological Architecture](part-1-ontology.md)
+### [:material-file-document-outline: Part 1 - Ontological Architecture](deel-1-ontologie.md)
 
 Defines the fundamental semantic structure:
 
@@ -27,7 +27,7 @@ Defines the fundamental semantic structure:
 - Properties and relationships
 - Alignment with Dutch/EU vocabularies
 
-### [:material-cogs: Part 2 - Implementation Architecture](part-2-implementation.md)
+### [:material-cogs: Part 2 - Implementation Architecture](deel-2-implementatie.md)
 
 Practical implementation specifications:
 
@@ -38,7 +38,7 @@ Practical implementation specifications:
 - Roles and access control
 - Demonstrator architecture
 
-### [:material-road-variant: Part 3 - Roadmap and Evaluation](part-3-roadmap.md)
+### [:material-road-variant: Part 3 - Roadmap and Evaluation](deel-3-roadmap.md)
 
 Implementation planning and evaluation:
 
@@ -93,13 +93,13 @@ The framework supports three primary use cases:
 ## Getting Started
 
 ### For Architects
-Start with [Part 1: Ontological Architecture](part-1-ontology.md) for the semantic foundations.
+Start with [Part 1: Ontological Architecture](deel-1-ontologie.md) for the semantic foundations.
 
 ### For Developers
-See [Part 2: Implementation Architecture](part-2-implementation.md) for technical specifications and SPARQL examples.
+See [Part 2: Implementation Architecture](deel-2-implementatie.md) for technical specifications and SPARQL examples.
 
 ### For Project Managers
-Consult [Part 3: Roadmap and Evaluation](part-3-roadmap.md) for implementation planning and ROI analysis.
+Consult [Part 3: Roadmap and Evaluation](deel-3-roadmap.md) for implementation planning and ROI analysis.
 
 ## Demonstrator
 

@@ -69,24 +69,25 @@ plugins:
           name: Nederlands
           build: true
           site_name: "Informatie Architectuur Framework"
-          nav:
-            - Home: nl/index.md
-            - Deel 1 - Ontologische Architectuur: nl/deel-1-ontologie.md
-            - Deel 2 - Implementatie Architectuur: nl/deel-2-implementatie.md
-            - Deel 3 - Roadmap en Evaluatie: nl/deel-3-roadmap.md
         - locale: en
           name: English
           build: true
           site_name: "Information Architecture Framework"
-          nav:
-            - Home: en/index.md
-            - Part 1 - Ontological Architecture: en/part-1-ontology.md
-            - Part 2 - Implementation Architecture: en/part-2-implementation.md
-            - Part 3 - Roadmap and Evaluation: en/part-3-roadmap.md
+          nav_translations:
+            Deel 1 - Ontologische Architectuur: Part 1 - Ontological Architecture
+            Deel 2 - Implementatie Architectuur: Part 2 - Implementation Architecture
+            Deel 3 - Roadmap en Evaluatie: Part 3 - Roadmap and Evaluation
   
   - git-revision-date-localized:
       enable_creation_date: true
       type: timeago
+
+# Root navigation (applies to default language)
+nav:
+  - Home: index.md
+  - Deel 1 - Ontologische Architectuur: deel-1-ontologie.md
+  - Deel 2 - Implementatie Architectuur: deel-2-implementatie.md
+  - Deel 3 - Roadmap en Evaluatie: deel-3-roadmap.md
 
 # Markdown extensions
 markdown_extensions:
