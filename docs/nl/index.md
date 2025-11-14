@@ -129,3 +129,4 @@ Voor vragen of feedback over dit framework, neem contact op via uw projectmanage
 
 !!! info "Over deze Documentatie"
     Deze documentatie is gegenereerd met [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) en gehost op Azure Static Web Apps. De bronbestanden zijn beschikbaar in GitLab CE.
+<- applies consistent line endings for cross-platform Build: 1763106765 -->
