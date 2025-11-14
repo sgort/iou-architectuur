@@ -2,16 +2,8 @@
 mkdocs>=1.5.3
 mkdocs-material>=9.5.0
 
-# Multilingual support
-mkdocs-static-i18n>=1.2.0
-
 # Additional plugins
 mkdocs-git-revision-date-localized-plugin>=1.2.0
 
-# Note: mkdocs-tags-plugin is built into mkdocs-material, no separate install needed
-
-# Markdown extensions (included with mkdocs-material but listed for clarity)
+# Markdown extensions
 pymdown-extensions>=10.7
-
-# Optional: For PDF export (uncomment if needed)
-# mkdocs-with-pdf>=0.9.3

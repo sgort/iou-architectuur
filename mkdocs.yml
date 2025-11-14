@@ -1,8 +1,8 @@
-site_name: Information Architecture Framework
+site_name: Informatie Architectuur Framework
 site_url: https://iou-architectuur.open-regels.nl
 site_description: >-
-  Comprehensive Information Architecture Framework for the Lelystad-Zuid Ring Road Project
-  using semantic web technologies and Dutch/EU standards (MIM, NL-SBB, CPSV-AP).
+  Uitgebreid Informatie Architectuur Framework voor het Lelystad-Zuid Ringweg Project
+  met gebruik van semantische webtechnologieën en Nederlandse/EU-standaarden (MIM, NL-SBB, CPSV-AP).
 
 # Repository
 repo_url: https://git.open-regels.nl/showcases/iou-architectuur
@@ -24,13 +24,13 @@ theme:
       accent: orange
       toggle:
         icon: material/brightness-7
-        name: Switch to dark mode
+        name: Schakel naar donkere modus
     - scheme: slate
       primary: blue
       accent: orange
       toggle:
         icon: material/brightness-4
-        name: Switch to light mode
+        name: Schakel naar lichte modus
   
   # Features
   features:
@@ -54,35 +54,14 @@ theme:
 # Plugins
 plugins:
   - search:
-      lang:
-        - nl
-        - en
-  
-  - i18n:
-      docs_structure: folder
-      fallback_to_default: true
-      reconfigure_material: true
-      reconfigure_search: true
-      languages:
-        - locale: nl
-          default: true
-          name: Nederlands
-          build: true
-          site_name: "Informatie Architectuur Framework"
-        - locale: en
-          name: English
-          build: true
-          site_name: "Information Architecture Framework"
-          nav_translations:
-            Deel 1 - Ontologische Architectuur: Part 1 - Ontological Architecture
-            Deel 2 - Implementatie Architectuur: Part 2 - Implementation Architecture
-            Deel 3 - Roadmap en Evaluatie: Part 3 - Roadmap and Evaluation
+      lang: nl
   
   - git-revision-date-localized:
       enable_creation_date: true
       type: timeago
+      locale: nl
 
-# Root navigation (applies to default language)
+# Navigation
 nav:
   - Home: index.md
   - Deel 1 - Ontologische Architectuur: deel-1-ontologie.md
