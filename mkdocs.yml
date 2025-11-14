@@ -5,7 +5,7 @@ site_description: >-
   using semantic web technologies and Dutch/EU standards (MIM, NL-SBB, CPSV-AP).
 
 # Repository
-repo_url: https://git.open-regels.nl/your-group/iou-architectuur
+repo_url: https://git.open-regels.nl/showcases/iou-architectuur
 repo_name: GitLab
 edit_uri: -/edit/main/docs/
 
@@ -34,22 +34,22 @@ theme:
   
   # Features
   features:
-    - navigation.tracking         # URL updates with scroll
-    - navigation.tabs             # Top-level tabs
-    - navigation.tabs.sticky      # Sticky tabs
-    - navigation.sections         # Section index pages
-    - navigation.expand           # Expand all sections
-    - navigation.path             # Breadcrumbs
-    - navigation.top              # Back to top button
-    - navigation.footer           # Previous/next footer
-    - toc.follow                  # TOC follows scroll
-    - toc.integrate               # TOC in navigation
-    - search.suggest              # Search suggestions
-    - search.highlight            # Highlight search terms
-    - search.share                # Share search results
-    - content.code.copy           # Copy code button
-    - content.code.annotate       # Code annotations
-    - content.tabs.link           # Link content tabs
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
 
 # Plugins
 plugins:
@@ -57,7 +57,6 @@ plugins:
       lang:
         - nl
         - en
-      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
   
   - i18n:
       docs_structure: folder
@@ -70,15 +69,20 @@ plugins:
           name: Nederlands
           build: true
           site_name: "Informatie Architectuur Framework"
+          nav:
+            - Home: nl/index.md
+            - Deel 1 - Ontologische Architectuur: nl/deel-1-ontologie.md
+            - Deel 2 - Implementatie Architectuur: nl/deel-2-implementatie.md
+            - Deel 3 - Roadmap en Evaluatie: nl/deel-3-roadmap.md
         - locale: en
           name: English
           build: true
           site_name: "Information Architecture Framework"
-          nav_translations:
-            Home: Home
-            Deel 1 - Ontologische Architectuur: Part 1 - Ontological Architecture
-            Deel 2 - Implementatie Architectuur: Part 2 - Implementation Architecture
-            Deel 3 - Roadmap en Evaluatie: Part 3 - Roadmap and Evaluation
+          nav:
+            - Home: en/index.md
+            - Part 1 - Ontological Architecture: en/part-1-ontology.md
+            - Part 2 - Implementation Architecture: en/part-2-implementation.md
+            - Part 3 - Roadmap and Evaluation: en/part-3-roadmap.md
   
   - git-revision-date-localized:
       enable_creation_date: true
@@ -86,7 +90,6 @@ plugins:
 
 # Markdown extensions
 markdown_extensions:
-  # Python Markdown
   - abbr
   - admonition
   - attr_list
@@ -97,8 +100,6 @@ markdown_extensions:
   - toc:
       permalink: true
       toc_depth: 3
-  
-  # Python Markdown Extensions
   - pymdownx.arithmatex:
       generic: true
   - pymdownx.betterem:
@@ -128,7 +129,7 @@ markdown_extensions:
       custom_checkbox: true
   - pymdownx.tilde
 
-# Extra CSS (path is relative to docs/ and will be copied by custom_dir)
+# Extra CSS
 extra_css:
   - stylesheets/extra.css
 
@@ -138,19 +139,3 @@ extra:
     - icon: fontawesome/brands/gitlab
       link: https://git.open-regels.nl/showcases/iou-architectuur
       name: GitLab Repository
-  
-  # Language selector
-  alternate:
-    - name: Nederlands
-      link: /nl/
-      lang: nl
-    - name: English
-      link: /en/
-      lang: en
-
-# Navigation structure
-nav:
-  - Home: index.md
-  - Deel 1 - Ontologische Architectuur: deel-1-ontologie.md
-  - Deel 2 - Implementatie Architectuur: deel-2-implementatie.md
-  - Deel 3 - Roadmap en Evaluatie: deel-3-roadmap.md
