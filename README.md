@@ -1,187 +1,118 @@
-# Information Architecture Framework - Documentation Site
+# Information Architecture Framework - Documentatie
 
-Comprehensive documentation for the Lelystad-Zuid Ring Road Information Architecture Framework, deployed via GitLab CI/CD to Azure Static Web Apps.
+Documentatie voor het Informatie Architectuur Framework van het Lelystad-Zuid Ringweg Project, gehost op Azure Static Web Apps.
 
-## 📋 Overview
+## 📋 Overzicht
 
-This repository contains the source files for the multilingual documentation site hosted at `https://iou-architectuur.open-regels.nl`.
+Deze repository bevat de bronbestanden voor de documentatiesite op `https://iou-architectuur.open-regels.nl`.
 
-**Languages**: Nederlands (NL) | English (EN)
+**Taal**: Nederlands
 
-**Technology Stack**:
-- **Static Site Generator**: MkDocs with Material Theme
-- **Source Format**: Markdown
-- **CI/CD**: GitLab CI/CD
+**Technische Stack**:
+- **Static Site Generator**: MkDocs met Material Theme
+- **Bronformaat**: Markdown
+- **CI/CD**: GitHub Actions
 - **Hosting**: Azure Static Web Apps
-- **Version Control**: GitLab CE (self-hosted)
+- **Versiebeheer**: GitLab CE (primair) + GitHub (deployment trigger)
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Vereisten
 
 - Python 3.11+
 - Git
-- Azure CLI (for initial setup)
-- Access to self-hosted GitLab at `git.open-regels.nl`
+- Azure CLI (alleen voor initiële setup)
+- Toegang tot GitLab CE op `git.open-regels.nl`
 
-### Local Development
+### Lokale Ontwikkeling
 
-1. **Clone the repository**:
+1. **Clone de repository**:
 ```bash
-git clone https://git.open-regels.nl/your-group/iou-architectuur.git
+git clone https://git.open-regels.nl/showcases/iou-architectuur.git
 cd iou-architectuur
 ```
 
-2. **Create virtual environment**:
+2. **Maak virtual environment aan**:
 ```bash
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 ```
 
-3. **Install dependencies**:
+3. **Installeer dependencies**:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. **Run local development server**:
+4. **Start lokale development server**:
 ```bash
 mkdocs serve
 ```
 
 5. **Open browser**: http://127.0.0.1:8000
 
-The site will auto-reload when you make changes to the Markdown files.
+De site herlaadt automatisch wanneer je wijzigingen maakt in de Markdown bestanden.
 
-### Building the Site
+### Site Bouwen
 
 ```bash
 mkdocs build
 ```
 
-This creates a `site/` directory with static HTML files.
+Dit maakt een `site/` directory aan met statische HTML bestanden.
 
-## 📂 Repository Structure
+## 📂 Repository Structuur
 
 ```
 iou-architectuur/
-├── docs/                           # Documentation source files
-│   ├── index.md                    # Landing page (redirects to /nl/)
-│   ├── nl/                         # Dutch documentation
-│   │   ├── index.md
-│   │   ├── deel-1-ontologie.md
-│   │   ├── deel-2-implementatie.md
-│   │   ├── deel-3-roadmap.md
-│   │   └── assets/
-│   ├── en/                         # English documentation
-│   │   ├── index.md
-│   │   ├── part-1-ontology.md
-│   │   ├── part-2-implementation.md
-│   │   ├── part-3-roadmap.md
-│   │   └── assets/
-│   ├── stylesheets/
-│   │   └── extras.css
-│   └── javascripts/                # Custom JavaScript
-├── mkdocs.yml                      # MkDocs configuration
-├── .gitlab-ci.yml                  # CI/CD pipeline
+├── docs/                           # Documentatie bronbestanden
+│   ├── index.md                    # Homepage
+│   ├── deel-1-ontologie.md         # Deel 1: Ontologische Architectuur
+│   ├── deel-2-implementatie.md     # Deel 2: Implementatie Architectuur
+│   ├── deel-3-roadmap.md           # Deel 3: Roadmap en Evaluatie
+│   └── stylesheets/
+│       └── extra.css               # NL Design System styling
+├── mkdocs.yml                      # MkDocs configuratie
+├── .github/workflows/
+│   └── azure-static-web-apps.yml   # GitHub Actions workflow
 ├── requirements.txt                # Python dependencies
-├── staticwebapp.config.json        # Azure SWA configuration
-├── setup-azure.sh                  # Azure setup script
-└── README.md                       # This file
+├── staticwebapp.config.json        # Azure SWA configuratie
+├── .gitignore                      # Git ignore regels
+└── README.md                       # Dit bestand
 ```
-
-## 🔧 Initial Azure Setup
-
-### Step 1: Run Setup Script
-
-```bash
-chmod +x setup-azure.sh
-./setup-azure.sh
-```
-
-This script will:
-1. Create Azure Resource Group
-2. Create Static Web App
-3. Generate deployment token
-4. Configure custom domain
-5. Optionally enable Application Insights
-
-### Step 2: Configure GitLab CI/CD Variables
-
-1. Go to your GitLab project: `https://git.open-regels.nl/your-group/iou-architectuur`
-2. Navigate to **Settings > CI/CD > Variables**
-3. Click **Add Variable**
-4. Add the deployment token:
-   - **Key**: `AZURE_STATIC_WEB_APPS_API_TOKEN`
-   - **Value**: [Token from setup script output]
-   - **Type**: Variable
-   - **Protected**: ✓ Yes
-   - **Masked**: ✓ Yes
-   - **Environment scope**: All
-
-### Step 3: Configure DNS
-
-Add these records to your DNS provider (where `open-regels.nl` is hosted):
-
-**CNAME Record**:
-```
-Type: CNAME
-Name: iou-architectuur
-Value: [your-app].azurestaticapps.net
-TTL: 3600
-```
-
-**TXT Record** (for domain validation):
-```
-Type: TXT
-Name: _dnsauth.iou-architectuur
-Value: [validation-token-from-azure]
-TTL: 3600
-```
-
-To get the validation token:
-```bash
-az staticwebapp hostname show \
-  --name iou-architectuur \
-  --resource-group rg-iou-architectuur \
-  --hostname iou-architectuur.open-regels.nl
-```
-
-### Step 4: Validate Custom Domain
-
-1. Wait 5-10 minutes for DNS propagation
-2. Go to Azure Portal: [Static Web Apps](https://portal.azure.com)
-3. Select your app: `iou-architectuur`
-4. Go to **Custom domains**
-5. Click **Validate** next to `iou-architectuur.open-regels.nl`
-6. Wait for SSL certificate provisioning (automatic via Let's Encrypt)
 
 ## 🔄 Deployment Workflow
 
-### Automatic Deployment
+### Automatische Deployment
 
-Every push to the `main` branch automatically triggers deployment:
+Elke push naar de `main` branch triggert automatisch deployment:
 
 ```bash
 git add .
-git commit -m "Update: description of changes"
-git push origin main
+git commit -m "Update: beschrijving van wijzigingen"
+git push origin main   # GitLab (primaire bron)
+git push github main   # GitHub (triggert Azure deployment)
 ```
 
-**Pipeline stages**:
-1. **Build**: MkDocs builds static site from Markdown
-2. **Deploy**: Site uploaded to Azure Static Web Apps
+**Of push naar beide tegelijk**:
+```bash
+git push --all
+```
 
-**Deployment time**: ~2-3 minutes
+**Pipeline stappen**:
+1. **Build**: MkDocs bouwt statische site vanuit Markdown
+2. **Deploy**: Site wordt geüpload naar Azure Static Web Apps
 
-### Manual Deployment
+**Deployment tijd**: ~2-3 minuten
 
-To deploy a specific branch manually:
+### Handmatige Deployment
+
+Indien nodig kun je handmatig deployen:
 
 ```bash
-# Build locally
+# Bouw lokaal
 mkdocs build
 
-# Deploy using Azure CLI
+# Deploy met Azure CLI
 az staticwebapp upload \
   --name iou-architectuur \
   --resource-group rg-iou-architectuur \
@@ -189,48 +120,41 @@ az staticwebapp upload \
   --token $AZURE_STATIC_WEB_APPS_API_TOKEN
 ```
 
-### Preview Deployments
+## ✍️ Content Aanpassen
 
-Merge requests can have preview deployments:
+### Nieuwe Pagina's Toevoegen
 
-1. Create merge request in GitLab
-2. Go to pipeline
-3. Manually trigger `deploy:preview` job
-4. Access at: `https://preview-[MR-ID].iou-architectuur.open-regels.nl`
-
-## ✍️ Content Authoring
-
-### Adding New Pages
-
-1. Create Markdown file in appropriate language directory:
+1. Maak Markdown bestand aan in `docs/`:
 ```bash
-docs/nl/new-page.md
-docs/en/new-page.md
+touch docs/nieuwe-pagina.md
 ```
 
-2. Add to navigation in `mkdocs.yml`:
+2. Voeg toe aan navigatie in `mkdocs.yml`:
 ```yaml
 nav:
-  - New Page: nl/new-page.md
+  - Home: index.md
+  - Nieuwe Pagina: nieuwe-pagina.md
+  - Deel 1: deel-1-ontologie.md
+  # etc.
 ```
 
-3. Commit and push
+3. Commit en push
 
 ### Markdown Features
 
-**Admonitions** (callout boxes):
+**Admonitions** (waarschuwingsblokken):
 ```markdown
-!!! note "Title"
-    Content here
+!!! note "Titel"
+    Inhoud hier
 
 !!! warning
-    Warning content
+    Waarschuwing inhoud
 
 !!! success
-    Success message
+    Succes bericht
 ```
 
-**Code blocks** with syntax highlighting:
+**Code blocks** met syntax highlighting:
 ````markdown
 ```turtle
 @prefix flvl: <https://data.flevoland.nl/def/> .
@@ -239,21 +163,21 @@ flvl:LelystadProject a flvl:InfrastructureProject .
 ```
 ````
 
-**Tables**:
+**Tabellen**:
 ```markdown
-| Column 1 | Column 2 |
-|----------|----------|
-| Value 1  | Value 2  |
+| Kolom 1 | Kolom 2 |
+|---------|---------|
+| Waarde 1| Waarde 2|
 ```
 
 **Cross-references**:
 ```markdown
-See [Part 1](deel-1-ontologie.md#section-name)
+Zie [Deel 1](deel-1-ontologie.md#sectie-naam)
 ```
 
-### Adding RDF Examples
+### RDF Voorbeelden Toevoegen
 
-Use the `turtle` language identifier for syntax highlighting:
+Gebruik de `turtle` taal identifier voor syntax highlighting:
 
 ````markdown
 ```turtle
@@ -262,195 +186,228 @@ Use the `turtle` language identifier for syntax highlighting:
 
 flvl-id:LelystadRingwegProject 
     a flvl-sp:InfrastructureProject ;
-    dcterms:title "Lelystad-Zuid Ring Road Project"@en .
+    dcterms:title "Lelystad-Zuid Ringweg Project"@nl .
 ```
 ````
 
-### Multilingual Content
+## 🎨 Styling Aanpassen
 
-Both Dutch and English versions must be maintained:
+Custom CSS staat in `docs/stylesheets/extra.css`.
 
-```
-docs/
-├── nl/
-│   └── pagina.md          # Dutch version
-└── en/
-    └── page.md            # English version (same content, translated)
-```
+Kleuren volgen NL Design System:
+- Primary: `#154273` (Rijksoverheid blauw)
+- Accent: `#e17000` (Oranje)
+- Status kleuren voor compliance states
 
-The i18n plugin handles language switching automatically.
+### Theme Aanpassingen
 
-## 🎨 Customization
-
-### Styling
-
-Custom CSS is in `docs/overrides/stylesheets/extra.css`.
-
-Colors match NL Design System:
-- Primary: `#154273` (Rijksoverheid blue)
-- Accent: `#e17000` (Orange)
-- Status colors for compliance states
-
-### Theme Overrides
-
-Custom HTML templates go in `docs/overrides/`.
-
-Example: Custom footer in `docs/overrides/main.html`:
-```html
-{% extends "base.html" %}
-
-{% block footer %}
-  <!-- Your custom footer -->
-{% endblock %}
-```
+Voor geavanceerde aanpassingen, zie [MkDocs Material documentatie](https://squidfunk.github.io/mkdocs-material/).
 
 ## 📊 Monitoring
 
-### Application Insights
+### GitHub Actions
 
-If enabled during setup, view metrics at:
-https://portal.azure.com → Application Insights → `iou-architectuur-insights`
+Bekijk deployment status:
+`https://github.com/YOUR-USERNAME/iou-architectuur/actions`
 
-**Metrics available**:
+**Beschikbare metrics**:
+- Build tijd
+- Deployment status
+- Foutmeldingen
+
+### Azure Portal
+
+Bekijk hosting metrics:
+`https://portal.azure.com` → Static Web Apps → `iou-architectuur`
+
+**Beschikbare metrics**:
 - Page views
-- User sessions
-- Performance
-- Failures
+- Bandwidth gebruik
+- Response times
 
-### Build Logs
-
-View CI/CD pipeline logs in GitLab:
-`https://git.open-regels.nl/your-group/iou-architectuur/-/pipelines`
-
-## 🔒 Security
+## 🔒 Beveiliging
 
 ### HTTPS
 
-- Automatic SSL certificate via Let's Encrypt
-- Certificate renewal handled by Azure
-- Enforced HTTPS redirects
+- Automatisch SSL certificaat via Let's Encrypt
+- Certificaat vernieuwing door Azure
+- Geforceerde HTTPS redirects
 
 ### Content Security Policy
 
-Configured in `staticwebapp.config.json`:
-- Restricts script sources
-- Prevents XSS attacks
-- Limits external resources
+Geconfigureerd in `staticwebapp.config.json`:
+- Beperkt script bronnen
+- Voorkomt XSS aanvallen
+- Limiteert externe resources
 
 ### Access Control
 
-For restricted content (future):
-```json
-{
-  "routes": [
-    {
-      "route": "/internal/*",
-      "allowedRoles": ["authenticated"]
-    }
-  ]
-}
-```
+Momenteel publiek toegankelijk. Voor beperkte toegang kan authenticatie worden toegevoegd via `staticwebapp.config.json`.
 
 ## 🐛 Troubleshooting
 
-### Build Fails
+### Build Faalt
 
-**Check Python version**:
+**Controleer Python versie**:
 ```bash
-python --version  # Should be 3.11+
+python --version  # Moet 3.11+ zijn
 ```
 
-**Reinstall dependencies**:
+**Herinstalleer dependencies**:
 ```bash
 pip install --upgrade -r requirements.txt
 ```
 
-**Check MkDocs syntax**:
+**Controleer MkDocs syntax**:
 ```bash
 mkdocs build --strict
 ```
 
-### Deployment Fails
+### Deployment Faalt
 
-**Verify GitLab CI/CD variable**:
-- Variable name exactly: `AZURE_STATIC_WEB_APPS_API_TOKEN`
-- No extra spaces
-- Masked and Protected enabled
+**Verifieer GitHub Secret**:
+- Variabele naam exact: `AZURE_STATIC_WEB_APPS_API_TOKEN`
+- Geen extra spaties
+- Protected en Masked enabled
 
-**Check pipeline logs**:
-Go to GitLab → CI/CD → Pipelines → Latest run → View logs
+**Controleer pipeline logs**:
+GitHub → Actions → Laatste run → Bekijk logs
 
-### Custom Domain Not Working
+### Custom Domain Werkt Niet
 
-**Verify DNS records**:
+**Verifieer DNS records**:
 ```bash
 nslookup iou-architectuur.open-regels.nl
 dig iou-architectuur.open-regels.nl CNAME
 ```
 
-**Check Azure validation**:
+**Controleer Azure validatie**:
 Azure Portal → Static Web App → Custom domains → Status
 
-**Wait for propagation**: DNS changes can take up to 24 hours
+**Wacht op propagatie**: DNS wijzigingen kunnen tot 24 uur duren
 
-### Site Shows 404
+### Site Toont Oude Content
 
-**Check route configuration** in `staticwebapp.config.json`
+**Controleer cache**:
+- Hard refresh browser: `Ctrl+Shift+R` (of `Cmd+Shift+R` op Mac)
+- Clear browser cache
+- Test in incognito/privé modus
 
-**Verify build output**:
+**Verifieer deployment**:
 ```bash
-mkdocs build
-ls -la site/
+# Controleer laatste commit
+git log --oneline -1
+
+# Check GitHub Actions status
 ```
 
-Should contain `index.html` and language directories.
+## 💰 Kosten
 
-## 💰 Cost Estimate
-
-### Free Tier (Current)
-- **Monthly cost**: €0.00
+### Free Tier (Huidige Setup)
+- **Maandelijkse kosten**: €0.00
 - 100 GB bandwidth
 - 0.5 GB storage
-- Free SSL certificate
+- Gratis SSL certificaat
 - Unlimited static content
 
-### Standard Tier (Optional Upgrade)
-- **Monthly cost**: ~€8.00
-- 100 GB bandwidth (then €0.15/GB)
-- 0.5 GB storage (then €0.15/GB)
-- Custom authentication
-- SLA guarantee
-
-**Expected usage** (documentation site):
-- Bandwidth: < 10 GB/month
+### Verwacht Gebruik
+- Bandwidth: < 10 GB/maand
 - Storage: < 100 MB
-- **Recommendation**: Stay on Free tier
+- **Aanbeveling**: Blijf op Free tier
 
 ## 📞 Support
 
-### For Framework Content Questions
-- **Organization**: Provincie Flevoland
-- **Department**: Infrastructure & Environment
-- **Project**: Lelystad-Zuid Ring Road
+### Voor Framework Inhoud Vragen
+- **Organisatie**: Provincie Flevoland
+- **Afdeling**: Infrastructuur & Omgeving
+- **Project**: Lelystad-Zuid Ringweg
 
-### For Technical/Deployment Issues
-- **GitLab**: https://git.open-regels.nl/your-group/iou-architectuur/-/issues
+### Voor Technische/Deployment Issues
+- **GitLab**: https://git.open-regels.nl/showcases/iou-architectuur/-/issues
 - **Azure Docs**: https://learn.microsoft.com/azure/static-web-apps/
 - **MkDocs Docs**: https://www.mkdocs.org/
 
 ## 📚 Resources
 
-- [MkDocs Material Documentation](https://squidfunk.github.io/mkdocs-material/)
-- [Azure Static Web Apps Documentation](https://learn.microsoft.com/azure/static-web-apps/)
-- [GitLab CI/CD Documentation](https://docs.gitlab.com/ee/ci/)
-- [Markdown Guide](https://www.markdownguide.org/)
+- [MkDocs Material Documentatie](https://squidfunk.github.io/mkdocs-material/)
+- [Azure Static Web Apps Documentatie](https://learn.microsoft.com/azure/static-web-apps/)
+- [GitHub Actions Documentatie](https://docs.github.com/actions)
+- [Markdown Gids](https://www.markdownguide.org/)
 
-## 📄 License
+## 🔧 Ontwikkelaar Workflow
 
-This documentation is proprietary to Provincie Flevoland.
+### Dagelijkse Workflow
+
+```bash
+# Activeer virtual environment
+source venv/bin/activate
+
+# Start development server
+mkdocs serve
+
+# Maak wijzigingen in docs/...
+
+# Test lokaal op http://127.0.0.1:8000
+
+# Commit en deploy
+git add .
+git commit -m "Update: beschrijving"
+git push --all
+
+# Deactiveer venv wanneer klaar
+deactivate
+```
+
+### Virtual Environment Beheer
+
+```bash
+# Activeren
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+
+# Deactiveren
+deactivate
+
+# Status checken
+echo $VIRTUAL_ENV  # Laat venv path zien als actief
+```
+
+### Git Remote Beheer
+
+```bash
+# Bekijk remotes
+git remote -v
+
+# Push naar specifieke remote
+git push origin main   # GitLab
+git push github main   # GitHub
+
+# Push naar beide
+git push --all
+```
+
+## 📄 Licentie
+
+Deze documentatie is eigendom van Provincie Flevoland.
+
+## 🎯 Project Status
+
+**Versie**: 1.0  
+**Status**: ✅ Productie  
+**Live URL**: https://iou-architectuur.open-regels.nl  
+**Laatste Update**: November 2025
 
 ---
 
-**Version**: 1.0  
-**Last Updated**: November 2025  
-**Maintained by**: Digital Infrastructure Team
+**Framework Componenten**:
+- Deel 1: Ontologische Architectuur (Secties 1-3)
+- Deel 2: Implementatie Architectuur (Secties 4-7)
+- Deel 3: Roadmap en Evaluatie (Secties 8-10)
+
+**Demonstrator**: https://iou.open-regels.nl
+
+**Technische Standaarden**:
+- MIM (Metamodel voor Informatiemodellering)
+- NL-SBB (SKOS-gebaseerde begrippenbeschrijving)
+- CPSV-AP (EU Public Service Vocabulary)
+- DSO/RTR (Digitaal Stelsel Omgevingswet)
