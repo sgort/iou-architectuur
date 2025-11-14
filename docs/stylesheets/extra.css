@@ -237,3 +237,47 @@ button:focus {
 .skip-link:focus {
   top: 0;
 }
+
+/* Image layout utilities */
+.image-row {
+  display: flex;
+  gap: 20px;
+  margin: 20px 0;
+  align-items: flex-start;
+}
+
+.image-row > * {
+  flex: 1;
+}
+
+.image-row img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.image-row figcaption {
+  text-align: center;
+  font-style: italic;
+  margin-top: 8px;
+  font-size: 0.9em;
+}
+
+/* Three columns */
+.image-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .image-row {
+    flex-direction: column;
+  }
+  
+  .image-row-3 {
+    grid-template-columns: 1fr;
+  }
+}

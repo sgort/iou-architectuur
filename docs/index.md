@@ -1,7 +1,20 @@
 # Informatie Architectuur Framework
 ## Lelystad-Zuid Ringweg Project
 
-Welkom bij de documentatie van het Informatie Architectuur Framework voor het Lelystad-Zuid Ringweg Project.
+De statische demonstrator [https://iou.open-regels.nl/](https://iou.open-regels.nl/) visualiseert de voorgestelde informatiearchitectuur voor het Lelystad-Zuid Ringweg Project. De getoonde data is fictief, dient ter illustratie én is work in progress.
+
+<div class="image-row">
+  <figure>
+    <img src="assets/screenshots/screenshot1.png" alt="Compliance Dashboard">
+    <figcaption>Compliance Dashboard</figcaption>
+  </figure>
+  <figure>
+    <img src="assets/screenshots/screenshot2.png" alt="Jurisdictionele Coördinatie">
+    <figcaption>Jurisdictionele Coördinatie</figcaption>
+  </figure>
+</div>
+
+Deze site bevat de documentatie van het Informatie Architectuur Framework voor dit Project.
 
 ## Over dit Framework
 
