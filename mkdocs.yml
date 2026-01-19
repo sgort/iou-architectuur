@@ -1,8 +1,8 @@
-site_name: Informatie Architectuur Framework
+site_name: IOU Architecture Documentation
 site_url: https://iou-architectuur.open-regels.nl
 site_description: >-
-  Uitgebreid Informatie Architectuur Framework voor het Lelystad-Zuid Ringweg Project
-  met gebruik van semantische webtechnologieën en Nederlandse/EU-standaarden (MIM, NL-SBB, CPSV-AP).
+  Information Architecture Framework for the Lelystad-Zuid Ringweg Project,
+  integrating CPSV Editor and Linked Data Explorer within the RONL ecosystem.
 
 # Repository
 repo_url: https://git.open-regels.nl/showcases/iou-architectuur
@@ -10,12 +10,12 @@ repo_name: GitLab
 edit_uri: -/edit/main/docs/
 
 # Copyright
-copyright: Copyright &copy; 2025 Provincie Flevoland
+copyright: Copyright &copy; 2025 Provincie Flevoland & RONL Initiative
 
 # Theme configuration
 theme:
   name: material
-  language: nl
+  language: en  # Default language
   
   # Colors matching NL Design System
   palette:
@@ -24,13 +24,13 @@ theme:
       accent: orange
       toggle:
         icon: material/brightness-7
-        name: Schakel naar donkere modus
+        name: Switch to dark mode
     - scheme: slate
       primary: blue
       accent: orange
       toggle:
         icon: material/brightness-4
-        name: Schakel naar lichte modus
+        name: Switch to light mode
   
   # Features
   features:
@@ -42,6 +42,7 @@ theme:
     - navigation.path
     - navigation.top
     - navigation.footer
+    - navigation.indexes
     - toc.follow
     - toc.integrate
     - search.suggest
@@ -50,23 +51,89 @@ theme:
     - content.code.copy
     - content.code.annotate
     - content.tabs.link
+    - content.action.edit
+    - content.action.view
+
+  # Custom styling
+  icon:
+    repo: fontawesome/brands/gitlab
+    edit: material/pencil
+    view: material/eye
 
 # Plugins
 plugins:
   - search:
-      lang: nl
+      lang:
+        - en
+        - nl
+  
+  - i18n:
+      docs_structure: folder
+      fallback_to_default: true
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: en
+          name: English
+          build: true
+          default: true
+        - locale: nl
+          name: Nederlands
+          build: true
   
   - git-revision-date-localized:
       enable_creation_date: true
       type: timeago
-      locale: nl
 
-# Navigation
+# Navigation structure
 nav:
   - Home: index.md
-  - Deel 1 - Ontologische Architectuur: deel-1-ontologie.md
-  - Deel 2 - Implementatie Architectuur: deel-2-implementatie.md
-  - Deel 3 - Roadmap en Evaluatie: deel-3-roadmap.md
+  
+  - IOU Architecture:
+    - Framework Overview: iou-architecture/index.md
+    - Ontological Architecture: iou-architecture/ontological-architecture.md
+    - Implementation Architecture: iou-architecture/implementation-architecture.md
+    - Roadmap & Evaluation: iou-architecture/roadmap-evaluation.md
+  
+  - CPSV Editor:
+    - Introduction: cpsv-editor/index.md
+    - Features: cpsv-editor/features.md
+    - User Guide:
+      - Getting Started: cpsv-editor/user-guide/getting-started.md
+      - Service Definition: cpsv-editor/user-guide/service-definition.md
+      - Rules & Parameters: cpsv-editor/user-guide/rules-parameters.md
+      - DMN Integration: cpsv-editor/user-guide/dmn-integration.md
+      - Import & Export: cpsv-editor/user-guide/import-export.md
+    - Technical Documentation:
+      - Architecture: cpsv-editor/technical/architecture.md
+      - Standards Compliance: cpsv-editor/technical/standards-compliance.md
+      - Field Mapping: cpsv-editor/technical/field-mapping.md
+      - Development: cpsv-editor/technical/development.md
+  
+  - Linked Data Explorer:
+    - Introduction: linked-data-explorer/index.md
+    - Features: linked-data-explorer/features.md
+    - User Guide:
+      - Getting Started: linked-data-explorer/user-guide/getting-started.md
+      - SPARQL Queries: linked-data-explorer/user-guide/sparql-queries.md
+      - DMN Orchestration: linked-data-explorer/user-guide/dmn-orchestration.md
+      - Chain Building: linked-data-explorer/user-guide/chain-building.md
+    - Technical Documentation:
+      - Architecture: linked-data-explorer/technical/architecture.md
+      - API Reference: linked-data-explorer/technical/api-reference.md
+      - Development: linked-data-explorer/technical/development.md
+  
+  - Shared Backend:
+    - Overview: shared-backend/index.md
+    - API Documentation: shared-backend/api-documentation.md
+    - TriplyDB Integration: shared-backend/triplydb-integration.md
+    - Operaton Integration: shared-backend/operaton-integration.md
+    - Deployment: shared-backend/deployment.md
+  
+  - Contributing:
+    - How to Contribute: contributing/index.md
+    - Documentation Guide: contributing/documentation-guide.md
+    - Code Standards: contributing/code-standards.md
 
 # Markdown extensions
 markdown_extensions:
@@ -97,7 +164,9 @@ markdown_extensions:
   - pymdownx.keys
   - pymdownx.mark
   - pymdownx.smartsymbols
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -119,3 +188,19 @@ extra:
     - icon: fontawesome/brands/gitlab
       link: https://git.open-regels.nl/showcases/iou-architectuur
       name: GitLab Repository
+    - icon: fontawesome/solid/globe
+      link: https://regels.overheid.nl/
+      name: Regels Overheid
+  
+  # Alternate languages
+  alternate:
+    - name: English
+      link: /en/
+      lang: en
+    - name: Nederlands
+      link: /nl/
+      lang: nl
+
+# Watch additional directories for changes
+watch:
+  - docs/includes
