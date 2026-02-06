@@ -11,7 +11,7 @@ Het Informatie Architectuur Framework voor het Lelystad-Zuid Ringweg Project int
 ### 🏗️ IOU Architectuur Framework
 De kern informatiearchitectuur die ontologieën, implementatiepatronen en governance definieert voor infrastructuurprojecten.
 
-[Verken Framework →](iou-architectuur/index.md){ .md-button .md-button--primary }
+[Verken Framework →](iou-architecture/index.md){ .md-button .md-button--primary }
 
 ### ✏️ CPSV Editor
 React-applicatie voor het maken van CPSV-AP 3.2.0 conforme RDF/Turtle bestanden voor Nederlandse overheidsdiensten.
@@ -26,7 +26,7 @@ Webapplicatie voor het visualiseren en bevragen van SPARQL endpoints met DMN ork
 ### 🔗 Gedeelde Backend
 Node.js/Express API die TriplyDB integratie en Operaton DMN executie biedt voor beide applicaties.
 
-[Bekijk Backend Docs →](gedeelde-backend/index.md){ .md-button }
+[Bekijk Backend Docs →](shared-backend/index.md){ .md-button }
 
 ## Architectuur Overzicht
 
