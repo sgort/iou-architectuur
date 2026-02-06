@@ -89,11 +89,30 @@ plugins:
 nav:
   - Home: index.md
   
-  - IOU Architecture:
-    - Framework Overview: iou-architecture/index.md
-    - Ontological Architecture: iou-architecture/ontological-architecture.md
-    - Implementation Architecture: iou-architecture/implementation-architecture.md
-    - Roadmap & Evaluation: iou-architecture/roadmap-evaluation.md
+  - RONL Business API:
+    - Overview: ronl-business-api/index.md
+    - Architecture:
+      - Architecture Overview: ronl-business-api/architecture/overview.md
+      - Deployment Architecture: ronl-business-api/architecture/deployment.md
+      - Security Architecture: ronl-business-api/architecture/security.md
+    - Deployment:
+      - VM Overview: ronl-business-api/deployment/vm-overview.md
+      - Keycloak Setup: ronl-business-api/deployment/keycloak.md
+      - Caddy Configuration: ronl-business-api/deployment/caddy.md
+      - Environment Variables: ronl-business-api/deployment/environment-variables.md
+      - Deployment Overview: ronl-business-api/deployment/overview.md
+      - Backend Deployment: ronl-business-api/deployment/backend.md
+      - Frontend Deployment: ronl-business-api/deployment/frontend.md
+    - Development:
+      - Development Workflow: ronl-business-api/development/workflow.md
+      - Quick Reference: ronl-business-api/development/quick-reference.md
+      - Troubleshooting: ronl-business-api/development/troubleshooting.md
+      - Backend Development: ronl-business-api/development/backend.md
+      - Frontend Development: ronl-business-api/development/frontend.md
+    - DigiD Integration:
+      - Login Mockup: ronl-business-api/digid-mockup/digid-keycloak-login-mockup.md
+      - Sequence Diagram: ronl-business-api/digid-mockup/digid-keycloak-sequence-diagram.md
+      - Keycloak Mapping: ronl-business-api/digid-mockup/keycloak-digid-idp-mapping.md
   
   - CPSV Editor:
     - Introduction: cpsv-editor/index.md

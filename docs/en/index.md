@@ -4,44 +4,116 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 ## What is IOU Architecture?
 
-The Information Architecture Framework for the Lelystad-Zuid Ringweg Project integrates semantic web technologies, decision models, and Dutch government standards.
+The Information Architecture Framework for the Lelystad-Zuid Ringweg Project integrates semantic web technologies, decision models, and Dutch government standards into a unified system for managing regulatory compliance and spatial planning.
 
 ## Ecosystem Components
 
-### 🏗️ IOU Architecture Framework
-The core information architecture defining ontologies, implementation patterns, and governance.
+### 🏗️ RONL Business API
+The core business API layer providing secure authentication and process orchestration for Dutch government digital services.
 
-[Explore Framework →](iou-architecture/index.md){ .md-button .md-button--primary }
+**Key Features**:
+- OpenID Connect (OIDC) authentication with DigiD/eIDAS
+- Multi-tenant architecture (per municipality)
+- Integration with Keycloak IAM and Operaton BPMN
+- Complete audit logging for compliance
+
+[Explore Documentation →](ronl-business-api/index.md){ .md-button .md-button--primary }
 
 ### ✏️ CPSV Editor
-React-based application for creating CPSV-AP 3.2.0 compliant RDF/Turtle files.
+React-based application for creating CPSV-AP 3.2.0 compliant RDF/Turtle files for Dutch government services.
 
 **Live App**: [cpsv.open-regels.nl](https://cpsv.open-regels.nl)
 
 [View Documentation →](cpsv-editor/index.md){ .md-button }
 
 ### 🔍 Linked Data Explorer
-Web application for SPARQL queries and DMN orchestration.
+Web application for SPARQL queries and DMN orchestration with TriplyDB integration.
 
 **Live App**: [linkeddata.open-regels.nl](https://linkeddata.open-regels.nl)
 
 [View Documentation →](linked-data-explorer/index.md){ .md-button }
 
 ### 🔗 Shared Backend
-Node.js/Express API providing TriplyDB and Operaton integration.
+Node.js/Express API providing TriplyDB and Operaton integration for both applications.
 
 [View Documentation →](shared-backend/index.md){ .md-button }
+
+## Architecture Overview
+
+```mermaid
+graph TB
+    subgraph "IOU Architecture Ecosystem"
+        A[Municipality Portal<br/>React] -->|OIDC/JWT| B[Keycloak IAM]
+        B -->|Validated Token| C[Business API<br/>Node.js]
+        C -->|REST| D[Operaton BPMN<br/>Business Rules]
+        
+        E[CPSV Editor<br/>React] -->|TTL| F[TriplyDB<br/>Knowledge Graph]
+        E -->|DMN Files| D
+        
+        F -->|SPARQL| G[Orchestration Service<br/>Node.js]
+        G -->|Deploy BPMN+DMN| D
+        
+        H[Linked Data Explorer<br/>React] -->|API Calls| G
+        H -->|Direct SPARQL| F
+    end
+```
 
 ## Quick Links
 
 | Resource | Link |
 |----------|------|
 | **CPSV Editor** | [cpsv.open-regels.nl](https://cpsv.open-regels.nl) |
-| **Explorer** | [linkeddata.open-regels.nl](https://linkeddata.open-regels.nl) |
+| **Linked Data Explorer** | [linkeddata.open-regels.nl](https://linkeddata.open-regels.nl) |
 | **Backend API** | [backend.linkeddata.open-regels.nl](https://backend.linkeddata.open-regels.nl) |
-| **Demonstrator** | [iou.open-regels.nl](https://iou.open-regels.nl) |
+| **Operaton** | [operaton.open-regels.nl](https://operaton.open-regels.nl) |
+| **Keycloak IAM** | [keycloak.open-regels.nl](https://keycloak.open-regels.nl) |
+
+## Documentation Sections
+
+### For Developers
+- [Architecture Overview](ronl-business-api/architecture/overview.md) - Understand the Business API Layer pattern
+- [Development Workflow](ronl-business-api/development/workflow.md) - Get started with local development
+- [Quick Reference](ronl-business-api/development/quick-reference.md) - Common commands and credentials
+
+### For DevOps
+- [Deployment Architecture](ronl-business-api/architecture/deployment.md) - VM + Azure hybrid deployment
+- [Keycloak Setup](ronl-business-api/deployment/keycloak.md) - IAM deployment guide
+- [Environment Variables](ronl-business-api/deployment/environment-variables.md) - Configuration reference
+
+### For Integrators
+- [Security Architecture](ronl-business-api/architecture/security.md) - Authentication flows and compliance
+- [DigiD Integration](ronl-business-api/digid-mockup/digid-keycloak-login-mockup.md) - DigiD/eIDAS mockup flows
+
+## Technology Stack
+
+The IOU Architecture ecosystem is built entirely on **open source technologies**:
+
+| Component | Technology | License |
+|-----------|-----------|---------|
+| **IAM** | Keycloak | Apache 2.0 |
+| **BPMN Engine** | Operaton | Apache 2.0 |
+| **Backend** | Node.js + Express | MIT |
+| **Frontend** | React | MIT |
+| **Database** | PostgreSQL | PostgreSQL License |
+| **Cache** | Redis | BSD 3-Clause |
+| **Reverse Proxy** | Caddy | Apache 2.0 |
+| **Knowledge Graph** | TriplyDB | - |
+
+## Standards Compliance
+
+- **CPSV-AP 3.2.0** - EU Public Service Vocabulary
+- **CPRMV** - Core Public Rule Management Vocabulary
+- **RONL** - Dutch Rules Vocabulary
+- **BIO** - Baseline Informatiebeveiliging Overheid
+- **NEN 7510** - Healthcare information security
+- **AVG/GDPR** - Data protection
+
+## Contributing
+
+We welcome contributions! See the [Contributing Guide](contributing/index.md) for details.
 
 ---
 
-**Documentation Version**: 1.0  
-**Last Updated**: January 2026
+**Documentation Version**: 2.0  
+**Last Updated**: January 2026  
+**License**: EUPL v1.2
