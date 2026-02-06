@@ -36,7 +36,7 @@ Get started with local development:
 
 ## 📖 Additional Resources
 
-- **Main README**: [../README.md](../README.md)
+- **Main README**: <!-- [<!-- <!-- ../README.md - Repository file --> - Repository file -->](<!-- <!-- ../README.md - Repository file --> - Repository file -->) - Repository file -->
 - **Project Repository**: GitHub
 - **Operaton Documentation**: https://docs.operaton.org
 - **Keycloak Documentation**: https://www.keycloak.org/docs/23.0/

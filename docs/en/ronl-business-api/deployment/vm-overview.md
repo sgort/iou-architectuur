@@ -100,7 +100,7 @@ cd ronl-business-api
 
 ### 2. Deploy Keycloak ACC
 
-Follow: [keycloak/acc/README.md](keycloak/acc/README.md)
+Follow: [keycloak/acc/README.md](keycloak.md)
 
 ```bash
 # Copy files to VM
@@ -115,7 +115,7 @@ cd ~/keycloak/acc
 
 ### 3. Deploy Keycloak PROD
 
-Follow: [keycloak/prod/README.md](keycloak/prod/README.md)
+Follow: [keycloak/prod/README.md](keycloak.md)
 
 ```bash
 # Copy files to VM
@@ -130,7 +130,7 @@ cd ~/keycloak/prod
 
 ### 4. Configure Caddy
 
-Follow: [caddy/README.md](caddy/README.md)
+Follow: [caddy/README.md](caddy.md)
 
 Ensure Caddy has entries for:
 
@@ -328,9 +328,9 @@ docker exec keycloak-acc bash -c 'timeout 2 bash -c "</dev/tcp/keycloak-postgres
 
 For issues specific to:
 
-- **Keycloak ACC:** See [keycloak/acc/README.md](keycloak/acc/README.md)
-- **Keycloak PROD:** See [keycloak/prod/README.md](keycloak/prod/README.md)
-- **Caddy:** See [caddy/README.md](caddy/README.md)
+- **Keycloak ACC:** See [keycloak/acc/README.md](keycloak.md)
+- **Keycloak PROD:** See [keycloak/prod/README.md](keycloak.md)
+- **Caddy:** See [caddy/README.md](caddy.md)
 - **Operaton:** Check Operaton documentation
 
 ## Security Considerations

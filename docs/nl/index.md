@@ -4,7 +4,7 @@ Welkom bij de uitgebreide documentatie voor het IOU Architectuur Framework en he
 
 ## Wat is IOU Architectuur?
 
-Het Informatie Architectuur Framework voor het Lelystad-Zuid Ringweg Project integreert semantische webtechnologieën, beslismodellen en Nederlandse overheidsstandaarden tot een uniform systeem voor het beheren van regelgevende naleving en ruimtelijke ordening.
+Het Informatie Architectuur Framework voor IOU integreert semantische webtechnologieën, beslismodellen en Nederlandse overheidsstandaarden tot een uniform systeem voor het beheren van regelgevende naleving en ruimtelijke ordening.
 
 ## Ecosysteem Componenten
 

@@ -66,9 +66,9 @@ ronl-business-api/
 
 **Key Files**:
 
-- [`deployment/vm/keycloak/acc/docker-compose.yml`](../../deployment/vm/keycloak/acc/docker-compose.yml) - ACC Docker Compose
-- [`deployment/vm/keycloak/prod/docker-compose.yml`](../../deployment/vm/keycloak/prod/docker-compose.yml) - PROD Docker Compose
-- [`config/keycloak/ronl-realm.json`](../../config/keycloak/ronl-realm.json) - Realm with users, clients, roles
+- [`deployment/vm/keycloak/acc/docker-compose.yml`) (see repository: `deployment/vm/keycloak/acc/docker-compose.yml`) - ACC Docker Compose
+- [`deployment/vm/keycloak/prod/docker-compose.yml`) (see repository: `deployment/vm/keycloak/prod/docker-compose.yml`) - PROD Docker Compose
+- [`config/keycloak/ronl-realm.json`) (see repository: `config/keycloak/ronl-realm.json`) - Realm with users, clients, roles
 
 ## Deployment Steps
 
@@ -566,9 +566,9 @@ See [Backend Deployment](backend.md) for full backend setup.
 
 ## Additional Resources
 
-- **ACC Setup**: [`deployment/vm/keycloak/acc/README.md`](../../deployment/vm/keycloak/acc/README.md)
-- **PROD Setup**: [`deployment/vm/keycloak/prod/README.md`](../../deployment/vm/keycloak/prod/README.md)
-- **VM Deployment**: [`deployment/vm/README.md`](../../deployment/vm/README.md)
+- **ACC Setup**: [`deployment/vm/keycloak/acc/README.md`](keycloak.md)
+- **PROD Setup**: [`deployment/vm/keycloak/prod/README.md`](keycloak.md)
+- **VM Deployment**: [`deployment/vm/README.md`](vm-overview.md)
 
 ---
 
