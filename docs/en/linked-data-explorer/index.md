@@ -11,11 +11,13 @@
 [![Vite](https://img.shields.io/badge/Vite-6.2-646cff?logo=vite)](https://vitejs.dev/)
 [![Node.js](https://img.shields.io/badge/Node.js-22-339933?logo=node.js)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-4.18-000000?logo=express)](https://expressjs.com/)
-![License](https://img.shields.io/badge/License-EUPL-yellow.svg)
+![License](https://img.shields.io/badge/License-EUPL--1.2-yellow.svg)
 
 ---
 
-**Linked Data Explorer** is a web application for discovering, composing, and executing DMN decision model chains from Dutch government knowledge graphs. It is built as part of the **Regels Overheid Nederland (RONL)** initiative and connects directly to TriplyDB knowledge graphs and the Operaton DMN execution engine.
+## What is the Linked Data Explorer?
+
+The **Linked Data Explorer** is a web application for discovering, composing, and executing DMN decision model chains from Dutch government knowledge graphs. It is built as part of the **Regels Overheid Nederland (RONL)** initiative and connects directly to TriplyDB knowledge graphs and the Operaton DMN execution engine.
 
 ![Screenshot: Linked Data Explorer main UI showing the Chain Builder with a loaded DMN chain](../assets/screenshots/linked-data-explorer-main-ui.png)
 
@@ -41,7 +43,7 @@ The Linked Data Explorer is one of three components in the RONL ecosystem. Under
 
 ```mermaid
 graph TB
-    CPSV[CPSV Editor<br/>cpsv.open-regels.nl]
+    CPSV[CPSV Editor<br/>cpsv-editor.open-regels.nl]
     LDE[Linked Data Explorer<br/>linkeddata.open-regels.nl]
     BACKEND[Shared Backend<br/>backend.linkeddata.open-regels.nl]
     TRIPLY[TriplyDB<br/>Knowledge Graph]

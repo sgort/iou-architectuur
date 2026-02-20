@@ -4,7 +4,7 @@
 
 ## Prerequisites
 
-**To use the web application:** a modern browser (Chrome, Firefox, Edge, or Safari). No installation required — the editor runs entirely in the browser at [cpsv.open-regels.nl](https://cpsv.open-regels.nl).
+**To use the web application:** a modern browser (Chrome, Firefox, Edge, or Safari). No installation required — the editor runs entirely in the browser at [cpsv-editor.open-regels.nl](https://cpsv-editor.open-regels.nl).
 
 **To run the editor locally:**
 

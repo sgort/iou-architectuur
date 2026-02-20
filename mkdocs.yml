@@ -89,7 +89,7 @@ plugins:
 nav:
   - Home: index.md
   
-  - RONL Business API:
+  - ⚙️ RONL Business API:
     - Overview: ronl-business-api/index.md
     - Features:
       - Overview: ronl-business-api/features/overview.md
@@ -110,6 +110,7 @@ nav:
       - Shared Package: ronl-business-api/developer/shared-package.md
       - Testing: ronl-business-api/developer/testing.md
       - CI/CD: ronl-business-api/developer/cicd.md
+      - Troubleshooting: ronl-business-api/developer/troubleshooting.md
       - Deployment:
         - Overview: ronl-business-api/developer/deployment/overview.md
         - Keycloak (VM): ronl-business-api/developer/deployment/keycloak.md
@@ -126,7 +127,7 @@ nav:
       - Standards & Compliance: ronl-business-api/references/standards-compliance.md
       - Changelog: ronl-business-api/references/changelog.md
   
-  - CPSV Editor:
+  - ✏️ CPSV Editor:
     - Overview: cpsv-editor/index.md
     - Features:
       - Service, Organisation & Legal: cpsv-editor/features/service-organisation-legal.md
@@ -161,7 +162,7 @@ nav:
       - Semantic Mediation Architecture: cpsv-editor/reference/semantic-mediation-architecture.md
       - External Standards: cpsv-editor/reference/external-standards.md
   
-  - Linked Data Explorer:
+  - 🔍 Linked Data Explorer:
     - Overview: linked-data-explorer/index.md
     - Features:
         - SPARQL Query Editor: linked-data-explorer/features/sparql-query-editor.md

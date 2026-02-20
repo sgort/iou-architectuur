@@ -101,3 +101,72 @@
 |---|---|---|
 | `VITE_API_URL` | Yes | Business API base URL (e.g. `https://api.open-regels.nl/v1`) |
 | `VITE_KEYCLOAK_URL` | Yes | Keycloak base URL (e.g. `https://keycloak.open-regels.nl`) |
+
+## DNS records
+
+These CNAME records must exist in the `open-regels.nl` DNS zone before deploying:
+
+```
+# ACC
+acc.api       CNAME   ronl-business-api-acc.azurewebsites.net
+acc.mijn      CNAME   <acc-static-web-app>.azurestaticapps.net
+
+# PROD
+api           CNAME   ronl-business-api-prod.azurewebsites.net
+mijn          CNAME   <prod-static-web-app>.azurestaticapps.net
+```
+
+VM subdomains use A records pointing to the VM's public IP:
+
+```
+acc.keycloak  A   <VM_IP>
+keycloak      A   <VM_IP>
+operaton      A   <VM_IP>
+```
+
+## GitHub repository secrets
+
+These secrets must be configured in the GitHub repository before any workflow can deploy:
+
+| Secret name | Where to get it |
+|---|---|
+| `AZURE_WEBAPP_PUBLISH_PROFILE_ACC` | Azure Portal → App Service `ronl-business-api-acc` → Get publish profile |
+| `AZURE_WEBAPP_PUBLISH_PROFILE_PROD` | Azure Portal → App Service `ronl-business-api-prod` → Get publish profile |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN_ACC` | Azure Portal → Static Web App ACC → Manage deployment token |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN_PROD` | Azure Portal → Static Web App PROD → Manage deployment token |
+
+## Generating environment passwords
+
+Save and run this script locally to generate all secrets for an environment:
+
+```bash
+#!/bin/bash
+set -e
+
+ENV=${1:-acc}   # usage: ./setup-env.sh acc  OR  ./setup-env.sh prod
+
+POSTGRES_PASSWORD=$(openssl rand -base64 32)
+KEYCLOAK_PASSWORD=$(openssl rand -base64 32)
+
+mkdir -p ~/.ronl-secrets
+
+cat > ~/.ronl-secrets/${ENV}-passwords.txt << EOF
+# RONL ${ENV^^} Environment — Generated: $(date)
+
+PostgreSQL:
+  Username: pgadmin
+  Password: ${POSTGRES_PASSWORD}
+
+Keycloak Admin:
+  Username: admin
+  Password: ${KEYCLOAK_PASSWORD}
+
+Connection strings:
+  DATABASE_URL: postgresql://pgadmin:${POSTGRES_PASSWORD}@ronl-postgres-${ENV}.postgres.database.azure.com:5432/audit_logs?sslmode=require
+  Keycloak VM .env: KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_PASSWORD}
+EOF
+
+chmod 600 ~/.ronl-secrets/${ENV}-passwords.txt
+echo "Passwords saved to: ~/.ronl-secrets/${ENV}-passwords.txt"
+echo "Back this file up securely before proceeding."
+```

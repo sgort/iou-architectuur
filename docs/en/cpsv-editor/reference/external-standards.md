@@ -45,8 +45,8 @@
 
 | Environment | URL |
 |---|---|
-| CPSV Editor (production) | https://cpsv.open-regels.nl |
-| CPSV Editor (acceptance) | https://acc.cpsv.open-regels.nl |
+| CPSV Editor (production) | https://cpsv-editor.open-regels.nl |
+| CPSV Editor (acceptance) | https://acc.cpsv-editor.open-regels.nl |
 | Linked Data Explorer (production) | https://linkeddata.open-regels.nl |
 | Linked Data Explorer (acceptance) | https://acc.linkeddata.open-regels.nl |
 

@@ -19,18 +19,16 @@ Have ideas for better organization or additional content? Open an issue with the
 4. Test the build locally: `mkdocs serve`
 5. Submit a merge request
 
-[Read the Documentation Guide →](documentation-guide.md)
-
 ## Code Contributions
 
+### RONL Business API
+See [RONL Business API development guide](../ronl-business-api/developer/local-development.md)
+
 ### CPSV Editor
-See [CPSV Editor development guide](../cpsv-editor/technical/development.md)
+See [CPSV Editor development guide](../cpsv-editor/developer/local-development.md)
 
 ### Linked Data Explorer
-See [Linked Data Explorer development guide](../linked-data-explorer/technical/development.md)
-
-### Shared Backend
-See [Backend deployment guide](../shared-backend/deployment.md)
+See [Linked Data Explorer development guide](../linked-data-explorer/developer/local-development.md)
 
 ## Standards
 

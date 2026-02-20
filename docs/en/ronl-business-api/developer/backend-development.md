@@ -140,3 +140,100 @@ After modifying shared types, rebuild the package before the backend picks up th
 ```bash
 npm run build --workspace=@ronl/shared
 ```
+
+## Security implementation
+
+The following code patterns are used across the middleware stack. These are the actual implementations — not configuration values — for reference when modifying security behaviour.
+
+### JWT validation
+
+`auth/jwt.middleware.ts` validates every protected request:
+
+```typescript
+const authHeader = req.headers.authorization;
+const token = authHeader?.split(' ')[1];
+
+// Fetch JWKS from Keycloak (cached in Redis, TTL 300s)
+const jwks = await fetchJWKS(config.keycloakUrl, config.keycloakRealm);
+const decoded = jwt.verify(token, jwks);
+
+// Validate standard claims
+if (decoded.exp < Date.now() / 1000) {
+  throw new Error('Token expired');
+}
+if (decoded.aud !== config.jwtAudience) {
+  throw new Error('Invalid audience');
+}
+if (!decoded.iss.startsWith(config.keycloakUrl)) {
+  throw new Error('Invalid issuer');
+}
+
+// Attach to request for downstream handlers
+req.user = decoded;
+```
+
+### Rate limiting
+
+Two policies applied in `src/index.ts`:
+
+```typescript
+import rateLimit from 'express-rate-limit';
+
+// General API: 100 requests per 15 minutes per IP
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Too many requests from this IP',
+});
+
+// Auth endpoints: 5 requests per 15 minutes per IP
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: 'Too many login attempts',
+});
+
+app.use('/v1', apiLimiter);
+app.use('/v1/auth', authLimiter);
+```
+
+### CORS
+
+```typescript
+import cors from 'cors';
+
+const allowedOrigins = config.corsOrigin.map((o) => o.trim());
+
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) { callback(null, true); return; }  // allow server-to-server
+    if (allowedOrigins.includes(origin)) { callback(null, true); return; }
+    callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+```
+
+`CORS_ORIGIN` in `.env` is a comma-separated list. In production it is `https://mijn.open-regels.nl`. In ACC it is `https://acc.mijn.open-regels.nl`. In local development it is `http://localhost:5173`.
+
+### Secrets in production (Azure Key Vault)
+
+Azure App Settings are the standard secrets store (injected as environment variables). For an additional layer, the Key Vault SDK can be used:
+
+```typescript
+import { SecretClient } from '@azure/keyvault-secrets';
+import { DefaultAzureCredential } from '@azure/identity';
+
+const credential = new DefaultAzureCredential();
+const client = new SecretClient(process.env.KEY_VAULT_URL!, credential);
+
+const dbPassword = await client.getSecret('db-password');
+```
+
+The App Service managed identity must be granted `Key Vault Secrets User` on the vault.
+

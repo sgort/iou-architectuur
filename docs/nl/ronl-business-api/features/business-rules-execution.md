@@ -2,7 +2,7 @@
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
-    Raadpleeg de [Engelse versie](../../../../en/ronl-business-api/features/business-rules-execution.md) voor de huidige inhoud.
+    Raadpleeg de [Engelse versie](../../../en/ronl-business-api/features/business-rules-execution.md) voor de huidige inhoud.
 
 ---
 

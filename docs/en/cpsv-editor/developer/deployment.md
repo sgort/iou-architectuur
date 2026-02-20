@@ -6,8 +6,8 @@
 
 | Environment | URL | Branch |
 |---|---|---|
-| Production | https://cpsv.open-regels.nl | `main` |
-| Acceptance | https://acc.cpsv.open-regels.nl | `acc` |
+| Production | https://cpsv-editor.open-regels.nl | `main` |
+| Acceptance | https://acc.cpsv-editor.open-regels.nl | `acc` |
 
 All changes go to `acc` first. After acceptance testing, they are merged to `main` for production deployment.
 
@@ -25,8 +25,8 @@ npm ci  →  npm run build
        ↓
 Azure Static Web Apps deployment
        ↓
-https://cpsv.open-regels.nl  (main)
-https://acc.cpsv.open-regels.nl  (acc)
+https://cpsv-editor.open-regels.nl  (main)
+https://acc.cpsv-editor.open-regels.nl  (acc)
 ```
 
 The workflow triggers on every push to `main` and `acc`. No manual deployment steps are required.

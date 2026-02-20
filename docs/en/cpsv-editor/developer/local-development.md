@@ -117,5 +117,5 @@ git push origin acc
 # https://github.com/your-org/cpsv-editor/actions
 
 # 4. Verify the ACC deployment
-curl https://acc.cpsv.open-regels.nl
+curl https://acc.cpsv-editor.open-regels.nl
 ```

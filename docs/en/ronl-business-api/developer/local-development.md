@@ -171,4 +171,4 @@ In Keycloak Admin: same path as above → Add mapper → `User Realm Role` → S
 **CORS error in browser**  
 Verify `CORS_ORIGIN` in `packages/backend/.env` matches the frontend URL exactly (including port).
 
-For additional issues, see [Troubleshooting](../../references/troubleshooting.md).
+For additional issues, see [Troubleshooting](../developer/troubleshooting.md).

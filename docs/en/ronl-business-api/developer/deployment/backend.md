@@ -72,6 +72,55 @@ az webapp config appsettings set \
 
 The full variable reference is in [Environment Variables](../../references/environment-variables.md).
 
+Complete command for **ACC** (all 30+ variables in one call):
+
+```bash
+az webapp config appsettings set \
+  --name ronl-business-api-acc \
+  --resource-group rg-ronl-acc \
+  --settings \
+    NODE_ENV=production \
+    PORT=8080 \
+    HOST=0.0.0.0 \
+    CORS_ORIGIN="https://acc.mijn.open-regels.nl" \
+    KEYCLOAK_URL="https://acc.keycloak.open-regels.nl" \
+    KEYCLOAK_REALM="ronl" \
+    KEYCLOAK_CLIENT_ID="ronl-business-api" \
+    KEYCLOAK_CLIENT_SECRET="<YOUR_CLIENT_SECRET>" \
+    JWT_ISSUER="https://acc.keycloak.open-regels.nl/realms/ronl" \
+    JWT_AUDIENCE="ronl-business-api" \
+    TOKEN_CACHE_TTL="300" \
+    OPERATON_BASE_URL="https://operaton.open-regels.nl/engine-rest" \
+    OPERATON_TIMEOUT="30000" \
+    DATABASE_URL="postgresql://pgadmin:<PASSWORD>@ronl-postgres-acc.postgres.database.azure.com:5432/audit_logs?sslmode=require" \
+    DATABASE_POOL_MIN="2" \
+    DATABASE_POOL_MAX="10" \
+    REDIS_URL="redis://ronl-redis-acc.redis.cache.windows.net:6380?password=<PRIMARY_KEY>&ssl=true" \
+    REDIS_TTL="3600" \
+    RATE_LIMIT_WINDOW_MS="60000" \
+    RATE_LIMIT_MAX_REQUESTS="100" \
+    RATE_LIMIT_PER_TENANT="true" \
+    LOG_LEVEL="info" \
+    LOG_FORMAT="json" \
+    LOG_FILE_ENABLED="true" \
+    LOG_FILE_PATH="/home/site/wwwroot/logs" \
+    LOG_FILE_MAX_SIZE="10m" \
+    LOG_FILE_MAX_FILES="7" \
+    AUDIT_LOG_ENABLED="true" \
+    AUDIT_LOG_INCLUDE_IP="true" \
+    AUDIT_LOG_RETENTION_DAYS="2555" \
+    HELMET_ENABLED="true" \
+    SECURE_COOKIES="true" \
+    TRUST_PROXY="true" \
+    ENABLE_SWAGGER="false" \
+    ENABLE_METRICS="true" \
+    ENABLE_HEALTH_CHECKS="true" \
+    ENABLE_TENANT_ISOLATION="true" \
+    DEFAULT_MAX_PROCESS_INSTANCES="1000"
+```
+
+For PROD, substitute `ronl-business-api-acc` → `ronl-business-api-prod`, `rg-ronl-acc` → `rg-ronl-prod`, and the ACC URLs → PROD URLs.
+
 ## Approving a PROD deployment
 
 When a push to `main` triggers the production workflow:
@@ -80,8 +129,6 @@ When a push to `main` triggers the production workflow:
 2. The workflow pauses at the `deploy` job waiting for approval
 3. Go to **GitHub → Actions → the running workflow → Review deployments**
 4. Select the `production` environment → **Approve and deploy**
-
-![Screenshot: RONL Business API GitHub Actions PROD Approval](../../../../assets/screenshots/ronl-business-api-github-actions-approval.png)
 
 ## Post-deployment health check
 

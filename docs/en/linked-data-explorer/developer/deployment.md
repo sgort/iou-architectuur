@@ -68,7 +68,7 @@ az webapp config appsettings set \
   --settings \
     NODE_ENV=acceptance \
     PORT=8080 \
-    CORS_ORIGIN="https://acc.linkeddata.open-regels.nl,https://acc.cpsv.open-regels.nl" \
+    CORS_ORIGIN="https://acc.linkeddata.open-regels.nl,https://acc.cpsv-editor.open-regels.nl" \
     TRIPLYDB_ENDPOINT="https://api.open-regels.triply.cc/..." \
     OPERATON_BASE_URL="https://operaton.open-regels.nl/engine-rest" \
     LOG_LEVEL=info
@@ -83,7 +83,7 @@ az webapp config appsettings set \
   --settings \
     NODE_ENV=production \
     PORT=8080 \
-    CORS_ORIGIN="https://linkeddata.open-regels.nl,https://cpsv.open-regels.nl" \
+    CORS_ORIGIN="https://linkeddata.open-regels.nl,https://cpsv-editor.open-regels.nl" \
     TRIPLYDB_ENDPOINT="https://api.open-regels.triply.cc/..." \
     OPERATON_BASE_URL="https://operaton.open-regels.nl/engine-rest" \
     LOG_LEVEL=info
