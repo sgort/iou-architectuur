@@ -58,7 +58,7 @@ The final output panel shows the combined results from all steps. For DRD chains
 
 ## Removing a DMN from the chain
 
-Click the × button on a DMN card in the Chain Composer to remove it. The validation status updates immediately and the input form adjusts to reflect the new chain.
+Click the trash icon on a DMN card in the Chain Composer to remove it. The validation status updates immediately and the input form adjusts to reflect the new chain.
 
 ---
 

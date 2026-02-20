@@ -28,10 +28,10 @@ The modal shows for each vendor implementation:
 
 ## Publishing vendor metadata
 
-Vendor implementations are published to TriplyDB via the CPSV Editor's Vendor tab. See the [CPSV Editor — Vendor Integration](../cpsv-editor/user-guide/vendor-integration.md) guide for the full publishing workflow.
+Vendor implementations are published to TriplyDB via the CPSV Editor's Vendor tab. See the [CPSV Editor — Vendor Integration](../../../cpsv-editor/user-guide/vendor-integration.md) guide for the full publishing workflow.
 
 ---
 
 ## RONL Ontology
 
-The vendor vocabulary is defined in the RONL Ontology v1.0 using `ronl:VendorService`, `ronl:basedOn`, and `ronl:implementedBy`, combined with Schema.org properties for provider contact information. For the full property specification, see [CPSV Editor — RONL Ontology](../cpsv-editor/reference/ronl-ontology.md).
+The vendor vocabulary is defined in the RONL Ontology v1.0 using `ronl:VendorService`, `ronl:basedOn`, and `ronl:implementedBy`, combined with Schema.org properties for provider contact information. For the full property specification, see [CPSV Editor — RONL Ontology](../../../cpsv-editor/reference/ronl-ontology.md).

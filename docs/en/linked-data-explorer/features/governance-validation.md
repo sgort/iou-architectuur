@@ -22,13 +22,13 @@ Badges appear on DMN cards in both the Available DMNs panel and the Chain Compos
 
 Validation metadata is stored as RONL Ontology properties on the `cprmv:DecisionModel` resource in TriplyDB and is queried alongside the DMN metadata when the Chain Builder loads. The properties are `ronl:validationStatus`, `ronl:validatedBy`, `ronl:validatedAt`, and optionally `ronl:validationNote`.
 
-Validation metadata is added to a DMN via the CPSV Editor at publish time. See the [CPSV Editor — Publishing to TriplyDB](../cpsv-editor/user-guide/publishing-to-triplydb.md) guide.
+Validation metadata is added to a DMN via the CPSV Editor at publish time. See the [CPSV Editor — Publishing to TriplyDB](../../../cpsv-editor/user-guide/publishing-to-triplydb.md) guide.
 
 ---
 
 ## RONL Ontology
 
-The governance vocabulary is defined in the RONL Ontology v1.0. For the full property specification, see [CPSV Editor — RONL Ontology](../cpsv-editor/reference/ronl-ontology.md). The LDE-specific properties used for governance badges are documented in [RONL Ontology reference](../reference/ronl-ontology.md).
+The governance vocabulary is defined in the RONL Ontology v1.0. For the full property specification, see [CPSV Editor — RONL Ontology](../../../cpsv-editor/reference/ronl-ontology.md). The LDE-specific properties used for governance badges are documented in [RONL Ontology reference](../reference/ronl-ontology.md).
 
 ---
 
