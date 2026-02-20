@@ -1,42 +1,53 @@
-# RONL Business API Documentation
+# RONL Business API
 
-Welcome to the RONL Business API documentation.
+**Regels Overheid Nederland — Business API** is a secure, multi-tenant platform that enables Dutch municipalities to offer government digital services to residents. It implements the **Business API Layer** pattern: a security and business-logic layer that sits between a municipality's IAM system and the Operaton BPMN engine.
 
-## 📚 Documentation Overview
+![Screenshot: RONL Business API Main UI](../../assets/screenshots/ronl-business-api-main-ui.png)
 
-### Architecture
+## What it does
 
-Understand the system design and decisions:
+Instead of exposing Operaton's REST API directly to municipality portals, RONL Business API provides:
 
-- [Architecture Overview](architecture/overview.md) - The Business API Layer pattern
-- [Deployment Architecture](architecture/deployment.md) - VM + Azure split
-- [Security Architecture](architecture/security.md) - Authentication & compliance
+- Secure OIDC/JWT token validation against Keycloak
+- Multi-tenant isolation per municipality (Utrecht, Amsterdam, Rotterdam, Den Haag)
+- Claims mapping from JWT to BPMN process variables
+- Role-based authorization (citizen, caseworker, admin)
+- Compliance-grade audit logging (BIO, NEN 7510, AVG/GDPR)
+- A clean, versioned REST API (`/v1/*`) following the Dutch API Design Rules
 
-### Deployment
+## Architecture at a glance
 
-Deploy RONL to production:
+```
+Resident → Municipality Portal → Keycloak IAM → Business API → Operaton BPMN Engine
+```
 
-- [Deployment Overview](deployment/vm-overview.md)- Complete deployment guide
-- [Keycloak Deployment](deployment/keycloak.md) - VM-based IAM setup
-- Frontend Deployment - Azure Static Web Apps
-- Backend Deployment- Azure App Service
-- [Environment Variables](deployment/environment-variables.md) - Configuration reference
+The system is hosted across two platforms. Azure hosts the stateless application layer (frontend, backend, PostgreSQL, Redis). A VM at `open-regels.nl` hosts the services requiring deep customisation or full control (Keycloak, Operaton, Caddy).
 
-### Development
+## Live environments
 
-Get started with local development:
+| Environment | Frontend | Backend | Keycloak |
+|---|---|---|---|
+| ACC | https://acc.mijn.open-regels.nl | https://acc.api.open-regels.nl | https://acc.keycloak.open-regels.nl |
+| Production | https://mijn.open-regels.nl | https://api.open-regels.nl | https://keycloak.open-regels.nl |
 
-- Getting Started - Complete setup guide
-- [Development Workflow](development/workflow.md) - Daily development process
-- [Quick Reference](development/quick-reference.md) - Common commands
-- [Troubleshooting](development/troubleshooting.md) - Common issues & solutions
-- Frontend Development - React development
-- Backend Development - Node.js development
-- Multi-Tenant Theming - Dynamic branding
+## Technology stack
 
-## 📖 Additional Resources
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, TypeScript, Vite, CSS Custom Properties |
+| Backend | Node.js 20, Express 4, TypeScript |
+| Authentication | Keycloak 23, OIDC Authorization Code Flow |
+| Business rules | Operaton BPMN/DMN engine |
+| Database | Azure PostgreSQL Flexible Server (audit logs) |
+| Cache | Azure Cache for Redis (JWKS, sessions) |
+| Hosting | Azure Static Web Apps (frontend), Azure App Service (backend) |
+| IAM/BPMN hosting | VM — Caddy, Docker Compose |
+| CI/CD | GitHub Actions |
+| License | EUPL-1.2 |
 
-- **Main README**: <!-- [<!-- <!-- ../README.md - Repository file --> - Repository file -->](<!-- <!-- ../README.md - Repository file --> - Repository file -->) - Repository file -->
-- **Project Repository**: GitHub
-- **Operaton Documentation**: https://docs.operaton.org
-- **Keycloak Documentation**: https://www.keycloak.org/docs/23.0/
+## Documentation sections
+
+- [**Features**](features/overview.md) — What RONL Business API does and why
+- [**User Guides**](user-guide/login-digid-flow.md) — How residents, caseworkers, and operators use the system
+- [**Developer Docs**](developer/local-development.md) — Local setup, backend, frontend, deployment
+- [**References**](references/api-endpoints.md) — API endpoints, environment variables, JWT claims, standards

@@ -1,0 +1,76 @@
+# Submitting a Calculation
+
+This guide walks through how a citizen submits a zorgtoeslag (healthcare allowance) calculation — the reference use case for RONL Business API.
+
+![Screenshot: RONL Business API Zorgtoeslag Form](../../../assets/screenshots/ronl-business-api-zorgtoeslag-form.png)
+
+## Prerequisites
+
+You must be logged in. See [Logging In — DigiD Flow](login-digid-flow.md) if you have not yet authenticated.
+
+## Submitting the zorgtoeslag form
+
+**Step 1 — Open the service**
+
+After login, the portal shows the services available for your municipality. Select **Zorgtoeslag berekenen** (calculate healthcare allowance).
+
+**Step 2 — Fill in the form**
+
+The form presents the eligibility criteria. The test environment pre-fills example values:
+
+| Field | Label | Example value |
+|---|---|---|
+| `ingezeteneVanNederland` | Bent u ingezetene van Nederland? | ✓ |
+| `18JaarOfOuder` | Bent u 18 jaar of ouder? | ✓ |
+| `zorgverzekeringInNederland` | Heeft u een zorgverzekering in Nederland? | ✓ |
+| `inkomenEnVermogen` | Jaarlijks inkomen (€) | 24000 |
+
+**Step 3 — Submit**
+
+Click **Berekenen** (Calculate). The portal sends:
+
+```http
+POST /v1/process/zorgtoeslag/start
+Authorization: Bearer <JWT>
+Content-Type: application/json
+
+{
+  "ingezeteneVanNederland": true,
+  "18JaarOfOuder": true,
+  "zorgverzekeringInNederland": true,
+  "inkomenEnVermogen": 24000
+}
+```
+
+**Step 4 — View the result**
+
+The result appears within a few seconds:
+
+![Screenshot: RONL Business API Zorgtoeslag Result](../../../assets/screenshots/ronl-business-api-zorgtoeslag-result.png)
+
+```
+Resultaat: U heeft recht op zorgtoeslag
+Maandbedrag: € 95,83 (€ 1.150 per jaar)
+Aanvraagnummer: abc-123-def
+```
+
+## What happens in the background
+
+1. The Business API validates your JWT
+2. Your `municipality` claim (`utrecht`) is used to scope the request to your tenant
+3. The input variables are combined with your user identity and submitted to Operaton
+4. Operaton executes the `zorgtoeslag` BPMN workflow and evaluates the DMN decision table
+5. The result is returned and an audit record is written
+
+The process typically completes in under 2 seconds. The `processInstanceId` in the response (`abc-123`) can be used to retrieve the result later via `GET /v1/process/abc-123/variables`.
+
+## Troubleshooting
+
+**Form submits but no result appears**  
+Check that the API Health indicator in the portal header shows all services as UP. If Operaton shows "down", the business rules engine is temporarily unavailable.
+
+**Error: FORBIDDEN / LOA_INSUFFICIENT**  
+Your DigiD assurance level is too low for this service. Log out and log in again using DigiD with SMS code (midden) or the ID check app (hoog).
+
+**Error: RATE_LIMIT_EXCEEDED**  
+Too many requests from your session. Wait one minute and try again.

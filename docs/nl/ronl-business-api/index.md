@@ -1,11 +1,10 @@
 # RONL Business API
 
-**Documentatie in ontwikkeling**
-
-Deze pagina zal binnenkort vertaald worden naar het Nederlands.
+!!! info "Documentatie in ontwikkeling"
+    De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
+    Raadpleeg de [Engelse versie](../../../en/ronl-business-api/index.md) voor de huidige inhoud.
 
 ---
 
-**Pad**: `docs/nl/ronl-business-api/index.md`  
-**Status**: Concept  
-**Taal**: Nederlands (NL)
+**Status:** Concept  
+**Engelstalige bron:** `ronl-business-api/index.md`

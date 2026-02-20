@@ -8,16 +8,20 @@ The Information Architecture Framework for IOU integrates semantic web technolog
 
 ## Ecosystem Components
 
-### 🏗️ RONL Business API
-The core business API layer providing secure authentication and process orchestration for Dutch government digital services.
+### RONL Business API
 
-**Key Features**:
-- OpenID Connect (OIDC) authentication with DigiD/eIDAS
-- Multi-tenant architecture (per municipality)
-- Integration with Keycloak IAM and Operaton BPMN
-- Complete audit logging for compliance
+A secure, multi-tenant Business API layer for Dutch municipalities. Handles DigiD/eIDAS/eHerkenning authentication via Keycloak, enforces multi-tenant isolation per municipality, and executes government business rules (BPMN/DMN) through Operaton — with compliance-grade audit logging.
 
-[Explore Documentation →](ronl-business-api/index.md){ .md-button }
+**Live environments:**  
+ACC: [acc.mijn.open-regels.nl](https://acc.mijn.open-regels.nl) · [acc.api.open-regels.nl](https://acc.api.open-regels.nl)  
+Production: [mijn.open-regels.nl](https://mijn.open-regels.nl) · [api.open-regels.nl](https://api.open-regels.nl)
+
+| | |
+|---|---|
+| [Features](ronl-business-api/features/overview.md) | Business API Layer pattern, multi-tenancy, authentication, security |
+| [User Guides](ronl-business-api/user-guide/login-digid-flow.md) | Login flow, submitting calculations, caseworker workflow, adding a municipality |
+| [Developer Docs](ronl-business-api/developer/local-development.md) | Local setup, backend, frontend, deployment (VM + Azure), CI/CD |
+| [References](ronl-business-api/references/api-endpoints.md) | API endpoints, environment variables, JWT claims, Keycloak realm, standards |
 
 ### ✏️ CPSV Editor
 React-based application for creating CPSV-AP 3.2.0 compliant RDF/Turtle files for Dutch government services.
@@ -32,11 +36,6 @@ Web application for SPARQL queries and BPMN & DMN orchestration with TriplyDB in
 **Live App**: [linkeddata.open-regels.nl](https://linkeddata.open-regels.nl)
 
 [View Documentation →](linked-data-explorer/index.md){ .md-button }
-
-### 🔗 Shared Backend
-Node.js/Express API providing TriplyDB and Operaton integration for both applications.
-
-[View Documentation →](shared-backend/index.md){ .md-button }
 
 ## Architecture Overview
 

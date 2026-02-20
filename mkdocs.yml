@@ -2,7 +2,7 @@ site_name: IOU Architecture Documentation
 site_url: https://iou-architectuur.open-regels.nl
 site_description: >-
   Information Architecture Framework for IOU,
-  integrating CPSV Editor and Linked Data Explorer within the RONL ecosystem.
+  integrating RONL Business API, CPSV Editor and Linked Data Explorer within the RONL ecosystem.
 
 # Repository
 repo_url: https://git.open-regels.nl/showcases/iou-architectuur
@@ -91,28 +91,40 @@ nav:
   
   - RONL Business API:
     - Overview: ronl-business-api/index.md
-    - Architecture:
-      - Architecture Overview: ronl-business-api/architecture/overview.md
-      - Deployment Architecture: ronl-business-api/architecture/deployment.md
-      - Security Architecture: ronl-business-api/architecture/security.md
-    - Deployment:
-      - VM Overview: ronl-business-api/deployment/vm-overview.md
-      - Keycloak Setup: ronl-business-api/deployment/keycloak.md
-      - Caddy Configuration: ronl-business-api/deployment/caddy.md
-      - Environment Variables: ronl-business-api/deployment/environment-variables.md
-      - Deployment Overview: ronl-business-api/deployment/overview.md
-      - Backend Deployment: ronl-business-api/deployment/backend.md
-      - Frontend Deployment: ronl-business-api/deployment/frontend.md
-    - Development:
-      - Development Workflow: ronl-business-api/development/workflow.md
-      - Quick Reference: ronl-business-api/development/quick-reference.md
-      - Troubleshooting: ronl-business-api/development/troubleshooting.md
-      - Backend Development: ronl-business-api/development/backend.md
-      - Frontend Development: ronl-business-api/development/frontend.md
-    - DigiD Integration:
-      - Login Mockup: ronl-business-api/digid-mockup/digid-keycloak-login-mockup.md
-      - Sequence Diagram: ronl-business-api/digid-mockup/digid-keycloak-sequence-diagram.md
-      - Keycloak Mapping: ronl-business-api/digid-mockup/keycloak-digid-idp-mapping.md
+    - Features:
+      - Overview: ronl-business-api/features/overview.md
+      - Multi-Tenant Municipality Portal: ronl-business-api/features/multi-tenant-portal.md
+      - Authentication & IAM: ronl-business-api/features/authentication-iam.md
+      - Business Rules Execution: ronl-business-api/features/business-rules-execution.md
+      - Security & Compliance: ronl-business-api/features/security-compliance.md
+      - API Design: ronl-business-api/features/api-design.md
+    - User Guides:
+      - Logging In (DigiD Flow): ronl-business-api/user-guide/login-digid-flow.md
+      - Submitting a Calculation: ronl-business-api/user-guide/submitting-calculation.md
+      - Caseworker Workflow: ronl-business-api/user-guide/caseworker-workflow.md
+      - Adding a Municipality: ronl-business-api/user-guide/adding-municipality.md
+    - Developer Docs:
+      - Local Development Setup: ronl-business-api/developer/local-development.md
+      - Backend Development: ronl-business-api/developer/backend-development.md
+      - Frontend Development: ronl-business-api/developer/frontend-development.md
+      - Shared Package: ronl-business-api/developer/shared-package.md
+      - Testing: ronl-business-api/developer/testing.md
+      - CI/CD: ronl-business-api/developer/cicd.md
+      - Deployment:
+        - Overview: ronl-business-api/developer/deployment/overview.md
+        - Keycloak (VM): ronl-business-api/developer/deployment/keycloak.md
+        - Operaton (VM): ronl-business-api/developer/deployment/operaton.md
+        - Backend (Azure App Service): ronl-business-api/developer/deployment/backend.md
+        - Frontend (Azure Static Web Apps): ronl-business-api/developer/deployment/frontend.md
+        - Caddy (Reverse Proxy): ronl-business-api/developer/deployment/caddy.md
+    - References:
+      - API Endpoints: ronl-business-api/references/api-endpoints.md
+      - Environment Variables: ronl-business-api/references/environment-variables.md
+      - JWT Claims: ronl-business-api/references/jwt-claims.md
+      - Keycloak Realm Configuration: ronl-business-api/references/keycloak-realm.md
+      - Municipality Themes: ronl-business-api/references/municipality-themes.md
+      - Standards & Compliance: ronl-business-api/references/standards-compliance.md
+      - Changelog: ronl-business-api/references/changelog.md
   
   - CPSV Editor:
     - Overview: cpsv-editor/index.md
