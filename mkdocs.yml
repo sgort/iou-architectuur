@@ -115,19 +115,38 @@ nav:
       - Keycloak Mapping: ronl-business-api/digid-mockup/keycloak-digid-idp-mapping.md
   
   - CPSV Editor:
-    - Introduction: cpsv-editor/index.md
-    - Features: cpsv-editor/features.md
-    - User Guide:
+    - Overview: cpsv-editor/index.md
+    - Features:
+      - Service, Organisation & Legal: cpsv-editor/features/service-organisation-legal.md
+      - Rules, Policy & Parameters: cpsv-editor/features/rules-policy-parameters.md
+      - DMN Orchestration: cpsv-editor/features/dmn-orchestration.md
+      - TriplyDB Publishing: cpsv-editor/features/triplydb-publishing.md
+      - Vendor Integration: cpsv-editor/features/vendor-integration.md
+      - Import, Export & Preview: cpsv-editor/features/import-export.md
+    - User Guides:
       - Getting Started: cpsv-editor/user-guide/getting-started.md
-      - Service Definition: cpsv-editor/user-guide/service-definition.md
-      - Rules & Parameters: cpsv-editor/user-guide/rules-parameters.md
-      - DMN Integration: cpsv-editor/user-guide/dmn-integration.md
-      - Import & Export: cpsv-editor/user-guide/import-export.md
-    - Technical Documentation:
-      - Architecture: cpsv-editor/technical/architecture.md
-      - Standards Compliance: cpsv-editor/technical/standards-compliance.md
-      - Field Mapping: cpsv-editor/technical/field-mapping.md
-      - Development: cpsv-editor/technical/development.md
+      - Filling In the Tabs: cpsv-editor/user-guide/filling-in-the-tabs.md
+      - Import & Export TTL: cpsv-editor/user-guide/import-export-ttl.md
+      - DMN Workflow: cpsv-editor/user-guide/dmn-workflow.md
+      - DMN Testing: cpsv-editor/user-guide/dmn-testing.md
+      - Publishing to TriplyDB: cpsv-editor/user-guide/publishing-to-triplydb.md
+      - Vendor Integration: cpsv-editor/user-guide/vendor-integration.md
+    - Developer Docs:
+      - Local Development: cpsv-editor/developer/local-development.md
+      - Project Structure: cpsv-editor/developer/project-structure.md
+      - Deployment: cpsv-editor/developer/deployment.md
+      - DMN Implementation: cpsv-editor/developer/dmn-implementation.md
+      - TriplyDB Publish Implementation: cpsv-editor/developer/triplydb-publish-implementation.md
+      - Vendor Tab Implementation: cpsv-editor/developer/vendor-tab-implementation.md
+      - Vocabulary Configuration: cpsv-editor/developer/vocabulary-configuration.md
+      - RONL Namespace Migration: cpsv-editor/developer/ronl-namespace-migration.md
+    - References:
+      - Namespace & Property Reference: cpsv-editor/reference/namespace-property-reference.md
+      - Field Mapping: cpsv-editor/reference/field-mapping.md
+      - RONL Ontology: cpsv-editor/reference/ronl-ontology.md
+      - RPP Architecture: cpsv-editor/reference/rpp-architecture.md
+      - Semantic Mediation Architecture: cpsv-editor/reference/semantic-mediation-architecture.md
+      - External Standards: cpsv-editor/reference/external-standards.md
   
   - Linked Data Explorer:
     - Introduction: linked-data-explorer/index.md
