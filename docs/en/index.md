@@ -17,7 +17,7 @@ The core business API layer providing secure authentication and process orchestr
 - Integration with Keycloak IAM and Operaton BPMN
 - Complete audit logging for compliance
 
-[Explore Documentation →](ronl-business-api/index.md){ .md-button .md-button--primary }
+[Explore Documentation →](ronl-business-api/index.md){ .md-button }
 
 ### ✏️ CPSV Editor
 React-based application for creating CPSV-AP 3.2.0 compliant RDF/Turtle files for Dutch government services.
@@ -27,7 +27,7 @@ React-based application for creating CPSV-AP 3.2.0 compliant RDF/Turtle files fo
 [View Documentation →](cpsv-editor/index.md){ .md-button }
 
 ### 🔍 Linked Data Explorer
-Web application for SPARQL queries and DMN orchestration with TriplyDB integration.
+Web application for SPARQL queries and BPMN & DMN orchestration with TriplyDB integration.
 
 **Live App**: [linkeddata.open-regels.nl](https://linkeddata.open-regels.nl)
 
@@ -67,22 +67,6 @@ graph TB
 | **Backend API** | [backend.linkeddata.open-regels.nl](https://backend.linkeddata.open-regels.nl) |
 | **Operaton** | [operaton.open-regels.nl](https://operaton.open-regels.nl) |
 | **Keycloak IAM** | [keycloak.open-regels.nl](https://keycloak.open-regels.nl) |
-
-## Documentation Sections
-
-### For Developers
-- [Architecture Overview](ronl-business-api/architecture/overview.md) - Understand the Business API Layer pattern
-- [Development Workflow](ronl-business-api/development/workflow.md) - Get started with local development
-- [Quick Reference](ronl-business-api/development/quick-reference.md) - Common commands and credentials
-
-### For DevOps
-- [Deployment Architecture](ronl-business-api/architecture/deployment.md) - VM + Azure hybrid deployment
-- [Keycloak Setup](ronl-business-api/deployment/keycloak.md) - IAM deployment guide
-- [Environment Variables](ronl-business-api/deployment/environment-variables.md) - Configuration reference
-
-### For Integrators
-- [Security Architecture](ronl-business-api/architecture/security.md) - Authentication flows and compliance
-- [DigiD Integration](ronl-business-api/digid-mockup/digid-keycloak-login-mockup.md) - DigiD/eIDAS mockup flows
 
 ## Technology Stack
 

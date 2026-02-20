@@ -10,3 +10,6 @@ mkdocs-git-revision-date-localized-plugin>=1.2.0
 
 # Markdown extensions
 pymdown-extensions>=10.7
+
+# Pin working version
+click==8.2.1
