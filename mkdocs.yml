@@ -149,29 +149,41 @@ nav:
       - External Standards: cpsv-editor/reference/external-standards.md
   
   - Linked Data Explorer:
-    - Introduction: linked-data-explorer/index.md
-    - Features: linked-data-explorer/features.md
-    - User Guide:
-      - Getting Started: linked-data-explorer/user-guide/getting-started.md
-      - SPARQL Queries: linked-data-explorer/user-guide/sparql-queries.md
-      - DMN Orchestration: linked-data-explorer/user-guide/dmn-orchestration.md
-      - Chain Building: linked-data-explorer/user-guide/chain-building.md
-    - Technical Documentation:
-      - Architecture: linked-data-explorer/technical/architecture.md
-      - API Reference: linked-data-explorer/technical/api-reference.md
-      - Development: linked-data-explorer/technical/development.md
-  
-  - Shared Backend:
-    - Overview: shared-backend/index.md
-    - API Documentation: shared-backend/api-documentation.md
-    - TriplyDB Integration: shared-backend/triplydb-integration.md
-    - Operaton Integration: shared-backend/operaton-integration.md
-    - Deployment: shared-backend/deployment.md
-  
-  - Contributing:
-    - How to Contribute: contributing/index.md
-    - Documentation Guide: contributing/documentation-guide.md
-    - Code Standards: contributing/code-standards.md
+    - Overview: linked-data-explorer/index.md
+    - Features:
+        - SPARQL Query Editor: linked-data-explorer/features/sparql-query-editor.md
+        - DMN Discovery & Chain Building: linked-data-explorer/features/dmn-chain-building.md
+        - DRD Generation: linked-data-explorer/features/drd-generation.md
+        - Semantic Analysis: linked-data-explorer/features/semantic-analysis.md
+        - BPMN Modeler: linked-data-explorer/features/bpmn-modeler.md
+        - Governance & Validation: linked-data-explorer/features/governance-validation.md
+        - Vendor Services: linked-data-explorer/features/vendor-services.md
+    - User Guides:
+        - Getting Started: linked-data-explorer/user-guide/getting-started.md
+        - Running SPARQL Queries: linked-data-explorer/user-guide/sparql-queries.md
+        - Building DMN Chains: linked-data-explorer/user-guide/chain-building.md
+        - Saving & Executing DRDs: linked-data-explorer/user-guide/drd-generation.md
+        - Semantic Analysis: linked-data-explorer/user-guide/semantic-analysis.md
+        - BPMN Modeler: linked-data-explorer/user-guide/bpmn-modeler.md
+        - Governance Badges: linked-data-explorer/user-guide/governance-badges.md
+        - Vendor Services: linked-data-explorer/user-guide/vendor-services.md
+    - Developer Docs:
+        - Architecture: linked-data-explorer/developer/architecture.md
+        - Local Development: linked-data-explorer/developer/local-development.md
+        - Frontend Architecture: linked-data-explorer/developer/frontend.md
+        - Backend Architecture: linked-data-explorer/developer/backend.md
+        - Enhanced Validation & Semantic Detection: linked-data-explorer/developer/enhanced-validation.md
+        - DRD Generation: linked-data-explorer/developer/drd-generation.md
+        - BPMN Modeler: linked-data-explorer/developer/bpmn-modeler.md
+        - Governance Implementation: linked-data-explorer/developer/governance.md
+        - Vendor Services Implementation: linked-data-explorer/developer/vendor-services.md
+        - Deployment: linked-data-explorer/developer/deployment.md
+        - Test Cases: linked-data-explorer/developer/test-cases.md
+        - Changelog & Roadmap: linked-data-explorer/developer/changelog-roadmap.md
+    - References:
+        - Operaton DMN Compatibility: linked-data-explorer/reference/operaton-dmn-compatibility.md
+        - API Reference: linked-data-explorer/reference/api-reference.md
+        - RONL Ontology: linked-data-explorer/reference/ronl-ontology.md
 
 # Markdown extensions
 markdown_extensions:

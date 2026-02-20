@@ -1,8 +1,10 @@
-# SPARQL Queries
+# SPARQL Queries Uitvoeren
 
-**Documentatie in ontwikkeling**
+!!! info "Documentatie in ontwikkeling"
+    De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
+    Raadpleeg de [Engelse versie](../../../en/linked-data-explorer/user-guide/sparql-queries.md) voor de huidige inhoud.
 
 ---
 
-**Pad**: `docs/nl/linked-data-explorer/user-guide/sparql-queries.md`
-**Status**: Concept
+**Status:** Concept
+**Engelstalige bron:** `linked-data-explorer/user-guide/sparql-queries.md`
