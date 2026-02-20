@@ -1,9 +1,21 @@
 # Linked Data Explorer
 
-**Linked Data Explorer** is a web application for discovering, composing, and executing DMN decision model chains from Dutch government knowledge graphs. It is built as part of the **Regels Overheid Nederland (RONL)** initiative and connects directly to TriplyDB knowledge graphs and the Operaton DMN execution engine.
+**A React-based SPARQL visualization and query tool for exploring Dutch Government Data (Regels Overheid)**
 
-**Live application:** [linkeddata.open-regels.nl](https://linkeddata.open-regels.nl)
-**Acceptance environment:** [acc.linkeddata.open-regels.nl](https://acc.linkeddata.open-regels.nl)
+🌐 **Live application:** [linkeddata.open-regels.nl](https://linkeddata.open-regels.nl)  
+🧪 **Acceptance environment:** [acc.linkeddate.open-regels.nl](https://acc.linkeddata.open-regels.nl)
+
+[![Deployed on Azure Static Web Apps](https://img.shields.io/badge/Azure-Static_Web_Apps-blue?logo=microsoft-azure)](https://linkeddata.open-regels.nl)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19.2-61dafb?logo=react)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-6.2-646cff?logo=vite)](https://vitejs.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-22-339933?logo=node.js)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-4.18-000000?logo=express)](https://expressjs.com/)
+![License](https://img.shields.io/badge/License-EUPL-yellow.svg)
+
+---
+
+**Linked Data Explorer** is a web application for discovering, composing, and executing DMN decision model chains from Dutch government knowledge graphs. It is built as part of the **Regels Overheid Nederland (RONL)** initiative and connects directly to TriplyDB knowledge graphs and the Operaton DMN execution engine.
 
 ![Screenshot: Linked Data Explorer main UI showing the Chain Builder with a loaded DMN chain](../assets/screenshots/linked-data-explorer-main-ui.png)
 

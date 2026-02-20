@@ -140,6 +140,7 @@ nav:
       - Vendor Tab Implementation: cpsv-editor/developer/vendor-tab-implementation.md
       - Vocabulary Configuration: cpsv-editor/developer/vocabulary-configuration.md
       - RONL Namespace Migration: cpsv-editor/developer/ronl-namespace-migration.md
+      - Changelog & Roadmap: cpsv-editor/developer/changelog-roadmap.md
     - References:
       - Namespace & Property Reference: cpsv-editor/reference/namespace-property-reference.md
       - Field Mapping: cpsv-editor/reference/field-mapping.md
