@@ -1,8 +1,10 @@
 # Aan de Slag
 
-**Documentatie in ontwikkeling**
+!!! info "Documentatie in ontwikkeling"
+    De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
+    Raadpleeg de [Engelse versie](../../../en/linked-data-explorer/user-guide/getting-started.md) voor de huidige inhoud.
 
 ---
 
-**Pad**: `docs/nl/linked-data-explorer/user-guide/getting-started.md`
-**Status**: Concept
+**Status:** Concept
+**Engelstalige bron:** `linked-data-explorer/user-guide/getting-started.md`

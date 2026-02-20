@@ -1,8 +1,10 @@
 # Linked Data Explorer
 
-**Documentatie in ontwikkeling**
+!!! info "Documentatie in ontwikkeling"
+    De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
+    Raadpleeg de [Engelse versie](../../en/linked-data-explorer/index.md) voor de huidige inhoud.
 
 ---
 
-**Pad**: `docs/nl/linked-data-explorer/index.md`
-**Status**: Concept
+**Status:** Concept
+**Engelstalige bron:** `linked-data-explorer/index.md`
