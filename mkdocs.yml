@@ -199,6 +199,10 @@ nav:
         - API Reference: linked-data-explorer/reference/api-reference.md
         - RONL Ontology: linked-data-explorer/reference/ronl-ontology.md
 
+  - 🤝 Contributing:
+    - Overview: contributing/index.md
+    - Code Standards: contributing/code-standards.md
+
 # Markdown extensions
 markdown_extensions:
   - abbr
@@ -268,3 +272,7 @@ extra:
 # Watch additional directories for changes
 watch:
   - docs/includes
+
+not_in_nav:
+  includes/abbreviations.md
+  nl/contributing/documentation-guide.md
