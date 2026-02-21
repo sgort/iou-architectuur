@@ -201,6 +201,10 @@ nav:
 
   - 🤝 Contributing:
     - Overview: contributing/index.md
+    - Documentation Architecture:
+      - Overview: contributing/doc-architecture/overview.md
+      - Navigation Structure: contributing/doc-architecture/navigation.md
+      - Technology Stack: contributing/doc-architecture/technology-stack.md
     - Code Standards: contributing/code-standards.md
 
 # Markdown extensions
@@ -263,7 +267,7 @@ extra:
   # Alternate languages
   alternate:
     - name: English
-      link: /en/
+      link: /
       lang: en
     - name: Nederlands
       link: /nl/
