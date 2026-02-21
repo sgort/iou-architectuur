@@ -145,6 +145,7 @@ nav:
       - Publishing to TriplyDB: cpsv-editor/user-guide/publishing-to-triplydb.md
       - Vendor Integration: cpsv-editor/user-guide/vendor-integration.md
     - Developer Docs:
+      - Visual Architecture: cpsv-editor/developer/visual-architecture.md
       - Local Development: cpsv-editor/developer/local-development.md
       - Project Structure: cpsv-editor/developer/project-structure.md
       - Deployment: cpsv-editor/developer/deployment.md
