@@ -15,6 +15,8 @@
 
 ## Caddyfile
 
+## Retrieving the Caddyfile from a running VM
+
 ## Deploying Caddy
 
 ## Adding a new domain
@@ -29,12 +31,6 @@
 
 ## Verifying SSL certificates
 
-# Check certificate expiry for each domain
-
 ## Metrics and monitoring
-
-# From the VM
-
-# Filter for a specific domain
 
 ## Troubleshooting

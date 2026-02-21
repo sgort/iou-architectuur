@@ -98,6 +98,34 @@ npm run lint:fix      # ESLint with auto-fix
 npm run type-check    # tsc --noEmit
 ```
 
+## Calling the Business API from a component
+
+`services/api.ts` exposes two primary methods. Use these when adding new features that interact with the backend:
+
+**Evaluate a DMN decision:**
+
+```typescript
+import { businessApi } from '../services/api';
+
+const result = await businessApi.evaluateDecision('berekenrechtenhoogtezorg', {
+  inkomenEnVermogen: { value: 24000, type: 'Integer' },
+  heeftZorgverzekering: { value: true, type: 'Boolean' },
+});
+```
+
+**Start a BPMN process:**
+
+```typescript
+const result = await businessApi.startProcess('vergunning', {
+  aanvrager: { value: 'Test Burger', type: 'String' },
+  adres: { value: 'Teststraat 123, Utrecht', type: 'String' },
+});
+
+console.log('Process started:', result.processInstanceId);
+```
+
+Both methods attach the JWT bearer token automatically via the Axios interceptor and return the parsed `ApiResponse<T>` from `@ronl/shared`. Wrap calls in `try/catch` — on HTTP 401 the interceptor attempts a silent Keycloak token refresh before rejecting.
+
 ## Adding a new page
 
 1. Create a component in `src/components/`

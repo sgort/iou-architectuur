@@ -195,3 +195,60 @@ docker exec keycloak-postgres-acc pg_dump -U keycloak keycloak \
 ```
 
 Store backups off-VM (e.g. Azure Blob Storage, 30-day retention policy).
+
+### Volume backup
+
+For a complete binary backup of the PostgreSQL data volume (weekly recommended):
+
+```bash
+docker run --rm \
+  -v keycloak-prod-db-data:/data \
+  -v /backup:/backup \
+  alpine tar czf /backup/keycloak-prod-$(date +%Y%m%d).tar.gz /data
+```
+
+## VM-level troubleshooting
+
+### Service not accessible from outside the VM
+
+1. Check container is running: `docker ps`
+2. Verify service responds locally from the VM: `curl http://localhost:8080`
+3. Check Caddy routing: `docker logs caddy | grep <service-name>`
+4. Check DNS resolves to the correct IP: `dig acc.keycloak.open-regels.nl`
+5. Check firewall: `sudo ufw status` — ports 80 and 443 must be open
+
+### Container shows as unhealthy
+
+```bash
+# View logs
+docker compose logs <service>
+
+# Check resource usage (CPU/memory)
+docker stats <service>
+
+# Restart
+docker compose restart <service>
+```
+
+### Keycloak database connection failing
+
+```bash
+# Check PostgreSQL is accepting connections
+docker exec keycloak-postgres-acc pg_isready -U keycloak
+
+# Test TCP connectivity from inside the Keycloak container
+docker exec keycloak-acc bash -c \
+  'timeout 2 bash -c "</dev/tcp/keycloak-postgres-acc/5432" && echo OK || echo FAILED'
+```
+
+## Production security checklist
+
+Before going live, verify:
+
+- ✅ All services are behind Caddy with SSL — no service exposed directly to the internet
+- ✅ Strong unique passwords for all admin accounts (different for ACC and PROD)
+- ✅ Firewall configured: only ports 80 and 443 open (`ufw status`)
+- ✅ Regular OS security updates scheduled
+- ⚠️ Enable MFA for the Keycloak admin account
+- ⚠️ Switch PROD Keycloak from `start-dev` to `start` (production mode) in `docker-compose.yml`
+- ⚠️ Monitor Caddy access logs regularly for anomalous traffic

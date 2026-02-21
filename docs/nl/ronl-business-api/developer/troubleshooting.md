@@ -31,6 +31,8 @@
 
 ### Health check returns unhealthy dependencies
 
+### Port already in use
+
 ### API returns 500 Internal Server Error
 
 ### Zorgtoeslag calculation fails
@@ -38,8 +40,6 @@
 ## Test user issues
 
 ### Can't log in with test users
-
-# Wait 60 seconds for Keycloak to start and import the realm
 
 ## Browser issues
 
@@ -53,26 +53,5 @@
 
 ## Emergency reset
 
-# 1. Stop dev servers
-
-# 2. Wipe Docker (containers + volumes = all Keycloak data)
-
-# 3. Wipe Node modules
-
-# 4. Fresh install and start
-
-# Wait 60 seconds
-
 ## Diagnostic commands
 
-# Check tool versions
-
-# Check running containers
-
-# Check ports in use (Linux/Mac)
-
-# Check ports in use (Windows)
-
-# API health with formatted output
-
-# Keycloak health

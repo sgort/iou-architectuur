@@ -23,6 +23,8 @@
 
 ## Development commands
 
+## Calling the Business API from a component
+
 ## Adding a new page
 
 ## Adding a feature flag check
