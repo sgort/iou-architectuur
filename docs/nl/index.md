@@ -13,6 +13,8 @@
 
 ## What is IOU Architecture?
 
+## Architecture Overview
+
 ## Ecosystem Components
 
 ### ⚙️ RONL Business API
@@ -20,8 +22,6 @@
 ### ✏️ CPSV Editor
 
 ### 🔍 Linked Data Explorer
-
-## Architecture Overview
 
 ## Quick Links
 
