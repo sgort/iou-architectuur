@@ -2,9 +2,35 @@
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
-    Raadpleeg de [Engelse versie](../../../en/linked-data-explorer/reference/api-reference.md) voor de huidige inhoud.
+    Raadpleeg de <a href="/linked-data-explorer/reference/api-reference/">Engelse versie</a> voor de huidige inhoud.
 
 ---
 
 **Status:** Concept
 **Engelstalige bron:** `linked-data-explorer/reference/api-reference.md`
+
+---
+
+## Health
+
+### `GET /v1/health`
+
+## DMN discovery
+
+### `GET /v1/dmns`
+
+### `GET /v1/dmns/enhanced-chain-links`
+
+### `GET /v1/dmns/semantic-equivalences`
+
+### `GET /v1/dmns/cycles`
+
+## Chain execution
+
+### `POST /v1/chains/execute`
+
+### `POST /v1/chains/export`
+
+## TriplyDB proxy
+
+### `POST /v1/triplydb/query`

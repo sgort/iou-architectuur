@@ -6,36 +6,6 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 The Information Architecture Framework for IOU integrates semantic web technologies, decision models, and Dutch government standards into a unified system for managing regulatory compliance and spatial planning.
 
-## Ecosystem Components
-
-### ⚙️ RONL Business API
-
-The core business API layer that provides secure authentication and process orchestration for Dutch government services.
-
-**Key Features:**  
-- OpenID Connect (OIDC) authentication with DigiD/eIDAS  
-- Multi-tenant architecture (per municipality)  
-- Integration with Keycloak IAM and Operaton BPMN  
-- Full audit logging for compliance  
-
-**Live App**: [mijn.open-regels.nl](https://mijn.open-regels.nl)
-
-[View Documentation →](ronl-business-api/index.md){ .md-button }
-
-### ✏️ CPSV Editor
-React-based application for creating CPSV-AP 3.2.0 compliant RDF/Turtle files for Dutch government services.
-
-**Live App**: [cpsv-editor.open-regels.nl](https://cpsv-editor.open-regels.nl)
-
-[View Documentation →](cpsv-editor/index.md){ .md-button }
-
-### 🔍 Linked Data Explorer
-Web application for SPARQL queries and BPMN & DMN orchestration with TriplyDB integration.
-
-**Live App**: [linkeddata.open-regels.nl](https://linkeddata.open-regels.nl)
-
-[View Documentation →](linked-data-explorer/index.md){ .md-button }
-
 ## Architecture Overview
 
 ```mermaid
@@ -55,6 +25,30 @@ graph TB
         H -->|Direct SPARQL| F
     end
 ```
+
+## Ecosystem Components
+
+### ⚙️ RONL Business API
+
+The core business API layer that provides secure authentication and process orchestration for Dutch government services.
+
+**Live App**: [mijn.open-regels.nl](https://mijn.open-regels.nl)
+
+[View Documentation →](ronl-business-api/index.md){ .md-button }
+
+### ✏️ CPSV Editor
+React-based application for creating CPSV-AP 3.2.0 compliant RDF/Turtle files for Dutch government services.
+
+**Live App**: [cpsv-editor.open-regels.nl](https://cpsv-editor.open-regels.nl)
+
+[View Documentation →](cpsv-editor/index.md){ .md-button }
+
+### 🔍 Linked Data Explorer
+Web application for SPARQL queries and BPMN & DMN orchestration with TriplyDB integration.
+
+**Live App**: [linkeddata.open-regels.nl](https://linkeddata.open-regels.nl)
+
+[View Documentation →](linked-data-explorer/index.md){ .md-button }
 
 ## Quick Links
 
