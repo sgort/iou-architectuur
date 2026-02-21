@@ -19,6 +19,8 @@
 
 ### DMN discovery
 
+### Chain discovery
+
 ### Chain execution
 
 ### TriplyDB proxy
@@ -32,3 +34,9 @@
 ## Logging
 
 ## Error handling
+
+## Performance
+
+## Security
+
+## Dutch Government API Design Rules compliance
