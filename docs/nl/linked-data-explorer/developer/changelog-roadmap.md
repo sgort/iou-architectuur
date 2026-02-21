@@ -29,4 +29,16 @@
 
 ### v0.1.0 — Initial Release (January 2026)
 
-## Roadmap — Phase 2
+## Notable backend bug fixes
+
+### Notable backend bug fixes
+
+### `/v1/*` endpoints returning 404 after Azure deployment
+
+### Root endpoint referencing deprecated `/api/*` paths
+
+## Roadmap
+
+### Frontend — Phase 2
+
+### Backend API - versioning roadmap

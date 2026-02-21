@@ -29,6 +29,5 @@
 
 ## Technology Stack
 
-
 ## Standards & Vocabularies
 

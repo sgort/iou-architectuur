@@ -188,6 +188,7 @@ nav:
         - Frontend Architecture: linked-data-explorer/developer/frontend.md
         - Backend Architecture: linked-data-explorer/developer/backend.md
         - Enhanced Validation & Semantic Detection: linked-data-explorer/developer/enhanced-validation.md
+        - Chain Export: linked-data-explorer/developer/chain-export.md
         - DRD Generation: linked-data-explorer/developer/drd-generation.md
         - BPMN Modeler: linked-data-explorer/developer/bpmn-modeler.md
         - Governance Implementation: linked-data-explorer/developer/governance.md

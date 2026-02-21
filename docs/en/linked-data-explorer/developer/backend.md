@@ -43,10 +43,10 @@ GET /v1/dmns?endpoint={sparql_endpoint_url}
 Queries TriplyDB for all `cprmv:DecisionModel` resources at the given endpoint. Returns models with full variable lists and governance/vendor metadata. Cached per endpoint for 5 minutes.
 
 ```
-GET /v1/dmns/chains?endpoint={url}
+GET /v1/dmns/:identifier?endpoint={url}
 ```
 
-Returns all DMN pairs where an output variable of one model matches an input variable of another by exact identifier.
+Returns full metadata for a single DMN by its `dct:identifier` value.
 
 ```
 GET /v1/dmns/enhanced-chain-links?endpoint={url}
@@ -66,6 +66,14 @@ GET /v1/dmns/cycles?endpoint={url}
 
 Returns circular dependencies detected via semantic links (3-hop traversal).
 
+### Chain discovery
+
+```
+GET /v1/chains?endpoint={url}
+```
+
+Returns all DMN pairs where an output variable of one model matches an input variable of another by exact identifier.
+
 ### Chain execution
 
 ```
@@ -84,10 +92,16 @@ Request body:
 Executes the chain sequentially, flattening outputs into inputs between steps. Returns per-step results and combined final output.
 
 ```
+POST /v1/chains/execute/heusdenpas
+```
+
+Convenience endpoint for the fixed three-step Heusdenpas chain with production test data. Target execution time: <1000ms. See [API Reference](../reference/api-reference.md) for the full request/response.
+
+```
 POST /v1/chains/export
 ```
 
-Generates a DRD XML file from a chain for deployment. See [DRD Generation](drd-generation.md).
+Generates a DRD XML file from a chain and deploys it to Operaton. See [DRD Generation](drd-generation.md).
 
 ### TriplyDB proxy
 
@@ -167,4 +181,68 @@ Winston structured logging with JSON output. All service calls log at `[INFO]` l
 
 ## Error handling
 
-A central `errorHandler.ts` middleware catches unhandled errors and returns standardised JSON error responses with appropriate HTTP status codes. SPARQL and Operaton errors are wrapped with descriptive messages before being returned to the frontend.
+A central `errorHandler.ts` middleware catches unhandled errors and returns standardised JSON error responses with appropriate HTTP status codes. SPARQL and Operaton errors are wrapped with descriptive messages before being returned to the frontend. No sensitive data is included in error responses.
+
+---
+
+## Performance
+
+**Targets:**
+
+| Operation | Target |
+|---|---|
+| Chain execution | < 1000ms |
+| Health check response | < 100ms |
+| DMN list query | < 500ms |
+| API response time (p95) | < 200ms |
+
+**Production baselines (Heusdenpas chain, 3 DMNs):**
+
+| Measurement | Observed |
+|---|---|
+| Full chain execution | ~827ms |
+| Health check (incl. TriplyDB + Operaton) | ~180ms |
+| DMN discovery (SPARQL + parsing) | ~350ms |
+| TriplyDB round-trip latency | 150–200ms |
+| Operaton per-DMN execution | 80–120ms |
+
+---
+
+## Security
+
+**HTTP headers** — [Helmet](https://helmetjs.github.io/) is configured to set comprehensive security headers on all responses, including `Content-Security-Policy`, `X-Content-Type-Options`, `X-Frame-Options`, and `Strict-Transport-Security`.
+
+**CORS** — only origins listed in `CORS_ORIGIN` are permitted. In production this is restricted to `https://linkeddata.open-regels.nl` and `https://cpsv.open-regels.nl`. All other origins receive a CORS rejection.
+
+**Input validation** — type checking is applied to all request inputs. Variable names, DMN identifiers, and SPARQL endpoint URLs are validated before any service call is made. Request body size is limited to 10 MB.
+
+**Environment variables** — all sensitive configuration (TriplyDB endpoint URLs, Operaton API URLs, CORS origins) is stored in environment variables and never hardcoded. No secrets are written to logs.
+
+**Error responses** — the central error handler scrubs stack traces and internal context before returning responses to clients, ensuring no implementation details are exposed.
+
+---
+
+## Dutch Government API Design Rules compliance
+
+The API follows the [Dutch Government API Design Rules](https://publicatie.centrumvoorstandaarden.nl/api/adr/) for interoperability and standardisation.
+
+**Implemented rules:**
+
+| Rule | Description | Implementation |
+|---|---|---|
+| API-20 | Major version in URI | `/v1/*` endpoints |
+| API-57 | Version header in responses | `API-Version: 0.4.0` on every response |
+| API-05 | Use nouns for resources | `dmns`, `chains`, `health` |
+| API-54 | Plural/singular naming | Correct usage throughout |
+| API-48 | No trailing slashes | Enforced in routing |
+| API-53 | Hide implementation details | Clean service abstractions |
+
+**Language note (API-04)** — technical endpoint names (`health`, `version`) follow international convention in English. Business resource names (`dmns`, `chains`) follow the source data. Dutch variable names (e.g., `geboortedatum`) are preserved as-is from the DMN definitions.
+
+**Planned:**
+
+| Rule | Description | Target version |
+|---|---|---|
+| API-16, API-51 | OpenAPI 3.0 spec at `/v1/openapi.json` | v0.5.0 |
+| API-02 | Standard error response format | v0.5.0 |
+| API-10 | Resource collections with pagination | v1.0.0 |
