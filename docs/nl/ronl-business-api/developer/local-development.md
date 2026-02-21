@@ -25,7 +25,11 @@
 
 ## Verify the setup
 
-# Backend health check
+## Getting a JWT token for API testing
+
+## Database access
+
+## Local service URLs
 
 ## Stopping the environment
 

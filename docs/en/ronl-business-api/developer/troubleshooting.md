@@ -118,6 +118,34 @@ If `operaton` is `"down"`: check that `https://operaton.open-regels.nl` is reach
 
 ---
 
+### Port already in use
+
+```
+Error: listen EADDRINUSE: address already in use :::3002
+```
+
+Find and stop whatever is occupying the port:
+
+```bash
+# Linux/Mac
+lsof -i :3002
+kill -9 <PID>
+
+# Windows
+netstat -ano | findstr :3002
+taskkill /PID <PID> /F
+```
+
+Alternatively, change the port in `packages/backend/.env`:
+
+```bash
+PORT=3003
+```
+
+And update `VITE_API_URL` in `packages/frontend/.env` to match.
+
+---
+
 ### API returns 500 Internal Server Error
 
 Check the backend terminal for a stack trace. Common causes:

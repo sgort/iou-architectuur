@@ -17,4 +17,14 @@
 
 ## What happens in the background
 
+## Test scenarios
+
+### Scenario 1 — Eligible, standard income
+
+### Scenario 2 — Not eligible, income too high
+
+### Scenario 3 — Active payment plan
+
+## Verification checklist
+
 ## Troubleshooting

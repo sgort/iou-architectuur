@@ -149,6 +149,75 @@ Expected response:
 
 ![Screenshot: RONL Business API Health Check Response](../../../assets/screenshots/ronl-business-api-health-check.png)
 
+## Getting a JWT token for API testing
+
+To test API endpoints directly (without the browser), obtain a token via curl. First retrieve the client secret from Keycloak Admin:
+
+1. Open `http://localhost:8080`
+2. Login: `admin` / `admin` → select realm **ronl**
+3. Navigate to **Clients → ronl-business-api → Credentials**
+4. Copy the **Client secret**
+
+Then request a token:
+
+```bash
+TOKEN=$(curl -s -X POST http://localhost:8080/realms/ronl/protocol/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "client_id=ronl-business-api" \
+  -d "client_secret=<YOUR_CLIENT_SECRET>" \
+  -d "username=test-citizen-utrecht" \
+  -d "password=test123" \
+  -d "grant_type=password" \
+  | jq -r '.access_token')
+
+echo "Token: $TOKEN"
+```
+
+Call a protected endpoint with the token:
+
+```bash
+curl -X POST http://localhost:3002/v1/process/zorgtoeslag/start \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "variables": {
+      "ingezeteneVanNederland": true,
+      "18JaarOfOuder": true,
+      "zorgverzekeringInNederland": true,
+      "inkomenEnVermogen": 24000
+    }
+  }' | jq
+```
+
+## Database access
+
+Inspect the audit log database while the Docker services are running:
+
+```bash
+docker exec -it ronl-postgres psql -U postgres
+
+# Switch to audit database
+\c audit_logs
+
+# View recent audit entries
+SELECT * FROM audit_logs ORDER BY timestamp DESC LIMIT 10;
+
+# View tenants
+SELECT * FROM tenants;
+
+# Exit
+\q
+```
+
+## Local service URLs
+
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:3002 |
+| Keycloak Admin | http://localhost:8080 (admin / admin) |
+| Operaton Cockpit | http://localhost:8081/operaton/app/cockpit/default/ |
+
 ## Stopping the environment
 
 ```bash

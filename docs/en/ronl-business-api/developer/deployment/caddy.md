@@ -29,6 +29,17 @@ operaton.open-regels.nl {
 
 Caddy automatically provisions and renews Let's Encrypt certificates for all listed domains. HTTP requests are automatically redirected to HTTPS.
 
+## Retrieving the Caddyfile from a running VM
+
+If the Caddyfile on the VM has diverged from the version in the repository, retrieve the live version and commit it:
+
+```bash
+ssh user@open-regels.nl "docker exec caddy cat /etc/caddy/Caddyfile" \
+  > deployment/vm/caddy/Caddyfile
+```
+
+Review the diff before committing — the VM copy is authoritative for any manual changes made outside of the normal deploy flow.
+
 ## Deploying Caddy
 
 ```bash

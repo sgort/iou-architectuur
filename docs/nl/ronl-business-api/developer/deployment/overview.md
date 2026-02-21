@@ -29,14 +29,6 @@
 
 ### VM health checks
 
-# Container resource usage (one-shot)
-
-# All VM service status
-
-# Service health endpoints (from the VM itself)
-
-# Follow logs
-
 ### Azure monitoring
 
 ## Disaster recovery
@@ -49,16 +41,20 @@
 
 ### OS security updates
 
-# If a kernel update was applied:
-
 ### Updating Keycloak
-
-# Update the image tag in docker-compose.yml, then:
-
-# Repeat for PROD during a maintenance window
 
 ### Updating Caddy
 
 ### Keycloak database backups
 
-# Run daily (add to cron on VM)
+### Volume backup
+
+## VM-level troubleshooting
+
+### Service not accessible from outside the VM
+
+### Container shows as unhealthy
+
+### Keycloak database connection failing
+
+## Production security checklist

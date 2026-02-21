@@ -54,7 +54,55 @@ Maandbedrag: € 95,83 (€ 1.150 per jaar)
 Aanvraagnummer: abc-123-def
 ```
 
-## What happens in the background
+## Test scenarios
+
+Use these to verify the calculation is working correctly end-to-end:
+
+### Scenario 1 — Eligible, standard income
+
+| Field | Value |
+|---|---|
+| Ingezetene van Nederland | ✓ |
+| 18 jaar of ouder | ✓ |
+| Zorgverzekering in Nederland | ✓ |
+| Betalingsregeling | ✗ |
+| Detentie | ✗ |
+| Jaarlijks inkomen | €24,000 |
+
+**Expected result:** Eligible — zorgtoeslag €1,250 per year
+
+### Scenario 2 — Not eligible, income too high
+
+| Field | Value |
+|---|---|
+| Ingezetene van Nederland | ✓ |
+| 18 jaar of ouder | ✓ |
+| Zorgverzekering in Nederland | ✓ |
+| Betalingsregeling | ✗ |
+| Detentie | ✗ |
+| Jaarlijks inkomen | €50,000 |
+
+**Expected result:** Not eligible — zorgtoeslag €0
+
+### Scenario 3 — Active payment plan
+
+Same as Scenario 1 but with **Betalingsregeling** set to ✓.
+
+**Expected result:** Payment plan active — eligibility and amount depend on current DMN rules; may be reduced or blocked.
+
+## Verification checklist
+
+Before signing off on a test environment:
+
+- [ ] Can log in as `test-citizen-utrecht`
+- [ ] Can log in as `test-caseworker-utrecht`
+- [ ] API health indicator shows all services UP
+- [ ] Municipality name displays correctly in the portal header
+- [ ] Assurance level (LoA) shows `hoog`
+- [ ] Zorgtoeslag calculation completes and shows a result
+- [ ] Results display correctly (amount, process instance ID)
+- [ ] Can log out and log in again without error
+- [ ] Token auto-refreshes — session remains active beyond 15 minutes without manual re-login
 
 1. The Business API validates your JWT
 2. Your `municipality` claim (`utrecht`) is used to scope the request to your tenant
