@@ -130,6 +130,7 @@ See [Authentication & IAM](../features/authentication-iam.md) for full DigiD set
 ### Mapper Not Appearing in Token
 
 **Check:**
+
 1. Mapper is added to correct client scope (`ronl-business-api-dedicated`)
 2. Client scope is assigned to client (`ronl-business-api`)
 3. "Add to access token" is enabled
@@ -246,6 +247,7 @@ docker compose exec keycloak \
 ```
 
 **Timeline Behavior:**
+
 - Cannot map user to BSN
 - Timeline fails to load
 - Error: "No BSN found for user"

@@ -100,7 +100,7 @@ nav:
       - Security & Compliance: ronl-business-api/features/security-compliance.md
       - API Design: ronl-business-api/features/api-design.md
     - User Guides:
-      - Logging In (DigiD Flow): ronl-business-api/user-guide/login-digid-flow.md
+      - Logging In: ronl-business-api/user-guide/login-digid-flow.md
       - Submitting a Calculation: ronl-business-api/user-guide/submitting-calculation.md
       - Using Timeline Navigation: ronl-business-api/user-guide/timeline-navigation.md
       - Caseworker Workflow: ronl-business-api/user-guide/caseworker-workflow.md

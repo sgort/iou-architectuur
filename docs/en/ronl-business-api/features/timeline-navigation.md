@@ -49,6 +49,7 @@ The timeline provides:
 #### Viewing Past Data
 
 **"What did my household look like in 2005?"**
+
 1. Drag slider to 2005 or click near 2005 on timeline
 2. See your age at that time (25 years old)
 3. See partner information (married since 2002)
