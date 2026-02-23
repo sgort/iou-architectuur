@@ -285,6 +285,6 @@ extra:
 watch:
   - docs/includes
 
-not_in_nav:
+not_in_nav: |
   includes/abbreviations.md
   nl/contributing/documentation-guide.md

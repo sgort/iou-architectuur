@@ -165,7 +165,7 @@ If you have multiple mappers for `preferred_username`:
 Beyond this mapper, ensure these are also configured:
 
 1. **Shared Package Types** — `KeycloakUser` interface includes `preferred_username`
-2. **Backend tsconfig** — Removed `composite: true` (see [Technical Architecture](../technical/brp-timeline-integration.md))
+2. **Backend tsconfig** — Removed `composite: true` (see [Technical Architecture](../references/brp-timeline-integration.md))
 3. **BSN Mapping Service** — Maps usernames to BSN (see [Developer Guide](../developer/implementing-timeline.md))
 
 ### Test Users Setup

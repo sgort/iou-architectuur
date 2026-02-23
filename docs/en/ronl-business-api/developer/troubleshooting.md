@@ -158,13 +158,48 @@ Check the backend terminal for a stack trace. Common causes:
 
 ### Zorgtoeslag calculation fails
 
+#### DMN hit policy violation
+
+**Symptom:**
+```
+POST /v1/decision/berekenrechtenhoogtezorg/evaluate → 500
+{
+  "success": false,
+  "error": {
+    "code": "DECISION_EVALUATION_FAILED",
+    "message": "DMN configuratiefout in beslissingstabel 'berekenrechtenhoogtezorg': meerdere regels zijn tegelijk van toepassing, maar het trefriebeleid (hit policy) staat slechts één treffer toe. Neem contact op met de beheerder."
+  }
+}
+```
+
+**Cause:** The DMN decision table uses the default `UNIQUE` hit policy, which requires exactly one rule to match per evaluation. When multiple disqualifying conditions are true simultaneously (e.g. both `betalingsregeling = true` and `detentie = true`), two rules match and Operaton throws a runtime exception. Operaton surfaces this as `"Exception while evaluating decision with key 'null'"` — the `'null'` refers to the internal rule key that could not be resolved, not to the decision key itself.
+
+**Fix:** Open `BerekenRechtEnHoogteZorg.dmn` in Camunda Modeler and set the hit policy on the decision table to `FIRST`:
+```xml
+<decisionTable id="decisionTable" hitPolicy="FIRST">
+```
+
+With `FIRST`, rules are evaluated top-to-bottom and evaluation stops at the first match. Ensure the disqualifying rules (betalingsregeling, detentie, ingezetene, leeftijd, verzekering) appear above the income threshold rules and the positive allowance rule.
+
+Also correct the `Null` literals in all disqualifying output entries — the FEEL spec requires lowercase `null`:
+```xml
+<!-- Wrong -->
+<outputEntry><text>Null</text></outputEntry>
+
+<!-- Correct -->
+<outputEntry><text>null</text></outputEntry>
+```
+
+After editing, redeploy the DMN to Operaton via the Camunda Modeler deploy feature or the Operaton REST API.
+
+**Error message routing:** The `operaton.service.ts` catch block detects this specific error pattern and throws a descriptive `Error` instead of re-throwing the raw axios exception. `decision.routes.ts` propagates that message as `error.message` in the 500 response body. The frontend `api.ts` reads `error.response.data` on a 500 and returns it as a structured `ApiResponse`, so `Dashboard.tsx` renders `result.error.message` directly. Citizens see a neutral notification; caseworkers see the technical message.
+
+#### Other causes
+
 1. Open browser DevTools → **Network tab**
 2. Find the request to `/v1/decision/berekenrechtenhoogtezorg/evaluate`
-3. Check the response status — should be `200`
-4. Common causes:
-   - `aud` claim missing from token → see JWT audience fix above
-   - Operaton service unreachable
-   - Invalid input variable types
+3. Check the response body — the `error.message` field identifies the cause
+4. Common causes: `aud` claim missing from token (see JWT audience fix above), Operaton service unreachable (check health endpoint), invalid input variable types
 
 ---
 
