@@ -90,6 +90,25 @@ Same as Scenario 1 but with **Betalingsregeling** set to ✓.
 
 **Expected result:** Payment plan active — eligibility and amount depend on current DMN rules; may be reduced or blocked.
 
+### Scenario 4 — Multiple disqualifying conditions active
+
+| Field | Value |
+|---|---|
+| Ingezetene van Nederland | ✓ |
+| 18 jaar of ouder | ✓ |
+| Zorgverzekering in Nederland | ✓ |
+| Betalingsregeling | ✓ |
+| Detentie | ✓ |
+| Jaarlijks inkomen | €24,000 |
+
+**Expected result:** This combination currently triggers a DMN configuration error — two disqualifying rules match simultaneously and the decision table's hit policy does not permit this. See the note below.
+
+!!! warning "Known DMN configuration issue"
+    When both **betalingsregeling** and **detentie** are active at the same time, the decision table returns an error instead of a result. The DMN is being updated to use the `FIRST` hit policy, which evaluates rules top-to-bottom and stops at the first match. Until that fix is deployed:
+
+    - **Citizens** see: *"De berekening kon niet worden afgerond vanwege een fout in de bedrijfsregels. Dit is bij de beheerder gemeld."*
+    - **Caseworkers** see: the technical error message identifying the hit policy conflict.
+
 ## Verification checklist
 
 Before signing off on a test environment:

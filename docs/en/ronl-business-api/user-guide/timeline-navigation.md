@@ -316,7 +316,6 @@ Planned features:
 ## Related Help Articles
 
 - [Login (DigiD Flow)](login-digid-flow.md)
-- [Zorgtoeslag Application](zorgtoeslag-application.md)
 - [Privacy & Security](../references/standards-compliance.md)
 
 ---
