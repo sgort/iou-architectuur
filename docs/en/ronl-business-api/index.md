@@ -1,8 +1,6 @@
 # RONL Business API
 
-
-
-**A React-based SPARQL visualization and query tool for exploring Dutch Government Data (Regels Overheid)**
+**Serves as a reference for implementing a compliant, secure, and reliable BPMN service for Dutch municipalities using open-source components.**
 
 🌐 **Live application:** [mijn.open-regels.nl](https://mijn.open-regels.nl)  
 🧪 **Acceptance environment:** [acc.mijn.open-regels.nl](https://acc.mijn.open-regels.nl)
