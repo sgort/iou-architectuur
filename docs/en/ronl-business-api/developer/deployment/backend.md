@@ -147,24 +147,42 @@ If the health check fails after 5 attempts, the workflow fails and the deploymen
 To deploy without GitHub Actions (emergency or first-time setup):
 
 ```bash
-cd packages/backend
+# Prepare package (same structure as CI)
 
-# Build
+# From project root
+cd packages/shared
+npm run build
+cd ../backend
+
+# Build backend
 npm run build
 
-# Prepare package (same structure as CI)
+# Prepare deployment package
 mkdir -p deploy
 cp -r dist deploy/
 cp package.json deploy/
+
+# Copy shared package
 mkdir -p deploy/node_modules/@ronl
 cp -r ../shared/dist deploy/node_modules/@ronl/shared
 cp ../shared/package.json deploy/node_modules/@ronl/shared/
+
+# Install production dependencies
 cd deploy && npm install --production --omit=dev && cd ..
+
+# Create zip file
+cd deploy
+zip -r ../deployment-acc.zip .
+cd ..
 
 # Deploy using Azure CLI
 az webapp deploy \
   --name ronl-business-api-acc \
   --resource-group rg-ronl-acc \
-  --src-path deploy \
+  --src-path deployment-acc.zip \
   --type zip
+
+# Cleanup
+rm -rf deploy
+rm deployment-acc.zip
 ```

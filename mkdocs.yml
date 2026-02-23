@@ -96,11 +96,13 @@ nav:
       - Multi-Tenant Municipality Portal: ronl-business-api/features/multi-tenant-portal.md
       - Authentication & IAM: ronl-business-api/features/authentication-iam.md
       - Business Rules Execution: ronl-business-api/features/business-rules-execution.md
+      - Timeline Navigation: ronl-business-api/features/timeline-navigation.md
       - Security & Compliance: ronl-business-api/features/security-compliance.md
       - API Design: ronl-business-api/features/api-design.md
     - User Guides:
       - Logging In (DigiD Flow): ronl-business-api/user-guide/login-digid-flow.md
       - Submitting a Calculation: ronl-business-api/user-guide/submitting-calculation.md
+      - Using Timeline Navigation: ronl-business-api/user-guide/timeline-navigation.md
       - Caseworker Workflow: ronl-business-api/user-guide/caseworker-workflow.md
       - Adding a Municipality: ronl-business-api/user-guide/adding-municipality.md
     - Developer Docs:
@@ -108,6 +110,7 @@ nav:
       - Backend Development: ronl-business-api/developer/backend-development.md
       - Frontend Development: ronl-business-api/developer/frontend-development.md
       - Shared Package: ronl-business-api/developer/shared-package.md
+      - Timeline Implementation: ronl-business-api/developer/implementing-timeline.md
       - Testing: ronl-business-api/developer/testing.md
       - CI/CD: ronl-business-api/developer/cicd.md
       - Troubleshooting: ronl-business-api/developer/troubleshooting.md
@@ -120,10 +123,13 @@ nav:
         - Caddy (Reverse Proxy): ronl-business-api/developer/deployment/caddy.md
     - References:
       - API Endpoints: ronl-business-api/references/api-endpoints.md
+      - BRP API Endpoints: ronl-business-api/references/brp-api-endpoints.md
       - Environment Variables: ronl-business-api/references/environment-variables.md
       - JWT Claims: ronl-business-api/references/jwt-claims.md
       - Keycloak Realm Configuration: ronl-business-api/references/keycloak-realm.md
+      - Keycloak Timeline Setup: ronl-business-api/references/keycloak-timeline-setup.md
       - Municipality Themes: ronl-business-api/references/municipality-themes.md
+      - BRP Timeline Integration: ronl-business-api/references/brp-timeline-integration.md
       - Standards & Compliance: ronl-business-api/references/standards-compliance.md
       - Changelog: ronl-business-api/references/changelog.md
   
