@@ -19,6 +19,7 @@ Currently, all test users map to Wessel Kooyman (BSN: 999992235). To add more di
 If you control the BRP API mock, add new persona data. Otherwise, you'll need to use different BSN numbers that exist in the mock.
 
 **Example personas to add:**
+
 - Single person without partner/children
 - Divorced person with children
 - Person with multiple marriages
