@@ -4,6 +4,14 @@
 
 ## Changelog
 
+### v0.9.x — DMN Syntactic Validation (February 2026)
+
+**v0.9.0 — DMN Validator**
+
+Added DMN Validator feature. The DMN Validator lets you validate one or more DMN files against the RONL DMN+ syntactic layers. It is accessible from the shield icon (🛡) in the sidebar. You can drop any number of .dmn or .xml files onto the validator at once, or add files incrementally — the drop zone remains visible at the top of the panel whenever files are loaded. Files are validated independently and displayed side-by-side for easy comparison.
+
+The validator runs on the shared backend at `POST /v1/dmns/validate` and is used both by this Linked Data Explorer's standalone DMN Validator view and by the CPSV Editor's inline validation in the [DMN tab](../../cpsv-editor/features/dmn-orchestration.md).
+
 ### v0.8.x — Governance & Vendor Integration (February 2026)
 
 **v0.8.4 — Vendor Services**

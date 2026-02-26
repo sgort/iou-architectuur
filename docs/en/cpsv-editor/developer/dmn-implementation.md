@@ -7,8 +7,9 @@
 ```
 src/
 ├── components/tabs/
-│   └── DMNTab.jsx                    # Main UI (850+ lines)
+│   └── DMNTab.jsx                    # Main UI (900+ lines)
 │       • File upload + card display
+│       • Syntactic validation panel
 │       • API configuration
 │       • Deployment controls
 │       • Single evaluate (Postman-style)
@@ -53,6 +54,91 @@ dmnData: {
   isImported: boolean,
 }
 ```
+
+---
+
+## Syntactic validation
+
+### Overview
+
+When a DMN file is uploaded or an example is loaded, `DMNTab.jsx` calls the shared backend validation endpoint and stores the result in local component state.
+
+```javascript
+// State added in v1.9.3
+const [validationResult, setValidationResult] = useState(null);
+const [isValidating, setIsValidating]         = useState(false);
+const [validationExpanded, setValidationExpanded] = useState(false);
+```
+
+### Backend call
+
+```javascript
+const runBackendValidation = async (content) => {
+  setIsValidating(true);
+  try {
+    const response = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/v1/dmns/validate`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content }),
+      }
+    );
+    const data = await response.json();
+    if (data.success) {
+      setValidationResult(data.data);
+      // Auto-expand the panel when errors are present
+      setValidationExpanded(data.data.summary.errors > 0);
+    }
+  } catch (err) {
+    // Validation failure is non-blocking — DMN workflow continues
+  } finally {
+    setIsValidating(false);
+  }
+};
+```
+
+The call is made:
+
+- After `handleFileUpload` — `reader.onload` completes
+- After `loadExampleDMN` — on successful fetch
+- Cleared in `handleClearFile` — `setValidationResult(null); setIsValidating(false);`
+
+### Validation is non-blocking
+
+A validation failure (network error or backend unavailable) does not prevent the DMN workflow from continuing. The panel simply does not appear. This ensures the editor remains functional in environments where the backend is unreachable.
+
+### Response shape
+
+```typescript
+interface ValidationResult {
+  valid: boolean;
+  parseError: string | null;
+  layers: {
+    base:        { label: string; issues: Issue[] };
+    business:    { label: string; issues: Issue[] };
+    execution:   { label: string; issues: Issue[] };
+    interaction: { label: string; issues: Issue[] };
+    content:     { label: string; issues: Issue[] };
+  };
+  summary: { errors: number; warnings: number; infos: number };
+}
+
+interface Issue {
+  severity: 'error' | 'warning' | 'info';
+  code: string;      // e.g. 'EXEC-001', 'INT-005'
+  message: string;
+  location?: string; // element description e.g. '<decision id="d1">'
+  line?: number;
+  column?: number;
+}
+```
+
+### UI rendering
+
+The validation panel is rendered inside the file card, between the file info row and the Deploy button. It is hidden when `validationResult` is null or `isValidating` is true (a spinner is shown instead).
+
+The collapsible layer rows follow the same pattern as the Linked Data Explorer's `DmnValidator` component — each layer shows an icon and badge counts at a glance and expands on click to show individual issue rows.
 
 ---
 
