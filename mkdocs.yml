@@ -114,6 +114,7 @@ nav:
       - Testing: ronl-business-api/developer/testing.md
       - CI/CD: ronl-business-api/developer/cicd.md
       - Troubleshooting: ronl-business-api/developer/troubleshooting.md
+      - Changelog & Roadmap: ronl-business-api/developer/changelog-roadmap.md
       - Deployment:
         - Overview: ronl-business-api/developer/deployment/overview.md
         - Keycloak (VM): ronl-business-api/developer/deployment/keycloak.md

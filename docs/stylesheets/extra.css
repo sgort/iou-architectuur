@@ -281,3 +281,22 @@ button:focus {
     grid-template-columns: 1fr;
   }
 }
+
+/* =============================================================
+   What's New — colored grid cards on home page
+   Each card gets a coloured top border matching its component.
+   .md-typeset prefix + !important overrides Material's own card
+   border shorthand which would otherwise win the cascade.
+   ============================================================= */
+
+.md-typeset .whats-new-cards li:nth-child(1) {
+  border-top: 4px solid var(--primary-color) !important;     /* RONL Business API — Rijksoverheid blue */
+}
+
+.md-typeset .whats-new-cards li:nth-child(2) {
+  border-top: 4px solid var(--accent-color) !important;      /* CPSV Editor — orange */
+}
+
+.md-typeset .whats-new-cards li:nth-child(3) {
+  border-top: 4px solid var(--status-compliant) !important;  /* Linked Data Explorer — green */
+}

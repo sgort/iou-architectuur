@@ -2,6 +2,46 @@
 
 Welcome to the comprehensive documentation for the IOU Architecture Framework and the RONL ecosystem.
 
+---
+
+## 🆕 What's New
+
+<div class="grid cards whats-new-cards" markdown>
+
+-   **⚙️ RONL Business API — v2.0.0** · *February 21, 2026*
+
+    ---
+
+    **Frontend Redesign & IDP Selection**
+
+    New landing page with identity provider selection (DigiD / eHerkenning / eIDAS), custom Keycloak theme matching MijnOmgeving design, multi-tenant theming with CSS custom properties, and full mobile-responsive layout.
+
+    [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
+
+-   **✏️ CPSV Editor — v1.9.3** · *February 2026*
+
+    ---
+
+    **DMN Syntactic Validation**
+
+    Inline DMN validation immediately after upload: five-layer syntactic checks with severity-coded results (error / warning / info), element references, and line numbers — directly in the DMN file card.
+
+    [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
+
+-   **🔍 Linked Data Explorer — v0.9.0** · *February 2026*
+
+    ---
+
+    **DMN Validator Feature**
+
+    Standalone DMN Validator accessible from the sidebar. Drop multiple `.dmn` or `.xml` files for independent side-by-side validation against RONL DMN+ syntactic layers via `POST /v1/dmns/validate`.
+
+    [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
+
+</div>
+
+---
+
 ## What is IOU Architecture?
 
 The Information Architecture Framework for IOU integrates semantic web technologies, decision models, and Dutch government standards into a unified system for managing regulatory compliance and spatial planning.
