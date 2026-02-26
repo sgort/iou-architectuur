@@ -29,7 +29,7 @@ Results are grouped into five layers. Each layer can be expanded to see individu
 | Layer | Badge | Covers |
 |---|---|---|
 | Base DMN | BASE-* | XML well-formedness, namespace, root element, required attributes |
-| Business Rules | BIZ-* | Hit policy, typeRef presence and correctness, rule entry counts |
+| Business Rules | BIZ-* | Hit policy, typeRef presence and correctness, rule entry counts, hit-policy overlap detection |
 | Execution Rules | EXEC-* | CPRMV extension attributes, enum values, date formats, BWB IDs |
 | Interaction Rules | INT-* | DRD wiring — href resolution, orphaned inputs, variable names |
 | Content | CON-* | Metadata quality — descriptions, typeRef, text annotations |
@@ -47,6 +47,14 @@ For the complete specification of every code and its rationale, see the [DMN Val
 | 🔴 | Error | The DMN has a structural or semantic problem that will likely cause deployment or execution failure. Must be resolved. |
 | 🟡 | Warning | The DMN will work but deviates from RONL publishing standards. Should be resolved before publishing. |
 | 🔵 | Info | A quality suggestion. No functional impact. |
+
+---
+
+## Validation example
+
+The screenshot below shows `BIZ-008-009-test.dmn` — a file deliberately authored with two hit-policy violations — loaded in the validator. The Business Rules layer reports one error and one warning.
+
+![Screenshot: BIZ-008-009-test.dmn in the DMN Validator showing Business Rules 1E 1W — BIZ-008 duplicate rows error and BIZ-009 catch-all shadow warning](../../assets/screenshots/linked-data-explorer-dmn-validator-biz-008-009-test.png)
 
 ---
 

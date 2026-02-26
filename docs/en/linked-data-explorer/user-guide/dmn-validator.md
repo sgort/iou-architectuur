@@ -73,6 +73,7 @@ Errors must be resolved in your DMN authoring tool (Camunda Modeler, VS Code DMN
 - **BASE-PARSE** — the file is not valid XML. Open it in a text editor to locate the syntax problem.
 - **BASE-NS** — the namespace does not match a known DMN version. Update the `xmlns` attribute on `<definitions>`.
 - **INT-005** — an `<inputData>` element exists but is not wired to any decision. Either connect it or remove it in your modeler.
+- **BIZ-008** — two rules in a `UNIQUE` or `ANY` table have identical input entries. Operaton throws `DmnHitPolicyException` at runtime. Remove or differentiate the duplicate rule.
 
 ### Warnings
 
@@ -80,6 +81,7 @@ Warnings are advisory. The most common ones for RONL publishing:
 
 - **BIZ-002 / BIZ-004** — `typeRef` is missing on an input expression or output column. Add the FEEL type (e.g. `boolean`, `string`, `integer`) in the modeler.
 - **EXEC-001** — the CPRMV namespace is not declared. CPRMV attributes are optional but recommended for RONL-compliant publishing.
+- **BIZ-009** — a `UNIQUE` or `ANY` table contains a catch-all rule (all inputs empty or `-`) alongside specific rules. Both the specific rule and the catch-all fire for any matching input, violating the hit policy. Change `hitPolicy` to `FIRST` and place the catch-all last.
 
 ### Informational messages
 
