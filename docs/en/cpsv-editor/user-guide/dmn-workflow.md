@@ -26,17 +26,35 @@ On upload, the editor:
 
 If you do not have a DMN file yet, click **Load Example** to use the provided AOW example.
 
-![Screenshot: DMN tab after file upload showing the file card with decision count badge, the auto-populated Decision Key field, and the auto-generated request body](../../assets/screenshots/cpsv-editor-dmn-uploaded.png)
+---
+
+## Step 2: Review the syntactic validation result
+
+Immediately after upload, the editor runs the file through the five-layer syntactic validator and displays the result in the file card.
+
+**If the file is valid**, a green *Syntax valid* badge appears. Any warnings or informational messages are shown in a collapsed panel — review them before deploying.
+
+**If the file has errors**, the panel expands automatically and lists the issues grouped by layer. Address the errors in your DMN authoring tool before proceeding with deployment.
+
+| Badge | Meaning |
+|---|---|
+| 🟢 Syntax valid | No errors. Warnings and info messages may still be present. |
+| 🔴 Validation failed | One or more errors detected. Deployment will likely fail or produce incorrect results. |
+
+!!! tip
+    Warnings in the **Interaction Rules** layer often indicate orphaned `<inputData>` elements — inputs that exist in the DRD but are not connected to any decision via `<informationRequirement>`. These are harmless for execution but result in dead data in the model.
+
+For a full explanation of every issue code and its rationale, see the [DMN Validation Reference](../../../linked-data-explorer/reference/dmn-validation-reference.md).
 
 ---
 
-## Step 2: Configure the API endpoint
+## Step 3: Configure the API endpoint
 
 The API endpoint defaults to `https://operaton.open-regels.nl/engine-rest`. Change it if you are using a different Operaton instance.
 
 ---
 
-## Step 3: Deploy to Operaton
+## Step 4: Deploy to Operaton
 
 Click **Deploy to Operaton**. The editor sends the DMN file to the engine via `POST /engine-rest/deployment/create`.
 
@@ -44,7 +62,7 @@ On success, the button changes to **Deployed — ID: {deployment-id}** and the d
 
 ---
 
-## Step 4: Test the decision
+## Step 5: Test the decision
 
 Review the auto-generated request body in the test panel. Edit variable values to match your test scenario.
 
@@ -54,7 +72,7 @@ For multi-table DMNs, expand the **Intermediate Decision Tests** section and cli
 
 ---
 
-## Step 5: Export TTL with DMN metadata
+## Step 6: Export TTL with DMN metadata
 
 Click **Download TTL**. The exported file includes:
 
@@ -72,3 +90,4 @@ The DMN section is appended after the core service metadata.
 - Use descriptive decision keys in your DMN XML (e.g. `zorgtoeslag_resultaat` rather than `Decision_1`).
 - Do not use spaces in decision keys — use underscores or camelCase.
 - Deploy and test before exporting. Undeployed DMN metadata in the Turtle output has no deployment ID, which limits its usefulness.
+- Resolve all validation **errors** before deploying. **Warnings** are advisory and will not prevent a successful deployment.

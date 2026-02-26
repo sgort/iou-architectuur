@@ -175,6 +175,7 @@ nav:
         - SPARQL Query Editor: linked-data-explorer/features/sparql-query-editor.md
         - DMN Discovery & Chain Building: linked-data-explorer/features/dmn-chain-building.md
         - DRD Generation: linked-data-explorer/features/drd-generation.md
+        - DMN Validator: linked-data-explorer/features/dmn-validator.md
         - Semantic Analysis: linked-data-explorer/features/semantic-analysis.md
         - BPMN Modeler: linked-data-explorer/features/bpmn-modeler.md
         - Governance & Validation: linked-data-explorer/features/governance-validation.md
@@ -184,6 +185,7 @@ nav:
         - Running SPARQL Queries: linked-data-explorer/user-guide/sparql-queries.md
         - Building DMN Chains: linked-data-explorer/user-guide/chain-building.md
         - Saving & Executing DRDs: linked-data-explorer/user-guide/drd-generation.md
+        - DMN Validator: linked-data-explorer/user-guide/dmn-validator.md
         - Semantic Analysis: linked-data-explorer/user-guide/semantic-analysis.md
         - BPMN Modeler: linked-data-explorer/user-guide/bpmn-modeler.md
         - Governance Badges: linked-data-explorer/user-guide/governance-badges.md
@@ -196,6 +198,7 @@ nav:
         - Enhanced Validation & Semantic Detection: linked-data-explorer/developer/enhanced-validation.md
         - Chain Export: linked-data-explorer/developer/chain-export.md
         - DRD Generation: linked-data-explorer/developer/drd-generation.md
+        - DMN Validator Implementation: linked-data-explorer/developer/dmn-validator-implementation.md
         - BPMN Modeler: linked-data-explorer/developer/bpmn-modeler.md
         - Governance Implementation: linked-data-explorer/developer/governance.md
         - Vendor Services Implementation: linked-data-explorer/developer/vendor-services.md
@@ -204,6 +207,7 @@ nav:
         - Changelog & Roadmap: linked-data-explorer/developer/changelog-roadmap.md
     - References:
         - Operaton DMN Compatibility: linked-data-explorer/reference/operaton-dmn-compatibility.md
+        - DMN Validation Reference: linked-data-explorer/reference/dmn-validation-reference.md
         - API Reference: linked-data-explorer/reference/api-reference.md
         - RONL Ontology: linked-data-explorer/reference/ronl-ontology.md
 
