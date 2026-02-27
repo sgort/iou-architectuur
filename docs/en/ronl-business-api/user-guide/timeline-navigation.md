@@ -315,7 +315,7 @@ Planned features:
 
 ## Related Help Articles
 
-- [Login (DigiD Flow)](login-digid-flow.md)
+- [Login (DigiD Flow)](login-flow.md)
 - [Privacy & Security](../references/standards-compliance.md)
 
 ---

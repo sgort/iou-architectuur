@@ -2,7 +2,7 @@
 
 Keycloak runs in Docker on the VM (`open-regels.nl`). Two fully isolated instances run in parallel: ACC and PROD. Each has its own PostgreSQL database container and custom RONL theme.
 
-![Screenshot: Keycloak Custom Theme Login Page](../../../../assets/screenshots/ronl-keycloak-custom-theme.png)
+![Screenshot: Keycloak Custom Theme Login Page](../../../../assets/screenshots/ronl-keycloak-digid-login.png)
 *Custom RONL theme matching MijnOmgeving design with blue gradient header*
 
 ## Repository structure
@@ -62,10 +62,14 @@ The RONL theme provides a consistent visual experience from the MijnOmgeving lan
 
 **Technical:**
 
+**Technical:**
+
 - ✅ FreeMarker templates for login flow
-- ✅ Custom CSS with government color schemes
+- ✅ Custom CSS with government colour schemes
 - ✅ Dutch translations (messages_nl.properties)
-- ✅ Optimized for accessibility (WCAG 2.1 AA)
+- ✅ Optimised for accessibility (WCAG 2.1 AA)
+- ✅ Caseworker context banner via `loginHint` sentinel detection
+- ✅ "← Terug naar inlogkeuze" cancel link using `history.go(-2)`
 
 ### Theme Structure
 
@@ -107,6 +111,75 @@ ronl/login/
   transition: all 0.2s;
 }
 ```
+
+### Caseworker context banner
+
+The `login.ftl` template distinguishes citizen and caseworker login using a sentinel value passed via Keycloak's `login_hint` parameter. When `AuthCallback.tsx` calls `keycloak.login({ loginHint: '__medewerker__' })`, Keycloak populates `login.username` with this sentinel before rendering `login.ftl`.
+
+The template detects the sentinel at the top of the file:
+
+```freemarker
+<#assign isMedewerker = (login.username!'') == '__medewerker__'>
+```
+
+When `isMedewerker` is true:
+
+- The page `<header>` section renders **"Medewerker portaal"** instead of the default "Inloggen" title
+- An indigo context banner is rendered above the form:
+
+```freemarker
+<#if isMedewerker>
+<div id="kc-context-banner" class="kc-context-medewerker">
+    <!-- briefcase SVG icon -->
+    Inloggen als gemeentemedewerker
+</div>
+</#if>
+```
+
+- The username `<input>` suppresses the sentinel so the caseworker sees an empty field:
+
+```freemarker
+<input ... value="<#if !isMedewerker>${(login.username!'')}</#if>" ... />
+```
+
+The corresponding CSS in `login.css`:
+
+```css
+#kc-context-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  margin-bottom: 1.5rem;
+  background: #f0f4ff;
+  border: 1px solid #c7d7fd;
+  border-radius: 8px;
+  color: #3730a3;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+```
+
+No JavaScript is involved — all detection and suppression happens server-side in FreeMarker before the HTML reaches the browser.
+
+### Cancel link
+
+Both citizen (test/fallback) and caseworker login forms include a "← Terug naar inlogkeuze" link below the submit button. It uses `history.go(-2)` to skip over the `/auth` intermediate route:
+
+```freemarker
+<div id="kc-cancel-container">
+    <a id="kc-cancel" href="${client.baseUrl!'/'}"
+       onclick="history.go(-2); return false;" tabindex="7">
+        <!-- left-arrow SVG -->
+        Terug naar inlogkeuze
+    </a>
+</div>
+```
+
+The `href` fallback (`client.baseUrl`) points to the frontend root URL configured in Keycloak Admin → Clients → `ronl-business-api` → Root URL. This is only used if JavaScript is disabled. The `history.go(-2)` skip is necessary because the browser history stack at this point is: `/ → /auth → [Keycloak]`, and `history.back()` would land on `/auth`, which immediately redirects back to Keycloak.
+
+!!! note "Container restart required after theme changes"
+    Keycloak caches theme templates at startup. Any change to `.ftl` or `.css` files requires a container restart to take effect — regardless of whether Keycloak is running in development or production mode. Theme changes do not require an image rebuild.
 
 ## Deploying to ACC
 
@@ -515,6 +588,36 @@ sudo find /opt/keycloak/themes/ronl -type f -exec chmod 644 {} \;
 docker compose restart keycloak-acc
 ```
 
+### Caseworker banner not appearing
+
+**Symptoms:** Caseworker login shows generic Keycloak form without the indigo banner or "Medewerker portaal" title.
+
+**Cause 1:** Outdated `login.ftl` on the server — the sentinel detection code is missing.
+
+**Solution:** Verify the installed template:
+```bash
+docker exec keycloak-acc grep -n 'isMedewerker' \
+  /opt/keycloak/themes/ronl/login/login.ftl
+# Should return line numbers for the assign and if blocks
+```
+If nothing is returned, redeploy the theme files and restart the container.
+
+**Cause 2:** `sessionStorage` is not carrying `selected_idp = medewerker` to `/auth`.
+
+**Solution:** Open DevTools → Application → Session Storage → `http://localhost:5173` (or the ACC URL). Confirm `selected_idp` equals `medewerker` before the `/auth` route is hit. If it is missing or a different value, the `handleIDPSelection` call in `LoginChoice.tsx` is not firing correctly.
+
+### Username field pre-filled with `__medewerker__`
+
+**Symptoms:** The caseworker login form shows `__medewerker__` in the username field.
+
+**Cause:** The `login.ftl` on the server does not include the sentinel suppression condition on the `value` attribute.
+
+**Solution:** The input must use:
+```freemarker
+value="<#if !isMedewerker>${(login.username!'')}</#if>"
+```
+Ensure the deployed `login.ftl` matches the version in the repository and restart the container.
+
 ### Dutch translations not working
 
 **Symptoms:** Theme applied but text still in English.
@@ -639,7 +742,7 @@ For PROD deployment:
 ## Related Documentation
 
 - [Authentication & IAM Features](../../features/authentication-iam.md) — Keycloak integration overview
-- [Login Flow User Guide](../../user-guide/login-digid-flow.md) — End-user authentication experience
+- [Login Flow User Guide](../../user-guide/login-flow.md) — End-user authentication experience
 - [Frontend Development](../frontend-development.md) — Keycloak JS adapter integration
 - [Deployment Overview](overview.md) — Full deployment architecture
 - [Caddy Reverse Proxy](caddy.md) — SSL termination and routing

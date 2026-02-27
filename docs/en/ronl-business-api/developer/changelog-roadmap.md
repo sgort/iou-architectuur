@@ -4,6 +4,12 @@
 
 ## Changelog
 
+### Frontend — v2.0.1 — Feature Release (February 27, 2026)
+
+**Caseworker login** 🏢
+
+Added a dedicated caseworker login path to the MijnOmgeving landing page. A slate-coloured "Inloggen als Medewerker" button, visually separated from the three citizen IdP options by a "MEDEWERKERS" section divider, initiates the new flow. `AuthCallback` uses `check-sso` instead of `login-required`, so caseworkers with an active Keycloak SSO session bypass the login screen on subsequent visits. When a new session is required, `keycloak.login({ loginHint: '__medewerker__' })` redirects to Keycloak, where the custom `login.ftl` theme detects the sentinel and renders an indigo "Inloggen als gemeentemedewerker" context banner with "Medewerker portaal" as the page title.
+
 ### Frontend — v2.0.0 — Major Release (February 2026)
 
 **Frontend Redesign** 🎨
@@ -128,6 +134,7 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 | IDP selection landing page | v2.0.0 |
 | Custom Keycloak MijnOmgeving theme | v2.0.0 |
 | DigiD / eHerkenning / eIDAS infrastructure | v2.0.0 |
+| Caseworker login with SSO session reuse | v2.0.1 |
 
 ---
 
