@@ -285,18 +285,47 @@ button:focus {
 /* =============================================================
    What's New — colored grid cards on home page
    Each card gets a coloured top border matching its component.
-   .md-typeset prefix + !important overrides Material's own card
-   border shorthand which would otherwise win the cascade.
+   Cards are addressed by position (order is fixed: API, CPSV, LDE).
    ============================================================= */
 
-.md-typeset .whats-new-cards li:nth-child(1) {
-  border-top: 4px solid var(--primary-color) !important;     /* RONL Business API — Rijksoverheid blue */
+.whats-new-cards > ul > li:nth-child(1) {
+  border-top: 4px solid var(--primary-color);     /* RONL Business API — Rijksoverheid blue */
 }
 
-.md-typeset .whats-new-cards li:nth-child(2) {
-  border-top: 4px solid var(--accent-color) !important;      /* CPSV Editor — orange */
+.whats-new-cards > ul > li:nth-child(2) {
+  border-top: 4px solid var(--accent-color);      /* CPSV Editor — orange */
 }
 
-.md-typeset .whats-new-cards li:nth-child(3) {
-  border-top: 4px solid var(--status-compliant) !important;  /* Linked Data Explorer — green */
+.whats-new-cards > ul > li:nth-child(3) {
+  border-top: 4px solid var(--status-compliant);  /* Linked Data Explorer — green */
+}
+/* =============================================================
+   Documentation Status — admonition table on home page
+   ============================================================= */
+
+/* Tighten the table inside the admonition — inherits th/td from
+   the global table rules above but overrides spacing and removes
+   the hover highlight that looks odd inside an admonition. */
+.doc-status-admonition .doc-status-table {
+  margin: 0.75em 0 0.25em;
+  font-size: 0.85em;
+}
+
+.doc-status-admonition .doc-status-table th {
+  background-color: var(--primary-color);
+  padding: 0.5em 0.75em;
+}
+
+.doc-status-admonition .doc-status-table td {
+  padding: 0.4em 0.75em;
+  vertical-align: middle;
+}
+
+.doc-status-admonition .doc-status-table tr:hover {
+  background-color: transparent;
+}
+
+.doc-status-admonition .doc-status-table a {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.95em;
 }
