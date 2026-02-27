@@ -8,13 +8,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.0.1** · *February 27, 2026*
+-   **⚙️ RONL Business API — v2.0.0** · *February 21, 2026*
 
     ---
 
     **Frontend Redesign & IDP Selection**
 
-    Added a dedicated caseworker login path to the MijnOmgeving v2.0.0 landing page with identity provider selection (DigiD / eHerkenning / eIDAS), custom Keycloak theme matching MijnOmgeving design, multi-tenant theming with CSS custom properties, and full mobile-responsive layout.
+    New landing page with identity provider selection (DigiD / eHerkenning / eIDAS), custom Keycloak theme matching MijnOmgeving design, multi-tenant theming with CSS custom properties, and full mobile-responsive layout.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
@@ -98,6 +98,14 @@ Web application for SPARQL queries and BPMN & DMN orchestration with TriplyDB in
 **Live App**: [linkeddata.open-regels.nl](https://linkeddata.open-regels.nl)
 
 [View Documentation →](linked-data-explorer/index.md){ .md-button }
+
+## Documentation Status
+
+<div id="doc-status">
+  <div class="admonition info">
+    <p class="admonition-title">Loading documentation status…</p>
+  </div>
+</div>
 
 ## Quick Links
 
