@@ -1,21 +1,40 @@
 # Caseworker Workflow
 
-Caseworkers (medewerkers) have elevated access compared to citizens. They can view all process instances submitted by residents of their municipality and take action on them.
+Caseworkers (medewerkers) are municipal employees with elevated access to the RONL Business API portal. Unlike citizens, they authenticate via a dedicated Keycloak-native login path — not through DigiD, eHerkenning, or eIDAS.
 
 ![Screenshot: RONL Business API Caseworker Dashboard](../../../assets/screenshots/ronl-business-api-caseworker-dashboard.png)
 
 ## Logging in as a caseworker
 
-Use the same DigiD login flow as a citizen ([Logging In — DigiD Flow](login-digid-flow.md)), but with an account that has the `caseworker` role assigned in Keycloak.
+Caseworkers use the **"Inloggen als Medewerker"** button on the MijnOmgeving landing page — a slate-coloured button visually separated from the three citizen identity provider options by a "MEDEWERKERS" section divider.
 
-In the test environment, use:
+![Screenshot: MijnOmgeving Landing Page — Caseworker Button](../../../assets/screenshots/ronl-mijnomgeving-landing-caseworker.png)
 
-```
-Username: test-caseworker-utrecht
-Password: test123
-```
+The caseworker login flow differs from the citizen flow in three important ways:
 
-After login, the JWT will contain `"roles": ["caseworker"]`. The portal detects this role and displays the caseworker dashboard instead of the citizen view.
+**No external identity provider.** Caseworker accounts are managed directly in the Keycloak `ronl` realm. There is no redirect to DigiD or eHerkenning.
+
+**SSO session check first.** `AuthCallback.tsx` calls `keycloak.init({ onLoad: 'check-sso' })`. If the caseworker already has an active Keycloak SSO session in the browser (e.g. from an earlier login that day), they are taken directly to the dashboard — no login screen shown at all.
+
+**Dedicated login screen.** If no SSO session exists, Keycloak is called with `loginHint: '__medewerker__'`. The custom `login.ftl` theme template detects this sentinel value and renders the Keycloak native login form with an indigo "Inloggen als gemeentemedewerker" context banner and "Medewerker portaal" as the page title, making the screen visually distinct from any citizen-facing Keycloak page.
+
+![Screenshot: Keycloak Login — Caseworker Banner](../../../assets/screenshots/ronl-keycloak-caseworker-login.png)
+*Keycloak native login form with caseworker context banner*
+
+For the full technical flow and step-by-step instructions, see [Logging In — Citizen & Caseworker](login-flow.md#caseworker-login).
+
+**Test environment accounts:**
+
+| Username | Municipality |
+|---|---|
+| `test-caseworker-utrecht` | Utrecht |
+| `test-caseworker-amsterdam` | Amsterdam |
+| `test-caseworker-rotterdam` | Rotterdam |
+| `test-caseworker-denhaag` | Den Haag |
+
+Password for all test accounts: `test123`
+
+After login, the JWT will contain `"roles": ["caseworker"]`. The portal detects this role and displays the caseworker dashboard.
 
 ## What caseworkers can do
 

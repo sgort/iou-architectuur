@@ -6,7 +6,7 @@ This guide walks through how a citizen submits a zorgtoeslag (healthcare allowan
 
 ## Prerequisites
 
-You must be logged in. See [Logging In — DigiD Flow](login-digid-flow.md) if you have not yet authenticated.
+You must be logged in. See [Logging In — Citizen & Caseworker](login-flow.md) if you have not yet authenticated.
 
 ## Submitting the zorgtoeslag form
 
