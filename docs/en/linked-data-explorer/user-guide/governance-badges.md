@@ -6,7 +6,7 @@ DMN cards in the Available DMNs panel and the Chain Composer display a validatio
 
 ## Interpreting badges
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: Governance validation badge with hover tooltip showing organisation and validation date](../../assets/screenshots/linked-data-explorer-governance-tooltip.png)
   <figcaption>Governance validation badge with hover tooltip showing organisation and validation date</figcaption>
 </figure>

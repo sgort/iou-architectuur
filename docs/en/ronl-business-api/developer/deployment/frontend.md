@@ -393,7 +393,7 @@ Keycloak Admin Console:
 4. **Valid Post Logout Redirect URIs:** `+` (inherits from redirect URIs)
 5. **Web Origins:** `https://acc.mijn.open-regels.nl`
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: Keycloak Client Redirect Configuration](../../../../assets/screenshots/ronl-keycloak-redirect-uris.png)
   <figcaption>Kecloak Admin Console showing redirects</figcaption>
 </figure>

@@ -193,7 +193,7 @@ Layer 2 checks the structural correctness of decision table definitions: that en
 | **Rationale** | An empty or `-` input entry matches any value. A rule where all inputs are empty or `-` therefore matches every possible input combination. In a `UNIQUE` or `ANY` table, this catch-all overlaps with every specific rule — for any input that satisfies a specific rule, both the specific rule and the catch-all fire simultaneously, violating the hit policy. This is the most common overlap pattern in government DMNs and the hardest to spot visually. |
 | **Fix** | Change `hitPolicy` to `FIRST` and place the catch-all last (it then only fires when no specific rule matches), or replace the catch-all with explicit rules covering the remaining input combinations. |
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: BIZ-008-009-test.dmn loaded in the DMN Validator showing Business Rules 1E 1W — BIZ-008 error on the duplicate-rows decision and BIZ-009 warning on the catch-all decision](../../assets/screenshots/linked-data-explorer-dmn-validator-biz-008-009-test.png)
   <figcaption>BIZ-008-009-test.dmn loaded in the DMN Validator showing Business Rules 1E 1W — BIZ-008 error on the duplicate-rows decision and BIZ-009 warning on the catch-all decision</figcaption>
 </figure>

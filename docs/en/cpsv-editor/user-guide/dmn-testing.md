@@ -25,7 +25,7 @@ Results display progressively as each decision is evaluated:
 
 The section only appears for DMNs with more than one decision — single-table DMNs do not have intermediate decisions to test.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: Intermediate Decision Tests section expanded showing a table of 4 decisions with ✅ OK results next to each row and a run button at the top](../../assets/screenshots/cpsv-editor-intermediate-tests.png)
   <figcaption>Intermediate Decision Tests section expanded showing a table of decisions with ✅ OK results next to each row</figcaption>
 </figure>
@@ -110,7 +110,7 @@ Results appear progressively:
 
 After a successful run, NL-SBB concepts are generated from the last successful result for semantic linking via the Linked Data Explorer.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: Test Cases section showing the pass/fail counter at the top (3/3 passed) and four test case rows each with a ✅ badge and the expected outcome text](../../assets/screenshots/cpsv-editor-test-cases.png)
   <figcaption>Test Cases section showing the pass/fail counter at the top (3/3 passed) and four test case rows each with a ✅ badge and the expected outcome text</figcaption>
 </figure>

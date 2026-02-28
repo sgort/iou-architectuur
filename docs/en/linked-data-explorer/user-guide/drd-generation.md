@@ -26,7 +26,7 @@ If the chain has amber validation (sequential execution required), clicking **Sa
 
 Saved templates appear in the **My Templates** section of the Configuration panel.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: My Templates panel showing a saved DRD template with the DRD badge alongside a sequential template](../../assets/screenshots/linked-data-explorer-drd-template.png)
   <figcaption>My Templates panel showing a saved DRD template with the DRD badge alongside a sequential template</figcaption>
 </figure>

@@ -26,7 +26,7 @@ The Vendor tab includes a certification tracking workflow. A vendor implementati
 
 The certification details are included in the Turtle output as `ronl:certificationStatus`, `ronl:certifiedBy`, `ronl:certifiedAt`, and `ronl:certificationNote` properties, making certification status queryable via SPARQL.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: Vendor tab showing the vendor dropdown with a vendor selected, the contact and technical information form, and the certification status section](../../assets/screenshots/cpsv-editor-vendor-tab.png)
   <figcaption>Vendor tab showing the vendor dropdown with a vendor selected, the contact and technical information form, and the certification status section</figcaption>
 </figure>

@@ -16,7 +16,7 @@ This guide walks you through the Linked Data Explorer for the first time, from o
 
 The application has a narrow left sidebar with navigation icons, and a main content area that changes depending on the active view.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: Linked Data Explorer sidebar navigation with the Orchestration view active](../../assets/screenshots/linked-data-explorer-orchestration-nav.png)
   <figcaption>Linked Data Explorer sidebar navigation with the Orchestration view active</figcaption>
 </figure>

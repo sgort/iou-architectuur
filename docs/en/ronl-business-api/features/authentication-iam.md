@@ -2,7 +2,7 @@
 
 RONL Business API uses **Keycloak 23** as its Identity and Access Management layer, implementing the OIDC Authorization Code Flow. Keycloak acts as an identity broker, federating authentication requests to DigiD, eIDAS, and eHerkenning — the three Dutch government identity providers.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: RONL Business API Keycloak Login Page](../../../assets/screenshots/ronl-business-api-keycloak-login.png)
   <figcaption>Default Keycloak login page</figcaption>
 </figure>

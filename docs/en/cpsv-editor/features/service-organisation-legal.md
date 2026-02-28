@@ -12,7 +12,7 @@ Key fields include the service's unique identifier (used to construct RDF URIs t
 
 The identifier field has special significance: the editor sanitises it automatically, replacing spaces with hyphens and removing invalid URI characters. The resulting value is used as the base for every URI in the exported Turtle file, so a stable, descriptive identifier is important.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: Service tab showing the identifier, title, description, and sector fields with an example service filled in](../../assets/screenshots/cpsv-editor-service-tab.png)
   <figcaption>Service tab showing the identifier, title, description, and sector fields with an example service filled in</figcaption>
 </figure>

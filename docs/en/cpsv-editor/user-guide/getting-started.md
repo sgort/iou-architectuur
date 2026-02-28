@@ -54,7 +54,7 @@ The typical workflow for a new service definition follows these steps:
 
 8. **Download TTL** — Click **Download TTL** to export the compliant Turtle file.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: The editor in its initial empty state showing the tab navigation and the Service tab with empty fields and the Validate and Download TTL buttons visible](../../assets/screenshots/cpsv-editor-empty-state.png)
   <figcaption>The editor in its initial empty state</figcaption>
 </figure>

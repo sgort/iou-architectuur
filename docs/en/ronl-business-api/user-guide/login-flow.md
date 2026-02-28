@@ -27,7 +27,7 @@ Citizens are Dutch residents, EU residents, or businesses accessing government s
 
 Open the municipality portal in your browser. You will see the **MijnOmgeving** landing page with four login options — three for citizens and one for caseworkers.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: MijnOmgeving Landing Page](../../../assets/screenshots/ronl-mijnomgeving-landing-idp-selection.png)
   <figcaption>MijnOmgeving landing page showing all four login options</figcaption>
 </figure>
@@ -59,7 +59,7 @@ keycloak.init({
 
 The `idpHint` tells Keycloak to skip its own login form and redirect immediately to the selected identity provider. In production, this takes you directly to DigiD, eHerkenning, or the eIDAS network. In the test environment (no real IdPs configured), Keycloak falls back to its native username/password form without a context banner.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: Keycloak Native Login — Citizen (test)](../../../assets/screenshots/ronl-keycloak-digid-login.png)
   <figcaption>Keycloak native login without caseworker banner</figcaption>
 </figure>
@@ -125,7 +125,7 @@ Password for all test accounts: `test123`
 
 On the MijnOmgeving landing page, scroll past the three citizen options. Below a "MEDEWERKERS" divider you will find the slate-coloured caseworker button.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: MijnOmgeving Landing Page — Caseworker Button](../../../assets/screenshots/ronl-mijnomgeving-landing-caseworker.png)
   <figcaption>Caseworker login button, visually separated from citizen IdP options</figcaption>
 </figure>
@@ -160,7 +160,7 @@ This redirects to Keycloak and passes `__medewerker__` as the `login_hint` param
 - Renders an indigo context banner: **"Inloggen als medewerker"**
 - Suppresses the sentinel value from the username field (the field renders empty, so the caseworker types their own username)
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: Keycloak Login — Caseworker](../../../assets/screenshots/ronl-keycloak-caseworker-login.png)
   <figcaption>Keycloak native login with caseworker context banner</figcaption>
 </figure>

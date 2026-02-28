@@ -8,7 +8,7 @@ Caseworkers (medewerkers) are municipal employees with elevated access to the RO
 
 Caseworkers use the **"Inloggen als Medewerker"** button on the MijnOmgeving landing page — a slate-coloured button visually separated from the three citizen identity provider options by a "MEDEWERKERS" section divider.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: MijnOmgeving Landing Page — Caseworker Button](../../../assets/screenshots/ronl-mijnomgeving-landing-caseworker.png)
   <figcaption>MijnOmgeving landing page showing all four login options</figcaption>
 </figure>
@@ -21,7 +21,7 @@ The caseworker login flow differs from the citizen flow in three important ways:
 
 **Dedicated login screen.** If no SSO session exists, Keycloak is called with `loginHint: '__medewerker__'`. The custom `login.ftl` theme template detects this sentinel value and renders the Keycloak native login form with an indigo "Inloggen als gemeentemedewerker" context banner and "Medewerker portaal" as the page title, making the screen visually distinct from any citizen-facing Keycloak page.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: Keycloak Login — Caseworker Banner](../../../assets/screenshots/ronl-keycloak-caseworker-login.png)
   <figcaption>Keycloak native login form with caseworker context banner</figcaption>
 </figure>

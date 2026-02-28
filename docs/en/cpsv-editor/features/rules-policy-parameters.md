@@ -2,17 +2,17 @@
 
 The editor implements the **Rules–Policy–Parameters (RPP)** architectural pattern for structuring government business rule management. Three separate tabs map to the three layers of this pattern, each visually distinguished by colour and labelled with its RPP role.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: Tab navigation bar showing the Rules (blue) with RPP layer badges](../../assets/screenshots/cpsv-editor-rpp-tabs-rules.png)
   <figcaption>Tab navigation bar showing the Rules (blue) with RPP layer badges</figcaption>
 </figure>
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: Tab navigation bar showing the CPRMV/Policy (purple) with RPP layer badges](../../assets/screenshots/cpsv-editor-rpp-tabs-policy.png)
   <figcaption>Tab navigation bar showing the CPRMV/Policy (purple) with RPP layer badges</figcaption>
 </figure>
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: Tab navigation bar showing the Parameters (green) tabs with RPP layer badges](../../assets/screenshots/cpsv-editor-rpp-tabs-parameters.png)
   <figcaption>Tab navigation bar showing the Parameters (green) tabs with RPP layer badges</figcaption>
 </figure>

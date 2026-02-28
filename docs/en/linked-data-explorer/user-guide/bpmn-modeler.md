@@ -32,7 +32,7 @@ Available element types: start events, intermediate events, end events, tasks (u
 
 Select a **BusinessRuleTask** on the canvas. The properties panel on the right shows the element details, including a **DMN/DRD Decision Reference** section.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: BPMN properties panel with the Link to DMN/DRD dropdown open showing DRD and single DMN options](../../assets/screenshots/linked-data-explorer-bpmn-dmn-dropdown.png)
   <figcaption>BPMN properties panel with the Link to DMN/DRD dropdown open showing DRD and single DMN options</figcaption>
 </figure>

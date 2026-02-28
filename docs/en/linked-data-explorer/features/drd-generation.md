@@ -2,7 +2,7 @@
 
 When all variable connections in a chain are exact identifier matches, the chain can be saved as a **Decision Requirements Diagram (DRD)** — a single, unified DMN artifact deployed to Operaton. This replaces multiple sequential API calls with one call that evaluates the entire chain internally.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: Save as DRD Template modal](../../assets/screenshots/linked-data-explorer-drd-save-modal.png)
   <figcaption>Save as DRD Template modal showing chain composition and DRD badge</figcaption>
 </figure>

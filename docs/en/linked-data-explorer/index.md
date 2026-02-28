@@ -19,7 +19,7 @@
 
 The **Linked Data Explorer** is a web application for discovering, composing, and executing DMN decision model chains from Dutch government knowledge graphs. It is built as part of the **Regels Overheid Nederland (RONL)** initiative and connects directly to TriplyDB knowledge graphs and the Operaton DMN execution engine.
 
-<figure markdown>
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: Linked Data Explorer main UI showing the Chain Builder with a loaded DMN chain](../assets/screenshots/linked-data-explorer-main-ui.png)
   <figcaption>Linked Data Explorer main UI showing the Chain Builder with a loaded DMN chain</figcaption>
 </figure>
