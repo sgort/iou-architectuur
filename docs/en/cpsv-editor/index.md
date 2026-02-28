@@ -21,7 +21,7 @@ The **CPSV Editor** is a React-based web application that simplifies the creatio
 
 No RDF knowledge is required to use the editor. Users fill in familiar form fields; the editor generates the correct Turtle syntax, validates it, and can publish it directly to a TriplyDB knowledge graph.
 
-![Screenshot: CPSV Editor main UI showing the split-screen layout with the Service tab active on the left and the live TTL preview panel on the right](../../assets/screenshots/cpsv-editor-main-ui.png)
+![Screenshot: CPSV Editor main UI showing the split-screen layout with the Service tab active on the left and the live TTL preview panel on the right](../../assets/screenshots/cpsv-editor-main-ui.png)*CPSV Editor main UI showing the split-screen layout with editor and preview panel*
 
 ---
 

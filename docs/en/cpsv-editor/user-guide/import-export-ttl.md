@@ -35,7 +35,7 @@ Importing a file that was previously exported from the editor produces identical
 
 If the imported Turtle file contains DMN entities (`cprmv:DecisionModel`, `cpsv:Input`, `cprmv:DecisionRule`), they are automatically detected and preserved.
 
-![Screenshot: DMN tab showing the blue "DMN data imported" notice with the preserved block summary and the "Clear Imported DMN Data" button](../../assets/screenshots/cpsv-editor-dmn-imported.png)
+![Screenshot: DMN tab showing the blue "DMN data imported" notice with the preserved block summary and the "Clear Imported DMN Data" button](../../assets/screenshots/cpsv-editor-dmn-imported.png)*MN tab showing the blue "DMN data imported" notice with the preserved block summary and the "Clear Imported DMN Data" button*
 
 The DMN tab displays a preservation notice showing what was found. The preserved blocks are appended unchanged to every subsequent export — they are not editable through the form interface. This protects deployed decision model metadata from accidental modification during collaborative editing.
 

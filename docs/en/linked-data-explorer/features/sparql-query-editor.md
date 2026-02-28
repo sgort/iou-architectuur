@@ -2,7 +2,7 @@
 
 The SPARQL Query Editor lets you run SPARQL 1.1 queries against any configured endpoint and explore results as a table or an interactive force-directed graph.
 
-![Screenshot: SPARQL Query Editor with query results displayed in a table](../../assets/screenshots/linked-data-explorer-sparql-editor.png)
+![Screenshot: SPARQL Query Editor with query results displayed in a table](../../assets/screenshots/linked-data-explorer-sparql-editor.png)*SPARQL Query Editor with query results displayed in a table*
 
 ---
 

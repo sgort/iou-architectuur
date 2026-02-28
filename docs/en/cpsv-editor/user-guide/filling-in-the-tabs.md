@@ -42,7 +42,7 @@ The Organisation tab models `cv:PublicOrganisation`.
 
 **Logo** — Upload a JPG or PNG. The editor resizes it to 256×256px. The logo URI is generated as `./assets/{OrganisationName}_logo.png` and included in the Turtle as both `foaf:logo` and `schema:image`.
 
-![Screenshot: Organisation tab showing the identifier field, name, spatial jurisdiction dropdown, and the logo upload area with a preview of an uploaded logo](../../assets/screenshots/cpsv-editor-organisation-tab.png)
+![Screenshot: Organisation tab showing the identifier field, name, spatial jurisdiction dropdown, and the logo upload area with a preview of an uploaded logo](../../assets/screenshots/cpsv-editor-organisation-tab.png)*Organisation tab showing the identifier field, name, spatial jurisdiction dropdown, and the logo upload area with a preview of an uploaded logo*
 
 ---
 

@@ -2,7 +2,7 @@
 
 The Chain Builder is the central feature of the Linked Data Explorer. It queries the active TriplyDB endpoint for all published DMN decision models, displays them with their input and output variables, and lets you compose them into executable chains.
 
-![Screenshot: DMN Discovery panel with variable inspection open on a DMN card](../../assets/screenshots/linked-data-explorer-dmn-discovery.png)
+![Screenshot: DMN Discovery panel with variable inspection open on a DMN card](../../assets/screenshots/linked-data-explorer-dmn-discovery.png)*DMN Discovery panel with variable inspection open on a DMN card*
 
 ---
 

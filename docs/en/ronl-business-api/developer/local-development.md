@@ -147,7 +147,7 @@ Expected response:
 }
 ```
 
-![Screenshot: RONL Business API Health Check Response](../../../assets/screenshots/ronl-business-api-health-check.png)
+![Screenshot: RONL Business API Health Check Response](../../../assets/screenshots/ronl-business-api-health-check.png)*Terminal showing API health*
 
 ## Getting a JWT token for API testing
 

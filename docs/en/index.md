@@ -8,7 +8,7 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.0.0** · *February 21, 2026*
+-   **⚙️ RONL Business API — v2.0.1** · *February 2026*
 
     ---
 

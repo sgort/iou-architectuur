@@ -8,7 +8,7 @@ Caseworkers (medewerkers) are municipal employees with elevated access to the RO
 
 Caseworkers use the **"Inloggen als Medewerker"** button on the MijnOmgeving landing page — a slate-coloured button visually separated from the three citizen identity provider options by a "MEDEWERKERS" section divider.
 
-![Screenshot: MijnOmgeving Landing Page — Caseworker Button](../../../assets/screenshots/ronl-mijnomgeving-landing-caseworker.png)
+![Screenshot: MijnOmgeving Landing Page — Caseworker Button](../../../assets/screenshots/ronl-mijnomgeving-landing-caseworker.png)*MijnOmgeving landing page showing all four login options*
 
 The caseworker login flow differs from the citizen flow in three important ways:
 

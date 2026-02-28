@@ -2,7 +2,7 @@
 
 The Timeline Navigation feature allows citizens to view their personal data at any point in time - past, present, or future. This enables "what if" scenario planning for life events and helps citizens understand how their circumstances affect eligibility for government services.
 
-![Timeline showing Wessel Kooyman on marriage date](../../../assets/screenshots/ronl-timeline-getrouwd.png)
+![Timeline showing Wessel Kooyman on marriage date](../../../assets/screenshots/ronl-timeline-getrouwd.png)*Example dashboard MijnOmgeving Timeline showing Wessel Kooyman on marriage date*
 
 ## What It Does
 
@@ -128,7 +128,8 @@ The timeline integrates with:
 - Single persona across all municipalities
 
 ## Timeline View - Current date
-![Timeline showing Wessel Kooyman with partner and children](../../../assets/screenshots/ronl-timeline-view-current-date.png)
+![Timeline showing Wessel Kooyman with partner and children](../../../assets/screenshots/ronl-timeline-view-current-date.png)*Example dashboard MijnOmgeving Timeline showing Wessel Kooyman with partner and children*
+
 
 ## Related Documentation
 

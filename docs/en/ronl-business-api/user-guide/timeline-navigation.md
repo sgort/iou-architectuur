@@ -33,7 +33,7 @@ Timeline Navigation lets you view your personal data from the BRP (Basisregistra
 
 ## Using the Timeline
 
-![Timeline showing Wessel Kooyman on marriage date](../../../assets/screenshots/ronl-timeline-getrouwd.png)
+![Timeline showing Wessel Kooyman on marriage date](../../../assets/screenshots/ronl-timeline-getrouwd.png)*Example dashboard MijnOmgeving Timeline showing Wessel Kooyman on marriage date*
 
 ### Navigation Methods
 

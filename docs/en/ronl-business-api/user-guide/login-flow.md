@@ -27,8 +27,7 @@ Citizens are Dutch residents, EU residents, or businesses accessing government s
 
 Open the municipality portal in your browser. You will see the **MijnOmgeving** landing page with four login options — three for citizens and one for caseworkers.
 
-![Screenshot: MijnOmgeving Landing Page](../../../assets/screenshots/ronl-mijnomgeving-landing-idp-selection.png)
-*MijnOmgeving landing page showing all four login options*
+![Screenshot: MijnOmgeving Landing Page](../../../assets/screenshots/ronl-mijnomgeving-landing-idp-selection.png)*MijnOmgeving landing page showing all four login options*
 
 ### Step 2 — Choose your identity provider
 
@@ -58,7 +57,7 @@ keycloak.init({
 The `idpHint` tells Keycloak to skip its own login form and redirect immediately to the selected identity provider. In production, this takes you directly to DigiD, eHerkenning, or the eIDAS network. In the test environment (no real IdPs configured), Keycloak falls back to its native username/password form without a context banner.
 
 ![Screenshot: Keycloak Native Login — Citizen (test)](../../../assets/screenshots/ronl-keycloak-digid-login.png)
-*Test environment fallback: Keycloak native login without caseworker banner*
+*Keycloak native login without caseworker banner*
 
 ### Step 4 — Authenticate
 

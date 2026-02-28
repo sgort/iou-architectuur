@@ -10,7 +10,7 @@ Ensure:
 - The **Validate** button shows no errors
 - You have a TriplyDB API token with write access to the target dataset
 
-![Screenshot: Publish modal](../../assets/screenshots/cpsv-editor-publish-modal.png)
+![Screenshot: Publish modal](../../assets/screenshots/cpsv-editor-publish-modal.png)*The TriplyDB publish dialog*
 
 ---
 
@@ -25,7 +25,7 @@ Ensure:
 3. Optionally click **Test Connection** to verify the credentials without uploading.
 4. Click **Publish to TriplyDB**.
 
-![Screenshot: Publish dialog in "publishing" state showing the progress bar, four step indicators (Validating, Generating TTL, Uploading, Updating service) with the first three showing ✓ and the fourth showing a spinner](../../assets/screenshots/cpsv-editor-publish-progress.png)
+![Screenshot: Publish dialog in "publishing" state showing the progress bar, four step indicators (Validating, Generating TTL, Uploading, Updating service) with the first three showing ✓ and the fourth showing a spinner](../../assets/screenshots/cpsv-editor-publish-progress.png)*Publish dialog in "publishing" state showing the progress bar, four step indicators (Validating, Generating TTL, Uploading to TriplyDB, Updating service)*
 
 ---
 

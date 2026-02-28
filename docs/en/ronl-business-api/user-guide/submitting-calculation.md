@@ -2,7 +2,7 @@
 
 This guide walks through how a citizen submits a zorgtoeslag (healthcare allowance) calculation — the reference use case for RONL Business API.
 
-![Screenshot: RONL Business API Zorgtoeslag Form](../../../assets/screenshots/ronl-business-api-zorgtoeslag-form.png)
+![Screenshot: RONL Business API Zorgtoeslag Form](../../../assets/screenshots/ronl-business-api-zorgtoeslag-form.png)*Example dashboard MijnOmgeving showing Zorgtoeslag calculation*
 
 ## Prerequisites
 
@@ -46,11 +46,11 @@ Content-Type: application/json
 
 The result appears within a few seconds:
 
-![Screenshot: RONL Business API Zorgtoeslag Result](../../../assets/screenshots/ronl-business-api-zorgtoeslag-result.png)
+![Screenshot: RONL Business API Zorgtoeslag Result](../../../assets/screenshots/ronl-business-api-zorgtoeslag-result.png)*Example dashboard MijnOmgeving showing Zorgtoeslag calculation result*
 
 ```
 Resultaat: U heeft recht op zorgtoeslag
-Maandbedrag: € 95,83 (€ 1.150 per jaar)
+Maandbedrag: € 103,33 (€ 1.240 per jaar)
 Aanvraagnummer: abc-123-def
 ```
 

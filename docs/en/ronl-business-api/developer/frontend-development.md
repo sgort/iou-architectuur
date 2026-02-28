@@ -92,7 +92,7 @@ Main application after successful authentication. The JWT `roles` claim determin
 
 A sliding panel that displays platform updates matching the format from CPSV Editor and Linked Data Explorer.
 
-![Screenshot: Changelog Panel Open](../../../assets/screenshots/ronl-changelog-panel-open.png)
+![Screenshot: Changelog Panel Open](../../../assets/screenshots/ronl-changelog-panel-open.png)*MijnOmgeving landing page showing Changelog panel*
 
 **Features:**
 

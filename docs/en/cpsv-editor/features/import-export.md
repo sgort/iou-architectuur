@@ -24,6 +24,6 @@ The export always includes the full set of namespace declarations, all populated
 
 The preview panel shows the generated Turtle in real time as you type, with syntax highlighting and line numbering. It can be toggled on and off via the **Show Preview** button in the header. When visible, the application switches to a split-screen layout with the form on the left and the Turtle preview on the right.
 
-![Screenshot: Split-screen layout with the Organization tab active on the left and the live TTL preview panel showing the generated Turtle on the right, with the line count visible at the bottom of the preview](../../assets/screenshots/cpsv-editor-preview-panel.png)
+![Screenshot: Split-screen layout with the Organization tab active on the left and the live TTL preview panel showing the generated Turtle on the right, with the line count visible at the bottom of the preview](../../assets/screenshots/cpsv-editor-preview-panel.png)*Split-screen layout with the Organization tab active on the left and the live TTL preview panel showing the generated Turtle on the right*
 
 A **Copy** button in the preview panel copies the full Turtle content to the clipboard without downloading a file.
