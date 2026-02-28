@@ -301,6 +301,10 @@ button:focus {
   border-top: 4px solid var(--status-compliant) !important;  /* Linked Data Explorer — green */
 }
 
+.md-typeset .whats-new-cards li:nth-child(4) {
+  border-top: 4px solid #5bb8f5 !important;               /* CPRMV API — light blue */
+}
+
 /* =============================================================
    Documentation Status — admonition table on home page
    ============================================================= */

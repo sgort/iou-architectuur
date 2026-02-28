@@ -24,6 +24,14 @@
       "commit": "d743594...",
       "commit_date": "2026-02-25",
       "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/d743594302def1944b15b8c2aaa05f87b6cd56c9"
+    },
+    {
+      "name": "CPRMV",
+      "icon": "📜",
+      "version": "v0.4.0",
+      "commit": "42f1771...",
+      "commit_date": "2026-02-24",
+      "repo_url": "https://git.open-regels.nl/standards/cprmv/-/commit/42f17711a470527890cb55b44b027f957324d6bc"
     }
   ]
 }

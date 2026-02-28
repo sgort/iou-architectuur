@@ -38,6 +38,16 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
+-   **📜 CPRMV API — v0.4.0** · *February 2026*
+
+    ---
+
+    **On-the-fly Rule Retrieval**
+
+    Live retrieval and CPRMV transformation of Dutch and EU legislation from BWB, CVDR, and EU CELLAR repositories. Automatic latest-version resolution, seven output formats, definition extraction with parse patterns, and Juriconnect reference resolution.
+
+    [:octicons-arrow-right-24: Full changelog](cprmv-api/developer/changelog-roadmap.md)
+
 </div>
 
 ---
@@ -73,6 +83,10 @@ graph TB
 
         H[Linked Data Explorer<br/>React] -->|API Calls| G
         H -->|Direct SPARQL| F
+
+        I[CPRMV API<br/>Python/FastAPI] -->|XML download| J[BWB / CVDR / CELLAR]
+        I -->|cprmv-json / RDF| F
+        I -->|cprmv-json / RDF| H
     end
 ```
 
@@ -102,6 +116,14 @@ Web application for SPARQL queries and BPMN & DMN orchestration with TriplyDB in
 
 [View Documentation →](linked-data-explorer/index.md){ .md-button }
 
+### 📜 CPRMV API
+
+Python/FastAPI service that fetches individual rules from Dutch and European legal publications on the fly, transforming them to CPRMV-structured RDF. Implements the Core Public Rule Management Vocabulary standard and hosts the CPRMV specification.
+
+**Live App**: [cprmv.open-regels.nl/docs](https://cprmv.open-regels.nl/docs)  
+
+[View Documentation →](cprmv-api/index.md){ .md-button }
+
 ## Documentation Status
 
 <div id="doc-status">
@@ -120,6 +142,7 @@ Web application for SPARQL queries and BPMN & DMN orchestration with TriplyDB in
 | **Keycloak IAM**         | [keycloak.open-regels.nl](https://keycloak.open-regels.nl)                     |
 | **Custom Business API**  | [api.open-regels.nl](https://api.open-regels.nl)                               |
 | **Operaton**             | [operaton.open-regels.nl](https://operaton.open-regels.nl)                     |
+| **CPRMV API**            | [cprmv.open-regels.nl/docs](https://cprmv.open-regels.nl/docs)                 |
 
 ## Technology Stack
 
@@ -135,6 +158,7 @@ The IOU Architecture ecosystem is built entirely on **open source technologies**
 | **Cache**           | Redis             | BSD 3-Clause       |
 | **Reverse Proxy**   | Caddy             | Apache 2.0         |
 | **Knowledge Graph** | TriplyDB          | -                  |
+| **Rule API**        | Python / FastAPI  | EUPL-1.2           |
 
 ## Standards Compliance
 

@@ -211,6 +211,29 @@ nav:
         - API Reference: linked-data-explorer/reference/api-reference.md
         - RONL Ontology: linked-data-explorer/reference/ronl-ontology.md
 
+  - 📜 CPRMV API:
+    - Overview: cprmv-api/index.md
+    - Features:
+      - Overview: cprmv-api/features/overview.md
+      - Publication Repositories: cprmv-api/features/publication-repositories.md
+      - Output Formats: cprmv-api/features/output-formats.md
+      - Reference Resolution: cprmv-api/features/reference-resolution.md
+    - User Guides:
+      - Getting Started: cprmv-api/user-guide/getting-started.md
+      - Fetching Rules: cprmv-api/user-guide/fetching-rules.md
+      - Rule Path Syntax: cprmv-api/user-guide/rule-path-syntax.md
+      - Definition Extraction: cprmv-api/user-guide/definition-extraction.md
+    - Developer Docs:
+      - Architecture: cprmv-api/developer/architecture.md
+      - Local Development: cprmv-api/developer/local-development.md
+      - Data Model: cprmv-api/developer/data-model.md
+      - Deployment: cprmv-api/developer/deployment.md
+      - CI/CD & Changelog: cprmv-api/developer/changelog-roadmap.md
+    - References:
+      - API Endpoints: cprmv-api/reference/api-endpoints.md
+      - ID Formats: cprmv-api/reference/id-formats.md
+      - CPRMV Vocabulary: cprmv-api/reference/cprmv-vocabulary.md
+
   - 🤝 Contributing:
     - Overview: contributing/index.md
     - Documentation Architecture:
