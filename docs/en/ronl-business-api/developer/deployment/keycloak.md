@@ -2,8 +2,10 @@
 
 Keycloak runs in Docker on the VM (`open-regels.nl`). Two fully isolated instances run in parallel: ACC and PROD. Each has its own PostgreSQL database container and custom RONL theme.
 
-![Screenshot: Keycloak Custom Theme Login Page](../../../../assets/screenshots/ronl-keycloak-digid-login.png)
-*Custom RONL theme matching MijnOmgeving design with blue gradient header*
+<figure markdown>
+  ![Screenshot: Keycloak Custom Theme Login Page](../../../../assets/screenshots/ronl-keycloak-digid-login.png)
+  <figcaption>Custom RONL theme matching MijnOmgeving design with blue gradient header</figcaption>
+</figure>
 
 ## Repository structure
 
@@ -46,8 +48,10 @@ On the VM (Ubuntu 24.04 LTS):
 
 The RONL theme provides a consistent visual experience from the MijnOmgeving landing page through the authentication flow.
 
-![Screenshot: Theme Comparison - Landing vs Keycloak](../../../../assets/screenshots/ronl-theme-consistency.png)
-*Visual consistency from landing page to Keycloak login*
+<figure markdown>
+  ![Screenshot: Theme Comparison - Landing vs Keycloak](../../../../assets/screenshots/ronl-theme-consistency.png)
+  <figcaption>Visual consistency from landing page to Keycloak login</figcaption>
+</figure>
 
 ### Theme Features
 
@@ -333,8 +337,10 @@ docker compose logs -f keycloak-acc
    - **Default Locale:** Select `nl`
    - Click **Save**
 
-![Screenshot: Keycloak Admin Console Theme Configuration](../../../../assets/screenshots/ronl-keycloak-admin-theme-config.png)
-*Keycloak Admin Console showing theme selection*
+<figure markdown>
+  ![Screenshot: Keycloak Admin Console Theme Configuration](../../../../assets/screenshots/ronl-keycloak-admin-theme-config.png)
+  <figcaption>Keycloak Admin Console showing theme selection</figcaption>
+</figure>
 
 ### Step 8 — Verify deployment
 

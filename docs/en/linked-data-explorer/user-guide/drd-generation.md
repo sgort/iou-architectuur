@@ -26,7 +26,7 @@ If the chain has amber validation (sequential execution required), clicking **Sa
 
 Saved templates appear in the **My Templates** section of the Configuration panel.
 
-![Screenshot: My Templates panel showing a saved DRD template with the DRD badge alongside a sequential template](../../assets/screenshots/linked-data-explorer-drd-template.png)
+![Screenshot: My Templates panel showing a saved DRD template with the DRD badge alongside a sequential template](../../assets/screenshots/linked-data-explorer-drd-template.png)*My Templates panel showing a saved DRD template with the DRD badge alongside a sequential template*
 
 Each template card shows its name, description, type badge (🔗 DRD or sequential), and the endpoint it was saved for. Click a template card to load it into the Chain Composer. Templates are endpoint-scoped — templates saved for one TriplyDB dataset do not appear when a different endpoint is active.
 

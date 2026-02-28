@@ -2,7 +2,7 @@
 
 Alongside the government reference implementations of DMN decision models, commercial vendors may offer certified implementations of the same decisions with additional enterprise features, SLAs, and support. The Vendor Services feature surfaces these implementations directly in the DMN list.
 
-![Screenshot: Vendor Services modal showing Blueriq implementation details for a government DMN](../../assets/screenshots/linked-data-explorer-vendor-modal.png)
+![Screenshot: Vendor Services modal showing Blueriq implementation details for a government DMN](../../assets/screenshots/linked-data-explorer-vendor-modal.png)*Vendor Services modal showing Blueriq implementation details for a government DMN*
 
 ---
 

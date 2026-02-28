@@ -2,7 +2,10 @@
 
 RONL Business API is built for multi-tenancy from the ground up. Each Dutch municipality that integrates with the platform has its own branded portal, its own set of users and roles, its own isolated data, and its own audit logs — all running on shared infrastructure.
 
-![Screenshot: RONL Business API Municipality Portal Utrecht](../../../assets/screenshots/ronl-business-api-municipality-portal-utrecht.png)*Example dashboard MijnOmgeving showing Zorgtoeslag calculation*
+<figure markdown>
+  ![Screenshot: RONL Business API Municipality Portal Utrecht](../../../assets/screenshots/ronl-business-api-municipality-portal-utrecht.png)
+  <figcaption>Example dashboard MijnOmgeving showing Zorgtoeslag calculation</figcaption>
+</figure>
 
 ## Supported municipalities
 

@@ -8,7 +8,7 @@ The Semantic Analysis tab in the Chain Builder helps you understand how DMN vari
 
 In the Chain Builder, click the **Semantic Analysis** tab header above the Chain Composer. The tab loads automatically from the active TriplyDB endpoint.
 
-![Screenshot: Semantic Analysis tab showing variable equivalences across government agencies](../../assets/screenshots/linked-data-explorer-semantic-analysis.png)
+![Screenshot: Semantic Analysis tab showing variable equivalences across government agencies](../../assets/screenshots/linked-data-explorer-semantic-analysis.png)*Semantic Analysis tab showing variable equivalences across government agencies*
 
 ---
 

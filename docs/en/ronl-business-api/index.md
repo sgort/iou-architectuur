@@ -23,7 +23,10 @@
 
 The **RONL Business API** is a secure, multi-tenant platform that enables Dutch municipalities to offer government digital services to residents. It implements the **Business API Layer** pattern: a security and business-logic layer that sits between a municipality's IAM system and the Operaton BPMN engine.
 
-![Screenshot: RONL Business API Main UI](../../assets/screenshots/ronl-business-api-main-ui.png)*Example dashboard MijnOmgeving showing Timeline View*
+<figure markdown>
+  ![Screenshot: RONL Business API Main UI](../../assets/screenshots/ronl-business-api-main-ui.png)
+  <figcaption>Example dashboard MijnOmgeving showing Timeline View</figcaption>
+</figure>
 
 ## What it does
 

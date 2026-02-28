@@ -2,7 +2,10 @@
 
 The DMN tab enables the editor to go beyond metadata authoring and become an active tool for deploying and testing decision logic. It integrates directly with the Operaton rule engine, which hosts the DMN models that execute government service decisions.
 
-![Screenshot: DMN tab showing a decision model with Decision Key and Syntactic validation check prior to deployment](../../assets/screenshots/cpsv-editor-dmn-tab.png)*DMN tab showing a decision model with Decision Key and Syntactic validation check prior to deployment*
+<figure markdown>
+  ![Screenshot: DMN tab showing a decision model with Decision Key and Syntactic validation check prior to deployment](../../assets/screenshots/cpsv-editor-dmn-tab.png)
+  <figcaption>DMN tab showing a decision model with Decision Key and Syntactic validation check prior to deployment</figcaption>
+</figure>
 
 ---
 

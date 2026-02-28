@@ -2,7 +2,10 @@
 
 This guide walks through how a citizen submits a zorgtoeslag (healthcare allowance) calculation — the reference use case for RONL Business API.
 
-![Screenshot: RONL Business API Zorgtoeslag Form](../../../assets/screenshots/ronl-business-api-zorgtoeslag-form.png)*Example dashboard MijnOmgeving showing Zorgtoeslag calculation*
+<figure markdown>
+  ![Screenshot: RONL Business API Zorgtoeslag Form](../../../assets/screenshots/ronl-business-api-zorgtoeslag-form.png)
+  <figcaption>Example dashboard MijnOmgeving showing Zorgtoeslag calculation</figcaption>
+</figure>
 
 ## Prerequisites
 
@@ -46,7 +49,10 @@ Content-Type: application/json
 
 The result appears within a few seconds:
 
-![Screenshot: RONL Business API Zorgtoeslag Result](../../../assets/screenshots/ronl-business-api-zorgtoeslag-result.png)*Example dashboard MijnOmgeving showing Zorgtoeslag calculation result*
+<figure markdown>
+  ![Screenshot: RONL Business API Zorgtoeslag Result](../../../assets/screenshots/ronl-business-api-zorgtoeslag-result.png)
+  <figcaption>Example dashboard MijnOmgeving showing Zorgtoeslag calculation result</figcaption>
+</figure>
 
 ```
 Resultaat: U heeft recht op zorgtoeslag

@@ -2,7 +2,7 @@
 
 Different government agencies publish DMN decision models using their own naming conventions for variables. When one agency's output variable and another agency's input variable represent the same concept but have different identifiers, exact identifier matching fails and chain building appears to break. The Semantic Analysis feature resolves this by using SKOS concept mappings to discover variable relationships across agency boundaries.
 
-![Screenshot: Semantic Analysis tab showing variable equivalences across government agencies](../../assets/screenshots/linked-data-explorer-semantic-analysis.png)
+![Screenshot: Semantic Analysis tab showing variable equivalences across government agencies](../../assets/screenshots/linked-data-explorer-semantic-analysis.png)*Semantic Analysis tab showing variable equivalences across government agencies*
 
 ---
 

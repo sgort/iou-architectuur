@@ -14,7 +14,10 @@ The Vendor tab is used when a commercial vendor has built an implementation of y
 2. Open the vendor dropdown. Vendors are loaded from the RONL vocabulary in TriplyDB — this may take a moment.
 3. Select the vendor. The form below the dropdown updates to show the fields for that vendor's integration.
 
-![Screenshot: Vendor tab showing the vendor dropdown open with several vendor options listed, and the Blueriq form visible below with contact and technical information fields](../../assets/screenshots/cpsv-editor-vendor-dropdown.png)*Vendor tab showing the vendor dropdown open with several vendor options listed, and the iKnow form visible below*
+<figure markdown>
+  ![Screenshot: Vendor tab showing the vendor dropdown open with several vendor options listed, and the Blueriq form visible below with contact and technical information fields](../../assets/screenshots/cpsv-editor-vendor-dropdown.png)
+  <figcaption>Vendor tab showing the vendor dropdown open with several vendor options listed, and the iKnow form visible below</figcaption>
+</figure>
 
 ---
 
@@ -61,7 +64,10 @@ To record that a vendor implementation has been assessed against the reference m
 4. Enter the certification date and an optional certification note.
 5. Confirm to save.
 
-![Screenshot: Certification workflow modal showing the certifying organisation field pre-filled from the Organisation tab, the certification date picker, and the optional certification note](../../assets/screenshots/cpsv-editor-certification-modal.png)*Certification workflow modal*
+<figure markdown>
+  ![Screenshot: Certification workflow modal showing the certifying organisation field pre-filled from the Organisation tab, the certification date picker, and the optional certification note](../../assets/screenshots/cpsv-editor-certification-modal.png)
+  <figcaption>Certification workflow modal</figcaption>
+</figure>
 
 The certification details are stored as `ronl:certificationStatus`, `ronl:certifiedBy`, `ronl:certifiedAt`, and `ronl:certificationNote` in the exported Turtle.
 

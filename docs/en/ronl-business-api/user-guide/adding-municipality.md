@@ -92,4 +92,7 @@ After making these changes:
 4. Verify the correct municipality theme and display name appear
 5. Verify that `GET /v1/health` still returns `healthy`
 
-![Screenshot: RONL Business API New Municipality Theme Comparison](../../../assets/screenshots/ronl-business-api-municipality-theme-comparison.png)*Example dashboard MijnOmgeving showing municipality theme*
+<figure markdown>
+  ![Screenshot: RONL Business API New Municipality Theme Comparison](../../../assets/screenshots/ronl-business-api-municipality-theme-comparison.png)
+  <figcaption>Example dashboard MijnOmgeving showing municipality theme</figcaption>
+</figure>

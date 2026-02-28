@@ -34,18 +34,18 @@ from pathlib import Path
 # Patterns
 # ---------------------------------------------------------------------------
 
-# Variant A: image and *caption* on the same line
+# Variant A: image and *caption* or _caption_ on the same line
 PATTERN_SAME_LINE = re.compile(
     r'(!\[[^\]]*\]\([^)]*\))'   # image tag
     r'[ \t]*'                    # optional horizontal whitespace
-    r'\*([^*\n]+)\*'             # *caption* (no newlines inside)
+    r'[*_]([^*_\n]+)[*_]'        # *caption* or _caption_ (no newlines inside)
 )
 
-# Variant B: image on one line, *caption* on the very next line
+# Variant B: image on one line, *caption* or _caption_ on the very next line
 PATTERN_NEXT_LINE = re.compile(
     r'(!\[[^\]]*\]\([^)]*\))'   # image tag
     r'[ \t]*\n'                  # end of image line
-    r'\*([^*\n]+)\*'             # *caption* on following line
+    r'[*_]([^*_\n]+)[*_]'        # *caption* or _caption_ on following line
 )
 
 REPLACEMENT = '<figure markdown>\n  \\1\n  <figcaption>\\2</figcaption>\n</figure>'

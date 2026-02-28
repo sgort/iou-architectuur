@@ -2,7 +2,10 @@
 
 The editor can publish service metadata directly to a TriplyDB knowledge graph without any manual file handling. The publish feature is available via the **Publish** button in the bottom-right of the application.
 
-![Screenshot: The publish dialog showing the credentials form with Base URL, Account, Dataset, and API Token fields, with the "Test Connection" and "Publish to TriplyDB" buttons visible](../../assets/screenshots/cpsv-editor-publish-dialog.png)*The TriplyDB publish dialog*
+<figure markdown>
+  ![Screenshot: The publish dialog showing the credentials form with Base URL, Account, Dataset, and API Token fields, with the "Test Connection" and "Publish to TriplyDB" buttons visible](../../assets/screenshots/cpsv-editor-publish-dialog.png)
+  <figcaption>The TriplyDB publish dialog</figcaption>
+</figure>
 
 ---
 

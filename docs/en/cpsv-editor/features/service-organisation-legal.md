@@ -12,7 +12,10 @@ Key fields include the service's unique identifier (used to construct RDF URIs t
 
 The identifier field has special significance: the editor sanitises it automatically, replacing spaces with hyphens and removing invalid URI characters. The resulting value is used as the base for every URI in the exported Turtle file, so a stable, descriptive identifier is important.
 
-![Screenshot: Service tab showing the identifier, title, description, and sector fields with an example service filled in](../../assets/screenshots/cpsv-editor-service-tab.png)*Service tab showing the identifier, title, description, and sector fields with an example service filled in*
+<figure markdown>
+  ![Screenshot: Service tab showing the identifier, title, description, and sector fields with an example service filled in](../../assets/screenshots/cpsv-editor-service-tab.png)
+  <figcaption>Service tab showing the identifier, title, description, and sector fields with an example service filled in</figcaption>
+</figure>
 
 The **Cost** and **Output** sections within the Service tab implement `cv:Cost` and `cv:Output` from CPSV-AP 3.2.0, allowing services to document fees and the deliverables citizens receive.
 
