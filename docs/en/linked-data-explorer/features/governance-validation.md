@@ -2,7 +2,10 @@
 
 The Linked Data Explorer displays the validation status of each DMN decision model as a visual badge. This lets users immediately see which models have been officially reviewed by a competent Dutch government authority before using them in a chain.
 
-![Screenshot: DMN list showing validated (green), in-review (amber), and unvalidated DMN cards](../../assets/screenshots/linked-data-explorer-governance-badges.png)*DMN list showing validated (green), in-review (amber), and unvalidated DMN cards*
+<figure markdown>
+  ![Screenshot: DMN list showing validated (green), in-review (amber), and unvalidated DMN cards](../../assets/screenshots/linked-data-explorer-governance-badges.png)
+  <figcaption>DMN list showing validated (green), in-review (amber), and unvalidated DMN cards</figcaption>
+</figure>
 
 ---
 

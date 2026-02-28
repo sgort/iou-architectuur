@@ -46,12 +46,15 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 The Information Architecture Framework for IOU integrates semantic web technologies, decision models, and Dutch government standards into a unified system for managing regulatory compliance and spatial planning.
 
-<iframe src="architecture-diagram.html" 
-        width="100%" 
-        height="700px" 
-        frameborder="0" 
-        style="border-radius:12px; display:block;">
-</iframe>
+<figure style="width:100%; margin:0;">
+  <iframe src="architecture-diagram.html"
+          width="100%"
+          height="700px"
+          frameborder="0"
+          style="border-radius:12px; display:block;">
+  </iframe>
+  <figcaption>IOU Architecture — interactive overview of the ecosystem components and their relationships</figcaption>
+</figure>
 
 ## Architecture Overview
 

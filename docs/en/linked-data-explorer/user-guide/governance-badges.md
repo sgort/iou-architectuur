@@ -6,7 +6,10 @@ DMN cards in the Available DMNs panel and the Chain Composer display a validatio
 
 ## Interpreting badges
 
-![Screenshot: Governance validation badge with hover tooltip showing organisation and validation date](../../assets/screenshots/linked-data-explorer-governance-tooltip.png)*Governance validation badge with hover tooltip showing organisation and validation date*
+<figure markdown>
+  ![Screenshot: Governance validation badge with hover tooltip showing organisation and validation date](../../assets/screenshots/linked-data-explorer-governance-tooltip.png)
+  <figcaption>Governance validation badge with hover tooltip showing organisation and validation date</figcaption>
+</figure>
 
 **✓ Gevalideerd (green)** — the DMN has been officially validated. The validating organisation and date are confirmed. This DMN has passed technical quality assurance by a recognised authority and is appropriate for production use.
 

@@ -2,7 +2,10 @@
 
 The BPMN Modeler is a full BPMN 2.0 process editor integrated into the Linked Data Explorer. It lets you design government service workflows visually and link `BusinessRuleTask` elements directly to DMN decision models or DRD chains discovered from TriplyDB.
 
-![Screenshot: BPMN Modeler showing the Tree Felling Permit example with properties panel open](../../assets/screenshots/linked-data-explorer-bpmn-modeler.png)*BPMN Modeler showing the Tree Felling Permit example with properties panel open*
+<figure markdown>
+  ![Screenshot: BPMN Modeler showing the Tree Felling Permit example with properties panel open](../../assets/screenshots/linked-data-explorer-bpmn-modeler.png)
+  <figcaption>BPMN Modeler showing the Tree Felling Permit example with properties panel open</figcaption>
+</figure>
 
 ---
 
