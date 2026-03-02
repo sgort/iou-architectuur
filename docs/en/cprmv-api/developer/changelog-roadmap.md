@@ -1,60 +1,79 @@
-# CI/CD & Changelog
-
-## CI/CD pipeline
-
-The `cprmv` repository uses GitLab CI (`.gitlab-ci.yml`) with three stages: `test`, `build`, `deploy`.
-
-### Stages
-
-**test-cprmv-api** (`python:3.12-bookworm`)
-
-Runs on merge requests and pushes to `main` when `serve_api/**` files change:
-
-1. Installs `libxml2-dev` and `libxslt-dev`.
-2. Installs `requirements-dev.txt`.
-3. Syntax-checks `src/serve.py` with `py_compile`.
-4. Import-checks the FastAPI app.
-5. Verifies `data/cprmvmethods.ttl` is present.
-6. Runs `pytest`.
-
-**build-cprmv-api** (`docker:24.0.5` with DinD)
-
-Runs on pushes to `main` and `develop` when `serve_api/**` changes:
-
-- On `main`: builds and pushes `datafluisteraar/cprmv-api:latest` and `datafluisteraar/cprmv-api:{commit-sha}`.
-- On `develop`: builds and pushes `datafluisteraar/cprmv-api:{branch-slug}`.
-
-Required CI/CD variables: `DOCKER_HUB_USERNAME`, `DOCKER_HUB_TOKEN`.
-
-**deploy-cprmv-api**
-
-Prints the new image tag and pull commands. Actual container restart is a manual step on the deployment host (run `docker compose pull && docker compose up -d`).
-
-### ReSpec publication
-
-A separate job (`create-pages`) builds the ReSpec HTML specification from `html/` using `node:lts` and publishes it to GitLab Pages at `html/public`.
+# Changelog & Roadmap
 
 ---
 
 ## Changelog
 
-### v0.4.0 — Current
+### v0.4.0 — Initial Release (February 2026)
 
-- On-the-fly rule retrieval for BWB, CVDR, and EU CELLAR publications.
-- Automatic `_latest` version resolution via SRU search.
-- Seven output formats: `cprmv-json`, `json-ld`, `turtle`, `ttl`, `turtle2`, `n3`, `xml`.
-- `unformat` parameter for structured definition extraction using `parse` patterns.
-- `/ref/Juriconnect/{reference}` endpoint — `jci1.3` and `jci1.31` redirect to `/rules/` paths.
-- `/methods` endpoint exposing the Methods KG in RDF.
-- Static CPRMV specification served at `/respec/`.
-- Docker image: `datafluisteraar/cprmv-api:latest`.
-- Non-root container user, built-in health check.
-- GitLab CI pipeline with test, build, and deploy stages.
-- Dutch locale (`nl_NL.UTF-8`) installed in the container.
-- DMN 1.3 / Operaton formalisation method (experimental).
+This changelog is going to be maintained starting from CPRMV / CPRMV API v0.4.0.
+Usage of earlier versions is deprecated and at own risk.
+Note that CPRMV / CPRMV API still is highly subjected to change
 
-### v0.1.0
+**v0.4.0 - CPRMV**
 
-- Browser-based prototype in `serve_api/cprmv-serve.html` using Pyodide/WebAssembly.
-- Local file-based rule set loading from pre-converted Turtle files.
-- Basic `/ruleset/{rulesetid}` and rule path traversal.
+- More elaborated and updated RDFS/OWL/SHACL specification of CPRMV. Adds several new classes like types of methods. Adds start for alignment with ELI.
+- Changes the official cprmv URI to one that resolves to the respective documentation
+- Normative section generated from RDFS/OWL/SHACL in the ReSpec documentation
+- Generated class diagram in ReSpec documentation
+
+**v0.4.0 - CPRMV API**
+
+- bugfixes around support for BWB schema (now supports circulaire’s)
+- Adds /respec section hosting the respec documentation (besides the official URI)
+- Adds /ref endpoint which is going to support all reference methods (but currently only implements juriconnect at a basic level)
+- Allows for retrieving DMN 1.3 rulesets published in acknowledged (in value list in cprmvmethods.ttl) Operaton servers (currently only operaton.open-regels.nl)
+
+---
+
+## Roadmap
+
+### Completed
+
+| Feature | Version |
+| ------- | ------- |
+| CPRMV   | v0.4.0  |
+| CPRMV   | v0.3.1  |
+
+---
+
+### Planned
+
+### v0.4.x — Features & ReSpec documentation
+
+**v0.4.1 — Respec documentation**
+
+- Documentation on properties in the ReSpec documentation
+- Improved class diagram layout in the ReSpec documentation
+- Examples and link to RDF definitions in the ReSpec documentation
+- Adds a property “:publication-location” (or similar) which refers to the location a RuleSet is officially published (which is something different from :isBasedOn)
+
+**v0.4.1 - CPRMV API**
+
+- /cellar-by-celex endpoint : redirects to the output of CELLAR instead of giving the user a URL to CELLAR
+- /cellar-by-eli endpoint : new variant of /cellar-by-celex which accepts a full ELI URI as argument. Also redirecting to output of CELLAR.
+- /ref endpoint : new version which accepts supported types of references, currently being ELI and Juriconnect.. For the CPRMV API style reference one can just use the /rules endpoint
+- Link to /respec section from within the /docs section
+- The /rules endpoint allows for retrieving the raw unprocessed source (the whole ruleset, not transformed into a CPRMV ruleset if the source isn’t a CPRMV ruleset)
+- The /rules endpoint adds :publication-location property to RuleSet’s with an URI’s as value (This will be the link to repository.overheid.nl in case for BWB,CVDR, an ELI reference in case of Formex 4 (these are seen as root sources for now). In the case of DMN it is the URI to the Operaton server
+- Fix escaping of quotes and newlines in transformations to RDF, which up until 0.4.1 can cause some sources to fail to load
+- Improved and more complete support for BWB, CVDR, Formex 4 and DMN 1.3 standards through usage of the existing XML Schema’s independent from XSL stylesheets (CPRMV uses a generic single stylesheet for all XML based standards which are constrained through schema checking)
+- Adds (basic) support for using the CPRMV API as MCP server
+
+**v0.4.2 - CPRMV**
+
+- Improved and more complete cprmv methods knowledge / value lists
+- Better defined relation with with official organisation registers (EU)
+- Start of a CPRMV-NL variant, based on MIM and CPSV-NL and the ROO
+- Adds acknowledgement of RegelSpraak as a FormalisationMethod and ALEF as tooling related to it
+- Adds acknowledgement of OpenFisca as a FormalisationMethod and tooling related to it
+
+**v0.4.2 - CPRMV API**
+
+- Support for using the /rules endpoint to find multiple published ruleset’s, which is a modus separate from referencing a single published ruleset. In the case of multiple ruleset’s the CPRMV API returns a list with references RuleSets which can be used with the CPRMV API to retrieve them.
+- Support for utilizing organisation and product and services catalog information within references in the /rules endpoint.
+- Support for utilizing :isBasedOn relations within references in the /rules endpoint. It should be possible to refer to.
+- Support for using ELI and where possible juriconnect references for other publication methods than typically supported by these reference types.
+- Adds a /browser section offering a minimal viable web based GUI to browse organisations, services and rulesets. Offers a searchable tree control at the left and a resource viewer at the right from which should offer users to start processes related to the resources (as defined by services)
+- Adds user friendly access to method knowledge in the /browser section relating to defined services for governance on value lists
+- Adds basic support for RegelSpraak sources (depending on where these will get published)

@@ -228,7 +228,8 @@ nav:
       - Local Development: cprmv-api/developer/local-development.md
       - Data Model: cprmv-api/developer/data-model.md
       - Deployment: cprmv-api/developer/deployment.md
-      - CI/CD & Changelog: cprmv-api/developer/changelog-roadmap.md
+      - CI/CD: cprmv-api/developer/ci-cd.md
+      - Changelog & Roadmap: cprmv-api/developer/changelog-roadmap.md
     - References:
       - API Endpoints: cprmv-api/reference/api-endpoints.md
       - ID Formats: cprmv-api/reference/id-formats.md

@@ -7,7 +7,8 @@
 | Standard | Version | Specification |
 |---|---|---|
 | CPSV-AP | 3.2.0 | <https://semiceu.github.io/CPSV-AP/> |
-| CPRMV | 0.3.0 | <https://cprmv.open-regels.nl/0.3.0/> |
+| CPRMV | 0.3.1 | <https://cprmv.open-regels.nl/docs> |
+| CPRMV | 0.4.0 | <https://acc.cprmv.open-regels.nl/docs> |
 | RONL Vocabulary | — | <https://regels.overheid.nl/termen/> |
 | ELI | — | <http://data.europa.eu/eli/ontology> |
 | Dublin Core Terms | — | <https://www.dublincore.org/specifications/dublin-core/dcmi-terms/> |
@@ -27,7 +28,7 @@
 | Dutch legislation (BWB) | <https://wetten.overheid.nl> |
 | Government organisations | <https://organisaties.overheid.nl> |
 | RONL Initiative | <https://regels.overheid.nl> |
-| CPRMV documentation | <https://cprmv.open-regels.nl/docs> |
+| CPRMV documentation | <https://standaarden.open-regels.nl/standards/cprmv/0.4.0/> |
 
 ---
 
