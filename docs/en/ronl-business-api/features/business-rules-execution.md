@@ -31,7 +31,7 @@ Input variables mapped from the JWT and request body:
 
 Output: `{ "eligible": true, "amount": 1150 }`
 
-## Process execution flow
+## Process execution flow Zorgtoeslag
 
 ```mermaid
 sequenceDiagram
@@ -51,6 +51,67 @@ sequenceDiagram
     B->>F: Return { eligible, amount }
 ```
 
+**AWB Kapvergunning (tree felling permit)**  
+A two-layer BPMN process implementing the Dutch Administrative Law Act (Awb) procedural requirements.
+
+The outer shell (`AwbShellProcess`) manages the six AWB phases: receipt acknowledgement, completeness check, decision subprocess, and citizen notification. It sets `receiptDate`, `awbDeadlineDate` (8 weeks per Awb 4:13), and `dossierReference`.
+
+The inner subprocess (`TreeFellingPermitSubProcess`) handles the substantive decision: it evaluates `TreeFellingDecision.dmn` and `ReplacementTreeDecision.dmn`, creates a `Sub_CaseReview` user task for caseworker review, and writes the final `permitDecision`, `status`, and `finalMessage` variables back to the parent process.
+
+After the subprocess completes, the AWB shell creates a `Task_Phase6_Notify` user task requiring the caseworker to confirm citizen notification before the process ends.
+
+## Process execution flow Tree Felling permit
+```mermaid
+sequenceDiagram
+    participant C as Citizen (Frontend)
+    participant B as Business API
+    participant O as Operaton
+    participant CW as Caseworker (Frontend)
+    participant D as PostgreSQL
+
+    C->>B: POST /v1/process/AwbShellProcess/start<br/>(treeDiameter, protectedArea)
+    B->>B: Validate JWT, inject tenant variables
+    B->>O: POST /process-definition/key/AwbShellProcess/start
+    O->>O: Phase 1 — set applicantId, productType, applicationDate
+    O->>O: Phase 2 — set receiptDate, awbDeadlineDate, dossierReference
+    O->>O: Phase 3 — evaluate AwbCompletenessCheck DMN
+    O->>O: Call Activity → TreeFellingPermitSubProcess
+    O->>O: Evaluate TreeFellingDecision DMN → permitDecision
+    O->>O: Evaluate ReplacementTreeDecision DMN → replacementDecision
+    O-->>O: Create user task: Sub_CaseReview
+    B->>D: Write audit log entry
+    B->>C: Return { processInstanceId, dossierReference }
+
+    Note over O: Process suspended — awaiting caseworker
+
+    CW->>B: GET /v1/task
+    B->>O: GET /task?processVariables=municipality_eq_utrecht
+    O->>B: Return task list
+    B->>CW: Return open tasks
+
+    CW->>B: POST /v1/task/:id/claim
+    B->>O: POST /task/:id/claim
+    CW->>B: POST /v1/task/:id/complete<br/>(reviewAction, reviewPermitDecision?)
+    B->>O: POST /task/:id/complete
+    O->>O: Set final status, decisionType, finalMessage
+    O-->>O: Create user task: Task_Phase6_Notify
+
+    Note over O: Process suspended — awaiting notification confirmation
+
+    CW->>B: POST /v1/task/:id/complete<br/>(notificationMethod, applicantNotified)
+    B->>O: POST /task/:id/complete
+    O->>O: Phase 6 complete — process ends
+    B->>D: Write audit log entry
+```
+
+**The key structural differences from Zorgtoeslag worth noting**:
+
+- Two suspension points — the process does not complete in a single request
+- Two actors — citizen initiates, caseworker drives both decision and notification
+- Subprocess — the material decision happens inside `TreeFellingPermitSubProcess`, which writes its variables back to the AWB shell
+- No result in the start response — the citizen receives only a `dossierReference`; the actual decision is only available later via `/v1/process/history`
+
+
 ## API endpoints for business rules
 
 | Method | Endpoint | Description |
@@ -60,6 +121,11 @@ sequenceDiagram
 | `GET` | `/v1/process/:id/status` | Get process instance status |
 | `GET` | `/v1/process/:id/variables` | Get process instance output variables |
 | `DELETE` | `/v1/process/:id` | Cancel a process instance |
+| `GET` | `/v1/task` | List open tasks for the caseworker's municipality |
+| `GET` | `/v1/task/:id/variables` | Get process variables for a task |
+| `POST` | `/v1/task/:id/claim` | Claim a task |
+| `POST` | `/v1/task/:id/complete` | Complete a task with caseworker-submitted variables |
+| `GET` | `/v1/process/history` | List process history for the authenticated citizen |
 
 All endpoints require a valid JWT in the `Authorization: Bearer` header.
 

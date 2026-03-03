@@ -66,6 +66,29 @@ Health status values: `healthy` (HTTP 200), `degraded` (HTTP 503), `unhealthy` (
 | `GET` | `/v1/process/:id/status` | Bearer JWT | Get process instance status |
 | `GET` | `/v1/process/:id/variables` | Bearer JWT | Get process instance output variables |
 | `DELETE` | `/v1/process/:id` | Bearer JWT | Cancel a process instance |
+| `GET` | `/v1/process/history` | Bearer JWT | List completed and active process instances for the authenticated citizen (`?applicantId=`) |
+
+## Task management
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/v1/task` | Bearer JWT (caseworker) | List all open tasks for the caseworker's municipality |
+| `GET` | `/v1/task/:id` | Bearer JWT (caseworker) | Get a single task by ID |
+| `GET` | `/v1/task/:id/variables` | Bearer JWT (caseworker) | Get all process variables for a task |
+| `POST` | `/v1/task/:id/claim` | Bearer JWT (caseworker) | Claim a task for the authenticated caseworker |
+| `POST` | `/v1/task/:id/complete` | Bearer JWT (caseworker) | Complete a task with submitted variables |
+
+Tasks are filtered to the caseworker's municipality via the `municipality` process variable. A caseworker from Utrecht cannot see Amsterdam's tasks.
+
+**`POST /v1/task/:id/complete` request body:**
+```json
+{
+  "variables": {
+    "reviewAction": "confirm",
+    "notificationMethod": "email"
+  }
+}
+```
 
 ## Response headers
 
@@ -95,3 +118,7 @@ Link: </v1/health>; rel="successor-version"
 | `PROCESS_NOT_FOUND` | 404 | Process key or instance ID not found |
 | `OPERATON_ERROR` | 502 | Upstream Operaton call failed |
 | `QUERY_ERROR` | 500 | Internal error |
+| `TASK_NOT_FOUND` | 404 | Task ID does not exist |
+| `TASK_CLAIM_FAILED` | 500 | Operaton rejected the claim request |
+| `TASK_COMPLETE_FAILED` | 500 | Operaton rejected the complete request |
+| `TASK_VARIABLES_FAILED` | 500 | Could not retrieve process variables for task |
