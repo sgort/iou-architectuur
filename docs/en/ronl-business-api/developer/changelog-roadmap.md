@@ -8,23 +8,21 @@
 
 **AWB Kapvergunning Process** 🌳
 
-Full two-layer AWB process implementation. `AwbShellProcess` manages the procedural framework (Awb phases 1–6): identity recording, receipt acknowledgement with `dossierReference` and statutory 8-week deadline (Awb 4:13), admissibility check via `AwbCompletenessCheck` DMN (Awb 2:3), and citizen notification confirmation. `TreeFellingPermitSubProcess` handles the substantive decision: both `TreeFellingDecision` and `ReplacementTreeDecision` DMNs are always evaluated before the caseworker review task, giving the caseworker full context. `Sub_ResolveDecision` applies overrides when `reviewAction = "change"`. `camunda:historyTimeToLive` set to 365 days (shell) and 180 days (subprocess).
+- Full two-layer AWB process implementation. `AwbShellProcess` manages the procedural framework (Awb phases 1–6): identity recording, receipt acknowledgement with `dossierReference` and statutory 8-week deadline (Awb 4:13), admissibility check via `AwbCompletenessCheck` DMN (Awb 2:3), and citizen notification confirmation.
+- `TreeFellingPermitSubProcess` handles the substantive decision: both `TreeFellingDecision` and `ReplacementTreeDecision` DMNs are always evaluated before the caseworker review task, giving the caseworker full context.
+- `Sub_ResolveDecision` applies overrides when `reviewAction = "change"`. `camunda:historyTimeToLive` set to 365 days (shell) and 180 days (subprocess).
 
 **Caseworker Task Queue — Claim-First Workflow** 🏛️
 
-All user tasks (`Sub_CaseReview`, `Task_Phase6_Notify`, `Task_RequestMissingInfo`) now use `camunda:candidateGroups="caseworker"` instead of `camunda:assignee`. Tasks appear as **Openstaand** in the task queue and require an explicit claim before the action form is displayed. Removed dead `Task_ExtractCompleteness` scriptTask from `AwbShellProcess` (had no incoming or outgoing flows, was never executed).
+- All user tasks (`Sub_CaseReview`, `Task_Phase6_Notify`, `Task_RequestMissingInfo`) now use `camunda:candidateGroups="caseworker"` instead of `camunda:assignee`.
+- Tasks appear as **Openstaand** in the task queue and require an explicit claim before the action form is displayed.
+- Removed dead `Task_ExtractCompleteness` scriptTask from `AwbShellProcess` (had no incoming or outgoing flows, was never executed).
 
 **Backend — Tenant Variable Serialisation** ⚙️
 
-Tenant middleware now stores plain scalar values. Process start routes wrap with `inferType()` before forwarding to Operaton. Resolves `Must provide 'null' or String value for value of SerializableValue type 'Json'` 500 error on `AwbShellProcess` start.
-
-**Documentation** 📄
-
-- `caseworker-workflow.md` — AWB full process flow mermaid diagram, `Sub_CaseReview` and `Task_Phase6_Notify` per-task sections with screenshots
-- `submitting-calculation.md` — Kapvergunning submission steps and test scenarios A–C
-- `api-endpoints.md` — Task management endpoint table and new error codes
-- `business-rules-execution.md` — AWB/Kapvergunning supported process description
-- `bpmn-design-criteria.md` — new reference page: `camunda:mapDecisionResult` modes, gateway condition rules, variable naming conventions
+- Tenant middleware now stores plain scalar values.
+- Process start routes wrap with `inferType()` before forwarding to Operaton.
+- Resolves `Must provide 'null' or String value for value of SerializableValue type 'Json'` 500 error on `AwbShellProcess` start.
 
 ---
 
@@ -133,16 +131,16 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 
 **Technology versions**
 
-| Component | Version |
-|---|---|
-| Node.js | 20 |
-| React | 18 |
-| TypeScript | 5.3 |
-| Keycloak | 23 |
-| Express | 4.18 |
-| Vite | Latest |
-| Caddy | 2 |
-| PostgreSQL | 16 |
+| Component  | Version |
+| ---------- | ------- |
+| Node.js    | 20      |
+| React      | 18      |
+| TypeScript | 5.3     |
+| Keycloak   | 23      |
+| Express    | 4.18    |
+| Vite       | Latest  |
+| Caddy      | 2       |
+| PostgreSQL | 16      |
 
 ---
 
@@ -150,19 +148,20 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 
 ### Completed
 
-| Feature | Version |
-|---|---|
-| Monorepo core architecture | v1.0.0 |
-| Multi-tenant municipality support | v1.5.0 |
-| Zorgtoeslag DMN calculator | v1.5.0 |
-| IDP selection landing page | v2.0.0 |
-| Custom Keycloak MijnOmgeving theme | v2.0.0 |
-| DigiD / eHerkenning / eIDAS infrastructure | v2.0.0 |
-| Caseworker login with SSO session reuse | v2.0.1 |
-| CI/CD Vite environment configuration | v2.0.2 |
-| AWB Kapvergunning process (AwbShellProcess + subprocess) | v2.1.0 |
-| Caseworker claim-first task queue | v2.1.0 |
-| BPMN design criteria reference documentation | v2.1.0 |
+| Feature                                                  | Version |
+| -------------------------------------------------------- | ------- |
+| Monorepo core architecture                               | v1.0.0  |
+| Multi-tenant municipality support                        | v1.5.0  |
+| Zorgtoeslag DMN calculator                               | v1.5.0  |
+| IDP selection landing page                               | v2.0.0  |
+| Custom Keycloak MijnOmgeving theme                       | v2.0.0  |
+| DigiD / eHerkenning / eIDAS infrastructure               | v2.0.0  |
+| Caseworker login with SSO session reuse                  | v2.0.1  |
+| CI/CD Vite environment configuration                     | v2.0.2  |
+| AWB Kapvergunning process (AwbShellProcess + subprocess) | v2.1.0  |
+| Caseworker claim-first task queue                        | v2.1.0  |
+| BPMN design criteria reference documentation             | v2.1.0  |
+
 ---
 
 ### Planned
