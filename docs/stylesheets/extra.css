@@ -335,3 +335,44 @@ button:focus {
   font-family: 'Roboto Mono', monospace;
   font-size: 0.95em;
 }
+
+/* Slightly smaller body text in What's New cards */
+.md-typeset .whats-new-cards li > p:not(:first-child) {
+  font-size: 0.82em;
+  line-height: 1.55;
+  color: var(--md-default-fg-color--light);
+}
+
+/* =============================================================
+   Environment badges — ACC / PROD
+   Used in the Documentation Status table and What's New cards.
+   ============================================================= */
+
+.env-badge {
+  display: inline-block;
+  padding: 0.15em 0.55em;
+  border-radius: 3px;
+  font-size: 0.75em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  vertical-align: middle;
+  line-height: 1.5;
+}
+
+.env-acc {
+  background-color: #f59e0b;
+  color: #fff;
+}
+
+.env-prod {
+  background-color: var(--status-compliant); /* reuses existing green */
+  color: #fff;
+}
+
+/* Slight offset so the badge sits comfortably after the version text
+   inside the What's New card <strong> element. */
+.whats-new-env-badge {
+  margin-left: 0.5em;
+  vertical-align: middle;
+}
