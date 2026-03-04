@@ -6,6 +6,17 @@
 
 ### v0.9.x — DMN Syntactic Validation (February 2026)
 
+**v0.9.1 — Date Input Validation Fix**
+
+Fixed a false "Missing 1 required input(s)" error in the Chain Composer when a DMN contains an optional `Date` input whose test value is intentionally `null` (e.g. `overlijdensdatum` in `zorgtoeslag_resultaat`).
+
+The root cause was a two-part gap between how RDF stores test data and how the validator tracks input state. In TriplyDB, a `null` value cannot be represented as a `schema:value` triple, so optional date variables have no `testValue` property at all on the `DmnVariable` object returned by the backend. The Fill with test data button in `InputForm.tsx` only wrote a key into the `inputs` state object when `testValue` was defined — silently skipping `null`-default dates. The validator in `ChainBuilder.tsx` then checked `input.identifier in inputs`, found the key absent, and pushed the variable into `missingInputs`.
+
+Two fixes were applied:
+
+- **`InputForm.tsx`** — the Fill button now explicitly sets `Date` inputs to `null` when `testValue` is `undefined`, ensuring the key is always registered in state after filling.
+- **`ChainBuilder.tsx`** — the validator now exempts `Date` inputs from the missing-input check when no value is present, consistent with the existing exemption for `Boolean` inputs (which default to `false` without user action). An unset date is a valid input state, not an authoring error.
+
 **v0.9.0 — DMN Validator**
 
 Added DMN Validator feature. The DMN Validator lets you validate one or more DMN files against the RONL DMN+ syntactic layers. It is accessible from the shield icon (🛡) in the sidebar. You can drop any number of .dmn or .xml files onto the validator at once, or add files incrementally — the drop zone remains visible at the top of the panel whenever files are loaded. Files are validated independently and displayed side-by-side for easy comparison.

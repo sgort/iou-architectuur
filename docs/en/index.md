@@ -8,13 +8,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.0.1** · *February 2026*
+-   **⚙️ RONL Business API — v2.1.0** · *March 2026*
 
     ---
 
-    **Frontend Redesign & IDP Selection**
+    **AWB Kapvergunning Process**
 
-    New landing page with identity provider selection (DigiD / eHerkenning / eIDAS), custom Keycloak theme matching MijnOmgeving design, multi-tenant theming with CSS custom properties, and full mobile-responsive layout.
+    Full AWB shell process (AwbShellProcess) implementing Awb procedural phases 1–6. TreeFellingPermitSubProcess handles substantive decision via TreeFellingDecision and ReplacementTreeDecision DMNs. Caseworker Task Queue — Claim-First Workflow.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
@@ -28,13 +28,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v0.9.0** · *February 2026*
+-   **🔍 Linked Data Explorer — v0.9.1** · *March 2026*
 
     ---
 
-    **DMN Validator Feature**
+    **Chain Composer bug fix**
 
-    Standalone DMN Validator accessible from the sidebar. Drop multiple `.dmn` or `.xml` files for independent side-by-side validation against RONL DMN+ syntactic layers via `POST /v1/dmns/validate`.
+    Fill with test data now explicitly sets Date inputs to null when no schema:value triple exists in RDF, registering the key in state so validation no longer flags it as absent. Validator now treats Date inputs without a value the same as Boolean — a null/empty date is semantically valid and no longer blocks chain execution.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
