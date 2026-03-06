@@ -46,6 +46,56 @@ Select a **BusinessRuleTask** on the canvas. The properties panel on the right s
 
 ---
 
+## Linking a UserTask or StartEvent to a form
+
+`UserTask` and `StartEvent` elements can be linked to Camunda Forms authored in the [Form Editor](form-editor.md). Once linked, Operaton renders the form at runtime for the citizen or caseworker assigned to that task.
+
+Select a **UserTask** or **StartEvent** on the canvas. The properties panel shows a **Link to Form** section beneath the standard element fields.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: BPMN properties panel open for a UserTask showing the Link to Form dropdown with a list of available forms](../../assets/screenshots/linked-data-explorer-bpmn-form-link-dropdown.png)
+  <figcaption>Link to Form dropdown in the properties panel for a UserTask</figcaption>
+</figure>
+
+1. Click the **Link to Form** dropdown. It lists all forms currently saved in the Form Editor.
+2. Select the form you want to link.
+3. A confirmation card appears below the dropdown showing the form name and the resulting `camunda:formRef` value.
+4. A **green badge** appears below the element on the canvas, confirming the link.
+
+The dropdown writes `camunda:formRef` and `camunda:formRefBinding="latest"` into the BPMN XML. `binding: latest` means Operaton always uses the most recently deployed version of that form — you do not need to pin a specific version.
+
+To unlink a form, open the dropdown and select the blank option at the top.
+
+!!! tip "Form not in the list?"
+    Open the **Form Editor** view and create or save the form first. Forms appear in the dropdown immediately after saving — no page reload required.
+
+---
+
+## Deploying to Operaton
+
+The Modeler can deploy your process — including subprocess BPMNs and linked forms — to Operaton in a single step.
+
+Click the **Deploy** button in the canvas toolbar. The deploy modal opens and lists:
+
+- The current BPMN file
+- Any subprocess BPMNs it calls via `calledElement` (resolved from your saved processes)
+- All `.form` files whose IDs match `camunda:formRef` references in the bundle
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Deploy modal showing three sections — BPMN file, subprocess BPMNs, and form files — with the Operaton endpoint field pre-filled and a Deploy button at the bottom](../../assets/screenshots/linked-data-explorer-bpmn-deploy-modal.png)
+  <figcaption>Deploy modal showing the complete bundle before committing to Operaton</figcaption>
+</figure>
+
+1. Review the resource list. If a referenced form ID is shown as unmatched, open the Form Editor and save a form with that ID before deploying.
+2. Confirm or edit the **Operaton endpoint** URL. It is pre-filled from the environment configuration.
+3. If your Operaton instance requires authentication, enter the **Username** and **Password**.
+4. Click **Deploy**. All resources are sent in one multipart request.
+5. On success, a deployment ID is shown and the Deploy button is disabled to prevent accidental re-deploy.
+
+Because the BPMN and all its forms land in the same Operaton deployment, `camunda:formRef` resolves correctly at runtime with no additional steps.
+
+---
+
 ## Editing element properties
 
 - **Name**: editable in the right properties panel for any selected element
@@ -66,6 +116,8 @@ Select a **BusinessRuleTask** on the canvas. The properties panel on the right s
 ## Saving and exporting
 
 Click **Save** in the canvas toolbar to persist the current process to browser local storage. Click **Export** to download a `.bpmn` file for deployment to Operaton.
+
+You can also deploy directly from the Modeler using the **Deploy** button. See [Deploying to Operaton](#deploying-to-operaton) above.
 
 !!! note
     Processes are stored in browser `localStorage`. They are not shared between browsers or users. Export processes you want to keep before clearing browser storage.

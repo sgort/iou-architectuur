@@ -19,6 +19,10 @@
 
 ## Linking a BusinessRuleTask to a decision
 
+## Linking a UserTask or StartEvent to a form
+
+## Deploying to Operaton
+
 ## Editing element properties
 
 ## Zoom and navigation

@@ -19,10 +19,8 @@
 
 ## Rendering artifact fix
 
-## DmnTemplateSelector
+## FormTemplateSelector — form linking for UserTask and StartEvent
 
-## Process persistence (localStorage)
+## Form badge overlay
 
-## Tree Felling Permit example auto-loading
-
-## Testing checklist
+## Deploy modal
