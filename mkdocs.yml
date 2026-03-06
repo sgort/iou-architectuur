@@ -179,6 +179,7 @@ nav:
         - DMN Validator: linked-data-explorer/features/dmn-validator.md
         - Semantic Analysis: linked-data-explorer/features/semantic-analysis.md
         - BPMN Modeler: linked-data-explorer/features/bpmn-modeler.md
+        - Form Editor: linked-data-explorer/features/form-editor.md
         - Governance & Validation: linked-data-explorer/features/governance-validation.md
         - Vendor Services: linked-data-explorer/features/vendor-services.md
     - User Guides:
@@ -189,6 +190,7 @@ nav:
         - DMN Validator: linked-data-explorer/user-guide/dmn-validator.md
         - Semantic Analysis: linked-data-explorer/user-guide/semantic-analysis.md
         - BPMN Modeler: linked-data-explorer/user-guide/bpmn-modeler.md
+        - Form Editor: linked-data-explorer/user-guide/form-editor.md
         - Governance Badges: linked-data-explorer/user-guide/governance-badges.md
         - Vendor Services: linked-data-explorer/user-guide/vendor-services.md
     - Developer Docs:
@@ -201,6 +203,7 @@ nav:
         - DRD Generation: linked-data-explorer/developer/drd-generation.md
         - DMN Validator Implementation: linked-data-explorer/developer/dmn-validator-implementation.md
         - BPMN Modeler: linked-data-explorer/developer/bpmn-modeler.md
+        - Form Editor: linked-data-explorer/developer/form-editor.md
         - Governance Implementation: linked-data-explorer/developer/governance.md
         - Vendor Services Implementation: linked-data-explorer/developer/vendor-services.md
         - Deployment: linked-data-explorer/developer/deployment.md

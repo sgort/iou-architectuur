@@ -43,10 +43,17 @@ App.tsx
 ├── BpmnModeler view
 │   ├── ProcessList (left panel)
 │   ├── BpmnCanvas (bpmn-js wrapper, centre)
+│   │   └── Deploy modal (one-click Operaton deployment)
 │   └── BpmnProperties (right panel)
-│       └── DmnTemplateSelector
+│       ├── DmnTemplateSelector (BusinessRuleTask)
+│       └── FormTemplateSelector (UserTask / StartEvent)  ← new in v1.0.0
+├── FormEditor view                                       ← new in v1.0.0
+│   ├── FormList (left panel)
+│   └── FormCanvas (@bpmn-io/form-js editor, centre)
 └── Changelog / Help view
 ```
+
+The `FormEditor` view and `BpmnModeler` view share the `FormService` localStorage layer — forms authored in `FormEditor` are immediately available to `FormTemplateSelector` in the BPMN properties panel with no explicit synchronisation step.
 
 State is managed with React hooks at the component level. There is no global state library. The `templateService.ts` utility provides the only persistent state — localStorage CRUD for chain templates and BPMN processes.
 

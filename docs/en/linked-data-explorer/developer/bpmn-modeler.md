@@ -8,18 +8,20 @@ The BPMN Modeler wraps the `bpmn-js` library in a three-panel React component. T
 
 ```
 packages/frontend/src/components/BpmnModeler/
-├── BpmnModeler.tsx           main orchestrator, manages selected process state
-├── BpmnCanvas.tsx            bpmn-js canvas wrapper (modeler lifecycle)
-├── BpmnProperties.tsx        properties panel (right), includes DmnTemplateSelector
-├── ProcessList.tsx           process list (left), CRUD operations
-├── DmnTemplateSelector.tsx   DMN/DRD dropdown for BusinessRuleTask linking
-└── BpmnModeler.css           custom styles for canvas rendering fixes
+├── BpmnModeler.tsx            main orchestrator, manages selected process state
+├── BpmnCanvas.tsx             bpmn-js canvas wrapper (modeler lifecycle, badge overlays, deploy trigger)
+├── BpmnProperties.tsx         properties panel (right), includes DmnTemplateSelector
+├── ProcessList.tsx            process list (left), CRUD operations
+├── DmnTemplateSelector.tsx    DMN/DRD dropdown for BusinessRuleTask linking
+├── FormTemplateSelector.tsx   Form dropdown for UserTask / StartEvent linking  ← new in v1.0.0
+└── BpmnModeler.css            custom styles for canvas rendering fixes and badge overlays
 
 packages/frontend/src/
 ├── services/
-│   └── bpmnService.ts        localStorage CRUD for BpmnProcess records
+│   ├── bpmnService.ts         localStorage CRUD for BpmnProcess records
+│   └── formService.ts         localStorage CRUD for FormSchema records (shared with FormEditor)
 └── utils/
-    └── bpmnTemplates.ts      default BPMN XML templates (new process, example)
+    └── bpmnTemplates.ts       default BPMN XML templates (new process, example)
 ```
 
 ---
@@ -85,6 +87,153 @@ This separates hit detection (on elements) from overlay rendering (no pointer ev
 
 ---
 
+## FormTemplateSelector — form linking for UserTask and StartEvent
+
+`FormTemplateSelector` is a React component injected into the bpmn-js properties panel when a `UserTask` or `StartEvent` is selected. It reads available forms from `FormService` and writes `camunda:formRef` / `camunda:formRefBinding` to the element's BPMN extension attributes via the bpmn-js `modeling` API.
+
+### Injection
+
+The injection follows the same pattern as `DmnTemplateSelector`. Inside `BpmnCanvas.tsx`, the `selectionChanged` listener distinguishes element type and mounts the appropriate selector:
+
+```typescript
+} else if (elementType === 'bpmn:UserTask' || elementType === 'bpmn:StartEvent') {
+  const selectorContainer = document.createElement('div');
+  selectorContainer.id = `form-template-custom-${selectedElement.id}`;
+  propertiesPanel.appendChild(selectorContainer);
+
+  const root = ReactDOM.createRoot(selectorContainer);
+  root.render(
+    <FormTemplateSelector
+      element={selectedElement}
+      modeling={modeling}
+      selectedFormRef={businessObject.get('camunda:formRef')}
+    />
+  );
+}
+```
+
+The `cleanupReactRoots()` helper unmounts the previous React root whenever the selection changes, preventing stale instances.
+
+### Writing attributes
+
+When the user selects a form:
+
+```typescript
+modeling.updateProperties(element, {
+  'camunda:formRef': schemaId,        // the schema.id from the FormSchema JSON
+  'camunda:formRefBinding': 'latest',
+  'camunda:formKey': undefined,       // clears any legacy HTML formKey
+});
+```
+
+`schemaId` is `(form.schema as Record<string, unknown>).id` — the ID embedded in the form's JSON schema, not the outer `FormSchema.id` used as the localStorage record key.
+
+### Clearing a link
+
+Selecting the blank option calls:
+
+```typescript
+modeling.updateProperties(element, {
+  'camunda:formRef': undefined,
+  'camunda:formRefBinding': undefined,
+});
+```
+
+---
+
+## Form badge overlay
+
+When any `UserTask` or `StartEvent` has `camunda:formRef` set, `BpmnCanvas.tsx` renders a green badge overlay below the element using the bpmn-js `overlays` service. This is applied on `import.done` and on every `element.changed` event.
+
+```typescript
+overlays.add(element.id, 'form-linked', {
+  position: { bottom: -22, left: leftOffset },
+  html: `<div class="form-linked-badge" title="${formRef}">📝 ${formRef}</div>`,
+});
+```
+
+The badge offset uses `leftOffset = Math.round((element.width - badgeWidth) / 2)` to centre the badge horizontally beneath the element. A separate CSS class `form-linked-badge--start` applies smaller font/padding for `StartEvent` elements, which have a narrower default width.
+
+Styles are defined in `BpmnModeler.css`:
+
+```css
+.form-linked-badge {
+  background: #16a34a;   /* green-600 */
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+```
+
+`pointer-events: none` prevents the badge from interfering with element selection on the canvas.
+
+---
+
+## Deploy modal
+
+The deploy modal is triggered by the **Deploy** button in the canvas toolbar. `BpmnCanvas.tsx` assembles the resource bundle before opening the modal:
+
+### Resource collection
+
+```typescript
+// 1. Save current BPMN to get latest XML
+const { xml } = await modelerRef.current.saveXML({ format: true });
+
+// 2. Extract subprocess calledElement references (recursive)
+const calledElements = extractCalledElements(xml);
+// → match against saved BpmnProcess records by process/@id
+
+// 3. Extract all camunda:formRef values from main + subprocess XMLs
+const allFormRefs = new Set([
+  ...extractFormRefs(xml),
+  ...subProcessXmls.flatMap(sp => extractFormRefs(sp.xml)),
+]);
+
+// 4. Match form refs against FormService.getForms() by schema.id
+const forms = allFormRefs → matched FormSchema records
+```
+
+Unmatched form refs (referenced in BPMN but not in localStorage) are passed to the modal as `unmatchedForms` for display.
+
+### API call
+
+On **Deploy**, `BpmnCanvas.tsx` sends a JSON body to the backend:
+
+```typescript
+await fetch(`${API_BASE_URL}/api/dmns/process/deploy`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    bpmnXml: xml,
+    deploymentName: processKey,   // from BPMN process/@id
+    forms,                        // [{ id, schema }]
+    subProcesses,                 // [{ filename, xml }]
+    operatonUrl,                  // from modal field
+    operatonUsername,
+    operatonPassword,
+  }),
+});
+```
+
+### Backend endpoint
+
+`POST /api/dmns/process/deploy` (in `dmn.routes.ts`) delegates to `operatonService.deployProcess()`. That method builds a `multipart/form-data` request with each resource appended as a named field matching Camunda Modeler behaviour:
+
+- Main BPMN: field name = `${processKey}.bpmn`
+- Subprocess BPMNs: field name = the subprocess filename
+- Forms: field name = `${formId}.form`
+
+A custom Operaton URL in the request body causes `deployProcess()` to construct a new Axios client targeting that URL, with optional Basic Auth credentials, instead of using the default `OPERATON_BASE_URL` from the backend environment.
+
+---
+
 ## DmnTemplateSelector
 
 `DmnTemplateSelector.tsx` loads from two sources in parallel when mounted for a `BusinessRuleTask`:
@@ -111,6 +260,10 @@ const loadOptions = async () => {
 ```
 
 The dropdown renders two `<optgroup>` elements: "🔗 DRDs (Unified Chains)" and "📋 Single DMNs". Selection auto-populates `camunda:decisionRef` and suggests a `camunda:resultVariable` value (derived from the decision title, camelCased).
+
+### DmnTemplateSelector pre-selection fix
+
+Before v1.0.0, opening the properties panel for a `BusinessRuleTask` that already had `camunda:decisionRef` set would show an empty dropdown. The fix reads `currentDecisionRef` from `businessObject.get('camunda:decisionRef')` and passes it as `selectedDecisionRef` to `DmnTemplateSelector`, which initialises its `useState` from that prop.
 
 ---
 

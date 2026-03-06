@@ -4,6 +4,45 @@
 
 ## Changelog
 
+### v1.0.0 — Form Editor & One-Click Deploy (March 2026)
+
+**v1.0.0 — Major Release**
+
+#### Form Editor
+
+New **Form Editor** view powered by `@bpmn-io/form-js` (schemaVersion 16, MIT licensed). Forms are authored as JSON schema, stored in `localStorage`, and available immediately to the BPMN Modeler.
+
+- Two-panel layout: form list (left) and `@bpmn-io/form-js` editor canvas (right)
+- Create, rename, and delete WIP forms; three seed EXAMPLE forms are read-only
+- Three built-in examples: `kapvergunning-start` (citizen-facing), `tree-felling-review` (caseworker review), `awb-notify-applicant` (caseworker notification)
+- Export individual forms as `.form` JSON files compatible with Camunda Modeler and Operaton
+- `FormService` localStorage CRUD shared with the BPMN Modeler — no sync step required
+
+**Files:** `FormEditor.tsx`, `FormCanvas.tsx`, `FormList.tsx`, `formService.ts`
+
+#### BPMN Modeler — Form integration
+
+- **Link to Form** dropdown in the properties panel for `UserTask` and `StartEvent` elements
+- Writes `camunda:formRef` and `camunda:formRefBinding="latest"` to the BPMN XML
+- `camunda:formRefBinding="latest"` means Operaton always resolves the most recent deployment of that form ID — no version pinning needed
+- Green badge overlay on `UserTask` and `StartEvent` elements when a form is linked
+- `DmnTemplateSelector` pre-selection bug fixed — dropdown now correctly reflects an existing `camunda:decisionRef` when opening properties for an already-linked element
+
+**Files:** `BpmnCanvas.tsx`, `FormTemplateSelector.tsx`
+
+#### BPMN Modeler — One-click deploy
+
+- **Deploy** button opens a modal listing all resources to be bundled: main BPMN, subprocess BPMNs (resolved via `calledElement` attributes), and all `.form` files referenced by `camunda:formRef`
+- All resources deployed in a single multipart `POST /api/dmns/process/deploy` to Operaton — `camunda:formRef` resolves at runtime because BPMN and forms share the same deployment ID
+- Configurable Operaton endpoint field pre-filled from `VITE_OPERATON_BASE_URL`
+- Optional HTTP Basic Auth credentials per deployment
+- Unmatched form references (in BPMN but not in localStorage) shown in modal before deploying
+- Deploy button disabled after a successful deployment to prevent accidental re-deploy
+
+**Files:** `BpmnCanvas.tsx` (frontend), `dmn.routes.ts` + `operaton.service.ts` (backend)
+
+---
+
 ### v0.9.x — DMN Syntactic Validation (February 2026)
 
 **v0.9.1 — Date Input Validation Fix**
