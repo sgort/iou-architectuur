@@ -28,13 +28,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v0.9.1** · *March 2026*
+-   **🔍 Linked Data Explorer — v1.0.0** · *March 2026*
 
     ---
 
-    **Chain Composer bug fix**
+    **Form Editor integration**
 
-    Fill with test data now explicitly sets Date inputs to null when no schema:value triple exists in RDF, registering the key in state so validation no longer flags it as absent. Validator now treats Date inputs without a value the same as Boolean — a null/empty date is semantically valid and no longer blocks chain execution.
+    New Form Editor view using `@bpmn-io/form-js` — create and edit Camunda Forms (schemaVersion 16) directly in the application. BPMN Modeler — One-Click Deploy button opens a modal listing all resources to be bundled: main BPMN, subprocess BPMNs (`calledElement` resolution), and linked `.form` files.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
