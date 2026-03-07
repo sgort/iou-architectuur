@@ -19,6 +19,8 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
 ![License](https://img.shields.io/badge/License-EUPL--1.2-yellow.svg)
 
+---
+
 ## What is the RONL Business API?
 
 The **RONL Business API** is a secure, multi-tenant platform that enables Dutch municipalities to offer government digital services to residents. It implements the **Business API Layer** pattern: a security and business-logic layer that sits between a municipality's IAM system and the Operaton BPMN engine.
@@ -27,6 +29,8 @@ The **RONL Business API** is a secure, multi-tenant platform that enables Dutch 
   ![Screenshot: RONL Business API Main UI](../../assets/screenshots/ronl-business-api-main-ui.png)
   <figcaption>Example dashboard MijnOmgeving showing Timeline View</figcaption>
 </figure>
+
+---
 
 ## What it does
 
@@ -39,6 +43,8 @@ Instead of exposing Operaton's REST API directly to municipality portals, RONL B
 - Compliance-grade audit logging (BIO, NEN 7510, AVG/GDPR)
 - A clean, versioned REST API (`/v1/*`) following the Dutch API Design Rules
 
+---
+
 ## Architecture at a glance
 
 ```
@@ -47,12 +53,16 @@ Resident → Municipality Portal → Keycloak IAM → Business API → Operaton 
 
 The system is hosted across two platforms. Azure hosts the stateless application layer (frontend, backend, PostgreSQL, Redis). A VM at `open-regels.nl` hosts the services requiring deep customisation or full control (Keycloak, Operaton, Caddy).
 
+---
+
 ## Live environments
 
 | Environment | Frontend | Backend | Keycloak |
 |---|---|---|---|
 | ACC | https://acc.mijn.open-regels.nl | https://acc.api.open-regels.nl | https://acc.keycloak.open-regels.nl |
 | Production | https://mijn.open-regels.nl | https://api.open-regels.nl | https://keycloak.open-regels.nl |
+
+---
 
 ## Technology stack
 
@@ -68,6 +78,8 @@ The system is hosted across two platforms. Azure hosts the stateless application
 | IAM/BPMN hosting | VM — Caddy, Docker Compose |
 | CI/CD | GitHub Actions |
 | License | EUPL-1.2 |
+
+---
 
 ## Documentation sections
 

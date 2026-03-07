@@ -13,9 +13,15 @@
 
 ## Layer Architecture
 
+---
+
 ## Component Interaction Flow
 
+---
+
 ## State Management Flow
+
+---
 
 ## Import/Export Data Flow
 
@@ -23,11 +29,19 @@
 
 ### Export Flow
 
+---
+
 ## Split-Screen Layout
+
+---
 
 ## File Dependencies
 
+---
+
 ## Technology Stack
+
+---
 
 ## Standards & Vocabularies
 

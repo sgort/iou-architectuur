@@ -2,12 +2,16 @@
 
 The backend deploys to **Azure App Service** (Node.js 20) via GitHub Actions. There are two independent deployment targets: ACC and PROD. PROD requires a manual approval step.
 
+---
+
 ## GitHub Actions workflows
 
 | Workflow file | Trigger | Target | Approval |
 |---|---|---|---|
 | `.github/workflows/azure-backend-acc.yml` | Push to `acc` branch with changes in `packages/backend/**` or `packages/shared/**` | `ronl-business-api-acc` (App Service) | Automatic |
 | `.github/workflows/azure-backend-production.yml` | Push to `main` branch (same path filters) or manual `workflow_dispatch` | `ronl-business-api-prod` (App Service) | **Manual required** |
+
+---
 
 ## Build and deployment steps
 
@@ -36,6 +40,8 @@ Both workflows follow the same build process:
 
 !!! warning "Deployment package structure"
     The `dist/` folder must be copied as a folder (`cp -r dist deploy/`), not flattened (`cp -r dist/* deploy/`). Flattening breaks TypeScript module resolution paths and causes 404 errors on all `/v1/*` endpoints after deployment.
+
+---
 
 ## Azure App Service configuration
 
@@ -121,6 +127,8 @@ az webapp config appsettings set \
 
 For PROD, substitute `ronl-business-api-acc` → `ronl-business-api-prod`, `rg-ronl-acc` → `rg-ronl-prod`, and the ACC URLs → PROD URLs.
 
+---
+
 ## Approving a PROD deployment
 
 When a push to `main` triggers the production workflow:
@@ -129,6 +137,8 @@ When a push to `main` triggers the production workflow:
 2. The workflow pauses at the `deploy` job waiting for approval
 3. Go to **GitHub → Actions → the running workflow → Review deployments**
 4. Select the `production` environment → **Approve and deploy**
+
+---
 
 ## Post-deployment health check
 
@@ -141,6 +151,8 @@ curl -s -o /dev/null -w "%{http_code}" https://api.open-regels.nl/v1/health
 ```
 
 If the health check fails after 5 attempts, the workflow fails and the deployment is marked unsuccessful. Roll back by redeploying the previous commit or using an Azure deployment slot swap.
+
+---
 
 ## Manual deployment
 

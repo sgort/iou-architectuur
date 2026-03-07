@@ -13,10 +13,18 @@
 
 ## Supported municipalities
 
+---
+
 ## Dynamic theming
+
+---
 
 ## Per-tenant feature flags
 
+---
+
 ## Tenant isolation in the backend
+
+---
 
 ## User roles

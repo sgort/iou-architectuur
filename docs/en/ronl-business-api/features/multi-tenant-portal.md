@@ -7,6 +7,8 @@ RONL Business API is built for multi-tenancy from the ground up. Each Dutch muni
   <figcaption>Example dashboard MijnOmgeving showing Zorgtoeslag calculation</figcaption>
 </figure>
 
+---
+
 ## Supported municipalities
 
 Four municipalities are currently configured:
@@ -19,6 +21,8 @@ Four municipalities are currently configured:
 | Den Haag | `#007BC7` (blue) | `#005A99` / `#E17000` (orange) | — |
 
 Adding a new municipality requires a `tenants.json` entry and a Keycloak user group — see [Adding a Municipality](../user-guide/adding-municipality.md).
+
+---
 
 ## Dynamic theming
 
@@ -36,6 +40,8 @@ This means a single deployed frontend binary serves all municipalities — the b
 
 The tenant configuration is loaded from `public/tenants.json` at runtime. Each entry specifies the theme, the municipality code (for API filtering), enabled features, and contact details.
 
+---
+
 ## Per-tenant feature flags
 
 The `TenantFeatures` configuration allows enabling or disabling specific government services per municipality:
@@ -49,6 +55,8 @@ processes      — list of allowed BPMN process keys
 
 A municipality that has not been cleared to offer `kinderbijslag` cannot invoke that process endpoint even if a user submits a valid JWT. The `processes` allowlist is enforced in the backend's tenant middleware.
 
+---
+
 ## Tenant isolation in the backend
 
 Every API request passes through the tenant middleware, which:
@@ -59,6 +67,8 @@ Every API request passes through the tenant middleware, which:
 4. Ensures all downstream queries and audit log entries are scoped to that municipality
 
 Process instances from one tenant are never returned to another. Audit log queries are always filtered by `municipality`.
+
+---
 
 ## User roles
 

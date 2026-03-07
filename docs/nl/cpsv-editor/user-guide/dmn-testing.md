@@ -17,6 +17,8 @@
 
 ### How it works
 
+---
+
 ## Test cases
 
 ### When to use
@@ -27,6 +29,10 @@
 
 ### Running test cases
 
+---
+
 ## Debugging strategy
+
+---
 
 ## Troubleshooting

@@ -2,6 +2,8 @@
 
 Each municipality has a colour theme defined in `packages/frontend/public/tenants.json`. The theme is applied at login time based on the `municipality` JWT claim.
 
+---
+
 ## Configured themes
 
 ### Utrecht
@@ -44,6 +46,8 @@ Each municipality has a colour theme defined in `packages/frontend/public/tenant
 | `secondary` | `#E17000` |
 | `accent` | `#007BC7` |
 
+---
+
 ## TenantConfig schema
 
 ```typescript
@@ -82,6 +86,8 @@ interface TenantConfig {
 }
 ```
 
+---
+
 ## CSS custom properties
 
 `applyTenantTheme()` sets these properties on `document.documentElement`:
@@ -95,6 +101,8 @@ interface TenantConfig {
 ```
 
 Tailwind utility classes in the frontend use `var(--color-primary)` etc. as their colour values. This means the entire theme switches dynamically — no page reload, no per-municipality CSS bundle.
+
+---
 
 ## Adding a theme
 

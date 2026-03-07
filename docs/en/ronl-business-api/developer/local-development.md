@@ -1,5 +1,7 @@
 # Local Development Setup
 
+---
+
 ## Prerequisites
 
 | Tool | Minimum version | Purpose |
@@ -10,6 +12,8 @@
 | Docker Compose | 2.x | Service orchestration |
 | Git | Latest | Version control |
 
+---
+
 ## Clone and install
 
 ```bash
@@ -19,6 +23,8 @@ npm install          # installs all workspace packages
 ```
 
 The monorepo uses npm workspaces. `npm install` at the root installs dependencies for `@ronl/backend`, `@ronl/frontend`, and `@ronl/shared` simultaneously.
+
+---
 
 ## Environment files
 
@@ -76,6 +82,8 @@ VITE_API_URL=http://localhost:3002/v1
 VITE_KEYCLOAK_URL=http://localhost:8080
 ```
 
+---
+
 ## Start Docker services
 
 Docker runs Keycloak and PostgreSQL locally:
@@ -98,6 +106,8 @@ npm run docker:logs:keycloak
 
 Keycloak is ready when you see: `Keycloak 23.x.x on ... started`
 
+---
+
 ## Start development servers
 
 ```bash
@@ -110,6 +120,8 @@ This starts both servers in parallel via `concurrently`:
 - **Frontend** — `http://localhost:5173` (Vite HMR, hot-reloads on React changes)
 
 Open `http://localhost:5173` in your browser. You will be redirected to Keycloak for login.
+
+---
 
 ## Test users
 
@@ -125,6 +137,8 @@ All test users have password `test123`.
 | `test-caseworker-rotterdam` | Rotterdam | caseworker |
 | `test-citizen-denhaag` | Den Haag | citizen |
 | `test-caseworker-denhaag` | Den Haag | caseworker |
+
+---
 
 ## Verify the setup
 
@@ -151,6 +165,8 @@ Expected response:
   ![Screenshot: RONL Business API Health Check Response](../../../assets/screenshots/ronl-business-api-health-check.png)
   <figcaption>Terminal showing API health</figcaption>
 </figure>
+
+---
 
 ## Getting a JWT token for API testing
 
@@ -192,6 +208,8 @@ curl -X POST http://localhost:3002/v1/process/zorgtoeslag/start \
   }' | jq
 ```
 
+---
+
 ## Database access
 
 Inspect the audit log database while the Docker services are running:
@@ -212,6 +230,8 @@ SELECT * FROM tenants;
 \q
 ```
 
+---
+
 ## Local service URLs
 
 | Service | URL |
@@ -221,6 +241,8 @@ SELECT * FROM tenants;
 | Keycloak Admin | http://localhost:8080 (admin / admin) |
 | Operaton Cockpit | http://localhost:8081/operaton/app/cockpit/default/ |
 
+---
+
 ## Stopping the environment
 
 ```bash
@@ -228,6 +250,8 @@ Ctrl+C                    # stop dev servers
 npm run docker:down       # stop Docker services (keeps data)
 npm run docker:down:volumes  # stop Docker and delete all data (clean slate)
 ```
+
+---
 
 ## Common issues
 

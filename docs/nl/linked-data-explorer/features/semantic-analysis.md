@@ -13,10 +13,18 @@
 
 ## The problem
 
+---
+
 ## The solution
+
+---
 
 ## Semantic Analysis tab
 
+---
+
 ## Standards
+
+---
 
 ## Graph view

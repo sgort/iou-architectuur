@@ -13,11 +13,19 @@
 
 ## GET /
 
+---
+
 ## GET /methods
+
+---
 
 ## GET /rules/{rule_id_path}
 
+---
+
 ## GET /ref/{referencemethod}/{reference}
+
+---
 
 ## Static: /respec/
 

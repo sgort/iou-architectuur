@@ -13,13 +13,23 @@
 
 ## Namespace
 
+---
+
 ## Core classes
+
+---
 
 ## RuleMethod hierarchy
 
+---
+
 ## RDF list structure for hasPart
 
+---
+
 ## Methods namespace
+
+---
 
 ## SHACL shapes
 

@@ -13,11 +13,15 @@
 
 ## Namespace prefix table
 
+---
+
 ## CPSV-AP (`cpsv:`)
 
 ### Classes
 
 ### Properties
+
+---
 
 ## Core Vocabulary (`cv:`)
 
@@ -25,7 +29,11 @@
 
 ### Properties
 
+---
+
 ## Dublin Core Terms (`dct:`)
+
+---
 
 ## RONL (`ronl:`) — Governance
 
@@ -33,16 +41,26 @@
 
 ### Properties
 
+---
+
 ## CPRMV (`cprmv:`) — Rule Management
 
 ### Classes
 
 ### Properties
 
+---
+
 ## SKOS (`skos:`)
+
+---
 
 ## Schema.org (`schema:`)
 
+---
+
 ## CPSV-AP 3.2.0 compliance changes (v1.4.0)
+
+---
 
 ## Data types

@@ -13,13 +13,23 @@
 
 ## When to use it
 
+---
+
 ## Pattern syntax
+
+---
 
 ## Behaviour when the pattern does not match
 
+---
+
 ## Non-breaking spaces
 
+---
+
 ## URL encoding the pattern
+
+---
 
 ## Format override
 

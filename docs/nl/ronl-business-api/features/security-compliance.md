@@ -13,6 +13,8 @@
 
 ## Applicable standards
 
+---
+
 ## Security controls
 
 ### HTTPS everywhere
@@ -27,6 +29,10 @@
 
 ### Secrets management
 
+---
+
 ## Audit logging
+
+---
 
 ## Data minimisation

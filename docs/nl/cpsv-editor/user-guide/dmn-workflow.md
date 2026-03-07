@@ -13,14 +13,26 @@
 
 ## Prerequisites
 
+---
+
 ## Step 1: Upload the DMN file
+
+---
 
 ## Step 2: Configure the API endpoint
 
+---
+
 ## Step 3: Deploy to Operaton
+
+---
 
 ## Step 4: Test the decision
 
+---
+
 ## Step 5: Export TTL with DMN metadata
+
+---
 
 ## Tips

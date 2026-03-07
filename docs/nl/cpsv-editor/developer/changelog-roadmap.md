@@ -33,6 +33,8 @@
 
 ### v1.0.x — Initial Release (October 2025)
 
+---
+
 ## Roadmap
 
 ### Completed

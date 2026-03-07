@@ -13,11 +13,15 @@
 
 ## Prerequisites
 
+---
+
 ## Setup
 
 # 1. Clone the repository
 
 # 2. Install all workspace dependencies
+
+---
 
 ## Backend configuration
 
@@ -33,17 +37,29 @@
 
 # Performance
 
+---
+
 ## Frontend configuration
+
+---
 
 ## Starting the services
 
+---
+
 ## Verifying the setup
 
+---
+
 ## Running backend tests
+
+---
 
 ## Code quality
 
 # Lint and format (from repo root)
+
+---
 
 ## Pushing to ACC
 

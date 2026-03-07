@@ -1,5 +1,7 @@
 # Environment Variables
 
+---
+
 ## Backend — `packages/backend/.env`
 
 ### Server
@@ -95,12 +97,16 @@
 | `ENABLE_TENANT_ISOLATION` | No | `true` | Enforce per-tenant data isolation |
 | `DEFAULT_MAX_PROCESS_INSTANCES` | No | `1000` | Max active instances per tenant |
 
+---
+
 ## Frontend — `packages/frontend/.env`
 
 | Variable | Required | Description |
 |---|---|---|
 | `VITE_API_URL` | Yes | Business API base URL (e.g. `https://api.open-regels.nl/v1`) |
 | `VITE_KEYCLOAK_URL` | Yes | Keycloak base URL (e.g. `https://keycloak.open-regels.nl`) |
+
+---
 
 ## DNS records
 
@@ -124,6 +130,8 @@ keycloak      A   <VM_IP>
 operaton      A   <VM_IP>
 ```
 
+---
+
 ## GitHub repository secrets
 
 These secrets must be configured in the GitHub repository before any workflow can deploy:
@@ -134,6 +142,8 @@ These secrets must be configured in the GitHub repository before any workflow ca
 | `AZURE_WEBAPP_PUBLISH_PROFILE_PROD` | Azure Portal → App Service `ronl-business-api-prod` → Get publish profile |
 | `AZURE_STATIC_WEB_APPS_API_TOKEN_ACC` | Azure Portal → Static Web App ACC → Manage deployment token |
 | `AZURE_STATIC_WEB_APPS_API_TOKEN_PROD` | Azure Portal → Static Web App PROD → Manage deployment token |
+
+---
 
 ## Generating environment passwords
 

@@ -2,6 +2,8 @@
 
 RONL Business API is designed to meet Dutch government security requirements. The following standards inform the security architecture and audit requirements.
 
+---
+
 ## Applicable standards
 
 | Standard | Scope |
@@ -11,6 +13,8 @@ RONL Business API is designed to meet Dutch government security requirements. Th
 | **AVG / GDPR** | Data minimisation, audit trails, retention periods, right to access |
 | **DigiD Norm** | Authentication assurance levels for citizen-facing services |
 | **NCSC Guidelines** | Secure software development, dependency management |
+
+---
 
 ## Security controls
 
@@ -72,6 +76,8 @@ Secrets are stored as Azure App Settings (environment variables on App Service) 
 - Redis primary keys
 - Admin passwords
 
+---
+
 ## Audit logging
 
 Every API call that results in a process action is written to the PostgreSQL audit log with:
@@ -87,6 +93,8 @@ Every API call that results in a process action is written to the PostgreSQL aud
 | `result` | HTTP response code |
 
 Audit records have a configured retention of 2555 days (7 years) to satisfy BIO and AVG archiving requirements. The table schema is initialised by `config/postgres/init-databases.sql`.
+
+---
 
 ## Data minimisation
 

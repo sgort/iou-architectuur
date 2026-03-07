@@ -2,6 +2,8 @@
 
 RONL Business API validates every request against a JWT access token issued by Keycloak. The token contains standard OIDC claims plus custom claims injected via Keycloak protocol mappers.
 
+---
+
 ## Full token example
 
 ```json
@@ -28,6 +30,8 @@ RONL Business API validates every request against a JWT access token issued by K
 }
 ```
 
+---
+
 ## Standard OIDC claims
 
 | Claim | Type | Description |
@@ -40,6 +44,8 @@ RONL Business API validates every request against a JWT access token issued by K
 | `preferred_username` | string | Human-readable username |
 | `typ` | string | Always `Bearer` |
 
+---
+
 ## Custom RONL claims
 
 These claims are added by Keycloak protocol mappers configured on the `ronl-business-api` client:
@@ -51,6 +57,8 @@ These claims are added by Keycloak protocol mappers configured on the `ronl-busi
 | `loa` | string | User Attribute | Level of Assurance from DigiD (`low`, `substantial`, `high`) |
 | `mandate` | string | User Attribute | Representation authority (optional — `legal-guardian`, `power-of-attorney`) |
 | `bsn` | string | User Attribute | Citizen Service Number (encrypted in production, placeholder in test) |
+
+---
 
 ## How claims are used by the backend
 
@@ -70,6 +78,8 @@ interface JwtClaims {
 
 The tenant middleware reads `req.user.municipality` to load the `TenantConfig` and apply the feature allowlist for the request.
 
+---
+
 ## Inspecting a token in the browser
 
 ```javascript
@@ -79,6 +89,8 @@ JSON.parse(atob(token.split('.')[1]));
 ```
 
 Or paste the token at [jwt.io](https://jwt.io) for a formatted view.
+
+---
 
 ## Token lifetime
 

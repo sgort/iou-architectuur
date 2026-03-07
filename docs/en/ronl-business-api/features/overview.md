@@ -1,5 +1,7 @@
 # Overview
 
+---
+
 ## The Business API Layer Pattern
 
 RONL Business API implements the **Business API Layer** pattern for government digital services. This pattern provides a secure, audited interface between a municipality's IAM system and the Operaton BPMN engine.
@@ -34,6 +36,8 @@ The Business API Layer sits between Keycloak and Operaton, handling all security
 
 Operaton's native REST API does not perform JWT validation, does not enforce multi-tenant isolation, does not emit audit logs in a compliance-grade format, and is not designed for public exposure. Fronting it with RONL Business API addresses all of these concerns without modifying the engine itself.
 
+---
+
 ## Core responsibilities
 
 **Token validation** — validates OIDC/JWT tokens issued by Keycloak, verifying the signature against JWKS, checking expiration, and confirming the audience claim matches `ronl-business-api`.
@@ -49,6 +53,8 @@ Operaton's native REST API does not perform JWT validation, does not enforce mul
 **Audit logging** — writes a tamper-evident audit entry for every API call, recording who performed what action and when. Stored in Azure PostgreSQL with 7-year retention.
 
 **API simplification** — presents a versioned (`/v1/*`) REST API following the Dutch Government API Design Rules (API-05, API-20, API-57), hiding Operaton's internal API structure from municipality frontends.
+
+---
 
 ## Example flow: zorgtoeslag calculation
 
@@ -70,6 +76,8 @@ Operaton's native REST API does not perform JWT validation, does not enforce mul
 9.  Backend writes audit log entry
 10. Returns to frontend: { "eligible": true, "amount": 1150 }
 ```
+
+---
 
 ## Open source components
 

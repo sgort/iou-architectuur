@@ -13,12 +13,22 @@
 
 ## Before you publish
 
+---
+
 ## Publishing
+
+---
 
 ## Progress tracking
 
+---
+
 ## Error handling
 
+---
+
 ## API token security
+
+---
 
 ## Cumulative publishing

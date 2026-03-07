@@ -13,12 +13,22 @@
 
 ## Running a query
 
+---
+
 ## Selecting from the query library
+
+---
 
 ## Switching endpoints
 
+---
+
 ## Exporting results
 
+---
+
 ## Graph view
+
+---
 
 ## Writing queries

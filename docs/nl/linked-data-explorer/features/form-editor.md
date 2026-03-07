@@ -13,12 +13,22 @@
 
 ## Two-panel layout
 
+---
+
 ## Form list panel
+
+---
 
 ## Example forms
 
+---
+
 ## Form canvas
 
+---
+
 ## Storage
+
+---
 
 ## Integration with the BPMN Modeler

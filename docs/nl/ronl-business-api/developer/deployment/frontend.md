@@ -13,17 +13,29 @@
 
 ## GitHub Actions workflows
 
+---
+
 ## Build and deployment steps
+
+---
 
 ## Environment files
 
+---
+
 ## Azure Static Web App configuration
 
+---
+
 ## GitHub secrets required
+
+---
 
 ## Post-deployment verification
 
 # Expected: 200
+
+---
 
 ## Manual deployment
 
@@ -32,5 +44,7 @@
 # Output: dist/
 
 # Deploy using Azure CLI
+
+---
 
 ## Keycloak redirect URI

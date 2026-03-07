@@ -13,14 +13,26 @@
 
 ## Workflow overview
 
+---
+
 ## Path filters
+
+---
 
 ## Branch strategy
 
+---
+
 ## Backend deployment pipeline
+
+---
 
 ## Frontend deployment pipeline
 
+---
+
 ## Required GitHub secrets
+
+---
 
 ## Rolling back a deployment

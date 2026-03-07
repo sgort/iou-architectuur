@@ -13,18 +13,34 @@
 
 ## 1) Namespace and DMN version
 
+---
+
 ## 2) Decision IDs and references
+
+---
 
 ## 3) FEEL expressions
 
+---
+
 ## 4) Variable naming and types
+
+---
 
 ## 5) Null / missing inputs
 
+---
+
 ## 6) DMNDI (diagram section)
+
+---
 
 ## 7) Operaton-specific extensions
 
+---
+
 ## 8) Deployment debugging workflow
+
+---
 
 ## 9) Testing strategy

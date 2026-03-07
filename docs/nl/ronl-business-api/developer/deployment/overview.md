@@ -13,17 +13,27 @@
 
 ## Architecture
 
+---
+
 ## Environments
 
 ### ACC (Acceptance)
 
 ### PROD (Production)
 
+---
+
 ## Why the split?
+
+---
 
 ## Deployment guides
 
+---
+
 ## Azure resource groups
+
+---
 
 ## Monitoring
 
@@ -31,11 +41,15 @@
 
 ### Azure monitoring
 
+---
+
 ## Disaster recovery
 
 ### VM total failure
 
 ### Azure region failure
+
+---
 
 ## VM maintenance
 
@@ -49,6 +63,8 @@
 
 ### Volume backup
 
+---
+
 ## VM-level troubleshooting
 
 ### Service not accessible from outside the VM
@@ -56,5 +72,7 @@
 ### Container shows as unhealthy
 
 ### Keycloak database connection failing
+
+---
 
 ## Production security checklist

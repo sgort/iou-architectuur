@@ -19,8 +19,14 @@
 
 ### Why not expose Operaton directly?
 
+---
+
 ## Core responsibilities
 
+---
+
 ## Example flow: zorgtoeslag calculation
+
+---
 
 ## Open source components

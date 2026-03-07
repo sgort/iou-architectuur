@@ -13,16 +13,30 @@
 
 ## Service tab — `cpsv:PublicService`
 
+---
+
 ## Organisation tab — `cv:PublicOrganisation`
+
+---
 
 ## Legal tab — `eli:LegalResource`
 
+---
+
 ## Rules tab — `cpsv:Rule, ronl:TemporalRule`
+
+---
 
 ## Parameters tab — `ronl:ParameterWaarde`
 
+---
+
 ## CPRMV tab — `cprmv:Rule`
 
+---
+
 ## DMN tab — `cprmv:DecisionModel`
+
+---
 
 ## Future phases

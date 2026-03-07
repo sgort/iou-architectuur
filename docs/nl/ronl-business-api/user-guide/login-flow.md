@@ -13,8 +13,14 @@
 
 ## What you need
 
+---
+
 ## Step-by-step login
 
+---
+
 ## Assurance levels (LoA)
+
+---
 
 ## Logging out

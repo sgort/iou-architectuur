@@ -13,4 +13,6 @@
 
 ## Documentatieframework
 
+---
+
 ## Build & Deploy Pipeline

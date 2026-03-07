@@ -13,14 +13,26 @@
 
 ## Architecture
 
+---
+
 ## Vendor list source
+
+---
 
 ## Vendor state shape
 
+---
+
 ## TTL output
+
+---
 
 ## Adding a new vendor integration
 
+---
+
 ## Certification auto-population
+
+---
 
 ## Planned enhancements

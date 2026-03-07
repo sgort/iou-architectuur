@@ -13,20 +13,38 @@
 
 ## Overzicht
 
+---
+
 ## Wat het doet
+
+---
 
 ## Gebruikersflow
 
+---
+
 ## "Wat als"-scenarioplanning (Visie)
+
+---
 
 ## Gegevensbronnen
 
+---
+
 ## Privacy en beveiliging
+
+---
 
 ## Technische opmerkingen
 
+---
+
 ## Huidige beperkingen
 
+---
+
 ## Schermafbeeldingen
+
+---
 
 ## Gerelateerde documentatie

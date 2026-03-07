@@ -13,14 +13,26 @@
 
 ## What is the Linked Data Explorer?
 
+---
+
 ## What it does
+
+---
 
 ## Ecosystem position
 
+---
+
 ## Environments and deployment
+
+---
 
 ## Technology stack
 
+---
+
 ## Repository structure
+
+---
 
 ## Licence

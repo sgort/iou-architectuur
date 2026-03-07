@@ -13,18 +13,34 @@
 
 ## Authenticatie
 
+---
+
 ## POST /brp/personen
+
+---
 
 ## POST /brp/verblijfplaatshistorie
 
+---
+
 ## Foutmeldingen
+
+---
 
 ## Testdata en BSN-mapping
 
+---
+
 ## Beveiligingsoverwegingen
+
+---
 
 ## Wijzigingslogboek
 
+---
+
 ## Ondersteuning en contact
+
+---
 
 ## Gerelateerde documentatie

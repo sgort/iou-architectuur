@@ -13,12 +13,22 @@
 
 ## System architecture
 
+---
+
 ## Frontend architecture
+
+---
 
 ## Backend architecture
 
+---
+
 ## Data flow — chain execution
 
+---
+
 ## Caching
+
+---
 
 ## Environment variables

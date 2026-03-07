@@ -13,12 +13,22 @@
 
 ## Overview
 
+---
+
 ## Selecting a vendor
+
+---
 
 ## iKnow integration
 
+---
+
 ## Vendor metadata form
 
+---
+
 ## Certification workflow
+
+---
 
 ## Adding a new vendor

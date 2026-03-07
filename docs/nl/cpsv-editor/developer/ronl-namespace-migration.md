@@ -13,10 +13,18 @@
 
 ## Background
 
+---
+
 ## What changed
+
+---
 
 ## Parser configuration
 
+---
+
 ## SPARQL query migration
+
+---
 
 ## RONL governance properties (current)

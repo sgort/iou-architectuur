@@ -13,13 +13,23 @@
 
 ## Environments
 
+---
+
 ## Exploring the API
+
+---
 
 ## Your first request
 
+---
+
 ## Fetching the current version of a law
 
+---
+
 ## Checking the CPRMV specification
+
+---
 
 ## Checking supported methods
 

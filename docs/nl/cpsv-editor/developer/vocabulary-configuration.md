@@ -13,14 +13,26 @@
 
 ## File structure
 
+---
+
 ## Namespaces
+
+---
 
 ## Entity types
 
+---
+
 ## Property aliases
+
+---
 
 ## Helper functions
 
+---
+
 ## Testing configuration changes
+
+---
 
 ## Troubleshooting

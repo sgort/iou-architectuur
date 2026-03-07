@@ -2,6 +2,8 @@
 
 Caddy handles TLS termination, automatic Let's Encrypt certificate provisioning, and reverse-proxy routing for all VM-hosted services (Keycloak ACC, Keycloak PROD, Operaton).
 
+---
+
 ## Repository structure
 
 ```
@@ -10,6 +12,8 @@ deployment/vm/caddy/
 ```
 
 The `Caddyfile` is version-controlled but must be copied to the VM and loaded by the Caddy container. It is **not** committed with secrets.
+
+---
 
 ## Caddyfile
 
@@ -29,6 +33,8 @@ operaton.open-regels.nl {
 
 Caddy automatically provisions and renews Let's Encrypt certificates for all listed domains. HTTP requests are automatically redirected to HTTPS.
 
+---
+
 ## Retrieving the Caddyfile from a running VM
 
 If the Caddyfile on the VM has diverged from the version in the repository, retrieve the live version and commit it:
@@ -39,6 +45,8 @@ ssh user@open-regels.nl "docker exec caddy cat /etc/caddy/Caddyfile" \
 ```
 
 Review the diff before committing — the VM copy is authoritative for any manual changes made outside of the normal deploy flow.
+
+---
 
 ## Deploying Caddy
 
@@ -91,6 +99,8 @@ docker compose logs -f caddy    # verify certificate provisioning
 
 Caddy is ready when you see: `certificate obtained successfully`
 
+---
+
 ## Adding a new domain
 
 To expose a new VM service through Caddy:
@@ -108,9 +118,13 @@ To expose a new VM service through Caddy:
    ssh user@open-regels.nl 'docker exec caddy caddy reload --config /etc/caddy/Caddyfile'
    ```
 
+---
+
 ## Docker network
 
 All VM containers communicate over a shared Docker network named `npm-network`. Caddy resolves Keycloak and Operaton by their container names (`keycloak-acc`, `keycloak-prod`, `operaton`) within this network. Ensure all containers specify `networks: npm-network` in their `docker-compose.yml`.
+
+---
 
 ## Security hardening
 
@@ -165,6 +179,8 @@ acc.keycloak.open-regels.nl {
 
 Note: Keycloak's built-in brute-force protection (5 failed attempts → lockout) is configured in the realm settings and operates independently of Caddy rate limiting.
 
+---
+
 ## Verifying SSL certificates
 
 ```bash
@@ -180,6 +196,8 @@ echo | openssl s_client -servername operaton.open-regels.nl \
 ```
 
 Caddy stores certificates in the `caddy-data` volume and renews them automatically ~30 days before expiry. No manual intervention is required unless DNS or the VM IP changes.
+
+---
 
 ## Metrics and monitoring
 
@@ -198,6 +216,8 @@ docker logs -f caddy
 # Filter for a specific domain
 docker logs caddy 2>&1 | grep "acc.keycloak.open-regels.nl"
 ```
+
+---
 
 ## Troubleshooting
 

@@ -3,6 +3,8 @@
 !!! info "Documentation In Progress"
     This page is being developed. Content will be added soon.
 
+---
+
 ## Coming Soon
 
 This section will contain comprehensive documentation about Code Standards.

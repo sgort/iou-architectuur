@@ -13,6 +13,8 @@
 
 ## Hoe deze reference te lezen
 
+---
+
 ## Laag 1 — Basis DMN (BASE-*)
 
 ### BASE-PARSE
@@ -26,6 +28,8 @@
 ### BASE-NSATTR
 
 ### BASE-EMPTY
+
+---
 
 ## Laag 2 — Bedrijfsregels (BIZ-*)
 
@@ -46,6 +50,8 @@
 ### BIZ-008
 
 ### BIZ-009
+
+---
 
 ## Laag 3 — Uitvoeringsregels (EXEC-*)
 
@@ -69,6 +75,8 @@
 
 ### EXEC-010
 
+---
+
 ## Laag 4 — Interactieregels (INT-*)
 
 ### INT-001
@@ -83,6 +91,8 @@
 
 ### INT-006
 
+---
+
 ## Laag 5 — Inhoud (CON-*)
 
 ### CON-001
@@ -95,6 +105,10 @@
 
 ### CON-005
 
+---
+
 ## Overzicht ernst per code
+
+---
 
 ## API-contract

@@ -13,13 +13,23 @@
 
 ## Request lifecycle
 
+---
+
 ## Startup
+
+---
 
 ## Method detection
 
+---
+
 ## Rule graph traversal
 
+---
+
 ## Static files
+
+---
 
 ## Locale
 

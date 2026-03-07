@@ -13,9 +13,13 @@
 
 ## CI/CD pipeline
 
+---
+
 ## Changelog
 
 ### v0.4.0 — Initial Release (February 2026)
+
+---
 
 ## Roadmap
 

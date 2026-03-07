@@ -2,6 +2,8 @@
 
 RONL Business API follows the **Dutch Government API Design Rules** (Nederlandse API Strategie). The API is versioned, uses standard HTTP semantics, and provides machine-readable metadata via response headers.
 
+---
+
 ## Versioning
 
 All current endpoints are served under the `/v1/` prefix (rule API-20: major version in the URI path). A response header `API-Version` is added to every response (rule API-57):
@@ -21,6 +23,8 @@ Link: </v1/health>; rel="successor-version"
 
 Legacy support will be removed in v2.0.0.
 
+---
+
 ## Naming conventions
 
 | Rule | Applied as |
@@ -30,6 +34,8 @@ Legacy support will be removed in v2.0.0.
 | API-48: no trailing slashes | Enforced in routing configuration |
 | API-53: hide implementation | No Operaton-internal identifiers exposed in responses |
 | API-04: language | Technical endpoints in English; business variable names follow Dutch source data |
+
+---
 
 ## Request / response format
 
@@ -56,13 +62,19 @@ All endpoints use `application/json`. Request bodies are validated using `expres
 }
 ```
 
+---
+
 ## Rate limiting headers
 
 Rate limit state is communicated via standard headers (`RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`) when approaching the limit.
 
+---
+
 ## OpenAPI documentation
 
 An OpenAPI 3.0 specification is planned at `/v1/openapi.json` (rule API-16 / API-51). It is currently enabled only in non-production environments via `ENABLE_SWAGGER=true`.
+
+---
 
 ## Route inventory
 

@@ -13,12 +13,22 @@
 
 ## Backend — SPARQL query
 
+---
+
 ## Backend — TypeScript interface
+
+---
 
 ## Frontend — ValidationBadge component
 
+---
+
 ## Frontend — integration points
 
+---
+
 ## RDF data structure
+
+---
 
 ## RONL Ontology reference

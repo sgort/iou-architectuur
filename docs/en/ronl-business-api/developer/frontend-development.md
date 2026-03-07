@@ -2,6 +2,8 @@
 
 The frontend is `packages/frontend` (`@ronl/frontend`) — a React 18 + TypeScript SPA built with Vite.
 
+---
+
 ## Project structure
 
 ```
@@ -27,6 +29,8 @@ packages/frontend/public/
 ├── tenants.json                # Municipality configurations (loaded at runtime)
 └── staticwebapp.config.json    # Azure SWA routing configuration
 ```
+
+---
 
 ## Landing page architecture
 
@@ -87,6 +91,8 @@ if (authenticated) {
 **3. Dashboard (`/dashboard` — `Dashboard.tsx`)**
 
 Main application after successful authentication. The JWT `roles` claim determines which view is displayed: the citizen calculator or the caseworker queue.
+
+---
 
 ## Changelog Panel Component
 
@@ -161,6 +167,8 @@ export const changelog: Changelog = {
 };
 ```
 
+---
+
 ## Authentication with Keycloak JS
 
 `services/keycloak.ts` exports the Keycloak instance. Initialisation is done manually in `AuthCallback.tsx` (not on import) so the IDP selection and caseworker sentinel can be applied before the first Keycloak call.
@@ -189,6 +197,8 @@ Token refresh is handled automatically by the Keycloak JS adapter. The adapter r
 
 **Token refresh** is still handled automatically by the adapter before the 15-minute expiry.
 
+---
+
 ## Multi-tenant theming
 
 On successful login, `services/tenant.ts` reads the `municipality` claim from the decoded JWT and applies the corresponding theme:
@@ -207,6 +217,8 @@ root.style.setProperty("--color-primary-dark", theme.primaryDark);
 
 All Tailwind utility classes and component styles reference these custom properties, so the entire UI re-themes without a page reload.
 
+---
+
 ## API client
 
 `services/api.ts` wraps Axios and adds the JWT bearer token to every request:
@@ -223,6 +235,8 @@ client.interceptors.request.use((config) => {
 ```
 
 If a request returns HTTP 401 (token expired between refresh cycles), the interceptor triggers a silent Keycloak refresh and retries.
+
+---
 
 ## Environment variables
 
@@ -253,6 +267,8 @@ if (hostname.includes("acc.mijn.open-regels.nl")) {
 
 This is used in the Architecture footer to show environment-specific URLs.
 
+---
+
 ## Development commands
 
 ```bash
@@ -277,6 +293,8 @@ npm run lint
 # Format
 npm run format
 ```
+
+---
 
 ## Calling the Business API from a component
 
@@ -432,6 +450,8 @@ import NewPage from './pages/NewPage';
 <Link to="/new-page">Go to New Page</Link>
 ```
 
+---
+
 ## Adding a feature flag check
 
 Feature flags are configured per municipality in `public/tenants.json`:
@@ -464,6 +484,8 @@ function MyComponent() {
 }
 ```
 
+---
+
 ## Styling guidelines
 
 **Use Tailwind utility classes:**
@@ -492,6 +514,8 @@ function MyComponent() {
   {/* Responsive width */}
 </div>
 ```
+
+---
 
 ## Testing
 
@@ -548,6 +572,8 @@ Test in:
 - Edge 90+
 - Mobile Safari (iOS 14+)
 - Chrome Mobile (Android)
+
+---
 
 ## Common Tasks
 

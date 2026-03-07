@@ -13,28 +13,54 @@
 
 ## Architectuuroverzicht
 
+---
+
 ## Componentstructuur
+
+---
 
 ## Gegevensstroom
 
+---
+
 ## Backend proxy-implementatie
+
+---
 
 ## Historische toestandsberekening
 
+---
+
 ## BSN-mapping voor testomgeving
+
+---
 
 ## Beveiligingsoverwegingen
 
+---
+
 ## Prestatieoverwegingen
+
+---
 
 ## Foutafhandeling
 
+---
+
 ## Vereiste configuratiewijzigingen
+
+---
 
 ## Deployment-opmerkingen
 
+---
+
 ## Testen
 
+---
+
 ## Toekomstige verbeteringen
+
+---
 
 ## Gerelateerde documentatie

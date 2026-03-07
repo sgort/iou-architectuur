@@ -13,8 +13,14 @@
 
 ## What publishing does
 
+---
+
 ## Progress tracking
 
+---
+
 ## Configuration
+
+---
 
 ## Cumulative data storage

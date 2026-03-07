@@ -13,16 +13,30 @@
 
 ## Service tab
 
+---
+
 ## Organisation tab
+
+---
 
 ## Legal tab
 
+---
+
 ## Rules tab (RPP: Rules)
+
+---
 
 ## Parameters tab (RPP: Parameters)
 
+---
+
 ## CPRMV tab (RPP: Policy)
 
+---
+
 ## DMN tab
+
+---
 
 ## Vendor tab

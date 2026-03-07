@@ -13,13 +13,23 @@
 
 ## Structure
 
+---
+
 ## Rule Set ID formats
+
+---
 
 ## Rule ID matching rules
 
+---
+
 ## Depth-first search
 
+---
+
 ## URL encoding
+
+---
 
 ## Minimum and maximum length
 

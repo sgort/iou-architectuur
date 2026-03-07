@@ -13,7 +13,11 @@
 
 ## Component structure
 
+---
+
 ## DMN state shape
+
+---
 
 ## Import preservation
 
@@ -23,10 +27,18 @@
 
 ### Export
 
+---
+
 ## Primary decision key extraction
+
+---
 
 ## Operaton REST API
 
+---
+
 ## URI generation
+
+---
 
 ## Shell script parity

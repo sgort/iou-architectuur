@@ -13,15 +13,27 @@
 
 ## On-the-fly rule retrieval
 
+---
+
 ## Multi-repository support
+
+---
 
 ## Rule path navigation
 
+---
+
 ## Multiple output formats
+
+---
 
 ## Definition extraction with unformat
 
+---
+
 ## Reference resolution
+
+---
 
 ## CPRMV Specification hosting
 

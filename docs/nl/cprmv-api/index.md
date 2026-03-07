@@ -13,13 +13,23 @@
 
 ## What it does
 
+---
+
 ## Ecosystem position
+
+---
 
 ## Environments
 
+---
+
 ## Technology stack
 
+---
+
 ## Repository structure
+
+---
 
 ## Licence
 
