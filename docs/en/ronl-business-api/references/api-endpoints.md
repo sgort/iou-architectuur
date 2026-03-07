@@ -29,6 +29,8 @@ All current endpoints use the `/v1/` prefix. Legacy `/api/*` endpoints are depre
 
 Health status values: `healthy` (HTTP 200), `degraded` (HTTP 503), `unhealthy` (HTTP 503).
 
+---
+
 ## Decision evaluation
 
 | Method | Endpoint | Auth | Description |
@@ -58,6 +60,8 @@ Health status values: `healthy` (HTTP 200), `degraded` (HTTP 503), `unhealthy` (
 }
 ```
 
+---
+
 ## Process management
 
 | Method | Endpoint | Auth | Description |
@@ -67,6 +71,10 @@ Health status values: `healthy` (HTTP 200), `degraded` (HTTP 503), `unhealthy` (
 | `GET` | `/v1/process/:id/variables` | Bearer JWT | Get process instance output variables |
 | `DELETE` | `/v1/process/:id` | Bearer JWT | Cancel a process instance |
 | `GET` | `/v1/process/history` | Bearer JWT | List completed and active process instances for the authenticated citizen (`?applicantId=`) |
+| `GET` | `/v1/process/:key/start-form` | Bearer JWT | Fetch the deployed Camunda Form schema for a process start event. Returns 404 `FORM_NOT_FOUND` if no form is linked; 415 `UNSUPPORTED_FORM_TYPE` if an embedded HTML form is linked. |
+| `GET` | `/v1/process/:id/historic-variables` | Bearer JWT | Fetch the final variable state of a completed process instance from Operaton history. Applies tenant isolation via the `municipality` variable. |
+
+---
 
 ## Task management
 
@@ -77,8 +85,7 @@ Health status values: `healthy` (HTTP 200), `degraded` (HTTP 503), `unhealthy` (
 | `GET` | `/v1/task/:id/variables` | Bearer JWT (caseworker) | Get all process variables for a task |
 | `POST` | `/v1/task/:id/claim` | Bearer JWT (caseworker) | Claim a task for the authenticated caseworker |
 | `POST` | `/v1/task/:id/complete` | Bearer JWT (caseworker) | Complete a task with submitted variables |
-
-Tasks are filtered to the caseworker's municipality via the `municipality` process variable. A caseworker from Utrecht cannot see Amsterdam's tasks.
+| `GET` | `/v1/task/:id/form-schema` | Bearer JWT (caseworker) | Fetch the deployed Camunda Form schema for a task. Returns 404 `FORM_NOT_FOUND` if no `camunda:formRef` is set; treats Operaton 400 responses as 404. |
 
 **`POST /v1/task/:id/complete` request body:**
 ```json
@@ -89,6 +96,33 @@ Tasks are filtered to the caseworker's municipality via the `municipality` proce
   }
 }
 ```
+
+Tasks are filtered to the caseworker's municipality via the `municipality` process variable. A caseworker from Utrecht cannot see Amsterdam's tasks.
+
+---
+
+## Process definition deployment
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/dmns/process/deploy` | Bearer JWT | Deploy a BPMN process bundle to Operaton in a single multipart request |
+
+This endpoint accepts a `multipart/form-data` request and deploys all provided files as one named Operaton deployment. It is used by the LDE BPMN Modeler one-click deploy feature.
+
+**Multipart fields:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `mainBpmn` | file | Yes | The primary BPMN file (e.g. `AwbShellProcess.bpmn`) |
+| `subProcessBpmns` | file (multiple) | No | Subprocess BPMN files |
+| `forms` | file (multiple) | No | Camunda Form `.form` files |
+| `operatonUrl` | string | No | Override the default Operaton base URL |
+| `operatonUser` | string | No | Override Operaton basic-auth username |
+| `operatonPassword` | string | No | Override Operaton basic-auth password |
+
+See [Dynamic Forms — Deployment](../features/dynamic-forms.md#deployment) for the full deploy workflow.
+
+---
 
 ## Response headers
 
@@ -105,6 +139,8 @@ Deprecated endpoints additionally include:
 Deprecation: true
 Link: </v1/health>; rel="successor-version"
 ```
+
+---
 
 ## Error codes
 

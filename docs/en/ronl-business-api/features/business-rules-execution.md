@@ -11,6 +11,8 @@ RONL Business API delegates all business rule execution to **Operaton**, an open
 
 The Business API hides the complexity of Operaton's REST API behind simple, purpose-built endpoints such as `POST /v1/decision/:key/evaluate` and `POST /v1/process/:key/start`.
 
+---
+
 ## Supported processes
 
 Currently configured processes include:
@@ -30,6 +32,8 @@ Input variables mapped from the JWT and request body:
 | `municipality` | string | JWT `municipality` claim |
 
 Output: `{ "eligible": true, "amount": 1150 }`
+
+---
 
 ## Process execution flow Zorgtoeslag
 
@@ -59,6 +63,8 @@ The outer shell (`AwbShellProcess`) manages the six AWB phases: receipt acknowle
 The inner subprocess (`TreeFellingPermitSubProcess`) handles the substantive decision: it evaluates `TreeFellingDecision.dmn` and `ReplacementTreeDecision.dmn`, creates a `Sub_CaseReview` user task for caseworker review, and writes the final `permitDecision`, `status`, and `finalMessage` variables back to the parent process.
 
 After the subprocess completes, the AWB shell creates a `Task_Phase6_Notify` user task requiring the caseworker to confirm citizen notification before the process ends.
+
+---
 
 ## Process execution flow Tree Felling permit
 ```mermaid
@@ -111,6 +117,9 @@ sequenceDiagram
 - Subprocess — the material decision happens inside `TreeFellingPermitSubProcess`, which writes its variables back to the AWB shell
 - No result in the start response — the citizen receives only a `dossierReference`; the actual decision is only available later via `/v1/process/history`
 
+From v2.2.0, citizen and caseworker interaction with the AWB process is driven entirely by **Camunda Forms** — JSON schemas authored in the [LDE Form Editor](../../../linked-data-explorer/features/form-editor.md) and deployed alongside the BPMN in Operaton. The citizen start form is fetched and rendered dynamically; the caseworker review and notification forms are fetched per task. A **Decision Viewer** in the citizen dashboard fetches the final variable state of completed applications via the Operaton history API. See [Dynamic Forms](dynamic-forms.md) for the full implementation detail.
+
+---
 
 ## API endpoints for business rules
 
@@ -126,8 +135,13 @@ sequenceDiagram
 | `POST` | `/v1/task/:id/claim` | Claim a task |
 | `POST` | `/v1/task/:id/complete` | Complete a task with caseworker-submitted variables |
 | `GET` | `/v1/process/history` | List process history for the authenticated citizen |
+| `GET` | `/v1/process/:key/start-form` | Fetch the deployed Camunda Form schema for a process start event |
+| `GET` | `/v1/task/:id/form-schema` | Fetch the deployed Camunda Form schema for a task |
+| `GET` | `/v1/process/:id/historic-variables` | Fetch final variable state of a completed process instance |
 
 All endpoints require a valid JWT in the `Authorization: Bearer` header.
+
+---
 
 ## Operaton environment
 

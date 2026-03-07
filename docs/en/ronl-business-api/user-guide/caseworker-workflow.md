@@ -39,6 +39,8 @@ Password for all test accounts: `test123`
 
 After login, the JWT will contain `"roles": ["caseworker"]`. The portal detects this role and displays the caseworker dashboard.
 
+---
+
 ## What caseworkers can do
 
 | Action              | Endpoint                     | Description                                                |
@@ -49,6 +51,8 @@ After login, the JWT will contain `"roles": ["caseworker"]`. The portal detects 
 | Complete a task     | `POST /v1/task/:id/complete` | Submit the caseworker's decision and close the task        |
 
 All results are filtered to the caseworker's own municipality. A caseworker from Utrecht cannot see Amsterdam's tasks.
+
+---
 
 ## Reviewing a citizen's application
 
@@ -123,7 +127,9 @@ This task is created inside `TreeFellingPermitSubProcess` after both DMNs have b
   <figcaption>Sub_CaseReview task in the task queue — unclaimed (Openstaand)</figcaption>
 </figure>
 
-After claiming, the `CaseReviewForm` is shown. The caseworker selects one of three actions:
+After claiming, the **`tree-felling-review`** Camunda Form is rendered by `TaskFormViewer`. The form is fetched live from the deployed process via `GET /v1/task/:id/form-schema` and pre-populated with the current DMN outputs (`permitDecision`, `replacementDecision`) so the caseworker sees the engine's recommendation immediately. FEEL conditional visibility hides the override fields unless the caseworker selects **Wijzigen**.
+
+The caseworker selects one of three actions:
 
 | Action     | `reviewAction` value                        | Effect                                                          |
 | ---------- | ------------------------------------------- | --------------------------------------------------------------- |
@@ -140,14 +146,16 @@ The `Sub_ResolveDecision` script task in the subprocess applies the override whe
 
 ### Task_Phase6_Notify — notification confirmation
 
-After `Sub_CaseReview` completes and the subprocess ends, the AWB shell creates `Task_Phase6_Notify`. This task also appears as **Openstaand** and requires a claim before it can be completed.
+After `Sub_CaseReview` completes and the subprocess ends, the AWB shell creates `Task_Phase6_Notify`. This task appears as **Claimed** and can as such be completed.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: MijnOmgeving — Caseworker AWB Notify Claim](../../../assets/screenshots/ronl-mijnomgeving-caseworker-awb-notify-claim.png)
-  <figcaption>Task_Phase6_Notify task in the task queue — unclaimed (Openstaand)</figcaption>
+  ![Screenshot: MijnOmgeving — Caseworker AWB Notify Claim](../../../assets/screenshots/ronl-mijnomgeving-caseworker-awb-notify-claimed.png)
+  <figcaption>Task_Phase6_Notify task - Claimed</figcaption>
 </figure>
 
-After claiming, the `NotifyApplicantForm` is shown. The caseworker selects how the citizen was notified and confirms:
+After claiming, the **`awb-notify-applicant`** Camunda Form is rendered by `TaskFormViewer`. The form displays the final decision variables (`status`, `permitDecision`, `finalMessage`, `replacementInfo`) as readonly fields so the caseworker can confirm the correct decision before notifying the citizen.
+
+The caseworker selects how the citizen was notified and confirms:
 
 | Field                    | Variable             | Required                                      |
 | ------------------------ | -------------------- | --------------------------------------------- |
@@ -174,6 +182,8 @@ Completing this task ends the AWB shell process. The process instance moves to h
 | Override DMN result                | —       | ✓          | ✓     |
 | View audit logs                    | —       | —          | ✓     |
 | Manage users in Keycloak           | —       | —          | ✓     |
+
+---
 
 ## Audit trail
 

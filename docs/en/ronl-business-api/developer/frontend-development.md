@@ -313,6 +313,90 @@ const handleEvaluate = async () => {
 };
 ```
 
+---
+
+## Camunda Forms — `@bpmn-io/form-js`
+
+Form rendering in both dashboards is handled by `@bpmn-io/form-js` v1.20.x (MIT-compatible). Forms are JSON schemas authored in the [LDE Form Editor](../../../linked-data-explorer/features/form-editor.md), deployed alongside BPMN in Operaton, and fetched at runtime by the backend form schema endpoints.
+
+The package is already in `packages/frontend/package.json`. Import in any component that renders a form:
+
+```tsx
+import { Form } from '@bpmn-io/form-js';
+import '@bpmn-io/form-js/dist/assets/form-js.css';
+```
+
+The CSS import is required — without it the form renders completely unstyled.
+
+### Callback stability pattern
+
+All three form components store callbacks (`onCompleted`, `onStarted`, `onError`) in refs rather than including them in the `useEffect` dependency array. Without this, inline arrow functions passed from a parent cause the effect to re-fire on every render, instantiating a new `Form` object and looping indefinitely.
+
+```tsx
+const onStartedRef = useRef(onStarted);
+const onErrorRef = useRef(onError);
+
+useEffect(() => { onStartedRef.current = onStarted; }, [onStarted]);
+useEffect(() => { onErrorRef.current = onError; }, [onError]);
+
+// Main init effect — callbacks intentionally NOT in the dependency array:
+useEffect(() => { /* importSchema, attach listeners */ }, [processKey]);
+```
+
+### Container div must always be in the DOM
+
+The `<div ref={containerRef} />` must be present in the DOM **before** `form.importSchema` is called. Conditional rendering (`status === 'loading' && <div ref={...} />`) means `containerRef.current` is `null` when the effect fires. Always render the container div and toggle visibility via a CSS class:
+
+```tsx
+<div ref={containerRef} className={status === 'ready' ? 'fjs-container' : 'hidden'} />
+```
+
+### `ProcessStartFormViewer`
+
+**`packages/frontend/src/components/ProcessStartFormViewer.tsx`**
+
+Renders the start form for a BPMN process in the citizen dashboard.
+
+| Prop | Type | Description |
+|---|---|---|
+| `processKey` | `string` | BPMN process definition key |
+| `initialData` | `Record<string, unknown>` | Hidden pre-populated variables (e.g. `applicantId`, `productType`) |
+| `onStarted` | `(dossier: string) => void` | Called with `businessKey` on successful process start |
+| `onError` | `() => void` | Called on API or form error |
+
+On mount: calls `businessApi.process.startForm(processKey)` to fetch the schema. On submit: calls `businessApi.process.start(processKey, formData)`. Extracts `businessKey` from the response (falls back to `processInstanceId`).
+
+### `TaskFormViewer`
+
+**`packages/frontend/src/components/CaseworkerDashboard/TaskFormViewer.tsx`**
+
+Renders the form for a claimed task in the caseworker dashboard.
+
+| Prop | Type | Description |
+|---|---|---|
+| `taskId` | `string` | Operaton task ID |
+| `variables` | `Record<string, unknown> \| null` | Process variables for pre-population |
+| `onCompleted` | `() => void` | Called after successful task completion |
+| `onError` | `() => void` | Called on API or form error |
+
+On mount: calls `businessApi.task.formSchema(taskId)` to fetch the schema. On submit: calls `businessApi.task.complete(taskId, formData)`. Falls back to a generic "Taak voltooien" button when `status === 'no-form'`.
+
+### `DecisionViewer`
+
+**`packages/frontend/src/components/DecisionViewer.tsx`**
+
+Displays the final decision for a completed process instance in the citizen dashboard (Mijn aanvragen). Readonly — no submit handler.
+
+| Prop | Type | Description |
+|---|---|---|
+| `processInstanceId` | `string` | Operaton process instance ID |
+
+On mount: calls `businessApi.process.historicVariables(processInstanceId)`. Renders a hardcoded readonly schema (five fields: `status`, `permitDecision`, `finalMessage`, `replacementInfo`, `dossierReference`) populated via `form.importSchema(schema, data)`.
+
+The schema is hardcoded rather than fetched so that the citizen sees only the decision outcome, not the caseworker-only action fields from `awb-notify-applicant`.
+
+---
+
 ## Adding a new page
 
 1. **Create the component:**

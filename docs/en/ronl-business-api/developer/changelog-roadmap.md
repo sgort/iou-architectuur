@@ -4,6 +4,36 @@
 
 ## Changelog
 
+### v2.2.0 — Feature Release (March 5, 2026)
+
+**Citizen Dashboard — Dynamic Start Form** 🌳
+
+- Kapvergunning form replaced by `@bpmn-io/form-js` viewer — schema fetched live from the deployed process via `GET /v1/process/:key/start-form`.
+- Form renders with `applicantId` and `productType` pre-populated as hidden initial data.
+- On submit, form variables are passed directly to `POST /v1/process/:key/start` — no hardcoded field mapping.
+- Falls back gracefully when no form is deployed (404/415).
+
+**Caseworker Dashboard — Dynamic Task Forms** 🏛️
+
+- `CaseReviewForm` and `NotifyApplicantForm` replaced by a single `TaskFormViewer` component.
+- Form schema fetched per task via `GET /v1/task/:id/form-schema` with tenant isolation.
+- Process variables pre-populated into the form at import time — caseworker sees current DMN decisions immediately.
+- FEEL conditional visibility on the `tree-felling-review` form hides override fields unless caseworker selects Wijzigen.
+- Falls back to a generic "Taak voltooien" button when no form is deployed (`status === 'no-form'`).
+
+**Citizen Dashboard — Decision Viewer** 📋
+
+- Completed applications in **Mijn aanvragen** show a **Bekijk beslissing** toggle.
+- `DecisionViewer` fetches final variable state via `GET /v1/process/:id/historic-variables`.
+- Readonly form renders `status`, `permitDecision`, `finalMessage`, `replacementInfo`, and `dossierReference` — caseworker-only fields excluded.
+- Historic variables available immediately after process completion — no polling required.
+
+**Backend — Form Schema Endpoints** ⚙️
+
+- `GET /v1/process/:key/start-form` — fetches deployed start form schema; returns 415 `UNSUPPORTED_FORM_TYPE` for legacy HTML `formKey` deployments.
+- `GET /v1/task/:id/form-schema` — fetches deployed task form schema with tenant isolation; treats Operaton 400 (no `formRef` set) as 404 `FORM_NOT_FOUND`.
+- `POST /api/dmns/process/deploy` — deploys BPMN + subprocess BPMNs + Camunda Forms in one multipart request.
+
 ### v2.1.0 — Feature Release (March 3, 2026)
 
 **AWB Kapvergunning Process** 🌳
@@ -161,6 +191,9 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 | AWB Kapvergunning process (AwbShellProcess + subprocess) | v2.1.0  |
 | Caseworker claim-first task queue                        | v2.1.0  |
 | BPMN design criteria reference documentation             | v2.1.0  |
+| Dynamic Camunda Forms — citizen start form               | v2.2.0  |
+| Dynamic Camunda Forms — caseworker task forms            | v2.2.0  |
+| Decision Viewer — citizen-facing historic variables      | v2.2.0  |
 
 ---
 

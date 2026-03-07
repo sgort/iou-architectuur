@@ -96,6 +96,7 @@ nav:
       - Multi-Tenant Municipality Portal: ronl-business-api/features/multi-tenant-portal.md
       - Authentication & IAM: ronl-business-api/features/authentication-iam.md
       - Business Rules Execution: ronl-business-api/features/business-rules-execution.md
+      - Dynamic Forms: ronl-business-api/features/dynamic-forms.md
       - Timeline Navigation: ronl-business-api/features/timeline-navigation.md
       - Security & Compliance: ronl-business-api/features/security-compliance.md
       - API Design: ronl-business-api/features/api-design.md

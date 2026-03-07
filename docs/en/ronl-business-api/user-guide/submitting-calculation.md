@@ -152,10 +152,14 @@ After login, select **Vergunningen** from the services catalogue, then choose **
 
 **Step 2 — Fill in the form**
 
+The form is a live-fetched **Camunda Form** (`kapvergunning-start`) rendered by `@bpmn-io/form-js`. Your `applicantId` and `productType` are injected automatically as hidden initial data — you do not need to enter them.
+
 | Field           | Label             | Input type    |
 | --------------- | ----------------- | ------------- |
 | `treeDiameter`  | Stamdiameter (cm) | Number, 1–500 |
 | `protectedArea` | Beschermd gebied  | Checkbox      |
+
+If no form schema is deployed for the process, the portal falls back to a static form and shows a brief notice.
 
 **Step 3 — Submit**
 
@@ -212,6 +216,29 @@ The AWB shell process runs automatically through phases 1–3 before pausing at 
 5. **Process suspends** — awaiting caseworker action
 
 After the caseworker completes the review and confirms citizen notification (`Task_Phase6_Notify`), the process ends and the final decision variables are stored.
+
+### Viewing the decision
+
+Once the caseworker completes both tasks and the process ends, a **Bekijk beslissing** toggle appears on the application card in **Mijn aanvragen**. Clicking the toggle expands the **Decision Viewer** panel below the card:
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Decision Viewer expanded](../../../assets/screenshots/ronl-mijnomgeving-citizen-decision-viewer-expanded.png)
+  <figcaption>Decision Viewer expanded — readonly decision fields</figcaption>
+</figure>
+
+The panel shows five readonly fields drawn from the final process variable state:
+
+| Field | Variable | Description |
+|---|---|---|
+| Status | `status` | `Approved` or `Rejected` |
+| Beslissing | `permitDecision` | `Permit` or `Reject` |
+| Beslissingstekst | `finalMessage` | Plain-text decision including appeal notice if rejected |
+| Herplantinformatie | `replacementInfo` | Whether a replacement tree is required |
+| Dossiernummer | `dossierReference` | The AWB dossier reference assigned at submission |
+
+The Decision Viewer calls `GET /v1/process/:id/historic-variables` — variables are available immediately after process completion with no polling needed.
+
+---
 
 ### Test scenarios
 

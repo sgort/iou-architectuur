@@ -8,13 +8,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.1.0** · *March 2026*
+-   **⚙️ RONL Business API — v2.2.0** · *March 2026*
 
     ---
 
-    **AWB Kapvergunning Process**
+    **Dynamic Forms**
 
-    Full AWB shell process (AwbShellProcess) implementing Awb procedural phases 1–6. TreeFellingPermitSubProcess handles substantive decision via TreeFellingDecision and ReplacementTreeDecision DMNs. Caseworker Task Queue — Claim-First Workflow.
+    Kapvergunning now renders a live-fetched Camunda Form via `@bpmn-io/form-js`. Caseworker task forms replaced by a single `TaskFormViewer` component. Citizens can view the full AWB decision directly in **Mijn aanvragen** via the new Decision Viewer.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
