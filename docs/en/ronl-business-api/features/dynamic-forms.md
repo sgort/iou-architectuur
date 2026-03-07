@@ -38,9 +38,9 @@ Linked to `Task_Phase6_Notify` (UserTask in `AwbShellProcess`). Rendered in the 
 | Field key | Label | Type |
 |---|---|---|
 | `status` | Status | Readonly display |
+| `permitDecision` | Vergunningsbesluit | Readonly display |
 | `finalMessage` | Beslissing | Readonly display |
 | `replacementInfo` | Herplantinformatie | Readonly display |
-| `dossierReference` | Dossiernummer | Readonly display |
 | `notificationMethod` | Wijze van kennisgeving | Select: `email` / `letter` / `phone` / `portal` |
 | `notificationNotes` | Aanvullende notities | Text (optional) |
 | `applicantNotified` | Bevestiging kennisgeving | Checkbox (required) |
