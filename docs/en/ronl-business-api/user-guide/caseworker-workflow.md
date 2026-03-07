@@ -148,11 +148,11 @@ The `Sub_ResolveDecision` script task in the subprocess applies the override whe
 
 ### Task_Phase6_Notify — notification confirmation
 
-After `Sub_CaseReview` completes and the subprocess ends, the AWB shell creates `Task_Phase6_Notify`. This task appears as **Claimed** and can as such be completed.
+After `Sub_CaseReview` completes and the subprocess ends, the AWB shell creates `Task_Phase6_Notify`. This task also appears as **Openstaand** and requires a claim before it can be completed.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: MijnOmgeving — Caseworker AWB Notify Claim](../../../assets/screenshots/ronl-mijnomgeving-caseworker-awb-notify-claimed.png)
-  <figcaption>Task_Phase6_Notify task - Claimed</figcaption>
+  ![Screenshot: MijnOmgeving — Caseworker AWB Notify Claim](../../../assets/screenshots/ronl-mijnomgeving-caseworker-awb-notify-claim.png)
+  <figcaption>Task_Phase6_Notify task - unclaimed (Openstaand)</figcaption>
 </figure>
 
 After claiming, the **`awb-notify-applicant`** Camunda Form is rendered by `TaskFormViewer`. The form displays the final decision variables (`status`, `permitDecision`, `finalMessage`, `replacementInfo`) as readonly fields so the caseworker can confirm the correct decision before notifying the citizen.
