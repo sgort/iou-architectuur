@@ -13,18 +13,34 @@
 
 ## Prerequisites
 
+---
+
 ## Scenario 1 — Exact match chain (DRD-compatible)
+
+---
 
 ## Scenario 2 — Semantic chain (sequential only)
 
+---
+
 ## Scenario 3 — DRD save and execute
+
+---
 
 ## Scenario 4 — Template system
 
+---
+
 ## Scenario 5 — BPMN Modeler + DRD linking
+
+---
 
 ## Scenario 6 — Governance badges
 
+---
+
 ## Scenario 7 — Vendor services
+
+---
 
 ## Common issues

@@ -13,14 +13,26 @@
 
 ## Component structure
 
+---
+
 ## Canvas initialisation
+
+---
 
 ## Scroll-to-zoom override
 
+---
+
 ## Rendering artifact fix
+
+---
 
 ## FormTemplateSelector — form linking for UserTask and StartEvent
 
+---
+
 ## Form badge overlay
+
+---
 
 ## Deploy modal

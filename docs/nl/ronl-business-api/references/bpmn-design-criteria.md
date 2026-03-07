@@ -21,12 +21,22 @@
 
 ### Known issue in `AwbShellProcess`
 
+---
+
 ## Gateway conditions and variable types
+
+---
 
 ## Process variable naming conventions
 
+---
+
 ## Tenant context variables
 
+---
+
 ## `camunda:historyTimeToLive`
+
+---
 
 ## Related pages

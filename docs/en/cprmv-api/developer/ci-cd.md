@@ -1,5 +1,7 @@
 # CI/CD
 
+---
+
 ## CI/CD pipeline
 
 The `cprmv` repository uses GitLab CI (`.gitlab-ci.yml`) with three stages: `test`, `build`, `deploy`.

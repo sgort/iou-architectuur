@@ -13,7 +13,11 @@
 
 ## Classes
 
+---
+
 ## Properties
+
+---
 
 ## External standards alignment
 

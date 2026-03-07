@@ -1,8 +1,12 @@
 # Contributing
 
+---
+
 ## How to Contribute
 
 We welcome contributions to the IOU Architecture documentation and associated projects!
+
+---
 
 ## Documentation
 
@@ -19,6 +23,8 @@ Have ideas for better organization or additional content? Open an issue with the
 4. Test the build locally: `mkdocs serve`
 5. Submit a merge request
 
+---
+
 ## Code Contributions
 
 ### RONL Business API
@@ -29,6 +35,8 @@ See [CPSV Editor development guide](../cpsv-editor/developer/local-development.m
 
 ### Linked Data Explorer
 See [Linked Data Explorer development guide](../linked-data-explorer/developer/local-development.md)
+
+---
 
 ## Standards
 

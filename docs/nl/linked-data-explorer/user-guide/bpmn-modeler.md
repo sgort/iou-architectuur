@@ -13,20 +13,38 @@
 
 ## Opening the Modeler
 
+---
+
 ## Creating a process
+
+---
 
 ## Building a diagram
 
+---
+
 ## Linking a BusinessRuleTask to a decision
+
+---
 
 ## Linking a UserTask or StartEvent to a form
 
+---
+
 ## Deploying to Operaton
+
+---
 
 ## Editing element properties
 
+---
+
 ## Zoom and navigation
 
+---
+
 ## Saving and exporting
+
+---
 
 ## The Tree Felling Permit example

@@ -2,6 +2,8 @@
 
 The `ronl` realm is defined in `config/keycloak/ronl-realm.json`. It is imported automatically on first Keycloak container start and can be re-imported at any time without data loss (using `--override true`).
 
+---
+
 ## Realm settings
 
 | Setting | Value |
@@ -15,6 +17,8 @@ The `ronl` realm is defined in `config/keycloak/ronl-realm.json`. It is imported
 | Wait increment | 60 seconds |
 | Max delta time | 12 hours |
 
+---
+
 ## Token lifespans
 
 | Token | Lifespan |
@@ -25,6 +29,8 @@ The `ronl` realm is defined in `config/keycloak/ronl-realm.json`. It is imported
 | SSO session max | 10 hours (`ssoSessionMaxLifespan: 36000`) |
 | Offline session idle | 30 days |
 | Auth code | 60 seconds |
+
+---
 
 ## Client: `ronl-business-api`
 
@@ -40,6 +46,8 @@ The `ronl` realm is defined in `config/keycloak/ronl-realm.json`. It is imported
 | Valid redirect URIs | `*` (restrict in production) |
 | Web origins | `*` (restrict in production) |
 
+---
+
 ## Protocol mappers
 
 Three protocol mappers are configured on the `ronl-business-api-dedicated` client scope:
@@ -51,6 +59,8 @@ Three protocol mappers are configured on the `ronl-business-api-dedicated` clien
 | `loa` | User Attribute | `loa` | User attribute `loa` |
 
 These mappers add `municipality`, `roles`, and `loa` to every access token issued for this client.
+
+---
 
 ## Test users
 
@@ -66,6 +76,8 @@ All test users have password `test123` and `directAccessGrantsEnabled: true`.
 | `test-caseworker-rotterdam` | `rotterdam` | `caseworker` |
 | `test-citizen-denhaag` | `denhaag` | `citizen` |
 | `test-caseworker-denhaag` | `denhaag` | `caseworker` |
+
+---
 
 ## Re-importing the realm
 

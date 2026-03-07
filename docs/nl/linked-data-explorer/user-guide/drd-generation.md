@@ -13,12 +13,22 @@
 
 ## Saving a DRD
 
+---
+
 ## Saving a sequential template
+
+---
 
 ## My Templates
 
+---
+
 ## Executing a DRD template
 
+---
+
 ## Using a DRD in a BPMN process
+
+---
 
 ## Notes on local storage

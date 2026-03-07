@@ -13,6 +13,8 @@
 
 ## Diagnosing a problem
 
+---
+
 ## Authentication errors
 
 ### JWT audience invalid
@@ -23,9 +25,13 @@
 
 ### Token expired
 
+---
+
 ## CORS errors
 
 ### CORS policy blocking Keycloak
+
+---
 
 ## Backend API errors
 
@@ -37,9 +43,13 @@
 
 ### Zorgtoeslag calculation fails
 
+---
+
 ## Test user issues
 
 ### Can't log in with test users
+
+---
 
 ## Browser issues
 
@@ -47,11 +57,17 @@
 
 ### Regular Chrome not working, Incognito works
 
+---
+
 ## Windows-specific issues
 
 ### Line ending warnings
 
+---
+
 ## Emergency reset
+
+---
 
 ## Diagnostic commands
 

@@ -2,6 +2,8 @@
 
 This documentation site serves as the central reference for the IOU Architecture Framework and the RONL ecosystem. It is built with MkDocs and published to Azure Static Web Apps, supporting both English and Dutch.
 
+---
+
 ## Site Structure
 
 The site is organised into two language trees sharing a common set of assets, stylesheets, and abbreviations.
@@ -60,6 +62,8 @@ graph TB
     style ASSETS fill:#50c878
     style LANG_SWITCH fill:#ffd700
 ```
+
+---
 
 ## Content Sources
 

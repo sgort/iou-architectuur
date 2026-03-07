@@ -21,8 +21,14 @@
 
 ### Den Haag
 
+---
+
 ## TenantConfig schema
 
+---
+
 ## CSS custom properties
+
+---
 
 ## Adding a theme

@@ -13,10 +13,18 @@
 
 ## Prerequisites
 
+---
+
 ## Application layout
+
+---
 
 ## Your first chain execution — 5-minute walkthrough
 
+---
+
 ## Smoke test checklist
+
+---
 
 ## Next steps

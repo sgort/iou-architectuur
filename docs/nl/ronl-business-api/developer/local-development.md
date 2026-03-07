@@ -13,24 +13,46 @@
 
 ## Prerequisites
 
+---
+
 ## Clone and install
+
+---
 
 ## Environment files
 
+---
+
 ## Start Docker services
+
+---
 
 ## Start development servers
 
+---
+
 ## Test users
+
+---
 
 ## Verify the setup
 
+---
+
 ## Getting a JWT token for API testing
+
+---
 
 ## Database access
 
+---
+
 ## Local service URLs
 
+---
+
 ## Stopping the environment
+
+---
 
 ## Common issues

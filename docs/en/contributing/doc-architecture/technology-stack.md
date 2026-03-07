@@ -1,5 +1,7 @@
 # Technology Stack
 
+---
+
 ## Documentation Framework
 
 The site is built on MkDocs with the Material theme, the mkdocs-static-i18n plugin for dual-language support, and the git-revision-date-localized plugin for showing last-modified timestamps.
@@ -58,6 +60,8 @@ graph LR
     style I18N fill:#50c878
     style AZURE_SWA fill:#4a90e2
 ```
+
+---
 
 ## Build & Deploy Pipeline
 

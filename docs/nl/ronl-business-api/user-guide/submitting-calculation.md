@@ -13,9 +13,15 @@
 
 ## Prerequisites
 
+---
+
 ## Submitting the zorgtoeslag form
 
+---
+
 ## What happens in the background
+
+---
 
 ## Test scenarios
 
@@ -25,6 +31,10 @@
 
 ### Scenario 3 — Active payment plan
 
+---
+
 ## Verification checklist
+
+---
 
 ## Troubleshooting

@@ -7,6 +7,8 @@ RONL Business API uses **Keycloak 23** as its Identity and Access Management lay
   <figcaption>Default Keycloak login page</figcaption>
 </figure>
 
+---
+
 ## Authentication flows
 
 The platform supports two distinct authentication paths. Both converge at the Business API's JWT validation middleware, but differ entirely in how the user reaches Keycloak.
@@ -101,6 +103,8 @@ The `loginHint: '__medewerker__'` value passed to `keycloak.login()` is a sentin
 
 When `isMedewerker` is true, the template renders the indigo context banner and suppresses the sentinel from the username field so the caseworker enters their own credentials into an empty field. No JavaScript is required — the suppression happens server-side in FreeMarker before the HTML is sent to the browser.
 
+---
+
 ## Keycloak as identity broker
 
 Keycloak sits between the municipality portal and the external identity providers. It handles:
@@ -114,6 +118,8 @@ Keycloak sits between the municipality portal and the external identity provider
 In the current development environment, DigiD is **simulated** — test users in the Keycloak realm substitute for a real DigiD connection. The architecture is identical; only the external IdP step is replaced by direct Keycloak credentials.
 
 Caseworker accounts are an exception to the identity broker pattern. Because municipal employees are managed directly in the `ronl` realm, their authentication stays entirely within Keycloak — no SAML round-trip to an external IdP occurs. The `municipality` and `caseworker` role attributes are set directly on the user account in Keycloak Admin and included in the JWT via protocol mappers.
+
+---
 
 ## JWT token structure
 
@@ -159,6 +165,8 @@ Caseworker tokens do not contain a `bsn` claim. The `loa` value is set staticall
 | `mandate`      | string | Representation authority (optional)              | `"legal-guardian"` |
 | `bsn`          | string | Citizen Service Number (encrypted in production) | `"***-***-***"`    |
 
+---
+
 ## OIDC discovery endpoints
 
 **ACC:**
@@ -183,6 +191,8 @@ Key endpoints exposed via the discovery document:
 | `userinfo_endpoint`      | Returns user profile attributes                           |
 | `end_session_endpoint`   | Logout                                                    |
 
+---
+
 ## Token validation in the backend
 
 The backend validates every incoming request through `auth/jwt.middleware.ts`:
@@ -195,6 +205,8 @@ The backend validates every incoming request through `auth/jwt.middleware.ts`:
 
 If any validation step fails, the request is rejected with HTTP 401 before it reaches any route handler.
 
+---
+
 ## Security settings in the Keycloak realm
 
 The `ronl` realm is configured with:
@@ -206,6 +218,8 @@ The `ronl` realm is configured with:
 - Direct access grants: enabled for development test users only
 
 The realm configuration is version-controlled in `config/keycloak/ronl-realm.json` and can be imported via the Keycloak Admin Console or the deployment scripts.
+
+---
 
 ## Connecting a real DigiD / eHerkenning / eIDAS provider
 

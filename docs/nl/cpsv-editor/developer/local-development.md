@@ -13,9 +13,15 @@
 
 ## When you need a local backend
 
+---
+
 ## Architecture
 
+---
+
 ## Prerequisites
+
+---
 
 ## Setup
 
@@ -25,7 +31,11 @@
 
 ### Linked Data Explorer (optional, for full regression testing)
 
+---
+
 ## Pre-deployment checklist
+
+---
 
 ## Deploying to ACC
 

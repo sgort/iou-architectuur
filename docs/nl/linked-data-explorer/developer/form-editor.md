@@ -13,16 +13,30 @@
 
 ## Component structure
 
+---
+
 ## `FormSchema` type
+
+---
 
 ## `FormService`
 
+---
+
 ## `FormEditor.tsx` — seeding logic
+
+---
 
 ## `FormCanvas.tsx` — editor lifecycle
 
+---
+
 ## Integration with `FormTemplateSelector`
 
+---
+
 ## Form schema requirements for Operaton
+
+---
 
 ## CSS

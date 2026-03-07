@@ -19,6 +19,8 @@
 
 ### Backend / Frontend — v1.0.0 — Initial Release (januari–februari 2026)
 
+---
+
 ## Roadmap
 
 ### Voltooid

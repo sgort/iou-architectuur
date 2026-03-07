@@ -13,7 +13,11 @@
 
 ## Build
 
+---
+
 ## Contents
+
+---
 
 ## Development workflow
 

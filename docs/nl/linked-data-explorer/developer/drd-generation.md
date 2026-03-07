@@ -13,12 +13,22 @@
 
 ## Preconditions
 
+---
+
 ## XML assembly
+
+---
 
 ## Operaton deployment
 
+---
+
 ## localStorage template schema
 
+---
+
 ## DRD execution path
+
+---
 
 ## BPMN Modeler integration

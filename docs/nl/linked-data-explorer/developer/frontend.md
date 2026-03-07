@@ -13,12 +13,22 @@
 
 ## Project structure
 
+---
+
 ## Key TypeScript interfaces
+
+---
 
 ## Drag-and-drop (dnd-kit)
 
+---
+
 ## SPARQL service
 
+---
+
 ## Template service (localStorage)
+
+---
 
 ## Environment variables (Vite)

@@ -13,10 +13,18 @@
 
 ## Standards implemented
 
+---
+
 ## Dutch government resources
+
+---
 
 ## Infrastructure
 
+---
+
 ## Application environments
+
+---
 
 ## License

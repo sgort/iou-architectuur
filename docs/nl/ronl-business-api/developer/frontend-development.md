@@ -13,18 +13,34 @@
 
 ## Project structure
 
+---
+
 ## Authentication with Keycloak JS
+
+---
 
 ## Multi-tenant theming
 
+---
+
 ## API client
+
+---
 
 ## Environment variables
 
+---
+
 ## Development commands
+
+---
 
 ## Calling the Business API from a component
 
+---
+
 ## Adding a new page
+
+---
 
 ## Adding a feature flag check

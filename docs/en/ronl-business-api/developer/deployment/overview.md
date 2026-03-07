@@ -2,6 +2,8 @@
 
 RONL Business API uses a **hybrid deployment architecture**: stateless application components run on Azure managed services, while components requiring deep customisation or full control run in Docker on a VM.
 
+---
+
 ## Architecture
 
 ```
@@ -32,6 +34,8 @@ RONL Business API uses a **hybrid deployment architecture**: stateless applicati
 └────────────────────────────────────────┘
 ```
 
+---
+
 ## Environments
 
 ### ACC (Acceptance)
@@ -52,6 +56,8 @@ RONL Business API uses a **hybrid deployment architecture**: stateless applicati
 | Keycloak | https://keycloak.open-regels.nl | VM |
 | Operaton | https://operaton.open-regels.nl | VM (shared with ACC) |
 
+---
+
 ## Why the split?
 
 **VM (full control):**  
@@ -59,6 +65,8 @@ Keycloak requires deep customisation for government compliance (DigiD federation
 
 **Azure (managed services):**  
 The stateless frontend and backend benefit from auto-scaling, managed TLS, deployment slots, and built-in monitoring. Azure Static Web Apps provides a CDN for the frontend at negligible cost.
+
+---
 
 ## Deployment guides
 
@@ -69,6 +77,8 @@ Each component has its own deployment page:
 - [Backend (Azure App Service)](backend.md) — GitHub Actions, build process, env config
 - [Frontend (Azure Static Web Apps)](frontend.md) — GitHub Actions, env files, deployment
 - [Caddy (Reverse Proxy)](caddy.md) — Caddyfile, SSL termination, routing
+
+---
 
 ## Azure resource groups
 
@@ -85,6 +95,8 @@ rg-ronl-prod
 ├── ronl-postgres-prod         (PostgreSQL Flexible Server)
 └── ronl-redis-prod            (Cache for Redis)
 ```
+
+---
 
 ## Monitoring
 
@@ -112,6 +124,8 @@ docker logs caddy -f
 ### Azure monitoring
 
 Azure Monitor and Application Insights are available for App Service (backend), PostgreSQL, and Redis. Backend API traces, performance metrics, and error tracking are visible in the Azure Portal under the `rg-ronl-acc` and `rg-ronl-prod` resource groups.
+
+---
 
 ## Disaster recovery
 
@@ -147,6 +161,8 @@ Recovery steps:
 1. Deploy frontend and backend to a different Azure region
 2. Restore PostgreSQL from automated backup (point-in-time restore)
 3. Update DNS CNAME records to the new Azure endpoints
+
+---
 
 ## VM maintenance
 
@@ -207,6 +223,8 @@ docker run --rm \
   alpine tar czf /backup/keycloak-prod-$(date +%Y%m%d).tar.gz /data
 ```
 
+---
+
 ## VM-level troubleshooting
 
 ### Service not accessible from outside the VM
@@ -240,6 +258,8 @@ docker exec keycloak-postgres-acc pg_isready -U keycloak
 docker exec keycloak-acc bash -c \
   'timeout 2 bash -c "</dev/tcp/keycloak-postgres-acc/5432" && echo OK || echo FAILED'
 ```
+
+---
 
 ## Production security checklist
 

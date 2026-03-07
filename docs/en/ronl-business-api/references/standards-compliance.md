@@ -1,5 +1,7 @@
 # Standards & Compliance
 
+---
+
 ## Dutch government standards
 
 | Standard | Relevance to RONL Business API |
@@ -9,6 +11,8 @@
 | **AVG / GDPR** | Data minimisation (BSN encrypted, not logged in plaintext), audit trail (7-year retention), purpose limitation (process variables scoped to the requesting service). |
 | **DigiD Norm** | Authentication assurance levels (LoA) for citizen-facing services. RONL enforces LoA checks on sensitive endpoints via the `loa` JWT claim. |
 | **NCSC Beveiligingsrichtlijnen** | Secure software development practices, dependency management, vulnerability disclosure. |
+
+---
 
 ## API design rules
 
@@ -24,6 +28,8 @@
 
 Reference: [Nederlandse API Strategie](https://docs.geostandaarden.nl/api/API-Strategie/)
 
+---
+
 ## Authentication & identity standards
 
 | Standard | Implementation |
@@ -33,6 +39,8 @@ Reference: [Nederlandse API Strategie](https://docs.geostandaarden.nl/api/API-St
 | **JWT (RFC 7519)** | RS256 signed access tokens |
 | **JWKS (RFC 7517)** | Public key distribution for JWT validation |
 | **SAML 2.0** | DigiD / eHerkenning / eIDAS federation via Keycloak IdP brokering |
+
+---
 
 ## Licences
 
@@ -49,6 +57,8 @@ Reference: [Nederlandse API Strategie](https://docs.geostandaarden.nl/api/API-St
 | Caddy | Apache 2.0 |
 
 All dependencies use government-compatible open source licences. No proprietary software is required.
+
+---
 
 ## External references
 

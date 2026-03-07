@@ -13,12 +13,22 @@
 
 ## De drie AWB Kapvergunning-formulieren
 
+---
+
 ## BPMN-koppeling
+
+---
 
 ## Implementatie
 
+---
+
 ## Runtime-weergave
 
+---
+
 ## API-eindpunten
+
+---
 
 ## Gerelateerde documentatie

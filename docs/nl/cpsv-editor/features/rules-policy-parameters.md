@@ -13,10 +13,18 @@
 
 ## The three layers
 
+---
+
 ## Rules layer
+
+---
 
 ## Policy layer (CPRMV)
 
+---
+
 ## Parameters layer
+
+---
 
 ## Why this separation matters

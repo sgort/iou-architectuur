@@ -13,6 +13,10 @@
 
 ## What the DMN tab does
 
+---
+
 ## Testing capabilities
+
+---
 
 ## Smart constant filtering

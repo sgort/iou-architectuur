@@ -13,20 +13,30 @@
 
 ## Repository structure
 
+---
+
 ## Starting Operaton
 
 # Create the Operaton directory
 
 # Create docker-compose.yml
 
+---
+
 ## Verify
 
 # Expected: [{"name":"default"}]
+
+---
 
 ## Deploying BPMN/DMN process definitions
 
 # Deploy zorgtoeslag BPMN
 
+---
+
 ## Integration with the Business API
+
+---
 
 ## Updating Operaton

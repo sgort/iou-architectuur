@@ -66,6 +66,8 @@ The Information Architecture Framework for IOU integrates semantic web technolog
   <figcaption>IOU Architecture — interactive overview of the ecosystem components and their relationships</figcaption>
 </figure>
 
+---
+
 ## Architecture Overview
 
 ```mermaid
@@ -89,6 +91,8 @@ graph TB
         I -->|cprmv-json / RDF| H
     end
 ```
+
+---
 
 ## Ecosystem Components
 
@@ -124,6 +128,8 @@ Python/FastAPI service that fetches individual rules from Dutch and European leg
 
 [View Documentation →](cprmv-api/index.md){ .md-button }
 
+---
+
 ## Documentation Status
 
 <div id="doc-status">
@@ -131,6 +137,8 @@ Python/FastAPI service that fetches individual rules from Dutch and European leg
     <p class="admonition-title">Loading documentation status…</p>
   </div>
 </div>
+
+---
 
 ## Quick Links
 
@@ -143,6 +151,8 @@ Python/FastAPI service that fetches individual rules from Dutch and European leg
 | **Custom Business API**  | [api.open-regels.nl](https://api.open-regels.nl)                               |
 | **Operaton**             | [operaton.open-regels.nl](https://operaton.open-regels.nl)                     |
 | **CPRMV API**            | [cprmv.open-regels.nl/docs](https://cprmv.open-regels.nl/docs)                 |
+
+---
 
 ## Technology Stack
 
@@ -160,6 +170,8 @@ The IOU Architecture ecosystem is built entirely on **open source technologies**
 | **Knowledge Graph** | TriplyDB          | -                  |
 | **Rule API**        | Python / FastAPI  | EUPL-1.2           |
 
+---
+
 ## Standards Compliance
 
 - **CPSV-AP 3.2.0** - EU Public Service Vocabulary
@@ -168,6 +180,8 @@ The IOU Architecture ecosystem is built entirely on **open source technologies**
 - **BIO** - Baseline Informatiebeveiliging Overheid
 - **NEN 7510** - Healthcare information security
 - **AVG/GDPR** - Data protection
+
+---
 
 ## Contributing
 

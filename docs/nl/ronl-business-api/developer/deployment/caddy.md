@@ -13,15 +13,27 @@
 
 ## Repository structure
 
+---
+
 ## Caddyfile
+
+---
 
 ## Retrieving the Caddyfile from a running VM
 
+---
+
 ## Deploying Caddy
+
+---
 
 ## Adding a new domain
 
+---
+
 ## Docker network
+
+---
 
 ## Security hardening
 
@@ -29,8 +41,14 @@
 
 ### Rate limiting
 
+---
+
 ## Verifying SSL certificates
 
+---
+
 ## Metrics and monitoring
+
+---
 
 ## Troubleshooting

@@ -2,6 +2,8 @@
 
 All current endpoints use the `/v1/` prefix. Legacy `/api/*` endpoints are deprecated and will be removed in v2.0.0. They return `Deprecation: true` and `Link: <successor>; rel="successor-version"` headers.
 
+---
+
 ## Root & Health
 
 | Method | Endpoint | Auth | Description |

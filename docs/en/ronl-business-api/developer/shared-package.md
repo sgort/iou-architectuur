@@ -2,6 +2,8 @@
 
 `packages/shared` (`@ronl/shared`) contains TypeScript types and utilities shared between the backend and frontend packages. It has no runtime dependencies and must be built before either package can consume it.
 
+---
+
 ## Build
 
 ```bash
@@ -9,6 +11,8 @@ npm run build --workspace=@ronl/shared
 ```
 
 Output is written to `packages/shared/dist/`. Both `@ronl/backend` and `@ronl/frontend` reference `@ronl/shared: "*"` in their `package.json`, resolving to the `dist/index.js` and `dist/index.d.ts` files.
+
+---
 
 ## Contents
 
@@ -50,6 +54,8 @@ interface JwtClaims {
   bsn?: string;
 }
 ```
+
+---
 
 ## Development workflow
 

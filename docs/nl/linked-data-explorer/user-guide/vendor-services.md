@@ -13,10 +13,18 @@
 
 ## Finding vendor implementations
 
+---
+
 ## Viewing vendor details
+
+---
 
 ## Understanding access types
 
+---
+
 ## Understanding licence types
+
+---
 
 ## Publishing vendor metadata (for vendors)

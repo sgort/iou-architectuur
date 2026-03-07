@@ -2,6 +2,8 @@
 
 RONL Business API delegates all business rule execution to **Operaton**, an open-source BPMN/DMN engine (Apache 2.0 licence) hosted on the VM at `operaton.open-regels.nl`. The Business API acts as a secure, authenticated proxy: it validates the user's identity and then invokes Operaton on their behalf.
 
+---
+
 ## What Operaton handles
 
 - Executing BPMN 2.0 workflows that orchestrate multi-step government processes

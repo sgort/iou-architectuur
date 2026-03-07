@@ -13,18 +13,34 @@
 
 ## Nieuwe testpersona's toevoegen
 
+---
+
 ## Tijdlijn uitbreiden met nieuwe gebeurtenistypen
+
+---
 
 ## Adresgeschiedenis toevoegen (Verblijfplaatshistorie)
 
+---
+
 ## Uiterlijk van tijdlijn aanpassen
+
+---
 
 ## Tijdlijnfuncties testen
 
+---
+
 ## Veelvoorkomende ontwikkeltaken
+
+---
 
 ## Debuggingtips
 
+---
+
 ## Prestatie-optimalisatie
+
+---
 
 ## Gerelateerde documentatie

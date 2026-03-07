@@ -13,8 +13,14 @@
 
 ## Three-state system
 
+---
+
 ## Data source
 
+---
+
 ## RONL Ontology
+
+---
 
 ## Backward compatibility

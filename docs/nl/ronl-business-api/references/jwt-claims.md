@@ -13,12 +13,22 @@
 
 ## Full token example
 
+---
+
 ## Standard OIDC claims
+
+---
 
 ## Custom RONL claims
 
+---
+
 ## How claims are used by the backend
 
+---
+
 ## Inspecting a token in the browser
+
+---
 
 ## Token lifetime

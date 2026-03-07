@@ -13,19 +13,35 @@
 
 ## Fetching a complete rule set
 
+---
+
 ## Fetching a specific article
+
+---
 
 ## Navigating to a nested rule
 
+---
+
 ## Skipping intermediate identifiers
+
+---
 
 ## CVDR
 
+---
+
 ## EU CELLAR
+
+---
 
 ## Choosing an output format
 
+---
+
 ## Using a custom path delimiter
+
+---
 
 ## Extracting structured values with unformat
 

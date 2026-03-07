@@ -13,10 +13,18 @@
 
 ## Environments
 
+---
+
 ## CI/CD pipeline
+
+---
 
 ## Pull request workflow
 
+---
+
 ## Azure Static Web Apps
+
+---
 
 ## Environment variables

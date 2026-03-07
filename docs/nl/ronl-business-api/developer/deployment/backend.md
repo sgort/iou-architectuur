@@ -13,17 +13,27 @@
 
 ## GitHub Actions workflows
 
+---
+
 ## Build and deployment steps
+
+---
 
 ## Azure App Service configuration
 
+---
+
 ## Approving a PROD deployment
+
+---
 
 ## Post-deployment health check
 
 # Retries up to 5 times with 10-second intervals
 
 # Expected: 200
+
+---
 
 ## Manual deployment
 

@@ -13,12 +13,22 @@
 
 ## Opening the Semantic Analysis tab
 
+---
+
 ## Statistics cards
+
+---
 
 ## Semantic Equivalences table
 
+---
+
 ## Semantic Chain Suggestions
 
+---
+
 ## What this means for chain building
+
+---
 
 ## Graph view

@@ -13,12 +13,22 @@
 
 ## DMN discovery
 
+---
+
 ## Chain composition
+
+---
 
 ## Validation states
 
+---
+
 ## Chain execution
 
+---
+
 ## Export
+
+---
 
 ## Related features

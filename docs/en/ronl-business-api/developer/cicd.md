@@ -2,6 +2,8 @@
 
 RONL Business API uses four GitHub Actions workflows for continuous integration and deployment. All workflows run on `ubuntu-latest`.
 
+---
+
 ## Workflow overview
 
 | File | Branch | Target | Auto-deploy |
@@ -11,6 +13,8 @@ RONL Business API uses four GitHub Actions workflows for continuous integration 
 | `azure-frontend-acc.yml` | `acc` | Frontend ACC (Azure Static Web Apps) | Yes |
 | `azure-frontend-production.yml` | `main` | Frontend PROD (Azure Static Web Apps) | Yes |
 
+---
+
 ## Path filters
 
 Workflows only trigger when relevant files change, avoiding unnecessary deployments:
@@ -19,6 +23,8 @@ Workflows only trigger when relevant files change, avoiding unnecessary deployme
 - Frontend workflows: `packages/frontend/**`, or the workflow file itself
 
 All workflows also support `workflow_dispatch` for manual triggering.
+
+---
 
 ## Branch strategy
 
@@ -30,6 +36,8 @@ feature/*  →  PR  →  acc  →  manual review  →  main
 ```
 
 Changes are developed on feature branches, merged to `acc` for acceptance testing, and promoted to `main` for production. The backend PROD deployment has a mandatory manual approval gate to prevent accidental production changes.
+
+---
 
 ## Backend deployment pipeline
 
@@ -60,6 +68,8 @@ Health check: GET /v1/health (5 retries × 10s)
 Verify /v1/health and /v1/dmns return HTTP 200
 ```
 
+---
+
 ## Frontend deployment pipeline
 
 ```
@@ -79,6 +89,8 @@ Wait 15 seconds
 Verify HTTP 200 on frontend URL
 ```
 
+---
+
 ## Required GitHub secrets
 
 | Secret | Used by |
@@ -89,6 +101,8 @@ Verify HTTP 200 on frontend URL
 | `AZURE_STATIC_WEB_APPS_API_TOKEN_PROD` | Frontend PROD workflow |
 
 To rotate a publish profile: Azure Portal → App Service → Overview → Get publish profile → download, then update the GitHub secret with the file contents.
+
+---
 
 ## Rolling back a deployment
 

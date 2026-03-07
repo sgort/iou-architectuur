@@ -2,6 +2,8 @@
 
 The backend is `packages/backend` (`@ronl/backend`) — a Node.js 20 Express application written in TypeScript.
 
+---
+
 ## Project structure
 
 ```
@@ -31,6 +33,8 @@ packages/backend/src/
     └── logger.ts               # Winston logger (JSON format in prod)
 ```
 
+---
+
 ## Middleware stack
 
 Middleware is registered in this order in `src/index.ts`:
@@ -47,6 +51,8 @@ Middleware is registered in this order in `src/index.ts`:
 10. `errorHandler` — catches and formats all thrown errors
 
 JWT validation (`jwt.middleware.ts`) is applied per-route on protected endpoints, not globally. Public endpoints (e.g. `GET /v1/health`) do not require authentication.
+
+---
 
 ## Adding a new route
 
@@ -84,6 +90,8 @@ router.use('/v1/myfeature', myfeatureRoutes);
 router.use('/api/myfeature', deprecationMiddleware('/v1/myfeature'), myfeatureRoutes);
 ```
 
+---
+
 ## Authentication on protected routes
 
 Apply the JWT middleware to any route that requires a logged-in user:
@@ -99,6 +107,8 @@ router.post('/sensitive', authenticateJWT, async (req, res) => {
 
 After `authenticateJWT`, `req.user` is populated with the decoded JWT claims.
 
+---
+
 ## TypeScript path aliases
 
 The `tsconfig.json` configures path aliases for clean imports:
@@ -112,6 +122,8 @@ The `tsconfig.json` configures path aliases for clean imports:
 ```
 
 `tsc-alias` resolves these aliases during the build step (`npm run build`).
+
+---
 
 ## Development commands
 
@@ -127,6 +139,8 @@ npm run test:unit     # Unit tests only
 npm run test:integration  # Integration tests only
 ```
 
+---
+
 ## Shared types
 
 Types shared between backend and frontend are in `packages/shared/src/`. Import them as `@ronl/shared`:
@@ -140,6 +154,8 @@ After modifying shared types, rebuild the package before the backend picks up th
 ```bash
 npm run build --workspace=@ronl/shared
 ```
+
+---
 
 ## Security implementation
 

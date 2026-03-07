@@ -13,6 +13,10 @@
 
 ## Service definition
 
+---
+
 ## Organisation management
+
+---
 
 ## Legal resource linking

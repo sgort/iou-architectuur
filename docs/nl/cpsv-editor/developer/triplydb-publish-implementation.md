@@ -13,7 +13,11 @@
 
 ## Architecture
 
+---
+
 ## Files
+
+---
 
 ## API functions
 
@@ -21,8 +25,14 @@
 
 ### `testTriplyDBConnection(config)`
 
+---
+
 ## Token storage
 
+---
+
 ## Graph accumulation
+
+---
 
 ## Backend proxy deployment checklist

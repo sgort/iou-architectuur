@@ -13,13 +13,23 @@
 
 ## Workflow overview
 
+---
+
 ## Frontend deployment
+
+---
 
 ## Backend deployment
 
+---
+
 ## Environment variables (Azure App Service)
 
+---
+
 ## Branch strategy
+
+---
 
 ## Post-deployment verification
 

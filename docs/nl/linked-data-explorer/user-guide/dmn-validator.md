@@ -13,9 +13,15 @@
 
 ## De validator openen
 
+---
+
 ## Bestanden laden
 
+---
+
 ## Validatie uitvoeren
+
+---
 
 ## Resultaten lezen
 
@@ -25,6 +31,8 @@
 
 ### Meldingsrijen
 
+---
+
 ## Aan de slag met resultaten
 
 ### Fouten
@@ -33,6 +41,10 @@
 
 ### Informatieve meldingen
 
+---
+
 ## Bestanden verwijderen
+
+---
 
 ## Volgende stappen

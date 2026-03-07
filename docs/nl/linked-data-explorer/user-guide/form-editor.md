@@ -13,18 +13,34 @@
 
 ## Opening the Form Editor
 
+---
+
 ## Exploring the example forms
+
+---
 
 ## Creating a new form
 
+---
+
 ## Building a form
+
+---
 
 ## Saving a form
 
+---
+
 ## Exporting a form as `.form`
+
+---
 
 ## Linking a form to a BPMN task
 
+---
+
 ## Renaming a form
+
+---
 
 ## Deleting a form

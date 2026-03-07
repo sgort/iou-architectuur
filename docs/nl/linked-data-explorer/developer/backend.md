@@ -13,6 +13,8 @@
 
 ## API versioning
 
+---
+
 ## Endpoints
 
 ### Health
@@ -25,18 +27,34 @@
 
 ### TriplyDB proxy
 
+---
+
 ## SPARQL service
+
+---
 
 ## Orchestration service
 
+---
+
 ## Operaton service
+
+---
 
 ## Logging
 
+---
+
 ## Error handling
+
+---
 
 ## Performance
 
+---
+
 ## Security
+
+---
 
 ## Dutch Government API Design Rules compliance

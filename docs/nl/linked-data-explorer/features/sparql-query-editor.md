@@ -13,10 +13,18 @@
 
 ## Query execution
 
+---
+
 ## Sample query library
+
+---
 
 ## Endpoint management
 
+---
+
 ## Results table
+
+---
 
 ## Graph visualisation

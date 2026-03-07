@@ -7,6 +7,8 @@ Keycloak runs in Docker on the VM (`open-regels.nl`). Two fully isolated instanc
   <figcaption>Custom RONL theme matching MijnOmgeving design with blue gradient header</figcaption>
 </figure>
 
+---
+
 ## Repository structure
 
 ```
@@ -33,6 +35,8 @@ ronl-business-api/
     └── ronl-realm.json             # Realm configuration (users, clients, mappers)
 ```
 
+---
+
 ## Prerequisites
 
 On the VM (Ubuntu 24.04 LTS):
@@ -43,6 +47,8 @@ On the VM (Ubuntu 24.04 LTS):
 - Ports 80 and 443 open
 - Caddy running (see [Caddy Deployment](caddy.md))
 - SSH access restricted to authorized IPs
+
+---
 
 ## Custom RONL Theme
 
@@ -184,6 +190,8 @@ The `href` fallback (`client.baseUrl`) points to the frontend root URL configure
 
 !!! note "Container restart required after theme changes"
     Keycloak caches theme templates at startup. Any change to `.ftl` or `.css` files requires a container restart to take effect — regardless of whether Keycloak is running in development or production mode. Theme changes do not require an image rebuild.
+
+---
 
 ## Deploying to ACC
 
@@ -363,6 +371,8 @@ docker exec keycloak-acc ls -la /opt/keycloak/themes/ronl/login/
 # Should see themed login page with blue gradient header
 ```
 
+---
+
 ## Deploying to PROD
 
 Follow the same steps using `deployment/vm/keycloak/prod/` and hostname `keycloak.open-regels.nl`.
@@ -375,6 +385,8 @@ Follow the same steps using `deployment/vm/keycloak/prod/` and hostname `keycloa
 - Test thoroughly in ACC before deploying to PROD
 - Deploy during maintenance window
 - Notify users of planned downtime
+
+---
 
 ## Realm import
 
@@ -400,6 +412,8 @@ docker exec keycloak-acc /opt/keycloak/bin/kc.sh import \
   --file /opt/keycloak/data/import/ronl-realm.json \
   --override true
 ```
+
+---
 
 ## Updating the Theme
 
@@ -452,6 +466,8 @@ sleep 30
 
 **Note:** Keycloak caches themes. Always test in incognito/private browsing mode or clear browser cache.
 
+---
+
 ## Backup
 
 ### Database Backup
@@ -486,6 +502,8 @@ docker run --rm \
   -v /backup:/backup \
   alpine tar czf /backup/keycloak-acc-$(date +%Y%m%d).tar.gz /data
 ```
+
+---
 
 ## Monitoring
 
@@ -526,6 +544,8 @@ docker compose logs keycloak-acc -f
 docker compose logs keycloak-acc | grep -i error
 docker compose logs keycloak-acc | grep -i exception
 ```
+
+---
 
 ## Troubleshooting
 
@@ -695,6 +715,8 @@ docker exec keycloak-acc /opt/keycloak/bin/kc.sh import \
   --file /opt/keycloak/data/import/ronl-realm.json
 ```
 
+---
+
 ## Security Considerations
 
 ### Production Hardening
@@ -724,6 +746,8 @@ For PROD deployment:
 - ✅ Store passwords in password manager (1Password, Bitwarden)
 - ✅ Keep separate passwords for ACC and PROD
 - ✅ Rotate passwords regularly (quarterly recommended)
+
+---
 
 ## URLs
 

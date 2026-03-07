@@ -13,11 +13,19 @@
 
 ## Docker image
 
+---
+
 ## Running with Docker Compose
+
+---
 
 ## Synology NAS deployment
 
+---
+
 ## Updating to a new image version
+
+---
 
 ## Health check
 

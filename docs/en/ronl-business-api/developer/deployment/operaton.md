@@ -2,9 +2,13 @@
 
 Operaton is the BPMN/DMN execution engine. It runs as a single Docker container on the VM, shared between ACC and PROD (process definition version tags differentiate environments). It is exposed via Caddy at `https://operaton.open-regels.nl`.
 
+---
+
 ## Repository structure
 
 Operaton deployment is managed directly on the VM. There is no Operaton-specific folder in the `ronl-business-api` repository — Operaton's Docker image and configuration are maintained separately from the application code.
+
+---
 
 ## Starting Operaton
 
@@ -46,6 +50,8 @@ EOF
 docker compose up -d
 ```
 
+---
+
 ## Verify
 
 ```bash
@@ -54,6 +60,8 @@ curl https://operaton.open-regels.nl/engine-rest/engine
 ```
 
 The Operaton Cockpit UI is available at `https://operaton.open-regels.nl/app/cockpit/`.
+
+---
 
 ## Deploying BPMN/DMN process definitions
 
@@ -67,6 +75,8 @@ curl -X POST https://operaton.open-regels.nl/engine-rest/deployment/create \
   -F "zorgtoeslag.bpmn=@processes/zorgtoeslag.bpmn"
 ```
 
+---
+
 ## Integration with the Business API
 
 The backend connects to Operaton via `OPERATON_BASE_URL`:
@@ -77,6 +87,8 @@ OPERATON_TIMEOUT=30000
 ```
 
 `packages/backend/src/services/operaton.service.ts` handles all Operaton API calls. The service injects user context variables and maps Operaton responses to the Business API response format.
+
+---
 
 ## Updating Operaton
 

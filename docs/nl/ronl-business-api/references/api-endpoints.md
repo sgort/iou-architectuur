@@ -13,10 +13,18 @@
 
 ## Root & Health
 
+---
+
 ## Decision evaluation
+
+---
 
 ## Process management
 
+---
+
 ## Response headers
+
+---
 
 ## Error codes
