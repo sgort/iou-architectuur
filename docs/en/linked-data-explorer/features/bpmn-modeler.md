@@ -103,3 +103,11 @@ On first launch, the Modeler auto-creates the **Tree Felling Permit** example pr
 The Modeler targets Operaton, the open-source fork of Camunda 7 CE. It uses `camunda-bpmn-moddle` for namespace support since no `operaton-bpmn-moddle` package exists yet. Operaton accepts both `camunda:` and `operaton:` namespace attributes, ensuring compatibility.
 
 The Modeler targets Operaton, the open-source fork of Camunda 7 CE. It uses `camunda-bpmn-moddle` for namespace support since no `operaton-bpmn-moddle` package exists yet. The `camunda:formRef` and `camunda:formRefBinding` attributes used for form linking are also accepted by Operaton under the `camunda:` namespace.
+
+---
+
+## Related documentation
+
+- [Form Editor](form-editor.md) — creating and managing Camunda Forms in the LDE
+- [RONL Business API — Dynamic Forms](../../../ronl-business-api/features/dynamic-forms.md) — how deployed forms are fetched and rendered at runtime in MijnOmgeving
+- [RONL API Endpoints — Process definition deployment](../../../ronl-business-api/references/api-endpoints.md#process-definition-deployment) — the `POST /api/dmns/process/deploy` endpoint this button calls

@@ -107,18 +107,19 @@ Tasks are filtered to the caseworker's municipality via the `municipality` proce
 |---|---|---|---|
 | `POST` | `/api/dmns/process/deploy` | Bearer JWT | Deploy a BPMN process bundle to Operaton in a single multipart request |
 
-This endpoint accepts a `multipart/form-data` request and deploys all provided files as one named Operaton deployment. It is used by the LDE BPMN Modeler one-click deploy feature.
+This endpoint accepts an `application/json` request body and deploys all provided resources as one named Operaton deployment. It is used by the LDE BPMN Modeler one-click deploy feature.
 
-**Multipart fields:**
+**Request body fields:**
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `mainBpmn` | file | Yes | The primary BPMN file (e.g. `AwbShellProcess.bpmn`) |
-| `subProcessBpmns` | file (multiple) | No | Subprocess BPMN files |
-| `forms` | file (multiple) | No | Camunda Form `.form` files |
-| `operatonUrl` | string | No | Override the default Operaton base URL |
-| `operatonUser` | string | No | Override Operaton basic-auth username |
-| `operatonPassword` | string | No | Override Operaton basic-auth password |
+| `bpmnXml` | `string` | Yes | The primary BPMN XML content |
+| `deploymentName` | `string` | Yes | Name for the Operaton deployment (typically the BPMN process ID) |
+| `forms` | `{ id: string, schema: object }[]` | No | Camunda Form schemas to include in the deployment. Defaults to `[]`. |
+| `subProcesses` | `{ filename: string, xml: string }[]` | No | Subprocess BPMN XML content. Defaults to `[]`. |
+| `operatonUrl` | `string` | No | Override the default Operaton base URL |
+| `operatonUsername` | `string` | No | Override Operaton basic-auth username |
+| `operatonPassword` | `string` | No | Override Operaton basic-auth password |
 
 See [Dynamic Forms — Deployment](../features/dynamic-forms.md#deployment) for the full deploy workflow.
 

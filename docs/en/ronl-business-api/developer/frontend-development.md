@@ -379,7 +379,7 @@ Renders the form for a claimed task in the caseworker dashboard.
 | `onCompleted` | `() => void` | Called after successful task completion |
 | `onError` | `() => void` | Called on API or form error |
 
-On mount: calls `businessApi.task.formSchema(taskId)` to fetch the schema. On submit: calls `businessApi.task.complete(taskId, formData)`. Falls back to a generic "Taak voltooien" button when `status === 'no-form'`.
+On mount: calls `businessApi.process.startForm(processKey)` to fetch the schema. On submit: calls `businessApi.process.start(processKey, formData)`. Extracts `businessKey` from the response (falls back to `processInstanceId`). On 404 or 415 from the API, sets `status = 'no-form'` and renders "Geen formulier beschikbaar voor dit proces." — the service cannot be started. On unmount, calls `form.destroy()` to release the `@bpmn-io/form-js` instance.
 
 ### `DecisionViewer`
 
