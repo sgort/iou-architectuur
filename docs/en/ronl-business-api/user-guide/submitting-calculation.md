@@ -219,7 +219,16 @@ After the caseworker completes the review and confirms citizen notification (`Ta
 
 ### Viewing the decision
 
-Once the caseworker completes both tasks and the process ends, a **Bekijk beslissing** toggle appears on the application card in **Mijn aanvragen**. Clicking the toggle expands the **Decision Viewer** panel below the card:
+Once the caseworker completes both tasks and the process ends, a **Bekijk beslissing** toggle appears on the application card in **Mijn aanvragen**. Clicking the toggle expands the **Decision Viewer** panel below the card.
+
+From v2.3.0, the Decision Viewer renders the official **decision letter** authored in the [LDE Document Composer](../../../linked-data-explorer/features/document-composer.md) and bundled with the deployed process. The letter includes the municipality letterhead, contact information, dossier reference, the substantive decision text, and — if applicable — replacement tree requirements. Variable placeholders in the template are resolved from the final process variables automatically.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Decision Document Viewer citizen view](../../../assets/screenshots/ronl-decision-document-viewer.png)
+  <figcaption>Mijn aanvragen — completed Kapvergunning application with Decision Document expanded</figcaption>
+</figure>
+
+For applications submitted before document templates were introduced, the viewer falls back to a compact readonly summary of the key decision fields.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: Decision Viewer expanded](../../../assets/screenshots/ronl-mijnomgeving-citizen-decision-viewer-expanded.png)

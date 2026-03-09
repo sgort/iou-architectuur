@@ -140,6 +140,7 @@ From v2.2.0, citizen and caseworker interaction with the AWB process is driven e
 | `GET` | `/v1/process/:key/start-form` | Fetch the deployed Camunda Form schema for a process start event |
 | `GET` | `/v1/task/:id/form-schema` | Fetch the deployed Camunda Form schema for a task |
 | `GET` | `/v1/process/:id/historic-variables` | Fetch final variable state of a completed process instance |
+| `GET` | `/v1/process/:id/decision-document` | Fetch the DocumentTemplate bundled in the Operaton deployment for a completed process instance |
 
 All endpoints require a valid JWT in the `Authorization: Bearer` header.
 

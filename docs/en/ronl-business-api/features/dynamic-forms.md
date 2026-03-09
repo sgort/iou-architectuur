@@ -2,6 +2,8 @@
 
 From v2.2.0, the RONL Business API MijnOmgeving portal renders all citizen and caseworker forms as **Camunda Forms** — JSON schemas executed at runtime by `@bpmn-io/form-js`. No form fields are hardcoded in the React application; the schema is fetched from the deployed Operaton process definition each time a form is opened.
 
+From v2.3.0, the **Decision Viewer** no longer renders a hardcoded `@bpmn-io/form-js` readonly schema. It fetches the **Document Template** bundled in the Operaton deployment and renders it as styled HTML — matching the letter layout authored in the [LDE Document Composer](../../../linked-data-explorer/features/document-composer.md). A form-js fallback remains for process instances deployed before document templates were introduced.
+
 ---
 
 ## The three AWB Kapvergunning forms
@@ -88,7 +90,23 @@ Tasks without a deployed form fall back to a generic complete button.
 
 ### Decision Viewer — `DecisionViewer`
 
-Completed applications in **Mijn aanvragen** show a **Bekijk beslissing** toggle. `DecisionViewer` calls `GET /v1/process/:id/historic-variables`, which retrieves the final variable state from the Operaton history API. `@bpmn-io/form-js` renders the result as a readonly form.
+Completed applications in **Mijn aanvragen** show a **Bekijk beslissing** toggle. Clicking it expands the Decision Viewer panel beneath the application card.
+
+On mount, `DecisionViewer` fires two requests in parallel:
+
+1. `GET /v1/process/:id/historic-variables` — retrieves the final variable state from the Operaton history API. The backend flattens the historic variable instances and applies tenant isolation via the `municipality` variable.
+2. `GET /v1/process/:id/decision-document` — resolves the `DocumentTemplate` bundled in the Operaton deployment. The backend reads the `ronl:documentRef` attribute from the BPMN UserTask XML, then fetches the corresponding `.document` resource from the deployment bundle.
+
+**Document template path (v2.3.0+):** If the document endpoint returns a template, `DecisionViewer` renders it as styled HTML. TipTap/ProseMirror JSON `text` blocks are rendered as React elements — bold, italic, and underline marks are preserved. `{{variableKey}}` placeholders in text blocks are substituted with the resolved historic process variables. `variable` blocks render the value directly by key. The letterhead and contact information zones are displayed side-by-side in a CSS grid, matching the Document Composer canvas layout.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Decision Document Viewer — rendered letter layout](../../../assets/screenshots/ronl-decision-document-viewer.png)
+  <figcaption>Decision Viewer rendering a DocumentTemplate for a completed Kapvergunning application</figcaption>
+</figure>
+
+**Form-js fallback path (pre-v2.3.0 deployments):** If `GET /v1/process/:id/decision-document` returns 404 `DOCUMENT_NOT_FOUND` (no `ronl:documentRef` present, or the `.document` resource is absent from the deployment bundle), `DecisionViewer` falls back to rendering a hardcoded readonly `@bpmn-io/form-js` schema with five fields: `status`, `permitDecision`, `finalMessage`, `replacementInfo`, and `dossierReference`.
+
+Caseworker-only action fields are excluded from both rendering paths.
 
 ---
 
@@ -99,6 +117,7 @@ Completed applications in **Mijn aanvragen** show a **Bekijk beslissing** toggle
 | `GET` | `/v1/process/:key/start-form` | Fetch deployed start form schema for a process definition |
 | `GET` | `/v1/task/:id/form-schema` | Fetch deployed task form schema for a task instance |
 | `GET` | `/v1/process/:id/historic-variables` | Fetch final variable state of a completed process instance |
+| `GET` | `/v1/process/:id/decision-document` | Fetch the DocumentTemplate bundled in the Operaton deployment for a completed process instance |
 
 See [API Endpoints](../references/api-endpoints.md) for full details and error codes.
 
@@ -107,7 +126,9 @@ See [API Endpoints](../references/api-endpoints.md) for full details and error c
 ## Related pages
 
 - [LDE Form Editor](../../../linked-data-explorer/features/form-editor.md) — authoring Camunda Forms
+- [LDE Document Composer](../../../linked-data-explorer/features/document-composer.md) — authoring DocumentTemplates
 - [LDE BPMN Modeler — Form linking](../../../linked-data-explorer/features/bpmn-modeler.md#form-linking) — linking forms to BPMN elements
+- [LDE BPMN Modeler — Document linking](../../../linked-data-explorer/features/bpmn-modeler.md#document-linking) — linking document templates to BPMN elements
 - [Submitting a Calculation or Application](../user-guide/submitting-calculation.md) — citizen perspective
 - [Caseworker Workflow](../user-guide/caseworker-workflow.md) — caseworker perspective
 - [Frontend Development — Camunda Forms](../developer/frontend-development.md#camunda-forms----bpmn-ioform-js) — component reference

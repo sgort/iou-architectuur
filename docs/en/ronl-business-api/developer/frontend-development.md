@@ -409,9 +409,18 @@ Displays the final decision for a completed process instance in the citizen dash
 |---|---|---|
 | `processInstanceId` | `string` | Operaton process instance ID |
 
-On mount: calls `businessApi.process.historicVariables(processInstanceId)`. Renders a hardcoded readonly schema (five fields: `status`, `permitDecision`, `finalMessage`, `replacementInfo`, `dossierReference`) populated via `form.importSchema(schema, data)`.
+On mount, fires two requests in parallel via `Promise.allSettled`:
 
-The schema is hardcoded rather than fetched so that the citizen sees only the decision outcome, not the caseworker-only action fields from `awb-notify-applicant`.
+1. `businessApi.process.historicVariables(processInstanceId)` — resolves to the flattened final variable state.
+2. `businessApi.process.decisionDocument(processInstanceId)` — resolves to `{ success: true, template: DocumentTemplate }` if a document template is bundled in the Operaton deployment; rejects or returns `success: false` for pre-v2.3.0 deployments.
+
+**Document template rendering (`status === 'ready'`):** `renderTipTapNode` recursively walks the ProseMirror JSON tree, substituting `{{variableKey}}` text placeholders with the resolved historic variables and applying `bold`, `italic`, and `underline` marks. `renderBlock` dispatches on `block.type`: `text` → `renderTipTapNode`; `variable` → direct variable lookup; `separator` → `<hr>`; `spacer` → empty div; `image` → `<img>`. Zones are rendered in order — `letterhead` and `contactInformation` side-by-side in a CSS grid, then `reference`, `body`, `closing`, `signOff`, `annex` stacked vertically.
+
+**Form-js fallback (`status === 'fallback'`):** When the decision-document fetch returns 404 or fails, a hardcoded `FALLBACK_SCHEMA` (five fields: `status`, `permitDecision`, `finalMessage`, `replacementInfo`, `dossierReference`) is mounted into a `<div ref={containerRef}>` via `form.importSchema`. The container div is always present in the DOM (toggled via CSS class) so that `containerRef.current` is non-null when the fallback `useEffect` fires.
+
+Caseworker-only fields are excluded from both rendering paths.
+
+See [Dynamic Forms — Decision Viewer](../features/dynamic-forms.md#decision-viewer----decisionviewer) for the feature description.
 
 ---
 
