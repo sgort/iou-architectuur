@@ -4,6 +4,64 @@
 
 ## Changelog
 
+### v1.1.0 — Document Composer (March 2026)
+
+**v1.1.0 — New Feature (March 8, 2026)**
+
+#### Document Composer
+
+New **Document Composer** view for authoring formal government decision document templates (*beschikkingen*).
+
+- Three-panel layout matching BPMN Modeler and Chain Builder conventions: document list (left), zone canvas (centre), Bindings panel (right)
+- Fixed-zone document structure: Letterhead, Contact Information, Reference, Body, Closing, Sign-off, and optional Annex
+- Five draggable block types: rich text (TipTap with bold, italic, headings, lists), variable placeholder, image (from TriplyDB), separator, horizontal rule, and spacer
+- Blocks dragged from the Content library onto zones; reordering within and across zones by drag
+- Image library tab fetches assets from the active TriplyDB dataset
+- Documents stored in `localStorage` under `linkedDataExplorer_documentTemplates`; create, rename, delete, and **Save as…** actions
+- Export document template as a `.document` JSON file
+- Read-only example document pre-loaded: **Kapvergunning Beschikking** (linked to `AwbShellProcess`)
+
+**Files:** `DocumentComposer.tsx`, `DocumentCanvas.tsx`, `DocumentList.tsx`, `ZonePanel.tsx`, `TextBlockEditor.tsx`, `ImageBlock.tsx`, `VariableBlock.tsx`, `BindingPanel.tsx`, `document.types.ts`, `documentService.ts`
+
+#### Variable Bindings
+
+- Bindings panel maps `{{placeholder}}` tokens in rich-text blocks to Operaton process variable keys
+- **Discover Variables** button queries `GET /v1/process/:key/variable-hints` for all variables used by completed instances of a given process definition key
+- Discovered variables shown as clickable chips labelled with type (`String`, `Boolean`, `Double`, etc.)
+- Each binding records placeholder, variable key, source (`process` or `dmn_output`), and optional label
+
+**File:** `BindingPanel.tsx`
+
+#### BPMN Modeler integration
+
+- **Link decision template** dropdown injected into the bpmn-js properties panel for `UserTask` elements (not `StartEvent`)
+- Selecting a template writes `camunda:documentRef` to the BPMN XML
+- Purple badge (📄) rendered on the canvas below the element, below the existing green form badge
+- Badge positioned at `bottom: -36` (vs. `bottom: -22` for the form badge) so both badges are visible simultaneously
+- `DocumentTemplateSelector.tsx` follows the identical injection pattern as `FormTemplateSelector.tsx`
+
+**Files:** `BpmnModeler/DocumentTemplateSelector.tsx`, `BpmnCanvas.tsx`
+
+---
+
+### v1.0.1 — Bug Fix & Internal (March 2026)
+
+**v1.0.1 — Bug Fix (March 7, 2026)**
+
+#### Bug fix
+
+Fixed `Task_Phase6_Notify` and `Task_RequestMissingInfo` appearing pre-claimed in the caseworker dashboard. `camunda:assignee="demo"` removed; `camunda:candidateGroups="caseworker"` added to both tasks so they are correctly visible in the task queue.
+
+#### Internal — example file migration and version registry
+
+- Example `.bpmn` and `.form` files moved to `public/examples/flevoland/` as the single source of truth. Inline schemas removed from `bpmnTemplates.ts` and `FormEditor.tsx`.
+- Added `exampleVersions.ts` with `EXAMPLE_VERSIONS` record (keyed by example name, value is an integer version). The app compares stored versions in `localStorage` key `linkedDataExplorer_exampleVersions` against `EXAMPLE_VERSIONS` and re-fetches any example whose version has been incremented.
+- **Developer workflow:** edit the file in `public/examples/`, mirror the change to `examples/organizations/`, increment the version in `exampleVersions.ts`, commit. Existing users receive the updated example without clearing `localStorage`.
+
+**Files:** `exampleVersions.ts`, `bpmnTemplates.ts`, `FormEditor.tsx`, `public/examples/flevoland/`
+
+---
+
 ### v1.0.0 — Form Editor & One-Click Deploy (March 2026)
 
 **v1.0.0 — Major Release**

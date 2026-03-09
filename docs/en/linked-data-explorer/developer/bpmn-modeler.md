@@ -13,7 +13,8 @@ packages/frontend/src/components/BpmnModeler/
 ├── BpmnProperties.tsx         properties panel (right), includes DmnTemplateSelector
 ├── ProcessList.tsx            process list (left), CRUD operations
 ├── DmnTemplateSelector.tsx    DMN/DRD dropdown for BusinessRuleTask linking
-├── FormTemplateSelector.tsx   Form dropdown for UserTask / StartEvent linking  ← new in v1.0.0
+├── FormTemplateSelector.tsx   Form dropdown for UserTask / StartEvent linking
+├── DocumentTemplateSelector.tsx  Document template dropdown for UserTask linking  ← new in v1.1.0
 └── BpmnModeler.css            custom styles for canvas rendering fixes and badge overlays
 
 packages/frontend/src/
@@ -173,6 +174,108 @@ Styles are defined in `BpmnModeler.css`:
 ```
 
 `pointer-events: none` prevents the badge from interfering with element selection on the canvas.
+
+---
+
+## DocumentTemplateSelector — document template linking for UserTask
+
+`DocumentTemplateSelector` is a React component injected into the bpmn-js properties panel when a `UserTask` is selected (not `StartEvent`). It reads available document templates from `DocumentService` and writes `camunda:documentRef` to the element via the bpmn-js `modeling` API. It follows the identical injection pattern as `FormTemplateSelector`.
+
+### Injection
+
+Inside the `selectionChanged` listener in `BpmnCanvas.tsx`, after the `FormTemplateSelector` is mounted for a `UserTask`, the document selector is appended immediately below it:
+
+```typescript
+// UserTask only — not StartEvent
+if (elementType === 'bpmn:UserTask') {
+  const docSelectorContainer = document.createElement('div');
+  docSelectorContainer.id = `document-template-custom-${selectedElement.id}`;
+  propertiesPanel.appendChild(docSelectorContainer);
+
+  const currentDocumentRef = businessObject.get('camunda:documentRef');
+
+  const docRoot = ReactDOM.createRoot(docSelectorContainer);
+  docRoot.render(
+    
+  );
+}
+```
+
+`cleanupReactRoots()` unmounts all injected React roots (form and document) when the selection changes.
+
+### Writing and clearing the attribute
+
+Selecting a template:
+
+```typescript
+modeling.updateProperties(element, {
+  'camunda:documentRef': templateId,
+});
+```
+
+Selecting the blank option:
+
+```typescript
+modeling.updateProperties(element, {
+  'camunda:documentRef': undefined,
+});
+```
+
+---
+
+## Document badge overlay
+
+When a `UserTask` has `camunda:documentRef` set, `BpmnCanvas.tsx` renders a purple badge below the element. This is applied in `refreshDmnOverlays()` alongside the DMN and form badges:
+
+```typescript
+overlays.remove({ type: 'document-linked' });
+
+// ...inside the elementRegistry.forEach loop, after the form badge check:
+if (element.type === 'bpmn:UserTask') {
+  const documentRef = element.businessObject.get('camunda:documentRef');
+  if (documentRef) {
+    const badgeWidth = 130;
+    const leftOffset = Math.round((element.width - badgeWidth) / 2);
+    overlays.add(element.id, 'document-linked', {
+      position: { bottom: -36, left: leftOffset }, // below the form badge at -22
+      html: `📄 ${documentRef}`,
+    });
+  }
+}
+```
+
+The badge offset is `bottom: -36` (vs. `bottom: -22` for the form badge), so both badges stack below the element without overlapping.
+
+### CSS
+
+Defined in `BpmnModeler.css`:
+
+```css
+.document-linked-badge {
+  background: #7c3aed;   /* violet-700 */
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+```
+
+### Badge stacking order
+
+| Overlay type | CSS class | Colour | `bottom` offset |
+|---|---|---|---|
+| `dmn-linked` | `.dmn-linked-badge` | Blue (`#2563eb`) | `8` (inside element) |
+| `form-linked` | `.form-linked-badge` | Green (`#16a34a`) | `-22` (below element) |
+| `document-linked` | `.document-linked-badge` | Violet (`#7c3aed`) | `-36` (below form badge) |
+
+`refreshDmnOverlays()` calls `overlays.remove({ type: 'document-linked' })` before re-adding, so stale badges are cleared on every `element.changed` event.
 
 ---
 
