@@ -4,6 +4,26 @@
 
 ## Changelog
 
+### v2.3.0 — Feature Release (March 9, 2026)
+
+**Citizen Dashboard — Document Template Viewer** 📄
+
+- `DecisionViewer` now fetches `GET /v1/process/:id/decision-document` in parallel with historic variables. When a `DocumentTemplate` is bundled in the Operaton deployment, it is rendered as styled HTML — TipTap/ProseMirror JSON blocks converted to React elements, `{{variableKey}}` placeholders substituted from historic process variables. The letter layout (letterhead + contact information side-by-side, body, closing, sign-off, optional annex) mirrors the Document Composer canvas.
+- Falls back to the v2.2.0 form-js readonly schema for process instances deployed before document templates were introduced.
+
+**Backend — Decision Document Endpoint** ⚙️
+
+- `GET /v1/process/:id/decision-document` — reads the `ronl:documentRef` attribute from the BPMN `UserTask` element via the process definition XML, fetches the named `.document` resource from the Operaton deployment bundle, and returns `{ success: true, template: DocumentTemplate }`.
+- Tenant isolation applied via `municipality` variable — same pattern as `historic-variables`.
+- Returns 404 `DOCUMENT_NOT_FOUND` when no `ronl:documentRef` is present or the `.document` resource is absent from the deployment bundle.
+- Route ordering in `process.routes.ts` corrected: literal `/history` route and instance-ID sub-routes registered before definition-key sub-routes.
+
+**LDE — BPMN Document Linking** 🔗
+
+- `BpmnCanvas` properties panel writes `ronl:documentRef="<templateId>"` into the BPMN XML when a document template is linked to a `UserTask`.
+- The `ronl` namespace (`http://ronl.nl/schema/1.0`) is declared on the BPMN `definitions` element.
+- The linked document template is bundled as a `.document` JSON file in the one-click deployment alongside BPMN and `.form` files.
+
 ### v2.2.0 — Feature Release (March 5, 2026)
 
 **Citizen Dashboard — Dynamic Start Form** 🌳
@@ -194,6 +214,9 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 | Dynamic Camunda Forms — citizen start form               | v2.2.0  |
 | Dynamic Camunda Forms — caseworker task forms            | v2.2.0  |
 | Decision Viewer — citizen-facing historic variables      | v2.2.0  |
+| Decision Document Viewer — DocumentTemplate rendering    | v2.3.0  |
+| Backend decision-document endpoint                       | v2.3.0  |
+| LDE BPMN document linking (`ronl:documentRef`)           | v2.3.0  |
 
 ---
 

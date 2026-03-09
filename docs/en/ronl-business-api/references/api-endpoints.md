@@ -75,6 +75,7 @@ Health status values: `healthy` (HTTP 200), `degraded` (HTTP 503), `unhealthy` (
 | `GET` | `/v1/process/history` | Bearer JWT | List completed and active process instances for the authenticated citizen (`?applicantId=`) |
 | `GET` | `/v1/process/:key/start-form` | Bearer JWT | Fetch the deployed Camunda Form schema for a process start event. Returns 404 `FORM_NOT_FOUND` if no form is linked; 415 `UNSUPPORTED_FORM_TYPE` if an embedded HTML form is linked. |
 | `GET` | `/v1/process/:id/historic-variables` | Bearer JWT | Fetch the final variable state of a completed process instance from Operaton history. Applies tenant isolation via the `municipality` variable. |
+| `GET` | `/v1/process/:id/decision-document` | Bearer JWT | Fetch the `DocumentTemplate` bundled in the Operaton deployment for a completed process instance. Reads `ronl:documentRef` from the BPMN `UserTask` element and returns the named `.document` resource. Returns 404 `DOCUMENT_NOT_FOUND` when no `ronl:documentRef` is present or the resource is absent. Applies tenant isolation via the `municipality` variable. |
 
 ---
 
@@ -118,6 +119,7 @@ This endpoint accepts an `application/json` request body and deploys all provide
 | `bpmnXml` | `string` | Yes | The primary BPMN XML content |
 | `deploymentName` | `string` | Yes | Name for the Operaton deployment (typically the BPMN process ID) |
 | `forms` | `{ id: string, schema: object }[]` | No | Camunda Form schemas to include in the deployment. Defaults to `[]`. |
+| `documents` | `{ id: string, template: object }[]` | No | Document template JSON files to include in the deployment. Each `template` is a `DocumentTemplate` object authored in the LDE Document Composer. Defaults to `[]`. |
 | `subProcesses` | `{ filename: string, xml: string }[]` | No | Subprocess BPMN XML content. Defaults to `[]`. |
 | `operatonUrl` | `string` | No | Override the default Operaton base URL |
 | `operatonUsername` | `string` | No | Override Operaton basic-auth username |

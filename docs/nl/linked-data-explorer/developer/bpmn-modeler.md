@@ -35,4 +35,12 @@
 
 ---
 
+## DocumentTemplateSelector — documentsjabloonkoppeling voor UserTask
+
+---
+
+## Document badge overlay
+
+---
+
 ## Deploy modal

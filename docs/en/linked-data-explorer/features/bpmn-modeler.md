@@ -66,6 +66,29 @@ To remove a form link, open the **Link to Form** dropdown and select the blank o
 
 ---
 
+## Document template linking
+
+When a `UserTask` is selected, the properties panel shows a **Link decision template** dropdown below the form selector. The dropdown lists every document template saved in the Document Composer's `localStorage`.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: BPMN properties panel for a UserTask showing the Link decision template dropdown with the Kapvergunning Beschikking template selected, and the purple info card below confirming the selection](../../assets/screenshots/linked-data-explorer-bpmn-document-template-selector.png)
+  <figcaption>Link decision template dropdown in the UserTask properties panel</figcaption>
+</figure>
+
+Selecting a template writes `camunda:documentRef` to the BPMN XML and renders a **purple badge** (📄) beneath the element on the canvas. The badge is positioned below the green form badge so all three linked artefacts are visible simultaneously:
+
+| Badge colour | Artefact type | Attribute written |
+|---|---|---|
+| Amber | DMN / DRD decision | `camunda:decisionRef` |
+| Green | Camunda Form | `camunda:formRef` |
+| **Purple** | **Document template** | **`camunda:documentRef`** |
+
+Document template linking is only available for `UserTask` elements (not `StartEvent`).
+
+See [Document Composer](document-composer.md) for how to create and manage document templates.
+
+---
+
 ## One-click deploy
 
 The **Deploy** button in the Modeler toolbar opens a deploy modal that collects all resources needed for a complete Operaton deployment:
@@ -111,3 +134,5 @@ The Modeler targets Operaton, the open-source fork of Camunda 7 CE. It uses `cam
 - [Form Editor](form-editor.md) — creating and managing Camunda Forms in the LDE
 - [RONL Business API — Dynamic Forms](../../../ronl-business-api/features/dynamic-forms.md) — how deployed forms are fetched and rendered at runtime in MijnOmgeving
 - [RONL API Endpoints — Process definition deployment](../../../ronl-business-api/references/api-endpoints.md#process-definition-deployment) — the `POST /api/dmns/process/deploy` endpoint this button calls
+- [Document Composer](document-composer.md) — authoring decision document templates
+- [Document Composer user guide](../user-guide/document-composer.md) — step-by-step workflow

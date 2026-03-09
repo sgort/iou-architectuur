@@ -8,13 +8,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.2.0** · *March 2026*
+-   **⚙️ RONL Business API — v2.3.0** · *March 2026*
 
     ---
 
     **Dynamic Forms**
 
-    Kapvergunning now renders a live-fetched Camunda Form via `@bpmn-io/form-js`. Caseworker task forms replaced by a single `TaskFormViewer` component. Citizens can view the full AWB decision directly in **Mijn aanvragen** via the new Decision Viewer.
+    From v2.3.0, the **Decision Viewer** no longer renders a hardcoded `@bpmn-io/form-js` readonly schema. It fetches the **Document Template** bundled in the Operaton deployment and renders it as styled HTML — matching the letter layout authored in the [LDE Document Composer](../../../linked-data-explorer/features/document-composer/). A form-js fallback remains for process instances deployed before document templates were introduced.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
@@ -28,13 +28,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.0.0** · *March 2026*
+-   **🔍 Linked Data Explorer — v1.1.0** · *March 2026*
 
     ---
 
-    **Form Editor integration**
+    **Document Composer**
 
-    New Form Editor view using `@bpmn-io/form-js` — create and edit Camunda Forms (schemaVersion 16) directly in the application. BPMN Modeler — One-Click Deploy button opens a modal listing all resources to be bundled: main BPMN, subprocess BPMNs (`calledElement` resolution), and linked `.form` files.
+    The Document Composer lets you author formal government decision documents (*beschikkingen*) as structured templates inside the Linked Data Explorer. Templates are zone-based, block-driven, and bound to Operaton process variables — so a document authored here can be rendered at runtime by [MijnOmgeving](../../../ronl-business-api/user-guide/submitting-calculation/#viewing-the-decision) for any completed process instance.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
