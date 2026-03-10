@@ -156,7 +156,7 @@ Python/FastAPI service that fetches individual rules from Dutch and European leg
 
 ## Technology Stack
 
-The IOU Architecture ecosystem is built entirely on **open source technologies**:
+The IOU Architecture ecosystem is - apart from TriplyDB - built entirely on **open source technologies**:
 
 | Component           | Technology        | License            |
 | ------------------- | ----------------- | ------------------ |
