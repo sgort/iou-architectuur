@@ -4,6 +4,94 @@
 
 ## Changelog
 
+### v2.5.1 — Enhancement (March 12, 2026)
+
+**Caseworker Dashboard — Changelog Panel** 📋
+
+- Changelog panel button added to the caseworker dashboard header, mirroring the button already present on the login page.
+- Button positioned to the right of the authenticated user block for consistent right-side placement.
+- Accessible without login — visible to unauthenticated visitors alongside the public sections.
+
+**Nieuws — Government.nl RSS Feed** 📰
+
+- Nieuws endpoint switched from the Rijksoverheid JSON API to the Government.nl RSS feed (`feeds.rijksoverheid.nl/nieuws.rss`).
+- RSS parsed server-side with no additional dependency — `axios` `responseType: text` with regex-based item extraction.
+- Source attribution updated to Government.nl; CDATA and plain-text description fields both handled correctly.
+- 10-minute cache TTL retained; stale cache returned on feed unavailability to prevent blank UI.
+
+---
+
+### v2.5.0 — Feature Release (March 12, 2026)
+
+**Caseworker Dashboard — Regelcatalogus** 🔍
+
+- New public section "Regelcatalogus" added to the Home tab — accessible without caseworker login.
+- **Diensten tab:** Public services from the RONL knowledge graph displayed as expandable cards with full description and URI link; clicking "Toon concepten" navigates to the Concepten tab pre-filtered by that service.
+- **Organisaties tab:** Implementing organisations with logo (TriplyDB assets API), homepage, and linked services.
+- **Concepten tab:** NL-SBB concepts searchable by label, filterable by service; each concept has a direct link to the `skos:exactMatch` URI.
+- **Regels tab:** Implementation rules grouped by service; searchable by rule name and description; groups expand automatically when searching; description expandable per rule.
+
+**Backend — Regelcatalogus Endpoint** ⚙️
+
+- `GET /v1/public/regelcatalogus` — no authentication required; returns services, organisations, concepts, and rules in a single response.
+- Five parallel SPARQL queries against the RONL TriplyDB endpoint: `PublicService`, `PublicOrganisation`, competent authority links, NL-SBB concept traversal, and `cpsv:Rule` implementations.
+- Organisation logos resolved via TriplyDB assets API to versioned CDN URLs.
+- 5-minute in-memory cache per data slice; stale cache returned on TriplyDB failure to prevent blank UI.
+- `RONL_SPARQL_ENDPOINT` environment variable added for overriding the default endpoint per deployment.
+
+---
+
+### v2.4.1 — Feature Release (March 11, 2026)
+
+**Multi-Tenant Architecture — Organisation Types** 🏛️
+
+- Platform extended beyond municipalities: provinces and national government agencies now supported as first-class tenant categories.
+- New `OrganisationType` union type: `municipality | province | national` — shared across frontend, backend, and Keycloak (`@ronl/shared`).
+- `organisationType` JWT claim added to all tokens via Keycloak protocol mapper (`organisation_type` user attribute).
+- `organisationType` propagated through `AuthenticatedUser`, `JWTPayload`, and BPMN process variables.
+- `TenantConfig` gains `organisationType` (required) and `organisationCode` (optional, for CBS PV codes, OIN, etc.); `municipalityCode` made optional.
+- `tenants.json` extended with Provincie Flevoland (`province`, `PV24`) and UWV (`national`) as reference tenants.
+- Backend error messages generalised: "municipality mismatch" → "organisation mismatch".
+- PostgreSQL `tenants` table gains `organisation_type` and `organisation_code` columns.
+- Keycloak realm: `organisation_type` attribute and protocol mapper added; test users for `flevoland` and `uwv` added.
+
+---
+
+### v2.4.0 — Feature Release (March 11, 2026)
+
+**HR Onboarding Process** 👤
+
+- `HrOnboardingProcess` BPMN deployed: collect employee data → DMN role assignment → HR review → notify employee.
+- `EmployeeRoleAssignment` DMN maps `department` + `jobFunction` to `assignedRoles`, `candidateGroups`, and `accessLevel`.
+- All user tasks use `candidateGroups="hr-medewerker"` — claim-first workflow identical to Kapvergunning.
+- Process started with empty variables; first task (Collect employee data) appears in the task queue immediately.
+- `hr-medewerker` realm role added; `test-hr-denhaag` and `test-onboarded-denhaag` test users added for Den Haag.
+- `employeeId` protocol mapper added to `ronl-business-api-dedicated` client scope — injects `employee_id` user attribute as `employeeId` JWT claim.
+
+**IT Handover Document** 📄
+
+- `hr-it-handover.document` authored and bundled in `HrOnboardingProcess` deployment.
+- Document linked via `ronl:documentRef` on `Task_NotifyEmployee` in `HrOnboardingProcess.bpmn`.
+- Template includes medewerkergegevens, toegangsspecificaties, and step-by-step Keycloak account creation instructions for IT.
+- Bindings cover `employeeId`, `firstName`, `lastName`, `municipality`, `department`, `jobFunction`, `assignedRoles`, `candidateGroups`, `accessLevel`, `startDate`.
+
+**Caseworker Dashboard — HR Sections** 🏛️
+
+- **Persoonlijke info → Profiel:** JWT identity card + onboarding data auto-fetched via `employeeId` claim; manual input fallback when claim absent.
+- **Persoonlijke info → Rollen & rechten:** Assigned roles from completed onboarding process with access level description card.
+- **Persoonlijke info → Medewerker onboarden:** Role-gated to `hr-medewerker`; starts `HrOnboardingProcess` with a single button; success state directs to task queue.
+- **Persoonlijke info → Afgeronde onboardingen:** Role-gated to `hr-medewerker`; lists all completed `HrOnboardingProcess` instances for the municipality with name, employee ID, and completion date; expand to render IT handover document via `DecisionViewer`.
+- `GET /v1/hr/onboarding/profile` — returns flattened historic variables for a completed onboarding by `employeeId` + municipality.
+- `GET /v1/hr/onboarding/completed` — returns list of all completed onboarding instances enriched with `employeeId`, `firstName`, `lastName`.
+
+**Caseworker Dashboard — UX Fixes** ✨
+
+- Header user block shows `preferred_username`, LoA badge, and all role badges dynamically — supports multiple roles.
+- Unauthenticated navigation to any top-nav page now defaults to the first section in the left panel, showing the login prompt immediately without a second click.
+- Afgeronde onboardingen access restricted to `hr-medewerker` role — regular caseworkers see access-denied message.
+
+---
+
 ### v2.3.0 — Feature Release (March 9, 2026)
 
 **Citizen Dashboard — Document Template Viewer** 📄
@@ -217,6 +305,15 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 | Decision Document Viewer — DocumentTemplate rendering    | v2.3.0  |
 | Backend decision-document endpoint                       | v2.3.0  |
 | LDE BPMN document linking (`ronl:documentRef`)           | v2.3.0  |
+| HR Onboarding Process (BPMN + DMN)                       | v2.4.0  |
+| IT Handover Document template                            | v2.4.0  |
+| Caseworker Dashboard — HR sections                       | v2.4.0  |
+| Multi-tenant organisation types (province, national)     | v2.4.1  |
+| `OrganisationType` claim in JWT                          | v2.4.1  |
+| Caseworker Dashboard — Regelcatalogus                    | v2.5.0  |
+| Backend Regelcatalogus endpoint (SPARQL + cache)         | v2.5.0  |
+| Changelog Panel in caseworker dashboard header           | v2.5.1  |
+| Nieuws — Government.nl RSS feed                          | v2.5.1  |
 
 ---
 

@@ -79,6 +79,123 @@ Health status values: `healthy` (HTTP 200), `degraded` (HTTP 503), `unhealthy` (
 
 ---
 
+## Public content
+ 
+These endpoints require no authentication and are accessible before login. They are used by both the MijnOmgeving landing page and the caseworker dashboard Home tab.
+ 
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/v1/public/nieuws` | None | National news from the Government.nl RSS feed. Supports `?limit=` (max 20) and `?offset=`. Cached 10 minutes server-side; stale cache returned on feed unavailability. |
+| `GET` | `/v1/public/berichten` | None | Platform announcements (static seed data). Supports `?limit=` and `?offset=`. |
+| `GET` | `/v1/public/berichten/:id` | None | Single bericht by ID. Returns 404 `BERICHT_NOT_FOUND` if absent. |
+| `GET` | `/v1/public/regelcatalogus` | None | RONL knowledge graph data: services, organisations, NL-SBB concepts, and implementation rules. Five parallel SPARQL queries against TriplyDB. Each data slice cached 5 minutes in-memory; stale cache returned on TriplyDB failure. |
+ 
+**`GET /v1/public/nieuws` response shape:**
+ 
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "guid-from-rss",
+        "title": "Titel van het bericht",
+        "summary": "Samenvatting...",
+        "category": null,
+        "publishedAt": "2026-03-12T08:00:00.000Z",
+        "url": "https://www.government.nl/...",
+        "source": { "id": "government", "name": "Government.nl" }
+      }
+    ],
+    "pagination": { "limit": 10, "offset": 0, "total": 40, "hasMore": true }
+  },
+  "meta": { "generatedAt": "2026-03-12T12:00:00.000Z" }
+}
+```
+ 
+**`GET /v1/public/regelcatalogus` response shape:**
+ 
+```json
+{
+  "success": true,
+  "data": {
+    "services": [
+      {
+        "uri": "https://example.org/service/zorgtoeslag",
+        "title": "Zorgtoeslag",
+        "description": "Healthcare allowance for low-income households.",
+        "organisationUri": "https://example.org/org/belastingdienst"
+      }
+    ],
+    "organisations": [
+      {
+        "uri": "https://example.org/org/belastingdienst",
+        "name": "Belastingdienst",
+        "homepage": "https://belastingdienst.nl",
+        "logo": "https://api.triplydb.com/assets/..."
+      }
+    ],
+    "concepts": [
+      {
+        "uri": "https://example.org/concept/toetsingsinkomen",
+        "prefLabel": "Toetsingsinkomen",
+        "serviceTitle": "Zorgtoeslag",
+        "exactMatch": "https://wetten.overheid.nl/..."
+      }
+    ],
+    "rules": [
+      {
+        "uri": "https://example.org/rule/zorgtoeslag-artikel-1",
+        "ruleTitle": "Zorgtoeslag artikel 1",
+        "description": "Beschrijving van de regel...",
+        "serviceTitle": "Zorgtoeslag",
+        "validFrom": "2026-01-01",
+        "confidence": "high"
+      }
+    ]
+  },
+  "meta": { "generatedAt": "2026-03-12T12:00:00.000Z" }
+}
+```
+ 
+---
+ 
+## HR Onboarding
+ 
+These endpoints require a valid JWT with the `caseworker` or `hr-medewerker` role. Tenant isolation is applied via the `municipality` JWT claim — a caseworker from Utrecht cannot retrieve Den Haag's onboarding records.
+ 
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/v1/hr/onboarding/profile` | Bearer JWT (caseworker) | Returns the flattened historic variables for a completed `HrOnboardingProcess` instance identified by `?employeeId=`. Any caseworker may look up their own record; `hr-medewerker` may look up any employee's record within the same municipality. Returns 500 `HR_PROFILE_FAILED` when no completed instance is found. |
+| `GET` | `/v1/hr/onboarding/completed` | Bearer JWT (caseworker) | Returns all completed `HrOnboardingProcess` instances for the caseworker's municipality, enriched with `employeeId`, `firstName`, `lastName`, `startTime`, and `endTime`. |
+ 
+**`GET /v1/hr/onboarding/profile` request:**
+ 
+```
+GET /v1/hr/onboarding/profile?employeeId=emp-001
+Authorization: Bearer <token>
+```
+ 
+**`GET /v1/hr/onboarding/completed` response shape:**
+ 
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "process-instance-uuid",
+      "startTime": "2026-03-11T09:00:00.000Z",
+      "endTime": "2026-03-11T10:30:00.000Z",
+      "employeeId": "emp-001",
+      "firstName": "Jan",
+      "lastName": "de Vries"
+    }
+  ]
+}
+```
+ 
+---
+
 ## Task management
 
 | Method | Endpoint | Auth | Description |

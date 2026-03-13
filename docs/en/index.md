@@ -8,13 +8,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.3.0** · *March 2026*
+-   **⚙️ RONL Business API — v2.5.1** · *March 2026*
 
     ---
 
-    **Dynamic Forms**
+    **Regelcatalogus, HR Onboarding & Organisation Types**
 
-    From v2.3.0, the **Decision Viewer** no longer renders a hardcoded `@bpmn-io/form-js` readonly schema. It fetches the **Document Template** bundled in the Operaton deployment and renders it as styled HTML — matching the letter layout authored in the [LDE Document Composer](../../../linked-data-explorer/features/document-composer/). A form-js fallback remains for process instances deployed before document templates were introduced.
+    From v2.5.0, the caseworker dashboard includes a public **Regelcatalogus** — services, organisations, NL-SBB concepts, and implementation rules from the RONL knowledge graph, accessible without login. v2.4.0 adds a full **HR Onboarding** BPMN process with DMN role assignment and an IT handover document. v2.4.1 extends multi-tenancy to provinces and national agencies.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
@@ -156,7 +156,7 @@ Python/FastAPI service that fetches individual rules from Dutch and European leg
 
 ## Technology Stack
 
-The IOU Architecture ecosystem is built entirely on **open source technologies**:
+The IOU Architecture ecosystem is - apart from TriplyDB - built entirely on **open source technologies**:
 
 | Component           | Technology        | License            |
 | ------------------- | ----------------- | ------------------ |

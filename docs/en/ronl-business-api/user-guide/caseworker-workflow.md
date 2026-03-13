@@ -4,6 +4,16 @@ Caseworkers (medewerkers) are municipal employees with elevated access to the RO
 
 ---
 
+## Dashboard navigation
+
+The caseworker dashboard at `/dashboard/caseworker` uses a three-zone shell: a top navigation bar with three pages (Home, Persoonlijke info, Projecten), a left panel whose contents change per page, and a main content area. The Projecten page hosts the task queue. A task count badge on the Projecten tab button shows pending work without requiring navigation.
+
+The dashboard is accessible without login — public sections (Nieuws, Berichten, Regelcatalogus) under the Home tab are visible to anyone. Private sections show a login prompt when clicked unauthenticated; no page redirect occurs.
+
+See [Caseworker Dashboard](../features/caseworker-dashboard.md) for the full shell architecture.
+
+---
+
 ## Logging in as a caseworker
 
 Caseworkers use the **"Inloggen als Medewerker"** button on the MijnOmgeving landing page — a slate-coloured button visually separated from the three citizen identity provider options by a "MEDEWERKERS" section divider.
@@ -176,17 +186,34 @@ Completing this task ends the AWB shell process. The process instance moves to h
 
 ## Role differences at a glance
 
-| Capability                         | Citizen | Caseworker | Admin |
-| ---------------------------------- | ------- | ---------- | ----- |
-| Submit a calculation               | ✓       | ✓          | ✓     |
-| View own applications              | ✓       | ✓          | ✓     |
-| View all municipality applications | —       | ✓          | ✓     |
-| Override DMN result                | —       | ✓          | ✓     |
-| View audit logs                    | —       | —          | ✓     |
-| Manage users in Keycloak           | —       | —          | ✓     |
+| Capability                         | Citizen | Caseworker | HR Medewerker | Admin |
+| ---------------------------------- | ------- | ---------- | ------------- | ----- |
+| Submit a calculation               | ✓       | ✓          | ✓             | ✓     |
+| View own applications              | ✓       | ✓          | ✓             | ✓     |
+| View all municipality applications | —       | ✓          | ✓             | ✓     |
+| Override DMN result                | —       | ✓          | ✓             | ✓     |
+| Start HR onboarding process        | —       | —          | ✓             | ✓     |
+| View completed onboardings         | —       | —          | ✓             | ✓     |
+| View audit logs                    | —       | —          | —             | ✓     |
+| Manage users in Keycloak           | —       | —          | —             | ✓     |
 
 ---
 
 ## Audit trail
 
 Every action a caseworker takes is recorded in the audit log with their `sub` (user ID), the action performed, the affected process instance, and a UTC timestamp. Audit records are retained for 7 years.
+
+---
+
+## Persoonlijke info — HR and profile sections
+
+From v2.4.0, the **Persoonlijke info** top-nav item exposes four left-panel subsections. Two are available to all authenticated caseworkers; two require the `hr-medewerker` role:
+
+| Subsection | Accessible to | Description |
+|---|---|---|
+| Profiel | All caseworkers | JWT identity card and onboarding data fetched via `employeeId` claim |
+| Rollen & rechten | All caseworkers | JWT roles and onboarding-assigned roles with access level description |
+| Medewerker onboarden | `hr-medewerker` only | Start a new `HrOnboardingProcess` instance |
+| Afgeronde onboardingen | `hr-medewerker` only | Browse completed onboardings and view IT handover documents |
+
+For the full walkthrough of each subsection — including the HR onboarding BPMN flow, IT handover document, and completed onboarding archive — see [HR Onboarding Workflow](hr-onboarding.md).
