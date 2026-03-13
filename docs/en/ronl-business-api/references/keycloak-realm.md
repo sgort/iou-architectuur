@@ -63,6 +63,7 @@ The following protocol mappers are configured on the `ronl-business-api-dedicate
 | `employee_id` | User Attribute | `employeeId` | `employee_id` |
 
 All mappers have `id.token.claim`, `access.token.claim`, and `userinfo.token.claim` set to `true`.
+The `employeeId` claim is present only for users who have the `employee_id` attribute set (caseworkers and HR staff). It is used by the dashboard to auto-fetch onboarding data on login without requiring a manual ID input.
 
 ---
 
@@ -96,6 +97,8 @@ All test users have password `test123` and `directAccessGrantsEnabled: true`.
 | `test-onboarded-denhaag` | `denhaag` | `municipality` | `caseworker` |
 | `test-caseworker-flevoland` | `flevoland` | `province` | `caseworker` |
 | `test-caseworker-uwv` | `uwv` | `national` | `caseworker` |
+
+`test-hr-denhaag` is the primary HR test account — it holds the `hr-medewerker` realm role and can start onboarding processes and view the Afgeronde onboardingen archive. `test-onboarded-denhaag` simulates an employee who has already been onboarded; logging in with this account triggers an auto-fetch of the completed onboarding record for `emp-test-01`.
 
 ---
 

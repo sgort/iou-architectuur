@@ -99,3 +99,15 @@ Each municipality has two standard roles configured in the Keycloak realm:
 | `admin` | System | Manage users, view audit logs, configure settings |
 
 Roles are set as realm roles in Keycloak, mapped into the JWT via a protocol mapper, and validated by the backend's authorization middleware.
+
+---
+
+## Caseworker dashboard shell
+
+The caseworker portal at `/dashboard/caseworker` is the primary entry point for municipality staff. Unlike the citizen dashboard, it is a **public route** — the page loads for any visitor and renders public content (Nieuws, Berichten, Regelcatalogus) without authentication. Authentication state is checked inside the component; private sections replace their content with a login prompt when clicked by an unauthenticated visitor.
+
+The dashboard layout consists of three zones: a top navigation bar, a left panel driven by `tenantConfig.leftPanelSections`, and a main content area. The left panel section list changes with each top-nav page, and the active section is remembered per page so navigating between Home, Persoonlijke info, and Projecten and back always restores the last visited section.
+
+Tenant theming applies in full — the header background and active section indicator use `--color-primary` from the municipality's theme entry in `tenants.json`. For unauthenticated visitors the default tenant (`utrecht`) is loaded so the left panel always renders.
+
+See [Caseworker Dashboard](caseworker-dashboard.md) for the complete feature description.

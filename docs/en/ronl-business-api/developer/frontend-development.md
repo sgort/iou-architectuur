@@ -88,9 +88,26 @@ if (authenticated) {
 
 `onLoad: 'check-sso'` returns `true` if a Keycloak SSO session cookie already exists in the browser, allowing the caseworker to skip the login screen entirely on subsequent visits within the session window. If no session exists, `keycloak.login({ loginHint: '__medewerker__' })` redirects to Keycloak and passes `__medewerker__` as the `login_hint` parameter. The `login.ftl` template detects this sentinel and renders the caseworker context banner (see [Keycloak Deployment — Caseworker banner](./deployment/keycloak.md#caseworker-context-banner)).
 
-**3. Dashboard (`/dashboard` — `Dashboard.tsx`)**
+**3. Caseworker dashboard (`/dashboard/caseworker` — `CaseworkerDashboard.tsx`)**
 
-Main application after successful authentication. The JWT `roles` claim determines which view is displayed: the citizen calculator or the caseworker queue.
+The caseworker portal. This route is **not wrapped in `ProtectedRoute`** — authentication is handled inside the component so public content (Nieuws, Berichten, Regelcatalogus) can render without a login. The component checks `keycloak.authenticated` on mount:
+```typescript
+const [isAuthenticated] = useState(() => !!keycloak.authenticated);
+```
+
+The shell renders three zones driven by `tenantConfig` loaded from `public/tenants.json`:
+
+- **Top nav** — three `TopNavPage` values: `home | personal-info | projects`
+- **Left panel** — `tenantConfig.leftPanelSections[activeTopNavPage]`, an array of `LeftPanelSection` objects each with `id`, `label`, and `isPublic`
+- **Main content** — `renderContent()` switches on `activeSection`
+
+For unauthenticated visitors, `getDefaultTenantConfig()` loads the default tenant (`utrecht`) so the left panel always renders. When a visitor clicks a section with `isPublic: false`, `renderLoginPrompt()` is rendered instead of the section content — no redirect.
+
+Section memory (`sectionMemory` state) stores the last visited section per top-nav page, so switching pages and returning always restores context.
+
+**4. Citizen dashboard (`/dashboard/citizen` — `Dashboard.tsx`)**
+
+The citizen portal, protected by `ProtectedRoute requiredRole="citizen"`. The JWT `roles` claim determines whether the user sees the zorgtoeslag calculator or is redirected to the caseworker dashboard.
 
 ---
 

@@ -98,6 +98,7 @@ nav:
       - Business Rules Execution: ronl-business-api/features/business-rules-execution.md
       - Dynamic Forms: ronl-business-api/features/dynamic-forms.md
       - Regelcatalogus: ronl-business-api/features/regelcatalogus.md
+      - Caseworker Dashboard: ronl-business-api/features/caseworker-dashboard.md
       - Timeline Navigation: ronl-business-api/features/timeline-navigation.md
       - Security & Compliance: ronl-business-api/features/security-compliance.md
       - API Design: ronl-business-api/features/api-design.md

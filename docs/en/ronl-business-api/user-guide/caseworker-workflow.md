@@ -4,6 +4,16 @@ Caseworkers (medewerkers) are municipal employees with elevated access to the RO
 
 ---
 
+## Dashboard navigation
+
+The caseworker dashboard at `/dashboard/caseworker` uses a three-zone shell: a top navigation bar with three pages (Home, Persoonlijke info, Projecten), a left panel whose contents change per page, and a main content area. The Projecten page hosts the task queue. A task count badge on the Projecten tab button shows pending work without requiring navigation.
+
+The dashboard is accessible without login — public sections (Nieuws, Berichten, Regelcatalogus) under the Home tab are visible to anyone. Private sections show a login prompt when clicked unauthenticated; no page redirect occurs.
+
+See [Caseworker Dashboard](../features/caseworker-dashboard.md) for the full shell architecture.
+
+---
+
 ## Logging in as a caseworker
 
 Caseworkers use the **"Inloggen als Medewerker"** button on the MijnOmgeving landing page — a slate-coloured button visually separated from the three citizen identity provider options by a "MEDEWERKERS" section divider.
@@ -206,4 +216,4 @@ From v2.4.0, the **Persoonlijke info** top-nav item exposes four left-panel subs
 | Medewerker onboarden | `hr-medewerker` only | Start a new `HrOnboardingProcess` instance |
 | Afgeronde onboardingen | `hr-medewerker` only | Browse completed onboardings and view IT handover documents |
 
-For the full workflow, see [HR Onboarding Workflow](hr-onboarding.md).
+For the full walkthrough of each subsection — including the HR onboarding BPMN flow, IT handover document, and completed onboarding archive — see [HR Onboarding Workflow](hr-onboarding.md).
