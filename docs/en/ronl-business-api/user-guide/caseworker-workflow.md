@@ -176,17 +176,34 @@ Completing this task ends the AWB shell process. The process instance moves to h
 
 ## Role differences at a glance
 
-| Capability                         | Citizen | Caseworker | Admin |
-| ---------------------------------- | ------- | ---------- | ----- |
-| Submit a calculation               | ✓       | ✓          | ✓     |
-| View own applications              | ✓       | ✓          | ✓     |
-| View all municipality applications | —       | ✓          | ✓     |
-| Override DMN result                | —       | ✓          | ✓     |
-| View audit logs                    | —       | —          | ✓     |
-| Manage users in Keycloak           | —       | —          | ✓     |
+| Capability                         | Citizen | Caseworker | HR Medewerker | Admin |
+| ---------------------------------- | ------- | ---------- | ------------- | ----- |
+| Submit a calculation               | ✓       | ✓          | ✓             | ✓     |
+| View own applications              | ✓       | ✓          | ✓             | ✓     |
+| View all municipality applications | —       | ✓          | ✓             | ✓     |
+| Override DMN result                | —       | ✓          | ✓             | ✓     |
+| Start HR onboarding process        | —       | —          | ✓             | ✓     |
+| View completed onboardings         | —       | —          | ✓             | ✓     |
+| View audit logs                    | —       | —          | —             | ✓     |
+| Manage users in Keycloak           | —       | —          | —             | ✓     |
 
 ---
 
 ## Audit trail
 
 Every action a caseworker takes is recorded in the audit log with their `sub` (user ID), the action performed, the affected process instance, and a UTC timestamp. Audit records are retained for 7 years.
+
+---
+
+## Persoonlijke info — HR and profile sections
+
+From v2.4.0, the **Persoonlijke info** top-nav item exposes four left-panel subsections. Two are available to all authenticated caseworkers; two require the `hr-medewerker` role:
+
+| Subsection | Accessible to | Description |
+|---|---|---|
+| Profiel | All caseworkers | JWT identity card and onboarding data fetched via `employeeId` claim |
+| Rollen & rechten | All caseworkers | JWT roles and onboarding-assigned roles with access level description |
+| Medewerker onboarden | `hr-medewerker` only | Start a new `HrOnboardingProcess` instance |
+| Afgeronde onboardingen | `hr-medewerker` only | Browse completed onboardings and view IT handover documents |
+
+For the full workflow, see [HR Onboarding Workflow](hr-onboarding.md).

@@ -96,6 +96,7 @@
 | `ENABLE_HEALTH_CHECKS` | No | `true` | Enable `/v1/health` endpoint |
 | `ENABLE_TENANT_ISOLATION` | No | `true` | Enforce per-tenant data isolation |
 | `DEFAULT_MAX_PROCESS_INSTANCES` | No | `1000` | Max active instances per tenant |
+| `RONL_SPARQL_ENDPOINT` | No | `https://api.triplydb.com/...` | Override the default RONL TriplyDB SPARQL endpoint used by the Regelcatalogus service |
 
 ---
 
