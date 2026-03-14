@@ -196,6 +196,83 @@ Authorization: Bearer <token>
  
 ---
 
+## RIP Phase 1
+
+These endpoints require a valid JWT with the `caseworker` role. Tenant isolation is applied via the `municipality` process variable compared to the JWT `municipality` claim.
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/v1/rip/phase1/active` | Bearer JWT (caseworker) | Lists all active `RipPhase1Process` instances for the authenticated user's municipality, enriched with `projectNumber`, `projectName`, and `edocsWorkspaceId`. |
+| `GET` | `/v1/rip/phase1/:instanceId/documents` | Bearer JWT (caseworker) | Returns all three document templates bundled in the deployment for a given process instance, together with current process variables. Documents not yet produced return `null`. Applies tenant isolation via the `municipality` process variable. |
+| `GET` | `/v1/rip/phase1/completed` | Bearer JWT (caseworker) | Lists all completed `RipPhase1Process` instances for the authenticated user's municipality, enriched with `projectNumber`, `projectName`, `edocsWorkspaceId`, and `endTime`. |
+
+**`GET /v1/rip/phase1/active` response shape:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "process-instance-uuid",
+      "startTime": "2026-03-13T09:00:00.000Z",
+      "projectNumber": "123456789",
+      "projectName": "Test",
+      "edocsWorkspaceId": "stub-ws-123456789"
+    }
+  ]
+}
+```
+
+**`GET /v1/rip/phase1/:instanceId/documents` response shape:**
+```json
+{
+  "success": true,
+  "data": {
+    "variables": {
+      "projectNumber": "123456789",
+      "projectName": "Test",
+      "municipality": "flevoland"
+    },
+    "intakeReport": { },
+    "psuReport": null,
+    "pdp": null
+  }
+}
+```
+
+`intakeReport`, `psuReport`, and `pdp` are `DocumentTemplate` objects when the corresponding ServiceTask has completed, or `null` when not yet produced.
+
+**`GET /v1/rip/phase1/completed` response shape:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "process-instance-uuid",
+      "startTime": "2026-03-13T09:00:00.000Z",
+      "endTime": "2026-03-13T14:30:00.000Z",
+      "projectNumber": "123456789",
+      "projectName": "Test",
+      "edocsWorkspaceId": "stub-ws-123456789"
+    }
+  ]
+}
+```
+
+---
+
+## eDOCS
+
+These endpoints require a valid JWT with the `caseworker` role. In development, `EDOCS_STUB_MODE=true` (default) means all calls return realistic fake responses without connecting to an eDOCS server. Set `EDOCS_STUB_MODE=false` and configure `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, and `EDOCS_PASSWORD` to connect to a live OpenText eDOCS server.
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/v1/edocs/status` | Bearer JWT (caseworker) | eDOCS connectivity status and stub mode flag. |
+| `POST` | `/v1/edocs/workspaces/ensure` | Bearer JWT (caseworker) | Create or retrieve a project workspace identified by `projectNumber`. Returns `edocsWorkspaceId`, `edocsWorkspaceName`, and `edocsWorkspaceCreated`. |
+| `POST` | `/v1/edocs/documents` | Bearer JWT (caseworker) | Upload a rendered document to a workspace. Accepts `edocsWorkspaceId`, `documentTemplateId`, and all template variable values. |
+| `GET` | `/v1/edocs/workspaces/:id/documents` | Bearer JWT (caseworker) | List documents stored in a given eDOCS workspace. |
+
+---
+
 ## Task management
 
 | Method | Endpoint | Auth | Description |

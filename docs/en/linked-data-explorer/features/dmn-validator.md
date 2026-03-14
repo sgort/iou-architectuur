@@ -34,7 +34,7 @@ Results are grouped into five layers. Each layer can be expanded to see individu
 | Base DMN | BASE-* | XML well-formedness, namespace, root element, required attributes |
 | Business Rules | BIZ-* | Hit policy, typeRef presence and correctness, rule entry counts, hit-policy overlap detection |
 | Execution Rules | EXEC-* | CPRMV extension attributes, enum values, date formats, BWB IDs |
-| Interaction Rules | INT-* | DRD wiring — href resolution, orphaned inputs, variable names |
+| Interaction Rules | INT-* | DRD wiring — href resolution, orphaned inputs (DRDs only), variable name consistency, missing `inputData` declarations (INT-007) |
 | Content | CON-* | Metadata quality — descriptions, typeRef, text annotations |
 
 A file is **valid** when no layer produces an error. Warnings and informational messages are advisory; they highlight quality improvements recommended for RONL publishing but do not block use.

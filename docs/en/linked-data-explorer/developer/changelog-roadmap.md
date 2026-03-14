@@ -3,6 +3,67 @@
 ---
 
 ## Changelog
+ 
+### v1.2.0 — RIP Phase 1 Bundle & eDOCS Integration (March 2026)
+ 
+**v1.2.0 — New Feature (March 14, 2026)**
+ 
+#### RIP Phase 1 Bundle
+ 
+New deployment bundle for the Regular Infrastructure Projects (RIP) Phase 1 workflow — Provincie Flevoland.
+ 
+- 20-step BPMN process (`RipPhase1Process.bpmn`) covering project definition and preliminary design preparation: intake form, intake meeting, intake report, PSU organisation, PSU execution, PSU report, risk file preparation, preliminary design principles, and two approval gateways with rejection loops
+- `RipProjectTypeAssignment.dmn` — assigns `candidateGroups` and `assignedRoles` from `projectType` and `department`; all rules resolve to `infra-projectteam` / `infra-medewerker`; designed for granular RBAC extension without BPMN changes
+- 7 forms: `rip-intake`, `rip-intake-meeting`, `rip-intake-report`, `rip-psu-organize`, `rip-psu-execution`, `rip-risk-file`, `rip-approval` (reusable at both approval gateways)
+- 3 document templates: `rip-intake-report.document` (column 2), `rip-psu-report.document` (column 3), `rip-pdp.document` (column 4)
+- Bundle deployed to `examples/organizations/flevoland/rip-phase1/`
+ 
+**Files:** `examples/organizations/flevoland/rip-phase1/`
+ 
+#### eDOCS Integration
+ 
+New backend service and external task worker for OpenText eDOCS document management.
+ 
+- `EdocsService` wraps the eDOCS REST API: `connect` (session token caching with auto re-authentication on 401/403), `ensureWorkspace`, `uploadDocument`, `getWorkspaceDocuments`, `healthCheck`
+- `ExternalTaskWorker` polls Operaton via `fetchAndLock` (long-polling, 20s timeout) for two topics: `rip-edocs-workspace` (create/retrieve project workspace, write `edocsWorkspaceId`) and `rip-edocs-document` (render and upload document, write named output variable)
+- Stub mode (`EDOCS_STUB_MODE=true`, default) — all methods return realistic fake responses; full process runs end-to-end without a live eDOCS server; no code changes needed when switching to live
+- Worker started in `app.listen()` callback; stopped cleanly on `SIGTERM`/`SIGINT`
+- 4 new REST endpoints: `GET /v1/edocs/status`, `POST /v1/edocs/workspaces/ensure`, `POST /v1/edocs/documents`, `GET /v1/edocs/workspaces/:id/documents`
+- New environment variables: `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, `EDOCS_PASSWORD`, `EDOCS_STUB_MODE`
+ 
+**Files:** `packages/backend/src/services/edocs.service.ts`, `packages/backend/src/services/externalTaskWorker.service.ts`, `packages/backend/src/routes/edocs.routes.ts`
+ 
+#### DMN Validator — Interaction Rules
+ 
+- **INT-005** scoped to DRDs only — no longer fires on standalone single-decision DMNs; `<inputData>` elements on standalone models serve as input contract declarations for CPSV publishing and do not require `<informationRequirement>` wiring
+- **INT-007** (new) — warns when an `<inputExpression>` references a variable name with no matching top-level `<inputData>` declaration; without this, the CPSV Editor generates an empty request body on deploy
+ 
+**File:** `packages/backend/src/services/dmn-validation.service.ts`
+ 
+**v1.1.2 — Bug Fix (March 11, 2026)**
+ 
+#### Form Editor
+ 
+- **Save** now correctly persists the current schema. `saveSchema()` in form-js 1.20.x returns the schema object directly — not wrapped in `{ schema }`. Destructuring assumption caused `undefined` to be written to `localStorage`, making the active form disappear on the next render.
+- **Export .form** fixed for the same reason.
+- Vite `dedupe` config added for `preact` / `preact/hooks` / `preact/compat` to prevent duplicate Preact instances after npm version round-trips involving `@bpmn-io/*` packages; fixes `TypeError: Cannot read properties of undefined (reading 'context')` on the form canvas.
+ 
+**Known issue:** Typing in a properties panel field (label, key, etc.) loses focus after the first character. Upstream form-js 1.20.x issue — Preact re-renders the properties panel internally on every change event. Will be resolved when an upstream fix is available.
+ 
+**File:** `packages/frontend/vite.config.ts`, `packages/frontend/src/components/FormEditor/FormCanvas.tsx`
+ 
+**v1.1.1 — Enhancement (March 10, 2026)**
+ 
+#### Import from file
+ 
+- **BPMN Modeler** — import `.bpmn` files via the Upload button in the process list header; process name derived from the `name` attribute on the `<process>` element, falling back to filename
+- **Form Editor** — import `.form` files; name derived from the schema `id` field, falling back to filename
+- **Document Composer** — import `.document` files; receives a fresh `id` and timestamps on import to avoid collisions with existing templates
+- All imported items open immediately in their respective editor and are persisted to `localStorage`
+ 
+**Files:** `BpmnModeler/BpmnModeler.tsx`, `FormEditor/FormEditor.tsx`, `DocumentComposer/DocumentComposer.tsx`
+ 
+---
 
 ### v1.1.0 — Document Composer (March 2026)
 

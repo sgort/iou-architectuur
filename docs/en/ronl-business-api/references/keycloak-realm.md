@@ -75,6 +75,8 @@ The `employeeId` claim is present only for users who have the `employee_id` attr
 | `representative` | Representative acting on behalf of a citizen (with mandate) |
 | `caseworker` | Municipality caseworker processing applications |
 | `hr-medewerker` | HR department employee who manages staff onboarding |
+| `infra-projectteam` | Infrastructure project team member — can claim RIP Phase 1 tasks |
+| `infra-medewerker` | Infrastructure employee role assigned via HR onboarding DMN |
 | `admin` | Municipality administrator |
 
 ---
@@ -96,9 +98,13 @@ All test users have password `test123` and `directAccessGrantsEnabled: true`.
 | `test-hr-denhaag` | `denhaag` | `municipality` | `caseworker`, `hr-medewerker` |
 | `test-onboarded-denhaag` | `denhaag` | `municipality` | `caseworker` |
 | `test-caseworker-flevoland` | `flevoland` | `province` | `caseworker` |
+| `test-hr-flevoland` | `flevoland` | `province` | `caseworker`, `hr-medewerker` |
+| `test-infra-flevoland` | `flevoland` | `province` | `caseworker`, `infra-projectteam`, `infra-medewerker` |
 | `test-caseworker-uwv` | `uwv` | `national` | `caseworker` |
 
 `test-hr-denhaag` is the primary HR test account — it holds the `hr-medewerker` realm role and can start onboarding processes and view the Afgeronde onboardingen archive. `test-onboarded-denhaag` simulates an employee who has already been onboarded; logging in with this account triggers an auto-fetch of the completed onboarding record for `emp-test-01`.
+
+`test-hr-flevoland` is the Flevoland HR account for onboarding infrastructure employees. `test-infra-flevoland` is a pre-configured infrastructure team member (`employeeId: EMP-FLV-001`) who can start and work through the RIP Fase 1 process.
 
 ---
 
@@ -113,5 +119,14 @@ docker exec keycloak-acc /opt/keycloak/bin/kc.sh import \
   --override true
 
 # Restart to apply
+cd ~/keycloak/acc
 docker compose restart keycloak-acc
+
+# On the VM, for PROD
+docker exec keycloak-prod /opt/keycloak/bin/kc.sh import \
+  --file /opt/keycloak/data/import/ronl-realm.json \
+  --override true
+
+cd ~/keycloak/prod
+docker compose restart keycloak-prod
 ```

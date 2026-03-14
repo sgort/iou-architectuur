@@ -217,3 +217,17 @@ From v2.4.0, the **Persoonlijke info** top-nav item exposes four left-panel subs
 | Afgeronde onboardingen | `hr-medewerker` only | Browse completed onboardings and view IT handover documents |
 
 For the full walkthrough of each subsection — including the HR onboarding BPMN flow, IT handover document, and completed onboarding archive — see [HR Onboarding Workflow](hr-onboarding.md).
+
+---
+
+## Projecten — RIP Phase 1 (Flevoland)
+
+From v2.6.0, Provincie Flevoland exposes three RIP-specific sections under the **Projecten** top-nav item, accessible to users with the `infra-projectteam` role:
+
+| Section | Description |
+|---|---|
+| RIP Fase 1 starten | Start a new `RipPhase1Process` instance — 17-step process covering intake, PSU, and PDP |
+| RIP Fase 1 WIP | Browse active RIP projects and view produced documents inline |
+| RIP Fase 1 gereed | Browse completed RIP projects and their final document archive |
+
+For the full process walkthrough — forms, document templates, eDOCS integration, and LDE deployment — see [RIP Phase 1 Workflow](rip-phase1-workflow.md).
