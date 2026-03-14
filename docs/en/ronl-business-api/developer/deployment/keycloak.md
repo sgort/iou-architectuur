@@ -404,13 +404,30 @@ The `ronl-realm.json` is imported on the first container start via the `--import
   - SSO session: 30 minutes
   - Refresh token: 30 minutes
 
-### Re-importing after changes
+### Re-importing the realm
+
+After modifying `config/keycloak/ronl-realm.json`:
+
+!!! note "v2.6.0 — RIP Phase 1 roles"
+    This release adds two realm roles (`infra-projectteam`, `infra-medewerker`) and one test user (`test-infra-flevoland`). Re-import the realm on both ACC and PROD before deploying the updated frontend and backend.
 
 ```bash
-# On VM
+# On the VM, for ACC
 docker exec keycloak-acc /opt/keycloak/bin/kc.sh import \
   --file /opt/keycloak/data/import/ronl-realm.json \
   --override true
+
+# Restart to apply
+cd ~/keycloak/acc
+docker compose restart keycloak-acc
+
+# On the VM, for PROD
+docker exec keycloak-prod /opt/keycloak/bin/kc.sh import \
+  --file /opt/keycloak/data/import/ronl-realm.json \
+  --override true
+
+cd ~/keycloak/prod
+docker compose restart keycloak-prod
 ```
 
 ---

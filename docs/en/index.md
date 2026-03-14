@@ -8,13 +8,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.5.1** · *March 2026*
+-   **⚙️ RONL Business API — v2.6.0** · *March 2026*
 
     ---
 
-    **Regelcatalogus, HR Onboarding & Organisation Types**
+    **RIP Phase 1 — Regular Infrastructure Projects (Flevoland)**
 
-    From v2.5.0, the caseworker dashboard includes a public **Regelcatalogus** — services, organisations, NL-SBB concepts, and implementation rules from the RONL knowledge graph, accessible without login. v2.4.0 adds a full **HR Onboarding** BPMN process with DMN role assignment and an IT handover document. v2.4.1 extends multi-tenancy to provinces and national agencies.
+    v2.6.0 adds a full **RIP Phase 1** BPMN process for Provincie Flevoland: 17-step project definition and preliminary design preparation, with eDOCS workspace and document integration. Three document templates (intake report, PSU report, PDP) are authored in the LDE Document Composer and rendered live in the caseworker dashboard across three dedicated Projecten sections — WIP and completed project archives included. A session expiry warning modal and proactive token refresh prevent mid-form authentication failures.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

@@ -221,6 +221,22 @@ The realm configuration is version-controlled in `config/keycloak/ronl-realm.jso
 
 ---
 
+## Session expiry warning
+
+When filling in long forms (such as the intake report), the session may expire before submission. From v2.6.0 a warning modal appears automatically when fewer than 2 minutes remain on the JWT access token:
+
+- **Sessie verlengen** — forces a silent token refresh via `keycloak.updateToken(-1)`. Unsaved form data is preserved.
+- **Uitloggen** — ends the session immediately.
+
+The Axios request interceptor also proactively calls `updateToken(30)` before every API request, so normal activity keeps the session alive automatically.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Session expiring warning](../../../assets/screenshots/ronl-session-expiring-modal.png)
+  <figcaption>Warning modal</figcaption>
+</figure>
+
+---
+
 ## Connecting a real DigiD / eHerkenning / eIDAS provider
 
 The current development environment simulates DigiD with test users in the Keycloak realm. The following documents how to configure Keycloak to broker real government identity providers when going to production. This configuration is done in the Keycloak Admin Console.
