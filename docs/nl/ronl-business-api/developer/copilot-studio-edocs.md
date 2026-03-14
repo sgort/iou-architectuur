@@ -35,4 +35,8 @@
 
 ---
 
+## eDOCS REST API specification notes
+
+---
+
 ## Switching to live mode (DOCUVITT)
