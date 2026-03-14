@@ -33,3 +33,6 @@
 
 ## Configuring Copilot Studio
 
+---
+
+## Switching to live mode (DOCUVITT)
