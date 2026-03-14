@@ -113,6 +113,7 @@ nav:
     - Developer Docs:
       - Local Development Setup: ronl-business-api/developer/local-development.md
       - Backend Development: ronl-business-api/developer/backend-development.md
+      - Copilot Studio — eDOCS: ronl-business-api/developer/copilot-studio-edocs.md
       - Frontend Development: ronl-business-api/developer/frontend-development.md
       - Shared Package: ronl-business-api/developer/shared-package.md
       - Timeline Implementation: ronl-business-api/developer/implementing-timeline.md
