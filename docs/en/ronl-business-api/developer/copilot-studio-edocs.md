@@ -168,3 +168,69 @@ In the Copilot Studio custom connector, configure OAuth 2.0 as follows:
 | **Client Secret** | *(from Keycloak admin console → Clients → copilot-studio-edocs → Credentials)* |
 | **Scope** | `openid` |
 | **Base URL** | `https://acc.api.open-regels.nl/v1/edocs` |
+
+---
+
+## Switching to live mode (DOCUVITT)
+
+No code changes are required. Switching to a live eDOCS server is purely a configuration change.
+
+### 1. Set the environment variables on Azure App Service
+
+```bash
+az webapp config appsettings set \
+  --name ronl-business-api-acc \
+  --resource-group rg-ronl-acc \
+  --settings \
+    EDOCS_BASE_URL="https://<docuvitt-host>/edocsapi/v1.0" \
+    EDOCS_LIBRARY="DOCUVITT" \
+    EDOCS_USER_ID="<user-id-from-credentials>" \
+    EDOCS_PASSWORD="<password-from-credentials>" \
+    EDOCS_STUB_MODE="false"
+```
+
+Do not put these values in any `.env` file in the repository.
+
+### 2. Restart the App Service
+
+Azure restarts the App Service automatically when Application settings are saved. Confirm the deployment slot comes back healthy.
+
+### 3. Verify the switch
+
+```bash
+TOKEN=$(curl -s -X POST \
+  https://acc.keycloak.open-regels.nl/realms/ronl/protocol/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials" \
+  -d "client_id=copilot-studio-edocs" \
+  -d "client_secret=<current-secret>" \
+  | jq -r .access_token)
+
+curl -s https://acc.api.open-regels.nl/v1/edocs/status \
+  -H "Authorization: Bearer $TOKEN" | jq .
+```
+
+`status` should now be `"up"` and `stubMode` should be `false`. A `502` response means `EDOCS_BASE_URL` or the credentials are incorrect.
+
+### 4. Rotate the Keycloak client secret
+
+Once real DOCUVITT credentials are active, the existing client secret must be rotated:
+
+1. Keycloak admin console on ACC → Clients → `copilot-studio-edocs` → Credentials → **Regenerate**
+2. Update the Copilot Studio connector with the new secret
+
+### 5. Repeat for production when ready
+
+```bash
+az webapp config appsettings set \
+  --name ronl-business-api-prod \
+  --resource-group rg-ronl-prod \
+  --settings \
+    EDOCS_BASE_URL="https://<docuvitt-host>/edocsapi/v1.0" \
+    EDOCS_LIBRARY="DOCUVITT" \
+    EDOCS_USER_ID="<user-id-from-credentials>" \
+    EDOCS_PASSWORD="<password-from-credentials>" \
+    EDOCS_STUB_MODE="false"
+```
+
+And rotate the client secret on `keycloak.open-regels.nl` as in step 4.
