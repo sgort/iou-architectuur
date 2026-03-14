@@ -212,9 +212,11 @@ The full RIP Phase 1 bundle lives in `examples/organizations/flevoland/rip-phase
 1. Open the LDE BPMN Canvas and load `RipPhase1Process.bpmn`
 2. Ensure all seven forms are authored and linked to their respective UserTasks via `camunda:formRef`
 3. Ensure the three documents are authored in the Document Composer and linked to their UserTasks via `ronl:documentRef` in the properties panel
-4. Verify the `ronl:` namespace (`http://ronl.nl/schema/1.0`) is declared on the BPMN `<definitions>` element
-5. Click **Deploy** — the LDE packages all files into a single Operaton deployment
-6. Verify the deployment in the Operaton Cockpit under `RipPhase1Process`
+4. Click **Deploy** — the LDE packages all files into a single Operaton deployment
+5. Verify the deployment in the Operaton Cockpit under `RipPhase1Process`
+
+!!! note "DMNs are not part of the deploy bundle"
+    Decision models referenced via `camunda:decisionRef` on `BusinessRuleTask` elements are **not** included in this deployment. DMNs reach Operaton through a separate path: they are published to TriplyDB by the [CPSV Editor](../../cpsv-editor/index.md) and deployed to Operaton from there. The BPMN process resolves `camunda:decisionRef` at runtime against whatever is already deployed — as long as the DMN key matches, no additional action is needed here.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: LDE BPMN Canvas — RipPhase1Process](../../../assets/screenshots/ronl-lde-bpmn-rip-phase1-canvas.png)

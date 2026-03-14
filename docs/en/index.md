@@ -28,13 +28,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.1.0** · *March 2026*
+-   **🔍 Linked Data Explorer — v1.2.0** · *March 2026*
 
     ---
 
-    **Document Composer**
+    **RIP Phase 1 Bundle & eDOCS Integration**
 
-    The Document Composer lets you author formal government decision documents (*beschikkingen*) as structured templates inside the Linked Data Explorer. Templates are zone-based, block-driven, and bound to Operaton process variables — so a document authored here can be rendered at runtime by [MijnOmgeving](../../../ronl-business-api/user-guide/submitting-calculation/#viewing-the-decision) for any completed process instance.
+    v1.2.0 adds a complete **RIP Phase 1** deployment bundle for Provincie Flevoland: a BPMN process covering project definition and preliminary design preparation and a DMN for role assignment. An eDOCS backend service and external task worker automatically create project workspaces and file documents into eDOCS at each milestone. Stub mode lets the full process run end-to-end before a live eDOCS server is available.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
@@ -156,7 +156,7 @@ Python/FastAPI service that fetches individual rules from Dutch and European leg
 
 ## Technology Stack
 
-The IOU Architecture ecosystem is - apart from TriplyDB - built entirely on **open source technologies**:
+The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entirely on **open source technologies**:
 
 | Component           | Technology        | License            |
 | ------------------- | ----------------- | ------------------ |
@@ -168,6 +168,7 @@ The IOU Architecture ecosystem is - apart from TriplyDB - built entirely on **op
 | **Cache**           | Redis             | BSD 3-Clause       |
 | **Reverse Proxy**   | Caddy             | Apache 2.0         |
 | **Knowledge Graph** | TriplyDB          | -                  |
+| **Document Mngmnt** | eDOCS             | -                  |
 | **Rule API**        | Python / FastAPI  | EUPL-1.2           |
 
 ---

@@ -4,6 +4,51 @@
 
 ## Changelog
 
+### v2.6.0 — Feature Release (March 13, 2026)
+
+**RIP Phase 1 — Process Bundle (Flevoland)** 🏗️
+
+- `RipPhase1Process` BPMN deployed: 17-step process covering intake → eDOCS workspace → intake meeting → intake report → approval loop → PSU → PSU report → risk file → PDP → approval loop → end.
+- `RipProjectTypeAssignment` DMN maps `department` + `projectType` to `candidateGroups` (`infra-projectteam`) and `assignedRoles` (`infra-medewerker`). Hit policy FIRST; structured for per-role granularity in future iterations.
+- Seven task forms: `rip-intake`, `rip-intake-meeting`, `rip-intake-report`, `rip-psu-organize`, `rip-psu-execution`, `rip-risk-file`, `rip-approval` (reusable at both approval gateways).
+- Three document templates bundled in deployment: `rip-intake-report.document` (Column 2), `rip-psu-report.document` (Column 3), `rip-pdp.document` (Column 4).
+- eDOCS integration via Operaton external task pattern — LDE backend worker polls topics `rip-edocs-workspace` (writes `edocsWorkspaceId`) and `rip-edocs-document` (writes `edocsIntakeReportId`, `edocsPsuReportId`, `edocsPdpId`). Stub mode (`EDOCS_STUB_MODE=true`) active by default.
+- `EmployeeRoleAssignment` DMN updated: all `infrastructuur` department rules prepend `infra-projectteam` to `candidateGroups` so onboarded infrastructure employees can claim RIP tasks without a separate configuration step.
+
+**RIP Phase 1 — Caseworker Dashboard** 🏛️
+
+- Projecten → **RIP Fase 1 starten**: role-gated to `infra-projectteam`; starts `RipPhase1Process` with a single button; success state directs to Taken.
+- Projecten → **RIP Fase 1 WIP**: lists all active `RipPhase1Process` instances for the municipality, enriched with `projectNumber`, `projectName`, `edocsWorkspaceId`, and start date. Expands to three collapsible document sections (Intakeverslag, PSU-verslag, Voorlopige Ontwerpuitgangspunten); documents not yet produced show "Nog niet beschikbaar".
+- Projecten → **RIP Fase 1 gereed**: identical layout to WIP; shows completed instances with completion date via `GET /v1/rip/phase1/completed`.
+- Document rendering reuses the TipTap/ProseMirror zone renderer from `DecisionViewer` with zone key normalisation (`signoff`/`signOff`, `contactInfo`/`contactInformation`).
+
+**Backend — RIP Phase 1 Endpoints** ⚙️
+
+- `GET /v1/rip/phase1/active` — lists active `RipPhase1Process` instances for the caseworker's municipality.
+- `GET /v1/rip/phase1/:instanceId/documents` — returns all three document templates from the deployment bundle plus current process variables in a single response; absent documents return `null`.
+- `GET /v1/rip/phase1/completed` — lists completed `RipPhase1Process` instances enriched with `endTime`.
+- All three endpoints apply municipality-based tenant isolation consistent with all other process routes.
+- eDOCS endpoints: `GET /v1/edocs/status`, `POST /v1/edocs/workspaces/ensure`, `POST /v1/edocs/documents`, `GET /v1/edocs/workspaces/:id/documents`.
+
+**Keycloak — Flevoland RIP Roles** 🔑
+
+- `infra-projectteam` and `infra-medewerker` realm roles added to `ronl-realm.json`.
+- `test-infra-flevoland` test user added with roles `caseworker`, `infra-projectteam`, `infra-medewerker` and attributes `municipality=flevoland`, `employeeId=EMP-FLV-001`.
+
+**Caseworker Dashboard — UX** ✨
+
+- Procesgegevens panel restyled to match RIP WIP document sections — bordered card with consistent ▲/▼ toggle.
+- `roleResult` intermediate DMN variable excluded from Procesgegevens display.
+- RIP WIP zone key normalisation fixes crash when expanding Intakeverslag.
+
+**Session Expiry Warning** ⏱️
+
+- `SessionExpiryWarning` component mounted in the caseworker dashboard — polls token expiry every 15 seconds and shows a modal when fewer than 2 minutes remain.
+- Modal offers **Sessie verlengen** (forces `updateToken`) and **Uitloggen**; unsaved form data is preserved when extending.
+- Axios request interceptor upgraded to proactively call `updateToken(30)` before every API request; forces re-login if the SSO session is gone.
+
+---
+
 ### v2.5.1 — Enhancement (March 12, 2026)
 
 **Caseworker Dashboard — Changelog Panel** 📋
@@ -314,7 +359,11 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 | Backend Regelcatalogus endpoint (SPARQL + cache)         | v2.5.0  |
 | Changelog Panel in caseworker dashboard header           | v2.5.1  |
 | Nieuws — Government.nl RSS feed                          | v2.5.1  |
-
+| RIP Phase 1 process bundle (Flevoland)                   | v2.6.0  |
+| eDOCS integration — external task worker + stub mode     | v2.6.0  |
+| RIP Fase 1 starten / WIP / gereed dashboard sections     | v2.6.0  |
+| `infra-projectteam` and `infra-medewerker` realm roles   | v2.6.0  |
+| Session expiry warning modal + proactive token refresh   | v2.6.0  |
 ---
 
 ### Planned
