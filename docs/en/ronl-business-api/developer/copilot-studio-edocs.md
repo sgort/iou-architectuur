@@ -240,7 +240,23 @@ Do not put these values in any `.env` file in the repository.
 
 ### 2. Restart the App Service
 
-Azure restarts the App Service automatically when Application settings are saved. Confirm the deployment slot comes back healthy.
+Azure restarts the App Service automatically when Application settings are saved. Confirm the slot is back up:
+ 
+```bash
+az webapp show \
+  --name ronl-business-api-acc \
+  --resource-group rg-ronl-acc \
+  --query "state" \
+  --output tsv
+```
+ 
+Then confirm the application itself is healthy:
+ 
+```bash
+curl -s https://acc.api.open-regels.nl/v1/health | jq .data.status
+```
+ 
+`Running` from Azure confirms the process started. `"healthy"` from the health endpoint confirms Express is bound and all dependencies are reachable.
 
 ### 3. Verify the switch
 
