@@ -289,8 +289,8 @@ az webapp config appsettings set \
   --name ronl-business-api-prod \
   --resource-group rg-ronl-prod \
   --settings \
-    EDOCS_BASE_URL="https://<docuvitt-host>/edocsapi/v1.0" \
-    EDOCS_LIBRARY="DOCUVITT" \
+    EDOCS_BASE_URL="https://<docuvitp-host>/edocsapi/v1.0" \
+    EDOCS_LIBRARY="DOCUVITP" \
     EDOCS_USER_ID="<user-id-from-credentials>" \
     EDOCS_PASSWORD="<password-from-credentials>" \
     EDOCS_STUB_MODE="false"

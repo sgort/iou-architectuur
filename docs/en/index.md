@@ -8,13 +8,10 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.6.0** · *March 2026*
+-   **⚙️ RONL Business API — v2.7.0** · *March 2026*
 
-    ---
-
-    **RIP Phase 1 — Regular Infrastructure Projects (Flevoland)**
-
-    v2.6.0 adds a full **RIP Phase 1** BPMN process for Provincie Flevoland: 17-step project definition and preliminary design preparation, with eDOCS workspace and document integration. Three document templates (intake report, PSU report, PDP) are authored in the LDE Document Composer and rendered live in the caseworker dashboard across three dedicated Projecten sections — WIP and completed project archives included. A session expiry warning modal and proactive token refresh prevent mid-form authentication failures.
+    v2.6.0 adds a full [RIP Phase 1 Workflow](ronl-business-api/user-guide/rip-phase1-workflow.md) process for Provincie Flevoland: 17-step project definition and preliminary design preparation, with eDOCS workspace and document integration.
+    v2.7.0 adds [eDOCS live mode](ronl-business-api/developer/copilot-studio-edocs.md): `EdocsService` and `ExternalTaskWorker` ported from LDE; Copilot Studio connected via OAuth 2.0 (Client Credentials) against Keycloak.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
@@ -24,7 +21,7 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     **DMN Syntactic Validation**
 
-    Inline DMN validation immediately after upload: five-layer syntactic checks with severity-coded results (error / warning / info), element references, and line numbers — directly in the DMN file card.
+    Inline [DMN validation](linked-data-explorer/reference/dmn-validation-reference.md) immediately after upload: five-layer syntactic checks with severity-coded results (error / warning / info), element references, and line numbers — directly in the DMN file card.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
@@ -34,7 +31,7 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     **RIP Phase 1 Bundle & eDOCS Integration**
 
-    v1.2.0 adds a complete **RIP Phase 1** deployment bundle for Provincie Flevoland: a BPMN process covering project definition and preliminary design preparation and a DMN for role assignment. An eDOCS backend service and external task worker automatically create project workspaces and file documents into eDOCS at each milestone. Stub mode lets the full process run end-to-end before a live eDOCS server is available.
+    v1.2.0 adds a complete [RIP Phase 1 deployment bundle](linked-data-explorer/features/rip-phase1-bundle.md) for Provincie Flevoland: a BPMN process covering project definition and preliminary design preparation and a DMN for role assignment. An eDOCS backend service and external task worker automatically create project workspaces and file documents into eDOCS at each milestone. Stub mode lets the full process run end-to-end before a live eDOCS server is available.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

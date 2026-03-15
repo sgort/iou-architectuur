@@ -27,10 +27,13 @@ packages/backend/src/
 │   └── jwt.middleware.ts       # JWT signature validation, JWKS caching
 ├── services/
 │   ├── operaton.service.ts     # Operaton REST API client
-│   └── audit.service.ts        # Audit log database writes
+│   ├── audit.service.ts        # Audit log database writes
+│   ├── edocs.service.ts        # OpenText eDOCS REST API client (stub + live)
+│   └── externalTaskWorker.service.ts  # Operaton external task long-poll worker
 └── utils/
     ├── config.ts               # Typed configuration from environment variables
-    └── logger.ts               # Winston logger (JSON format in prod)
+    ├── logger.ts               # Winston logger (JSON format in prod)
+    └── errors.ts               # getErrorMessage() helper
 ```
 
 ---
@@ -89,6 +92,32 @@ import myfeatureRoutes from './myfeature.routes';
 router.use('/v1/myfeature', myfeatureRoutes);
 router.use('/api/myfeature', deprecationMiddleware('/v1/myfeature'), myfeatureRoutes);
 ```
+
+---
+ 
+## eDOCS service and external task worker
+ 
+`edocs.service.ts` wraps the OpenText eDOCS REST API. It authenticates once via `POST /connect`, caches the `X-DM-DST` session token extracted from the `Set-Cookie` response header, and re-authenticates automatically on `401`/`403`. Key methods:
+ 
+```typescript
+ensureWorkspace(projectNumber: string, projectName: string): Promise<EdocsWorkspaceResult>
+uploadDocument(workspaceId: string, filename: string, contentBase64: string, metadata: EdocsDocumentMetadata): Promise<EdocsDocumentResult>
+getWorkspaceDocuments(workspaceId: string): Promise<...>
+healthCheck(): Promise<{ status: 'up' | 'down' | 'stub' }>
+```
+ 
+When `EDOCS_STUB_MODE=true` (the default), all methods return realistic fake data and log what they would have done. The stub is transparent — callers cannot distinguish it from a live server.
+ 
+`externalTaskWorker.service.ts` polls Operaton's external task API (`POST /external-task/fetchAndLock`) using long-polling (`asyncResponseTimeout: 20 000 ms`). It handles two topics:
+ 
+| Topic | Reads | Writes |
+|---|---|---|
+| `rip-edocs-workspace` | `projectNumber`, `projectName` | `edocsWorkspaceId`, `edocsWorkspaceName`, `edocsWorkspaceCreated` |
+| `rip-edocs-document` | `edocsWorkspaceId`, `documentTemplateId`, `edocsDocumentVariableName`, + template variables | `<edocsDocumentVariableName>` (e.g. `edocsIntakeReportId`) |
+ 
+The worker is started inside the `app.listen()` callback and stopped in both `SIGTERM` and `SIGINT` handlers. It will not begin polling until the HTTP server is fully bound.
+ 
+For configuration and live-mode switchover, see [Copilot Studio — eDOCS OAuth Integration](copilot-studio-edocs.md).
 
 ---
 
