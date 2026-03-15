@@ -259,17 +259,77 @@ These endpoints require a valid JWT with the `caseworker` role. Tenant isolation
 ```
 
 ---
-
+ 
 ## eDOCS
-
-These endpoints require a valid JWT with the `caseworker` role. In development, `EDOCS_STUB_MODE=true` (default) means all calls return realistic fake responses without connecting to an eDOCS server. Set `EDOCS_STUB_MODE=false` and configure `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, and `EDOCS_PASSWORD` to connect to a live OpenText eDOCS server.
-
+ 
+All `/v1/edocs` endpoints require a Bearer JWT issued by Keycloak (`aud: ronl-business-api`). They are intended for machine-to-machine access — the primary consumer is Microsoft Copilot Studio via the `copilot-studio-edocs` Keycloak client, though they can be called by any authenticated client.
+ 
+When `EDOCS_STUB_MODE=true` (default on ACC), all endpoints return realistic fake responses. No live eDOCS server is contacted.
+ 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| `GET` | `/v1/edocs/status` | Bearer JWT (caseworker) | eDOCS connectivity status and stub mode flag. |
-| `POST` | `/v1/edocs/workspaces/ensure` | Bearer JWT (caseworker) | Create or retrieve a project workspace identified by `projectNumber`. Returns `edocsWorkspaceId`, `edocsWorkspaceName`, and `edocsWorkspaceCreated`. |
-| `POST` | `/v1/edocs/documents` | Bearer JWT (caseworker) | Upload a rendered document to a workspace. Accepts `edocsWorkspaceId`, `documentTemplateId`, and all template variable values. |
-| `GET` | `/v1/edocs/workspaces/:id/documents` | Bearer JWT (caseworker) | List documents stored in a given eDOCS workspace. |
+| `GET` | `/v1/edocs/status` | Bearer JWT | Returns service health: `status` (`stub`, `up`, or `down`), `library`, `stubMode`, and optional `latencyMs` |
+| `POST` | `/v1/edocs/workspaces/ensure` | Bearer JWT | Creates or retrieves a project workspace. Returns `workspaceId`, `workspaceName`, `created` |
+| `POST` | `/v1/edocs/documents` | Bearer JWT | Uploads a base64-encoded document to a workspace. Returns `documentId`, `documentNumber`, `workspaceId` |
+| `GET` | `/v1/edocs/workspaces/:workspaceId/documents` | Bearer JWT | Lists all documents in a workspace |
+ 
+**`GET /v1/edocs/status` response:**
+ 
+```json
+{
+  "success": true,
+  "data": {
+    "status": "stub",
+    "library": "DOCUVITT",
+    "stubMode": true
+  },
+  "timestamp": "2026-03-14T20:32:47.462Z"
+}
+```
+ 
+**`POST /v1/edocs/workspaces/ensure` request body:**
+ 
+```json
+{
+  "projectNumber": "FL-INF-2025-042",
+  "projectName": "N308 Reconstructie"
+}
+```
+ 
+**`POST /v1/edocs/documents` request body:**
+ 
+```json
+{
+  "workspaceId": "2993896",
+  "filename": "rip-intake-report-FL-INF-2025-042.txt",
+  "contentBase64": "<base64-encoded content>",
+  "metadata": {
+    "docName": "FL-INF-2025-042 — Intake Report — N308 Reconstructie",
+    "appId": "INFRA"
+  }
+}
+```
+ 
+**`GET /v1/edocs/workspaces/:workspaceId/documents` response:**
+ 
+```json
+{
+  "success": true,
+  "data": {
+    "workspaceId": "2993896",
+    "documents": [
+      {
+        "id": "stub-doc-1",
+        "name": "rip-intake-report.pdf",
+        "documentNumber": "2993898"
+      }
+    ]
+  },
+  "timestamp": "2026-03-14T20:32:53.462Z"
+}
+```
+ 
+For OAuth setup and curl verification, see [Copilot Studio — eDOCS OAuth Integration](../developer/copilot-studio-edocs.md).
 
 ---
 

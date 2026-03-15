@@ -4,6 +4,26 @@
 
 ## Changelog
 
+## v2.7.0 — March 14, 2026
+ 
+### eDOCS Service — Live Mode
+ 
+`EdocsService` ported to `packages/backend/src/services/edocs.service.ts`: session token caching via `POST /connect`, automatic re-authentication on 401/403, `ensureWorkspace`, `uploadDocument`, `getWorkspaceDocuments`, and `healthCheck`. When `EDOCS_STUB_MODE=true` (default) all methods return realistic fake responses — the stub is fully transparent to callers.
+ 
+`ExternalTaskWorker` ported to `packages/backend/src/services/externalTaskWorker.service.ts`: long-polling Operaton's external task API on topics `rip-edocs-workspace` and `rip-edocs-document`. The worker starts inside the `app.listen()` callback and stops cleanly on `SIGTERM`/`SIGINT`.
+ 
+`edocs.routes.ts` rewritten to delegate to `EdocsService` — all four endpoints (`/status`, `/workspaces/ensure`, `/documents`, `/workspaces/:id/documents`) are now backed by the service rather than hardcoded stub responses.
+ 
+`config.ts` extended with an `edocs` block reading `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, `EDOCS_PASSWORD`, and `EDOCS_STUB_MODE`. `utils/errors.ts` added with the `getErrorMessage()` helper.
+ 
+### Copilot Studio — eDOCS OAuth Connection
+ 
+Keycloak client `copilot-studio-edocs` registered in `ronl-realm`: confidential, service accounts enabled, Client Credentials grant only, audience mapper targeting `ronl-business-api`. The OAuth 2.0 connection was verified end-to-end on ACC.
+ 
+See [Copilot Studio — eDOCS OAuth Integration](copilot-studio-edocs.md) for the full setup, curl verification steps and Live Mode switch.
+
+---
+
 ### v2.6.0 — Feature Release (March 13, 2026)
 
 **RIP Phase 1 — Process Bundle (Flevoland)** 🏗️

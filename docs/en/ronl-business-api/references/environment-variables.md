@@ -37,6 +37,17 @@
 | `OPERATON_BASE_URL` | Yes | `https://operaton.open-regels.nl/engine-rest` |
 | `OPERATON_TIMEOUT` | No | `30000` | Request timeout in ms |
 
+### eDOCS
+ 
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `EDOCS_BASE_URL` | Yes (live mode) | — | eDOCS REST API base URL, e.g. `https://docuvitt-host/edocsapi/v1.0` |
+| `EDOCS_LIBRARY` | Yes (live mode) | `DOCUVITT` | eDOCS library name |
+| `EDOCS_USER_ID` | Yes (live mode) | — | eDOCS service account user ID |
+| `EDOCS_PASSWORD` | Yes (live mode) | — | eDOCS service account password |
+| `EDOCS_STUB_MODE` | No | `true` | When `true`, all eDOCS service methods return realistic fake responses. Set to `false` to enable live calls. Never commit real credentials to the repository — use Azure App Service Application settings. |
+ 
+
 ### Database (PostgreSQL)
 
 | Variable | Required | Description |
