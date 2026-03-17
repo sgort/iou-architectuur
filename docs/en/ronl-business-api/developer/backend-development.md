@@ -282,3 +282,65 @@ const dbPassword = await client.getSecret('db-password');
 
 The App Service managed identity must be granted `Key Vault Secrets User` on the vault.
 
+`CORS_ORIGIN` in `.env` is a comma-separated list. In production it is `https://mijn.open-regels.nl`. In ACC it is `https://acc.mijn.open-regels.nl`. In local development it is `http://localhost:5173`.
+
+---
+
+## Audit logging
+
+### Architecture
+
+Audit logging spans two files:
+
+- `src/types/audit.types.ts` — `AuditLogEntry` interface, the single source of truth for the shape of an audit record
+- `src/middleware/audit.middleware.ts` — `auditMiddleware` (automatic per-request logging) and `auditLog()` (explicit action logging from route handlers); re-exports `AuditLogEntry` for backward compatibility
+- `src/services/audit.service.ts` — pg-promise connection pool and `persistAuditLog()`
+
+### Automatic vs. explicit logging
+
+Every authenticated request is logged automatically by `auditMiddleware`, which wraps `res.end` and calls `createAuditLog()` after the response is sent. The action is `${req.method} ${req.path}` and the result is derived from the HTTP status code:
+
+| Status range | Result |
+|---|---|
+| 200–399 | `success` |
+| 400–499 | `failure` |
+| 500+ | `error` |
+
+Route handlers can additionally call `auditLog()` directly to record domain-level actions with richer detail:
+```typescript
+auditLog(req, 'process.start.zorgtoeslag', 'success', {
+  processInstanceId: instance.id,
+});
+```
+
+### Database persistence
+
+`persistAuditLog()` in `audit.service.ts` writes each entry to the `audit_logs` table on Azure PostgreSQL Flexible Server using a pg-promise named-parameter `INSERT`. It is called fire-and-forget from `createAuditLog()` — errors are caught and logged but never propagated to the request cycle, so a database outage does not affect API availability.
+
+`initDb()` is called at server startup to verify connectivity. If the database is unreachable at startup, the backend falls back to in-memory logging and logs a warning. In-memory entries are not persisted to the database later; they exist only for the lifetime of the process.
+
+See [PostgreSQL Deployment](deployment/postgresql.md) for schema, firewall, and connection string setup.
+
+### Skipping self-referential entries
+
+`GET /audit` requests are excluded from the audit log to prevent the Audit Log viewer from recording its own page loads. The skip is applied inside `auditMiddleware` before `createAuditLog()` is called:
+```typescript
+if (req.path === '/audit') {
+  return originalEnd.apply(this, args as any);
+}
+```
+
+### Known issues fixed
+
+**IP address format on Azure App Service**
+
+`req.ip` on Azure App Service includes the port (`77.161.155.118:40796`). PostgreSQL's `inet` type does not accept a port suffix, causing every `INSERT` to fail silently. Fixed in `audit.service.ts` by stripping the port before the insert:
+```typescript
+ipAddress: entry.ipAddress ? entry.ipAddress.replace(/:\d+$/, '') : null,
+```
+
+This only affects Azure — local Express sets `req.ip` without a port.
+
+**Audit log viewer pagination reset**
+
+The `useEffect` that triggers `loadAuditLogs(0)` on section entry incorrectly included `auditLogs.length` in its dependency array. When "Meer laden" appended records, the length change re-fired the effect and reset pagination to offset 0. Fixed by removing `auditLogs.length` from the dependency array — `activeSection` changing to `audit-overzicht` or `audit-details` is sufficient to trigger the initial load.

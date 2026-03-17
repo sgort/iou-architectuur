@@ -128,6 +128,7 @@ nav:
         - Backend (Azure App Service): ronl-business-api/developer/deployment/backend.md
         - Frontend (Azure Static Web Apps): ronl-business-api/developer/deployment/frontend.md
         - Caddy (Reverse Proxy): ronl-business-api/developer/deployment/caddy.md
+        - PostgreSQL (Azure): ronl-business-api/developer/deployment/postgresql.md
     - References:
       - API Endpoints: ronl-business-api/references/api-endpoints.md
       - BRP API Endpoints: ronl-business-api/references/brp-api-endpoints.md

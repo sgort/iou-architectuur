@@ -8,10 +8,10 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.7.0** · *March 2026*
+-   **⚙️ RONL Business API — v2.7.1** · *March 2026*
 
     v2.6.0 adds a full [RIP Phase 1 Workflow](ronl-business-api/user-guide/rip-phase1-workflow.md) process for Provincie Flevoland: 17-step project definition and preliminary design preparation, with eDOCS workspace and document integration.
-    v2.7.0 adds [eDOCS live mode](ronl-business-api/developer/copilot-studio-edocs.md): `EdocsService` and `ExternalTaskWorker` ported from LDE; Copilot Studio connected via OAuth 2.0 (Client Credentials) against Keycloak.
+    v2.7.0 adds [eDOCS live mode](ronl-business-api/developer/copilot-studio-edocs.md): `EdocsService` and `ExternalTaskWorker` ported from LDE; Copilot Studio connected via OAuth 2.0 (Client Credentials) against Keycloak. v2.7.1 adds new "Audit log" top-nav tab with two left panel sections: Overzicht and Details
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
