@@ -10,7 +10,7 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 -   **⚙️ RONL Business API — v2.8.2** · *March 2026*
 
-    M2M API: `/v1/m2m/*` route group exposes the full Operaton surface (process, task, decision) to machine-to-machine clients via OAuth 2.0 Client Credentials, without tenant scoping. `operaton-mcp-client` Keycloak client registered; dedicated Operaton instance configurable via `PERATON_M2M_BASE_URL`. Audit log records M2M activity by Keycloak client ID. See [Operaton MCP Client](ronl-business-api/developer/operaton-mcp-client.md)
+    M2M API: `/v1/m2m/*` route group exposes the full Operaton surface (process, task, decision) to machine-to-machine clients via OAuth 2.0 Client Credentials, without tenant scoping. `operaton-mcp-client` Keycloak client registered; dedicated Operaton instance configurable via `OPERATON_M2M_BASE_URL`. Audit log records M2M activity by Keycloak client ID. See [Operaton MCP Client](ronl-business-api/developer/operaton-mcp-client.md)
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
