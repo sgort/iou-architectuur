@@ -194,6 +194,20 @@ To add a new section, add an entry here and implement the corresponding case in 
 
 ---
 
+## Tenant-scoped vs platform-scoped features
+
+Not all dashboard features are controlled by `tenants.json`. There are two distinct categories:
+
+**Tenant-scoped features** are configured per organisation in `tenants.json` via `leftPanelSections`. They vary between tenants — a section present for Flevoland may be absent for Utrecht. Adding or removing a tenant-scoped feature requires only a `tenants.json` change; no code is touched.
+
+**Platform-scoped features** are hardcoded in `CaseworkerDashboard.tsx` and apply across all tenants. They are not controlled by organisation — instead, visibility is gated by **role**. A platform-scoped feature is either present for all tenants (if the user holds the required role) or absent for all tenants (if they do not).
+
+The **audit log** is the primary example of a platform-scoped feature. It is not listed in any tenant's `leftPanelSections`, it shows cross-tenant data, and its visibility is governed by the `admin` role — not by organisation. Two other features follow the same pattern: the **Changelog button** in the top navigation bar and **top navigation filtering** (which hides top-nav pages that have no accessible sections for the current user). Both are rendered unconditionally in `CaseworkerDashboard.tsx` and are unaffected by tenant configuration.
+
+The practical rule when adding new dashboard functionality: if the feature is organisation-specific, add it to `tenants.json` and implement the render case in `renderContent()`. If the feature is cross-tenant and role-gated, add it directly to `CaseworkerDashboard.tsx` without touching `tenants.json`.
+
+---
+
 ## Related documentation
 
 - [Caseworker Workflow](../user-guide/caseworker-workflow.md) — Task queue, claim, complete, AWB Kapvergunning

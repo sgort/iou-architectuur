@@ -70,6 +70,10 @@ Every API request passes through the tenant middleware, which:
 
 Process instances from one tenant are never returned to another. Audit log queries are always filtered by `municipality`.
 
+### PostgreSQL tenants table
+
+A `tenants` table exists in the `audit_logs` database and mirrors the entries in `tenants.json`. It is **bookkeeping only** — no backend middleware or route queries it at runtime. Tenant context is derived entirely from JWT claims (`municipality`, `organisation_type`) that Keycloak injects at login. The table was designed for future admin tooling such as per-tenant rate limiting (the `config` JSONB column already carries `maxProcessInstances`) and tenant management APIs. Until that tooling is built, the table can be treated as a registry for operational reference. A consequence of this design is that omitting a tenant from the table has no effect on runtime behaviour — the ACC environment operated without the table entirely and all tenant isolation worked correctly via JWT claims alone.
+
 ---
 
 ## Organisation types

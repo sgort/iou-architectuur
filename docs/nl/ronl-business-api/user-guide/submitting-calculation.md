@@ -17,7 +17,7 @@
 
 ### Submitting the application
 
-### SWhat happens in the background
+### What happens in the background
 
 ### Viewing the decision
 

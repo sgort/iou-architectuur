@@ -4,6 +4,62 @@
 
 ## Changelog
 
+## v2.8.2 — March 19, 2026
+
+### Audit log — database persistence fixes
+
+`persistAuditLog()` in `audit.service.ts` refactored to pass an explicit named-parameter object to pg-promise instead of spreading `AuditLogEntry`. The spread caused pg-promise to throw `Property 'resourceType' doesn't exist` for any field not referenced in the SQL template (specifically `azp` added in v2.8.1), silently suppressing all audit log writes to the database on ACC.
+
+`ipAddress` port stripping now applied in the explicit object — Azure App Service appends the port to `req.ip`, which is invalid for PostgreSQL `inet` type. This error was masked by the spread error and is now also fixed.
+
+---
+
+## v2.8.1 — March 19, 2026
+
+### Audit log — M2M tenant fallback
+
+`persistAuditLog()` now falls back to the `azp` claim when `tenantId` is absent, preventing a NOT NULL violation on `tenant_id` for service account tokens. The fallback is applied only at the point of DB persistence — `req.user.tenantId` is unchanged.
+
+`jwt.middleware.ts` reverted: `tenantId` is set exclusively from the `municipality` claim. The earlier `azp` fallback on `req.user` caused `tenantMiddleware` to pass M2M tokens through to tenant-scoped routes, returning empty data instead of `MISSING_TENANT`.
+
+`azp?: string` added to `AuditLogEntry` in `audit.types.ts` and to `AuthContext` in `auth.types.ts`. `azp` populated on `req.auth` in `jwt.middleware.ts` and passed through `createAuditLog()` — eliminates type casts in `audit.middleware.ts`.
+
+---
+
+## v2.8.0 — March 19, 2026
+ 
+### M2M API — Operaton access
+ 
+New `/v1/m2m/*` route group in `m2m.routes.ts` applies `jwtMiddleware` only — no `tenantMiddleware`. M2M clients are system actors not scoped to a single organisation, so tenant isolation is intentionally absent.
+ 
+The full Operaton surface is exposed: process (list, start, status, variables, historic-variables, history, decision-document, start-form, variable-hints, delete), task (list, get, variables, form-schema, claim, complete), and decision (evaluate, get).
+ 
+A `M2M_ALLOWED_OPERATIONS` constant at the top of `m2m.routes.ts` acts as a curation gate — comment out any entry to disable that operation with no other code changes required.
+ 
+Dedicated Operaton instance supported via `OPERATON_M2M_BASE_URL`, `OPERATON_M2M_USERNAME`, `OPERATON_M2M_PASSWORD` — falls back to the shared instance when unset. On ACC, the M2M routes point at `operaton-doc.open-regels.nl`.
+ 
+See [Operaton MCP Client](operaton-mcp-client.md) for the full setup, curl verification steps, and curation instructions.
+ 
+### OperatonService — new public methods and constructor
+ 
+`getUserTasks()` parameters made optional — `tenantId` omitted returns an unfiltered task list; existing callers with `tenantId` are unaffected.
+ 
+`getTaskVariables(taskId)` added: resolves `processInstanceId` via `getTask()`, returns flattened process variables.
+ 
+`listProcessInstances(params?)`, `queryProcessHistory(body)`, and `getDecisionDefinition(key)` added as thin pass-throughs to Operaton with no tenant filter, intended for M2M callers.
+ 
+`OperatonService` constructor updated to accept optional `baseUrl`, `username`, and `password` parameters — the existing singleton instantiation is unchanged.
+ 
+### Keycloak — operaton-mcp-client
+ 
+New confidential client `operaton-mcp-client` registered in the `ronl` realm: service accounts enabled, Client Credentials grant only, audience mapper targeting `ronl-business-api`. No `municipality` or `organisation_type` claims — M2M client has no tenant context by design.
+ 
+### Audit log — M2M tenant fallback
+ 
+`extractUser()` in `jwt.middleware.ts` falls back to the `azp` claim when `municipality` is absent, preventing a NOT NULL violation on `tenant_id` for service account tokens. M2M audit entries record `tenant_id` as the Keycloak client ID (e.g. `operaton-mcp-client`).
+ 
+---
+
 ## v2.7.0 — March 14, 2026
  
 ### eDOCS Service — Live Mode
