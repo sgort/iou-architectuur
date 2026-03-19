@@ -13,6 +13,7 @@ packages/backend/src/
 │   ├── index.ts                # Route registration (v1/* and legacy api/*)
 │   ├── health.routes.ts        # GET /v1/health
 │   ├── decision.routes.ts      # POST /v1/decision/:key/evaluate
+│   ├── m2m.routes.ts           # GET|POST|DELETE /v1/m2m/* (M2M, jwtMiddleware only)
 │   ├── process.routes.ts       # POST /v1/process/:key/start, GET/DELETE
 │   ├── template.routes.ts      # GET /v1/chains/templates
 │   ├── triplydb.routes.ts      # GET /v1/triplydb (TriplyDB proxy)
@@ -118,6 +119,28 @@ When `EDOCS_STUB_MODE=true` (the default), all methods return realistic fake dat
 The worker is started inside the `app.listen()` callback and stopped in both `SIGTERM` and `SIGINT` handlers. It will not begin polling until the HTTP server is fully bound.
  
 For configuration and live-mode switchover, see [Copilot Studio — eDOCS OAuth Integration](copilot-studio-edocs.md).
+
+---
+ 
+## M2M route group
+ 
+`m2m.routes.ts` exposes the full Operaton surface to machine-to-machine clients without tenant scoping. It applies `jwtMiddleware` only — `tenantMiddleware` is intentionally absent.
+ 
+A `M2M_ALLOWED_OPERATIONS` constant at the top of the file controls which operations are active. Commenting out an entry returns `403 OPERATION_NOT_PERMITTED` for that operation with no other code changes required.
+ 
+The route group is instantiated with a dedicated `OperatonService` when `OPERATON_M2M_BASE_URL` is set, otherwise it reuses the shared singleton:
+ 
+```typescript
+const m2mOperatonService = config.operaton.m2mBaseUrl
+  ? new OperatonService(
+      config.operaton.m2mBaseUrl,
+      config.operaton.m2mUsername,
+      config.operaton.m2mPassword
+    )
+  : operatonService;
+```
+ 
+See [Operaton MCP Client](operaton-mcp-client.md) for the full endpoint reference and Keycloak setup.
 
 ---
 

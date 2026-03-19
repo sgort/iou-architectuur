@@ -332,6 +332,58 @@ When `EDOCS_STUB_MODE=true` (default on ACC), all endpoints return realistic fak
 For OAuth setup and curl verification, see [Copilot Studio — eDOCS OAuth Integration](../developer/copilot-studio-edocs.md).
 
 ---
+ 
+## M2M — Operaton
+ 
+All `/v1/m2m` endpoints require a Bearer JWT issued by Keycloak (`aud: ronl-business-api`). Only `jwtMiddleware` is applied — no tenant scoping. These endpoints are intended for the `operaton-mcp-client` Keycloak client and other system-level callers.
+ 
+The curation gate in `m2m.routes.ts` controls which operations are active. See [Operaton MCP Client](../developer/operaton-mcp-client.md) for details.
+ 
+### Process
+ 
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/v1/m2m/process` | List active process instances across all organisations. Query params forwarded to Operaton. |
+| `POST` | `/v1/m2m/process/:key/start` | Start a process instance by definition key |
+| `GET` | `/v1/m2m/process/history` | Query process history. Request body forwarded to Operaton. |
+| `GET` | `/v1/m2m/process/:id/status` | Get process instance status |
+| `GET` | `/v1/m2m/process/:id/variables` | Get current process variables (plain values) |
+| `GET` | `/v1/m2m/process/:id/historic-variables` | Get final variable state of a completed instance |
+| `GET` | `/v1/m2m/process/:id/decision-document` | Fetch the DocumentTemplate linked via `ronl:documentRef` |
+| `GET` | `/v1/m2m/process/:key/start-form` | Fetch the deployed Camunda Form schema for a process start event |
+| `GET` | `/v1/m2m/process/:key/variable-hints` | Fetch deduplicated variable names and types from history |
+| `DELETE` | `/v1/m2m/process/:id` | Cancel a process instance |
+ 
+### Task
+ 
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/v1/m2m/task` | List all open tasks across all organisations |
+| `GET` | `/v1/m2m/task/:id` | Get a single task by ID |
+| `GET` | `/v1/m2m/task/:id/variables` | Get all process variables for a task |
+| `GET` | `/v1/m2m/task/:id/form-schema` | Fetch the deployed Camunda Form schema for a task |
+| `POST` | `/v1/m2m/task/:id/claim` | Claim a task. Body: `{ "userId": "..." }` (optional — falls back to token subject) |
+| `POST` | `/v1/m2m/task/:id/complete` | Complete a task with submitted variables |
+ 
+### Decision
+ 
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/v1/m2m/decision/:key/evaluate` | Evaluate a DMN decision table by key |
+| `GET` | `/v1/m2m/decision/:key` | Fetch decision definition metadata |
+ 
+**`POST /v1/m2m/decision/:key/evaluate` request body:**
+ 
+```json
+{
+  "variables": {
+    "treeDiameter": 45,
+    "protectedArea": false
+  }
+}
+```
+ 
+---
 
 ## Task management
 

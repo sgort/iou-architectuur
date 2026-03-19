@@ -13,14 +13,14 @@ RONL Business API is built for multi-tenancy from the ground up. Each Dutch muni
 
 Six tenants are currently configured across three organisation types:
 
-| Tenant | `organisationType` | Theme primary | Portal URL |
-|---|---|---|---|
-| Utrecht | `municipality` | `#C41E3A` (red) | https://mijn.open-regels.nl |
-| Amsterdam | `municipality` | `#EC0000` (bright red) | — |
-| Rotterdam | `municipality` | `#00811F` (green) | — |
-| Den Haag | `municipality` | `#007BC7` (blue) | — |
-| Provincie Flevoland | `province` | `#0046ad` (blue) | — |
-| UWV | `national` | — | — |
+| Tenant              | `organisationType` | Theme primary          | Portal URL                  |
+| ------------------- | ------------------ | ---------------------- | --------------------------- |
+| Utrecht             | `municipality`     | `#C41E3A` (red)        | https://mijn.open-regels.nl |
+| Amsterdam           | `municipality`     | `#EC0000` (bright red) | —                           |
+| Rotterdam           | `municipality`     | `#00811F` (green)      | —                           |
+| Den Haag            | `municipality`     | `#007BC7` (blue)       | —                           |
+| Provincie Flevoland | `province`         | `#0046ad` (blue)       | —                           |
+| UWV                 | `national`         | —                      | —                           |
 
 Adding a new tenant requires a `tenants.json` entry and a Keycloak user — see [Adding a Municipality](../user-guide/adding-municipality.md).
 
@@ -70,17 +70,21 @@ Every API request passes through the tenant middleware, which:
 
 Process instances from one tenant are never returned to another. Audit log queries are always filtered by `municipality`.
 
+### PostgreSQL tenants table
+
+A `tenants` table exists in the `audit_logs` database and mirrors the entries in `tenants.json`. It is **bookkeeping only** — no backend middleware or route queries it at runtime. Tenant context is derived entirely from JWT claims (`municipality`, `organisation_type`) that Keycloak injects at login. The table was designed for future admin tooling such as per-tenant rate limiting (the `config` JSONB column already carries `maxProcessInstances`) and tenant management APIs. Until that tooling is built, the table can be treated as a registry for operational reference. A consequence of this design is that omitting a tenant from the table has no effect on runtime behaviour — the ACC environment operated without the table entirely and all tenant isolation worked correctly via JWT claims alone.
+
 ---
 
 ## Organisation types
 
 From v2.4.1, the platform supports three organisation categories as first-class types in `TenantConfig`:
 
-| `organisationType` | Used for | `organisationCode` example |
-|---|---|---|
-| `municipality` | Dutch municipalities (gemeenten) | CBS municipality code e.g. `GM0344` |
-| `province` | Dutch provinces | CBS province code e.g. `PV24` |
-| `national` | National government agencies (rijksoverheid) | OIN or agency identifier |
+| `organisationType` | Used for                                     | `organisationCode` example          |
+| ------------------ | -------------------------------------------- | ----------------------------------- |
+| `municipality`     | Dutch municipalities (gemeenten)             | CBS municipality code e.g. `GM0344` |
+| `province`         | Dutch provinces                              | CBS province code e.g. `PV24`       |
+| `national`         | National government agencies (rijksoverheid) | OIN or agency identifier            |
 
 The `organisationType` is injected into every JWT via the `organisation_type` Keycloak protocol mapper and propagated as a BPMN process variable by the tenant middleware. It is available in Operaton as `organisationType` alongside `municipality`.
 
@@ -92,11 +96,11 @@ The `organisationType` is injected into every JWT via the `organisation_type` Ke
 
 Each municipality has two standard roles configured in the Keycloak realm:
 
-| Role | Scope | Capabilities |
-|---|---|---|
-| `citizen` | Own submissions | Start processes, view own application status, view own results |
+| Role         | Scope              | Capabilities                                                                     |
+| ------------ | ------------------ | -------------------------------------------------------------------------------- |
+| `citizen`    | Own submissions    | Start processes, view own application status, view own results                   |
 | `caseworker` | Municipality queue | Process applications, view all submissions for their municipality, update status |
-| `admin` | System | Manage users, view audit logs, configure settings |
+| `admin`      | System             | Manage users, view audit logs, configure settings                                |
 
 Roles are set as realm roles in Keycloak, mapped into the JWT via a protocol mapper, and validated by the backend's authorization middleware.
 
@@ -111,3 +115,11 @@ The dashboard layout consists of three zones: a top navigation bar, a left panel
 Tenant theming applies in full — the header background and active section indicator use `--color-primary` from the municipality's theme entry in `tenants.json`. For unauthenticated visitors the default tenant (`utrecht`) is loaded so the left panel always renders.
 
 See [Caseworker Dashboard](caseworker-dashboard.md) for the complete feature description.
+
+---
+
+## Commercial organisations
+
+In addition to municipalities, provinces, and national agencies, the platform supports **commercial organisations** as a tenant category.
+
+A commercial tenant has its own branded MijnOmgeving and feature flags but delegates AWB process handling to a designated government processing authority. The `organisationType: "commercial"` value in `tenants.json` and the corresponding `organisation_type: commercial` Keycloak user attribute are the only configuration changes required. The rest of the theming and feature flag system works identically to other tenant types. For the full cross-tenant architecture — including the processing authority override, cross-tenant history, and decision document access — see [Commercial Organisation Integration](./commercial-org-integration.md).

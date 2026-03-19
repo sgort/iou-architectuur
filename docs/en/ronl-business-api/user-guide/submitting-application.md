@@ -1,139 +1,12 @@
-# Submitting a Calculation or Application
+# Submitting an Application
 
-This guide covers the two citizen-facing processes currently available in RONL Business API: the **Zorgtoeslag** (healthcare allowance) calculation and the **Kapvergunning** (tree felling permit) application.
-
----
-
-## Zorgtoeslag (healthcare allowance calculation)
-
-<figure markdown style="width:100%; margin:0;">
-  ![Screenshot: RONL Business API Zorgtoeslag Form](../../../assets/screenshots/ronl-business-api-zorgtoeslag-form.png)
-  <figcaption>Example dashboard MijnOmgeving showing Zorgtoeslag calculation</figcaption>
-</figure>
-
-### Prerequisites
-
-You must be logged in. See [Logging In — Citizen & Caseworker](login-flow.md) if you have not yet authenticated.
-
-### Submitting the zorgtoeslag form
-
-**Step 1 — Open the service**
-
-After login, the portal shows the services available for your municipality. Select **Zorgtoeslag berekenen** (calculate healthcare allowance).
-
-**Step 2 — Fill in the form**
-
-The form presents the eligibility criteria. The test environment pre-fills example values:
-
-| Field                        | Label                                     | Example value |
-| ---------------------------- | ----------------------------------------- | ------------- |
-| `ingezeteneVanNederland`     | Bent u ingezetene van Nederland?          | ✓             |
-| `18JaarOfOuder`              | Bent u 18 jaar of ouder?                  | ✓             |
-| `zorgverzekeringInNederland` | Heeft u een zorgverzekering in Nederland? | ✓             |
-| `inkomenEnVermogen`          | Jaarlijks inkomen (€)                     | 24000         |
-
-**Step 3 — Submit**
-
-Click **Berekenen** (Calculate). The portal sends:
-
-```http
-POST /v1/process/zorgtoeslag/start
-Authorization: Bearer <JWT>
-Content-Type: application/json
-
-{
-  "ingezeteneVanNederland": true,
-  "18JaarOfOuder": true,
-  "zorgverzekeringInNederland": true,
-  "inkomenEnVermogen": 24000
-}
-```
-
-**Step 4 — View the result**
-
-The result appears within a few seconds:
-
-<figure markdown style="width:100%; margin:0;">
-  ![Screenshot: RONL Business API Zorgtoeslag Result](../../../assets/screenshots/ronl-business-api-zorgtoeslag-result.png)
-  <figcaption>Example dashboard MijnOmgeving showing Zorgtoeslag calculation result</figcaption>
-</figure>
-
-```
-Resultaat: U heeft recht op zorgtoeslag
-Maandbedrag: € 91,66 (€ 1.100 per jaar)
-Aanvraagnummer: abc-123-def
-```
-
-### What happens in the background
-
-1. The Business API validates your JWT
-2. Your `municipality` claim (`utrecht`) is used to scope the request to your tenant
-3. The input variables are combined with your user identity and submitted to Operaton
-4. Operaton executes the `zorgtoeslag` BPMN workflow and evaluates the DMN decision table
-5. The result is returned and an audit record is written
-
-The process typically completes in under 2 seconds. The `processInstanceId` in the response can be used to retrieve the result later via `GET /v1/process/:id/variables`.
-
-### Test scenarios
-
-Use these to verify the calculation is working correctly end-to-end:
-
-#### Scenario 1 — Eligible, standard income
-
-| Field                        | Value   |
-| ---------------------------- | ------- |
-| Ingezetene van Nederland     | ✓       |
-| 18 jaar of ouder             | ✓       |
-| Zorgverzekering in Nederland | ✓       |
-| Betalingsregeling            | ✗       |
-| Detentie                     | ✗       |
-| Jaarlijks inkomen            | €24,000 |
-
-**Expected result:** Eligible — zorgtoeslag €1,100 per year
-
-#### Scenario 2 — Not eligible, income too high
-
-| Field                        | Value   |
-| ---------------------------- | ------- |
-| Ingezetene van Nederland     | ✓       |
-| 18 jaar of ouder             | ✓       |
-| Zorgverzekering in Nederland | ✓       |
-| Betalingsregeling            | ✗       |
-| Detentie                     | ✗       |
-| Jaarlijks inkomen            | €50,000 |
-
-**Expected result:** Not eligible — zorgtoeslag €0
-
-#### Scenario 3 — Active payment plan
-
-Same as Scenario 1 but with **Betalingsregeling** set to ✓.
-
-**Expected result:** Payment plan active — eligibility and amount depend on current DMN rules; may be reduced or blocked.
-
-#### Scenario 4 — Multiple disqualifying conditions active
-
-| Field                        | Value   |
-| ---------------------------- | ------- |
-| Ingezetene van Nederland     | ✓       |
-| 18 jaar of ouder             | ✓       |
-| Zorgverzekering in Nederland | ✓       |
-| Betalingsregeling            | ✓       |
-| Detentie                     | ✓       |
-| Jaarlijks inkomen            | €24,000 |
-
-**Expected result:** This combination currently triggers a DMN configuration error — two disqualifying rules match simultaneously and the decision table's hit policy does not permit this. See the note below.
-
-!!! warning "Known DMN configuration issue"
-    When both **betalingsregeling** and **detentie** are active at the same time, the decision table returns an error instead of a result. The DMN is being updated to use the `FIRST` hit policy, which evaluates rules top-to-bottom and stops at the first match. Until that fix is deployed:
-
-    - **Citizens** see: *"De berekening kon niet worden afgerond vanwege een fout in de bedrijfsregels. Dit is bij de beheerder gemeld."*
-    - **Caseworkers** see: the technical error message identifying the hit policy conflict.
+This guide covers the **Kapvergunning** (tree felling permit) application — the AWB process currently available in the RONL Business API citizen portal. For the zorgtoeslag calculator and application, see [Applying for Zorgtoeslag via Unive](zorgtoeslag-cross-org-journey.md).
 
 ---
 
 ## Kapvergunning (tree felling permit application)
 
-The tree felling permit is an **asynchronous, multi-actor process** implementing the Dutch Administrative Law Act (Awb). Unlike the zorgtoeslag calculation, the citizen submits an application and receives a dossier reference — the actual decision is made later by a caseworker and communicated separately.
+The tree felling permit is an **asynchronous, multi-actor process** implementing the Dutch Administrative Law Act (Awb). Unlike a simple calculation, the citizen submits an application and receives a dossier reference — the actual decision is made later by a caseworker and communicated separately.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: RONL Business API Kapvergunning Form](../../../assets/screenshots/ronl-business-api-kapvergunning-form.png)
@@ -142,7 +15,7 @@ The tree felling permit is an **asynchronous, multi-actor process** implementing
 
 ### Prerequisites
 
-You must be logged in with DigiD assurance level **hoog**. The kapvergunning application requires `requireAssuranceLevel('midden')` — DigiD Midden or higher. See [Logging In — Citizen & Caseworker](login-flow.md).
+You must be logged in with DigiD assurance level **midden** or higher. See [Logging In — Citizen & Caseworker](login-flow.md).
 
 ### Submitting the application
 
@@ -181,11 +54,10 @@ Content-Type: application/json
 
 The portal immediately shows your dossier reference:
 
-<figure markdown style="width:100%; margin:text-center;">
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: RONL Business API Kapvergunning Confirmation](../../../assets/screenshots/ronl-business-api-kapvergunning-confirmation.png)
   <figcaption>Confirmation screen showing dossierReference after successful submission</figcaption>
 </figure>
-
 ```
 Uw aanvraag is ingediend.
 Dossiernummer: AWB-2026-524494
@@ -194,13 +66,13 @@ Uiterste beslistermijn: 28 april 2026 (Awb 4:13, 8 weken)
 
 **No decision is returned at this point.** The process is now waiting for caseworker review. You can track the status under **Mijn aanvragen**.
 
-<figure markdown style="width:100%; margin:text-center;">
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: RONL Business API Kapvergunning Application list](../../../assets/screenshots/ronl-business-api-kapvergunning-application-list.png)
-  <figcaption>Mijn aanvragen screen showing AWB & Tree Felling Permit Application list</figcaption>
+  <figcaption>Mijn aanvragen screen showing the submitted Kapvergunning application</figcaption>
 </figure>
 
-!!! note "Notice the current status of the list"
-    The list is work in progress and currently shows completed and open applications. Furthermore, no distinction has yet been made between the application itself and the supporting processes (**AwbShellProcess** and **TreeFellingPermitSubProcess**).
+!!! note "Application list status"
+    The list currently shows both completed and open applications. No distinction has yet been made between the shell process and its subprocess (**AwbShellProcess** and **TreeFellingPermitSubProcess**).
 
 ### What happens in the background
 
@@ -237,13 +109,13 @@ For applications submitted before document templates were introduced, the viewer
 
 The panel shows five readonly fields drawn from the final process variable state:
 
-| Field | Variable | Description |
-|---|---|---|
-| Status | `status` | `Approved` or `Rejected` |
-| Beslissing | `permitDecision` | `Permit` or `Reject` |
-| Beslissingstekst | `finalMessage` | Plain-text decision including appeal notice if rejected |
-| Herplantinformatie | `replacementInfo` | Whether a replacement tree is required |
-| Dossiernummer | `dossierReference` | The AWB dossier reference assigned at submission |
+| Field              | Variable           | Description                                             |
+| ------------------ | ------------------ | ------------------------------------------------------- |
+| Status             | `status`           | `Approved` or `Rejected`                                |
+| Beslissing         | `permitDecision`   | `Permit` or `Reject`                                    |
+| Beslissingstekst   | `finalMessage`     | Plain-text decision including appeal notice if rejected |
+| Herplantinformatie | `replacementInfo`  | Whether a replacement tree is required                  |
+| Dossiernummer      | `dossierReference` | The AWB dossier reference assigned at submission        |
 
 The Decision Viewer calls `GET /v1/process/:id/historic-variables` — variables are available immediately after process completion with no polling needed.
 
@@ -288,7 +160,7 @@ The Decision Viewer calls `GET /v1/process/:id/historic-variables` — variables
 **Form submits but no result appears**
 Check that the API Health indicator in the portal header shows all services as UP. If Operaton shows "down", the business rules engine is temporarily unavailable.
 
-**Kapvergunning: 500 error on submission**
+**500 error on submission**
 The most common cause is a double-wrapped variable format in the tenant middleware. Check the backend log for `Must provide 'null' or String value for value of SerializableValue type 'Json'`. See [Troubleshooting](../developer/troubleshooting.md).
 
 **Error: FORBIDDEN / LOA_INSUFFICIENT**
@@ -297,5 +169,5 @@ Your DigiD assurance level is too low for this service. Log out and log in again
 **Error: RATE_LIMIT_EXCEEDED**
 Too many requests from your session. Wait one minute and try again.
 
-**Kapvergunning: task not visible in caseworker queue**
+**Task not visible in caseworker queue**
 The task queue filters by `municipality` process variable. Verify that the citizen and caseworker accounts belong to the same municipality in Keycloak. See [Caseworker Workflow](caseworker-workflow.md).

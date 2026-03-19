@@ -37,6 +37,14 @@
 | `OPERATON_BASE_URL` | Yes | `https://operaton.open-regels.nl/engine-rest` |
 | `OPERATON_TIMEOUT` | No | `30000` | Request timeout in ms |
 
+### Operaton — M2M
+ 
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `OPERATON_M2M_BASE_URL` | No | — | Base URL for a dedicated Operaton instance used by M2M routes only. Falls back to `OPERATON_BASE_URL` when unset. On ACC: `https://operaton-doc.open-regels.nl/engine-rest` |
+| `OPERATON_M2M_USERNAME` | No | — | Basic auth username for the M2M Operaton instance |
+| `OPERATON_M2M_PASSWORD` | No | — | Basic auth password for the M2M Operaton instance |
+
 ### eDOCS
  
 | Variable | Required | Default | Description |
