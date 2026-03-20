@@ -334,13 +334,13 @@ For OAuth setup and curl verification, see [Copilot Studio — eDOCS OAuth Integ
 ---
  
 ## M2M — Operaton
- 
+
 All `/v1/m2m` endpoints require a Bearer JWT issued by Keycloak (`aud: ronl-business-api`). Only `jwtMiddleware` is applied — no tenant scoping. These endpoints are intended for the `operaton-mcp-client` Keycloak client and other system-level callers.
- 
-The curation gate in `m2m.routes.ts` controls which operations are active. See [Operaton MCP Client](../developer/operaton-mcp-client.md) for details.
- 
+
+The `M2M_ALLOWED_OPERATIONS` constant in `m2m.routes.ts` gates which operations are active. Commenting out an entry returns `403 OPERATION_NOT_PERMITTED` for that operation — no other code changes required. See [Operaton MCP Client](../developer/operaton-mcp-client.md) for Keycloak setup and authentication details.
+
 ### Process
- 
+
 | Method | Endpoint | Description |
 |---|---|---|
 | `GET` | `/v1/m2m/process` | List active process instances across all organisations. Query params forwarded to Operaton. |
@@ -349,31 +349,30 @@ The curation gate in `m2m.routes.ts` controls which operations are active. See [
 | `GET` | `/v1/m2m/process/:id/status` | Get process instance status |
 | `GET` | `/v1/m2m/process/:id/variables` | Get current process variables (plain values) |
 | `GET` | `/v1/m2m/process/:id/historic-variables` | Get final variable state of a completed instance |
-| `GET` | `/v1/m2m/process/:id/decision-document` | Fetch the DocumentTemplate linked via `ronl:documentRef` |
-| `GET` | `/v1/m2m/process/:key/start-form` | Fetch the deployed Camunda Form schema for a process start event |
+| `GET` | `/v1/m2m/process/:id/decision-document` | Fetch the DocumentTemplate linked via `ronl:documentRef`. Returns 404 `DOCUMENT_NOT_FOUND` if no `ronl:documentRef` is present. |
+| `GET` | `/v1/m2m/process/:key/start-form` | Fetch the deployed Camunda Form schema for a process start event. Returns 404 `FORM_NOT_FOUND` if no form is linked. |
 | `GET` | `/v1/m2m/process/:key/variable-hints` | Fetch deduplicated variable names and types from history |
 | `DELETE` | `/v1/m2m/process/:id` | Cancel a process instance |
- 
+
 ### Task
- 
+
 | Method | Endpoint | Description |
 |---|---|---|
 | `GET` | `/v1/m2m/task` | List all open tasks across all organisations |
 | `GET` | `/v1/m2m/task/:id` | Get a single task by ID |
 | `GET` | `/v1/m2m/task/:id/variables` | Get all process variables for a task |
-| `GET` | `/v1/m2m/task/:id/form-schema` | Fetch the deployed Camunda Form schema for a task |
+| `GET` | `/v1/m2m/task/:id/form-schema` | Fetch the deployed Camunda Form schema for a task. Returns 404 `FORM_NOT_FOUND` if no form is linked. |
 | `POST` | `/v1/m2m/task/:id/claim` | Claim a task. Body: `{ "userId": "..." }` (optional — falls back to token subject) |
 | `POST` | `/v1/m2m/task/:id/complete` | Complete a task with submitted variables |
- 
+
 ### Decision
- 
+
 | Method | Endpoint | Description |
 |---|---|---|
 | `POST` | `/v1/m2m/decision/:key/evaluate` | Evaluate a DMN decision table by key |
 | `GET` | `/v1/m2m/decision/:key` | Fetch decision definition metadata |
- 
+
 **`POST /v1/m2m/decision/:key/evaluate` request body:**
- 
 ```json
 {
   "variables": {
@@ -382,6 +381,34 @@ The curation gate in `m2m.routes.ts` controls which operations are active. See [
   }
 }
 ```
+
+### Test script
+
+`scripts/test-m2m-routes.sh` validates all M2M routes against a running instance. It obtains a token via Client Credentials, checks JWT claims, exercises every active operation, and verifies tenant isolation remains intact on the standard caseworker routes.
+
+**Prerequisites:** `curl` and `jq` must be available on `$PATH`. The `operaton-mcp-client` Keycloak client must be configured with `CAMUNDA_BPM_AUTHORIZATION_ENABLED=false` on the target Operaton instance (or equivalent authorization grants in place) — without this, process, history, and deployment endpoints return 404.
+
+**Usage:**
+```bash
+CLIENT_SECRET=<secret> bash scripts/test-m2m-routes.sh
+```
+
+**Overridable environment variables:**
+
+| Variable | Default | Description |
+|---|---|---|
+| `BASE_URL` | `https://acc.api.open-regels.nl` | RONL Business API base URL |
+| `KEYCLOAK_URL` | `https://acc.keycloak.open-regels.nl` | Keycloak base URL |
+| `CLIENT_ID` | `operaton-mcp-client` | Keycloak client ID |
+| `CLIENT_SECRET` | _(required)_ | Keycloak client secret |
+| `DECISION_KEY` | `TreeFellingDecision` | DMN key used for the decision evaluate test |
+
+**What it checks:**
+
+- Token obtained and JWT claims valid (`azp`, `aud`, `municipality` absent)
+- All active operations return HTTP 200 (404 accepted for `form-schema`, `start-form`, `decision-document` — resource may not exist in the deployment)
+- All disabled operations return `403 OPERATION_NOT_PERMITTED`
+- `GET /v1/task` with an M2M token returns `403 MISSING_TENANT` — confirming tenant-scoped routes remain isolated
  
 ---
 
