@@ -412,7 +412,14 @@ After modifying `config/keycloak/ronl-realm.json`:
     This release adds two realm roles (`infra-projectteam`, `infra-medewerker`) and one test user (`test-infra-flevoland`). Re-import the realm on both ACC and PROD before deploying the updated frontend and backend.
 
 ```bash
+# On localhost root dir
+scp config/keycloak/ronl-realm.json user@your-vm:~/keycloak/acc/ or /prod/
+
 # On the VM, for ACC
+# Copy the updated realm file to the container
+docker cp ~/keycloak/acc/ronl-realm.json keycloak-acc:/tmp/ronl-realm.json
+
+# Import with override
 docker exec keycloak-acc /opt/keycloak/bin/kc.sh import \
   --file /opt/keycloak/data/import/ronl-realm.json \
   --override true
@@ -422,10 +429,15 @@ cd ~/keycloak/acc
 docker compose restart keycloak-acc
 
 # On the VM, for PROD
+# Copy the updated realm file to the container
+docker cp ~/keycloak/prod/ronl-realm.json keycloak-prod:/tmp/ronl-realm.json
+
+# Import with override
 docker exec keycloak-prod /opt/keycloak/bin/kc.sh import \
   --file /opt/keycloak/data/import/ronl-realm.json \
   --override true
 
+# Restart to apply
 cd ~/keycloak/prod
 docker compose restart keycloak-prod
 ```
