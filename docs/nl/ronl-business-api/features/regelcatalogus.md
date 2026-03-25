@@ -17,13 +17,13 @@
 
 ## De vier tabbladen
 
-### Diensten
-
 ### Organisaties
 
-### Concepten
+### Diensten
 
 ### Regels
+
+### Concepten
 
 ---
 

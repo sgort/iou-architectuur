@@ -64,6 +64,39 @@ ENABLE_CACHING=false
 
 ---
 
+## PostgreSQL setup (local)
+
+For local development, reuse the `ronl-postgres` container already running as part of the RONL Business API stack. Create the LDE database and user once:
+```bash
+docker exec -it ronl-postgres psql -U postgres -c \
+  "CREATE USER lde_user WITH PASSWORD 'lde_password';"
+
+docker exec -it ronl-postgres psql -U postgres -c \
+  "CREATE DATABASE lde_assets OWNER lde_user;"
+
+docker exec -it ronl-postgres psql -U postgres -c \
+  "GRANT ALL PRIVILEGES ON DATABASE lde_assets TO lde_user;"
+```
+
+Then add to `packages/backend/.env`:
+```
+DATABASE_URL=postgresql://lde_user:lde_password@localhost:5432/lde_assets
+```
+
+The migration runs automatically on `npm run dev` startup. Look for `[DB] Migrations applied` in the console.
+
+To verify the tables were created:
+```bash
+docker exec -it ronl-postgres psql -U lde_user -d lde_assets -c "\dt"
+```
+
+If `DATABASE_URL` is absent, the backend logs `[DB] Skipping migrations — database not configured` and continues without asset storage — localStorage fallback remains fully functional for development.
+
+!!! note "Shared container, isolated database"
+    The `ronl-postgres` container hosts multiple databases. The LDE uses `lde_assets` with a dedicated `lde_user` scoped to that database only. The RONL Business API uses `audit_logs` with `audit_user`. The two databases are fully isolated.
+
+---
+
 ## Frontend configuration
 
 The frontend reads environment variables via Vite. The `packages/frontend/.env.development` file is pre-configured:

@@ -9,7 +9,10 @@ All current endpoints use the `/v1/` prefix. Legacy `/api/*` endpoints are depre
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
 | `GET` | `/` | None | API name, version, status, endpoint map |
-| `GET` | `/v1/health` | None | Health check with service latencies |
+| `GET` | `/v1/health` | None | Health check with service latencies (Keycloak + Operaton) |
+| `GET` | `/v1/health/live` | None | Liveness probe — returns `{ status: "alive" }` |
+| `GET` | `/v1/health/ready` | None | Readiness probe — checks Operaton availability |
+| `GET` | `/v1/health/external` | None | Reachability check for CPRMV API, TriplyDB, and LDE. Performs server-side HEAD requests (5-second timeout) to avoid CORS. Returns `{ status: "up"|"down", latency: number }` per service. |
 | `GET` | `/api/health` | None | ⚠ Deprecated |
 
 **`GET /v1/health` response:**
@@ -422,6 +425,7 @@ CLIENT_SECRET=<secret> bash scripts/test-m2m-routes.sh
 | `POST` | `/v1/task/:id/claim` | Bearer JWT (caseworker) | Claim a task for the authenticated caseworker |
 | `POST` | `/v1/task/:id/complete` | Bearer JWT (caseworker) | Complete a task with submitted variables |
 | `GET` | `/v1/task/:id/form-schema` | Bearer JWT (caseworker) | Fetch the deployed Camunda Form schema for a task. Returns 404 `FORM_NOT_FOUND` if no `camunda:formRef` is set; treats Operaton 400 responses as 404. |
+| `GET` | `/v1/task/history` | Bearer JWT (caseworker) | List completed tasks for the caseworker's municipality. Tenant-scoped via `municipality` process variable. Returns up to 200 tasks sorted by `endTime` descending. Route registered before `/:id` to prevent shadowing. |
 
 **`POST /v1/task/:id/complete` request body:**
 ```json

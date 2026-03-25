@@ -117,14 +117,15 @@ Because the BPMN and all its forms land in the same Operaton deployment, `camund
 
 ---
 
-## Saving and exporting
+## Storage
 
-Click **Save** in the canvas toolbar to persist the current process to browser local storage. Click **Export** to download a `.bpmn` file for deployment to Operaton.
+Processes are stored in PostgreSQL via the LDE backend and cached in browser `localStorage` for instant access. On editor load, the service fetches the authoritative list from the server and replaces the local cache. If the backend is unreachable, the local cache is used as a fallback without any error surfaced to the user.
 
-You can also deploy directly from the Modeler using the **Deploy** button. See [Deploying to Operaton](#deploying-to-operaton) above.
+Example processes (`readonly: true`) are seeded from `public/examples/` on the frontend and are never written to the database.
 
-!!! note
-    Processes are stored in browser `localStorage`. They are not shared between browsers or users. Export processes you want to keep before clearing browser storage.
+See [Asset Storage](../developer/asset-storage.md) for the full architecture.
+
+Click **Export** to download a `.bpmn` file for deployment to Operaton. You can also deploy directly from the Modeler using the **Deploy** button. See [Deploying to Operaton](#deploying-to-operaton) above.
 
 ---
 
@@ -139,3 +140,21 @@ The example process cannot be deleted. It demonstrates:
 - Two end events: Permit Granted and Permit Rejected
 
 To use it as a starting point, export it, create a new process, and paste the exported XML.
+
+---
+
+## AWB shell and subprocess examples
+
+The process library ships with two AWB shell processes and their subprocesses:
+
+**AWB Generic Process** (`SHELL`) — the universal eight-phase AWB procedural shell for the Kapvergunning (tree felling permit). Calls `TreeFellingPermitSubProcess` via a Call Activity at Phase 4+5.
+
+└── **Tree Felling Permit** (`SUB`) — evaluates the substantive tree felling decision and routes to caseworker review.
+
+**AWB Zorgtoeslag — Provisional Entitlement** (`SHELL`) — AWB shell wired for the Zorgtoeslag provisional entitlement subprocess.
+
+└── **Zorgtoeslag — Provisional Entitlement** (`SUB`) — validates application, retrieves income data, evaluates the `resultaat_zorgtoeslag` DMN, and routes to caseworker review.
+
+└── **Zorgtoeslag — Final Settlement** (`SUB`) — started via the `FinalIncomeReceived` message event once final annual income data arrives from Belastingdienst. Evaluates confirmed income and sets the settlement outcome.
+
+All example processes are protected (`EXAMPLE` badge, delete disabled). To use one as a starting point, export it and import the copy as a new process.

@@ -3,6 +3,61 @@
 ---
 
 ## Changelog
+
+### v1.3.0 — PostgreSQL Asset Storage & AWB Process Hierarchy (March 2026)
+
+**v1.3.0 — Infrastructure (March 25, 2026)**
+
+#### PostgreSQL asset storage
+
+BPMN processes, form schemas, and document templates now persist to PostgreSQL via the LDE backend rather than living exclusively in browser `localStorage`.
+
+- New `src/db/pool.ts` — `pg.Pool` initialised from `DATABASE_URL`; null-guarded so the backend starts without a database configured
+- New `src/db/migrate.ts` — idempotent DDL (`CREATE TABLE IF NOT EXISTS`) for `process_definitions`, `form_schemas`, and `document_templates`; called from `startServer()` before `app.listen()`
+- New `src/services/assets.service.ts` — `listBpmn`, `upsertBpmn`, `deleteBpmn`, `getBpmnByBpmnProcessId`, `listForms`, `upsertForm`, `deleteForm`, `listDocuments`, `upsertDocument`, `deleteDocument`
+- New `src/routes/assets.routes.ts` — `GET`/`POST`/`DELETE` for each asset type; `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId` for subprocess bundle resolution; all routes return `503 DB_NOT_CONFIGURED` when pool is null
+- Registered at `/v1/assets` in `src/routes/index.ts`
+- `packages/backend/package.json` — `pg: ^8` added to `dependencies`, `@types/pg: ^8` to `devDependencies`
+
+**Write-through cache strategy:** saves update `localStorage` immediately and fire a background POST to the backend. Reads remain synchronous from `localStorage` — zero-latency UI at all times.
+
+**Hydration on mount:** each editor runs `hydrateFromServer()` on mount — `GET /v1/assets/{type}` merges server records with local read-only examples and updates the `localStorage` cache. Falls back to local cache silently if the backend is unreachable.
+
+**Files:** `src/db/pool.ts`, `src/db/migrate.ts`, `src/services/assets.service.ts`, `src/routes/assets.routes.ts`, `src/routes/index.ts`, `src/index.ts`, `packages/backend/package.json`, `src/services/bpmnService.ts`, `src/services/formService.ts`, `src/services/documentService.ts`
+
+#### AWB shell / subprocess hierarchy
+
+The `BpmnProcess` type and process library now model the two-layer AWB shell pattern explicitly.
+
+- `BpmnProcess` interface extended with `bpmnProcessId?: string`, `processRole?: 'shell' | 'subprocess' | 'standalone'`, and `calledElement?: string`
+- `bpmnProcessId` is extracted from `<process id="...">` in the XML automatically on save and import via `extractBpmnProcessId()`
+- All five seeded example processes carry explicit role and relationship metadata
+- `ProcessList.tsx` renders a hierarchical grouped view: shell entries are top-level, their subprocesses are indented with a tree connector; standalone and unclassified processes appear as top-level entries
+- `SHELL` (violet) and `SUB` (teal) role badges added to process cards
+- `process_definitions` table stores `process_role`, `called_element`, and `bpmn_process_id` as indexed columns
+
+**Files:** `src/types/index.ts`, `src/components/BpmnModeler/BpmnModeler.tsx`, `src/components/BpmnModeler/ProcessList.tsx`
+
+#### Schema versioning
+
+`schema_version INTEGER NOT NULL DEFAULT 1` column added to all three PostgreSQL tables, enabling server-side re-seeding of example assets across all users and devices when source files change.
+
+#### Zorgtoeslag example processes
+
+Three new versioned example processes added: `AwbZorgtoeslagProcess` (shell), `ZorgtoeslagProvisionalSubProcess`, and `ZorgtoeslagFinalSubProcess` (both subprocesses). Four new example forms: `zorgtoeslag-provisional-start`, `zorgtoeslag-provisional-review`, `zorgtoeslag-final-review`, `zorgtoeslag-notify-applicant`.
+
+**Files:** `src/utils/exampleVersions.ts`, `public/examples/toeslagen/`
+
+#### Azure deployment — troubleshooting notes
+
+During ACC deployment the following issues were encountered and resolved:
+
+- **`permission denied for schema public`** — Azure PostgreSQL Flexible Server (PostgreSQL 15+) revokes `CREATE` on the public schema from non-superusers by default. Fixed by running `GRANT ALL ON SCHEMA public TO lde_user` plus `ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO lde_user` as admin.
+- **CI/CD health check failing (`503`)** — caused by the above permission error crashing `migrate()` before `app.listen()` was reached. The App Service showed "Application Error" page with no log output via `az webapp log tail`; logs were only retrievable via `az webapp log download`.
+
+See [PostgreSQL Deployment](deployment-postgresql.md) for the full provisioning guide including these fixes.
+
+---
  
 ### v1.2.0 — RIP Phase 1 Bundle & eDOCS Integration (March 2026)
  

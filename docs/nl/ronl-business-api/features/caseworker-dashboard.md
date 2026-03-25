@@ -49,4 +49,12 @@
 
 ---
 
+## Tabblad Gereedschap
+
+---
+
+## Tabblad Audit log
+
+---
+
 ## Tenantconfiguratie

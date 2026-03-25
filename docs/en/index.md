@@ -8,9 +8,9 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.8.2** · *March 2026*
+-   **⚙️ RONL Business API — v2.9.2** · *March 2026*
 
-    M2M API: `/v1/m2m/*` route group exposes the full Operaton surface (process, task, decision) to machine-to-machine clients via OAuth 2.0 Client Credentials, without tenant scoping. `operaton-mcp-client` Keycloak client registered; dedicated Operaton instance configurable via `OPERATON_M2M_BASE_URL`. Audit log records M2M activity by Keycloak client ID. See [Operaton MCP Client](ronl-business-api/developer/operaton-mcp-client.md)
+    Gereedschap tab: a new platform-scoped top-nav page giving all authenticated caseworkers a central hub for platform tools (LDE, TriplyDB, CPSV Editor, CPRMV API, Operaton Cockpit, eDOCS, SAP, KMS) with live status widgets. Archief tab: caseworkers can now browse all completed tasks grouped by process definition key, with variable inspection via the existing history endpoint. CaseworkerDashboard.tsx refactored from ~2 500 lines to a pure shell — all sections are now self-contained components in `src/components/CaseworkerDashboard/`.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
@@ -24,13 +24,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.2.0** · *March 2026*
+-   **🔍 Linked Data Explorer — v1.3.0** · *March 2026*
 
     ---
 
-    **RIP Phase 1 Bundle & eDOCS Integration**
+    **PostgreSQL Asset Storage & AWB Process Hierarchy**
 
-    v1.2.0 adds a complete [RIP Phase 1 deployment bundle](linked-data-explorer/features/rip-phase1-bundle.md) for Provincie Flevoland: a BPMN process covering project definition and preliminary design preparation and a DMN for role assignment. An eDOCS backend service and external task worker automatically create project workspaces and file documents into eDOCS at each milestone. Stub mode lets the full process run end-to-end before a live eDOCS server is available.
+    v1.3.0 migrates BPMN processes, form schemas, and document templates from browser `localStorage` to PostgreSQL. Assets persist across browsers and devices with a write-through cache strategy — saves are instant locally and sync to the backend in the background. The process library now renders shell/subprocess hierarchy: AWB shell processes are top-level entries with their subprocesses indented beneath them. New `processRole`, `bpmnProcessId`, and `calledElement` fields on `BpmnProcess` carry the relationship metadata.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
@@ -78,6 +78,7 @@ graph TB
 
         F -->|SPARQL| G[Orchestration Service<br/>Node.js]
         G -->|Deploy BPMN+DMN| D
+        G -->|asset storage| K[PostgreSQL<br/>lde_assets]
 
         H[Linked Data Explorer<br/>React] -->|API Calls| G
         H -->|Direct SPARQL| F

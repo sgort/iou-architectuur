@@ -4,6 +4,69 @@
 
 ## Changelog
 
+## v2.9.2 — Refactor (March 23, 2026)
+
+### Regelcatalogus — tab order
+
+Tab order changed to **Organisaties → Diensten → Regels → Concepten**. The `TABS` array in `RegelCatalogus.tsx` was reordered; no data or API changes.
+
+### Caseworker Dashboard — component extraction
+
+`CaseworkerDashboard.tsx` reduced from ~2 500 lines to a pure shell responsible for auth state, tenant config, navigation state, and layout only — no domain logic remains in the page file. All sections extracted to `src/components/CaseworkerDashboard/`:
+
+- `NieuwsSection`, `BerichtenSection` — own their fetch lifecycle; `PRIORITY_STYLES` and `TYPE_LABELS` moved into `BerichtenSection`
+- `ArchiefSection` — owns task history fetch, grouping logic, variable cache, and expand state
+- `OnboardingArchiefSection` — role-gated to `hr-medewerker`; owns completed onboarding list fetch and `DecisionViewer` expand state
+- `RipFase1WipSection`, `RipFase1GereedSection` — role-gated to `infra-projectteam`; each owns its own project list fetch and viewer expand state
+- `GereedschapSection` — owns all three status API calls (eDOCS, Operaton, external); `PLATFORM_TOOLS` constant moved out of the page file
+- `TakenSection` — owns full task queue lifecycle including list fetch, select, claim, `TaskFormViewer` integration, and `onCountChange` callback for the top nav badge
+- `HrOnboardingSection`, `RipFase1Section` — each owns its started/error state, eliminating the last uses of shared `actionMessage` state
+- `AuditSection` — handles both `audit-overzicht` and `audit-details` tabs via `activeTab` prop, owns paginated fetch and load-more state
+- `ProfielSection` — consumes `useProfielData` hook; owns `employeeIdInput` for manual ID lookup fallback
+- `RollenSection` — consumes `useProfielData` independently; derives onboarding roles and access level display
+- `useProfielData` hook introduced in `src/hooks/useProfielData.ts` — shared by `ProfielSection` and `RollenSection`
+- `formatDate` extracted to `src/utils/formatDate.ts` and shared across components
+
+---
+
+## v2.9.1 — Feature Release (March 21, 2026)
+
+### Archive — Completed tasks
+
+**Archief** section added to the Projecten tab. Completed tasks are fetched from the Operaton historic task API (`GET /history/task?finished=true`) via the new `GET /v1/task/history` backend endpoint. The endpoint is tenant-scoped via the `municipality` process variable and registered before `/:id` to prevent route shadowing.
+
+`OperatonService.getCompletedTasks(tenantId)` fetches up to 200 completed tasks sorted by `endTime` descending.
+
+In the frontend, tasks are grouped by `processDefinitionKey` — identical to the active task queue: mono uppercase group headers, groups sorted by most recent `endTime`. Each task card shows name, completion date, and assignee. Expanding a card loads historic process variables via the existing `historicVariables` endpoint; variables are cached per `processInstanceId`.
+
+`businessApi.task.history()` added to `api.ts` with `HistoricTask` type from `@ronl/shared`.
+
+---
+
+## v2.9.0 — Feature Release (March 20, 2026)
+
+### Caseworker Dashboard — Gereedschap
+
+New **Gereedschap** top-nav page added as a platform-scoped tab — not tenant-configured, visible to all authenticated caseworkers regardless of organisation.
+
+Eight tool cards: CPSV Editor, CPRMV API, TriplyDB, Linked Data Explorer, Operaton Cockpit, eDOCS, SAP, KMS. Each active tool opens in a new browser tab; placeholder tools (eDOCS, SAP, KMS) show an orange **Binnenkort** badge with no open button. Operaton Cockpit and SAP are only visible to users with the `admin` role.
+
+Live status widgets:
+
+| Tool | Source |
+|---|---|
+| Operaton Cockpit | `GET /v1/health` — existing health endpoint |
+| eDOCS | `GET /v1/edocs/status` — stub/live/offline |
+| CPRMV API, TriplyDB, LDE | `GET /v1/health/external` — server-side HEAD requests to avoid CORS |
+
+`GET /v1/health/external` added to `health.routes.ts`. It performs parallel HEAD requests (5-second timeout) to `acc.cprmv.open-regels.nl`, `api.open-regels.triply.cc`, and `acc.linkeddata.open-regels.nl`, returning `{ status: "up"|"down", latency: number }` per service.
+
+Adding a new tool requires a single entry in the `PLATFORM_TOOLS` constant in `GereedschapSection.tsx`. No other code changes are required.
+
+`businessApi.externalStatus()` added to `api.ts`. `businessApi.health()` error handling hardened to extract dependency data from axios 503 responses.
+
+---
+
 ## v2.8.2 — March 19, 2026
 
 ### Audit log — database persistence fixes
@@ -440,6 +503,15 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 | RIP Fase 1 starten / WIP / gereed dashboard sections     | v2.6.0  |
 | `infra-projectteam` and `infra-medewerker` realm roles   | v2.6.0  |
 | Session expiry warning modal + proactive token refresh   | v2.6.0  |
+| Audit log — database persistence (`audit_logs` table)    | v2.7.1  |
+| Audit log tab in caseworker dashboard                    | v2.7.1  |
+| Commercial organisation type + cross-tenant processing   | v2.7.3  |
+| M2M API — `/v1/m2m/*` route group                        | v2.8.0  |
+| `operaton-mcp-client` Keycloak client                    | v2.8.0  |
+| Audit log — database persistence fixes                   | v2.8.2  |
+| Gereedschap platform tools hub                           | v2.9.0  |
+| Archief — completed task history                         | v2.9.1  |
+| CaseworkerDashboard.tsx component extraction             | v2.9.2  |
 ---
 
 ### Planned
