@@ -77,9 +77,11 @@ Each binding records:
 
 ## Storage
 
-Documents are stored in `localStorage` under the key `linkedDataExplorer_documentTemplates`. The schema version is `1`. Documents can be exported as `.document` JSON files for backup, version control, or sharing with other LDE instances.
+Document templates are stored in PostgreSQL via the LDE backend, cached locally in `localStorage` for instant synchronous access. On editor load, the service fetches the authoritative list from `GET /v1/assets/documents` and replaces the local cache.
 
-The read-only **Kapvergunning Beschikking** example document is seeded from `public/examples/` on first launch via the example version registry (`linkedDataExplorer_exampleVersions`). Incrementing the example version in `exampleVersions.ts` pushes an updated seed document to existing users without requiring a `localStorage` clear.
+Example templates (`readonly: true`) are seeded from `defaultTemplates.ts` on the frontend and are never written to the database.
+
+See [Asset Storage](../developer/asset-storage.md) for the full architecture.
 
 ---
 

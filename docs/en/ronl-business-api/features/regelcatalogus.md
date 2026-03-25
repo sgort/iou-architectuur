@@ -19,17 +19,28 @@ The section is rendered by the `RegelCatalogus` React component (`src/components
 
 ## The four tabs
 
-### Diensten
-
-Public services from the RONL knowledge graph are shown as expandable cards. Each card displays the service title, a full description, and a link to the service URI in TriplyDB. Clicking **Toon concepten** navigates directly to the Concepten tab with that service pre-selected as a filter.
+From v2.9.2 the tabs render in this order: **Organisaties**, **Diensten**, **Regels**, **Concepten**.
 
 ### Organisaties
 
 Implementing organisations are listed with their logo (resolved via the TriplyDB assets API to a versioned CDN URL), homepage link, and the services they implement. The same logo resolution mechanism is used in the Linked Data Explorer.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Regelcatalogus — Regels tab](../../../assets/screenshots/ronl-caseworker-regelcatalogus-organisaties.png)
-  <figcaption>Regelcatalogus — Regels tab with organizations</figcaption>
+  ![Screenshot: Regelcatalogus — Organisaties tab](../../../assets/screenshots/ronl-caseworker-regelcatalogus-organisaties.png)
+  <figcaption>Regelcatalogus — Organisaties tab with implementing organisations</figcaption>
+</figure>
+
+### Diensten
+
+Public services from the RONL knowledge graph are shown as expandable cards. Each card displays the service title, a full description, and a link to the service URI in TriplyDB. Clicking **Toon concepten** navigates directly to the Concepten tab with that service pre-selected as a filter.
+
+### Regels
+
+Implementation rules are grouped by service. Each group is collapsible. A search input filters across all groups simultaneously; matching groups expand automatically. Each rule entry shows the rule title, optional validity date, and an expandable description.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Regelcatalogus — Regels tab](../../../assets/screenshots/ronl-caseworker-regelcatalogus-regels.png)
+  <figcaption>Regelcatalogus — Regels tab with grouped implementation rules</figcaption>
 </figure>
 
 ### Concepten
@@ -39,15 +50,6 @@ NL-SBB concepts are searchable by label and filterable by service. Each row has 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: Regelcatalogus — Concepten tab](../../../assets/screenshots/ronl-caseworker-regelcatalogus-concepten.png)
   <figcaption>Regelcatalogus — Concepten tab with search and service filter</figcaption>
-</figure>
-
-### Regels
-
-Implementation rules are grouped by service. Each group is collapsible. A search input filters across all groups simultaneously; matching groups expand automatically. Each rule entry shows the rule title, optional validity date, and an expandable description.
-
-<figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Regelcatalogus — Regels tab](../../../assets/screenshots/ronl-caseworker-regelcatalogus-regels.png)
-  <figcaption>Regelcatalogus — Regels tab with grouped implementation rules</figcaption>
 </figure>
 
 ---

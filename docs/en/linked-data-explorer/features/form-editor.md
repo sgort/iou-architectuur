@@ -62,7 +62,7 @@ The canvas toolbar provides:
 
 ## Storage
 
-Forms are stored in `localStorage` under the key `linkedDataExplorer_formSchemas`. All schemas use:
+Forms are stored in PostgreSQL via the LDE backend under the key `linkedDataExplorer_formSchemas`, cached locally in `localStorage` for instant synchronous access. On editor load, the service fetches the authoritative list from `GET /v1/assets/forms` and replaces the local cache. All schemas use:
 
 ```json
 {
@@ -72,7 +72,9 @@ Forms are stored in `localStorage` under the key `linkedDataExplorer_formSchemas
 }
 ```
 
-Forms created in the Form Editor are immediately available to the **Link to Form** selector in the BPMN Modeler without any manual configuration.
+Example forms (`readonly: true`) are seeded from `public/examples/` and are never written to the database.
+
+See [Asset Storage](../developer/asset-storage.md) for the full architecture.
 
 ---
 

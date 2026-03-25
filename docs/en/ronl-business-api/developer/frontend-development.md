@@ -14,16 +14,35 @@ packages/frontend/src/
 ├── pages/
 │   ├── LoginChoice.tsx         # Landing page with IDP selection
 │   ├── AuthCallback.tsx        # Keycloak initialization handler
-│   ├── Dashboard.tsx           # Main application (zorgtoeslag calculator)
+│   ├── CaseworkerDashboard.tsx # Caseworker shell: auth state, nav state, layout only
+│   ├── Dashboard.tsx           # Citizen portal (zorgtoeslag calculator)
 │   ├── ChangelogPanel.tsx      # Sliding changelog panel
 │   └── changelog-data.ts       # Changelog content
-├── components/                 # Reusable UI components
+├── components/
+│   └── CaseworkerDashboard/    # All caseworker dashboard sections (extracted v2.9.2)
+│       ├── NieuwsSection.tsx
+│       ├── BerichtenSection.tsx
+│       ├── RegelCatalogus.tsx
+│       ├── TakenSection.tsx
+│       ├── ArchiefSection.tsx
+│       ├── ProfielSection.tsx
+│       ├── RollenSection.tsx
+│       ├── HrOnboardingSection.tsx
+│       ├── OnboardingArchiefSection.tsx
+│       ├── RipFase1Section.tsx
+│       ├── RipFase1WipSection.tsx
+│       ├── RipFase1GereedSection.tsx
+│       ├── GereedschapSection.tsx
+│       └── AuditSection.tsx
 ├── contexts/                   # React contexts (auth, tenant)
-├── hooks/                      # Custom React hooks
+├── hooks/
+│   └── useProfielData.ts       # Shared hook for Profiel and Rollen sections
 ├── services/
 │   ├── keycloak.ts             # Keycloak JS adapter initialization
 │   ├── api.ts                  # Business API HTTP client (Axios)
 │   └── tenant.ts               # Tenant config loading and theme application
+├── utils/
+│   └── formatDate.ts           # Shared date formatter
 └── themes/                     # Per-municipality theme tokens
 packages/frontend/public/
 ├── tenants.json                # Municipality configurations (loaded at runtime)

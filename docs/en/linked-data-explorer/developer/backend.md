@@ -136,6 +136,41 @@ Proxies a SPARQL query to any TriplyDB endpoint, bypassing CORS restrictions. Us
 
 ---
 
+### Asset storage
+```
+GET    /v1/assets/bpmn
+POST   /v1/assets/bpmn
+DELETE /v1/assets/bpmn/:id
+GET    /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId
+
+GET    /v1/assets/forms
+POST   /v1/assets/forms
+DELETE /v1/assets/forms/:id
+
+GET    /v1/assets/documents
+POST   /v1/assets/documents
+DELETE /v1/assets/documents/:id
+```
+
+Persists BPMN processes, form schemas, and document templates to PostgreSQL. All routes return `503 DB_NOT_CONFIGURED` when `DATABASE_URL` is absent. See [Asset Storage](asset-storage.md) for the service architecture and [API Reference](../reference/api-reference.md#asset-storage) for full request/response documentation.
+
+---
+
+## Database
+
+The backend connects to a PostgreSQL database via a `pg.Pool`. The pool is initialised in `src/db/pool.ts` when `DATABASE_URL` is present in the environment. If the variable is absent, `pool` is `null` and all asset endpoints respond with `503`.
+
+Schema migrations run automatically on startup via `migrate()` in `src/db/migrate.ts`, called from `startServer()` before `app.listen()`. The migration is idempotent (`CREATE TABLE IF NOT EXISTS`).
+```
+src/db/
+├── pool.ts       — pg.Pool initialisation, error listener, null-if-unconfigured guard
+└── migrate.ts    — idempotent DDL: process_definitions, form_schemas, document_templates
+```
+
+See [PostgreSQL Deployment](deployment-postgresql.md) for Azure provisioning.
+
+---
+
 ## SPARQL service
 
 `sparql.service.ts` builds and executes all SPARQL queries against TriplyDB. Key functions:

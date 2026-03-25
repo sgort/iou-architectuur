@@ -14,27 +14,35 @@ The MijnOmgeving caseworker dashboard is the primary interface for municipality 
 The dashboard is divided into three permanent zones:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  Top navigation bar (header)                                │
-│  MijnOmgeving  [Home] [Persoonlijke info] [Projecten]  User │
-├──────────────┬──────────────────────────────────────────────┤
-│ Left panel   │                                              │
-│ (w-56)       │  Main content area                           │
-│              │                                              │
-│ Section nav  │  Rendered by renderContent()                 │
-│              │  based on activeSection                      │
-└──────────────┴──────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│  Top navigation bar (header)                                        │
+│  MijnOmgeving  [Home] [Persoonlijke info] [Projecten]               │
+│                [Gereedschap] [Audit log]                      User  │
+├──────────────┬──────────────────────────────────────────────────────┤
+│ Left panel   │                                                      │
+│ (w-56)       │  Main content area                                   │
+│              │                                                      │
+│ Section nav  │  Rendered by renderContent()                         │
+│              │  based on activeSection                              │
+└──────────────┴──────────────────────────────────────────────────────┘
 ```
+
+!!! note "Tenant vs Platform"
+    Tenant-configured pages (Home, Persoonlijke info, Projecten) are driven by `tenants.json`. Platform-scoped pages (Gereedschap, Audit log) are hardcoded in `CaseworkerDashboard.tsx` — they always appear for authenticated users regardless of tenant.
 
 ### Top navigation bar
 
 The header contains three top-level navigation pages and a user block on the right:
 
-| Page ID         | Label             | Default first section |
-| --------------- | ----------------- | --------------------- |
-| `home`          | Home              | Nieuws                |
-| `personal-info` | Persoonlijke info | Profiel               |
-| `projects`      | Projecten         | Taken                 |
+| Page ID         | Label             | Default first section    | Scope                                        |
+| --------------- | ----------------- | ------------------------ | -------------------------------------------- |
+| `home`          | Home              | Nieuws                   | Tenant-configured (`tenants.json`)           |
+| `personal-info` | Persoonlijke info | Profiel                  | Tenant-configured (`tenants.json`)           |
+| `projects`      | Projecten         | Taken                    | Tenant-configured (`tenants.json`)           |
+| `gereedschap`   | Gereedschap       | Gereedschap (overview)   | Platform-scoped — all authenticated users    |
+| `audit-log`     | Audit log         | Overzicht                | Platform-scoped — `admin` role required      |
+
+The three tenant-configured pages show or hide entirely based on whether the tenant's `leftPanelSections` contains at least one section for that page. Pages with no accessible sections for the current user are filtered out of the top nav automatically.
 
 When tasks are pending, the page button for Projecten shows a count badge (`tasks.length`) so caseworkers can see open work at a glance without navigating there first.
 
@@ -66,19 +74,25 @@ The active section is highlighted using the tenant's primary colour (`--color-pr
 
 The main area renders the component for `activeSection`. Each section ID maps to a dedicated render function:
 
-| Section ID           | Render function             | Auth required                  |
-| -------------------- | --------------------------- | ------------------------------ |
-| `nieuws`             | `renderNieuws()`            | No                             |
-| `berichten`          | `renderBerichten()`         | No                             |
-| `regelcatalogus`     | `<RegelCatalogus />`        | No                             |
-| `taken`              | `renderTaskQueue()`         | Yes                            |
-| `profiel`            | `renderProfiel()`           | Yes                            |
-| `rollen`             | `renderRollen()`            | Yes                            |
-| `hr-onboarding`      | `renderHrOnboarding()`      | Yes + `hr-medewerker` role     |
-| `onboarding-archief` | `renderOnboardingArchief()` | Yes + `hr-medewerker` role     |
-| `rip-fase1`          | `renderRipPhase1()`         | Yes + `infra-projectteam` role |
-| `rip-fase1-wip`      | `renderRipFase1Wip()`       | Yes + `infra-projectteam` role |
-| `rip-fase1-gereed`   | `renderRipFase1Gereed()`    | Yes + `infra-projectteam` role |
+| Section ID              | Component                              | Auth required                     |
+| ----------------------- | -------------------------------------- | --------------------------------- |
+| `nieuws`                | `<NieuwsSection />`                    | No                                |
+| `berichten`             | `<BerichtenSection />`                 | No                                |
+| `regelcatalogus`        | `<RegelCatalogus />`                   | No                                |
+| `taken`                 | `<TakenSection />`                     | Yes                               |
+| `archief`               | `<ArchiefSection />`                   | Yes                               |
+| `profiel`               | `<ProfielSection />`                   | Yes                               |
+| `rollen`                | `<RollenSection />`                    | Yes                               |
+| `hr-onboarding`         | `<HrOnboardingSection />`              | Yes + `hr-medewerker` role        |
+| `onboarding-archief`    | `<OnboardingArchiefSection />`         | Yes + `hr-medewerker` role        |
+| `rip-fase1`             | `<RipFase1Section />`                  | Yes + `infra-projectteam` role    |
+| `rip-fase1-wip`         | `<RipFase1WipSection />`               | Yes + `infra-projectteam` role    |
+| `rip-fase1-gereed`      | `<RipFase1GereedSection />`            | Yes + `infra-projectteam` role    |
+| `gereedschap-overzicht` | `<GereedschapSection />`               | Yes (platform-scoped)             |
+| `audit-overzicht`       | `<AuditSection activeTab="overzicht">` | Yes + `admin` role (platform-scoped) |
+| `audit-details`         | `<AuditSection activeTab="details">`   | Yes + `admin` role (platform-scoped) |
+
+All components live in `src/components/CaseworkerDashboard/` (from v2.9.2). The platform-scoped entries (`gereedschap-overzicht`, `audit-overzicht`, `audit-details`) are never present in any tenant's `leftPanelSections` — they use dedicated section constant arrays hardcoded in `CaseworkerDashboard.tsx`.
 
 Sections not yet implemented render a placeholder card ("Deze sectie is in ontwikkeling.").
 
@@ -202,15 +216,24 @@ Not all dashboard features are controlled by `tenants.json`. There are two disti
 
 **Platform-scoped features** are hardcoded in `CaseworkerDashboard.tsx` and apply across all tenants. They are not controlled by organisation — instead, visibility is gated by **role**. A platform-scoped feature is either present for all tenants (if the user holds the required role) or absent for all tenants (if they do not).
 
-The **audit log** is the primary example of a platform-scoped feature. It is not listed in any tenant's `leftPanelSections`, it shows cross-tenant data, and its visibility is governed by the `admin` role — not by organisation. Two other features follow the same pattern: the **Changelog button** in the top navigation bar and **top navigation filtering** (which hides top-nav pages that have no accessible sections for the current user). Both are rendered unconditionally in `CaseworkerDashboard.tsx` and are unaffected by tenant configuration.
+The **audit log** is the primary example of a platform-scoped feature. It is not listed in any tenant's `leftPanelSections`, it shows cross-tenant data, and its visibility is governed by the `admin` role — not by organisation.
 
-The practical rule when adding new dashboard functionality: if the feature is organisation-specific, add it to `tenants.json` and implement the render case in `renderContent()`. If the feature is cross-tenant and role-gated, add it directly to `CaseworkerDashboard.tsx` without touching `tenants.json`.
+The **Gereedschap** tab is a second example. It is also not in `tenants.json` — it is a fixed top-nav page available to all authenticated caseworkers regardless of organisation. It provides a central hub for platform tools (LDE, TriplyDB, CPSV Editor, CPRMV API, Operaton Cockpit, eDOCS, SAP, KMS), each as a tool card. Active tools open in a new tab; placeholder tools (eDOCS, SAP, KMS) show an orange **Binnenkort** badge instead. Live status widgets for Operaton, eDOCS, CPRMV API, TriplyDB, and LDE are fetched on mount — eDOCS and Operaton via existing endpoints, the three external tools via `GET /v1/health/external` (server-side HEAD requests to avoid CORS). Operaton Cockpit and SAP are only visible to users with the `admin` role. Adding a new tool requires a single entry in the `PLATFORM_TOOLS` constant in `GereedschapSection.tsx`.
+
+Two further features follow the same pattern: the **Changelog button** in the top navigation bar and **top navigation filtering** (which hides top-nav pages that have no accessible sections for the current user). Both are rendered unconditionally in `CaseworkerDashboard.tsx` and are unaffected by tenant configuration.
+
+The practical rule when adding new dashboard functionality: if the feature is organisation-specific, add it to `tenants.json` and implement the corresponding `case` in `renderContent()`. If the feature is cross-tenant and role-gated, add it directly to `CaseworkerDashboard.tsx` without touching `tenants.json`.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Caseworker Dashboard — Gereedschap tab](../../../assets/screenshots/ronl-caseworker-gereedschap.png)
+  <figcaption>Gereedschap tab — platform tools hub with live status badges. Operaton Cockpit shows Online with latency; eDOCS shows Stub mode.</figcaption>
+</figure>
 
 ---
 
 ## Related documentation
 
-- [Caseworker Workflow](../user-guide/caseworker-workflow.md) — Task queue, claim, complete, AWB Kapvergunning
+- [Caseworker Workflow](../user-guide/caseworker-workflow.md) — Task queue, claim, complete, AWB Kapvergunning, Archief
 - [HR Onboarding Workflow](../user-guide/hr-onboarding.md) — Persoonlijke info sections in detail
 - [RIP Phase 1 Workflow](../user-guide/rip-phase1-workflow.md) — Projecten tab RIP sections in detail
 - [Regelcatalogus](regelcatalogus.md) — Knowledge graph browser

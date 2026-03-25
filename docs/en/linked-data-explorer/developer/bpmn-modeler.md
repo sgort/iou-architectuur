@@ -370,29 +370,54 @@ Before v1.0.0, opening the properties panel for a `BusinessRuleTask` that alread
 
 ---
 
-## Process persistence (localStorage)
+## Process persistence
 
-`bpmnService.ts` stores processes as `BpmnProcess` records:
+`bpmnService.ts` stores processes as `BpmnProcess` records in PostgreSQL via the backend, using `localStorage` as a synchronous read cache. See [Asset Storage](asset-storage.md) for the full write-through cache and hydration architecture.
 
+The `BpmnProcess` type includes three relationship fields added in v1.3.0:
 ```typescript
 interface BpmnProcess {
-  id: string;
-  name: string;
-  xml: string;
-  createdAt: string;
-  updatedAt: string;
-  linkedDmnTemplates: string[];
-  readonly?: boolean;
+  // ... existing fields ...
+  bpmnProcessId?: string;                               // <process id="..."> from XML
+  processRole?: 'shell' | 'subprocess' | 'standalone';
+  calledElement?: string;                               // parent shell's bpmnProcessId
 }
 ```
 
-`readonly: true` marks the Tree Felling Permit example; its delete button is disabled in `ProcessList.tsx`.
+`bpmnProcessId` is extracted from the XML on save using:
+```typescript
+const extractBpmnProcessId = (xml: string): string => {
+  const match = xml.match(/<(?:bpmn:)?process[^>]+\bid="([^"]+)"/);
+  return match?.[1] ?? 'unknown';
+};
+```
+
+`ProcessList.tsx` uses `calledElement === shell.bpmnProcessId` to group subprocesses under their parent shell in the hierarchical view.
+
+### Bundle assembly after migration
+
+`BpmnCanvas.tsx` resolves subprocess XMLs for deployment by matching `calledElement` values from the active BPMN against stored `BpmnProcess` records. After the PostgreSQL migration the lookup continues to work identically — `hydrateFromServer()` ensures the local cache reflects the database state on mount, so the in-memory lookup in `BpmnService.getProcesses()` always has current data.
+
+The backend additionally exposes `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId` for direct server-side subprocess lookup by BPMN process id.
 
 ---
 
-## Tree Felling Permit example auto-loading
+## Example process seeding
 
-On first mount (empty localStorage), `bpmnService.ts` calls `seedExampleProcess()` which writes the example process using the template from `bpmnTemplates.ts`. The example is always protected by `readonly: true`.
+On mount, `BpmnModeler.tsx` runs a versioned seed effect. For each example defined in `EXAMPLE_VERSIONS`, if the stored version is lower than the current version the file is re-fetched from `public/examples/` and the record is overwritten in `localStorage`. Example records carry `readonly: true` and are excluded from backend writes.
+
+The current example processes and their roles:
+
+| Seed ID | `processRole` | `bpmnProcessId` | `calledElement` |
+|---|---|---|---|
+| `example_awb_process` | `shell` | `AwbShellProcess` | — |
+| `example_tree_felling` | `subprocess` | `TreeFellingPermitSubProcess` | `AwbShellProcess` |
+| `example_awb_zorgtoeslag` | `shell` | `AwbZorgtoeslagProcess` | — |
+| `example_zorgtoeslag_provisional` | `subprocess` | `ZorgtoeslagProvisionalSubProcess` | `AwbZorgtoeslagProcess` |
+| `example_zorgtoeslag_final` | `subprocess` | `ZorgtoeslagFinalSubProcess` | `AwbZorgtoeslagProcess` |
+| `wip_asylum_migration` | `standalone` | `Process_Migratie_en_Asiel` | — |
+
+After the seed effect, a separate hydration effect runs `BpmnService.hydrateFromServer()` to merge any user-authored processes stored in PostgreSQL into the local list.
 
 ---
 

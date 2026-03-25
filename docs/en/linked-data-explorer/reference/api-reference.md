@@ -534,6 +534,83 @@ Lists all documents stored in an eDOCS workspace.
   }
 }
 ```
+---
+
+## Asset Storage
+
+These endpoints persist and retrieve BPMN processes, form schemas, and document templates. They require a configured `DATABASE_URL` on the backend — if the database is not configured, all endpoints return `503 DB_NOT_CONFIGURED`.
+
+### `GET /v1/assets/bpmn`
+
+Returns all non-readonly BPMN processes stored in the database.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "process_1774384869117",
+      "bpmnProcessId": "HrOnboardingProcess",
+      "name": "HR Onboarding Process",
+      "processRole": "standalone",
+      "calledElement": null,
+      "status": "wip",
+      "linkedDmnTemplates": [],
+      "createdAt": "2026-03-25T07:00:00.000Z",
+      "updatedAt": "2026-03-25T07:00:00.000Z"
+    }
+  ]
+}
+```
+
+### `POST /v1/assets/bpmn`
+
+Creates or updates a BPMN process (upsert by `id`).
+
+### `DELETE /v1/assets/bpmn/:id`
+
+Deletes a BPMN process by its LDE `id`.
+
+### `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId`
+
+Looks up a process by its BPMN `<process id="...">` value. Used by the deploy bundle assembler to resolve `calledElement` subprocess references.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "example_tree_felling",
+    "bpmnProcessId": "TreeFellingPermitSubProcess",
+    "xml": "<?xml version=\"1.0\"...>"
+  }
+}
+```
+
+### `GET /v1/assets/forms`
+
+Returns all non-readonly form schemas.
+
+### `POST /v1/assets/forms`
+
+Creates or updates a form schema (upsert by `id`).
+
+### `DELETE /v1/assets/forms/:id`
+
+Deletes a form schema.
+
+### `GET /v1/assets/documents`
+
+Returns all non-readonly document templates.
+
+### `POST /v1/assets/documents`
+
+Creates or updates a document template (upsert by `id`).
+
+### `DELETE /v1/assets/documents/:id`
+
+Deletes a document template.
 
 ---
 
@@ -565,6 +642,9 @@ All error responses follow a standard envelope:
 ---
 
 ## Legacy endpoints and deprecation
+
+!!! note
+    Asset storage endpoints (`/v1/assets/*`) have no legacy `/api/` equivalents. They were introduced in v1.3.0 as v1-only routes.
 
 All `/api/*` endpoints are deprecated and will be removed in v2.0.0. They return identical responses to their `/v1/*` counterparts plus the following headers:
 

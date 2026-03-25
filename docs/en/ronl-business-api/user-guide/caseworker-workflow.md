@@ -205,6 +205,32 @@ Every action a caseworker takes is recorded in the audit log with their `sub` (u
 
 ---
 
+---
+
+## Archief — Completed tasks
+
+From v2.9.1, the **Archief** section in the Projecten tab provides a read-only view of all completed tasks for the caseworker's municipality.
+
+Tasks are fetched from `GET /v1/task/history` and grouped by `processDefinitionKey`, using the same mono uppercase group headers and sort order as the active task queue. Within each group, tasks are sorted by completion date descending. Each task card shows:
+
+- Task name
+- Completion date and time
+- Assignee at time of completion
+
+Expanding a task card loads its historic process variables via `GET /v1/process/:instanceId/historic-variables`. Variables are cached per `processInstanceId` — expanding a card a second time costs no additional API call.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Caseworker Dashboard — Archief](../../../assets/screenshots/ronl-caseworker-archief.png)
+  <figcaption>Archief — completed tasks grouped by process definition key. Expanded card shows historic process variables.</figcaption>
+</figure>
+
+The Archief section is tenant-scoped and must be added to the tenant's `leftPanelSections.projects` in `tenants.json` to appear:
+```json
+{ "id": "archief", "label": "Archief", "isPublic": false }
+```
+
+---
+
 ## Persoonlijke info — HR and profile sections
 
 From v2.4.0, the **Persoonlijke info** top-nav item exposes four left-panel subsections. Two are available to all authenticated caseworkers; two require the `hr-medewerker` role:

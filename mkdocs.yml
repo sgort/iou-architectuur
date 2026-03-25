@@ -212,6 +212,7 @@ nav:
         - Local Development: linked-data-explorer/developer/local-development.md
         - Frontend Architecture: linked-data-explorer/developer/frontend.md
         - Backend Architecture: linked-data-explorer/developer/backend.md
+        - Asset Storage: linked-data-explorer/developer/asset-storage.md
         - eDOCS Integration: en/linked-data-explorer/developer/edocs-integration.md
         - Enhanced Validation & Semantic Detection: linked-data-explorer/developer/enhanced-validation.md
         - Chain Export: linked-data-explorer/developer/chain-export.md
@@ -223,6 +224,7 @@ nav:
         - Governance Implementation: linked-data-explorer/developer/governance.md
         - Vendor Services Implementation: linked-data-explorer/developer/vendor-services.md
         - Deployment: linked-data-explorer/developer/deployment.md
+        - PostgreSQL Deployment: linked-data-explorer/developer/deployment-postgresql.md
         - Test Cases: linked-data-explorer/developer/test-cases.md
         - Changelog & Roadmap: linked-data-explorer/developer/changelog-roadmap.md
     - References:

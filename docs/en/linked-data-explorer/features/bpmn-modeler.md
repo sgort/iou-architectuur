@@ -19,6 +19,57 @@ The Modeler uses the same three-panel layout as the Chain Builder:
 
 ---
 
+## Process library
+
+The left panel lists all processes grouped by their role in the AWB shell pattern.
+
+### Shell / subprocess hierarchy
+
+The Linked Data Explorer models government service workflows as two-layer BPMN compositions: a universal **AWB shell** process handles the eight statutory procedural phases, and a product-specific **subprocess** delivers the substantive decision via a Call Activity. The process list reflects this structure visually.
+
+Shell processes are top-level entries. Their subprocesses are indented beneath them with a tree connector. Standalone processes — those with no parent-child relationship — appear as top-level entries without indentation.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: BPMN Modeler process list showing AWB Generic Process with Tree Felling Permit indented below it as a subprocess, and AWB Zorgtoeslag with its two subprocesses indented below it](../../assets/screenshots/linked-data-explorer-bpmn-process-hierarchy.png)
+  <figcaption>Process list showing shell/subprocess hierarchy: AWB shells with their subprocesses indented</figcaption>
+</figure>
+
+### Role badges
+
+Each process card carries one or more badges:
+
+| Badge | Colour | Meaning |
+|---|---|---|
+| `EXAMPLE` | Blue | Seeded read-only example — cannot be deleted |
+| `WIP` | Amber | Work in progress — user-authored |
+| `SHELL` | Violet | AWB shell process — calls one or more subprocesses via a Call Activity |
+| `SUB` | Teal | Subprocess — called by a shell via its `calledElement` attribute |
+
+### Process roles
+
+Every `BpmnProcess` record carries three relationship fields:
+
+| Field | Type | Description |
+|---|---|---|
+| `bpmnProcessId` | `string` | The `<process id="...">` value from the BPMN XML |
+| `processRole` | `'shell' \| 'subprocess' \| 'standalone'` | How this process relates to others |
+| `calledElement` | `string?` | For subprocesses: the `bpmnProcessId` of the parent shell |
+
+User-created and imported processes default to `standalone`. The BPMN `<process id="...">` value is extracted automatically from the XML on save.
+
+### Example processes
+
+| Process | `processRole` | `calledElement` |
+|---|---|---|
+| AWB Generic Process | `shell` | — |
+| Tree Felling Permit | `subprocess` | `AwbShellProcess` |
+| AWB Zorgtoeslag — Provisional Entitlement | `shell` | — |
+| Zorgtoeslag — Provisional Entitlement | `subprocess` | `AwbZorgtoeslagProcess` |
+| Zorgtoeslag — Final Settlement | `subprocess` | `AwbZorgtoeslagProcess` |
+| Migration & Asylum Procedure | `standalone` | — |
+
+---
+
 ## BPMN palette
 
 The palette provides all standard BPMN 2.0 elements: start, intermediate, and end events; tasks (including business rule tasks); gateways (exclusive, parallel, inclusive, event-based); sub-processes; data objects; pools; and text annotations.

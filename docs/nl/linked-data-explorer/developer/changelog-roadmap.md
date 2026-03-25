@@ -13,6 +13,10 @@
 
 ## Changelog
 
+### v1.3.0 — PostgreSQL Asset Storage & AWB Process Hierarchy (March 2026)
+
+### v1.2.0 — RIP Phase 1 Bundle & eDOCS Integration (March 2026)
+
 ### v1.1.0 — Document Composer (March 2026)
 
 ### v1.0.x — Form Editor & One-Click Deploy / Bug Fixes (March 2026)
