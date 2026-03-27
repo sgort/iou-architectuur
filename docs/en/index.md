@@ -8,9 +8,9 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.9.2** · *March 2026*
+-   **⚙️ RONL Business API — v2.9.3** · *March 2026*
 
-    Gereedschap tab: a new platform-scoped top-nav page giving all authenticated caseworkers a central hub for platform tools (LDE, TriplyDB, CPSV Editor, CPRMV API, Operaton Cockpit, eDOCS, SAP, KMS) with live status widgets. Archief tab: caseworkers can now browse all completed tasks grouped by process definition key, with variable inspection via the existing history endpoint. CaseworkerDashboard.tsx refactored from ~2 500 lines to a pure shell — all sections are now self-contained components in `src/components/CaseworkerDashboard/`.
+    Berichten section switched from hardcoded seed data to the live Provincie Flevoland RSS feed. New Producten & Diensten Catalogus section for the Flevoland tenant: SC4.0 XML feed rendered as a searchable 2-column card grid with audience and online-aanvraag badges. AI Assistant upgraded to SSE streaming — tokens arrive in real time, tool activity shown between rounds, 240s timeout. Regelcatalogus default tab changed to Organisaties.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

@@ -89,8 +89,9 @@ These endpoints require no authentication and are accessible before login. They 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
 | `GET` | `/v1/public/nieuws` | None | National news from the Government.nl RSS feed. Supports `?limit=` (max 20) and `?offset=`. Cached 10 minutes server-side; stale cache returned on feed unavailability. |
-| `GET` | `/v1/public/berichten` | None | Platform announcements (static seed data). Supports `?limit=` and `?offset=`. |
-| `GET` | `/v1/public/berichten/:id` | None | Single bericht by ID. Returns 404 `BERICHT_NOT_FOUND` if absent. |
+| `GET` | `/v1/public/berichten` | None | Returns announcements from the Provincie Flevoland news RSS feed. |
+| `GET` | `/v1/public/berichten/:id` | None | Returns a single bericht by its RSS `<guid>`. Reads from the in-memory cache populated by the list endpoint; returns `404 BERICHT_NOT_FOUND` if the cache is empty or the id is not present. |
+| `GET` | `/v1/public/producten-diensten` | None | Returns the Provincie Flevoland product and services catalogue. No authentication required. Currently only populated for the Flevoland tenant; other tenants receive an empty list. |
 | `GET` | `/v1/public/regelcatalogus` | None | RONL knowledge graph data: services, organisations, NL-SBB concepts, and implementation rules. Five parallel SPARQL queries against TriplyDB. Each data slice cached 5 minutes in-memory; stale cache returned on TriplyDB failure. |
  
 **`GET /v1/public/nieuws` response shape:**
@@ -115,7 +116,83 @@ These endpoints require no authentication and are accessible before login. They 
   "meta": { "generatedAt": "2026-03-12T12:00:00.000Z" }
 }
 ```
- 
+
+**`GET /v1/public/berichten` response shape:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "https://flevoland.nl/actueel/nieuws/2026/...",
+        "subject": "Titel van het bericht",
+        "preview": "Korte beschrijving...",
+        "content": "<p>Korte beschrijving...</p>",
+        "type": "announcement",
+        "status": "published",
+        "audience": "all",
+        "sender": { "id": "flevoland", "name": "Provincie Flevoland" },
+        "publishedAt": "2026-03-12T08:00:00.000Z",
+        "expiresAt": null,
+        "priority": "normal",
+        "isRead": false,
+        "action": { "label": "Lees meer", "url": "https://flevoland.nl/actueel/nieuws/2026/..." }
+      }
+    ],
+    "pagination": { "limit": 10, "offset": 0, "total": 25, "hasMore": true }
+  },
+  "meta": { "generatedAt": "2026-03-12T12:00:00.000Z" }
+}
+```
+
+Returns announcements from the Provincie Flevoland news RSS feed. No authentication required.
+
+**Query parameters:** `limit` (default 10, max 20), `offset` (default 0)
+
+**Data source:** `https://flevoland.nl/Content/Pages/Loket?rss=news` — parsed server-side, cached 10 minutes. Stale cache is returned on feed unavailability.
+
+**Response:** `application/json`
+
+Each item contains: `id` (RSS `<guid>`), `subject`, `preview`, `content`, `type`, (`announcement`), `sender` (`{ id: "flevoland", name: "Provincie Flevoland" }`), `publishedAt`, `priority` (`normal`), `isRead` (`false`), `action` (`{ label: "Lees meer", url: "<link>" }` when the RSS item carries a `<link>` element, otherwise `null`).
+
+**`GET /v1/public/berichten/:id`**
+
+No authentication required.
+
+**`GET /v1/public/producten-diensten` response shape**
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "12345",
+        "title": "Kapvergunning aanvragen",
+        "description": "Wilt u een boom kappen? Dan heeft u mogelijk een omgevingsvergunning nodig...",
+        "url": "https://flevoland.nl/loket/producten/kapvergunning",
+        "audience": ["particulier", "ondernemer"],
+        "onlineAanvragen": true,
+        "modified": "2026-01-15"
+      }
+    ],
+    "pagination": { "limit": 50, "offset": 0, "total": 142, "hasMore": true }
+  },
+  "meta": { "generatedAt": "2026-03-12T12:00:00.000Z" }
+}
+```
+
+**Query parameters:** `limit` (default 50, max 200), `offset` (default 0)
+
+**Data source:** `https://flevoland.nl/loket/loketoverview?sc40=true` — SC4.0 XML feed parsed server-side using regex, cached 30 minutes. Stale cache is returned on feed unavailability.
+
+**Response:** `application/json`
+
+Each item contains: `id` (`productID` element), `title` (`dcterms:title`), `description`, (`dcterms:abstract`), `url` (`dcterms:identifier`), `audience` (array of `"ondernemer"` | `"particulier"`), `onlineAanvragen` (boolean, `true` when the `<onlineAanvragen>` element is `"ja"`), `modified` (`dcterms:modified` or `null`). HTML entities are decoded server-side.
+
+Items with no title are filtered out.
+
 **`GET /v1/public/regelcatalogus` response shape:**
  
 ```json
@@ -333,6 +410,53 @@ When `EDOCS_STUB_MODE=true` (default on ACC), all endpoints return realistic fak
 ```
  
 For OAuth setup and curl verification, see [Copilot Studio — eDOCS OAuth Integration](../developer/copilot-studio-edocs.md).
+
+---
+
+## Operaton MCP AI Assistant
+
+**`POST /v1/mcp/chat`**
+
+Runs a single agentic chat turn through the MCP loop and streams the response via Server-Sent
+Events.
+
+**Auth:** JWT required — `caseworker` or `admin` role.
+
+**Request body:**
+```json
+{
+  "message": "How many active process instances are running?",
+  "history": [
+    { "role": "user", "content": "..." },
+    { "role": "assistant", "content": "..." }
+  ]
+}
+```
+
+**Response:** `Content-Type: text/event-stream`
+
+Headers are flushed immediately. Events arrive as newline-delimited `data:` frames:
+```
+data: {"type":"status","message":"Calling processInstance_count…"}
+
+data: {"type":"delta","text":"There are currently "}
+
+data: {"type":"delta","text":"42 active process instances."}
+
+data: {"type":"done"}
+```
+
+Pre-flight errors (MCP disabled, MCP not connected, missing message) are returned as standard
+JSON with the appropriate HTTP status code before the stream is opened.
+
+| Event type | When                                          |
+|------------|-----------------------------------------------|
+| `status`   | Before each MCP tool call                     |
+| `delta`    | Each text token from Claude                   |
+| `done`     | Loop completed                                |
+| `error`    | Timeout, tool failure, or Anthropic API error |
+
+**Timeout:** 240 seconds. **Not recorded in the audit log.**
 
 ---
  
