@@ -37,6 +37,16 @@
 | `OPERATON_BASE_URL` | Yes | `https://operaton.open-regels.nl/engine-rest` |
 | `OPERATON_TIMEOUT` | No | `30000` | Request timeout in ms |
 
+### MCP AI Assistant
+
+| Variable            | Required              | Default | Description                                                                 |
+|---------------------|-----------------------|---------|-----------------------------------------------------------------------------|
+| `MCP_ENABLED`       | No                    | `false` | Enables the MCP client and `POST /v1/mcp/chat`. Must be `true` on ACC/PROD. |
+| `ANTHROPIC_API_KEY` | When `MCP_ENABLED=true` | —     | Anthropic API key for `claude-sonnet-4-20250514`.                           |
+
+> `OPERATON_USERNAME` and `OPERATON_PASSWORD` are also passed to the `operaton-mcp` child process.
+> Ensure they are set before enabling MCP.
+
 ### Operaton — M2M
  
 | Variable | Required | Default | Description |

@@ -4,6 +4,40 @@
 
 ## Changelog
 
+## v2.9.3 — Feature Release (March 26, 2026)
+
+### Caseworker Dashboard — Berichten & Regelcatalogus
+
+- Berichten endpoint switched from hardcoded seed data to the Provincie Flevoland RSS feed (`flevoland.nl/Content/Pages/Loket?rss=news`) — same axios/regex pattern as the Nieuws service, 10-minute cache TTL.
+- HTML entities decoded server-side (`nbsp`, `amp`, `euro`, `lt`, `gt`, `quot`); action link populated from RSS `<link>` element as "Lees meer".
+- `getBerichtById()` now reads from the live cache instead of the removed `SEED` constant; `/berichten` and `/berichten/:id` routes made async.
+- `BerichtenSection` footer row now renders `item.action` as a "Lees meer →" anchor, matching the `NieuwsSection` pattern.
+- Berichten section moved above Nieuws in `leftPanelSections.home` for all tenants in `tenants.json`.
+- Regelcatalogus default active tab changed from `diensten` to `organisaties`.
+
+### Caseworker Dashboard — Producten & Diensten Catalogus
+
+- New "Producten & Diensten" section added to the Flevoland tenant home panel — publicly accessible without login.
+- Backend service fetches the Provincie Flevoland SC4.0 product feed (`flevoland.nl/loket/loketoverview?sc40=true`) — XML parsed server-side with no additional dependency, 30-minute cache TTL.
+- New `GET /v1/public/producten-diensten` endpoint; returns `id`, `title`, `description`, `url`, `audience`, `onlineAanvragen`, and `modified` per item.
+- `ProductenDienstenCatalogus` component: expandable 2-column card grid styled after `RegelCatalogus`, with free-text search and audience filter (Alle / Ondernemer / Particulier).
+- Cards show audience badges and an "Online aanvragen" badge where applicable; expanded card links directly to the product page on flevoland.nl.
+- Stats row shows total visible product count and number of online-aanvraagbare items.
+- Main content area overflow corrected from `overflow-hidden` to `overflow-y-auto` — all sections with long content lists are now fully scrollable.
+
+### AI Assistant — SSE Streaming
+
+- `POST /v1/mcp/chat` replaced with SSE streaming — `Content-Type: text/event-stream`, headers flushed immediately, `X-Accel-Buffering: no` set for Caddy; three event types: `status` (tool call starting), `delta` (text token), `done` (loop complete).
+- `client.messages.stream()` used in place of `messages.create()`; text deltas emitted immediately on all rounds so the user sees tokens arrive in real time.
+- Tool result payloads capped at 12,000 characters before being added to the messages array — prevents prompt-too-long errors on multi-round queries that return large Operaton JSON responses.
+- Timeout raised to 240s for the SSE endpoint.
+- `POST /v1/mcp/chat` excluded from audit log middleware alongside `GET /v1/admin/audit`.
+- `AbortController` threaded through the streaming loop and tool execution: fires on client disconnect and on timeout.
+- `businessApi.mcp.chatStream()` async generator in `api.ts` replaces the axios POST — refreshes Keycloak token first, then consumes the SSE `ReadableStream` line-by-line and yields typed `McpChatStreamEvent` objects.
+- `McpChatSection`: in-progress assistant bubble updates token-by-token on `delta` events with a blinking cursor; status line above the typing dots shows the active tool name (e.g. `Calling deployment_list…`) between rounds; Clear chat aborts any in-flight stream; `AbortController` cancelled on unmount.
+
+---
+
 ## v2.9.2 — Refactor (March 23, 2026)
 
 ### Regelcatalogus — tab order

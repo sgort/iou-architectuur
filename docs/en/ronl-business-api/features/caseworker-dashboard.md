@@ -78,6 +78,7 @@ The main area renders the component for `activeSection`. Each section ID maps to
 | ----------------------- | -------------------------------------- | --------------------------------- |
 | `nieuws`                | `<NieuwsSection />`                    | No                                |
 | `berichten`             | `<BerichtenSection />`                 | No                                |
+| `producten-diensten`    | `<ProductenDienstenCatalogus />`       | No                                |
 | `regelcatalogus`        | `<RegelCatalogus />`                   | No                                |
 | `taken`                 | `<TakenSection />`                     | Yes                               |
 | `archief`               | `<ArchiefSection />`                   | Yes                               |
@@ -131,12 +132,40 @@ Fetches the latest government news from the Rijksoverheid RSS feed via `GET /v1/
 
 ### Berichten
 
-Fetches internal portal messages via `GET /v1/public/berichten`. Messages are typed (`announcement`, `maintenance`, `update`) and prioritised (`high`, `normal`, `low`), with colour-coded priority badges.
+`BerichtenSection` is a self-contained component that fetches and renders announcements from `GET /v1/public/berichten`. It owns its own fetch lifecycle and requires no props beyond being mounted.
+
+The data source changed in v2.9.3 from a hardcoded seed array to the live Provincie Flevoland RSS feed. From the frontend perspective the contract is unchanged — the component consumes the same `BerichtItem` shape it always did.
+
+Each card in the list shows the subject, preview, priority badge, and publication date. When `item.action` is present, a **Lees meer →** anchor is rendered in the card footer, linking directly to the source article on flevoland.nl. This mirrors the pattern used by `NieuwsSection`.
+
+The section is registered as `{ id: "berichten", label: "Berichten", isPublic: true }` in `leftPanelSections.home` for all tenants in `tenants.json`, and appears above `nieuws`.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard — Home Berichten](../../../assets/screenshots/ronl-caseworker-dashboard-home-berichten.png)
-  <figcaption>Home → Berichten — internal portal messages with type and priority indicators</figcaption>
+  ![Screenshot: Berichten section showing a list of Provincie Flevoland announcements with subject, preview text, and a 'Lees meer →' link in the card footer](../../../assets/screenshots/ronl-caseworker-dashboard-home-berichten.png)
+  <figcaption>Berichten section — live RSS feed from Provincie Flevoland.</figcaption>
 </figure>
+
+### Producten & Diensten Catalogus
+
+`ProductenDienstenCatalogus` is a self-contained component that fetches `GET /v1/public/producten-diensten` and renders the Provincie Flevoland SC4.0 product feed as an expandable card grid. The section is only configured in the Flevoland tenant's `leftPanelSections.home` in `tenants.json`. It is publicly accessible — no login required.
+
+**Layout.** Products are displayed in a 2-column card grid, styled after `RegelCatalogus`. Each card shows the product title and audience badges (`Ondernemer`, `Particulier`). An **Online aanvragen** badge appears on products where `onlineAanvragen` is `true`. Expanding a card reveals the full description and a link to the product page on flevoland.nl.
+
+**Filtering.** A free-text search field and an audience filter (Alle / Ondernemer / Particulier) are rendered above the grid. Both filters operate client-side on the full cached dataset.
+
+**Stats row.** A summary row above the grid shows the total number of visible products and the count of items with online aanvraag enabled.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Producten & Diensten Catalogus showing a 2-column card grid with audience badges and an 'Online aanvragen' badge on applicable cards; stats row visible at the top](../../../assets/screenshots/ronl-caseworker-dashboard-home-producten-diensten.png)
+  <figcaption>Producten & Diensten Catalogus — Flevoland SC4.0 feed rendered as an expandable card grid.</figcaption>
+</figure>
+
+To add this section to another tenant, add the following entry to that tenant's `leftPanelSections.home` in `public/tenants.json`:
+```json
+{ "id": "producten-diensten", "label": "Producten & Diensten", "isPublic": true }
+```
+
+The backend service (`productenDiensten.service.ts`) currently hard-codes the Flevoland SC4.0 feed URL. Serving a different feed for a different tenant would require extending the service to accept a tenant parameter.
 
 ### Regelcatalogus
 
@@ -183,9 +212,10 @@ Each tenant defines its own left-panel section lists in `public/tenants.json`. T
 ```json
 "leftPanelSections": {
   "home": [
-    { "id": "nieuws",          "label": "Nieuws",          "isPublic": true  },
-    { "id": "berichten",       "label": "Berichten",        "isPublic": true  },
-    { "id": "regelcatalogus",  "label": "Regelcatalogus",   "isPublic": true  }
+    { "id": "nieuws",             "label": "Nieuws",                "isPublic": true  },
+    { "id": "berichten",          "label": "Berichten",             "isPublic": true  },
+    { "id": "producten-diensten", "label": "Producten & Diensten",  "isPublic": true  },
+    { "id": "regelcatalogus",     "label": "Regelcatalogus",        "isPublic": true  }
   ],
   "personal-info": [
     { "id": "profiel",             "label": "Profiel",                 "isPublic": false },
