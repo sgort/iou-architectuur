@@ -4,6 +4,29 @@ This page documents the `operaton-mcp-client` Keycloak client and the `/v1/m2m/*
 
 ---
 
+## Access pattern
+
+This feature uses [**Pattern 3 — RONL Business API M2M routes**](operaton-access-patterns.md#pattern-3-ronl-business-api-m2m-routes-v1m2m) from the Operaton Access Patterns reference. Callers interact with Operaton **through the RONL Business API**, not directly with `engine-rest`. This gives the platform audit logging, a curation gate, and RONL-shaped response envelopes — at the cost of a narrower operation surface compared to Pattern 2.
+
+There are two distinct authentication hops in this pattern:
+
+1. **Caller → RONL Business API** — the `operaton-mcp-client` Keycloak client obtains a JWT via OAuth 2.0 Client Credentials and presents it as `Authorization: Bearer <token>`. `jwtMiddleware` in `m2m.routes.ts` validates the token; `tenantMiddleware` is intentionally absent, so no `municipality` claim is required or expected.
+
+2. **RONL Business API → Operaton** — the backend calls Operaton using **basic auth** via a dedicated `OperatonService` instance, configured from `OPERATON_M2M_BASE_URL`, `OPERATON_M2M_USERNAME`, and `OPERATON_M2M_PASSWORD`. When `OPERATON_M2M_BASE_URL` is unset, the M2M routes fall back to the shared default Operaton instance:
+```typescript
+const m2mOperatonService = config.operaton.m2mBaseUrl
+  ? new OperatonService(
+      config.operaton.m2mBaseUrl,
+      config.operaton.m2mUsername,
+      config.operaton.m2mPassword
+    )
+  : operatonService;
+```
+
+The `M2M_ALLOWED_OPERATIONS` constant in `m2m.routes.ts` acts as a curation gate — any operation not listed returns `403 OPERATION_NOT_PERMITTED` regardless of what Operaton supports. This is the key structural difference from Pattern 2, which exposes the full `engine-rest` surface with no curation.
+
+---
+
 ## Architecture
 
 Regular RONL Business API routes (`/v1/process`, `/v1/task`, `/v1/decision`) enforce tenant isolation via `tenantMiddleware` — every request must carry a `municipality` JWT claim and data is filtered to that organisation. This is correct for human caseworkers but wrong for system actors such as an MCP agent that needs a cross-organisation view of Operaton.
