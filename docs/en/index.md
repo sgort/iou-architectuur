@@ -24,13 +24,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.3.0** · *March 2026*
+-   **🔍 Linked Data Explorer — v1.4.0** · *March 2026*
 
     ---
 
-    **PostgreSQL Asset Storage & AWB Process Hierarchy**
+    **RoPA Records — GDPR Article 30 Compliance**
 
-    v1.3.0 migrates BPMN processes, form schemas, and document templates from browser `localStorage` to PostgreSQL. Assets persist across browsers and devices with a write-through cache strategy — saves are instant locally and sync to the backend in the background. The process library now renders shell/subprocess hierarchy: AWB shell processes are top-level entries with their subprocesses indented beneath them. New `processRole`, `bpmnProcessId`, and `calledElement` fields on `BpmnProcess` carry the relationship metadata.
+    v1.4.0 introduces a full Record of Processing Activities (RoPA) framework. The LDE RoPA Editor lets Product Owners author GDPR Art. 30 records per process bundle — with a legal basis SPARQL lookup, form-hydrated personal data field classification, and a BPMN link written as `ronl:ropaRef` on the process element. Active records are served from a CORS-open public endpoint and rendered on a dedicated static site (`ropa.open-regels.nl`) deployed separately from the LDE stack.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

@@ -4,6 +4,68 @@
 
 ## Changelog
 
+### v1.4.0 — RoPA Records & GDPR Article 30 Compliance (March 2026)
+
+**v1.4.0 — New Feature (March 28, 2026)**
+
+#### RoPA Records — PostgreSQL
+
+Two new tables appended to the `migrate.ts` DDL block. Migrations run automatically at backend startup — no manual schema step required.
+
+- `ropa_records` — one row per process (shell or subprocess); keyed on `bpmn_process_id` with a unique index so re-running the seed updates rows in place rather than inserting duplicates; `status` column (`draft` / `active` / `archived`) controls public visibility
+- `ropa_personal_data_fields` — one row per personal data field collected by the linked forms; `ON DELETE CASCADE` from `ropa_records`; `special_category` boolean flags Art. 9/10 GDPR fields
+- New `src/types/ropa.types.ts` — `RopaRecord`, `RopaPersonalDataField`, `PublicRopaRecord`
+- New `src/services/ropa.service.ts` — `listRopa`, `getRopaById`, `getRopaByBpmnProcessId`, `upsertRopa` (transactional: record header + field rows in one `BEGIN`/`COMMIT`), `deleteRopa`, `listPublicRopa`
+- New `src/db/seed-ropa.ts` — idempotent seed for four active records covering `AwbShellProcess`, `TreeFellingPermitSubProcess`, `AwbZorgtoeslagProcess`, and `ZorgtoeslagProvisionalSubProcess`
+
+**Files:** `src/db/migrate.ts`, `src/types/ropa.types.ts`, `src/services/ropa.service.ts`, `src/db/seed-ropa.ts`
+
+#### RoPA Records — API routes
+
+- New `src/routes/ropa.routes.ts` — authenticated asset routes at `/v1/assets/ropa`: `GET` (list), `POST` (upsert, returns `{ id }`), `DELETE /:id`, `GET /by-bpmn-id/:bpmnProcessId`
+- New `src/routes/ropa.public.routes.ts` — CORS-open public route at `/v1/ropa/public`; `?organisation=` query parameter filters by `controller_name ILIKE '%…%'`; strips `controllerContact`, `dpoContact`, and `schemaVersion` before returning; only `status = 'active'` records returned
+- Global CORS middleware in `src/index.ts` patched with path-aware logic: `/v1/ropa/public` bypasses the origin whitelist entirely (`origin: '*'`); all other routes remain subject to `CORS_ORIGIN` env var
+
+**Files:** `src/routes/ropa.routes.ts`, `src/routes/ropa.public.routes.ts`, `src/routes/index.ts`, `src/index.ts`
+
+#### RoPA Editor — LDE UI
+
+New **RoPA Records** view in the LDE sidebar (`ScrollText` icon). `ViewMode.ROPA` added to the enum in `types/index.ts`.
+
+- `RopaEditor.tsx` — root orchestrator; list state, load/save/delete; passes `record={null}` for new records, `key={activeId}` on `RopaRecordEditor` for clean remount on selection change
+- `RopaList.tsx` — left panel; shell records first, subprocess records second; DRAFT / ACTIVE / ARCHIVED badges; delete control per record
+- `RopaRecordEditor.tsx` — four-tab editor:
+  - **Record** — all GDPR Art. 30 mandatory fields; **Lookup from knowledge graph** button fires a SPARQL query against the TriplyDB RONL endpoint via `POST /v1/triplydb/query` and returns a pick-list of `eli:LegalResource` entries
+  - **Personal Data Fields** — **Hydrate from forms** reads `camunda:formRef` values from the process XML, loads matching form schemas from `FormService`, and appends one row per component with a `key` property; each row is classified with a data category and Art. 9/10 flag
+  - **BPMN Link** — reads `ronl:ropaRef` from the matching process XML via `BpmnService`; **Write ronl:ropaRef to BPMN** injects the attribute and persists via `BpmnService.saveProcess`; status indicator: not linked / linked (green) / points to different record (amber)
+  - **Status** — three lifecycle buttons with confirmation dialog before activation
+- New `src/services/ropaService.ts` — fetch-based API client for all five backend operations
+- New `src/types/ropa.types.ts` (frontend mirror)
+
+**Files:** `src/components/RopaEditor/RopaEditor.tsx`, `RopaList.tsx`, `RopaRecordEditor.tsx`, `src/services/ropaService.ts`, `src/types/ropa.types.ts`, `src/types/index.ts`, `src/App.tsx`
+
+#### RoPA Selector — BPMN Modeler
+
+- New `src/components/BpmnModeler/RopaSelector.tsx` — renders as a fixed footer panel pinned below the scrollable process list in `ProcessList.tsx`; only shown when `activeProcess` is non-null; reads the current `ronl:ropaRef` from the process XML by regex; writes via `handleRopaRefChange` in `BpmnModeler.tsx`
+- `ProcessList.tsx` — two new props: `activeProcess: BpmnProcess | null` and `onRopaRefChange: (ropaRef: string | undefined) => void`; `RopaSelector` rendered outside the `overflow-y-auto` scroll container so it stays pinned regardless of list length
+- `BpmnModeler.tsx` — new `handleRopaRefChange`: ensures `xmlns:ronl` declaration on `<definitions>`, then sets, updates, or removes `ronl:ropaRef` on the `<bpmn:process>` opening tag; persists via `BpmnService.saveProcess`
+- `ronlModdleDescriptor.json` — second type entry added: `RopaRefMixin` extends `bpmn:Process` with `ropaRef` as an `isAttr: true` String property; without this registration the attribute is silently dropped by bpmn-js on `saveXML()`
+- Deploy modal — `ropaRefMissing` flag set when `ronl:ropaRef` is absent from the process XML; amber non-blocking warning rendered between the resource list and the resource count line
+
+**Files:** `src/components/BpmnModeler/RopaSelector.tsx`, `ProcessList.tsx`, `BpmnModeler.tsx`, `BpmnCanvas.tsx`, `ronlModdleDescriptor.json`
+
+#### RoPA Public Site — MVP
+
+New package `packages/ropa-site/` — a zero-dependency static HTML/CSS/JS site with no build step.
+
+- `index.html` — fetches `GET /v1/ropa/public`, renders collapsible cards per record with full GDPR Art. 30 field display, personal data fields table with colour-coded data categories and Art. 9/10 red badges, Provincie Flevoland dark green house style; shells rendered before subprocesses
+- `staticwebapp.config.json` — Azure Static Web Apps navigation fallback and no-cache headers
+- Deployed as a separate Azure Static Web Apps resource (`ropa-flevoland-acc`) independent of the LDE frontend; GitHub Actions workflow scoped to `packages/ropa-site/**` path filter
+
+**Files:** `packages/ropa-site/index.html`, `packages/ropa-site/staticwebapp.config.json`, `packages/ropa-site/README.md`, `.github/workflows/azure-static-web-apps-ropa-flevoland-acc.yml`
+
+---
+
 ### v1.3.0 — PostgreSQL Asset Storage & AWB Process Hierarchy (March 2026)
 
 **v1.3.0 — Infrastructure (March 25, 2026)**

@@ -402,6 +402,53 @@ The backend additionally exposes `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId`
 
 ---
 
+## RoPA linkage — moddleDescriptor and ProcessList
+
+### ronlModdleDescriptor.json
+
+`ronlModdleDescriptor.json` contains two type entries. The first extends `bpmn:UserTask` with `documentRef`. The second, added in v1.4.0, extends `bpmn:Process` with `ropaRef`:
+```json
+{
+  "name": "RopaRefMixin",
+  "extends": ["bpmn:Process"],
+  "properties": [
+    { "name": "ropaRef", "isAttr": true, "type": "String" }
+  ]
+}
+```
+
+Without this registration, `ronl:ropaRef` is silently stripped by bpmn-js on every `saveXML()` call — matching the behaviour documented for `ronl:documentRef` on UserTask elements.
+
+### RopaSelector placement
+
+`RopaSelector.tsx` is rendered as a sibling of the scrollable list container inside `ProcessList.tsx`, not as a child. The JSX structure is:
+```
+<div className="w-80 bg-white border-r ...">   ← outer wrapper
+  <div className="h-14 ...">                   ← header
+  <div className="flex-1 overflow-y-auto ..."> ← scrollable list
+  </div>
+  {activeProcess && (                          ← RopaSelector — outside scroll container
+    <div className="border-t ... shrink-0">
+      <RopaSelector ... />
+    </div>
+  )}
+</div>
+```
+
+Placing the panel inside the scroll container caused it to scroll away with the list — it must be a sibling to stay pinned.
+
+### handleRopaRefChange
+
+`handleRopaRefChange` in `BpmnModeler.tsx` handles three cases:
+
+- `ropaRef` is a non-empty string and `ronl:ropaRef` already exists → regex replace the existing value
+- `ropaRef` is a non-empty string and `ronl:ropaRef` is absent → inject into the `<bpmn:process>` opening tag before its `>` or `/>`
+- `ropaRef` is `undefined` → remove the attribute entirely with a regex that also strips the preceding whitespace
+
+In all cases it first checks for `xmlns:ronl=` in the XML and injects the namespace declaration on the `<definitions>` element if absent.
+
+---
+
 ## Example process seeding
 
 On mount, `BpmnModeler.tsx` runs a versioned seed effect. For each example defined in `EXAMPLE_VERSIONS`, if the stored version is lower than the current version the file is re-fetched from `public/examples/` and the record is overwritten in `localStorage`. Example records carry `readonly: true` and are excluded from backend writes.

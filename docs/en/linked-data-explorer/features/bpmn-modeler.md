@@ -166,6 +166,24 @@ If a `camunda:formRef` references a form ID that is not found in `localStorage`,
 
 ---
 
+## RoPA record linkage
+
+Every process in the LDE can be linked to a RoPA record via `ronl:ropaRef`. Two mechanisms are available:
+
+**RoPA Record selector in the process list** — when a process is open, a **RoPA Record** panel is pinned to the bottom of the left panel below the scrollable process list. A dropdown shows all available records; selecting one writes `ronl:ropaRef` into the process XML immediately.
+
+**BPMN Link tab in the RoPA Editor** — the RoPA Editor's BPMN Link tab writes the same attribute and shows whether the current record ID matches the value already in the XML.
+
+Both mechanisms produce identical results. The attribute is registered in `ronlModdleDescriptor.json` under the `http://ronl.nl/schema/1.0` namespace so it survives `saveXML()` serialisation.
+
+### Deploy warning
+
+The deploy modal checks for the presence of `ronl:ropaRef` on the process element. If absent, an amber warning appears between the resource list and the resource count line. The warning is non-blocking — the bundle can still be deployed — but is intended to prevent deploying to production without a linked RoPA record.
+
+See [RoPA Records](ropa-records.md) for the full feature description.
+
+---
+
 ## Tree Felling Permit example
 
 On first launch, the Modeler auto-creates the **Tree Felling Permit** example process, demonstrating a complete municipal workflow: application submission, two `BusinessRuleTask` elements linked to DMN decision models (`TreeFellingDecision`, `ReplacementTreeDecision`), an exclusive gateway routing to permit granted or rejected outcomes. The example is protected from deletion and serves as a reference for process designers.
