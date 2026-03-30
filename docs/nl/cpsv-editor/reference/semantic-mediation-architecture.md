@@ -13,14 +13,26 @@
 
 ## Visual overview
 
+---
+
 ## Semantic layers
+
+---
 
 ## Architecture purpose
 
+---
+
 ## TOGAF ADM positioning
+
+---
 
 ## TOGAF terminology mapping
 
+---
+
 ## ArchiMate terminology mapping
+
+---
 
 ## Positioning of the CPSV Editor

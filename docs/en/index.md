@@ -8,13 +8,9 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.0.0** · *February 21, 2026*
+-   **⚙️ RONL Business API — v2.9.3** · *March 2026*
 
-    ---
-
-    **Frontend Redesign & IDP Selection**
-
-    New landing page with identity provider selection (DigiD / eHerkenning / eIDAS), custom Keycloak theme matching MijnOmgeving design, multi-tenant theming with CSS custom properties, and full mobile-responsive layout.
+    Berichten section switched from hardcoded seed data to the live Provincie Flevoland RSS feed. New Producten & Diensten Catalogus section for the Flevoland tenant: SC4.0 XML feed rendered as a searchable 2-column card grid with audience and online-aanvraag badges. AI Assistant upgraded to SSE streaming — tokens arrive in real time, tool activity shown between rounds, 240s timeout. Regelcatalogus default tab changed to Organisaties.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
@@ -24,19 +20,29 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     **DMN Syntactic Validation**
 
-    Inline DMN validation immediately after upload: five-layer syntactic checks with severity-coded results (error / warning / info), element references, and line numbers — directly in the DMN file card.
+    Inline [DMN validation](linked-data-explorer/reference/dmn-validation-reference.md) immediately after upload: five-layer syntactic checks with severity-coded results (error / warning / info), element references, and line numbers — directly in the DMN file card.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v0.9.0** · *February 2026*
+-   **🔍 Linked Data Explorer — v1.4.0** · *March 2026*
 
     ---
 
-    **DMN Validator Feature**
+    **RoPA Records — GDPR Article 30 Compliance**
 
-    Standalone DMN Validator accessible from the sidebar. Drop multiple `.dmn` or `.xml` files for independent side-by-side validation against RONL DMN+ syntactic layers via `POST /v1/dmns/validate`.
+    v1.4.0 introduces a full Record of Processing Activities (RoPA) framework. The LDE RoPA Editor lets Product Owners author GDPR Art. 30 records per process bundle — with a legal basis SPARQL lookup, form-hydrated personal data field classification, and a BPMN link written as `ronl:ropaRef` on the process element. Active records are served from a CORS-open public endpoint and rendered on a dedicated static site (`ropa.open-regels.nl`) deployed separately from the LDE stack.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
+
+-   **📜 CPRMV API — v0.4.0** · *February 2026*
+
+    ---
+
+    **On-the-fly Rule Retrieval**
+
+    Live retrieval and CPRMV transformation of Dutch and EU legislation from BWB, CVDR, and EU CELLAR repositories. Automatic latest-version resolution, seven output formats, definition extraction with parse patterns, and Juriconnect reference resolution.
+
+    [:octicons-arrow-right-24: Full changelog](cprmv-api/developer/changelog-roadmap.md)
 
 </div>
 
@@ -46,12 +52,17 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 The Information Architecture Framework for IOU integrates semantic web technologies, decision models, and Dutch government standards into a unified system for managing regulatory compliance and spatial planning.
 
-<iframe src="architecture-diagram.html" 
-        width="100%" 
-        height="700px" 
-        frameborder="0" 
-        style="border-radius:12px; display:block;">
-</iframe>
+<figure style="width:100%; margin:0;">
+  <iframe src="architecture-diagram.html"
+          width="100%"
+          height="700px"
+          frameborder="0"
+          style="border-radius:12px; display:block;">
+  </iframe>
+  <figcaption>IOU Architecture — interactive overview of the ecosystem components and their relationships</figcaption>
+</figure>
+
+---
 
 ## Architecture Overview
 
@@ -67,11 +78,18 @@ graph TB
 
         F -->|SPARQL| G[Orchestration Service<br/>Node.js]
         G -->|Deploy BPMN+DMN| D
+        G -->|asset storage| K[PostgreSQL<br/>lde_assets]
 
         H[Linked Data Explorer<br/>React] -->|API Calls| G
         H -->|Direct SPARQL| F
+
+        I[CPRMV API<br/>Python/FastAPI] -->|XML download| J[BWB / CVDR / CELLAR]
+        I -->|cprmv-json / RDF| F
+        I -->|cprmv-json / RDF| H
     end
 ```
+
+---
 
 ## Ecosystem Components
 
@@ -99,6 +117,16 @@ Web application for SPARQL queries and BPMN & DMN orchestration with TriplyDB in
 
 [View Documentation →](linked-data-explorer/index.md){ .md-button }
 
+### 📜 CPRMV API
+
+Python/FastAPI service that fetches individual rules from Dutch and European legal publications on the fly, transforming them to CPRMV-structured RDF. Implements the Core Public Rule Management Vocabulary standard and hosts the CPRMV specification.
+
+**Live App**: [cprmv.open-regels.nl/docs](https://cprmv.open-regels.nl/docs)  
+
+[View Documentation →](cprmv-api/index.md){ .md-button }
+
+---
+
 ## Documentation Status
 
 <div id="doc-status">
@@ -106,6 +134,8 @@ Web application for SPARQL queries and BPMN & DMN orchestration with TriplyDB in
     <p class="admonition-title">Loading documentation status…</p>
   </div>
 </div>
+
+---
 
 ## Quick Links
 
@@ -117,10 +147,13 @@ Web application for SPARQL queries and BPMN & DMN orchestration with TriplyDB in
 | **Keycloak IAM**         | [keycloak.open-regels.nl](https://keycloak.open-regels.nl)                     |
 | **Custom Business API**  | [api.open-regels.nl](https://api.open-regels.nl)                               |
 | **Operaton**             | [operaton.open-regels.nl](https://operaton.open-regels.nl)                     |
+| **CPRMV API**            | [cprmv.open-regels.nl/docs](https://cprmv.open-regels.nl/docs)                 |
+
+---
 
 ## Technology Stack
 
-The IOU Architecture ecosystem is built entirely on **open source technologies**:
+The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entirely on **open source technologies**:
 
 | Component           | Technology        | License            |
 | ------------------- | ----------------- | ------------------ |
@@ -132,6 +165,10 @@ The IOU Architecture ecosystem is built entirely on **open source technologies**
 | **Cache**           | Redis             | BSD 3-Clause       |
 | **Reverse Proxy**   | Caddy             | Apache 2.0         |
 | **Knowledge Graph** | TriplyDB          | -                  |
+| **Document Mngmnt** | eDOCS             | -                  |
+| **Rule API**        | Python / FastAPI  | EUPL-1.2           |
+
+---
 
 ## Standards Compliance
 
@@ -141,6 +178,8 @@ The IOU Architecture ecosystem is built entirely on **open source technologies**
 - **BIO** - Baseline Informatiebeveiliging Overheid
 - **NEN 7510** - Healthcare information security
 - **AVG/GDPR** - Data protection
+
+---
 
 ## Contributing
 

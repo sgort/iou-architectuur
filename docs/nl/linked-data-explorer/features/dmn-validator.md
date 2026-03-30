@@ -13,10 +13,18 @@
 
 ## Multi-file validatie
 
+---
+
 ## Validatielagen
+
+---
 
 ## Ernstniveaus
 
+---
+
 ## Bestanden vergelijken
+
+---
 
 ## Validatievoorbeeld

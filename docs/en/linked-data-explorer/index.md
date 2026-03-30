@@ -19,7 +19,10 @@
 
 The **Linked Data Explorer** is a web application for discovering, composing, and executing DMN decision model chains from Dutch government knowledge graphs. It is built as part of the **Regels Overheid Nederland (RONL)** initiative and connects directly to TriplyDB knowledge graphs and the Operaton DMN execution engine.
 
-![Screenshot: Linked Data Explorer main UI showing the Chain Builder with a loaded DMN chain](../assets/screenshots/linked-data-explorer-main-ui.png)
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Linked Data Explorer main UI showing the Chain Builder with a loaded DMN chain](../assets/screenshots/linked-data-explorer-main-ui.png)
+  <figcaption>Linked Data Explorer main UI showing the Chain Builder with a loaded DMN chain</figcaption>
+</figure>
 
 ---
 
@@ -83,6 +86,7 @@ See also: [CPSV Editor documentation](../cpsv-editor/index.md).
 | Build tool | Vite | 6.2.x |
 | Graph visualisation | D3.js | 7.9.x |
 | BPMN editor | bpmn-js | 18.12.0 |
+| Form editor | @bpmn-io/form-js | 1.20.x |
 | Drag-and-drop | dnd-kit | 6.x / 10.x |
 | Backend framework | Node.js + Express | 22 / 4.18.x |
 | DMN engine | Operaton | — |
@@ -101,12 +105,14 @@ linked-data-explorer/
 │   │   │   ├── components/
 │   │   │   │   ├── ChainBuilder/   # DMN chain builder (main feature)
 │   │   │   │   ├── BpmnModeler/    # BPMN 2.0 process editor
+│   │   │   │   ├── FormEditor/     # Camunda Form editor (@bpmn-io/form-js)
 │   │   │   │   ├── GraphView.tsx   # D3.js SPARQL graph visualisation
 │   │   │   │   ├── ResultsTable.tsx
 │   │   │   │   └── Changelog.tsx
 │   │   │   ├── services/
 │   │   │   │   ├── sparqlService.ts
-│   │   │   │   └── templateService.ts
+│   │   │   │   ├── templateService.ts
+│   │   │   │   └── formService.ts  # localStorage CRUD for Camunda Form schemas
 │   │   │   ├── utils/
 │   │   │   │   └── exportService.ts
 │   │   │   ├── types/

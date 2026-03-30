@@ -13,14 +13,26 @@
 
 ## Purpose
 
+---
+
 ## Validation properties
+
+---
 
 ## Certification properties
 
+---
+
 ## Vendor integration properties
+
+---
 
 ## Property constraints
 
+---
+
 ## Example: Reference DMN validation
+
+---
 
 ## Example: Vendor service certification

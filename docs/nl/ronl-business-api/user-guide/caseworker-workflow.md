@@ -1,4 +1,4 @@
-# Werkproces medewerker
+# Medewerkersworkflow
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
@@ -11,12 +11,32 @@
 
 ---
 
-## Logging in as a caseworker
+## Dashboardnavigatie
 
-## What caseworkers can do
+---
 
-## Reviewing a citizen's application
+## Inloggen als medewerker
 
-## Role differences at a glance
+---
 
-## Audit trail
+## Takenwachtrij
+
+---
+
+## Een taak claimen
+
+---
+
+## Een taak voltooien
+
+---
+
+## Archief — Afgeronde taken
+
+---
+
+## Persoonlijke info — HR en profielsecties
+
+---
+
+## Projecten — RIP Fase 1 (Flevoland)

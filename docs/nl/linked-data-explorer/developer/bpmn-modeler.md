@@ -13,16 +13,34 @@
 
 ## Component structure
 
+---
+
 ## Canvas initialisation
+
+---
 
 ## Scroll-to-zoom override
 
+---
+
 ## Rendering artifact fix
 
-## DmnTemplateSelector
+---
 
-## Process persistence (localStorage)
+## FormTemplateSelector — form linking for UserTask and StartEvent
 
-## Tree Felling Permit example auto-loading
+---
 
-## Testing checklist
+## Form badge overlay
+
+---
+
+## DocumentTemplateSelector — documentsjabloonkoppeling voor UserTask
+
+---
+
+## Document badge overlay
+
+---
+
+## Deploy modal

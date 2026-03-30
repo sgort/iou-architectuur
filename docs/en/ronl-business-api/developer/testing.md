@@ -1,5 +1,7 @@
 # Testing
 
+---
+
 ## Backend tests
 
 The backend uses **Jest** with **ts-jest** for TypeScript support and **Supertest** for HTTP integration tests.
@@ -28,6 +30,8 @@ Location: `packages/backend/tests/integration/`
 When adding a new route or service:
 - Unit test: the service function in isolation (mock all external calls)
 - Integration test: the route with a valid JWT → expected response, and with no/invalid JWT → HTTP 401
+
+---
 
 ## Health check verification
 
@@ -59,6 +63,8 @@ Expected healthy response:
 
 Status values: `healthy` (HTTP 200), `degraded` (HTTP 503 — one or more services down), `unhealthy` (HTTP 503 — health check itself failed).
 
+---
+
 ## Pre-commit and pre-push hooks
 
 Husky hooks run automatically:
@@ -71,6 +77,8 @@ Husky hooks run automatically:
 - `npm run type-check` across all workspaces
 
 These hooks run before any push reaches CI and catch common issues early.
+
+---
 
 ## CI test run
 

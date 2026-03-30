@@ -13,10 +13,18 @@
 
 ## Architecture
 
+---
+
 ## Backend SPARQL query
+
+---
 
 ## Frontend validation engine
 
+---
+
 ## React state dependency tracking
+
+---
 
 ## Debugging notes

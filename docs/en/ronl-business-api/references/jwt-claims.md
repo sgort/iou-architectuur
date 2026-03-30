@@ -2,6 +2,8 @@
 
 RONL Business API validates every request against a JWT access token issued by Keycloak. The token contains standard OIDC claims plus custom claims injected via Keycloak protocol mappers.
 
+---
+
 ## Full token example
 
 ```json
@@ -22,35 +24,44 @@ RONL Business API validates every request against a JWT access token issued by K
     "preferred_username": "test-citizen-utrecht",
     "email_verified": false,
     "municipality": "utrecht",
+    "organisation_type": "municipality",
     "roles": ["citizen"],
     "loa": "substantial"
   }
 }
 ```
 
+---
+
 ## Standard OIDC claims
 
-| Claim | Type | Description |
-|---|---|---|
-| `iss` | string | Token issuer — Keycloak realm URL |
-| `aud` | string | Intended audience — must be `ronl-business-api` |
-| `sub` | string | Subject — unique user UUID, used as `userId` in audit logs |
-| `exp` | number | Expiry — Unix timestamp; token lifetime is 15 minutes |
-| `iat` | number | Issued at — Unix timestamp |
-| `preferred_username` | string | Human-readable username |
-| `typ` | string | Always `Bearer` |
+| Claim                | Type   | Description                                                |
+| -------------------- | ------ | ---------------------------------------------------------- |
+| `iss`                | string | Token issuer — Keycloak realm URL                          |
+| `aud`                | string | Intended audience — must be `ronl-business-api`            |
+| `sub`                | string | Subject — unique user UUID, used as `userId` in audit logs |
+| `exp`                | number | Expiry — Unix timestamp; token lifetime is 15 minutes      |
+| `iat`                | number | Issued at — Unix timestamp                                 |
+| `preferred_username` | string | Human-readable username                                    |
+| `typ`                | string | Always `Bearer`                                            |
+
+---
 
 ## Custom RONL claims
 
 These claims are added by Keycloak protocol mappers configured on the `ronl-business-api` client:
 
-| Claim | Type | Mapper type | Description |
-|---|---|---|---|
-| `municipality` | string | User Attribute | Tenant identifier — maps to `TenantConfig.id` |
-| `roles` | string[] | User Realm Role | Roles assigned in the Keycloak realm |
-| `loa` | string | User Attribute | Level of Assurance from DigiD (`low`, `substantial`, `high`) |
-| `mandate` | string | User Attribute | Representation authority (optional — `legal-guardian`, `power-of-attorney`) |
-| `bsn` | string | User Attribute | Citizen Service Number (encrypted in production, placeholder in test) |
+| Claim               | Type     | Mapper type     | Description                                                                                                                                                                                   |
+| ------------------- | -------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `municipality`      | string   | User Attribute  | Tenant identifier — maps to `TenantConfig.id`                                                                                                                                                 |
+| `organisation_type` | string   | User Attribute  | Organisation category: `municipality`, `province`, or `national`                                                                                                                              |
+| `roles`             | string[] | User Realm Role | Roles assigned in the Keycloak realm                                                                                                                                                          |
+| `loa`               | string   | User Attribute  | Level of Assurance from DigiD (`low`, `substantial`, `high`)                                                                                                                                  |
+| `mandate`           | string   | User Attribute  | Representation authority (optional — `legal-guardian`, `power-of-attorney`)                                                                                                                   |
+| `bsn`               | string   | User Attribute  | Citizen Service Number (encrypted in production, placeholder in test)                                                                                                                         |
+| `employeeId`        | string   | User Attribute  | Employee ID injected from `employee_id` user attribute. Present on caseworker accounts that have been onboarded via `HrOnboardingProcess`; absent for citizens and non-onboarded caseworkers. |
+
+---
 
 ## How claims are used by the backend
 
@@ -58,17 +69,21 @@ After successful JWT validation in `jwt.middleware.ts`, the decoded payload is a
 
 ```typescript
 interface JwtClaims {
-  sub: string;           // → userId in audit log
-  municipality: string;  // → tenant isolation filter
-  roles: string[];       // → authorization checks
-  loa: string;           // → LoA-gated endpoint checks
+  sub: string; // → userId in audit log
+  municipality: string; // → tenant isolation filter
+  organisation_type: string; // → propagated to BPMN process variables
+  roles: string[]; // → authorization checks
+  loa: string; // → LoA-gated endpoint checks
   preferred_username: string;
   mandate?: string;
   bsn?: string;
+  employeeId?: string; // → HR onboarding profile lookup
 }
 ```
 
 The tenant middleware reads `req.user.municipality` to load the `TenantConfig` and apply the feature allowlist for the request.
+
+---
 
 ## Inspecting a token in the browser
 
@@ -80,12 +95,14 @@ JSON.parse(atob(token.split('.')[1]));
 
 Or paste the token at [jwt.io](https://jwt.io) for a formatted view.
 
+---
+
 ## Token lifetime
 
-| Setting | Value | Keycloak config key |
-|---|---|---|
-| Access token | 15 minutes | `accessTokenLifespan: 900` |
-| SSO session idle | 30 minutes | `ssoSessionIdleTimeout: 1800` |
-| SSO session max | 10 hours | `ssoSessionMaxLifespan: 36000` |
+| Setting          | Value      | Keycloak config key            |
+| ---------------- | ---------- | ------------------------------ |
+| Access token     | 15 minutes | `accessTokenLifespan: 900`     |
+| SSO session idle | 30 minutes | `ssoSessionIdleTimeout: 1800`  |
+| SSO session max  | 10 hours   | `ssoSessionMaxLifespan: 36000` |
 
 The Keycloak JS adapter in the frontend automatically refreshes the access token before it expires, as long as the SSO session is still valid.

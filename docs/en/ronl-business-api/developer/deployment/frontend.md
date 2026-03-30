@@ -2,6 +2,8 @@
 
 The frontend is deployed to Azure Static Web Apps via GitHub Actions. Separate instances run for ACC and PROD environments.
 
+---
+
 ## Architecture
 
 ```
@@ -41,6 +43,8 @@ The frontend is deployed to Azure Static Web Apps via GitHub Actions. Separate i
 │  ✅ SPA fallback routing                │
 └─────────────────────────────────────────┘
 ```
+
+---
 
 ## GitHub Actions Workflows
 
@@ -111,6 +115,8 @@ Same structure as ACC but with:
 - PROD secrets (`PROD_KEYCLOAK_URL`, `PROD_API_URL`, `PROD_AZURE_SWA_TOKEN`)
 - Additional approval gate (manual approval before deployment)
 
+---
+
 ## SPA Routing Configuration
 
 **Critical for React Router:** Azure Static Web Apps needs `staticwebapp.config.json` to handle client-side routing.
@@ -143,6 +149,8 @@ Same structure as ACC but with:
 - ✅ Correct MIME types
 
 **Without this file:** Routes like `/auth` and `/dashboard` return 404 errors after Keycloak redirect.
+
+---
 
 ## Build and Deployment Steps
 
@@ -216,6 +224,8 @@ curl -I https://acc.mijn.open-regels.nl/auth
 # Dashboard should load at /dashboard
 ```
 
+---
+
 ## Environment Files
 
 Environment variables are configured as GitHub Secrets:
@@ -243,6 +253,8 @@ PROD_AZURE_SWA_TOKEN=<deployment-token>
 3. Name: `ACC_KEYCLOAK_URL`
 4. Value: `https://acc.keycloak.open-regels.nl`
 5. Click **Add secret**
+
+---
 
 ## Azure Static Web App Configuration
 
@@ -297,6 +309,8 @@ PROD_AZURE_SWA_TOKEN=<deployment-token>
 
 **SSL certificate:** Automatically provisioned by Azure (Let's Encrypt)
 
+---
+
 ## Post-Deployment Verification
 
 ### Automated Tests (Future)
@@ -328,6 +342,8 @@ PROD_AZURE_SWA_TOKEN=<deployment-token>
 - [ ] Calculator form submits
 - [ ] Mobile responsive (test on phone)
 - [ ] No console errors in browser DevTools
+
+---
 
 ## Manual Deployment
 
@@ -379,6 +395,8 @@ curl -I https://acc.mijn.open-regels.nl
 # Visit: https://acc.mijn.open-regels.nl
 ```
 
+---
+
 ## Keycloak Redirect URIs
 
 **Critical:** Keycloak client must allow redirects from deployed URLs.
@@ -393,7 +411,10 @@ Keycloak Admin Console:
 4. **Valid Post Logout Redirect URIs:** `+` (inherits from redirect URIs)
 5. **Web Origins:** `https://acc.mijn.open-regels.nl`
 
-![Screenshot: Keycloak Client Redirect Configuration](../../../../assets/screenshots/ronl-keycloak-redirect-uris.png)
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Keycloak Client Redirect Configuration](../../../../assets/screenshots/ronl-keycloak-redirect-uris.png)
+  <figcaption>Kecloak Admin Console showing redirects</figcaption>
+</figure>
 
 ### PROD Configuration
 
@@ -401,6 +422,8 @@ Same as ACC but with:
 
 - **Valid Redirect URIs:** `https://mijn.open-regels.nl/*`
 - **Web Origins:** `https://mijn.open-regels.nl`
+
+---
 
 ## Rollback Procedure
 
@@ -425,6 +448,8 @@ git push origin acc
 2. Left menu → **Environments**
 3. Select previous deployment
 4. Click **Promote**
+
+---
 
 ## Troubleshooting
 
@@ -550,6 +575,8 @@ app.use(cors({
 # CDN cache usually invalidates within 5 minutes
 # Wait and try again if issue persists
 ```
+
+---
 
 ## Performance Optimization
 

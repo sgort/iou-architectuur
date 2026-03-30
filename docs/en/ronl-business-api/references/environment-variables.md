@@ -1,5 +1,7 @@
 # Environment Variables
 
+---
+
 ## Backend — `packages/backend/.env`
 
 ### Server
@@ -34,6 +36,35 @@
 |---|---|---|
 | `OPERATON_BASE_URL` | Yes | `https://operaton.open-regels.nl/engine-rest` |
 | `OPERATON_TIMEOUT` | No | `30000` | Request timeout in ms |
+
+### MCP AI Assistant
+
+| Variable            | Required              | Default | Description                                                                 |
+|---------------------|-----------------------|---------|-----------------------------------------------------------------------------|
+| `MCP_ENABLED`       | No                    | `false` | Enables the MCP client and `POST /v1/mcp/chat`. Must be `true` on ACC/PROD. |
+| `ANTHROPIC_API_KEY` | When `MCP_ENABLED=true` | —     | Anthropic API key for `claude-sonnet-4-20250514`.                           |
+
+> `OPERATON_USERNAME` and `OPERATON_PASSWORD` are also passed to the `operaton-mcp` child process.
+> Ensure they are set before enabling MCP.
+
+### Operaton — M2M
+ 
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `OPERATON_M2M_BASE_URL` | No | — | Base URL for a dedicated Operaton instance used by M2M routes only. Falls back to `OPERATON_BASE_URL` when unset. On ACC: `https://operaton-doc.open-regels.nl/engine-rest` |
+| `OPERATON_M2M_USERNAME` | No | — | Basic auth username for the M2M Operaton instance |
+| `OPERATON_M2M_PASSWORD` | No | — | Basic auth password for the M2M Operaton instance |
+
+### eDOCS
+ 
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `EDOCS_BASE_URL` | Yes (live mode) | — | eDOCS REST API base URL, e.g. `https://docuvitt-host/edocsapi/v1.0` |
+| `EDOCS_LIBRARY` | Yes (live mode) | `DOCUVITT` | eDOCS library name |
+| `EDOCS_USER_ID` | Yes (live mode) | — | eDOCS service account user ID |
+| `EDOCS_PASSWORD` | Yes (live mode) | — | eDOCS service account password |
+| `EDOCS_STUB_MODE` | No | `true` | When `true`, all eDOCS service methods return realistic fake responses. Set to `false` to enable live calls. Never commit real credentials to the repository — use Azure App Service Application settings. |
+ 
 
 ### Database (PostgreSQL)
 
@@ -94,6 +125,9 @@
 | `ENABLE_HEALTH_CHECKS` | No | `true` | Enable `/v1/health` endpoint |
 | `ENABLE_TENANT_ISOLATION` | No | `true` | Enforce per-tenant data isolation |
 | `DEFAULT_MAX_PROCESS_INSTANCES` | No | `1000` | Max active instances per tenant |
+| `RONL_SPARQL_ENDPOINT` | No | `https://api.triplydb.com/...` | Override the default RONL TriplyDB SPARQL endpoint used by the Regelcatalogus service |
+
+---
 
 ## Frontend — `packages/frontend/.env`
 
@@ -101,6 +135,8 @@
 |---|---|---|
 | `VITE_API_URL` | Yes | Business API base URL (e.g. `https://api.open-regels.nl/v1`) |
 | `VITE_KEYCLOAK_URL` | Yes | Keycloak base URL (e.g. `https://keycloak.open-regels.nl`) |
+
+---
 
 ## DNS records
 
@@ -124,6 +160,8 @@ keycloak      A   <VM_IP>
 operaton      A   <VM_IP>
 ```
 
+---
+
 ## GitHub repository secrets
 
 These secrets must be configured in the GitHub repository before any workflow can deploy:
@@ -134,6 +172,8 @@ These secrets must be configured in the GitHub repository before any workflow ca
 | `AZURE_WEBAPP_PUBLISH_PROFILE_PROD` | Azure Portal → App Service `ronl-business-api-prod` → Get publish profile |
 | `AZURE_STATIC_WEB_APPS_API_TOKEN_ACC` | Azure Portal → Static Web App ACC → Manage deployment token |
 | `AZURE_STATIC_WEB_APPS_API_TOKEN_PROD` | Azure Portal → Static Web App PROD → Manage deployment token |
+
+---
 
 ## Generating environment passwords
 

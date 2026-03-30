@@ -2,7 +2,12 @@
 
 The Timeline Navigation feature allows citizens to view their personal data at any point in time - past, present, or future. This enables "what if" scenario planning for life events and helps citizens understand how their circumstances affect eligibility for government services.
 
-![Timeline showing Wessel Kooyman on marriage date](../../../assets/screenshots/ronl-timeline-getrouwd.png)
+<figure markdown style="width:100%; margin:0;">
+  ![Timeline showing Wessel Kooyman on marriage date](../../../assets/screenshots/ronl-timeline-getrouwd.png)
+  <figcaption>Example dashboard MijnOmgeving Timeline showing Wessel Kooyman on marriage date</figcaption>
+</figure>
+
+---
 
 ## What It Does
 
@@ -13,6 +18,8 @@ The timeline provides:
 3. **Dynamic Data** - Person, partner, and children information updates based on selected date
 4. **Future Scenarios** - Select future dates to plan for upcoming life changes
 5. **Interactive Navigation** - Drag slider or click event buttons to jump to specific dates
+
+---
 
 ## User Flow
 
@@ -64,6 +71,8 @@ The timeline provides:
 3. (Future) Compare eligibility for toeslagen with/without additional child
 4. (Future) See how income requirements change
 
+---
+
 ## "What If" Scenario Planning (Vision)
 
 The right panel will eventually support:
@@ -91,6 +100,8 @@ The right panel will eventually support:
 - "When will my child turn 18 and how does that affect my benefits?"
 - "What happens to my toeslagen when I retire?"
 
+---
+
 ## Data Sources
 
 The timeline integrates with:
@@ -105,6 +116,8 @@ The timeline integrates with:
 2. **(Future) Verblijfplaatshistorie** - Address history
 3. **(Future) Stored Applications** - Historical zorgtoeslag calculations
 
+---
+
 ## Privacy & Security
 
 - **Authentication Required** - DigiD login with LoA "hoog"
@@ -112,12 +125,16 @@ The timeline integrates with:
 - **Audit Logging** - All timeline access is logged for compliance
 - **No Data Storage** - Timeline calculations are done in real-time
 
+---
+
 ## Technical Notes
 
 - Timeline range: Birth date - 2 years to Current date + 10 years
 - Event detection: Automatic from BRP data (marriage, children)
 - Age calculations: Dynamic based on selected date
 - Section visibility: Partner/children sections only appear after relevant dates
+
+---
 
 ## Current Limitations
 
@@ -127,8 +144,15 @@ The timeline integrates with:
 - No actual "what if" simulation yet
 - Single persona across all municipalities
 
+---
+
 ## Timeline View - Current date
-![Timeline showing Wessel Kooyman with partner and children](../../../assets/screenshots/ronl-timeline-view-current-date.png)
+<figure markdown style="width:100%; margin:0;">
+  ![Timeline showing Wessel Kooyman with partner and children](../../../assets/screenshots/ronl-timeline-view-current-date.png)
+  <figcaption>Example dashboard MijnOmgeving Timeline showing Wessel Kooyman with partner and children</figcaption>
+</figure>
+
+---
 
 ## Related Documentation
 

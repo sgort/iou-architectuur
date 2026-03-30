@@ -13,8 +13,14 @@
 
 ## Interpreting badges
 
+---
+
 ## Hover tooltip
 
+---
+
 ## Using validated DMNs in a chain
+
+---
 
 ## Adding validation metadata (for publishers)

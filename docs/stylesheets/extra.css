@@ -285,20 +285,26 @@ button:focus {
 /* =============================================================
    What's New — colored grid cards on home page
    Each card gets a coloured top border matching its component.
-   Cards are addressed by position (order is fixed: API, CPSV, LDE).
+   .md-typeset prefix + !important overrides Material's own card
+   border shorthand which would otherwise win the cascade.
    ============================================================= */
 
-.whats-new-cards > ul > li:nth-child(1) {
-  border-top: 4px solid var(--primary-color);     /* RONL Business API — Rijksoverheid blue */
+.md-typeset .whats-new-cards li:nth-child(1) {
+  border-top: 4px solid var(--primary-color) !important;     /* RONL Business API — Rijksoverheid blue */
 }
 
-.whats-new-cards > ul > li:nth-child(2) {
-  border-top: 4px solid var(--accent-color);      /* CPSV Editor — orange */
+.md-typeset .whats-new-cards li:nth-child(2) {
+  border-top: 4px solid var(--accent-color) !important;      /* CPSV Editor — orange */
 }
 
-.whats-new-cards > ul > li:nth-child(3) {
-  border-top: 4px solid var(--status-compliant);  /* Linked Data Explorer — green */
+.md-typeset .whats-new-cards li:nth-child(3) {
+  border-top: 4px solid var(--status-compliant) !important;  /* Linked Data Explorer — green */
 }
+
+.md-typeset .whats-new-cards li:nth-child(4) {
+  border-top: 4px solid #5bb8f5 !important;               /* CPRMV API — light blue */
+}
+
 /* =============================================================
    Documentation Status — admonition table on home page
    ============================================================= */
@@ -328,4 +334,45 @@ button:focus {
 .doc-status-admonition .doc-status-table a {
   font-family: 'Roboto Mono', monospace;
   font-size: 0.95em;
+}
+
+/* Slightly smaller body text in What's New cards */
+.md-typeset .whats-new-cards li > p:not(:first-child) {
+  font-size: 0.82em;
+  line-height: 1.55;
+  color: var(--md-default-fg-color--light);
+}
+
+/* =============================================================
+   Environment badges — ACC / PROD
+   Used in the Documentation Status table and What's New cards.
+   ============================================================= */
+
+.env-badge {
+  display: inline-block;
+  padding: 0.15em 0.55em;
+  border-radius: 3px;
+  font-size: 0.75em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  vertical-align: middle;
+  line-height: 1.5;
+}
+
+.env-acc {
+  background-color: #f59e0b;
+  color: #fff;
+}
+
+.env-prod {
+  background-color: var(--status-compliant); /* reuses existing green */
+  color: #fff;
+}
+
+/* Slight offset so the badge sits comfortably after the version text
+   inside the What's New card <strong> element. */
+.whats-new-env-badge {
+  margin-left: 0.5em;
+  vertical-align: middle;
 }

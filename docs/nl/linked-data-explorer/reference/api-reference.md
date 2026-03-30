@@ -15,9 +15,13 @@
 
 ### `GET /`
 
+---
+
 ## Health
 
 ### `GET /v1/health`
+
+---
 
 ## DMN discovery
 
@@ -29,9 +33,13 @@
 
 ### `GET /v1/dmns/cycles`
 
+---
+
 ## Chain discovery
 
 ### `GET /v1/chains`
+
+---
 
 ## Chain execution
 
@@ -41,10 +49,16 @@
 
 ### `POST /v1/chains/export`
 
+---
+
 ## TriplyDB proxy
 
 ### `POST /v1/triplydb/query`
 
+---
+
 ## Error responses
+
+---
 
 ## Legacy endpoints and deprecation

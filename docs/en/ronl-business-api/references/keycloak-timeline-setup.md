@@ -1,5 +1,7 @@
 # Keycloak Timeline Setup - Configuration Reference
 
+---
+
 ## Overview
 
 The Timeline Navigation feature requires the `preferred_username` field in JWT tokens to map test users to their BSN (Burgerservicenummer). This document explains how to configure Keycloak to include this field.

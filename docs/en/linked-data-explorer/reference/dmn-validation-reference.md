@@ -193,7 +193,10 @@ Layer 2 checks the structural correctness of decision table definitions: that en
 | **Rationale** | An empty or `-` input entry matches any value. A rule where all inputs are empty or `-` therefore matches every possible input combination. In a `UNIQUE` or `ANY` table, this catch-all overlaps with every specific rule — for any input that satisfies a specific rule, both the specific rule and the catch-all fire simultaneously, violating the hit policy. This is the most common overlap pattern in government DMNs and the hardest to spot visually. |
 | **Fix** | Change `hitPolicy` to `FIRST` and place the catch-all last (it then only fires when no specific rule matches), or replace the catch-all with explicit rules covering the remaining input combinations. |
 
-![Screenshot: BIZ-008-009-test.dmn loaded in the DMN Validator showing Business Rules 1E 1W — BIZ-008 error on the duplicate-rows decision and BIZ-009 warning on the catch-all decision](../../assets/screenshots/linked-data-explorer-dmn-validator-biz-008-009-test.png)
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: BIZ-008-009-test.dmn loaded in the DMN Validator showing Business Rules 1E 1W — BIZ-008 error on the duplicate-rows decision and BIZ-009 warning on the catch-all decision](../../assets/screenshots/linked-data-explorer-dmn-validator-biz-008-009-test.png)
+  <figcaption>BIZ-008-009-test.dmn loaded in the DMN Validator showing Business Rules 1E 1W — BIZ-008 error on the duplicate-rows decision and BIZ-009 warning on the catch-all decision</figcaption>
+</figure>
 
 ---
 
@@ -364,14 +367,14 @@ Layer 4 validates the Decision Requirements Diagram (DRD) — the graph of decis
 ---
 
 ### INT-005
-
+ 
 | | |
 |---|---|
 | **Severity** | 🟡 warning |
-| **Trigger** | An `<inputData>` element exists in the document but is not referenced by any `<informationRequirement>` |
-| **Rationale** | An orphaned `<inputData>` element declares an input that no decision uses. It adds clutter to the DRD, makes the model harder to understand, and causes the CPSV Editor to generate `cpsv:Input` metadata for an input that has no effect on any decision outcome. |
+| **Trigger** | An `<inputData>` element exists in the document but is not referenced by any `<informationRequirement>`. Only fires in DRDs — models with more than one `<decision>` element or at least one `<informationRequirement>`. In standalone single-decision DMNs, `<inputData>` elements serve as input contract declarations for CPSV/publishing purposes and do not require wiring. |
+| **Rationale** | An orphaned `<inputData>` element in a DRD declares an input that no decision uses. It adds clutter to the DRD, makes the model harder to understand, and causes the CPSV Editor to generate `cpsv:Input` metadata for an input that has no effect on any decision outcome. |
 | **Fix** | Connect the `<inputData>` element to a decision via `<informationRequirement>`, or remove it from the model. |
-
+ 
 ---
 
 ### INT-006
@@ -383,6 +386,17 @@ Layer 4 validates the Decision Requirements Diagram (DRD) — the graph of decis
 | **Rationale** | Operaton resolves inputs by variable name at runtime. A mismatch between the `<inputData name="...">` and its `<variable name="...">` is a common source of "my rule never fires" bugs where the input evaluates to null. |
 | **Fix** | Align the `<variable name="...">` with the `<inputData name="...">`. |
 
+---
+
+### INT-007
+ 
+| | |
+|---|---|
+| **Severity** | 🟡 warning |
+| **Trigger** | An `<inputExpression>` references a variable name that has no corresponding top-level `<inputData name="...">` declaration in the `<definitions>` element. Not checked for empty expressions, literal booleans (`true` / `false`), or numeric and quoted-string literals — these are hardcoded values, not variable references. |
+| **Rationale** | Without a matching `<inputData>` declaration, the CPSV Editor cannot discover the DMN's input contract and generates an empty request body on deploy. Adding `<inputData>` elements with `<variable>` children makes the input contract explicit for both tooling and human readers. |
+| **Fix** | For each flagged variable name, add a top-level `<inputData id="InputData_<n>" name="<n>">` element with a `<variable id="Variable_<n>" name="<n>" typeRef="<type>" />` child, placed between `</decision>` and `<dmndi:DMNDI>`. |
+ 
 ---
 
 ## Layer 5 — Content (CON-*)
@@ -481,6 +495,7 @@ Layer 5 checks metadata quality: whether descriptive attributes are populated an
 | INT-004 | 🟡 warning |
 | INT-005 | 🟡 warning |
 | INT-006 | 🟡 warning |
+| INT-007 | 🟡 warning |
 | CON-001 | 🟡 warning |
 | CON-002 | 🟡 warning |
 | CON-003 | 🔵 info |

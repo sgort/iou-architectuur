@@ -13,12 +13,22 @@
 
 ## Versioning
 
+---
+
 ## Naming conventions
+
+---
 
 ## Request / response format
 
+---
+
 ## Rate limiting headers
 
+---
+
 ## OpenAPI documentation
+
+---
 
 ## Route inventory

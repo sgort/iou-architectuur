@@ -2,20 +2,30 @@
 
 The editor implements the **Rules–Policy–Parameters (RPP)** architectural pattern for structuring government business rule management. Three separate tabs map to the three layers of this pattern, each visually distinguished by colour and labelled with its RPP role.
 
-![Screenshot: Tab navigation bar showing the Rules (blue) with RPP layer badges](../../assets/screenshots/cpsv-editor-rpp-tabs-rules.png)
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Tab navigation bar showing the Rules (blue) with RPP layer badges](../../assets/screenshots/cpsv-editor-rpp-tabs-rules.png)
+  <figcaption>Tab navigation bar showing the Rules (blue) with RPP layer badges</figcaption>
+</figure>
 
-![Screenshot: Tab navigation bar showing the CPRMV/Policy (purple) with RPP layer badges](../../assets/screenshots/cpsv-editor-rpp-tabs-policy.png)
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Tab navigation bar showing the CPRMV/Policy (purple) with RPP layer badges](../../assets/screenshots/cpsv-editor-rpp-tabs-policy.png)
+  <figcaption>Tab navigation bar showing the CPRMV/Policy (purple) with RPP layer badges</figcaption>
+</figure>
 
-![Screenshot: Tab navigation bar showing the Parameters (green) tabs with RPP layer badges](../../assets/screenshots/cpsv-editor-rpp-tabs-parameters.png)
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Tab navigation bar showing the Parameters (green) tabs with RPP layer badges](../../assets/screenshots/cpsv-editor-rpp-tabs-parameters.png)
+  <figcaption>Tab navigation bar showing the Parameters (green) tabs with RPP layer badges</figcaption>
+</figure>
+
 ---
 
 ## The three layers
 
-| Layer | Tab | Colour | RDF class | Description |
-|---|---|---|---|---|
-| **Rules** | Rules | 🔵 Blue | `cpsv:Rule, ronl:TemporalRule` | Executable decision logic that operationalises policy |
-| **Policy** | CPRMV | 🟣 Purple | `cprmv:Rule` | Normative values derived directly from legislation |
-| **Parameters** | Parameters | 🟢 Green | `ronl:ParameterWaarde` | Configurable values that tune rule behaviour |
+| Layer          | Tab        | Colour    | RDF class                      | Description                                           |
+| -------------- | ---------- | --------- | ------------------------------ | ----------------------------------------------------- |
+| **Rules**      | Rules      | 🔵 Blue   | `cpsv:Rule, ronl:TemporalRule` | Executable decision logic that operationalises policy |
+| **Policy**     | CPRMV      | 🟣 Purple | `cprmv:Rule`                   | Normative values derived directly from legislation    |
+| **Parameters** | Parameters | 🟢 Green  | `ronl:ParameterWaarde`         | Configurable values that tune rule behaviour          |
 
 ---
 

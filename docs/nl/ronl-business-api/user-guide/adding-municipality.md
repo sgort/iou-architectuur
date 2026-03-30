@@ -13,8 +13,14 @@
 
 ## 1. Add the tenant configuration
 
+---
+
 ## 2. Configure Keycloak
 
+---
+
 ## 3. Add backend tenant middleware allowlist
+
+---
 
 ## 4. Deploy and verify

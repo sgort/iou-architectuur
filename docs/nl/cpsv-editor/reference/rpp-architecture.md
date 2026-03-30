@@ -19,6 +19,8 @@
 
 ### Parameters layer
 
+---
+
 ## Semantic linking
 
 # Policy rule — linked to legislation
@@ -27,6 +29,10 @@
 
 # Parameter — used by the rule
 
+---
+
 ## Governance benefits
+
+---
 
 ## Implementation in the editor

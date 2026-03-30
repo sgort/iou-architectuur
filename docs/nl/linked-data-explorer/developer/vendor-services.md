@@ -13,12 +13,22 @@
 
 ## Backend — SPARQL query
 
+---
+
 ## TypeScript interfaces
+
+---
 
 ## Frontend — vendor badge
 
+---
+
 ## Frontend — vendor modal
 
+---
+
 ## RDF data structure
+
+---
 
 ## RONL Ontology reference

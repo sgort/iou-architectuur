@@ -4,7 +4,293 @@
 
 ## Changelog
 
+### v1.4.0 — RoPA Records & GDPR Article 30 Compliance (March 2026)
+
+**v1.4.0 — New Feature (March 28, 2026)**
+
+#### RoPA Records — PostgreSQL
+
+Two new tables appended to the `migrate.ts` DDL block. Migrations run automatically at backend startup — no manual schema step required.
+
+- `ropa_records` — one row per process (shell or subprocess); keyed on `bpmn_process_id` with a unique index so re-running the seed updates rows in place rather than inserting duplicates; `status` column (`draft` / `active` / `archived`) controls public visibility
+- `ropa_personal_data_fields` — one row per personal data field collected by the linked forms; `ON DELETE CASCADE` from `ropa_records`; `special_category` boolean flags Art. 9/10 GDPR fields
+- New `src/types/ropa.types.ts` — `RopaRecord`, `RopaPersonalDataField`, `PublicRopaRecord`
+- New `src/services/ropa.service.ts` — `listRopa`, `getRopaById`, `getRopaByBpmnProcessId`, `upsertRopa` (transactional: record header + field rows in one `BEGIN`/`COMMIT`), `deleteRopa`, `listPublicRopa`
+- New `src/db/seed-ropa.ts` — idempotent seed for four active records covering `AwbShellProcess`, `TreeFellingPermitSubProcess`, `AwbZorgtoeslagProcess`, and `ZorgtoeslagProvisionalSubProcess`
+
+**Files:** `src/db/migrate.ts`, `src/types/ropa.types.ts`, `src/services/ropa.service.ts`, `src/db/seed-ropa.ts`
+
+#### RoPA Records — API routes
+
+- New `src/routes/ropa.routes.ts` — authenticated asset routes at `/v1/assets/ropa`: `GET` (list), `POST` (upsert, returns `{ id }`), `DELETE /:id`, `GET /by-bpmn-id/:bpmnProcessId`
+- New `src/routes/ropa.public.routes.ts` — CORS-open public route at `/v1/ropa/public`; `?organisation=` query parameter filters by `controller_name ILIKE '%…%'`; strips `controllerContact`, `dpoContact`, and `schemaVersion` before returning; only `status = 'active'` records returned
+- Global CORS middleware in `src/index.ts` patched with path-aware logic: `/v1/ropa/public` bypasses the origin whitelist entirely (`origin: '*'`); all other routes remain subject to `CORS_ORIGIN` env var
+
+**Files:** `src/routes/ropa.routes.ts`, `src/routes/ropa.public.routes.ts`, `src/routes/index.ts`, `src/index.ts`
+
+#### RoPA Editor — LDE UI
+
+New **RoPA Records** view in the LDE sidebar (`ScrollText` icon). `ViewMode.ROPA` added to the enum in `types/index.ts`.
+
+- `RopaEditor.tsx` — root orchestrator; list state, load/save/delete; passes `record={null}` for new records, `key={activeId}` on `RopaRecordEditor` for clean remount on selection change
+- `RopaList.tsx` — left panel; shell records first, subprocess records second; DRAFT / ACTIVE / ARCHIVED badges; delete control per record
+- `RopaRecordEditor.tsx` — four-tab editor:
+  - **Record** — all GDPR Art. 30 mandatory fields; **Lookup from knowledge graph** button fires a SPARQL query against the TriplyDB RONL endpoint via `POST /v1/triplydb/query` and returns a pick-list of `eli:LegalResource` entries
+  - **Personal Data Fields** — **Hydrate from forms** reads `camunda:formRef` values from the process XML, loads matching form schemas from `FormService`, and appends one row per component with a `key` property; each row is classified with a data category and Art. 9/10 flag
+  - **BPMN Link** — reads `ronl:ropaRef` from the matching process XML via `BpmnService`; **Write ronl:ropaRef to BPMN** injects the attribute and persists via `BpmnService.saveProcess`; status indicator: not linked / linked (green) / points to different record (amber)
+  - **Status** — three lifecycle buttons with confirmation dialog before activation
+- New `src/services/ropaService.ts` — fetch-based API client for all five backend operations
+- New `src/types/ropa.types.ts` (frontend mirror)
+
+**Files:** `src/components/RopaEditor/RopaEditor.tsx`, `RopaList.tsx`, `RopaRecordEditor.tsx`, `src/services/ropaService.ts`, `src/types/ropa.types.ts`, `src/types/index.ts`, `src/App.tsx`
+
+#### RoPA Selector — BPMN Modeler
+
+- New `src/components/BpmnModeler/RopaSelector.tsx` — renders as a fixed footer panel pinned below the scrollable process list in `ProcessList.tsx`; only shown when `activeProcess` is non-null; reads the current `ronl:ropaRef` from the process XML by regex; writes via `handleRopaRefChange` in `BpmnModeler.tsx`
+- `ProcessList.tsx` — two new props: `activeProcess: BpmnProcess | null` and `onRopaRefChange: (ropaRef: string | undefined) => void`; `RopaSelector` rendered outside the `overflow-y-auto` scroll container so it stays pinned regardless of list length
+- `BpmnModeler.tsx` — new `handleRopaRefChange`: ensures `xmlns:ronl` declaration on `<definitions>`, then sets, updates, or removes `ronl:ropaRef` on the `<bpmn:process>` opening tag; persists via `BpmnService.saveProcess`
+- `ronlModdleDescriptor.json` — second type entry added: `RopaRefMixin` extends `bpmn:Process` with `ropaRef` as an `isAttr: true` String property; without this registration the attribute is silently dropped by bpmn-js on `saveXML()`
+- Deploy modal — `ropaRefMissing` flag set when `ronl:ropaRef` is absent from the process XML; amber non-blocking warning rendered between the resource list and the resource count line
+
+**Files:** `src/components/BpmnModeler/RopaSelector.tsx`, `ProcessList.tsx`, `BpmnModeler.tsx`, `BpmnCanvas.tsx`, `ronlModdleDescriptor.json`
+
+#### RoPA Public Site — MVP
+
+New package `packages/ropa-site/` — a zero-dependency static HTML/CSS/JS site with no build step.
+
+- `index.html` — fetches `GET /v1/ropa/public`, renders collapsible cards per record with full GDPR Art. 30 field display, personal data fields table with colour-coded data categories and Art. 9/10 red badges, Provincie Flevoland dark green house style; shells rendered before subprocesses
+- `staticwebapp.config.json` — Azure Static Web Apps navigation fallback and no-cache headers
+- Deployed as a separate Azure Static Web Apps resource (`ropa-flevoland-acc`) independent of the LDE frontend; GitHub Actions workflow scoped to `packages/ropa-site/**` path filter
+
+**Files:** `packages/ropa-site/index.html`, `packages/ropa-site/staticwebapp.config.json`, `packages/ropa-site/README.md`, `.github/workflows/azure-static-web-apps-ropa-flevoland-acc.yml`
+
+---
+
+### v1.3.0 — PostgreSQL Asset Storage & AWB Process Hierarchy (March 2026)
+
+**v1.3.0 — Infrastructure (March 25, 2026)**
+
+#### PostgreSQL asset storage
+
+BPMN processes, form schemas, and document templates now persist to PostgreSQL via the LDE backend rather than living exclusively in browser `localStorage`.
+
+- New `src/db/pool.ts` — `pg.Pool` initialised from `DATABASE_URL`; null-guarded so the backend starts without a database configured
+- New `src/db/migrate.ts` — idempotent DDL (`CREATE TABLE IF NOT EXISTS`) for `process_definitions`, `form_schemas`, and `document_templates`; called from `startServer()` before `app.listen()`
+- New `src/services/assets.service.ts` — `listBpmn`, `upsertBpmn`, `deleteBpmn`, `getBpmnByBpmnProcessId`, `listForms`, `upsertForm`, `deleteForm`, `listDocuments`, `upsertDocument`, `deleteDocument`
+- New `src/routes/assets.routes.ts` — `GET`/`POST`/`DELETE` for each asset type; `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId` for subprocess bundle resolution; all routes return `503 DB_NOT_CONFIGURED` when pool is null
+- Registered at `/v1/assets` in `src/routes/index.ts`
+- `packages/backend/package.json` — `pg: ^8` added to `dependencies`, `@types/pg: ^8` to `devDependencies`
+
+**Write-through cache strategy:** saves update `localStorage` immediately and fire a background POST to the backend. Reads remain synchronous from `localStorage` — zero-latency UI at all times.
+
+**Hydration on mount:** each editor runs `hydrateFromServer()` on mount — `GET /v1/assets/{type}` merges server records with local read-only examples and updates the `localStorage` cache. Falls back to local cache silently if the backend is unreachable.
+
+**Files:** `src/db/pool.ts`, `src/db/migrate.ts`, `src/services/assets.service.ts`, `src/routes/assets.routes.ts`, `src/routes/index.ts`, `src/index.ts`, `packages/backend/package.json`, `src/services/bpmnService.ts`, `src/services/formService.ts`, `src/services/documentService.ts`
+
+#### AWB shell / subprocess hierarchy
+
+The `BpmnProcess` type and process library now model the two-layer AWB shell pattern explicitly.
+
+- `BpmnProcess` interface extended with `bpmnProcessId?: string`, `processRole?: 'shell' | 'subprocess' | 'standalone'`, and `calledElement?: string`
+- `bpmnProcessId` is extracted from `<process id="...">` in the XML automatically on save and import via `extractBpmnProcessId()`
+- All five seeded example processes carry explicit role and relationship metadata
+- `ProcessList.tsx` renders a hierarchical grouped view: shell entries are top-level, their subprocesses are indented with a tree connector; standalone and unclassified processes appear as top-level entries
+- `SHELL` (violet) and `SUB` (teal) role badges added to process cards
+- `process_definitions` table stores `process_role`, `called_element`, and `bpmn_process_id` as indexed columns
+
+**Files:** `src/types/index.ts`, `src/components/BpmnModeler/BpmnModeler.tsx`, `src/components/BpmnModeler/ProcessList.tsx`
+
+#### Schema versioning
+
+`schema_version INTEGER NOT NULL DEFAULT 1` column added to all three PostgreSQL tables, enabling server-side re-seeding of example assets across all users and devices when source files change.
+
+#### Zorgtoeslag example processes
+
+Three new versioned example processes added: `AwbZorgtoeslagProcess` (shell), `ZorgtoeslagProvisionalSubProcess`, and `ZorgtoeslagFinalSubProcess` (both subprocesses). Four new example forms: `zorgtoeslag-provisional-start`, `zorgtoeslag-provisional-review`, `zorgtoeslag-final-review`, `zorgtoeslag-notify-applicant`.
+
+**Files:** `src/utils/exampleVersions.ts`, `public/examples/toeslagen/`
+
+#### Azure deployment — troubleshooting notes
+
+During ACC deployment the following issues were encountered and resolved:
+
+- **`permission denied for schema public`** — Azure PostgreSQL Flexible Server (PostgreSQL 15+) revokes `CREATE` on the public schema from non-superusers by default. Fixed by running `GRANT ALL ON SCHEMA public TO lde_user` plus `ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO lde_user` as admin.
+- **CI/CD health check failing (`503`)** — caused by the above permission error crashing `migrate()` before `app.listen()` was reached. The App Service showed "Application Error" page with no log output via `az webapp log tail`; logs were only retrievable via `az webapp log download`.
+
+See [PostgreSQL Deployment](deployment-postgresql.md) for the full provisioning guide including these fixes.
+
+---
+ 
+### v1.2.0 — RIP Phase 1 Bundle & eDOCS Integration (March 2026)
+ 
+**v1.2.0 — New Feature (March 14, 2026)**
+ 
+#### RIP Phase 1 Bundle
+ 
+New deployment bundle for the Regular Infrastructure Projects (RIP) Phase 1 workflow — Provincie Flevoland.
+ 
+- 20-step BPMN process (`RipPhase1Process.bpmn`) covering project definition and preliminary design preparation: intake form, intake meeting, intake report, PSU organisation, PSU execution, PSU report, risk file preparation, preliminary design principles, and two approval gateways with rejection loops
+- `RipProjectTypeAssignment.dmn` — assigns `candidateGroups` and `assignedRoles` from `projectType` and `department`; all rules resolve to `infra-projectteam` / `infra-medewerker`; designed for granular RBAC extension without BPMN changes
+- 7 forms: `rip-intake`, `rip-intake-meeting`, `rip-intake-report`, `rip-psu-organize`, `rip-psu-execution`, `rip-risk-file`, `rip-approval` (reusable at both approval gateways)
+- 3 document templates: `rip-intake-report.document` (column 2), `rip-psu-report.document` (column 3), `rip-pdp.document` (column 4)
+- Bundle deployed to `examples/organizations/flevoland/rip-phase1/`
+ 
+**Files:** `examples/organizations/flevoland/rip-phase1/`
+ 
+#### eDOCS Integration
+ 
+New backend service and external task worker for OpenText eDOCS document management.
+ 
+- `EdocsService` wraps the eDOCS REST API: `connect` (session token caching with auto re-authentication on 401/403), `ensureWorkspace`, `uploadDocument`, `getWorkspaceDocuments`, `healthCheck`
+- `ExternalTaskWorker` polls Operaton via `fetchAndLock` (long-polling, 20s timeout) for two topics: `rip-edocs-workspace` (create/retrieve project workspace, write `edocsWorkspaceId`) and `rip-edocs-document` (render and upload document, write named output variable)
+- Stub mode (`EDOCS_STUB_MODE=true`, default) — all methods return realistic fake responses; full process runs end-to-end without a live eDOCS server; no code changes needed when switching to live
+- Worker started in `app.listen()` callback; stopped cleanly on `SIGTERM`/`SIGINT`
+- 4 new REST endpoints: `GET /v1/edocs/status`, `POST /v1/edocs/workspaces/ensure`, `POST /v1/edocs/documents`, `GET /v1/edocs/workspaces/:id/documents`
+- New environment variables: `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, `EDOCS_PASSWORD`, `EDOCS_STUB_MODE`
+ 
+**Files:** `packages/backend/src/services/edocs.service.ts`, `packages/backend/src/services/externalTaskWorker.service.ts`, `packages/backend/src/routes/edocs.routes.ts`
+ 
+#### DMN Validator — Interaction Rules
+ 
+- **INT-005** scoped to DRDs only — no longer fires on standalone single-decision DMNs; `<inputData>` elements on standalone models serve as input contract declarations for CPSV publishing and do not require `<informationRequirement>` wiring
+- **INT-007** (new) — warns when an `<inputExpression>` references a variable name with no matching top-level `<inputData>` declaration; without this, the CPSV Editor generates an empty request body on deploy
+ 
+**File:** `packages/backend/src/services/dmn-validation.service.ts`
+ 
+**v1.1.2 — Bug Fix (March 11, 2026)**
+ 
+#### Form Editor
+ 
+- **Save** now correctly persists the current schema. `saveSchema()` in form-js 1.20.x returns the schema object directly — not wrapped in `{ schema }`. Destructuring assumption caused `undefined` to be written to `localStorage`, making the active form disappear on the next render.
+- **Export .form** fixed for the same reason.
+- Vite `dedupe` config added for `preact` / `preact/hooks` / `preact/compat` to prevent duplicate Preact instances after npm version round-trips involving `@bpmn-io/*` packages; fixes `TypeError: Cannot read properties of undefined (reading 'context')` on the form canvas.
+ 
+**Known issue:** Typing in a properties panel field (label, key, etc.) loses focus after the first character. Upstream form-js 1.20.x issue — Preact re-renders the properties panel internally on every change event. Will be resolved when an upstream fix is available.
+ 
+**File:** `packages/frontend/vite.config.ts`, `packages/frontend/src/components/FormEditor/FormCanvas.tsx`
+ 
+**v1.1.1 — Enhancement (March 10, 2026)**
+ 
+#### Import from file
+ 
+- **BPMN Modeler** — import `.bpmn` files via the Upload button in the process list header; process name derived from the `name` attribute on the `<process>` element, falling back to filename
+- **Form Editor** — import `.form` files; name derived from the schema `id` field, falling back to filename
+- **Document Composer** — import `.document` files; receives a fresh `id` and timestamps on import to avoid collisions with existing templates
+- All imported items open immediately in their respective editor and are persisted to `localStorage`
+ 
+**Files:** `BpmnModeler/BpmnModeler.tsx`, `FormEditor/FormEditor.tsx`, `DocumentComposer/DocumentComposer.tsx`
+ 
+---
+
+### v1.1.0 — Document Composer (March 2026)
+
+**v1.1.0 — New Feature (March 8, 2026)**
+
+#### Document Composer
+
+New **Document Composer** view for authoring formal government decision document templates (*beschikkingen*).
+
+- Three-panel layout matching BPMN Modeler and Chain Builder conventions: document list (left), zone canvas (centre), Bindings panel (right)
+- Fixed-zone document structure: Letterhead, Contact Information, Reference, Body, Closing, Sign-off, and optional Annex
+- Five draggable block types: rich text (TipTap with bold, italic, headings, lists), variable placeholder, image (from TriplyDB), separator, horizontal rule, and spacer
+- Blocks dragged from the Content library onto zones; reordering within and across zones by drag
+- Image library tab fetches assets from the active TriplyDB dataset
+- Documents stored in `localStorage` under `linkedDataExplorer_documentTemplates`; create, rename, delete, and **Save as…** actions
+- Export document template as a `.document` JSON file
+- Read-only example document pre-loaded: **Kapvergunning Beschikking** (linked to `AwbShellProcess`)
+
+**Files:** `DocumentComposer.tsx`, `DocumentCanvas.tsx`, `DocumentList.tsx`, `ZonePanel.tsx`, `TextBlockEditor.tsx`, `ImageBlock.tsx`, `VariableBlock.tsx`, `BindingPanel.tsx`, `document.types.ts`, `documentService.ts`
+
+#### Variable Bindings
+
+- Bindings panel maps `{{placeholder}}` tokens in rich-text blocks to Operaton process variable keys
+- **Discover Variables** button queries `GET /v1/process/:key/variable-hints` for all variables used by completed instances of a given process definition key
+- Discovered variables shown as clickable chips labelled with type (`String`, `Boolean`, `Double`, etc.)
+- Each binding records placeholder, variable key, source (`process` or `dmn_output`), and optional label
+
+**File:** `BindingPanel.tsx`
+
+#### BPMN Modeler integration
+
+- **Link decision template** dropdown injected into the bpmn-js properties panel for `UserTask` elements (not `StartEvent`)
+- Selecting a template writes `camunda:documentRef` to the BPMN XML
+- Purple badge (📄) rendered on the canvas below the element, below the existing green form badge
+- Badge positioned at `bottom: -36` (vs. `bottom: -22` for the form badge) so both badges are visible simultaneously
+- `DocumentTemplateSelector.tsx` follows the identical injection pattern as `FormTemplateSelector.tsx`
+
+**Files:** `BpmnModeler/DocumentTemplateSelector.tsx`, `BpmnCanvas.tsx`
+
+---
+
+### v1.0.1 — Bug Fix & Internal (March 2026)
+
+**v1.0.1 — Bug Fix (March 7, 2026)**
+
+#### Bug fix
+
+Fixed `Task_Phase6_Notify` and `Task_RequestMissingInfo` appearing pre-claimed in the caseworker dashboard. `camunda:assignee="demo"` removed; `camunda:candidateGroups="caseworker"` added to both tasks so they are correctly visible in the task queue.
+
+#### Internal — example file migration and version registry
+
+- Example `.bpmn` and `.form` files moved to `public/examples/flevoland/` as the single source of truth. Inline schemas removed from `bpmnTemplates.ts` and `FormEditor.tsx`.
+- Added `exampleVersions.ts` with `EXAMPLE_VERSIONS` record (keyed by example name, value is an integer version). The app compares stored versions in `localStorage` key `linkedDataExplorer_exampleVersions` against `EXAMPLE_VERSIONS` and re-fetches any example whose version has been incremented.
+- **Developer workflow:** edit the file in `public/examples/`, mirror the change to `examples/organizations/`, increment the version in `exampleVersions.ts`, commit. Existing users receive the updated example without clearing `localStorage`.
+
+**Files:** `exampleVersions.ts`, `bpmnTemplates.ts`, `FormEditor.tsx`, `public/examples/flevoland/`
+
+---
+
+### v1.0.0 — Form Editor & One-Click Deploy (March 2026)
+
+**v1.0.0 — Major Release**
+
+#### Form Editor
+
+New **Form Editor** view powered by `@bpmn-io/form-js` (schemaVersion 16, MIT licensed). Forms are authored as JSON schema, stored in `localStorage`, and available immediately to the BPMN Modeler.
+
+- Two-panel layout: form list (left) and `@bpmn-io/form-js` editor canvas (right)
+- Create, rename, and delete WIP forms; three seed EXAMPLE forms are read-only
+- Three built-in examples: `kapvergunning-start` (citizen-facing), `tree-felling-review` (caseworker review), `awb-notify-applicant` (caseworker notification)
+- Export individual forms as `.form` JSON files compatible with Camunda Modeler and Operaton
+- `FormService` localStorage CRUD shared with the BPMN Modeler — no sync step required
+
+**Files:** `FormEditor.tsx`, `FormCanvas.tsx`, `FormList.tsx`, `formService.ts`
+
+#### BPMN Modeler — Form integration
+
+- **Link to Form** dropdown in the properties panel for `UserTask` and `StartEvent` elements
+- Writes `camunda:formRef` and `camunda:formRefBinding="latest"` to the BPMN XML
+- `camunda:formRefBinding="latest"` means Operaton always resolves the most recent deployment of that form ID — no version pinning needed
+- Green badge overlay on `UserTask` and `StartEvent` elements when a form is linked
+- `DmnTemplateSelector` pre-selection bug fixed — dropdown now correctly reflects an existing `camunda:decisionRef` when opening properties for an already-linked element
+
+**Files:** `BpmnCanvas.tsx`, `FormTemplateSelector.tsx`
+
+#### BPMN Modeler — One-click deploy
+
+- **Deploy** button opens a modal listing all resources to be bundled: main BPMN, subprocess BPMNs (resolved via `calledElement` attributes), and all `.form` files referenced by `camunda:formRef`
+- All resources deployed in a single multipart `POST /api/dmns/process/deploy` to Operaton — `camunda:formRef` resolves at runtime because BPMN and forms share the same deployment ID
+- Configurable Operaton endpoint field pre-filled from `VITE_OPERATON_BASE_URL`
+- Optional HTTP Basic Auth credentials per deployment
+- Unmatched form references (in BPMN but not in localStorage) shown in modal before deploying
+- Deploy button disabled after a successful deployment to prevent accidental re-deploy
+
+**Files:** `BpmnCanvas.tsx` (frontend), `dmn.routes.ts` + `operaton.service.ts` (backend)
+
+---
+
 ### v0.9.x — DMN Syntactic Validation (February 2026)
+
+**v0.9.1 — Date Input Validation Fix**
+
+Fixed a false "Missing 1 required input(s)" error in the Chain Composer when a DMN contains an optional `Date` input whose test value is intentionally `null` (e.g. `overlijdensdatum` in `zorgtoeslag_resultaat`).
+
+The root cause was a two-part gap between how RDF stores test data and how the validator tracks input state. In TriplyDB, a `null` value cannot be represented as a `schema:value` triple, so optional date variables have no `testValue` property at all on the `DmnVariable` object returned by the backend. The Fill with test data button in `InputForm.tsx` only wrote a key into the `inputs` state object when `testValue` was defined — silently skipping `null`-default dates. The validator in `ChainBuilder.tsx` then checked `input.identifier in inputs`, found the key absent, and pushed the variable into `missingInputs`.
+
+Two fixes were applied:
+
+- **`InputForm.tsx`** — the Fill button now explicitly sets `Date` inputs to `null` when `testValue` is `undefined`, ensuring the key is always registered in state after filling.
+- **`ChainBuilder.tsx`** — the validator now exempts `Date` inputs from the missing-input check when no value is present, consistent with the existing exemption for `Boolean` inputs (which default to `false` without user action). An unset date is a valid input state, not an authoring error.
 
 **v0.9.0 — DMN Validator**
 

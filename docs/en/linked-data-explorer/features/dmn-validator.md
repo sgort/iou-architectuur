@@ -2,7 +2,10 @@
 
 The DMN Validator lets you validate one or more DMN files against the RONL DMN+ syntactic layers before publishing them to TriplyDB. It is accessible from the shield icon (🛡) in the sidebar.
 
-![Screenshot: DMN Validator showing two files loaded side-by-side, one valid with warnings, one with an Interaction Rules error expanded](../../assets/screenshots/linked-data-explorer-dmn-validator.png)
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: DMN Validator showing two files loaded side-by-side, one valid with warnings, one with an Interaction Rules error expanded](../../assets/screenshots/linked-data-explorer-dmn-validator.png)
+  <figcaption>DMN Validator showing two files loaded side-by-side, one valid with warnings, one with an Interaction Rules error expanded</figcaption>
+</figure>
 
 ---
 
@@ -31,7 +34,7 @@ Results are grouped into five layers. Each layer can be expanded to see individu
 | Base DMN | BASE-* | XML well-formedness, namespace, root element, required attributes |
 | Business Rules | BIZ-* | Hit policy, typeRef presence and correctness, rule entry counts, hit-policy overlap detection |
 | Execution Rules | EXEC-* | CPRMV extension attributes, enum values, date formats, BWB IDs |
-| Interaction Rules | INT-* | DRD wiring — href resolution, orphaned inputs, variable names |
+| Interaction Rules | INT-* | DRD wiring — href resolution, orphaned inputs (DRDs only), variable name consistency, missing `inputData` declarations (INT-007) |
 | Content | CON-* | Metadata quality — descriptions, typeRef, text annotations |
 
 A file is **valid** when no layer produces an error. Warnings and informational messages are advisory; they highlight quality improvements recommended for RONL publishing but do not block use.
@@ -54,7 +57,10 @@ For the complete specification of every code and its rationale, see the [DMN Val
 
 The screenshot below shows `BIZ-008-009-test.dmn` — a file deliberately authored with two hit-policy violations — loaded in the validator. The Business Rules layer reports one error and one warning.
 
-![Screenshot: BIZ-008-009-test.dmn in the DMN Validator showing Business Rules 1E 1W — BIZ-008 duplicate rows error and BIZ-009 catch-all shadow warning](../../assets/screenshots/linked-data-explorer-dmn-validator-biz-008-009-test.png)
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: BIZ-008-009-test.dmn in the DMN Validator showing Business Rules 1E 1W — BIZ-008 duplicate rows error and BIZ-009 catch-all shadow warning](../../assets/screenshots/linked-data-explorer-dmn-validator-biz-008-009-test.png)
+  <figcaption>BIZ-008-009-test.dmn in the DMN Validator showing Business Rules 1E 1W — BIZ-008 duplicate rows error and BIZ-009 catch-all shadow warning</figcaption>
+</figure>
 
 ---
 

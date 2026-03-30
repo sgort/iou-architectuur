@@ -13,6 +13,8 @@
 
 ## Directory layout
 
+---
+
 ## Key modules
 
 ### `src/hooks/useEditorState.js`
@@ -25,6 +27,10 @@
 
 ### `src/config/vocabularies_config.js`
 
+---
+
 ## RPP tab mapping
+
+---
 
 ## State flow

@@ -13,15 +13,27 @@
 
 ## Authentication flow
 
+---
+
 ## Keycloak as identity broker
+
+---
 
 ## JWT token structure
 
+---
+
 ## OIDC discovery endpoints
+
+---
 
 ## Token validation in the backend
 
+---
+
 ## Security settings in the Keycloak realm
+
+---
 
 ## Connecting a real DigiD / eHerkenning / eIDAS provider
 

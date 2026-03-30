@@ -101,6 +101,10 @@
             <stop offset="0%" stop-color="#EEF3F9" />
             <stop offset="100%" stop-color="#F5F8FC" />
           </linearGradient>
+          <linearGradient id="edocs-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0D7377" />
+            <stop offset="100%" stop-color="#085F63" />
+          </linearGradient>
           <linearGradient id="bpmn-grad" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#E040FB" />
             <stop offset="50%" stop-color="#9C27B0" />
@@ -205,7 +209,7 @@
 
         <!-- 3. CPSV Editor → BPMN/DMN: DMN Files -->
         <path
-          d="M 310 320 C 310 390, 535 450, 565 490"
+          d="M 310 320 C 310 370, 450 410, 490 425"
           stroke="#1B6B35"
           stroke-width="2.5"
           fill="none"
@@ -213,7 +217,7 @@
         />
         <rect
           x="353"
-          y="393"
+          y="358"
           width="82"
           height="21"
           rx="5"
@@ -223,7 +227,7 @@
         />
         <text
           x="394"
-          y="408"
+          y="373"
           text-anchor="middle"
           font-size="10"
           font-family="IBM Plex Mono, monospace"
@@ -235,7 +239,7 @@
 
         <!-- 4. Chain Composer → BPMN/DMN: Deploy BPMN+DMN -->
         <path
-          d="M 693 565 C 670 565, 655 548, 653 530"
+          d="M 693 490 C 675 490, 660 474, 653 464"
           stroke="#1B6B35"
           stroke-width="2.5"
           fill="none"
@@ -243,7 +247,7 @@
         />
         <rect
           x="600"
-          y="552"
+          y="474"
           width="130"
           height="21"
           rx="5"
@@ -253,7 +257,7 @@
         />
         <text
           x="665"
-          y="567"
+          y="489"
           text-anchor="middle"
           font-size="9.5"
           font-family="IBM Plex Mono, monospace"
@@ -265,7 +269,7 @@
 
         <!-- 5. BPMN/DMN → Self Service Portals: Business Rules -->
         <path
-          d="M 506 565 C 460 565, 430 580, 400 598"
+          d="M 490 484 C 455 484, 430 510, 400 530"
           stroke="#1B6B35"
           stroke-width="2.5"
           fill="none"
@@ -273,7 +277,7 @@
         />
         <rect
           x="396"
-          y="545"
+          y="488"
           width="108"
           height="21"
           rx="5"
@@ -283,7 +287,7 @@
         />
         <text
           x="450"
-          y="560"
+          y="503"
           text-anchor="middle"
           font-size="9.5"
           font-family="IBM Plex Mono, monospace"
@@ -305,7 +309,6 @@
           fill="white"
           stroke="#94AEC5"
           stroke-width="2"
-          stroke-dasharray="10,6"
           filter="url(#card-shadow)"
         />
 
@@ -903,7 +906,7 @@
         <!-- ══════════════════════════════════════════════ -->
         <rect
           x="490"
-          y="476"
+          y="410"
           width="220"
           height="148"
           rx="18"
@@ -915,7 +918,7 @@
         <!-- BPMN/DMN icon -->
         <rect
           x="540"
-          y="490"
+          y="424"
           width="52"
           height="52"
           rx="12"
@@ -923,7 +926,7 @@
         />
         <rect
           x="547"
-          y="497"
+          y="431"
           width="16"
           height="16"
           rx="3"
@@ -931,7 +934,7 @@
         />
         <rect
           x="568"
-          y="497"
+          y="431"
           width="16"
           height="16"
           rx="3"
@@ -939,7 +942,7 @@
         />
         <rect
           x="547"
-          y="518"
+          y="452"
           width="16"
           height="16"
           rx="3"
@@ -947,7 +950,7 @@
         />
         <rect
           x="568"
-          y="518"
+          y="452"
           width="16"
           height="16"
           rx="3"
@@ -956,43 +959,43 @@
         <!-- X marks left col -->
         <line
           x1="550"
-          y1="500"
+          y1="434"
           x2="560"
-          y2="510"
+          y2="444"
           stroke="#E040FB"
           stroke-width="2.5"
           stroke-linecap="round"
         />
         <line
           x1="560"
-          y1="500"
+          y1="434"
           x2="550"
-          y2="510"
+          y2="444"
           stroke="#E040FB"
           stroke-width="2.5"
           stroke-linecap="round"
         />
         <line
           x1="550"
-          y1="521"
+          y1="455"
           x2="560"
-          y2="531"
+          y2="465"
           stroke="#E040FB"
           stroke-width="2.5"
           stroke-linecap="round"
         />
         <line
           x1="560"
-          y1="521"
+          y1="455"
           x2="550"
-          y2="531"
+          y2="465"
           stroke="#E040FB"
           stroke-width="2.5"
           stroke-linecap="round"
         />
         <!-- Checks right col -->
         <polyline
-          points="571,506 576,511 581,501"
+          points="571,440 576,445 581,435"
           fill="none"
           stroke="#22C55E"
           stroke-width="2.5"
@@ -1000,7 +1003,7 @@
           stroke-linejoin="round"
         />
         <polyline
-          points="571,527 576,532 581,522"
+          points="571,461 576,466 581,456"
           fill="none"
           stroke="#22C55E"
           stroke-width="2.5"
@@ -1010,7 +1013,7 @@
         <!-- Labels -->
         <text
           x="600"
-          y="558"
+          y="492"
           text-anchor="middle"
           font-family="IBM Plex Sans, sans-serif"
           font-size="16"
@@ -1021,7 +1024,7 @@
         </text>
         <text
           x="600"
-          y="574"
+          y="508"
           text-anchor="middle"
           font-family="IBM Plex Sans, sans-serif"
           font-size="10.5"
@@ -1031,7 +1034,7 @@
         </text>
         <rect
           x="524"
-          y="582"
+          y="516"
           width="152"
           height="28"
           rx="8"
@@ -1041,7 +1044,7 @@
         />
         <text
           x="600"
-          y="593"
+          y="527"
           text-anchor="middle"
           font-family="IBM Plex Mono, monospace"
           font-size="8"
@@ -1052,15 +1055,164 @@
         </text>
         <text
           x="600"
-          y="605"
+          y="539"
           text-anchor="middle"
           font-family="IBM Plex Mono, monospace"
-          font-size="7.5"
+          font-size="8"
           fill="#7C3AED"
         >
           Apache 2.0 Open Source
         </text>
 
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- ARROW: BPMN/DMN → eDOCS                        -->
+        <!-- ══════════════════════════════════════════════ -->
+        <path
+          d="M 600 558 L 600 643"
+          stroke="#1B6B35"
+          stroke-width="2.5"
+          fill="none"
+          marker-end="url(#arrow-green)"
+        />
+        <rect
+          x="556"
+          y="588"
+          width="82"
+          height="21"
+          rx="5"
+          fill="#E8F5E9"
+          stroke="#81C784"
+          stroke-width="1"
+        />
+        <text
+          x="600"
+          y="600"
+          text-anchor="middle"
+          font-size="10"
+          font-family="IBM Plex Mono, monospace"
+          fill="#1B5E20"
+          font-weight="500"
+        >
+          Documents
+        </text>
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- CARD: eDOCS / DMS — below BPMN/DMN            -->
+        <!-- ══════════════════════════════════════════════ -->
+        <rect
+          x="490"
+          y="645"
+          width="220"
+          height="115"
+          rx="18"
+          fill="white"
+          stroke="#E2E8F0"
+          stroke-width="2"
+          filter="url(#center-shadow)"
+        />
+        <!-- eDOCS icon -->
+        <rect
+          x="538"
+          y="658"
+          width="48"
+          height="48"
+          rx="12"
+          fill="url(#edocs-grad)"
+        />
+        <!-- Document shape -->
+        <rect
+          x="548"
+          y="666"
+          width="22"
+          height="28"
+          rx="3"
+          fill="rgba(255,255,255,0.92)"
+        />
+        <!-- Dog-ear -->
+        <path
+          d="M 564 666 L 570 666 L 570 672 Z"
+          fill="rgba(255,255,255,0.45)"
+        />
+        <!-- Lines -->
+        <line
+          x1="551"
+          y1="674"
+          x2="568"
+          y2="674"
+          stroke="#0D7377"
+          stroke-width="1.4"
+        />
+        <line
+          x1="551"
+          y1="680"
+          x2="568"
+          y2="680"
+          stroke="#0D7377"
+          stroke-width="1.4"
+        />
+        <line
+          x1="551"
+          y1="686"
+          x2="561"
+          y2="686"
+          stroke="#0D7377"
+          stroke-width="1.4"
+        />
+        <!-- Second document (offset) -->
+        <rect
+          x="557"
+          y="662"
+          width="22"
+          height="28"
+          rx="3"
+          fill="rgba(255,255,255,0.6)"
+          stroke="rgba(13,115,119,0.3)"
+          stroke-width="1"
+        />
+        <!-- Labels -->
+        <text
+          x="600"
+          y="719"
+          text-anchor="middle"
+          font-family="IBM Plex Sans, sans-serif"
+          font-size="14"
+          font-weight="600"
+          fill="#0F2B5B"
+        >
+          eDOCS / DMS
+        </text>
+        <text
+          x="600"
+          y="735"
+          text-anchor="middle"
+          font-family="IBM Plex Sans, sans-serif"
+          font-size="10.5"
+          fill="#64748B"
+        >
+          OpenText Document Management
+        </text>
+        <!-- Stub mode pill -->
+        <rect
+          x="524"
+          y="743"
+          width="152"
+          height="15"
+          rx="5"
+          fill="#F0FDFA"
+          stroke="#99F6E4"
+          stroke-width="1"
+        />
+        <text
+          x="600"
+          y="754"
+          text-anchor="middle"
+          font-family="IBM Plex Mono, monospace"
+          font-size="7.5"
+          fill="#0D7377"
+          font-weight="500"
+        >
+          EDOCS_STUB_MODE · live-switchable
+        </text>
         <!-- ══════════════════════════════════════════════ -->
         <!-- CARD 4: SELF SERVICE PORTALS — bottom left     -->
         <!-- ══════════════════════════════════════════════ -->
@@ -1073,7 +1225,6 @@
           fill="white"
           stroke="#94AEC5"
           stroke-width="2"
-          stroke-dasharray="10,6"
           filter="url(#card-shadow)"
         />
         <!-- Check badge -->
@@ -1390,7 +1541,7 @@
           height="375"
           rx="18"
           fill="white"
-          stroke="#CBD5E1"
+          stroke="#94AEC5"
           stroke-width="2"
           filter="url(#card-shadow)"
         />

@@ -13,18 +13,34 @@
 
 ## Opening the Chain Builder
 
+---
+
 ## Inspecting DMNs
+
+---
 
 ## Building the chain
 
+---
+
 ## Providing inputs
+
+---
 
 ## Executing the chain
 
+---
+
 ## Reading results
+
+---
 
 ## Removing a DMN from the chain
 
+---
+
 ## Reordering the chain
+
+---
 
 ## Next steps

@@ -24,7 +24,10 @@ Before building a chain, identify which DMNs you want to connect and verify that
 
 Drag a DMN card from the Available DMNs panel and drop it into the Chain Composer. A placeholder zone appears as you drag; release to place the card. Repeat for each subsequent DMN in the order you want them to execute.
 
-![Screenshot: Chain Builder with a valid chain showing green validation status and active action buttons](../../assets/screenshots/linked-data-explorer-chain-validation.png)
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Chain Builder with a valid chain showing green validation status and active action buttons](../../assets/screenshots/linked-data-explorer-chain-validation.png)
+  <figcaption>Chain Builder with a valid chain showing green validation status and active action buttons</figcaption>
+</figure>
 
 The validation panel below the composer updates after each drop:
 

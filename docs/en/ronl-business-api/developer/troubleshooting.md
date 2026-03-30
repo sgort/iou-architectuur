@@ -1,5 +1,7 @@
 # Troubleshooting
 
+---
+
 ## Diagnosing a problem
 
 Start by identifying which layer the error comes from:

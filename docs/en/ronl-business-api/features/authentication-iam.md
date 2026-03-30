@@ -2,7 +2,12 @@
 
 RONL Business API uses **Keycloak 23** as its Identity and Access Management layer, implementing the OIDC Authorization Code Flow. Keycloak acts as an identity broker, federating authentication requests to DigiD, eIDAS, and eHerkenning — the three Dutch government identity providers.
 
-![Screenshot: RONL Business API Keycloak Login Page](../../../assets/screenshots/ronl-business-api-keycloak-login.png)
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: RONL Business API Keycloak Login Page](../../../assets/screenshots/ronl-business-api-keycloak-login.png)
+  <figcaption>Default Keycloak login page</figcaption>
+</figure>
+
+---
 
 ## Authentication flows
 
@@ -98,6 +103,8 @@ The `loginHint: '__medewerker__'` value passed to `keycloak.login()` is a sentin
 
 When `isMedewerker` is true, the template renders the indigo context banner and suppresses the sentinel from the username field so the caseworker enters their own credentials into an empty field. No JavaScript is required — the suppression happens server-side in FreeMarker before the HTML is sent to the browser.
 
+---
+
 ## Keycloak as identity broker
 
 Keycloak sits between the municipality portal and the external identity providers. It handles:
@@ -111,6 +118,8 @@ Keycloak sits between the municipality portal and the external identity provider
 In the current development environment, DigiD is **simulated** — test users in the Keycloak realm substitute for a real DigiD connection. The architecture is identical; only the external IdP step is replaced by direct Keycloak credentials.
 
 Caseworker accounts are an exception to the identity broker pattern. Because municipal employees are managed directly in the `ronl` realm, their authentication stays entirely within Keycloak — no SAML round-trip to an external IdP occurs. The `municipality` and `caseworker` role attributes are set directly on the user account in Keycloak Admin and included in the JWT via protocol mappers.
+
+---
 
 ## JWT token structure
 
@@ -156,6 +165,8 @@ Caseworker tokens do not contain a `bsn` claim. The `loa` value is set staticall
 | `mandate`      | string | Representation authority (optional)              | `"legal-guardian"` |
 | `bsn`          | string | Citizen Service Number (encrypted in production) | `"***-***-***"`    |
 
+---
+
 ## OIDC discovery endpoints
 
 **ACC:**
@@ -180,6 +191,8 @@ Key endpoints exposed via the discovery document:
 | `userinfo_endpoint`      | Returns user profile attributes                           |
 | `end_session_endpoint`   | Logout                                                    |
 
+---
+
 ## Token validation in the backend
 
 The backend validates every incoming request through `auth/jwt.middleware.ts`:
@@ -192,6 +205,8 @@ The backend validates every incoming request through `auth/jwt.middleware.ts`:
 
 If any validation step fails, the request is rejected with HTTP 401 before it reaches any route handler.
 
+---
+
 ## Security settings in the Keycloak realm
 
 The `ronl` realm is configured with:
@@ -203,6 +218,24 @@ The `ronl` realm is configured with:
 - Direct access grants: enabled for development test users only
 
 The realm configuration is version-controlled in `config/keycloak/ronl-realm.json` and can be imported via the Keycloak Admin Console or the deployment scripts.
+
+---
+
+## Session expiry warning
+
+When filling in long forms (such as the intake report), the session may expire before submission. From v2.6.0 a warning modal appears automatically when fewer than 2 minutes remain on the JWT access token:
+
+- **Sessie verlengen** — forces a silent token refresh via `keycloak.updateToken(-1)`. Unsaved form data is preserved.
+- **Uitloggen** — ends the session immediately.
+
+The Axios request interceptor also proactively calls `updateToken(30)` before every API request, so normal activity keeps the session alive automatically.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Session expiring warning](../../../assets/screenshots/ronl-session-expiring-modal.png)
+  <figcaption>Warning modal</figcaption>
+</figure>
+
+---
 
 ## Connecting a real DigiD / eHerkenning / eIDAS provider
 

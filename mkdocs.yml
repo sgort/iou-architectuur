@@ -96,18 +96,29 @@ nav:
       - Multi-Tenant Municipality Portal: ronl-business-api/features/multi-tenant-portal.md
       - Authentication & IAM: ronl-business-api/features/authentication-iam.md
       - Business Rules Execution: ronl-business-api/features/business-rules-execution.md
+      - Dynamic Forms: ronl-business-api/features/dynamic-forms.md
+      - Regelcatalogus: ronl-business-api/features/regelcatalogus.md
+      - Caseworker Dashboard: ronl-business-api/features/caseworker-dashboard.md
+      - Commercial Organisation Integration: en/ronl-business-api/features/commercial-org-integration.md
       - Timeline Navigation: ronl-business-api/features/timeline-navigation.md
       - Security & Compliance: ronl-business-api/features/security-compliance.md
       - API Design: ronl-business-api/features/api-design.md
     - User Guides:
       - Logging In — Citizen & Caseworker: ronl-business-api/user-guide/login-flow.md
-      - Submitting a Calculation: ronl-business-api/user-guide/submitting-calculation.md
+      - Submitting an Application: ronl-business-api/user-guide/submitting-application.md
+      - Zorgtoeslag via Commercial Org: en/ronl-business-api/user-guide/zorgtoeslag-cross-org-journey.md
       - Using Timeline Navigation: ronl-business-api/user-guide/timeline-navigation.md
       - Caseworker Workflow: ronl-business-api/user-guide/caseworker-workflow.md
+      - HR Onboarding: ronl-business-api/user-guide/hr-onboarding.md
+      - RIP Phase 1 Workflow: ronl-business-api/user-guide/rip-phase1-workflow.md
       - Adding a Municipality: ronl-business-api/user-guide/adding-municipality.md
     - Developer Docs:
       - Local Development Setup: ronl-business-api/developer/local-development.md
       - Backend Development: ronl-business-api/developer/backend-development.md
+      - Copilot Studio — eDOCS: ronl-business-api/developer/copilot-studio-edocs.md
+      - Operaton Access Patterns: ronl-business-api/developer/operaton-access-patterns.md
+      - Operaton MCP Client: ronl-business-api/developer/operaton-mcp-client.md
+      - Operaton MCP AI Assistant: ronl-business-api/developer/operaton-mcp-ai-assistant.md
       - Frontend Development: ronl-business-api/developer/frontend-development.md
       - Shared Package: ronl-business-api/developer/shared-package.md
       - Timeline Implementation: ronl-business-api/developer/implementing-timeline.md
@@ -122,9 +133,12 @@ nav:
         - Backend (Azure App Service): ronl-business-api/developer/deployment/backend.md
         - Frontend (Azure Static Web Apps): ronl-business-api/developer/deployment/frontend.md
         - Caddy (Reverse Proxy): ronl-business-api/developer/deployment/caddy.md
+        - PostgreSQL (Azure): ronl-business-api/developer/deployment/postgresql.md
+        - PROD Deployment Notes - v2.9.1: ronl-business-api/developer/deployment/prod-deployment-v2.9.1.md
     - References:
       - API Endpoints: ronl-business-api/references/api-endpoints.md
       - BRP API Endpoints: ronl-business-api/references/brp-api-endpoints.md
+      - BPMN Design Criteria: ronl-business-api/references/bpmn-design-criteria.md
       - Environment Variables: ronl-business-api/references/environment-variables.md
       - JWT Claims: ronl-business-api/references/jwt-claims.md
       - Keycloak Realm Configuration: ronl-business-api/references/keycloak-realm.md
@@ -176,8 +190,12 @@ nav:
         - DMN Discovery & Chain Building: linked-data-explorer/features/dmn-chain-building.md
         - DRD Generation: linked-data-explorer/features/drd-generation.md
         - DMN Validator: linked-data-explorer/features/dmn-validator.md
+        - RIP Phase 1 Bundle: en/linked-data-explorer/features/rip-phase1-bundle.md
         - Semantic Analysis: linked-data-explorer/features/semantic-analysis.md
         - BPMN Modeler: linked-data-explorer/features/bpmn-modeler.md
+        - Form Editor: linked-data-explorer/features/form-editor.md
+        - Document Composer: linked-data-explorer/features/document-composer.md
+        - RoPA Records: linked-data-explorer/features/ropa-records.md
         - Governance & Validation: linked-data-explorer/features/governance-validation.md
         - Vendor Services: linked-data-explorer/features/vendor-services.md
     - User Guides:
@@ -188,6 +206,9 @@ nav:
         - DMN Validator: linked-data-explorer/user-guide/dmn-validator.md
         - Semantic Analysis: linked-data-explorer/user-guide/semantic-analysis.md
         - BPMN Modeler: linked-data-explorer/user-guide/bpmn-modeler.md
+        - Form Editor: linked-data-explorer/user-guide/form-editor.md
+        - Document Composer: linked-data-explorer/user-guide/document-composer.md
+        - RoPA Records: linked-data-explorer/user-guide/ropa-records.md
         - Governance Badges: linked-data-explorer/user-guide/governance-badges.md
         - Vendor Services: linked-data-explorer/user-guide/vendor-services.md
     - Developer Docs:
@@ -195,14 +216,21 @@ nav:
         - Local Development: linked-data-explorer/developer/local-development.md
         - Frontend Architecture: linked-data-explorer/developer/frontend.md
         - Backend Architecture: linked-data-explorer/developer/backend.md
+        - Asset Storage: linked-data-explorer/developer/asset-storage.md
+        - DB Type Layer: linked-data-explorer/developer/db-type-layer.md
+        - eDOCS Integration: en/linked-data-explorer/developer/edocs-integration.md
         - Enhanced Validation & Semantic Detection: linked-data-explorer/developer/enhanced-validation.md
         - Chain Export: linked-data-explorer/developer/chain-export.md
         - DRD Generation: linked-data-explorer/developer/drd-generation.md
         - DMN Validator Implementation: linked-data-explorer/developer/dmn-validator-implementation.md
         - BPMN Modeler: linked-data-explorer/developer/bpmn-modeler.md
+        - Form Editor: linked-data-explorer/developer/form-editor.md
+        - Document Composer: linked-data-explorer/developer/document-composer.md
+        - RoPA Records: linked-data-explorer/developer/ropa-records.md
         - Governance Implementation: linked-data-explorer/developer/governance.md
         - Vendor Services Implementation: linked-data-explorer/developer/vendor-services.md
         - Deployment: linked-data-explorer/developer/deployment.md
+        - PostgreSQL Deployment: linked-data-explorer/developer/deployment-postgresql.md
         - Test Cases: linked-data-explorer/developer/test-cases.md
         - Changelog & Roadmap: linked-data-explorer/developer/changelog-roadmap.md
     - References:
@@ -210,6 +238,30 @@ nav:
         - DMN Validation Reference: linked-data-explorer/reference/dmn-validation-reference.md
         - API Reference: linked-data-explorer/reference/api-reference.md
         - RONL Ontology: linked-data-explorer/reference/ronl-ontology.md
+
+  - 📜 CPRMV API:
+    - Overview: cprmv-api/index.md
+    - Features:
+      - Overview: cprmv-api/features/overview.md
+      - Publication Repositories: cprmv-api/features/publication-repositories.md
+      - Output Formats: cprmv-api/features/output-formats.md
+      - Reference Resolution: cprmv-api/features/reference-resolution.md
+    - User Guides:
+      - Getting Started: cprmv-api/user-guide/getting-started.md
+      - Fetching Rules: cprmv-api/user-guide/fetching-rules.md
+      - Rule Path Syntax: cprmv-api/user-guide/rule-path-syntax.md
+      - Definition Extraction: cprmv-api/user-guide/definition-extraction.md
+    - Developer Docs:
+      - Architecture: cprmv-api/developer/architecture.md
+      - Local Development: cprmv-api/developer/local-development.md
+      - Data Model: cprmv-api/developer/data-model.md
+      - Deployment: cprmv-api/developer/deployment.md
+      - CI/CD: cprmv-api/developer/ci-cd.md
+      - Changelog & Roadmap: cprmv-api/developer/changelog-roadmap.md
+    - References:
+      - API Endpoints: cprmv-api/reference/api-endpoints.md
+      - ID Formats: cprmv-api/reference/id-formats.md
+      - CPRMV Vocabulary: cprmv-api/reference/cprmv-vocabulary.md
 
   - 🤝 Contributing:
     - Overview: contributing/index.md

@@ -35,7 +35,11 @@
 
 ### Features
 
+---
+
 ## Frontend — `packages/frontend/.env`
+
+---
 
 ## DNS records
 
@@ -43,7 +47,11 @@
 
 # PROD
 
+---
+
 ## GitHub repository secrets
+
+---
 
 ## Generating environment passwords
 

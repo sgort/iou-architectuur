@@ -1,5 +1,7 @@
 # BRP Timeline Integration - Technical Architecture
 
+---
+
 ## Architecture Overview
 
 ```
@@ -32,6 +34,8 @@
 │              https://brp-api-mock.open-regels.nl              │
 └───────────────────────────────────────────────────────────────┘
 ```
+
+---
 
 ## Component Structure
 

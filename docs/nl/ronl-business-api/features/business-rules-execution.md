@@ -13,10 +13,18 @@
 
 ## What Operaton handles
 
+---
+
 ## Supported processes
+
+---
 
 ## Process execution flow
 
+---
+
 ## API endpoints for business rules
+
+---
 
 ## Operaton environment

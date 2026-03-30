@@ -1,5 +1,7 @@
 # Timeline Implementation - Developer Guide
 
+---
+
 ## Table of Contents
 
 1. [Adding New Test Personas](#adding-new-test-personas)

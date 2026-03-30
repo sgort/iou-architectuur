@@ -13,7 +13,11 @@
 
 ## What is IOU Architecture?
 
+---
+
 ## Architecture Overview
+
+---
 
 ## Ecosystem Components
 
@@ -23,10 +27,18 @@
 
 ### 🔍 Linked Data Explorer
 
+---
+
 ## Quick Links
+
+---
 
 ## Technology Stack
 
+---
+
 ## Standards Compliance
+
+---
 
 ## Contributing

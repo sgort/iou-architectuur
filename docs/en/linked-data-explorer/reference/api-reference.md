@@ -80,11 +80,11 @@ Content-Type: application/json
 
 **`status` values:**
 
-| Value | HTTP | Meaning |
-|---|---|---|
-| `healthy` | 200 | All dependencies operational |
-| `degraded` | 503 | One or more dependencies down |
-| `unhealthy` | 503 | Health check itself failed |
+| Value       | HTTP | Meaning                       |
+| ----------- | ---- | ----------------------------- |
+| `healthy`   | 200  | All dependencies operational  |
+| `degraded`  | 503  | One or more dependencies down |
+| `unhealthy` | 503  | Health check itself failed    |
 
 ---
 
@@ -96,9 +96,9 @@ Query TriplyDB for all published DMN decision models at the given endpoint.
 
 **Query parameters:**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `endpoint` | Yes | SPARQL endpoint URL (URL-encoded) |
+| Parameter  | Required | Description                       |
+| ---------- | -------- | --------------------------------- |
+| `endpoint` | Yes      | SPARQL endpoint URL (URL-encoded) |
 
 **Response:**
 
@@ -112,16 +112,24 @@ Query TriplyDB for all published DMN decision models at the given endpoint.
         "identifier": "SVB_LeeftijdsInformatie",
         "title": "AOW Leeftijdsberekening",
         "inputs": [
-          { "identifier": "geboortedatum", "title": "Geboortedatum", "type": "Date" }
+          {
+            "identifier": "geboortedatum",
+            "title": "Geboortedatum",
+            "type": "Date"
+          }
         ],
         "outputs": [
-          { "identifier": "aanvragerIs181920", "title": "Aanvrager is 18/19/20", "type": "Boolean" }
+          {
+            "identifier": "aanvragerIs181920",
+            "title": "Aanvrager is 18/19/20",
+            "type": "Boolean"
+          }
         ],
         "validationStatus": "validated",
         "validatedByName": "Sociale Verzekeringsbank",
         "validatedAt": "2026-02-14",
         "vendorCount": 1,
-        "vendors": [ "..." ]
+        "vendors": ["..."]
       }
     ],
     "endpoint": "https://api.open-regels.triply.cc/...",
@@ -140,8 +148,8 @@ Returns full metadata for a single DMN by its identifier.
 
 **Path parameters:**
 
-| Parameter | Description |
-|---|---|
+| Parameter    | Description                                                             |
+| ------------ | ----------------------------------------------------------------------- |
 | `identifier` | The `dct:identifier` value of the DMN (e.g., `SVB_LeeftijdsInformatie`) |
 
 **Query parameters:** `endpoint` (required)
@@ -241,7 +249,7 @@ Set `isDrd: true` and provide a single entry-point identifier in `chain` for DRD
   "data": {
     "results": {
       "aanvragerIs181920": true,
-      "bijstandsnorm": 1200.00
+      "bijstandsnorm": 1200.0
     },
     "steps": [
       {
@@ -253,7 +261,7 @@ Set `isDrd: true` and provide a single entry-point identifier in `chain` for DRD
       {
         "dmn": "SZW_BijstandsnormInformatie",
         "inputs": { "aanvragerIs181920": true },
-        "outputs": { "bijstandsnorm": 1200.00 },
+        "outputs": { "bijstandsnorm": 1200.0 },
         "duration": 98
       }
     ],
@@ -413,6 +421,199 @@ Execute a SPARQL query against any TriplyDB endpoint, bypassing browser CORS res
 
 ---
 
+## eDOCS
+
+Endpoints for integrating with the OpenText eDOCS document management system.
+Used by the RIP Phase 1 process to file project documents into project workspaces.
+
+A legacy alias exists at `/api/edocs` (deprecated, returns `Deprecation: true` header).
+
+See [eDOCS Integration](../developer/edocs-integration.md) for configuration and stub mode details.
+
+### `GET /v1/edocs/status`
+
+Returns eDOCS connectivity status and whether stub mode is active.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "status": "stub",
+    "stubMode": true
+  }
+}
+```
+
+`status` values: `"up"` — live connection healthy, `"down"` — connection failed, `"stub"` — stub mode active.
+
+---
+
+### `POST /v1/edocs/workspaces/ensure`
+
+Creates a project workspace if one does not already exist for the given project number, or returns the existing one. Idempotent — safe to call multiple times for the same project.
+
+**Request body:**
+
+| Field           | Type   | Required | Description                                                  |
+| --------------- | ------ | -------- | ------------------------------------------------------------ |
+| `projectNumber` | string | Yes      | Unique project identifier. Used as the workspace search key. |
+| `projectName`   | string | Yes      | Human-readable project name.                                 |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "workspaceId": "2993897",
+    "workspaceName": "123456789 — N308 Reconstructie",
+    "created": true
+  }
+}
+```
+
+---
+
+### `POST /v1/edocs/documents`
+
+Uploads a base64-encoded document to an eDOCS workspace.
+
+**Request body:**
+
+| Field               | Type   | Required | Description                                           |
+| ------------------- | ------ | -------- | ----------------------------------------------------- |
+| `workspaceId`       | string | Yes      | eDOCS workspace ID returned by `/workspaces/ensure`.  |
+| `filename`          | string | Yes      | Filename for the document.                            |
+| `contentBase64`     | string | Yes      | Base64-encoded file content.                          |
+| `metadata.docName`  | string | Yes      | eDOCS `DOCNAME` profile field.                        |
+| `metadata.appId`    | string | No       | eDOCS `APP_ID` profile field. Defaults to `"INFRA"`.  |
+| `metadata.formName` | string | No       | eDOCS form name for profile selection.                |
+| `metadata.extra`    | object | No       | Additional eDOCS profile fields passed through as-is. |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "documentId": "2993898",
+    "documentNumber": "2993898",
+    "workspaceId": "2993897"
+  }
+}
+```
+
+---
+
+### `GET /v1/edocs/workspaces/:workspaceId/documents`
+
+Lists all documents stored in an eDOCS workspace.
+
+**Path parameters:**
+
+| Parameter     | Description         |
+| ------------- | ------------------- |
+| `workspaceId` | eDOCS workspace ID. |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "documents": [
+      {
+        "id": "2993898",
+        "name": "123456789 — Intake Report — N308 Reconstructie",
+        "documentNumber": "2993898"
+      }
+    ],
+    "count": 1
+  }
+}
+```
+---
+
+## Asset Storage
+
+These endpoints persist and retrieve BPMN processes, form schemas, and document templates. They require a configured `DATABASE_URL` on the backend — if the database is not configured, all endpoints return `503 DB_NOT_CONFIGURED`.
+
+### `GET /v1/assets/bpmn`
+
+Returns all non-readonly BPMN processes stored in the database.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "process_1774384869117",
+      "bpmnProcessId": "HrOnboardingProcess",
+      "name": "HR Onboarding Process",
+      "processRole": "standalone",
+      "calledElement": null,
+      "status": "wip",
+      "linkedDmnTemplates": [],
+      "createdAt": "2026-03-25T07:00:00.000Z",
+      "updatedAt": "2026-03-25T07:00:00.000Z"
+    }
+  ]
+}
+```
+
+### `POST /v1/assets/bpmn`
+
+Creates or updates a BPMN process (upsert by `id`).
+
+### `DELETE /v1/assets/bpmn/:id`
+
+Deletes a BPMN process by its LDE `id`.
+
+### `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId`
+
+Looks up a process by its BPMN `<process id="...">` value. Used by the deploy bundle assembler to resolve `calledElement` subprocess references.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "example_tree_felling",
+    "bpmnProcessId": "TreeFellingPermitSubProcess",
+    "xml": "<?xml version=\"1.0\"...>"
+  }
+}
+```
+
+### `GET /v1/assets/forms`
+
+Returns all non-readonly form schemas.
+
+### `POST /v1/assets/forms`
+
+Creates or updates a form schema (upsert by `id`).
+
+### `DELETE /v1/assets/forms/:id`
+
+Deletes a form schema.
+
+### `GET /v1/assets/documents`
+
+Returns all non-readonly document templates.
+
+### `POST /v1/assets/documents`
+
+Creates or updates a document template (upsert by `id`).
+
+### `DELETE /v1/assets/documents/:id`
+
+Deletes a document template.
+
+---
+
 ## Error responses
 
 All error responses follow a standard envelope:
@@ -430,17 +631,20 @@ All error responses follow a standard envelope:
 
 **Error codes:**
 
-| Code | Meaning |
-|---|---|
+| Code              | Meaning                               |
+| ----------------- | ------------------------------------- |
 | `INVALID_REQUEST` | Invalid or missing request parameters |
-| `NOT_FOUND` | Resource not found |
-| `QUERY_ERROR` | SPARQL query to TriplyDB failed |
-| `EXECUTION_ERROR` | DMN execution via Operaton failed |
-| `DISCOVERY_ERROR` | Chain discovery query failed |
+| `NOT_FOUND`       | Resource not found                    |
+| `QUERY_ERROR`     | SPARQL query to TriplyDB failed       |
+| `EXECUTION_ERROR` | DMN execution via Operaton failed     |
+| `DISCOVERY_ERROR` | Chain discovery query failed          |
 
 ---
 
 ## Legacy endpoints and deprecation
+
+!!! note
+    Asset storage endpoints (`/v1/assets/*`) have no legacy `/api/` equivalents. They were introduced in v1.3.0 as v1-only routes.
 
 All `/api/*` endpoints are deprecated and will be removed in v2.0.0. They return identical responses to their `/v1/*` counterparts plus the following headers:
 
@@ -453,11 +657,15 @@ Link: </v1/health>; rel="successor-version"
 
 **Migration:** replace every `/api/` prefix with `/v1/` in API calls.
 
-| Deprecated | Replacement |
-|---|---|
-| `GET /api/health` | `GET /v1/health` |
-| `GET /api/dmns` | `GET /v1/dmns` |
-| `GET /api/dmns/:identifier` | `GET /v1/dmns/:identifier` |
-| `GET /api/chains` | `GET /v1/chains` |
-| `POST /api/chains/execute` | `POST /v1/chains/execute` |
-| `POST /api/chains/execute/heusdenpas` | `POST /v1/chains/execute/heusdenpas` |
+| Deprecated                                | Replacement                              |
+| ----------------------------------------- | ---------------------------------------- |
+| `GET /api/health`                         | `GET /v1/health`                         |
+| `GET /api/dmns`                           | `GET /v1/dmns`                           |
+| `GET /api/dmns/:identifier`               | `GET /v1/dmns/:identifier`               |
+| `GET /api/chains`                         | `GET /v1/chains`                         |
+| `POST /api/chains/execute`                | `POST /v1/chains/execute`                |
+| `POST /api/chains/execute/heusdenpas`     | `POST /v1/chains/execute/heusdenpas`     |
+| `GET /api/edocs/status`                   | `GET /v1/edocs/status`                   |
+| `POST /api/edocs/workspaces/ensure`       | `POST /v1/edocs/workspaces/ensure`       |
+| `POST /api/edocs/documents`               | `POST /v1/edocs/documents`               |
+| `GET /api/edocs/workspaces/:id/documents` | `GET /v1/edocs/workspaces/:id/documents` |

@@ -13,8 +13,14 @@
 
 ## Multi-vendor architecture
 
+---
+
 ## iKnow integration
 
+---
+
 ## Certification workflow
+
+---
 
 ## Adding new vendors

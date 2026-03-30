@@ -13,17 +13,31 @@
 
 ## Project structure
 
+---
+
 ## Middleware stack
+
+---
 
 ## Adding a new route
 
+---
+
 ## Authentication on protected routes
+
+---
 
 ## TypeScript path aliases
 
+---
+
 ## Development commands
 
+---
+
 ## Shared types
+
+---
 
 ## Security implementation
 

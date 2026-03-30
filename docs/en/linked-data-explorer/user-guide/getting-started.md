@@ -16,14 +16,20 @@ This guide walks you through the Linked Data Explorer for the first time, from o
 
 The application has a narrow left sidebar with navigation icons, and a main content area that changes depending on the active view.
 
-![Screenshot: Linked Data Explorer sidebar navigation with the Orchestration view active](../../assets/screenshots/linked-data-explorer-orchestration-nav.png)
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Linked Data Explorer sidebar navigation with the Orchestration view active](../../assets/screenshots/linked-data-explorer-orchestration-nav.png)
+  <figcaption>Linked Data Explorer sidebar navigation with the Orchestration view active</figcaption>
+</figure>
 
 | Icon | View |
 |---|---|
-| Search / query icon | SPARQL Query Editor |
-| GitBranch icon | Chain Builder (Orchestration) |
-| Graph icon | Graph Visualisation |
-| ? icon | Help / Changelog |
+| Search / query | SPARQL Query Editor |
+| GitBranch | Chain Builder (Orchestration) |
+| Flowchart | BPMN Modeler |
+| ShieldCheck | DMN Validator |
+| Graph | Graph Visualisation |
+| HelpCircle | Help |
+| BookOpen | Changelog |
 
 ---
 

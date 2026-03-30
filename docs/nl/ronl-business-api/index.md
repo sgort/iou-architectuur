@@ -13,12 +13,22 @@
 
 ## What is the RONL Business API?
 
+---
+
 ## What it does
+
+---
 
 ## Architecture at a glance
 
+---
+
 ## Live environments
 
+---
+
 ## Technology stack
+
+---
 
 ## Documentation sections

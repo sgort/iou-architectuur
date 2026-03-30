@@ -1,0 +1,1090 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gebruiksscenario indienen · Submit Use Case — IOU Architecture</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --blue:        #154273;
+        --blue-dark:   #0f2f52;
+        --blue-light:  #e8eef5;
+        --orange:      #e17000;
+        --orange-light:#fef3e2;
+        --green:       #1B6B35;
+        --green-light: #e8f5e9;
+        --red:         #c0392b;
+        --red-light:   #fdecea;
+        --border:      #c8d2de;
+        --bg-page:     #f4f6f9;
+        --bg-card:     #ffffff;
+        --text:        #1a2438;
+        --text-muted:  #556070;
+        --radius:      8px;
+        --shadow:      0 2px 12px rgba(21,66,115,0.09);
+        --font:        'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html { font-size: 16px; }
+
+      body {
+        font-family: var(--font);
+        background: var(--bg-page);
+        color: var(--text);
+        min-height: 100vh;
+        padding: 0 0 64px;
+      }
+
+      /* ── Header bar ─────────────────────────────────────────────── */
+      .site-header {
+        background: var(--blue);
+        color: #fff;
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        height: 56px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      }
+      .site-header a {
+        color: rgba(255,255,255,0.7);
+        text-decoration: none;
+        font-size: 0.85rem;
+        transition: color .15s;
+      }
+      .site-header a:hover { color: #fff; }
+      .site-header .sep { color: rgba(255,255,255,0.35); }
+      .site-header .current { color: #fff; font-weight: 500; }
+
+      /* ── Page shell ─────────────────────────────────────────────── */
+      .page-wrap {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 40px 24px 0;
+      }
+
+      /* ── Page heading ───────────────────────────────────────────── */
+      .page-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--blue);
+        line-height: 1.2;
+      }
+      .page-subtitle {
+        font-size: 1.05rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+        font-style: italic;
+      }
+      .page-intro {
+        margin-top: 20px;
+        background: var(--blue-light);
+        border-left: 4px solid var(--blue);
+        border-radius: 0 var(--radius) var(--radius) 0;
+        padding: 14px 18px;
+        font-size: 0.92rem;
+        line-height: 1.6;
+        color: var(--text);
+      }
+      .page-intro p + p { margin-top: 6px; }
+      .lang-en { color: var(--blue);   font-weight: 600; }
+      .lang-nl { color: var(--orange); font-weight: 600; }
+
+      /* ── Card ───────────────────────────────────────────────────── */
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        margin-top: 28px;
+        overflow: hidden;
+      }
+      .card-header {
+        background: var(--blue);
+        color: #fff;
+        padding: 12px 20px;
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+      }
+      .card-number {
+        font-size: 0.78rem;
+        font-weight: 600;
+        background: rgba(255,255,255,0.18);
+        border-radius: 20px;
+        padding: 2px 9px;
+        letter-spacing: .04em;
+        flex-shrink: 0;
+      }
+      .card-title-en { font-weight: 600; font-size: 1rem; }
+      .card-title-nl { font-size: 0.88rem; color: rgba(255,255,255,0.72); font-style: italic; }
+      .card-body { padding: 20px; }
+
+      /* ── PO card ────────────────────────────────────────────────── */
+      .card.po-card .card-header {
+        background: var(--text-muted);
+      }
+      .po-notice {
+        background: var(--orange-light);
+        border: 1px solid #f5c584;
+        border-radius: var(--radius);
+        padding: 12px 16px;
+        font-size: 0.88rem;
+        color: #7a4000;
+        line-height: 1.5;
+      }
+      .po-notice strong { color: var(--orange); }
+
+      /* ── Form elements ──────────────────────────────────────────── */
+      .field { margin-bottom: 20px; }
+      .field:last-child { margin-bottom: 0; }
+
+      label.field-label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 0.9rem;
+      }
+      label.field-label .en { color: var(--blue);   font-weight: 600; }
+      label.field-label .nl { color: var(--orange); font-style: italic; }
+      label.field-label .req { color: var(--red); margin-left: 2px; }
+
+      .hint {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        line-height: 1.4;
+      }
+      .hint .nl { font-style: italic; }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="date"],
+      textarea,
+      select {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 9px 12px;
+        font-family: var(--font);
+        font-size: 0.93rem;
+        color: var(--text);
+        background: #fff;
+        transition: border-color .15s, box-shadow .15s;
+        appearance: none;
+      }
+      input[type="text"]:focus,
+      input[type="email"]:focus,
+      input[type="date"]:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px rgba(21,66,115,0.12);
+      }
+      input.invalid, textarea.invalid {
+        border-color: var(--red);
+        box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+      }
+      textarea { resize: vertical; min-height: 90px; }
+
+      /* ── Two-column grid (submitter info) ───────────────────────── */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      @media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } }
+
+      /* ── Steps ──────────────────────────────────────────────────── */
+      .steps-list { display: flex; flex-direction: column; gap: 10px; }
+      .step-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .step-number {
+        flex-shrink: 0;
+        width: 28px;
+        height: 28px;
+        background: var(--blue);
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-top: 8px;
+      }
+      .step-row textarea { min-height: 60px; }
+      .btn-add-step {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 10px;
+        background: none;
+        border: 1px dashed var(--blue);
+        color: var(--blue);
+        border-radius: var(--radius);
+        padding: 6px 14px;
+        font-family: var(--font);
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: background .15s;
+      }
+      .btn-add-step:hover { background: var(--blue-light); }
+
+      /* ── Checkboxes & radios ────────────────────────────────────── */
+      .check-group, .radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .check-group label, .radio-group label {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+      .check-group input[type="checkbox"],
+      .radio-group input[type="radio"] {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        accent-color: var(--blue);
+        cursor: pointer;
+      }
+      .check-other {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 4px;
+      }
+      .check-other input[type="text"] {
+        flex: 1;
+        padding: 6px 10px;
+        font-size: 0.88rem;
+      }
+
+      /* ── Priority options ───────────────────────────────────────── */
+      .priority-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      @media (max-width: 480px) { .priority-grid { grid-template-columns: 1fr; } }
+      .priority-option {
+        border: 2px solid var(--border);
+        border-radius: var(--radius);
+        padding: 12px;
+        cursor: pointer;
+        transition: border-color .15s, background .15s;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .priority-option:has(input:checked) {
+        border-color: var(--blue);
+        background: var(--blue-light);
+      }
+      .priority-option input { accent-color: var(--blue); margin-top: 3px; flex-shrink: 0; }
+      .priority-option .p-label { font-size: 0.88rem; line-height: 1.4; }
+      .priority-option .p-en { font-weight: 600; color: var(--blue); }
+      .priority-option .p-nl { color: var(--text-muted); font-style: italic; font-size: 0.82rem; }
+
+      /* ── Divider ────────────────────────────────────────────────── */
+      .section-divider {
+        border: none;
+        border-top: 2px dashed var(--border);
+        margin: 36px 0 0;
+      }
+      .section-label {
+        text-align: center;
+        margin-top: -14px;
+        margin-bottom: 0;
+      }
+      .section-label span {
+        background: var(--bg-page);
+        padding: 0 12px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        letter-spacing: .06em;
+        text-transform: uppercase;
+      }
+
+      /* ── Submit button ──────────────────────────────────────────── */
+      .submit-row {
+        margin-top: 32px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      .btn-submit {
+        background: var(--blue);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius);
+        padding: 14px 40px;
+        font-family: var(--font);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background .15s, transform .1s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .btn-submit:hover:not(:disabled) { background: var(--blue-dark); }
+      .btn-submit:active:not(:disabled) { transform: scale(.98); }
+      .btn-submit:disabled { opacity: .55; cursor: not-allowed; }
+      .submit-note {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-align: center;
+        max-width: 480px;
+        line-height: 1.5;
+      }
+
+      /* ── Spinner ────────────────────────────────────────────────── */
+      .spinner {
+        width: 18px;
+        height: 18px;
+        border: 2.5px solid rgba(255,255,255,0.4);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin .7s linear infinite;
+        display: none;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      /* ── Feedback banners ───────────────────────────────────────── */
+      .feedback {
+        display: none;
+        border-radius: var(--radius);
+        padding: 20px 24px;
+        margin-top: 28px;
+        line-height: 1.6;
+      }
+      .feedback.success {
+        background: var(--green-light);
+        border: 1px solid #81c784;
+        color: var(--green);
+      }
+      .feedback.error {
+        background: var(--red-light);
+        border: 1px solid #ef9a9a;
+        color: var(--red);
+      }
+      .feedback h3 { font-size: 1.05rem; margin-bottom: 8px; }
+      .feedback a { color: inherit; font-weight: 600; }
+      .feedback code {
+        background: rgba(0,0,0,0.08);
+        padding: 1px 5px;
+        border-radius: 3px;
+        font-size: 0.88rem;
+      }
+
+      /* ── Validation summary ─────────────────────────────────────── */
+      .validation-summary {
+        display: none;
+        background: var(--red-light);
+        border: 1px solid #ef9a9a;
+        border-radius: var(--radius);
+        padding: 14px 18px;
+        margin-top: 16px;
+        font-size: 0.88rem;
+        color: var(--red);
+      }
+      .validation-summary ul { margin: 6px 0 0 18px; }
+    </style>
+  </head>
+  <body>
+
+    <!-- ── Header ──────────────────────────────────────────────────── -->
+    <header class="site-header">
+      <a href="/">IOU Architecture</a>
+      <span class="sep">›</span>
+      <a href="/contributing/">Contributing</a>
+      <span class="sep">›</span>
+      <span class="current">Gebruiksscenario indienen · Submit Use Case</span>
+    </header>
+
+    <div class="page-wrap">
+
+      <!-- ── Page title ─────────────────────────────────────────────── -->
+      <h1 class="page-title">Gebruiksscenario indienen</h1>
+      <p class="page-subtitle">Submit a Use Case</p>
+
+      <div class="page-intro">
+        <p>
+          Gebruik dit formulier om een nieuw gebruiksscenario in te dienen voor het IOU Architecture-ecosysteem.
+          Vul alle secties zo volledig mogelijk in — technische kennis is niet vereist.
+        </p>
+        <p>
+          Use this form to submit a new use case for the IOU Architecture ecosystem.
+          Complete all sections as fully as possible — no technical knowledge is required.
+        </p>
+      </div>
+
+      <!-- ── Form ──────────────────────────────────────────────────── -->
+      <form id="use-case-form" novalidate>
+
+        <!-- 1. Title -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-number">1</span>
+            <span>
+              <span class="card-title-en">Title</span>
+              <span class="card-title-nl"> · Titel</span>
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="field">
+              <label class="field-label" for="uc-title">
+                <span class="en">Short, descriptive name</span>
+                <span class="nl"> · Korte, beschrijvende naam</span>
+                <span class="req">*</span>
+              </label>
+              <input type="text" id="uc-title" name="title"
+                     placeholder="e.g. Subsidy eligibility check for Flevoland residents"
+                     required />
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Submitter -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-number">2</span>
+            <span>
+              <span class="card-title-en">Submitter</span>
+              <span class="card-title-nl"> · Indiener</span>
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="grid-2">
+              <div class="field">
+                <label class="field-label" for="uc-name">
+                  <span class="en">Name</span>
+                  <span class="nl"> · Naam</span>
+                  <span class="req">*</span>
+                </label>
+                <input type="text" id="uc-name" name="name" required />
+              </div>
+              <div class="field">
+                <label class="field-label" for="uc-org">
+                  <span class="en">Organisation</span>
+                  <span class="nl"> · Organisatie</span>
+                  <span class="req">*</span>
+                </label>
+                <input type="text" id="uc-org" name="organisation"
+                       placeholder="e.g. Provincie Flevoland" required />
+              </div>
+              <div class="field">
+                <label class="field-label" for="uc-role">
+                  <span class="en">Role / Function</span>
+                  <span class="nl"> · Functie</span>
+                </label>
+                <input type="text" id="uc-role" name="role"
+                       placeholder="e.g. Beleidsadviseur" />
+              </div>
+              <div class="field">
+                <label class="field-label" for="uc-contact">
+                  <span class="en">Contact (e-mail or Teams)</span>
+                  <span class="nl"> · Contact (e-mail of Teams)</span>
+                  <span class="req">*</span>
+                </label>
+                <input type="text" id="uc-contact" name="contact" required />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Description -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-number">3</span>
+            <span>
+              <span class="card-title-en">Description</span>
+              <span class="card-title-nl"> · Beschrijving</span>
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="field">
+              <p class="hint">
+                Which regulation, policy, or government service does this involve, and what problem or opportunity does it address?<br/>
+                <span class="nl">Op welke regelgeving, welk beleid of welke overheidsdienst heeft dit betrekking, en welk probleem of welke kans wordt behandeld?</span>
+              </p>
+              <textarea id="uc-description" name="description" rows="4"
+                        required placeholder="Describe the use case in plain language…"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Current situation -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-number">4</span>
+            <span>
+              <span class="card-title-en">Current Situation</span>
+              <span class="card-title-nl"> · Huidige situatie</span>
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="field">
+              <p class="hint">
+                How is this handled today? (e.g. manual spreadsheet, phone call, separate system, not handled at all)<br/>
+                <span class="nl">Hoe wordt dit nu afgehandeld? (bijv. handmatige spreadsheet, telefoongesprek, apart systeem, nog niet afgehandeld)</span>
+              </p>
+              <textarea id="uc-current" name="currentSituation" rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Desired outcome -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-number">5</span>
+            <span>
+              <span class="card-title-en">Desired Outcome</span>
+              <span class="card-title-nl"> · Gewenst resultaat</span>
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="field">
+              <p class="hint">
+                What should the ecosystem enable or automate? Describe what "done" looks like from your perspective.<br/>
+                <span class="nl">Wat moet het ecosysteem mogelijk maken of automatiseren? Beschrijf hoe "klaar" eruitziet vanuit uw perspectief.</span>
+              </p>
+              <textarea id="uc-desired" name="desiredOutcome" rows="3"
+                        required></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Concrete example -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-number">6</span>
+            <span>
+              <span class="card-title-en">Concrete Example</span>
+              <span class="card-title-nl"> · Concreet voorbeeld</span>
+            </span>
+          </div>
+          <div class="card-body">
+            <p class="hint" style="margin-bottom:14px">
+              Walk through one scenario step by step — who does what, and what is the expected result? Real or fictional data is fine.<br/>
+              <span class="nl">Loop stap voor stap door één scenario — wie doet wat, en wat is het verwachte resultaat? Echte of fictieve gegevens zijn prima.</span>
+            </p>
+            <div class="steps-list" id="steps-container">
+              <!-- Steps are injected by JS -->
+            </div>
+            <button type="button" class="btn-add-step" id="btn-add-step">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Add step · Stap toevoegen
+            </button>
+          </div>
+        </div>
+
+        <!-- 7. Legislation -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-number">7</span>
+            <span>
+              <span class="card-title-en">Relevant Legislation or Policy</span>
+              <span class="card-title-nl"> · Relevante wet- of regelgeving</span>
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="field">
+              <p class="hint">
+                Which law, article, or policy document does this relate to? A name and article number is sufficient.<br/>
+                <span class="nl">Op welke wet, artikel of welk beleidsdocument heeft dit betrekking? Een naam en artikelnummer volstaan.</span>
+              </p>
+              <textarea id="uc-legislation" name="legislation" rows="3"
+                        placeholder="e.g. Participatiewet, artikel 11 · Omgevingswet, artikel 4.2"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8. Affected parties -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-number">8</span>
+            <span>
+              <span class="card-title-en">Affected Parties</span>
+              <span class="card-title-nl"> · Betrokken partijen</span>
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="field">
+              <p class="hint">
+                Who is involved in or affected by this use case? (e.g. residents, businesses, caseworkers, other agencies)<br/>
+                <span class="nl">Wie is betrokken bij of beïnvloed door dit gebruiksscenario?</span>
+              </p>
+              <textarea id="uc-parties" name="affectedParties" rows="2"
+                        placeholder="e.g. Inwoners Flevoland, afdeling Sociale Zaken, SVB"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 9. Existing materials -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-number">9</span>
+            <span>
+              <span class="card-title-en">Existing Materials</span>
+              <span class="card-title-nl"> · Bestaande materialen</span>
+            </span>
+          </div>
+          <div class="card-body">
+            <p class="hint" style="margin-bottom:12px">
+              Do you have documents, spreadsheets, or process descriptions that already capture this use case?<br/>
+              <span class="nl">Heeft u documenten, spreadsheets of procesbeschrijvingen die dit gebruiksscenario al beschrijven?</span>
+            </p>
+            <div class="check-group">
+              <label>
+                <input type="checkbox" name="materials" value="Excel / spreadsheet" />
+                Excel / spreadsheet
+              </label>
+              <label>
+                <input type="checkbox" name="materials" value="Word / PDF" />
+                Word / PDF
+              </label>
+              <label>
+                <input type="checkbox" name="materials" value="Procesdiagram / Process diagram" />
+                Procesdiagram / Process diagram
+              </label>
+              <label>
+                <input type="checkbox" name="materials" value="DMN-bestand / DMN file" />
+                DMN-bestand / DMN file
+              </label>
+              <div class="check-other">
+                <input type="checkbox" name="materials" value="__other__" id="mat-other-check" />
+                <label for="mat-other-check" style="margin:0;cursor:pointer">
+                  Overig / Other:
+                </label>
+                <input type="text" id="mat-other-text" placeholder="specify…"
+                       style="max-width:220px" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10. Priority -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-number">10</span>
+            <span>
+              <span class="card-title-en">Priority</span>
+              <span class="card-title-nl"> · Prioriteit</span>
+            </span>
+          </div>
+          <div class="card-body">
+            <p class="hint" style="margin-bottom:12px">
+              How urgent is this for your work? · <span class="nl">Hoe urgent is dit voor uw werk?</span>
+            </p>
+            <div class="priority-grid">
+              <label class="priority-option">
+                <input type="radio" name="priority" value="🔴 Critical — blocking current work / Kritiek — blokkeert huidig werk" />
+                <span class="p-label">
+                  <span class="p-en">🔴 Critical</span><br/>
+                  <span class="p-nl">Blocking current work · Blokkeert huidig werk</span>
+                </span>
+              </label>
+              <label class="priority-option">
+                <input type="radio" name="priority" value="🟠 High — needed within months / Hoog — nodig binnen maanden" />
+                <span class="p-label">
+                  <span class="p-en">🟠 High</span><br/>
+                  <span class="p-nl">Needed within months · Nodig binnen maanden</span>
+                </span>
+              </label>
+              <label class="priority-option">
+                <input type="radio" name="priority" value="🟡 Medium — planned for near future / Middel — gepland voor nabije toekomst" checked />
+                <span class="p-label">
+                  <span class="p-en">🟡 Medium</span><br/>
+                  <span class="p-nl">Planned for near future · Nabije toekomst</span>
+                </span>
+              </label>
+              <label class="priority-option">
+                <input type="radio" name="priority" value="🟢 Low — nice to have / Laag — prettig om te hebben" />
+                <span class="p-label">
+                  <span class="p-en">🟢 Low</span><br/>
+                  <span class="p-nl">Nice to have · Prettig om te hebben</span>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- PO section notice -->
+        <hr class="section-divider" />
+        <p class="section-label"><span>PO Assessment · PO Beoordeling</span></p>
+
+        <div class="card po-card" style="margin-top:16px">
+          <div class="card-header">
+            <span class="card-number">🔒</span>
+            <span>
+              <span class="card-title-en">Product Owner Assessment</span>
+              <span class="card-title-nl"> · PO Beoordeling</span>
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="po-notice">
+              <strong>This section is completed by the Product Owner after submission.</strong>
+              It will be added to the work item by the PO and is not part of this form.<br/>
+              <em>Deze sectie wordt na indiening ingevuld door de Product Owner en maakt geen deel uit van dit formulier.</em>
+            </div>
+          </div>
+        </div>
+
+        <!-- Validation summary -->
+        <div class="validation-summary" id="validation-summary">
+          <strong>Please complete the required fields · Vul de verplichte velden in:</strong>
+          <ul id="validation-list"></ul>
+        </div>
+
+        <!-- Submit -->
+        <div class="submit-row">
+          <button type="submit" class="btn-submit" id="btn-submit">
+            <span id="btn-text">Indienen · Submit</span>
+            <span class="spinner" id="btn-spinner"></span>
+          </button>
+          <p class="submit-note">
+            Your submission creates a work item in the IOU Architecture project tracker. You will receive a link to it after submitting.<br/>
+            <em>Uw indiening maakt een werkitem aan in het IOU Architecture-projectbeheer. U ontvangt na indiening een link hiernaar.</em>
+          </p>
+        </div>
+
+      </form>
+
+      <!-- Feedback banners -->
+      <div class="feedback success" id="feedback-success">
+        <h3>✅ Submitted successfully · Succesvol ingediend</h3>
+        <p id="success-message"></p>
+      </div>
+      <div class="feedback error" id="feedback-error">
+        <h3>❌ Submission failed · Indiening mislukt</h3>
+        <p id="error-message"></p>
+      </div>
+
+    </div><!-- /.page-wrap -->
+
+    <!-- ================================================================
+         CONFIGURATION — update before deploying
+         ================================================================
+         GITLAB_TOKEN   : Project Access Token with `api` scope.
+                          Create at: GitLab → Project → Settings →
+                          Access Tokens → role: Developer, scope: api
+                          Note: this token is visible in page source.
+                          Use a project-scoped token, not a personal one.
+
+         GITLAB_BASE    : Base URL of your self-hosted GitLab instance.
+
+         PROJECT_PATH   : URL-encoded namespace/project path.
+                          showcases/iou-architectuur → showcases%2Fiou-architectuur
+
+         UC_LABEL       : GitLab label applied to new submissions.
+                          Create the label first in GitLab → Project →
+                          Manage → Labels.
+         ================================================================ -->
+    <script>
+      const GITLAB_BASE   = 'https://git.open-regels.nl';
+      const GITLAB_TOKEN  = 'YOUR_PROJECT_ACCESS_TOKEN'; // glpat-…
+      const PROJECT_PATH  = 'showcases%2Fiou-architectuur';
+      const UC_LABEL      = 'uc::submitted';
+
+      // ── Steps widget ───────────────────────────────────────────────
+      const stepsContainer = document.getElementById('steps-container');
+      let stepCount = 0;
+
+      function addStep(value = '') {
+        stepCount++;
+        const row = document.createElement('div');
+        row.className = 'step-row';
+        row.innerHTML = `
+          <span class="step-number">${stepCount}</span>
+          <textarea name="step" rows="2"
+            placeholder="Describe step ${stepCount}… · Beschrijf stap ${stepCount}…"
+          >${value}</textarea>`;
+        stepsContainer.appendChild(row);
+      }
+
+      // Start with 3 empty steps
+      addStep(); addStep(); addStep();
+
+      document.getElementById('btn-add-step').addEventListener('click', () => addStep());
+
+      // ── Form submission ────────────────────────────────────────────
+      document.getElementById('use-case-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // — Collect values —
+        const title        = document.getElementById('uc-title').value.trim();
+        const name         = document.getElementById('uc-name').value.trim();
+        const org          = document.getElementById('uc-org').value.trim();
+        const role         = document.getElementById('uc-role').value.trim();
+        const contact      = document.getElementById('uc-contact').value.trim();
+        const description  = document.getElementById('uc-description').value.trim();
+        const current      = document.getElementById('uc-current').value.trim();
+        const desired      = document.getElementById('uc-desired').value.trim();
+        const legislation  = document.getElementById('uc-legislation').value.trim();
+        const parties      = document.getElementById('uc-parties').value.trim();
+
+        const steps = Array.from(document.querySelectorAll('[name="step"]'))
+          .map(t => t.value.trim())
+          .filter(Boolean);
+
+        const materialChecks = Array.from(
+          document.querySelectorAll('[name="materials"]:checked')
+        ).map(cb => cb.value === '__other__'
+          ? document.getElementById('mat-other-text').value.trim() || 'Other'
+          : cb.value
+        );
+
+        const priorityEl = document.querySelector('[name="priority"]:checked');
+        const priority = priorityEl ? priorityEl.value : '(not specified)';
+
+        const today = new Date().toLocaleDateString('nl-NL', {
+          day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+
+        // — Validate —
+        const errors = [];
+        const clearInvalid = (id) => document.getElementById(id)?.classList.remove('invalid');
+        const markInvalid  = (id) => document.getElementById(id)?.classList.add('invalid');
+        ['uc-title','uc-name','uc-org','uc-contact','uc-description','uc-desired'].forEach(clearInvalid);
+
+        if (!title)       { markInvalid('uc-title');       errors.push('Title · Titel'); }
+        if (!name)        { markInvalid('uc-name');        errors.push('Name · Naam'); }
+        if (!org)         { markInvalid('uc-org');         errors.push('Organisation · Organisatie'); }
+        if (!contact)     { markInvalid('uc-contact');     errors.push('Contact'); }
+        if (!description) { markInvalid('uc-description'); errors.push('Description · Beschrijving'); }
+        if (!desired)     { markInvalid('uc-desired');     errors.push('Desired Outcome · Gewenst resultaat'); }
+
+        const summary = document.getElementById('validation-summary');
+        const list    = document.getElementById('validation-list');
+
+        if (errors.length) {
+          list.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+          summary.style.display = 'block';
+          summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+        summary.style.display = 'none';
+
+        // — Build markdown body —
+        const stepsText = steps.length
+          ? steps.map((s, i) => `**Step ${i+1} · Stap ${i+1}:** ${s}`).join('\n\n')
+          : '*(not provided)*';
+
+        const materialsText = materialChecks.length
+          ? materialChecks.map(m => `- ${m}`).join('\n')
+          : '- *(none indicated)*';
+
+        const body = `## 1. Submitter · Indiener
+
+| Field · Veld | Value · Waarde |
+|---|---|
+| Name · Naam | ${name} |
+| Organisation · Organisatie | ${org} |
+| Role · Functie | ${role || '—'} |
+| Contact | ${contact} |
+| Date submitted · Datum ingediend | ${today} |
+
+---
+
+## 2. Description · Beschrijving
+
+${description}
+
+---
+
+## 3. Current Situation · Huidige situatie
+
+${current || '*(not provided)*'}
+
+---
+
+## 4. Desired Outcome · Gewenst resultaat
+
+${desired}
+
+---
+
+## 5. Concrete Example · Concreet voorbeeld
+
+${stepsText}
+
+---
+
+## 6. Relevant Legislation · Relevante wet- of regelgeving
+
+${legislation || '*(not provided)*'}
+
+---
+
+## 7. Affected Parties · Betrokken partijen
+
+${parties || '*(not provided)*'}
+
+---
+
+## 8. Existing Materials · Bestaande materialen
+
+${materialsText}
+
+---
+
+## 9. Priority · Prioriteit
+
+${priority}
+
+---
+---
+
+## 🔒 PO Assessment · PO Beoordeling
+
+*To be completed by the Product Owner after review.*
+*In te vullen door de Product Owner na beoordeling.*
+
+### A. Classification · Classificatie
+
+- [ ] New DMN decision model(s)
+- [ ] New LDE chain composition
+- [ ] New / modified BPMN process
+- [ ] New or extended CPRMV API capability
+- [ ] New or extended RONL Business API capability
+- [ ] Documentation / reference implementation
+- [ ] Multiple — see component impact below
+
+### B. Component Impact · Component impact
+
+| Component | Impact | Notes · Opmerkingen |
+|---|---|---|
+| RONL Business API | None / Minor / Moderate / Major | |
+| CPSV Editor | None / Minor / Moderate / Major | |
+| Linked Data Explorer | None / Minor / Moderate / Major | |
+| CPRMV API | None / Minor / Moderate / Major | |
+| TriplyDB / Knowledge Graph | None / Minor / Moderate / Major | |
+| Operaton (BPMN/DMN engine) | None / Minor / Moderate / Major | |
+| Documentation site | None / Minor / Moderate / Major | |
+
+### C. Technical Prerequisites · Technische vereisten
+
+*(To be completed by PO)*
+
+### D. Effort Estimate · Inspanningsschatting
+
+- [ ] Small — hours · Klein — uren
+- [ ] Medium — days · Middel — dagen
+- [ ] Large — weeks · Groot — weken
+- [ ] Epic — requires its own project · Epic — vereist een eigen project
+
+### E. Decision · Beslissing
+
+- [ ] ✅ Accepted · Geaccepteerd
+- [ ] 🕐 Deferred · Uitgesteld
+- [ ] ❌ Declined · Afgewezen
+
+**Rationale · Motivatie:** *(To be completed by PO)*
+
+**Target milestone · Doelmijlpaal:** *(To be completed by PO)*
+
+### F. Follow-up Actions · Vervolgacties
+
+| Action · Actie | Owner · Eigenaar | Due · Deadline |
+|---|---|---|
+| | | |
+`;
+
+        // — Submit to GitLab —
+        const btn     = document.getElementById('btn-submit');
+        const btnText = document.getElementById('btn-text');
+        const spinner = document.getElementById('btn-spinner');
+
+        btn.disabled       = true;
+        btnText.textContent = 'Bezig… · Submitting…';
+        spinner.style.display = 'block';
+
+        document.getElementById('feedback-success').style.display = 'none';
+        document.getElementById('feedback-error').style.display   = 'none';
+
+        try {
+          const response = await fetch(
+            `${GITLAB_BASE}/api/v4/projects/${PROJECT_PATH}/issues`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'PRIVATE-TOKEN': GITLAB_TOKEN,
+              },
+              body: JSON.stringify({
+                title:       `[Use Case] ${title}`,
+                description: body,
+                labels:      UC_LABEL,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(
+              errData.message
+                ? JSON.stringify(errData.message)
+                : `HTTP ${response.status} ${response.statusText}`
+            );
+          }
+
+          const data = response.status === 201 ? await response.json() : {};
+          const issueUrl  = data.web_url  || `${GITLAB_BASE}`;
+          const issueId   = data.iid      || '—';
+
+          document.getElementById('success-message').innerHTML =
+            `Work item <strong>#${issueId}</strong> has been created.
+             You can view it at: <a href="${issueUrl}" target="_blank" rel="noopener">${issueUrl}</a>.<br/>
+             <em>Werkitem <strong>#${issueId}</strong> is aangemaakt. U kunt het bekijken via bovenstaande link.</em>`;
+
+          document.getElementById('feedback-success').style.display = 'block';
+          document.getElementById('feedback-success').scrollIntoView({ behavior: 'smooth' });
+          document.getElementById('use-case-form').reset();
+          stepsContainer.innerHTML = '';
+          stepCount = 0;
+          addStep(); addStep(); addStep();
+
+        } catch (err) {
+          document.getElementById('error-message').innerHTML =
+            `Could not create the work item. Please try again or contact the product owner directly.<br/>
+             <em>Het werkitem kon niet worden aangemaakt. Probeer het opnieuw of neem contact op met de product owner.</em><br/><br/>
+             <code>${err.message}</code>`;
+          document.getElementById('feedback-error').style.display = 'block';
+          document.getElementById('feedback-error').scrollIntoView({ behavior: 'smooth' });
+
+        } finally {
+          btn.disabled         = false;
+          btnText.textContent  = 'Indienen · Submit';
+          spinner.style.display = 'none';
+        }
+      });
+    </script>
+
+  </body>
+</html>

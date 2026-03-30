@@ -2,6 +2,8 @@
 
 The frontend is `packages/frontend` (`@ronl/frontend`) — a React 18 + TypeScript SPA built with Vite.
 
+---
+
 ## Project structure
 
 ```
@@ -12,21 +14,42 @@ packages/frontend/src/
 ├── pages/
 │   ├── LoginChoice.tsx         # Landing page with IDP selection
 │   ├── AuthCallback.tsx        # Keycloak initialization handler
-│   ├── Dashboard.tsx           # Main application (zorgtoeslag calculator)
+│   ├── CaseworkerDashboard.tsx # Caseworker shell: auth state, nav state, layout only
+│   ├── Dashboard.tsx           # Citizen portal (zorgtoeslag calculator)
 │   ├── ChangelogPanel.tsx      # Sliding changelog panel
 │   └── changelog-data.ts       # Changelog content
-├── components/                 # Reusable UI components
+├── components/
+│   └── CaseworkerDashboard/    # All caseworker dashboard sections (extracted v2.9.2)
+│       ├── NieuwsSection.tsx
+│       ├── BerichtenSection.tsx
+│       ├── RegelCatalogus.tsx
+│       ├── TakenSection.tsx
+│       ├── ArchiefSection.tsx
+│       ├── ProfielSection.tsx
+│       ├── RollenSection.tsx
+│       ├── HrOnboardingSection.tsx
+│       ├── OnboardingArchiefSection.tsx
+│       ├── RipFase1Section.tsx
+│       ├── RipFase1WipSection.tsx
+│       ├── RipFase1GereedSection.tsx
+│       ├── GereedschapSection.tsx
+│       └── AuditSection.tsx
 ├── contexts/                   # React contexts (auth, tenant)
-├── hooks/                      # Custom React hooks
+├── hooks/
+│   └── useProfielData.ts       # Shared hook for Profiel and Rollen sections
 ├── services/
 │   ├── keycloak.ts             # Keycloak JS adapter initialization
 │   ├── api.ts                  # Business API HTTP client (Axios)
 │   └── tenant.ts               # Tenant config loading and theme application
+├── utils/
+│   └── formatDate.ts           # Shared date formatter
 └── themes/                     # Per-municipality theme tokens
 packages/frontend/public/
 ├── tenants.json                # Municipality configurations (loaded at runtime)
 └── staticwebapp.config.json    # Azure SWA routing configuration
 ```
+
+---
 
 ## Landing page architecture
 
@@ -84,15 +107,37 @@ if (authenticated) {
 
 `onLoad: 'check-sso'` returns `true` if a Keycloak SSO session cookie already exists in the browser, allowing the caseworker to skip the login screen entirely on subsequent visits within the session window. If no session exists, `keycloak.login({ loginHint: '__medewerker__' })` redirects to Keycloak and passes `__medewerker__` as the `login_hint` parameter. The `login.ftl` template detects this sentinel and renders the caseworker context banner (see [Keycloak Deployment — Caseworker banner](./deployment/keycloak.md#caseworker-context-banner)).
 
-**3. Dashboard (`/dashboard` — `Dashboard.tsx`)**
+**3. Caseworker dashboard (`/dashboard/caseworker` — `CaseworkerDashboard.tsx`)**
 
-Main application after successful authentication. The JWT `roles` claim determines which view is displayed: the citizen calculator or the caseworker queue.
+The caseworker portal. This route is **not wrapped in `ProtectedRoute`** — authentication is handled inside the component so public content (Nieuws, Berichten, Regelcatalogus) can render without a login. The component checks `keycloak.authenticated` on mount:
+```typescript
+const [isAuthenticated] = useState(() => !!keycloak.authenticated);
+```
+
+The shell renders three zones driven by `tenantConfig` loaded from `public/tenants.json`:
+
+- **Top nav** — three `TopNavPage` values: `home | personal-info | projects`
+- **Left panel** — `tenantConfig.leftPanelSections[activeTopNavPage]`, an array of `LeftPanelSection` objects each with `id`, `label`, and `isPublic`
+- **Main content** — `renderContent()` switches on `activeSection`
+
+For unauthenticated visitors, `getDefaultTenantConfig()` loads the default tenant (`utrecht`) so the left panel always renders. When a visitor clicks a section with `isPublic: false`, `renderLoginPrompt()` is rendered instead of the section content — no redirect.
+
+Section memory (`sectionMemory` state) stores the last visited section per top-nav page, so switching pages and returning always restores context.
+
+**4. Citizen dashboard (`/dashboard/citizen` — `Dashboard.tsx`)**
+
+The citizen portal, protected by `ProtectedRoute requiredRole="citizen"`. The JWT `roles` claim determines whether the user sees the zorgtoeslag calculator or is redirected to the caseworker dashboard.
+
+---
 
 ## Changelog Panel Component
 
 A sliding panel that displays platform updates matching the format from CPSV Editor and Linked Data Explorer.
 
-![Screenshot: Changelog Panel Open](../../../assets/screenshots/ronl-changelog-panel-open.png)
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Changelog Panel Open](../../../assets/screenshots/ronl-changelog-panel-open.png)
+  <figcaption>MijnOmgeving landing page showing Changelog panel</figcaption>
+</figure>
 
 **Features:**
 
@@ -158,6 +203,8 @@ export const changelog: Changelog = {
 };
 ```
 
+---
+
 ## Authentication with Keycloak JS
 
 `services/keycloak.ts` exports the Keycloak instance. Initialisation is done manually in `AuthCallback.tsx` (not on import) so the IDP selection and caseworker sentinel can be applied before the first Keycloak call.
@@ -186,6 +233,8 @@ Token refresh is handled automatically by the Keycloak JS adapter. The adapter r
 
 **Token refresh** is still handled automatically by the adapter before the 15-minute expiry.
 
+---
+
 ## Multi-tenant theming
 
 On successful login, `services/tenant.ts` reads the `municipality` claim from the decoded JWT and applies the corresponding theme:
@@ -204,6 +253,8 @@ root.style.setProperty("--color-primary-dark", theme.primaryDark);
 
 All Tailwind utility classes and component styles reference these custom properties, so the entire UI re-themes without a page reload.
 
+---
+
 ## API client
 
 `services/api.ts` wraps Axios and adds the JWT bearer token to every request:
@@ -220,6 +271,8 @@ client.interceptors.request.use((config) => {
 ```
 
 If a request returns HTTP 401 (token expired between refresh cycles), the interceptor triggers a silent Keycloak refresh and retries.
+
+---
 
 ## Environment variables
 
@@ -250,6 +303,8 @@ if (hostname.includes("acc.mijn.open-regels.nl")) {
 
 This is used in the Architecture footer to show environment-specific URLs.
 
+---
+
 ## Development commands
 
 ```bash
@@ -274,6 +329,8 @@ npm run lint
 # Format
 npm run format
 ```
+
+---
 
 ## Calling the Business API from a component
 
@@ -310,6 +367,99 @@ const handleEvaluate = async () => {
 };
 ```
 
+---
+
+## Camunda Forms — `@bpmn-io/form-js`
+
+Form rendering in both dashboards is handled by `@bpmn-io/form-js` v1.20.x (MIT-compatible). Forms are JSON schemas authored in the [LDE Form Editor](../../../linked-data-explorer/features/form-editor.md), deployed alongside BPMN in Operaton, and fetched at runtime by the backend form schema endpoints.
+
+The package is already in `packages/frontend/package.json`. Import in any component that renders a form:
+
+```tsx
+import { Form } from '@bpmn-io/form-js';
+import '@bpmn-io/form-js/dist/assets/form-js.css';
+```
+
+The CSS import is required — without it the form renders completely unstyled.
+
+### Callback stability pattern
+
+All three form components store callbacks (`onCompleted`, `onStarted`, `onError`) in refs rather than including them in the `useEffect` dependency array. Without this, inline arrow functions passed from a parent cause the effect to re-fire on every render, instantiating a new `Form` object and looping indefinitely.
+
+```tsx
+const onStartedRef = useRef(onStarted);
+const onErrorRef = useRef(onError);
+
+useEffect(() => { onStartedRef.current = onStarted; }, [onStarted]);
+useEffect(() => { onErrorRef.current = onError; }, [onError]);
+
+// Main init effect — callbacks intentionally NOT in the dependency array:
+useEffect(() => { /* importSchema, attach listeners */ }, [processKey]);
+```
+
+### Container div must always be in the DOM
+
+The `<div ref={containerRef} />` must be present in the DOM **before** `form.importSchema` is called. Conditional rendering (`status === 'loading' && <div ref={...} />`) means `containerRef.current` is `null` when the effect fires. Always render the container div and toggle visibility via a CSS class:
+
+```tsx
+<div ref={containerRef} className={status === 'ready' ? 'fjs-container' : 'hidden'} />
+```
+
+### `ProcessStartFormViewer`
+
+**`packages/frontend/src/components/ProcessStartFormViewer.tsx`**
+
+Renders the start form for a BPMN process in the citizen dashboard.
+
+| Prop | Type | Description |
+|---|---|---|
+| `processKey` | `string` | BPMN process definition key |
+| `initialData` | `Record<string, unknown>` | Hidden pre-populated variables (e.g. `applicantId`, `productType`) |
+| `onStarted` | `(dossier: string) => void` | Called with `businessKey` on successful process start |
+| `onError` | `() => void` | Called on API or form error |
+
+On mount: calls `businessApi.process.startForm(processKey)` to fetch the schema. On submit: calls `businessApi.process.start(processKey, formData)`. Extracts `businessKey` from the response (falls back to `processInstanceId`).
+
+### `TaskFormViewer`
+
+**`packages/frontend/src/components/CaseworkerDashboard/TaskFormViewer.tsx`**
+
+Renders the form for a claimed task in the caseworker dashboard.
+
+| Prop | Type | Description |
+|---|---|---|
+| `taskId` | `string` | Operaton task ID |
+| `variables` | `Record<string, unknown> \| null` | Process variables for pre-population |
+| `onCompleted` | `() => void` | Called after successful task completion |
+| `onError` | `() => void` | Called on API or form error |
+
+On mount: calls `businessApi.process.startForm(processKey)` to fetch the schema. On submit: calls `businessApi.process.start(processKey, formData)`. Extracts `businessKey` from the response (falls back to `processInstanceId`). On 404 or 415 from the API, sets `status = 'no-form'` and renders "Geen formulier beschikbaar voor dit proces." — the service cannot be started. On unmount, calls `form.destroy()` to release the `@bpmn-io/form-js` instance.
+
+### `DecisionViewer`
+
+**`packages/frontend/src/components/DecisionViewer.tsx`**
+
+Displays the final decision for a completed process instance in the citizen dashboard (Mijn aanvragen). Readonly — no submit handler.
+
+| Prop | Type | Description |
+|---|---|---|
+| `processInstanceId` | `string` | Operaton process instance ID |
+
+On mount, fires two requests in parallel via `Promise.allSettled`:
+
+1. `businessApi.process.historicVariables(processInstanceId)` — resolves to the flattened final variable state.
+2. `businessApi.process.decisionDocument(processInstanceId)` — resolves to `{ success: true, template: DocumentTemplate }` if a document template is bundled in the Operaton deployment; rejects or returns `success: false` for pre-v2.3.0 deployments.
+
+**Document template rendering (`status === 'ready'`):** `renderTipTapNode` recursively walks the ProseMirror JSON tree, substituting `{{variableKey}}` text placeholders with the resolved historic variables and applying `bold`, `italic`, and `underline` marks. `renderBlock` dispatches on `block.type`: `text` → `renderTipTapNode`; `variable` → direct variable lookup; `separator` → `<hr>`; `spacer` → empty div; `image` → `<img>`. Zones are rendered in order — `letterhead` and `contactInformation` side-by-side in a CSS grid, then `reference`, `body`, `closing`, `signOff`, `annex` stacked vertically.
+
+**Form-js fallback (`status === 'fallback'`):** When the decision-document fetch returns 404 or fails, a hardcoded `FALLBACK_SCHEMA` (five fields: `status`, `permitDecision`, `finalMessage`, `replacementInfo`, `dossierReference`) is mounted into a `<div ref={containerRef}>` via `form.importSchema`. The container div is always present in the DOM (toggled via CSS class) so that `containerRef.current` is non-null when the fallback `useEffect` fires.
+
+Caseworker-only fields are excluded from both rendering paths.
+
+See [Dynamic Forms — Decision Viewer](../features/dynamic-forms.md#decision-viewer----decisionviewer) for the feature description.
+
+---
+
 ## Adding a new page
 
 1. **Create the component:**
@@ -345,6 +495,8 @@ import NewPage from './pages/NewPage';
 <Link to="/new-page">Go to New Page</Link>
 ```
 
+---
+
 ## Adding a feature flag check
 
 Feature flags are configured per municipality in `public/tenants.json`:
@@ -377,6 +529,8 @@ function MyComponent() {
 }
 ```
 
+---
+
 ## Styling guidelines
 
 **Use Tailwind utility classes:**
@@ -405,6 +559,8 @@ function MyComponent() {
   {/* Responsive width */}
 </div>
 ```
+
+---
 
 ## Testing
 
@@ -461,6 +617,8 @@ Test in:
 - Edge 90+
 - Mobile Safari (iOS 14+)
 - Chrome Mobile (Android)
+
+---
 
 ## Common Tasks
 

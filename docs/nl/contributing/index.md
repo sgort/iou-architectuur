@@ -13,6 +13,8 @@
 
 ## How to Contribute
 
+---
+
 ## Documentation
 
 ### Reporting Issues
@@ -21,6 +23,8 @@
 
 ### Making Changes
 
+---
+
 ## Code Contributions
 
 ### RONL Business API
@@ -28,5 +32,7 @@
 ### CPSV Editor
 
 ### Linked Data Explorer
+
+---
 
 ## Standards

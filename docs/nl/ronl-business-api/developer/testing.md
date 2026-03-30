@@ -19,12 +19,18 @@
 
 ### What to test
 
+---
+
 ## Health check verification
 
 # Local
 
 # ACC
 
+---
+
 ## Pre-commit and pre-push hooks
+
+---
 
 ## CI test run

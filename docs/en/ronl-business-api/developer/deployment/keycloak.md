@@ -2,8 +2,12 @@
 
 Keycloak runs in Docker on the VM (`open-regels.nl`). Two fully isolated instances run in parallel: ACC and PROD. Each has its own PostgreSQL database container and custom RONL theme.
 
-![Screenshot: Keycloak Custom Theme Login Page](../../../../assets/screenshots/ronl-keycloak-digid-login.png)
-*Custom RONL theme matching MijnOmgeving design with blue gradient header*
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Keycloak Custom Theme Login Page](../../../../assets/screenshots/ronl-keycloak-digid-login.png)
+  <figcaption>Custom RONL theme matching MijnOmgeving design with blue gradient header</figcaption>
+</figure>
+
+---
 
 ## Repository structure
 
@@ -31,6 +35,8 @@ ronl-business-api/
     └── ronl-realm.json             # Realm configuration (users, clients, mappers)
 ```
 
+---
+
 ## Prerequisites
 
 On the VM (Ubuntu 24.04 LTS):
@@ -42,12 +48,16 @@ On the VM (Ubuntu 24.04 LTS):
 - Caddy running (see [Caddy Deployment](caddy.md))
 - SSH access restricted to authorized IPs
 
+---
+
 ## Custom RONL Theme
 
 The RONL theme provides a consistent visual experience from the MijnOmgeving landing page through the authentication flow.
 
-![Screenshot: Theme Comparison - Landing vs Keycloak](../../../../assets/screenshots/ronl-theme-consistency.png)
-*Visual consistency from landing page to Keycloak login*
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Theme Comparison - Landing vs Keycloak](../../../../assets/screenshots/ronl-theme-consistency.png)
+  <figcaption>Visual consistency from landing page to Keycloak login</figcaption>
+</figure>
 
 ### Theme Features
 
@@ -180,6 +190,8 @@ The `href` fallback (`client.baseUrl`) points to the frontend root URL configure
 
 !!! note "Container restart required after theme changes"
     Keycloak caches theme templates at startup. Any change to `.ftl` or `.css` files requires a container restart to take effect — regardless of whether Keycloak is running in development or production mode. Theme changes do not require an image rebuild.
+
+---
 
 ## Deploying to ACC
 
@@ -333,8 +345,10 @@ docker compose logs -f keycloak-acc
    - **Default Locale:** Select `nl`
    - Click **Save**
 
-![Screenshot: Keycloak Admin Console Theme Configuration](../../../../assets/screenshots/ronl-keycloak-admin-theme-config.png)
-*Keycloak Admin Console showing theme selection*
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Keycloak Admin Console Theme Configuration](../../../../assets/screenshots/ronl-keycloak-admin-theme-config.png)
+  <figcaption>Keycloak Admin Console showing theme selection</figcaption>
+</figure>
 
 ### Step 8 — Verify deployment
 
@@ -357,6 +371,8 @@ docker exec keycloak-acc ls -la /opt/keycloak/themes/ronl/login/
 # Should see themed login page with blue gradient header
 ```
 
+---
+
 ## Deploying to PROD
 
 Follow the same steps using `deployment/vm/keycloak/prod/` and hostname `keycloak.open-regels.nl`.
@@ -369,6 +385,8 @@ Follow the same steps using `deployment/vm/keycloak/prod/` and hostname `keycloa
 - Test thoroughly in ACC before deploying to PROD
 - Deploy during maintenance window
 - Notify users of planned downtime
+
+---
 
 ## Realm import
 
@@ -386,14 +404,45 @@ The `ronl-realm.json` is imported on the first container start via the `--import
   - SSO session: 30 minutes
   - Refresh token: 30 minutes
 
-### Re-importing after changes
+### Re-importing the realm
+
+After modifying `config/keycloak/ronl-realm.json`:
+
+!!! note "v2.6.0 — RIP Phase 1 roles"
+    This release adds two realm roles (`infra-projectteam`, `infra-medewerker`) and one test user (`test-infra-flevoland`). Re-import the realm on both ACC and PROD before deploying the updated frontend and backend.
 
 ```bash
-# On VM
+# On localhost root dir
+scp config/keycloak/ronl-realm.json user@your-vm:~/keycloak/acc/ or /prod/
+
+# On the VM, for ACC
+# Copy the updated realm file to the container
+docker cp ~/keycloak/acc/ronl-realm.json keycloak-acc:/tmp/ronl-realm.json
+
+# Import with override
 docker exec keycloak-acc /opt/keycloak/bin/kc.sh import \
   --file /opt/keycloak/data/import/ronl-realm.json \
   --override true
+
+# Restart to apply
+cd ~/keycloak/acc
+docker compose restart keycloak-acc
+
+# On the VM, for PROD
+# Copy the updated realm file to the container
+docker cp ~/keycloak/prod/ronl-realm.json keycloak-prod:/tmp/ronl-realm.json
+
+# Import with override
+docker exec keycloak-prod /opt/keycloak/bin/kc.sh import \
+  --file /opt/keycloak/data/import/ronl-realm.json \
+  --override true
+
+# Restart to apply
+cd ~/keycloak/prod
+docker compose restart keycloak-prod
 ```
+
+---
 
 ## Updating the Theme
 
@@ -446,6 +495,8 @@ sleep 30
 
 **Note:** Keycloak caches themes. Always test in incognito/private browsing mode or clear browser cache.
 
+---
+
 ## Backup
 
 ### Database Backup
@@ -480,6 +531,8 @@ docker run --rm \
   -v /backup:/backup \
   alpine tar czf /backup/keycloak-acc-$(date +%Y%m%d).tar.gz /data
 ```
+
+---
 
 ## Monitoring
 
@@ -520,6 +573,8 @@ docker compose logs keycloak-acc -f
 docker compose logs keycloak-acc | grep -i error
 docker compose logs keycloak-acc | grep -i exception
 ```
+
+---
 
 ## Troubleshooting
 
@@ -689,6 +744,8 @@ docker exec keycloak-acc /opt/keycloak/bin/kc.sh import \
   --file /opt/keycloak/data/import/ronl-realm.json
 ```
 
+---
+
 ## Security Considerations
 
 ### Production Hardening
@@ -718,6 +775,8 @@ For PROD deployment:
 - ✅ Store passwords in password manager (1Password, Bitwarden)
 - ✅ Keep separate passwords for ACC and PROD
 - ✅ Rotate passwords regularly (quarterly recommended)
+
+---
 
 ## URLs
 

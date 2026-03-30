@@ -13,6 +13,8 @@
 
 ## What is the CPSV Editor?
 
+---
+
 ## Architecture
 
 ### Application layers
@@ -23,6 +25,10 @@
 
 ### Deployment pipeline
 
+---
+
 ## Standards
+
+---
 
 ## Positioning

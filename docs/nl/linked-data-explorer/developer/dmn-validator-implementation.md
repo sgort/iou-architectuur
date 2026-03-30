@@ -13,6 +13,8 @@
 
 ## Architectuuroverzicht
 
+---
+
 ## Frontend — `DmnValidator.tsx`
 
 ### Toestandsmodel
@@ -21,7 +23,11 @@
 
 ### Componentenboom
 
+---
+
 ## Backend — route-handler
+
+---
 
 ## Backend — validatieservice
 
@@ -33,6 +39,10 @@
 
 ### Hulpfuncties
 
+---
+
 ## Een nieuwe validatiecontrole toevoegen
+
+---
 
 ## Omgevingsvariabelen

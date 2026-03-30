@@ -13,26 +13,50 @@
 
 ## Wat is tijdlijnnavigatie?
 
+---
+
 ## Aan de slag
+
+---
 
 ## De tijdlijn gebruiken
 
+---
+
 ## Begrijpen wat u ziet
+
+---
 
 ## Voorbeeldscenario's
 
+---
+
 ## Tips en trucs
+
+---
 
 ## Privacy en uw gegevens
 
+---
+
 ## Veelgestelde vragen
+
+---
 
 ## Probleemoplossing
 
+---
+
 ## Sneltoetsen
+
+---
 
 ## Feedback geven
 
+---
+
 ## Wat komt er aan?
+
+---
 
 ## Gerelateerde hulpartikelen

@@ -81,6 +81,7 @@ POST /v1/chains/execute
 ```
 
 Request body:
+
 ```json
 {
   "chain": ["SVB_LeeftijdsInformatie", "SZW_BijstandsnormInformatie"],
@@ -103,6 +104,19 @@ POST /v1/chains/export
 
 Generates a DRD XML file from a chain and deploys it to Operaton. See [DRD Generation](drd-generation.md).
 
+### eDOCS
+
+```
+GET  /v1/edocs/status
+POST /v1/edocs/workspaces/ensure
+POST /v1/edocs/documents
+GET  /v1/edocs/workspaces/:workspaceId/documents
+```
+
+Integrates with the OpenText eDOCS document management system. Used by the RIP Phase 1 process to create project workspaces and file documents. In stub mode (`EDOCS_STUB_MODE=true`, default) all methods return realistic fake responses so the process runs end-to-end before a live eDOCS server is available.
+
+See [eDOCS Integration](edocs-integration.md) and the [API Reference](../reference/api-reference.md#edocs) for request/response details.
+
 ### TriplyDB proxy
 
 ```
@@ -110,6 +124,7 @@ POST /v1/triplydb/query
 ```
 
 Request body:
+
 ```json
 {
   "endpoint": "https://api.open-regels.triply.cc/...",
@@ -118,6 +133,41 @@ Request body:
 ```
 
 Proxies a SPARQL query to any TriplyDB endpoint, bypassing CORS restrictions. Used by the frontend Query Editor for dynamic endpoint support.
+
+---
+
+### Asset storage
+```
+GET    /v1/assets/bpmn
+POST   /v1/assets/bpmn
+DELETE /v1/assets/bpmn/:id
+GET    /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId
+
+GET    /v1/assets/forms
+POST   /v1/assets/forms
+DELETE /v1/assets/forms/:id
+
+GET    /v1/assets/documents
+POST   /v1/assets/documents
+DELETE /v1/assets/documents/:id
+```
+
+Persists BPMN processes, form schemas, and document templates to PostgreSQL. All routes return `503 DB_NOT_CONFIGURED` when `DATABASE_URL` is absent. See [Asset Storage](asset-storage.md) for the service architecture and [API Reference](../reference/api-reference.md#asset-storage) for full request/response documentation.
+
+---
+
+## Database
+
+The backend connects to a PostgreSQL database via a `pg.Pool`. The pool is initialised in `src/db/pool.ts` when `DATABASE_URL` is present in the environment. If the variable is absent, `pool` is `null` and all asset endpoints respond with `503`.
+
+Schema migrations run automatically on startup via `migrate()` in `src/db/migrate.ts`, called from `startServer()` before `app.listen()`. The migration is idempotent (`CREATE TABLE IF NOT EXISTS`).
+```
+src/db/
+├── pool.ts       — pg.Pool initialisation, error listener, null-if-unconfigured guard
+└── migrate.ts    — idempotent DDL: process_definitions, form_schemas, document_templates
+```
+
+See [PostgreSQL Deployment](deployment-postgresql.md) for Azure provisioning.
 
 ---
 
@@ -161,6 +211,7 @@ POST {OPERATON_BASE_URL}/decision-definition/key/{decisionRef}/evaluate
 ```
 
 Request payload maps to Operaton's variable format:
+
 ```json
 {
   "variables": {
@@ -170,6 +221,36 @@ Request payload maps to Operaton's variable format:
 ```
 
 For DRD execution, the same endpoint is used with the DRD entry-point identifier. Operaton handles internal decision dependency evaluation.
+
+---
+
+## eDOCS service
+
+`edocs.service.ts` wraps the OpenText eDOCS REST API. It authenticates once via `POST /connect`, caches the `X-DM-DST` session token, and re-authenticates automatically on `401`/`403`. Key methods:
+
+```typescript
+ensureWorkspace(projectNumber: string, projectName: string): Promise<EdocsWorkspaceResult>
+uploadDocument(workspaceId: string, filename: string, contentBase64: string, metadata: EdocsDocumentMetadata): Promise<EdocsDocumentResult>
+getWorkspaceDocuments(workspaceId: string): Promise<...>
+healthCheck(): Promise<{ status: 'up' | 'down' | 'stub' }>
+```
+
+When `EDOCS_STUB_MODE=true`, all methods return realistic fake data and log what they would have done. The stub is transparent to all callers.
+
+---
+
+## External task worker
+
+`externalTaskWorker.service.ts` polls Operaton's external task API (`POST /external-task/fetchAndLock`) using long-polling (`asyncResponseTimeout: 20 000 ms`). It handles two topics:
+
+| Topic                 | Reads                                                                                       | Writes                                                            |
+| --------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `rip-edocs-workspace` | `projectNumber`, `projectName`                                                              | `edocsWorkspaceId`, `edocsWorkspaceName`, `edocsWorkspaceCreated` |
+| `rip-edocs-document`  | `edocsWorkspaceId`, `documentTemplateId`, `edocsDocumentVariableName`, + template variables | `<edocsDocumentVariableName>` (e.g. `edocsIntakeReportId`)        |
+
+`documentTemplateId` and `edocsDocumentVariableName` are injected per ServiceTask via `camunda:inputParameter` in the BPMN, making the single topic handler reusable across all three document upload steps in the RIP Phase 1 process.
+
+The worker starts inside the `app.listen()` callback and stops in both `SIGTERM` and `SIGINT` handlers.
 
 ---
 
@@ -189,22 +270,22 @@ A central `errorHandler.ts` middleware catches unhandled errors and returns stan
 
 **Targets:**
 
-| Operation | Target |
-|---|---|
-| Chain execution | < 1000ms |
-| Health check response | < 100ms |
-| DMN list query | < 500ms |
-| API response time (p95) | < 200ms |
+| Operation               | Target   |
+| ----------------------- | -------- |
+| Chain execution         | < 1000ms |
+| Health check response   | < 100ms  |
+| DMN list query          | < 500ms  |
+| API response time (p95) | < 200ms  |
 
 **Production baselines (Heusdenpas chain, 3 DMNs):**
 
-| Measurement | Observed |
-|---|---|
-| Full chain execution | ~827ms |
-| Health check (incl. TriplyDB + Operaton) | ~180ms |
-| DMN discovery (SPARQL + parsing) | ~350ms |
-| TriplyDB round-trip latency | 150–200ms |
-| Operaton per-DMN execution | 80–120ms |
+| Measurement                              | Observed  |
+| ---------------------------------------- | --------- |
+| Full chain execution                     | ~827ms    |
+| Health check (incl. TriplyDB + Operaton) | ~180ms    |
+| DMN discovery (SPARQL + parsing)         | ~350ms    |
+| TriplyDB round-trip latency              | 150–200ms |
+| Operaton per-DMN execution               | 80–120ms  |
 
 ---
 
@@ -216,7 +297,7 @@ A central `errorHandler.ts` middleware catches unhandled errors and returns stan
 
 **Input validation** — type checking is applied to all request inputs. Variable names, DMN identifiers, and SPARQL endpoint URLs are validated before any service call is made. Request body size is limited to 10 MB.
 
-**Environment variables** — all sensitive configuration (TriplyDB endpoint URLs, Operaton API URLs, CORS origins) is stored in environment variables and never hardcoded. No secrets are written to logs.
+**Environment variables** — all sensitive configuration (TriplyDB endpoint URLs, Operaton API URLs, CORS origins, eDOCS credentials) is stored in environment variables and never hardcoded. eDOCS-specific variables: `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, `EDOCS_PASSWORD`, `EDOCS_STUB_MODE`.
 
 **Error responses** — the central error handler scrubs stack traces and internal context before returning responses to clients, ensuring no implementation details are exposed.
 
@@ -228,21 +309,21 @@ The API follows the [Dutch Government API Design Rules](https://publicatie.centr
 
 **Implemented rules:**
 
-| Rule | Description | Implementation |
-|---|---|---|
-| API-20 | Major version in URI | `/v1/*` endpoints |
+| Rule   | Description                 | Implementation                         |
+| ------ | --------------------------- | -------------------------------------- |
+| API-20 | Major version in URI        | `/v1/*` endpoints                      |
 | API-57 | Version header in responses | `API-Version: 0.4.0` on every response |
-| API-05 | Use nouns for resources | `dmns`, `chains`, `health` |
-| API-54 | Plural/singular naming | Correct usage throughout |
-| API-48 | No trailing slashes | Enforced in routing |
-| API-53 | Hide implementation details | Clean service abstractions |
+| API-05 | Use nouns for resources     | `dmns`, `chains`, `health`             |
+| API-54 | Plural/singular naming      | Correct usage throughout               |
+| API-48 | No trailing slashes         | Enforced in routing                    |
+| API-53 | Hide implementation details | Clean service abstractions             |
 
 **Language note (API-04)** — technical endpoint names (`health`, `version`) follow international convention in English. Business resource names (`dmns`, `chains`) follow the source data. Dutch variable names (e.g., `geboortedatum`) are preserved as-is from the DMN definitions.
 
 **Planned:**
 
-| Rule | Description | Target version |
-|---|---|---|
-| API-16, API-51 | OpenAPI 3.0 spec at `/v1/openapi.json` | v0.5.0 |
-| API-02 | Standard error response format | v0.5.0 |
-| API-10 | Resource collections with pagination | v1.0.0 |
+| Rule           | Description                            | Target version |
+| -------------- | -------------------------------------- | -------------- |
+| API-16, API-51 | OpenAPI 3.0 spec at `/v1/openapi.json` | v0.5.0         |
+| API-02         | Standard error response format         | v0.5.0         |
+| API-10         | Resource collections with pagination   | v1.0.0         |

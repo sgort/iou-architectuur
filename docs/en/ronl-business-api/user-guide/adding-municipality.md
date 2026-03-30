@@ -2,6 +2,8 @@
 
 This guide is for system operators and developers onboarding a new Dutch municipality to RONL Business API. Three things need to be configured: the tenant configuration file, Keycloak users and groups, and (optionally) municipality-specific feature flags.
 
+---
+
 ## 1. Add the tenant configuration
 
 Edit `packages/frontend/public/tenants.json` and add an entry for the new municipality. Use the following structure:
@@ -44,6 +46,8 @@ The `id` value must match the `municipality` claim that Keycloak will issue in t
 
 Theme colours follow the municipality's visual identity. The `primary` colour is applied to buttons, headers, and active navigation items. Use sufficient contrast against white text (WCAG AA minimum).
 
+---
+
 ## 2. Configure Keycloak
 
 Open the Keycloak Admin Console (ACC: `https://acc.keycloak.open-regels.nl/admin`, PROD: `https://keycloak.open-regels.nl/admin`), realm `ronl`.
@@ -78,9 +82,13 @@ Under **Users**, create:
 
 Set a temporary password and mark it as non-temporary for test accounts.
 
+---
+
 ## 3. Add backend tenant middleware allowlist
 
 If `ENABLE_TENANT_ISOLATION=true` in the backend `.env`, verify that `newtown` is included in the allowed tenants list in `packages/backend/src/middleware/tenant.middleware.ts`. If the middleware uses a hard-coded list, add the new municipality ID.
+
+---
 
 ## 4. Deploy and verify
 
@@ -92,4 +100,7 @@ After making these changes:
 4. Verify the correct municipality theme and display name appear
 5. Verify that `GET /v1/health` still returns `healthy`
 
-![Screenshot: RONL Business API New Municipality Theme Comparison](../../../assets/screenshots/ronl-business-api-municipality-theme-comparison.png)
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: RONL Business API New Municipality Theme Comparison](../../../assets/screenshots/ronl-business-api-municipality-theme-comparison.png)
+  <figcaption>Example dashboard MijnOmgeving showing municipality theme</figcaption>
+</figure>

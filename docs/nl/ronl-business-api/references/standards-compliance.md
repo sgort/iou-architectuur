@@ -13,10 +13,18 @@
 
 ## Dutch government standards
 
+---
+
 ## API design rules
+
+---
 
 ## Authentication & identity standards
 
+---
+
 ## Licences
+
+---
 
 ## External references

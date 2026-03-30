@@ -13,8 +13,14 @@
 
 ## Vendor badges
 
+---
+
 ## Vendor detail modal
 
+---
+
 ## Publishing vendor metadata
+
+---
 
 ## RONL Ontology

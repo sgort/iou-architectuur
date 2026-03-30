@@ -13,10 +13,18 @@
 
 ## Exporting a Turtle file
 
+---
+
 ## Importing an existing Turtle file
+
+---
 
 ## Round-trip editing
 
+---
+
 ## Importing files with DMN data
+
+---
 
 ## Importing files without all sections

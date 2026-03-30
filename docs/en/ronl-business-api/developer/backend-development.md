@@ -2,6 +2,8 @@
 
 The backend is `packages/backend` (`@ronl/backend`) — a Node.js 20 Express application written in TypeScript.
 
+---
+
 ## Project structure
 
 ```
@@ -11,6 +13,7 @@ packages/backend/src/
 │   ├── index.ts                # Route registration (v1/* and legacy api/*)
 │   ├── health.routes.ts        # GET /v1/health
 │   ├── decision.routes.ts      # POST /v1/decision/:key/evaluate
+│   ├── m2m.routes.ts           # GET|POST|DELETE /v1/m2m/* (M2M, jwtMiddleware only)
 │   ├── process.routes.ts       # POST /v1/process/:key/start, GET/DELETE
 │   ├── template.routes.ts      # GET /v1/chains/templates
 │   ├── triplydb.routes.ts      # GET /v1/triplydb (TriplyDB proxy)
@@ -25,11 +28,16 @@ packages/backend/src/
 │   └── jwt.middleware.ts       # JWT signature validation, JWKS caching
 ├── services/
 │   ├── operaton.service.ts     # Operaton REST API client
-│   └── audit.service.ts        # Audit log database writes
+│   ├── audit.service.ts        # Audit log database writes
+│   ├── edocs.service.ts        # OpenText eDOCS REST API client (stub + live)
+│   └── externalTaskWorker.service.ts  # Operaton external task long-poll worker
 └── utils/
     ├── config.ts               # Typed configuration from environment variables
-    └── logger.ts               # Winston logger (JSON format in prod)
+    ├── logger.ts               # Winston logger (JSON format in prod)
+    └── errors.ts               # getErrorMessage() helper
 ```
+
+---
 
 ## Middleware stack
 
@@ -47,6 +55,8 @@ Middleware is registered in this order in `src/index.ts`:
 10. `errorHandler` — catches and formats all thrown errors
 
 JWT validation (`jwt.middleware.ts`) is applied per-route on protected endpoints, not globally. Public endpoints (e.g. `GET /v1/health`) do not require authentication.
+
+---
 
 ## Adding a new route
 
@@ -84,6 +94,56 @@ router.use('/v1/myfeature', myfeatureRoutes);
 router.use('/api/myfeature', deprecationMiddleware('/v1/myfeature'), myfeatureRoutes);
 ```
 
+---
+ 
+## eDOCS service and external task worker
+ 
+`edocs.service.ts` wraps the OpenText eDOCS REST API. It authenticates once via `POST /connect`, caches the `X-DM-DST` session token extracted from the `Set-Cookie` response header, and re-authenticates automatically on `401`/`403`. Key methods:
+ 
+```typescript
+ensureWorkspace(projectNumber: string, projectName: string): Promise<EdocsWorkspaceResult>
+uploadDocument(workspaceId: string, filename: string, contentBase64: string, metadata: EdocsDocumentMetadata): Promise<EdocsDocumentResult>
+getWorkspaceDocuments(workspaceId: string): Promise<...>
+healthCheck(): Promise<{ status: 'up' | 'down' | 'stub' }>
+```
+ 
+When `EDOCS_STUB_MODE=true` (the default), all methods return realistic fake data and log what they would have done. The stub is transparent — callers cannot distinguish it from a live server.
+ 
+`externalTaskWorker.service.ts` polls Operaton's external task API (`POST /external-task/fetchAndLock`) using long-polling (`asyncResponseTimeout: 20 000 ms`). It handles two topics:
+ 
+| Topic | Reads | Writes |
+|---|---|---|
+| `rip-edocs-workspace` | `projectNumber`, `projectName` | `edocsWorkspaceId`, `edocsWorkspaceName`, `edocsWorkspaceCreated` |
+| `rip-edocs-document` | `edocsWorkspaceId`, `documentTemplateId`, `edocsDocumentVariableName`, + template variables | `<edocsDocumentVariableName>` (e.g. `edocsIntakeReportId`) |
+ 
+The worker is started inside the `app.listen()` callback and stopped in both `SIGTERM` and `SIGINT` handlers. It will not begin polling until the HTTP server is fully bound.
+ 
+For configuration and live-mode switchover, see [Copilot Studio — eDOCS OAuth Integration](copilot-studio-edocs.md).
+
+---
+ 
+## M2M route group
+ 
+`m2m.routes.ts` exposes the full Operaton surface to machine-to-machine clients without tenant scoping. It applies `jwtMiddleware` only — `tenantMiddleware` is intentionally absent.
+ 
+A `M2M_ALLOWED_OPERATIONS` constant at the top of the file controls which operations are active. Commenting out an entry returns `403 OPERATION_NOT_PERMITTED` for that operation with no other code changes required.
+ 
+The route group is instantiated with a dedicated `OperatonService` when `OPERATON_M2M_BASE_URL` is set, otherwise it reuses the shared singleton:
+ 
+```typescript
+const m2mOperatonService = config.operaton.m2mBaseUrl
+  ? new OperatonService(
+      config.operaton.m2mBaseUrl,
+      config.operaton.m2mUsername,
+      config.operaton.m2mPassword
+    )
+  : operatonService;
+```
+ 
+See [Operaton MCP Client](operaton-mcp-client.md) for the full endpoint reference and Keycloak setup.
+
+---
+
 ## Authentication on protected routes
 
 Apply the JWT middleware to any route that requires a logged-in user:
@@ -99,6 +159,8 @@ router.post('/sensitive', authenticateJWT, async (req, res) => {
 
 After `authenticateJWT`, `req.user` is populated with the decoded JWT claims.
 
+---
+
 ## TypeScript path aliases
 
 The `tsconfig.json` configures path aliases for clean imports:
@@ -112,6 +174,8 @@ The `tsconfig.json` configures path aliases for clean imports:
 ```
 
 `tsc-alias` resolves these aliases during the build step (`npm run build`).
+
+---
 
 ## Development commands
 
@@ -127,6 +191,8 @@ npm run test:unit     # Unit tests only
 npm run test:integration  # Integration tests only
 ```
 
+---
+
 ## Shared types
 
 Types shared between backend and frontend are in `packages/shared/src/`. Import them as `@ronl/shared`:
@@ -140,6 +206,8 @@ After modifying shared types, rebuild the package before the backend picks up th
 ```bash
 npm run build --workspace=@ronl/shared
 ```
+
+---
 
 ## Security implementation
 
@@ -237,3 +305,65 @@ const dbPassword = await client.getSecret('db-password');
 
 The App Service managed identity must be granted `Key Vault Secrets User` on the vault.
 
+`CORS_ORIGIN` in `.env` is a comma-separated list. In production it is `https://mijn.open-regels.nl`. In ACC it is `https://acc.mijn.open-regels.nl`. In local development it is `http://localhost:5173`.
+
+---
+
+## Audit logging
+
+### Architecture
+
+Audit logging spans two files:
+
+- `src/types/audit.types.ts` — `AuditLogEntry` interface, the single source of truth for the shape of an audit record
+- `src/middleware/audit.middleware.ts` — `auditMiddleware` (automatic per-request logging) and `auditLog()` (explicit action logging from route handlers); re-exports `AuditLogEntry` for backward compatibility
+- `src/services/audit.service.ts` — pg-promise connection pool and `persistAuditLog()`
+
+### Automatic vs. explicit logging
+
+Every authenticated request is logged automatically by `auditMiddleware`, which wraps `res.end` and calls `createAuditLog()` after the response is sent. The action is `${req.method} ${req.path}` and the result is derived from the HTTP status code:
+
+| Status range | Result |
+|---|---|
+| 200–399 | `success` |
+| 400–499 | `failure` |
+| 500+ | `error` |
+
+Route handlers can additionally call `auditLog()` directly to record domain-level actions with richer detail:
+```typescript
+auditLog(req, 'process.start.zorgtoeslag', 'success', {
+  processInstanceId: instance.id,
+});
+```
+
+### Database persistence
+
+`persistAuditLog()` in `audit.service.ts` writes each entry to the `audit_logs` table on Azure PostgreSQL Flexible Server using a pg-promise named-parameter `INSERT`. It is called fire-and-forget from `createAuditLog()` — errors are caught and logged but never propagated to the request cycle, so a database outage does not affect API availability.
+
+`initDb()` is called at server startup to verify connectivity. If the database is unreachable at startup, the backend falls back to in-memory logging and logs a warning. In-memory entries are not persisted to the database later; they exist only for the lifetime of the process.
+
+See [PostgreSQL Deployment](deployment/postgresql.md) for schema, firewall, and connection string setup.
+
+### Skipping self-referential entries
+
+`GET /audit` requests are excluded from the audit log to prevent the Audit Log viewer from recording its own page loads. The skip is applied inside `auditMiddleware` before `createAuditLog()` is called:
+```typescript
+if (req.path === '/audit') {
+  return originalEnd.apply(this, args as any);
+}
+```
+
+### Known issues fixed
+
+**IP address format on Azure App Service**
+
+`req.ip` on Azure App Service includes the port (`77.161.155.118:40796`). PostgreSQL's `inet` type does not accept a port suffix, causing every `INSERT` to fail silently. Fixed in `audit.service.ts` by stripping the port before the insert:
+```typescript
+ipAddress: entry.ipAddress ? entry.ipAddress.replace(/:\d+$/, '') : null,
+```
+
+This only affects Azure — local Express sets `req.ip` without a port.
+
+**Audit log viewer pagination reset**
+
+The `useEffect` that triggers `loadAuditLogs(0)` on section entry incorrectly included `auditLogs.length` in its dependency array. When "Meer laden" appended records, the length change re-fired the effect and reset pagination to offset 0. Fixed by removing `auditLogs.length` from the dependency array — `activeSection` changing to `audit-overzicht` or `audit-details` is sufficient to trigger the initial load.

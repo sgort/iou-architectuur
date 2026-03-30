@@ -13,7 +13,11 @@
 
 ## Repository structure
 
+---
+
 ## Prerequisites
+
+---
 
 ## Deploying to ACC
 
@@ -21,16 +25,26 @@
 
 # Expected: JSON with endpoints
 
+---
+
 ## Deploying to PROD
 
+---
+
 ## Realm import
+
+---
 
 ## Backup
 
 # Daily backup of PROD Keycloak database
 
+---
+
 ## Updating Keycloak
 
 # Update docker-compose.yml image tag, then:
+
+---
 
 ## Connecting the backend

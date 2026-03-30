@@ -2,29 +2,27 @@
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
-    Raadpleeg de <a href="/ronl-business-api/user-guide/submitting-calculation/">Engelse versie</a> voor de huidige inhoud.
+    Raadpleeg de <a href="/ronl-business-api/user-guide/submitting-application/">Engelse versie</a> voor de huidige inhoud.
 
 ---
 
 **Status:** Concept  
-**Engelstalige bron:** `ronl-business-api/user-guide/submitting-calculation.md`
+**Engelstalige bron:** `ronl-business-api/user-guide/submitting-application.md`
 
 ---
 
-## Prerequisites
+## Kapvergunning (tree felling permit application)
 
-## Submitting the zorgtoeslag form
+### Prerequisites
 
-## What happens in the background
+### Submitting the application
 
-## Test scenarios
+### What happens in the background
 
-### Scenario 1 — Eligible, standard income
+### Viewing the decision
 
-### Scenario 2 — Not eligible, income too high
+### Test scenarios
 
-### Scenario 3 — Active payment plan
-
-## Verification checklist
+---
 
 ## Troubleshooting
