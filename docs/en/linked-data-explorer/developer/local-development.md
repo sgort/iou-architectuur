@@ -97,6 +97,94 @@ If `DATABASE_URL` is absent, the backend logs `[DB] Skipping migrations — data
 
 ---
 
+## RoPA Records — local setup
+
+### Seed example records
+
+After the database is running and the backend has started (tables created by migration), seed the four example RoPA records from `packages/backend`:
+```bash
+cd packages/backend
+npx ts-node --project tsconfig.json src/db/seed-ropa.ts
+```
+
+Expected output:
+```
+[seed-ropa] Seeding RoPA records…
+[seed-ropa] AwbShellProcess (Flevoland) → <uuid>
+[seed-ropa] TreeFellingPermitSubProcess → <uuid>
+[seed-ropa] AwbZorgtoeslagProcess → <uuid>
+[seed-ropa] ZorgtoeslagProvisionalSubProcess → <uuid>
+[seed-ropa] Done.
+```
+
+The seed is idempotent — re-running it updates existing rows in place via `ON CONFLICT (bpmn_process_id) DO UPDATE`. It is safe to run multiple times.
+
+### Verify records in the database
+```bash
+docker exec -it ronl-postgres psql -U lde_user -d lde_assets \
+  -c "SELECT bpmn_process_id, process_level, status FROM ropa_records ORDER BY process_level;"
+```
+
+Expected output:
+```
+         bpmn_process_id          | process_level | status
+----------------------------------+---------------+--------
+ AwbShellProcess                  | shell         | active
+ AwbZorgtoeslagProcess            | shell         | active
+ TreeFellingPermitSubProcess      | subprocess    | active
+ ZorgtoeslagProvisionalSubProcess | subprocess    | active
+(4 rows)
+```
+
+### Verify the public endpoint
+```bash
+curl "http://localhost:3001/v1/ropa/public?organisation=flevoland" | jq '.data | length'
+```
+
+Should return `4`. If you get `0`, the `controller_name` values in the seeded records do not contain "flevoland" — re-run the seed after verifying the controller names in `src/db/seed-ropa.ts`.
+
+### Test the public site locally
+
+`packages/ropa-site/index.html` has the API URL hardcoded. For local development change it to the local backend:
+```javascript
+const API_URL =
+  'http://localhost:3001/v1/ropa/public?organisation=flevoland';
+```
+
+Open the file directly in a browser (`file://`) or serve it:
+```bash
+cd packages/ropa-site
+npx serve .
+```
+
+!!! warning "CORS when opening as file://"
+    When `index.html` is opened directly from disk, the browser sends `Origin: null`. The global CORS middleware rejects `null` origins. The path-aware CORS fix in `index.ts` that serves `/v1/ropa/public` with `origin: '*'` bypasses this — but only if that fix is in place. If you see a CORS error when opening from `file://`, confirm `index.ts` has the path-aware cors middleware, not just the route-level cors in `ropa.public.routes.ts`.
+
+!!! note "Revert before committing"
+    Remember to revert `const API_URL` to the ACC or production URL before committing `packages/ropa-site/index.html`.
+
+---
+
+## Environment comparison
+
+The table below summarises how the LDE stack differs between local development and ACC deployment.
+
+| Aspect | Local development | ACC |
+|---|---|---|
+| Backend URL | `http://localhost:3001` | `https://acc.backend.linkeddata.open-regels.nl` |
+| Frontend URL | `http://localhost:5173` | `https://acc.linkeddata.open-regels.nl` |
+| PostgreSQL | `ronl-postgres` Docker container, `lde_assets` DB | Azure PostgreSQL Flexible Server, `lde_assets` DB |
+| `DATABASE_URL` | `postgresql://lde_user:lde_password@localhost:5432/lde_assets` | Set as Azure App Service env var with `?sslmode=require` |
+| DB migrations | Run automatically on `npm run dev` | Run automatically on App Service startup (CI/CD deploy) |
+| RoPA seed | Run manually: `npx ts-node ... src/db/seed-ropa.ts` | Run manually once after first ACC deploy |
+| RoPA public endpoint | `http://localhost:3001/v1/ropa/public` | `https://acc.backend.linkeddata.open-regels.nl/v1/ropa/public` |
+| `ropa-site` API URL | `http://localhost:3001/v1/ropa/public` (hardcoded in `index.html`) | `https://acc.backend.linkeddata.open-regels.nl/v1/ropa/public` (hardcoded in `index.html`) |
+| `ropa-site` deployment | Open `index.html` directly or `npx serve .` | Azure Static Web Apps (`ropa-flevoland-acc`), deployed via GitHub Actions on push to `acc` with path filter `packages/ropa-site/**` |
+| CORS for public route | Path-aware middleware in `index.ts` bypasses `CORS_ORIGIN` whitelist | Same — `origin: '*'` for `/v1/ropa/public` regardless of `CORS_ORIGIN` env var |
+| RoPA Editor | Available in LDE at `http://localhost:5173` under the ScrollText icon | Available at `https://acc.linkeddata.open-regels.nl` under the ScrollText icon |
+
+---
+
 ## Frontend configuration
 
 The frontend reads environment variables via Vite. The `packages/frontend/.env.development` file is pre-configured:
