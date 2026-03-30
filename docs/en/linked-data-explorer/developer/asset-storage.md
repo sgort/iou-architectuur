@@ -5,45 +5,12 @@ From v1.3.0, BPMN processes, form schemas, and document templates are persisted 
 ---
 
 ## Architecture
-```
-┌──────────────────────────────────────────────────────────────┐
-│  Browser                                                     │
-│                                                              │
-│  Editor component                                            │
-│    │  mount → hydrateFromServer()  ───────────────────────┐  │
-│    │  save  → Service.save()  ──────────────────────────┐ │  │
-│    │  read  → Service.getAll() (localStorage, sync)     │ │  │
-│                                                         │ │  │
-│  localStorage (cache)  ◄────────────────────────────────┘ │  │
-│                                                           │  │
-└───────────────────────────────────────────────────────────│──┘
-                                                            │
-                              background fetch (async)      │
-                                                            ▼
-┌──────────────────────────────────────────────────────────────┐
-│  LDE Backend  (Node.js / Express)                            │
-│                                                              │
-│  POST /v1/assets/bpmn        (upsert by lde_id)              │
-│  GET  /v1/assets/bpmn        (list, non-readonly only)       │
-│  DELETE /v1/assets/bpmn/:id                                  │
-│  GET  /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId              │
-│                                                              │
-│  POST /v1/assets/forms                                       │
-│  GET  /v1/assets/forms                                       │
-│  DELETE /v1/assets/forms/:id                                 │
-│                                                              │
-│  POST /v1/assets/documents                                   │
-│  GET  /v1/assets/documents                                   │
-│  DELETE /v1/assets/documents/:id                             │
-│                                                              │
-└──────────────────────────────────┬───────────────────────────┘
-                                   │
-                                   ▼
-┌──────────────────────────────────────────────────────────────┐
-│  PostgreSQL — database: lde_assets                           │
-│                                                              │
-│  process_definitions    form_schemas    document_templates   │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    A[Editor component] -->|mount| B[hydrateFromServer]
+    A -->|save| C[localStorage cache]
+    B -->|background fetch| D[LDE Backend]
+    D --> E[(PostgreSQL — lde_assets)]
 ```
 
 ---
@@ -189,9 +156,18 @@ interface BpmnProcess {
 
 ---
 
+## Type safety — DB row types and mappers
+
+The `assets.service.ts` functions use the three-layer DB type pattern to safely bridge PostgreSQL row data and service-layer domain objects. `pool.query<T>()` is typed with a row type from `src/db/types.ts`, and results are transformed to camelCase domain objects via pure mapper functions in `src/db/mappers.ts`. This eliminates implicit `any` casts that TypeScript strict mode rejects on some platforms, and keeps all snake_case → camelCase and `null` → `undefined` conversion in one place.
+
+See [DB Type Layer](db-type-layer.md) for the full pattern description and guidance on adding new entities.
+
+---
+
 ## Related pages
 
 - [Backend Architecture](backend.md) — route and service overview
 - [Local Development](local-development.md) — PostgreSQL setup for local dev
+- [DB Type Layer](db-type-layer.md) — DB row types, domain types, and mapper pattern
 - [Deployment](deployment.md) — Azure provisioning and App Settings
 - [API Reference — Asset Storage](../reference/api-reference.md#asset-storage)

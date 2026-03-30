@@ -217,6 +217,7 @@ nav:
         - Frontend Architecture: linked-data-explorer/developer/frontend.md
         - Backend Architecture: linked-data-explorer/developer/backend.md
         - Asset Storage: linked-data-explorer/developer/asset-storage.md
+        - DB Type Layer: linked-data-explorer/developer/db-type-layer.md
         - eDOCS Integration: en/linked-data-explorer/developer/edocs-integration.md
         - Enhanced Validation & Semantic Detection: linked-data-explorer/developer/enhanced-validation.md
         - Chain Export: linked-data-explorer/developer/chain-export.md

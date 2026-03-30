@@ -256,10 +256,21 @@ Custom domain configuration is done in the Azure Portal under **Static Web Apps 
 
 ---
 
+## Type safety — DB row types and mappers
+
+`ropa.service.ts` follows the same three-layer DB type pattern used by `assets.service.ts`. Row types `RopaRecordRow` and `RopaFieldRow` in `src/db/types.ts` mirror the exact column names and pg-native types of `ropa_records` and `ropa_personal_data_fields`. The mapper functions `mapRopaRecord` and `mapRopaField` in `src/db/mappers.ts` perform all snake_case → camelCase conversion, `null` → `undefined` coercion, and `Date` → ISO string serialisation in one place. Services use `pool.query<RopaRecordRow>()` — no `as` casts appear in query results.
+
+RoPA types live in `src/types/ropa.types.ts` rather than `src/domain/types.ts` because they are mirrored on the frontend at `packages/frontend/src/types/ropa.types.ts`. The pattern is otherwise identical.
+
+See [DB Type Layer](db-type-layer.md) for the full pattern description and guidance on adding new entities.
+
+---
+
 ## Related pages
 
 - [RoPA Records features](../features/ropa-records.md)
 - [RoPA Records user guide](../user-guide/ropa-records.md)
 - [Asset Storage](asset-storage.md) — PostgreSQL write-through cache architecture
+- [DB Type Layer](db-type-layer.md) — DB row types, domain types, and mapper pattern
 - [PostgreSQL deployment](deployment-postgresql.md) — firewall rules and schema management
 - [BPMN Modeler developer docs](bpmn-modeler.md) — moddleDescriptor, ProcessList, deploy modal
