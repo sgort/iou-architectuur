@@ -791,26 +791,14 @@
     <!-- ================================================================
          CONFIGURATION — update before deploying
          ================================================================
-         GITLAB_TOKEN   : Project Access Token with `api` scope.
-                          Create at: GitLab → Project → Settings →
-                          Access Tokens → role: Developer, scope: api
-                          Note: this token is visible in page source.
-                          Use a project-scoped token, not a personal one.
-
-         GITLAB_BASE    : Base URL of your self-hosted GitLab instance.
-
-         PROJECT_PATH   : URL-encoded namespace/project path.
-                          showcases/iou-architectuur → showcases%2Fiou-architectuur
-
-         UC_LABEL       : GitLab label applied to new submissions.
-                          Create the label first in GitLab → Project →
-                          Manage → Labels.
+         API_BASE : Root URL of the RONL Business API backend.
+                    The form POSTs to API_BASE + '/v1/public/use-case'.
+                    The GitLab token lives server-side in GITLAB_TOKEN
+                    env var — it is never sent to the browser.
          ================================================================ -->
     <script>
-      const GITLAB_BASE   = 'https://git.open-regels.nl';
-      const GITLAB_TOKEN  = 'YOUR_PROJECT_ACCESS_TOKEN'; // glpat-…
-      const PROJECT_PATH  = 'showcases%2Fiou-architectuur';
-      const UC_LABEL      = 'uc::submitted';
+      //const API_BASE = 'http://localhost:3002'; // local backend during development
+      const API_BASE = 'https://api.open-regels.nl'; // RONL Business API
 
       // ── Steps widget ───────────────────────────────────────────────
       const stepsContainer = document.getElementById('steps-container');
@@ -863,10 +851,6 @@
         const priorityEl = document.querySelector('[name="priority"]:checked');
         const priority = priorityEl ? priorityEl.value : '(not specified)';
 
-        const today = new Date().toLocaleDateString('nl-NL', {
-          day: '2-digit', month: '2-digit', year: 'numeric'
-        });
-
         // — Validate —
         const errors = [];
         const clearInvalid = (id) => document.getElementById(id)?.classList.remove('invalid');
@@ -891,7 +875,11 @@
         }
         summary.style.display = 'none';
 
-        // — Build markdown body —
+        // — Build markdown body (mirrors the GitLab work item template) —
+        const today = new Date().toLocaleDateString('nl-NL', {
+          day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+
         const stepsText = steps.length
           ? steps.map((s, i) => `**Step ${i+1} · Stap ${i+1}:** ${s}`).join('\n\n')
           : '*(not provided)*';
@@ -900,7 +888,7 @@
           ? materialChecks.map(m => `- ${m}`).join('\n')
           : '- *(none indicated)*';
 
-        const body = `## 1. Submitter · Indiener
+        const markdownBody = `## 1. Submitter · Indiener
 
 | Field · Veld | Value · Waarde |
 |---|---|
@@ -1016,12 +1004,12 @@ ${priority}
 | | | |
 `;
 
-        // — Submit to GitLab —
+        // — Submit to RONL Business API proxy —
         const btn     = document.getElementById('btn-submit');
         const btnText = document.getElementById('btn-text');
         const spinner = document.getElementById('btn-spinner');
 
-        btn.disabled       = true;
+        btn.disabled        = true;
         btnText.textContent = 'Bezig… · Submitting…';
         spinner.style.display = 'block';
 
@@ -1029,39 +1017,24 @@ ${priority}
         document.getElementById('feedback-error').style.display   = 'none';
 
         try {
-          const response = await fetch(
-            `${GITLAB_BASE}/api/v4/projects/${PROJECT_PATH}/issues`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'PRIVATE-TOKEN': GITLAB_TOKEN,
-              },
-              body: JSON.stringify({
-                title:       `[Use Case] ${title}`,
-                description: body,
-                labels:      UC_LABEL,
-              }),
-            }
-          );
+          const response = await fetch(`${API_BASE}/v1/public/use-case`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, description: markdownBody }),
+          });
 
-          if (!response.ok) {
-            const errData = await response.json().catch(() => ({}));
-            throw new Error(
-              errData.message
-                ? JSON.stringify(errData.message)
-                : `HTTP ${response.status} ${response.statusText}`
-            );
+          const data = await response.json();
+
+          if (!response.ok || !data.success) {
+            throw new Error(data.error?.message || `HTTP ${response.status}`);
           }
 
-          const data = response.status === 201 ? await response.json() : {};
-          const issueUrl  = data.web_url  || `${GITLAB_BASE}`;
-          const issueId   = data.iid      || '—';
+          const { iid, web_url } = data.data;
 
           document.getElementById('success-message').innerHTML =
-            `Work item <strong>#${issueId}</strong> has been created.
-             You can view it at: <a href="${issueUrl}" target="_blank" rel="noopener">${issueUrl}</a>.<br/>
-             <em>Werkitem <strong>#${issueId}</strong> is aangemaakt. U kunt het bekijken via bovenstaande link.</em>`;
+            `Work item <strong>#${iid}</strong> has been created.
+             You can view it at: <a href="${web_url}" target="_blank" rel="noopener">${web_url}</a>.<br/>
+             <em>Werkitem <strong>#${iid}</strong> is aangemaakt. U kunt het bekijken via bovenstaande link.</em>`;
 
           document.getElementById('feedback-success').style.display = 'block';
           document.getElementById('feedback-success').scrollIntoView({ behavior: 'smooth' });
@@ -1079,8 +1052,8 @@ ${priority}
           document.getElementById('feedback-error').scrollIntoView({ behavior: 'smooth' });
 
         } finally {
-          btn.disabled         = false;
-          btnText.textContent  = 'Indienen · Submit';
+          btn.disabled          = false;
+          btnText.textContent   = 'Indienen · Submit';
           spinner.style.display = 'none';
         }
       });
