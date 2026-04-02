@@ -78,13 +78,14 @@ A `tenants` table exists in the `audit_logs` database and mirrors the entries in
 
 ## Organisation types
 
-From v2.4.1, the platform supports three organisation categories as first-class types in `TenantConfig`:
+From v2.4.1, the platform supports four organisation types, controlled by the `organisationType` field in `tenants.json` and propagated as a JWT claim via the `organisation_type` Keycloak protocol mapper:
 
-| `organisationType` | Used for                                     | `organisationCode` example          |
-| ------------------ | -------------------------------------------- | ----------------------------------- |
-| `municipality`     | Dutch municipalities (gemeenten)             | CBS municipality code e.g. `GM0344` |
-| `province`         | Dutch provinces                              | CBS province code e.g. `PV24`       |
-| `national`         | National government agencies (rijksoverheid) | OIN or agency identifier            |
+| Type | Description | Examples |
+|---|---|---|
+| `municipality` | Dutch municipalities | Utrecht (`GM0344`), Amsterdam (`GM0363`), Rotterdam (`GM0599`), Den Haag (`GM0518`) |
+| `province` | Dutch provinces | Provincie Flevoland (`PV24`) |
+| `national` | National government agencies | UWV (`OIN-00000001820588740000`), Dienst Toeslagen (`OIN-00000001003214345000`) |
+| `commercial` | Commercial organisations | Unive Verzekeringen (`KVK-12345678`) |
 
 The `organisationType` is injected into every JWT via the `organisation_type` Keycloak protocol mapper and propagated as a BPMN process variable by the tenant middleware. It is available in Operaton as `organisationType` alongside `municipality`.
 

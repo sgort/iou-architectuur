@@ -35,14 +35,19 @@
 | Variable | Required | Description |
 |---|---|---|
 | `OPERATON_BASE_URL` | Yes | `https://operaton.open-regels.nl/engine-rest` |
-| `OPERATON_TIMEOUT` | No | `30000` | Request timeout in ms |
+| `OPERATON_TIMEOUT` | `30000` | Operaton request timeout in ms |
+| `OPERATON_M2M_BASE_URL` | — | Dedicated Operaton `engine-rest` base URL for M2M routes. Falls back to `OPERATON_BASE_URL` when unset |
+| `OPERATON_M2M_USERNAME` | — | Basic auth username for the M2M Operaton instance |
+| `OPERATON_M2M_PASSWORD` | — | Basic auth password for the M2M Operaton instance |
 
 ### MCP AI Assistant
 
 | Variable            | Required              | Default | Description                                                                 |
 |---------------------|-----------------------|---------|-----------------------------------------------------------------------------|
 | `MCP_ENABLED`       | No                    | `false` | Enables the MCP client and `POST /v1/mcp/chat`. Must be `true` on ACC/PROD. |
-| `ANTHROPIC_API_KEY` | When `MCP_ENABLED=true` | —     | Anthropic API key for `claude-sonnet-4-20250514`.                           |
+| `ANTHROPIC_API_KEY` | — | Anthropic API key; required when `MCP_ENABLED=true` |
+| `TRIPLYDB_ENDPOINT` | `https://api.open-regels.triply.cc/datasets/stevengort/RONL/services/RONL/sparql` | SPARQL endpoint for the TriplyDB Knowledge Graph MCP provider |
+| `TRIPLYDB_TOKEN` | — | TriplyDB API token; required for authenticated SPARQL queries |
 
 > `OPERATON_USERNAME` and `OPERATON_PASSWORD` are also passed to the `operaton-mcp` child process.
 > Ensure they are set before enabling MCP.
@@ -65,6 +70,14 @@
 | `EDOCS_PASSWORD` | Yes (live mode) | — | eDOCS service account password |
 | `EDOCS_STUB_MODE` | No | `true` | When `true`, all eDOCS service methods return realistic fake responses. Set to `false` to enable live calls. Never commit real credentials to the repository — use Azure App Service Application settings. |
  
+### GitLab integration
+
+| Variable | Default | Description |
+|---|---|---|
+| `GITLAB_TOKEN` | — | Personal access token with `api` scope for the GitLab instance |
+| `GITLAB_BASE_URL` | `https://git.open-regels.nl` | GitLab instance base URL |
+| `GITLAB_PROJECT_PATH` | — | URL-encoded project path (e.g. `showcases%2Fiou-architectuur`) |
+| `GITLAB_UC_LABEL` | `Submitted` | Label applied to newly created use-case issues |
 
 ### Database (PostgreSQL)
 

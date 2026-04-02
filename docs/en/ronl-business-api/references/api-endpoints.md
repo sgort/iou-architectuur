@@ -79,7 +79,7 @@ Health status values: `healthy` (HTTP 200), `degraded` (HTTP 503), `unhealthy` (
 | `GET` | `/v1/process/:key/start-form` | Bearer JWT | Fetch the deployed Camunda Form schema for a process start event. Returns 404 `FORM_NOT_FOUND` if no form is linked; 415 `UNSUPPORTED_FORM_TYPE` if an embedded HTML form is linked. |
 | `GET` | `/v1/process/:id/historic-variables` | Bearer JWT | Fetch the final variable state of a completed process instance from Operaton history. Applies tenant isolation via the `municipality` variable. |
 | `GET` | `/v1/process/:id/decision-document` | Bearer JWT | Fetch the `DocumentTemplate` bundled in the Operaton deployment for a completed process instance. Reads `ronl:documentRef` from the BPMN `UserTask` element and returns the named `.document` resource. Returns 404 `DOCUMENT_NOT_FOUND` when no `ronl:documentRef` is present or the resource is absent. Applies tenant isolation via the `municipality` variable. |
-
+| `GET` | `/v1/process/:key/variable-hints` | Bearer JWT | Fetch deduplicated variable names and their inferred types from the historic variable store for a given process definition key. Used by the caseworker dashboard to pre-populate form fields. |
 ---
 
 ## Public content
@@ -93,6 +93,10 @@ These endpoints require no authentication and are accessible before login. They 
 | `GET` | `/v1/public/berichten/:id` | None | Returns a single bericht by its RSS `<guid>`. Reads from the in-memory cache populated by the list endpoint; returns `404 BERICHT_NOT_FOUND` if the cache is empty or the id is not present. |
 | `GET` | `/v1/public/producten-diensten` | None | Returns the Provincie Flevoland product and services catalogue. No authentication required. Currently only populated for the Flevoland tenant; other tenants receive an empty list. |
 | `GET` | `/v1/public/regelcatalogus` | None | RONL knowledge graph data: services, organisations, NL-SBB concepts, and implementation rules. Five parallel SPARQL queries against TriplyDB. Each data slice cached 5 minutes in-memory; stale cache returned on TriplyDB failure. |
+| `POST` | `/v1/public/use-case` | None | Submit a use-case scenario as a GitLab issue in the IOU Architecture project. Returns the created issue's `iid` and `web_url`. |
+| `GET` | `/v1/public/use-cases` | None | List GitLab issues for the IOU Architecture project. Query: `?state=opened` (default) or `?state=closed`. Returns up to 100 items sorted by `created_at` descending. |
+| `POST` | `/v1/public/feedback` | None | Submit feedback with optional screenshot attachments as a GitLab issue. Accepts `multipart/form-data`. Images are uploaded to the GitLab project uploads API and embedded as markdown references in the issue body. |
+| `POST` | `/v1/public/upload-file` | None | Upload a single file of any type to the GitLab project and receive its markdown reference. Used by the use-case form to pre-upload attachments before JSON submission. Accepts `multipart/form-data` with a single file under the field name `file`. |
  
 **`GET /v1/public/nieuws` response shape:**
  
@@ -240,6 +244,90 @@ Items with no title are filtered out.
  
 ---
  
+**`POST /v1/public/use-case` request body:**
+```json
+{
+  "title": "Subsidietoets voor Flevolandse inwoners",
+  "description": "## 1. Submitter · Indiener\n\n| Veld | Waarde |\n|---|---|\n| Naam | Jan de Vries |"
+}
+```
+
+**`POST /v1/public/use-case` response:**
+```json
+{
+  "success": true,
+  "data": {
+    "iid": 42,
+    "web_url": "https://git.open-regels.nl/showcases/iou-architectuur/-/issues/42"
+  },
+  "meta": { "generatedAt": "2026-04-01T10:00:00.000Z" }
+}
+```
+
+The `title` is automatically prefixed with `[Use Case]` before creation. Requires `GITLAB_TOKEN`, `GITLAB_BASE_URL`, and `GITLAB_PROJECT_PATH` to be set on the backend. Returns `503 GITLAB_NOT_CONFIGURED` when any of these are missing.
+
+**`GET /v1/public/use-cases` response shape:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "iid": 42,
+      "title": "[Use Case] Subsidietoets voor Flevolandse inwoners",
+      "state": "opened",
+      "created_at": "2026-04-01T10:00:00.000Z",
+      "updated_at": "2026-04-01T10:00:00.000Z",
+      "web_url": "https://git.open-regels.nl/showcases/iou-architectuur/-/issues/42",
+      "labels": ["Submitted"],
+      "assignees": [],
+      "description": "## 1. Submitter · Indiener\n\n..."
+    }
+  ]
+}
+```
+
+**`POST /v1/public/feedback` request (multipart/form-data fields):**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | string | Yes | Submitter name |
+| `org` | string | No | Organisation |
+| `role` | string | No | Function / role |
+| `contact` | string | Yes | Contact e-mail address |
+| `description` | string | Yes | Feedback description |
+| `screenshots` | file[] | No | Up to 5 image files, max 10 MB each |
+
+**`POST /v1/public/feedback` response:**
+```json
+{
+  "success": true,
+  "data": {
+    "iid": 43,
+    "web_url": "https://git.open-regels.nl/showcases/iou-architectuur/-/issues/43"
+  }
+}
+```
+
+**`POST /v1/public/upload-file` request (multipart/form-data fields):**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `file` | file | Yes | Any file type, max 10 MB |
+
+**`POST /v1/public/upload-file` response:**
+```json
+{
+  "success": true,
+  "data": {
+    "markdown": "![filename](/uploads/abc123/filename.pdf)"
+  }
+}
+```
+
+The returned `markdown` string is the GitLab-hosted reference. The use-case form collects these references for all attachments and appends them as a `## Bijlagen · Attachments` section to the issue body before calling `POST /v1/public/use-case`.
+
+---
+
 ## HR Onboarding
  
 These endpoints require a valid JWT with the `caseworker` or `hr-medewerker` role. Tenant isolation is applied via the `municipality` JWT claim — a caseworker from Utrecht cannot retrieve Den Haag's onboarding records.
@@ -415,6 +503,35 @@ For OAuth setup and curl verification, see [Copilot Studio — eDOCS OAuth Integ
 
 ## Operaton MCP AI Assistant
 
+**`GET /v1/mcp/sources`**
+
+Returns all registered MCP providers with their connection status. Used by the frontend to populate the source selector in the Gereedschap tab. Returns an empty array when `MCP_ENABLED=false`.
+
+**Auth:** JWT required — `caseworker` or `admin` role.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "operaton",
+      "displayName": "Process Engine",
+      "description": "Operaton BPMN/DMN — process instances, tasks, decisions, deployments",
+      "connected": true
+    },
+    {
+      "id": "triplydb",
+      "displayName": "Knowledge Graph",
+      "description": "TriplyDB SPARQL — decision models, services, organisations, rules",
+      "connected": true
+    }
+  ]
+}
+```
+
+---
+
 **`POST /v1/mcp/chat`**
 
 Runs a single agentic chat turn through the MCP loop and streams the response via Server-Sent
@@ -429,9 +546,12 @@ Events.
   "history": [
     { "role": "user", "content": "..." },
     { "role": "assistant", "content": "..." }
-  ]
+  ],
+  "sources": ["operaton", "triplydb"]
 }
 ```
+
+The `sources` array controls which MCP providers are active for this turn. An empty array activates all connected providers. Provider IDs are returned by `GET /v1/mcp/sources`.
 
 **Response:** `Content-Type: text/event-stream`
 
@@ -590,6 +710,43 @@ See [Dynamic Forms — Deployment](../features/dynamic-forms.md#deployment) for 
 
 ---
 
+## Admin
+
+The `/v1/admin` endpoints require a valid JWT with the `admin` role. Non-admin caseworkers receive `403 FORBIDDEN`.
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/v1/admin/audit` | Bearer JWT (`admin`) | Returns paginated audit log records from PostgreSQL. Query: `?limit=` (default 50, max 200), `?offset=` (default 0). Excluded from its own audit trail. |
+
+**`GET /v1/admin/audit` response shape:**
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": 1,
+        "timestamp": "2026-03-19T12:00:00.000Z",
+        "tenant_id": "flevoland",
+        "user_id": "sub-uuid-from-jwt",
+        "action": "task.claim",
+        "resource_type": null,
+        "resource_id": null,
+        "details": { "taskId": "task-uuid" },
+        "result": "success",
+        "error_message": null,
+        "request_id": null
+      }
+    ],
+    "pagination": { "limit": 50, "offset": 0, "total": 312, "hasMore": true }
+  }
+}
+```
+
+For M2M tokens, `tenant_id` is set to the Keycloak `azp` claim (e.g. `operaton-mcp-client`) because service account tokens carry no `municipality` claim.
+
+---
+
 ## Response headers
 
 All responses include:
@@ -624,3 +781,14 @@ Link: </v1/health>; rel="successor-version"
 | `TASK_CLAIM_FAILED` | 500 | Operaton rejected the claim request |
 | `TASK_COMPLETE_FAILED` | 500 | Operaton rejected the complete request |
 | `TASK_VARIABLES_FAILED` | 500 | Could not retrieve process variables for task |
+| `MISSING_TENANT` | 403 | M2M token used on a tenant-scoped route — no `municipality` claim present |
+| `OPERATION_NOT_PERMITTED` | 403 | M2M operation is disabled in `M2M_ALLOWED_OPERATIONS` |
+| `GITLAB_NOT_CONFIGURED` | 503 | Required GitLab env vars (`GITLAB_TOKEN`, `GITLAB_PROJECT_PATH`) are missing |
+| `GITLAB_ERROR` | 502 | GitLab API rejected the request |
+| `GITLAB_UNREACHABLE` | 502 | GitLab API could not be reached |
+| `USE_CASE_INVALID` | 400 | `title` or `description` missing from use-case submission |
+| `MISSING_FIELDS` | 400 | Required fields absent from feedback or file upload request |
+| `NO_FILE` | 400 | `POST /v1/public/upload-file` called without a file |
+| `MCP_DISABLED` | 503 | `MCP_ENABLED=false` — MCP endpoints are inactive |
+| `MCP_NOT_CONNECTED` | 503 | No connected MCP providers match the requested `sources` |
+| `DB_ERROR` | 500 | PostgreSQL query failed in admin/audit endpoint |

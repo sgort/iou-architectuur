@@ -4,6 +4,59 @@
 
 ## Changelog
 
+## v2.9.5 — Enhancement (April 2, 2026)
+
+### IOU — Gebruiksscenario indienen — UX improvements
+
+Sub-step number badges in step 6 (Concrete Example) changed from filled blue circles (`bg-blue-600 rounded-full`) to slate rounded squares (`bg-slate-500 rounded-md`), eliminating the visual collision with the section header badges which share the same shape and colour. The size was reduced from `w-6 h-6` to `w-5 h-5` to keep them visually subordinate to the section headers, and `font-mono` applied so the counter numerals read as distinct from section numbers.
+
+Step 6 now has a remove button per row — only rendered when more than one step is present to prevent accidental full deletion. The button turns red on hover to signal destructive intent.
+
+Step 9 (Existing Materials) gains an optional file attachment zone below the existing material checkboxes — drag-and-drop or file picker, any file type, up to 5 files at 10 MB each.
+
+### Backend — new endpoint
+
+`POST /v1/public/upload-file` added to `public.routes.ts`. Accepts a single file of any type via `multipart/form-data` (field name `file`), uploads it to the GitLab project uploads API using `GITLAB_TOKEN`, and returns the GitLab-generated markdown reference (`{ success: true, data: { markdown } }`). Uses a dedicated `uploadAny` multer instance without the image-only `fileFilter` used by the `/feedback` route.
+
+The `/use-case` submission remains plain JSON (`Content-Type: application/json`). Attachments are pre-uploaded one-by-one via `POST /v1/public/upload-file` before the issue is created; the returned markdown references are appended as a `## Bijlagen · Attachments` section in the issue body. This avoids a multer v2 `req.body` field-parsing failure that occurred when text fields were submitted alongside files in `multipart/form-data` — text fields arrived as `undefined` regardless of file presence.
+
+### Backend — development noise fix
+
+`ExternalTaskWorker.asyncResponseTimeout` reduced to 5 000 ms when `NODE_ENV !== 'production'` (was 20 000 ms). The long-poll window exceeded the TCP keep-alive timeout on the network path between the local dev machine and the remote Operaton VM, causing repeated `ECONNRESET` poll errors in the development log. The worker still runs locally; only the poll window is shortened.
+
+---
+
+## v2.9.4 — Feature Release (April 1, 2026)
+
+### Caseworker Dashboard — IOU tab (Flevoland)
+
+New **IOU** top-nav tab added, tenant-scoped to the `flevoland` tenant via `tenants.json → leftPanelSections.iou`. The tab is visible without authentication; submission sections require login. Four sections:
+
+| Section | Auth required | Description |
+|---|---|---|
+| Gebruiksscenario indienen | Yes | 10-section submission form (title, submitter, description, current situation, desired outcome, concrete example, legislation, affected parties, existing materials, priority). POSTs to `POST /v1/public/use-case`; organisation pre-filled as "Provincie Flevoland". |
+| Feedback geven | Yes | Feedback form with submitter info, description, and screenshot upload — paste (Ctrl+V), drag-and-drop, or file picker; up to 5 images at 10 MB each. POSTs to `POST /v1/public/feedback`. |
+| Actieve zaken | No | Read-only list of open GitLab issues via `GET /v1/public/use-cases?state=opened`. Expandable cards rendered with `react-markdown` + `remark-gfm`; parsed sections: Indiener table, Beschrijving, and Gewenst resultaat. |
+| Archief | No | Same component as Actieve zaken with `state=closed`. |
+
+The IOU badge count on the top-nav **IOU** tab is populated by `IouZakenSection` via an `onCountChange` callback — identical pattern to the task count badge on the **Projecten** tab.
+
+`IouZakenSection` is shared by both list views; the `WORK_ITEM_FIELDS` constant controls which markdown sections are extracted and displayed per card. Main content area overflow corrected from `flex-col` to `block` so all long-form sections scroll correctly.
+
+To enable the IOU tab for another tenant, add an `iou` key with the four section entries to that tenant's `leftPanelSections` in `tenants.json`. No code changes are required.
+
+### Backend — IOU public endpoints
+
+`GET /v1/public/use-cases` added to `public.routes.ts`. Lists GitLab issues for `GITLAB_PROJECT_PATH`; supports `?state=opened` (default) or `?state=closed`; returns up to 100 items sorted by `created_at` descending. Returns `iid`, `title`, `state`, `created_at`, `updated_at`, `web_url`, `labels`, `assignees`, and `description` per item. No authentication required.
+
+`POST /v1/public/feedback` added to `public.routes.ts`. Accepts `multipart/form-data` with fields `name`, `org`, `role`, `contact`, `description`, and up to 5 image files under the field name `screenshots`. Each image is first uploaded to the GitLab project uploads API; the returned markdown references are embedded in the issue body. Uses `multer` in-memory storage with a per-file 10 MB limit and an image-only `fileFilter`. No authentication required.
+
+Both endpoints require `GITLAB_TOKEN`, `GITLAB_BASE_URL`, and `GITLAB_PROJECT_PATH` to be set. Missing configuration returns `503 GITLAB_NOT_CONFIGURED`.
+
+See [IOU GitLab Integration](iou-gitlab-integration.md) for full setup instructions, environment variable reference, and the curl verification steps.
+
+---
+
 ## v2.9.3 — Feature Release (March 26, 2026)
 
 ### Caseworker Dashboard — Berichten & Regelcatalogus
@@ -546,6 +599,14 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 | Gereedschap platform tools hub                           | v2.9.0  |
 | Archief — completed task history                         | v2.9.1  |
 | CaseworkerDashboard.tsx component extraction             | v2.9.2  |
+| Berichten — live Provincie Flevoland RSS feed            | v2.9.3  |
+| Producten & Diensten Catalogus (Flevoland)               | v2.9.3  |
+| AI Assistant — SSE streaming + TriplyDB Knowledge Graph  | v2.9.3  |
+| IOU tab — GitLab integration (Flevoland)                 | v2.9.4  |
+| `POST /v1/public/use-cases`, `POST /v1/public/feedback`  | v2.9.4  |
+| IOU form UX — step badges, add/remove, file attachments  | v2.9.5  |
+| `POST /v1/public/upload-file`                            | v2.9.5  |
+
 ---
 
 ### Planned
