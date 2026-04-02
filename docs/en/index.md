@@ -8,9 +8,9 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.9.3** · *March 2026*
+-   **⚙️ RONL Business API — v2.9.5** · *April 2026*
 
-    Berichten section switched from hardcoded seed data to the live Provincie Flevoland RSS feed. New Producten & Diensten Catalogus section for the Flevoland tenant: SC4.0 XML feed rendered as a searchable 2-column card grid with audience and online-aanvraag badges. AI Assistant upgraded to SSE streaming — tokens arrive in real time, tool activity shown between rounds, 240s timeout. Regelcatalogus default tab changed to Organisaties.
+    New IOU tab for the Flevoland tenant: use-case submission form (10 sections, optional file attachments), feedback form with screenshot upload, and read-only active/archived GitLab issue lists — all backed by a new GitLab proxy route group on `/v1/public`. AI Assistant extended with a TriplyDB Knowledge Graph provider alongside the existing Operaton Process Engine — source selector lets caseworkers toggle providers per turn. Step numbering UX refined in the use-case form: sub-step badges now use slate squares to distinguish them from section header badges.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

@@ -27,6 +27,45 @@ Authentication is **basic auth** — unlike the standalone external `operaton-mc
 
 ---
 
+## Data sources
+
+The AI assistant connects to one or more **MCP providers** registered in `McpRegistry`. Each provider exposes a curated set of read-only tools and contributes a section to the system prompt. The frontend fetches the list of providers from `GET /v1/mcp/sources` on mount and pre-selects all connected ones. The user can deselect sources before sending a message.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: AI Assistant source selector buttons](../../../assets/screenshots/mcp-chat-source-selector.png)
+  <figcaption>MCP chat source selector.</figcaption>
+</figure>
+
+Two providers are registered in ACC:
+
+| Source ID | Display name | Tools | Description |
+|---|---|---|---|
+| `operaton` | Process Engine | 16 | Live Operaton data: process instances, tasks, deployments, decisions, incidents |
+| `triplydb` | Knowledge Graph | 11 | RONL knowledge graph via SPARQL: DMN metadata, public services, organisations, rules, concepts |
+
+The `sources` array in the `POST /v1/mcp/chat` request body controls which providers are active for a given turn. An empty array activates all connected providers.
+
+### Process Engine tools (`operaton`)
+
+The `OperatonMcpProvider` allows the following 16 tools from `operaton-mcp`:
+
+`processDefinition_list`, `processDefinition_count`, `processDefinition_getByKey`, `processInstance_list`, `processInstance_count`, `processInstance_get`, `task_list`, `task_count`, `task_getById`, `decision_list`, `decision_getByKey`, `deployment_list`, `deployment_count`, `deployment_getById`, `incident_list`, `incident_count`
+
+All other `operaton-mcp` tools are blocked by the `ALLOWED_TOOLS` set in `OperatonMcpProvider.ts`.
+
+### Knowledge Graph tools (`triplydb`)
+
+The `TriplyDbMcpProvider` spawns the bundled `src/mcp-servers/triplydb/index.ts` (compiled to `dist/mcp-servers/triplydb/index.js` in production) and exposes the following 11 tools:
+
+`dmn_list`, `dmn_get`, `dmn_chain_links`, `dmn_enhanced_chain_links`, `dmn_semantic_equivalences`, `organization_list`, `service_list`, `rule_list`, `concept_list`, `service_rules_metadata`, `sparql_query`
+
+The TriplyDB server requires `TRIPLYDB_ENDPOINT` and `TRIPLYDB_TOKEN` env vars. If the connection fails at startup, the provider is silently unavailable and does not appear in the `GET /v1/mcp/sources` response as connected.
+
+!!! note "Knowledge graph vs live engine"
+    The TriplyDB knowledge graph contains **documented metadata** about decision models, including their intended Operaton endpoints. It is not live deployment data. To verify what is actually running in Operaton, the Process Engine source must also be selected. The model is prompted to note this distinction in its responses.
+
+---
+
 ## Architecture
 ```
 McpChatSection (React)
