@@ -10,6 +10,10 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 -   **⚙️ RONL Business API — v2.9.7** · *April 2026*
 
+    ---
+
+    **AI Assistant — MCP providers & multi-model LLM registry**
+    
     AI Assistant extended with three independent MCP providers — CPRMV legislation (Dutch & EU law), LDE Process Library (deployed BPMN bundles, forms, document templates), and a multi-model LLM registry supporting both Claude and GPT-4o. New Procesbibliotheek section on the Home tab lets caseworkers browse deployed processes without login. IOU tab for Flevoland: use-case submission with file attachments, feedback with screenshot upload, and read-only GitLab issue lists.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
