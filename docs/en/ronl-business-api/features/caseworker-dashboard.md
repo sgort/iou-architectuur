@@ -261,6 +261,69 @@ The practical rule when adding new dashboard functionality: if the feature is or
 
 ---
 
+## Platform-scoped vs tenant-scoped sections
+
+Not all top-nav tabs in the caseworker dashboard are equal. The dashboard distinguishes two categories:
+
+**Tenant-scoped sections** are driven entirely by `tenants.json`. The `leftPanelSections` object per tenant defines which sections appear under `home`, `personal-info`, and `projects`. Adding or removing a section for a specific organisation requires only a change to `tenants.json` — no code changes are needed. This makes it safe to roll out features incrementally per organisation type.
+
+**Platform-scoped sections** are hardcoded in `CaseworkerDashboard.tsx` and are identical for all tenants. They are gated by role or authentication state, not by organisation. The canonical examples are the `audit-log` and `gereedschap` tabs.
+
+| Tab | Type | Gating |
+|---|---|---|
+| Home | Tenant-scoped | Defined in `tenants.json → leftPanelSections.home` |
+| Persoonlijke info | Tenant-scoped | Defined in `tenants.json → leftPanelSections.personal-info` |
+| Projecten | Tenant-scoped | Defined in `tenants.json → leftPanelSections.projects` |
+| Audit log | Platform-scoped | Visible to all authenticated users; non-admin users see a *Toegang beperkt* screen. Gated by the `admin` Keycloak realm role, **not** by organisation |
+| Gereedschap | Platform-scoped | Visible to all authenticated caseworkers. Individual tools within the overview are role-gated (Operaton Cockpit and SAP require `admin`) |
+| IOU | **Tenant-scoped** (tenant opt-in) | Defined in `tenants.json → leftPanelSections.iou`; currently only enabled for `flevoland` |
+
+The `Changelog` button in the top navigation bar and the top-nav filtering (e.g. showing only the tabs applicable to the current tenant) follow the same platform-scoped pattern — they are hardcoded in `CaseworkerDashboard.tsx` and are not configurable per tenant.
+
+---
+
+## IOU tab (Provincie Flevoland)
+
+The IOU tab is a tenant-scoped top-nav tab currently enabled only for the `flevoland` tenant. It provides a lightweight project-management interface over the IOU Architecture GitLab repository and contains four sections:
+
+| Section ID | Label | Auth required | Description |
+|---|---|---|---|
+| `iou-gebruiksscenario` | Gebruiksscenario indienen | Yes | 10-section submission form that creates a GitLab issue via `POST /v1/public/use-case`. Organisation is pre-filled as "Provincie Flevoland". |
+| `iou-feedback` | Feedback geven | Yes | Feedback form with optional screenshot upload (up to 5 images, 10 MB each). Backend uploads images to the GitLab project uploads API and embeds them in the issue body via `POST /v1/public/feedback`. |
+| `iou-actieve-zaken` | Actieve zaken | No (public) | Read-only list of open GitLab issues fetched from `GET /v1/public/use-cases?state=opened`. Cards are rendered with `react-markdown` + `remark-gfm`. |
+| `iou-archief` | Archief | No (public) | Same component as Actieve zaken with `state=closed`. |
+
+The IOU tab is enabled in `tenants.json` by adding an `iou` key to `leftPanelSections` for the relevant tenant. Removing or commenting out the `iou` key for a tenant hides the tab entirely without any code change.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: IOU tab showing the Gebruiksscenario indienen form with the 10-section card layout and Provincie Flevoland pre-filled in the organisation field](../../../assets/screenshots/caseworker-dashboard-iou-gebruiksscenario.png)
+  <figcaption>The Gebruiksscenario indienen form. Organisation is pre-filled from the tenant configuration.</figcaption>
+</figure>
+
+<figure markdown style="width:100%; margin:0;">
+  <img src="../../../assets/screenshots/caseworker-dashboard-iou-feedback.png"
+       alt="IOU tab: Feedback geven form with screenshot upload area showing drag-and-drop zone" />
+  <figcaption>The Feedback geven form. Screenshots can be pasted (Ctrl+V), dragged, or selected via file picker.</figcaption>
+</figure>
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: IOU tab Actieve zaken list showing expandable cards with issue title, status, and parsed markdown sections for Beschrijving and Gewenst resultaat](../../../assets/screenshots/caseworker-dashboard-iou-actieve-zaken.png)
+  <figcaption>Actieve zaken renders GitLab issues as expandable cards. No authentication is required to view this section.</figcaption>
+</figure>
+
+### Backend dependencies
+
+The IOU tab depends on three environment variables that must be set on the backend:
+
+| Variable | Description |
+|---|---|
+| `GITLAB_TOKEN` | Personal access token with `api` scope for `git.open-regels.nl` |
+| `GITLAB_BASE_URL` | GitLab instance base URL (default: `https://git.open-regels.nl`) |
+| `GITLAB_PROJECT_PATH` | URL-encoded project path (e.g. `showcases%2Fiou-architectuur`) |
+| `GITLAB_UC_LABEL` | Label applied to newly created use-case issues (e.g. `Submitted`) |
+
+---
+
 ## Related documentation
 
 - [Caseworker Workflow](../user-guide/caseworker-workflow.md) — Task queue, claim, complete, AWB Kapvergunning, Archief

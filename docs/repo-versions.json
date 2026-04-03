@@ -1,14 +1,14 @@
 {
-  "docs_built": "2026-03-29",
+  "docs_built": "2026-04-02",
   "repositories": [
     {
       "name": "RONL Business API",
       "icon": "⚙️",
-      "version": "v2.9.3",
+      "version": "v2.9.6",
       "environment": "acc",
-      "commit": "00b8be7...",
-      "commit_date": "2026-03-26",
-      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/00b8be7939df0a7b90eddcd7bed768ed07ff6845"
+      "commit": "65e54ea...",
+      "commit_date": "2026-04-02",
+      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/65e54ea4b9dd5773c5ade85f33ecd2bbfecc006a"
     },
     {
       "name": "CPSV Editor",
