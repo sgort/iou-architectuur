@@ -80,6 +80,7 @@ The main area renders the component for `activeSection`. Each section ID maps to
 | `berichten`             | `<BerichtenSection />`                 | No                                |
 | `producten-diensten`    | `<ProductenDienstenCatalogus />`       | No                                |
 | `regelcatalogus`        | `<RegelCatalogus />`                   | No                                |
+| `procesbibliotheek`     | `<ProcesBibliotheek />`                | No                                |
 | `taken`                 | `<TakenSection />`                     | Yes                               |
 | `archief`               | `<ArchiefSection />`                   | Yes                               |
 | `profiel`               | `<ProfielSection />`                   | Yes                               |
@@ -90,6 +91,7 @@ The main area renders the component for `activeSection`. Each section ID maps to
 | `rip-fase1-wip`         | `<RipFase1WipSection />`               | Yes + `infra-projectteam` role    |
 | `rip-fase1-gereed`      | `<RipFase1GereedSection />`            | Yes + `infra-projectteam` role    |
 | `gereedschap-overzicht` | `<GereedschapSection />`               | Yes (platform-scoped)             |
+| `mcp-chat`              | `<McpChatSection />`                   | Yes — `caseworker` role (platform-scoped) |
 | `audit-overzicht`       | `<AuditSection activeTab="overzicht">` | Yes + `admin` role (platform-scoped) |
 | `audit-details`         | `<AuditSection activeTab="details">`   | Yes + `admin` role (platform-scoped) |
 

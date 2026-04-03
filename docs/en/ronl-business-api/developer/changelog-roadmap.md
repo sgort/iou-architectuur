@@ -4,7 +4,53 @@
 
 ## Changelog
 
-## v2.9.5 — Enhancement (April 2, 2026)
+## v2.9.7 — Feature Release (April 3, 2026)
+
+### AI Assistant — CPRMV Legislation Provider
+
+`CprmvMcpProvider` added to the MCP registry. Connects to the CPRMV HTTP MCP server at `acc.cprmv.open-regels.nl/mcp` using `StreamableHTTPClientTransport` — a remote HTTP endpoint, not a subprocess. Enabled via `CPRMV_MCP_ENABLED=true`; URL overridable via `CPRMV_URL`.
+
+Three tools exposed: `rules_rules__rule_id_path__get` (retrieve rules from BWB, CVDR, or EU CELLAR by rule ID path), `ref_ref__referencemethod___reference__get` (resolve rules by Juriconnect reference), `celex_cellar_by_celex__celexid___language___format__get` (look up EU CELLAR publications by CELEX id).
+
+`config.cprmv` added to `Config`: `enabled` (`CPRMV_MCP_ENABLED`, default `false`), `url` (`CPRMV_URL`).
+
+### AI Assistant — LDE Process Library Provider
+
+`LdeMcpProvider` added. Spawns a custom `lde-mcp` stdio subprocess (`src/mcp-servers/lde/index.ts` in dev, `dist/mcp-servers/lde/index.js` in prod) that connects directly to the LDE `lde_assets` PostgreSQL database. Enabled via `LDE_MCP_ENABLED=true` and `LDE_DATABASE_URL`.
+
+Six tools: `bundle_list`, `bundle_get` (deployed BPMN bundles with forms, documents, subprocesses, and DMN keys), `form_list`, `form_get` (full Camunda Form JSON schema), `document_list`, `document_get` (zones and bindings).
+
+SSL handled by stripping `sslmode` from the connection URL and passing `ssl: { rejectUnauthorized: true }` to the pg `Pool` constructor directly — avoids the pg-connection-string `sslmode=require` deprecation warning.
+
+`config.lde` added to `Config`: `enabled` (`LDE_MCP_ENABLED`, default `false`), `databaseUrl` (`LDE_DATABASE_URL`).
+
+### AI Assistant — LLM Provider Architecture
+
+`LlmProvider` interface introduced in `src/services/llm/LlmProvider.ts`. Decouples the agentic loop from any specific SDK — `mcpChat.service.ts` has no direct dependency on Anthropic or OpenAI. Provider-agnostic types: `AgentMessage`, `AgentToolUse`, `AgentToolResult`, `LlmStreamParams`, `LlmTurnResult`.
+
+`LlmRegistry` singleton maps model IDs to their owning provider. `getAvailableModels()` returns only models from providers where `isAvailable()` is `true`.
+
+`AnthropicLlmProvider` registered with three models: `claude-sonnet-4-20250514`, `claude-opus-4-20250514`, `claude-haiku-4-5-20251001`. Enabled when `ANTHROPIC_API_KEY` is set.
+
+`OpenAILlmProvider` registered with `gpt-4o` and `gpt-4o-mini`. Enabled when `OPENAI_API_KEY` is set.
+
+`GET /v1/mcp/models` added — returns all available models with `providerId` and `providerDisplayName`. Used by the frontend model selector dropdown.
+
+`POST /v1/mcp/chat` body extended with `modelId: string` — required field; returns `400 INVALID_REQUEST` when absent.
+
+Frontend: model selector dropdown rendered below the subtitle in the AI Assistant header. Hidden when only one model is available. First available model pre-selected on mount.
+
+### Caseworker Dashboard — Procesbibliotheek
+
+New `procesbibliotheek` section added to the Home tab for all tenants whose `leftPanelSections.home` includes the entry (currently Utrecht, Amsterdam, Rotterdam, Den Haag, Flevoland). Publicly accessible (`isPublic: true`).
+
+Fetches deployed BPMN bundles from the LDE public API (`VITE_LDE_API_URL/bundles/public`). A dedicated `ldeApi` Axios instance is used — no Keycloak `Authorization` header is sent. Cards show process name, `bpmnProcessId`, status badge (WIP/Actief/Concept), role badge (Standalone/Subprocess), and deployment date; expand to reveal forms, documents, DMN keys, and deployment ID.
+
+`ProcessBundle`, `BundleDeployedForm`, `BundleDeployedDocument` types exported from `api.ts`. `VITE_LDE_API_URL` added to all env files and `vite-env.d.ts`.
+
+---
+
+## v2.9.6 — Enhancement (April 2, 2026)
 
 ### IOU — Gebruiksscenario indienen — UX improvements
 
@@ -26,7 +72,7 @@ The `/use-case` submission remains plain JSON (`Content-Type: application/json`)
 
 ---
 
-## v2.9.4 — Feature Release (April 1, 2026)
+## v2.9.5 — Feature Release (April 1, 2026)
 
 ### Caseworker Dashboard — IOU tab (Flevoland)
 
@@ -54,6 +100,28 @@ To enable the IOU tab for another tenant, add an `iou` key with the four section
 Both endpoints require `GITLAB_TOKEN`, `GITLAB_BASE_URL`, and `GITLAB_PROJECT_PATH` to be set. Missing configuration returns `503 GITLAB_NOT_CONFIGURED`.
 
 See [IOU GitLab Integration](iou-gitlab-integration.md) for full setup instructions, environment variable reference, and the curl verification steps.
+
+---
+
+## v2.9.4 — Feature Release (March 30, 2026)
+
+### AI Assistant — Multi-Source MCP Registry
+
+`McpClientService` singleton replaced by `McpRegistry` — a provider registry that manages multiple independent MCP sources. Each provider connects, exposes a curated set of tools, and contributes a section to the composite system prompt independently. A provider failure does not block other providers.
+
+`McpProvider` interface introduced: `id`, `displayName`, `description`, `connect()`, `disconnect()`, `getToolDefinitions()`, `callTool()`, `isConnected()`, `systemPromptContribution()`.
+
+`OperatonMcpProvider` replaces `McpClientService` — identical stdio subprocess behaviour, 15-tool `ALLOWED_TOOLS` curation gate preserved.
+
+`TriplyDbMcpProvider` added — spawns the bundled `triplydb-mcp` stdio server; connects to the RONL SPARQL endpoint (`stevengort/RONL`). Exposes 11 tools: `dmn_list`, `dmn_get`, `dmn_chain_links`, `dmn_enhanced_chain_links`, `dmn_semantic_equivalences`, `organization_list`, `service_list`, `rule_list`, `concept_list`, `service_rules_metadata`, `sparql_query`. Enabled via `TRIPLYDB_MCP_ENABLED=true`.
+
+`McpRegistry.getToolDefinitions(providerIds?)` and `callTool()` accept an optional provider ID filter. `buildSystemPrompt(providerIds?)` assembles a composite prompt from only the selected connected providers. `getProviderMeta()` returns metadata and connection status for all registered providers.
+
+`POST /v1/mcp/chat` extended with `sources: string[]` — provider IDs selected by the user for the session. `GET /v1/mcp/sources` added — returns provider metadata and connection status.
+
+Frontend: source selector toggle buttons rendered below the message history. All connected sources pre-selected by default; offline providers shown greyed-out. Send button and textarea disabled when no sources are selected. Header subtitle shows active source display names dynamically.
+
+Markdown rendering added to assistant bubbles via `react-markdown` + `@tailwindcss/typography` prose classes. In-progress streaming bubble also renders Markdown incrementally.
 
 ---
 
@@ -602,10 +670,17 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 | Berichten — live Provincie Flevoland RSS feed            | v2.9.3  |
 | Producten & Diensten Catalogus (Flevoland)               | v2.9.3  |
 | AI Assistant — SSE streaming + TriplyDB Knowledge Graph  | v2.9.3  |
-| IOU tab — GitLab integration (Flevoland)                 | v2.9.4  |
-| `POST /v1/public/use-cases`, `POST /v1/public/feedback`  | v2.9.4  |
-| IOU form UX — step badges, add/remove, file attachments  | v2.9.5  |
-| `POST /v1/public/upload-file`                            | v2.9.5  |
+| AI Assistant — Multi-Source MCP Registry (McpRegistry)   | v2.9.4  |
+| TriplyDbMcpProvider + Knowledge Graph tools              | v2.9.4  |
+| Source selector UI + Markdown rendering in chat bubbles  | v2.9.4  |
+| IOU tab — GitLab integration (Flevoland)                 | v2.9.5  |
+| `GET /v1/public/use-cases`, `POST /v1/public/feedback`   | v2.9.5  |
+| IOU form UX — step badges, add/remove, file attachments  | v2.9.6  |
+| `POST /v1/public/upload-file`                            | v2.9.6  |
+| CPRMV Legislation Provider                               | v2.9.7  |
+| LDE Process Library Provider                             | v2.9.7  |
+| LLM Provider Architecture (LlmRegistry, OpenAI support)  | v2.9.7  |
+| Procesbibliotheek section                                | v2.9.7  |
 
 ---
 

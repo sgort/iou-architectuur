@@ -71,6 +71,21 @@ Multer is configured with in-memory storage and an image-only MIME filter. The f
 
 ---
 
+### `POST /v1/public/upload-file`
+
+Uploads a single file of any type to the GitLab project uploads API and returns the GitLab Markdown reference. Used by `IouGebruiksscenarioSection` to pre-upload attachments before the use-case JSON body is submitted, so that the file markdown references can be embedded in the issue description.
+
+**Form field:** `file` (single file, any MIME type, up to 10 MB)
+
+**Response:** `201 { success: true, data: { markdown: "![filename](upload-url)" } }`
+
+Uses a dedicated `uploadAny` multer instance without the image-only `fileFilter` applied to the `/feedback` route. No authentication required.
+
+!!! note "Why separate from `/use-case`"
+    The `/use-case` route accepts `Content-Type: application/json`. Combining file uploads with text fields in a single `multipart/form-data` request caused multer v2 to silently discard all text fields (`req.body` was empty regardless of field presence). Pre-uploading via `/upload-file` and embedding the returned references in the JSON body avoids this.
+
+---
+
 ## Configuration
 
 | Variable | Description |

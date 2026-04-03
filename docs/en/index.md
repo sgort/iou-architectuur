@@ -8,9 +8,9 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.9.6** · *April 2026*
+-   **⚙️ RONL Business API — v2.9.7** · *April 2026*
 
-    New IOU tab for the Flevoland tenant: use-case submission form (10 sections, optional file attachments), feedback form with screenshot upload, and read-only active/archived GitLab issue lists — all backed by a new GitLab proxy route group on `/v1/public`. AI Assistant extended with a TriplyDB Knowledge Graph provider alongside the existing Operaton Process Engine — source selector lets caseworkers toggle providers per turn.
+    AI Assistant extended with three independent MCP providers — CPRMV legislation (Dutch & EU law), LDE Process Library (deployed BPMN bundles, forms, document templates), and a multi-model LLM registry supporting both Claude and GPT-4o. New Procesbibliotheek section on the Home tab lets caseworkers browse deployed processes without login. IOU tab for Flevoland: use-case submission with file attachments, feedback with screenshot upload, and read-only GitLab issue lists.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

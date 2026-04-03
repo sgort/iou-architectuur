@@ -33,7 +33,13 @@ packages/frontend/src/
 │       ├── RipFase1WipSection.tsx
 │       ├── RipFase1GereedSection.tsx
 │       ├── GereedschapSection.tsx
-│       └── AuditSection.tsx
+│       ├── AuditSection.tsx
+│       ├── McpChatSection.tsx
+│       ├── ProductenDienstenCatalogus.tsx
+│       ├── ProcesBibliotheek.tsx
+│       ├── IouGebruiksscenarioSection.tsx
+│       ├── IouFeedbackSection.tsx
+│       └── IouZakenSection.tsx
 ├── contexts/                   # React contexts (auth, tenant)
 ├── hooks/
 │   └── useProfielData.ts       # Shared hook for Profiel and Rollen sections
@@ -116,7 +122,7 @@ const [isAuthenticated] = useState(() => !!keycloak.authenticated);
 
 The shell renders three zones driven by `tenantConfig` loaded from `public/tenants.json`:
 
-- **Top nav** — three `TopNavPage` values: `home | personal-info | projects`
+- **Top nav** — six `TopNavPage` values: `home | personal-info | projects | audit-log | gereedschap | iou`. The `audit-log` and `gereedschap` tabs are platform-scoped (hardcoded, not in `tenants.json`). The `iou` tab is tenant-scoped and only present for tenants that define `leftPanelSections.iou`.
 - **Left panel** — `tenantConfig.leftPanelSections[activeTopNavPage]`, an array of `LeftPanelSection` objects each with `id`, `label`, and `isPublic`
 - **Main content** — `renderContent()` switches on `activeSection`
 
@@ -284,6 +290,9 @@ VITE_KEYCLOAK_URL=https://acc.keycloak.open-regels.nl
 
 # Business API
 VITE_API_URL=https://acc.api.open-regels.nl/v1
+
+# Linked Data Explorer (used by ProcesBibliotheek)
+VITE_LDE_API_URL=https://acc.backend.linkeddata.open-regels.nl/v1
 ```
 
 **Environment detection:**

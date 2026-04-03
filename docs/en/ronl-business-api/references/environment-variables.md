@@ -46,8 +46,16 @@
 |---------------------|-----------------------|---------|-----------------------------------------------------------------------------|
 | `MCP_ENABLED`       | No                    | `false` | Enables the MCP client and `POST /v1/mcp/chat`. Must be `true` on ACC/PROD. |
 | `ANTHROPIC_API_KEY` | — | Anthropic API key; required when `MCP_ENABLED=true` |
-| `TRIPLYDB_ENDPOINT` | `https://api.open-regels.triply.cc/datasets/stevengort/RONL/services/RONL/sparql` | SPARQL endpoint for the TriplyDB Knowledge Graph MCP provider |
-| `TRIPLYDB_TOKEN` | — | TriplyDB API token; required for authenticated SPARQL queries |
+| `MCP_SKIP_HEALTH_CHECK` | No | `false` | Skips provider health checks on startup. Useful when providers start slowly on first deployment. |
+| `ANTHROPIC_API_KEY` | Conditional | — | Anthropic API key. Required when `MCP_ENABLED=true` and `AnthropicLlmProvider` is active. |
+| `OPENAI_API_KEY` | No | — | Enables `OpenAILlmProvider` and exposes `gpt-4o` and `gpt-4o-mini` in the model selector. Leave unset to use Anthropic only. Requires the `openai` package: `npm install openai --workspace=@ronl/backend`. |
+| `TRIPLYDB_MCP_ENABLED` | No | `false` | Enables the TriplyDB Knowledge Graph MCP provider. |
+| `TRIPLYDB_ENDPOINT` | Conditional | — | SPARQL endpoint URL. Required when `TRIPLYDB_MCP_ENABLED=true`. Use `https://api.open-regels.triply.cc/datasets/stevengort/RONL/services/RONL/sparql` for the canonical RONL graph. |
+| `TRIPLYDB_TOKEN` | No | — | TriplyDB API token. May be empty for public datasets. |
+| `CPRMV_MCP_ENABLED` | No | `false` | Enables the CPRMV legislation provider (Dutch and EU law via HTTP MCP). |
+| `CPRMV_URL` | No | `https://acc.cprmv.open-regels.nl/mcp` | CPRMV MCP server URL. Override for PROD deployment. |
+| `LDE_MCP_ENABLED` | No | `false` | Enables the LDE Process Library provider. Exposes deployed BPMN bundles, form schemas, and document templates to the AI Assistant. |
+| `LDE_DATABASE_URL` | Conditional | — | PostgreSQL connection string for the `lde_assets` database. Required when `LDE_MCP_ENABLED=true`. On Azure: use a separate Flexible Server and append `?sslmode=require`. Locally: reuse the existing `ronl-postgres` container. |
 
 > `OPERATON_USERNAME` and `OPERATON_PASSWORD` are also passed to the `operaton-mcp` child process.
 > Ensure they are set before enabling MCP.
@@ -148,6 +156,7 @@
 |---|---|---|
 | `VITE_API_URL` | Yes | Business API base URL (e.g. `https://api.open-regels.nl/v1`) |
 | `VITE_KEYCLOAK_URL` | Yes | Keycloak base URL (e.g. `https://keycloak.open-regels.nl`) |
+| `VITE_LDE_API_URL` | Yes | LDE public API base URL. Used by `ProcesBibliotheek` to fetch deployed BPMN bundles. ACC: `https://acc.backend.linkeddata.open-regels.nl/v1`. PROD: `https://backend.linkeddata.open-regels.nl/v1`. |
 
 ---
 

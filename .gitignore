@@ -87,3 +87,5 @@ $RECYCLE.BIN/
 .fuse_hidden*
 .directory
 .Trash-*
+
+flatten_directory.sh
