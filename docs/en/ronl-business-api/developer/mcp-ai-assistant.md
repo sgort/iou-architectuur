@@ -1,6 +1,8 @@
-# Operaton MCP AI Assistant
+# MCP AI Assistant
 
-The AI Assistant is a streaming chat interface embedded in the Gereedschap tab of the caseworker dashboard. It connects Claude (claude-sonnet-4) to the live Operaton BPMN/DMN engine via the [Model Context Protocol](https://modelcontextprotocol.io/) (MCP), allowing caseworkers to query process definitions, running instances, tasks, decisions, deployments, and incidents in natural language.
+The AI Assistant is a streaming chat interface embedded in the Gereedschap tab of the caseworker dashboard. It connects a configurable LLM to a registry of data sources via the [Model Context Protocol](https://modelcontextprotocol.io/) (MCP), allowing caseworkers to query process definitions, running instances, tasks, decisions, deployments, legislation, knowledge graph data, and deployed process bundles in natural language.
+
+Sources and models are selected per session. See [LLM Provider Architecture](llm-provider-architecture.md) for how providers and models are registered and extended.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: AI Assistant mid-response: assistant bubble filling with streamed tokens while a status line above the typing dots reads 'Calling deployment_list…'](../../../assets/screenshots/mcp-client-ai-assistant-streaming.png)
@@ -31,26 +33,29 @@ Authentication is **basic auth** — unlike the standalone external `operaton-mc
 ```
 McpChatSection (React)
   │  native fetch + ReadableStream
+  │  { message, history, sources[], modelId }
   ▼
 POST /v1/mcp/chat  (text/event-stream)
   │  SSE: { type: "status" | "delta" | "done" | "error" }
   ▼
 runChatStream()  — mcpChat.service.ts
-  │  client.messages.stream()  (Anthropic SDK)
+  │  resolves LlmProvider from LlmRegistry by modelId
+  │  resolves tools + system prompt from McpRegistry by sources[]
   ▼
-Claude claude-sonnet-4
-  │  tool_use blocks → MCP tool calls
+LlmProvider.streamTurn()
+  │  e.g. AnthropicLlmProvider → client.messages.stream()
   ▼
-McpClientService  — mcpClient.service.ts
-  │  stdio child process
+LLM (Claude, GPT-4o, …)
+  │  tool_use blocks → MCP tool calls → McpRegistry.callTool()
   ▼
-operaton-mcp  (Node.js, bundled in packages/backend)
-  │  REST calls
-  ▼
-Operaton engine-rest  (operaton.open-regels.nl)
+McpRegistry  — routes each tool call to the owning provider
+  ├── OperatonMcpProvider   (stdio subprocess → operaton-mcp → engine-rest)
+  ├── TriplyDbMcpProvider   (stdio subprocess → triplydb-mcp → SPARQL)
+  ├── CprmvMcpProvider      (HTTP → acc.cprmv.open-regels.nl/mcp)
+  └── LdeMcpProvider        (stdio subprocess → lde-mcp → PostgreSQL)
 ```
 
-The backend runs an **agentic loop**: Claude receives the conversation, decides which Operaton tools to call, executes them, feeds the results back to Claude, and repeats until Claude produces a final answer. The loop runs for up to 10 rounds and terminates on `stop_reason: end_turn`. Responses are streamed to the browser over **Server-Sent Events (SSE)** so the user sees tokens as they arrive and sees tool activity between rounds.
+The backend runs an **agentic loop**: the LLM receives the conversation and available tools, decides which tools to call, executes them through the registry, feeds results back, and repeats until `stop_reason: end_turn`. The loop runs for up to 10 rounds. Responses stream to the browser over **Server-Sent Events (SSE)**.
 
 ---
 
@@ -69,13 +74,11 @@ Pre-flight errors (MCP disabled, MCP not connected, missing message body) are re
 
 ---
 
-## Backend
-
 ### `mcpChat.service.ts`
 
-`runChatStream(history, userMessage, emit, signal?)` replaces the former `runChatTurn`.
+`runChatStream(history, userMessage, emit, selectedProviderIds, modelId, signal?)` is the agentic loop entry point. It resolves the correct `LlmProvider` from `LlmRegistry` by `modelId` and the scoped tool definitions and system prompt from `McpRegistry` by `selectedProviderIds`. The service has no direct dependency on any LLM SDK.
 
-**`client.messages.stream()`** is used instead of `client.messages.create()`. Text deltas are emitted immediately via the `stream.on('text')` handler, so the user sees tokens in real time.
+Text deltas arrive via the `onDelta` callback supplied to `LlmProvider.streamTurn()` and are emitted immediately, so the user sees tokens in real time. See [LLM Provider Architecture — Response delivery](llm-provider-architecture.md#response-delivery-streaming-vs-buffered) for the streaming vs. buffered trade-off.
 
 **Tool result truncation.** Each tool result is capped at 12,000 characters before being added to the messages array. Multi-round queries against Operaton list endpoints can return large JSON payloads; without truncation the accumulated messages array exceeds the 200,000-token API limit.
 
@@ -108,18 +111,16 @@ A single `AbortController` covers both the 240-second hard timeout and client-di
 
 ### Allowed tools
 
-The `ALLOWED_TOOLS` set in `mcpChat.service.ts` is a curation gate. Only these 15 read-only Operaton tools are forwarded to Claude; all others are stripped from the tool definitions before the first API call.
+Each `McpProvider` maintains its own `ALLOWED_TOOLS` set as a curation gate. Only the listed tools are exposed to the LLM; all others are stripped from the tool definitions before the first API call. Tools from providers not included in the request's `sources[]` array are never loaded at all.
 
-| Category            | Tools                                               |
-|---------------------|-----------------------------------------------------|
-| Process definitions | `processDefinition_list`, `_count`, `_getByKey`     |
-| Process instances   | `processInstance_list`, `_count`, `_get`            |
-| Tasks               | `task_list`, `_count`, `_getById`                   |
-| Decisions           | `decision_list`, `_getByKey`                        |
-| Deployments         | `deployment_list`, `_count`, `_getById`             |
-| Incidents           | `incident_list`, `_count`                           |
+| Provider              | Allowed tools                                                                                                              |
+|-----------------------|----------------------------------------------------------------------------------------------------------------------------|
+| `OperatonMcpProvider` | `processDefinition_list/count/getByKey`, `processInstance_list/count/get`, `task_list/count/getById`, `decision_list/getByKey`, `deployment_list/count/getById`, `incident_list/count` |
+| `TriplyDbMcpProvider` | `dmn_list`, `dmn_get`, `dmn_chain_links`, `dmn_enhanced_chain_links`, `dmn_semantic_equivalences`, `organization_list`, `service_list`, `rule_list`, `concept_list`, `service_rules_metadata`, `sparql_query` |
+| `CprmvMcpProvider`    | `rules_rules__rule_id_path__get`, `ref_ref__referencemethod___reference__get`, `celex_cellar_by_celex__celexid___language___format__get` |
+| `LdeMcpProvider`      | `bundle_list`, `bundle_get`, `form_list`, `form_get`, `document_list`, `document_get`                                     |
 
-To enable or disable a tool, add or remove its name from the set. No other code changes are required.
+To enable or disable a tool, add or remove its name from the provider's `ALLOWED_TOOLS` set. No other code changes are required.
 
 ### System prompt conventions
 
@@ -133,7 +134,7 @@ The system prompt instructs Claude to use `maxResults=20` when listing resources
 
 The axios POST has been replaced with a native `fetch` + `ReadableStream` async generator. The generator refreshes the Keycloak token before the request (mirroring the axios interceptor), consumes the SSE stream line by line, and yields typed `McpChatStreamEvent` objects.
 ```typescript
-for await (const event of businessApi.mcp.chatStream(message, history, abortSignal)) {
+for await (const event of businessApi.mcp.chatStream(message, history, sources, modelId, abortSignal)) {
   if (event.type === 'delta')  { /* append text to bubble */ }
   if (event.type === 'status') { /* show tool name above typing dots */ }
   if (event.type === 'done')   { /* commit bubble to message history */ }
@@ -143,12 +144,16 @@ for await (const event of businessApi.mcp.chatStream(message, history, abortSign
 
 ### `McpChatSection.tsx`
 
-| State variable     | Purpose                                                            |
-|--------------------|--------------------------------------------------------------------|
-| `streamingContent` | Accumulated delta text for the in-progress bubble                 |
-| `streamingRef`     | Mutable ref that accumulates deltas without stale-closure risk     |
-| `statusMessage`    | Tool name shown above the typing dots between rounds              |
-| `abortRef`         | `AbortController` for the active stream; cancelled on unmount      |
+| State variable      | Purpose                                                           |
+|---------------------|-------------------------------------------------------------------|
+| `streamingContent`  | Accumulated delta text for the in-progress bubble                 |
+| `streamingRef`      | Mutable ref that accumulates deltas without stale-closure risk    |
+| `statusMessage`     | Tool name shown above the typing dots between rounds              |
+| `abortRef`          | `AbortController` for the active stream; cancelled on unmount     |
+| `availableSources`  | Provider metadata fetched from `GET /v1/mcp/sources` on mount     |
+| `selectedSources`   | Set of provider IDs toggled by the source selector buttons        |
+| `availableModels`   | Model entries fetched from `GET /v1/mcp/models` on mount          |
+| `selectedModelId`   | Currently selected model ID; sent with every chat request         |
 
 **In-progress bubble.** While `loading && streamingContent !== ''`, a separate assistant bubble renders below the confirmed message history. It displays `streamingContent` with a blinking cursor (`animate-pulse`). When `done` arrives, the accumulated text is committed to the `messages` array via `onMessagesChange` and the streaming state is cleared.
 
@@ -170,14 +175,22 @@ for await (const event of businessApi.mcp.chatStream(message, history, abortSign
 
 ## Prerequisites
 
-| Requirement         | Details                                                             |
-|---------------------|---------------------------------------------------------------------|
-| `MCP_ENABLED=true`  | Backend env var; defaults to `false`                                |
-| `ANTHROPIC_API_KEY` | Valid Anthropic API key with access to `claude-sonnet-4-20250514`   |
-| `OPERATON_USERNAME` | Operaton credentials passed to the MCP child process                |
-| `OPERATON_PASSWORD` | —                                                                   |
-| Node.js 22 LTS      | Required by `operaton-mcp`; Azure App Service must use `NODE|22-lts`|
-| `caseworker` role   | JWT claim required to access `POST /v1/mcp/chat`                    |
+| Requirement              | Details                                                                        |
+|--------------------------|--------------------------------------------------------------------------------|
+| `MCP_ENABLED=true`       | Backend env var; defaults to `false`                                           |
+| `ANTHROPIC_API_KEY`      | Required for Anthropic models; enables `AnthropicLlmProvider`                  |
+| `OPENAI_API_KEY`         | Optional; enables `OpenAILlmProvider` and its models in the selector           |
+| `OPERATON_USERNAME`      | Operaton credentials passed to the `OperatonMcpProvider` child process         |
+| `OPERATON_PASSWORD`      | —                                                                              |
+| `TRIPLYDB_MCP_ENABLED`   | Set to `true` to register `TriplyDbMcpProvider`; defaults to `false`           |
+| `TRIPLYDB_ENDPOINT`      | SPARQL endpoint URL for the RONL knowledge graph                               |
+| `TRIPLYDB_TOKEN`         | Bearer token for the TriplyDB endpoint; may be empty for public endpoints      |
+| `CPRMV_MCP_ENABLED`      | Set to `true` to register `CprmvMcpProvider`; defaults to `false`              |
+| `CPRMV_URL`              | CPRMV MCP endpoint; defaults to `https://acc.cprmv.open-regels.nl/mcp`         |
+| `LDE_MCP_ENABLED`        | Set to `true` to register `LdeMcpProvider`; defaults to `false`                |
+| `LDE_DATABASE_URL`       | PostgreSQL connection string for the LDE `lde_assets` database                 |
+| Node.js 22 LTS           | Required by `operaton-mcp`; Azure App Service must use `NODE|22-lts`           |
+| `caseworker` role        | JWT claim required to access `POST /v1/mcp/chat`                               |
 
 `operaton-mcp` is a regular `package.json` dependency of `packages/backend`. On Linux (Azure App Service) it is resolved from `node_modules` at startup via `require.resolve`. On Windows/macOS it falls back to `npx -y operaton-mcp`. No global install is needed.
 
@@ -234,6 +247,6 @@ az webapp log tail --name ronl-business-api-acc --resource-group rg-ronl-acc
 
 **`400 prompt is too long`** — A multi-round query accumulated too many tokens. This is handled automatically — each tool result is truncated to 12,000 characters. If it still occurs, the query is driving an unusual number of rounds with very large results; try a more specific question.
 
-**Stream hangs / timeout** — The hard timeout is 240 seconds. Complex queries involving many sequential tool rounds require the full budget. If you consistently hit the timeout, the Operaton instance may be slow or the query requires more rounds than `MAX_TOOL_ROUNDS = 10` allows.
+**Stream hangs / timeout** — The hard timeout is 480 seconds (`CHAT_TIMEOUT_MS` in `mcp.routes.ts`). Cross-source queries involving TriplyDB SPARQL can take several minutes of wall-clock time. If you consistently hit the timeout, check whether TriplyDB is slow or whether the query is driving more than `MAX_TOOL_ROUNDS = 10` rounds.
 
 **EPIPE errors in logs** — These are suppressed. They are expected when the MCP stdio pipe closes on disconnect and do not indicate a problem.
