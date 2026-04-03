@@ -118,6 +118,7 @@ nav:
       - Copilot Studio — eDOCS: ronl-business-api/developer/copilot-studio-edocs.md
       - Operaton Access Patterns: ronl-business-api/developer/operaton-access-patterns.md
       - IOU GitLab Integration: ronl-business-api/developer/iou-gitlab-integration.md
+      - LLM Provider Architecture: ronl-business-api/developer/llm-provider-architecture.md
       - Operaton MCP Client: ronl-business-api/developer/operaton-mcp-client.md
       - MCP AI Assistant: ronl-business-api/developer/mcp-ai-assistant.md
       - Frontend Development: ronl-business-api/developer/frontend-development.md

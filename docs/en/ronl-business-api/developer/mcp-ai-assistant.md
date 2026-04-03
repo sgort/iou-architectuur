@@ -5,6 +5,11 @@ The AI Assistant is a streaming chat interface embedded in the Gereedschap tab o
 Sources and models are selected per session. See [LLM Provider Architecture](llm-provider-architecture.md) for how providers and models are registered and extended.
 
 <figure markdown style="width:100%; margin:0;">
+  ![Screenshot: LLM Source selector dropdown'](../../../assets/screenshots/llm-source-selector.png)
+  <figcaption>LLM source selector dropdown.</figcaption>
+</figure>
+
+<figure markdown style="width:100%; margin:0;">
   ![Screenshot: AI Assistant mid-response: assistant bubble filling with streamed tokens while a status line above the typing dots reads 'Calling deployment_list…'](../../../assets/screenshots/mcp-client-ai-assistant-streaming.png)
   <figcaption>The assistant bubble updates token-by-token. Between tool rounds, the active tool name appears above the typing indicator.</figcaption>
 </figure>
@@ -38,18 +43,20 @@ The AI assistant connects to one or more **MCP providers** registered in `McpReg
   <figcaption>MCP chat source selector.</figcaption>
 </figure>
 
-Two providers are registered in ACC:
+Four providers are registered. Each is independently enabled via its env var and appears in `GET /v1/mcp/sources` only when connected.
 
-| Source ID | Display name | Tools | Description |
-|---|---|---|---|
-| `operaton` | Process Engine | 16 | Live Operaton data: process instances, tasks, deployments, decisions, incidents |
-| `triplydb` | Knowledge Graph | 11 | RONL knowledge graph via SPARQL: DMN metadata, public services, organisations, rules, concepts |
+| Source ID  | Display name        | Transport | Tools | Description |
+|------------|---------------------|-----------|-------|-------------|
+| `operaton` | Process Engine      | stdio     | 16    | Live Operaton data: process instances, tasks, deployments, decisions, incidents |
+| `triplydb` | Knowledge Graph     | stdio     | 11    | RONL knowledge graph via SPARQL: DMN metadata, public services, organisations, rules, concepts |
+| `cprmv`    | Legislation (CPRMV) | HTTP      | 3     | Dutch and EU legislation: BWB national law, CVDR municipal regulations, EU CELLAR |
+| `lde`      | Process Library     | stdio     | 6     | LDE asset store: deployed BPMN bundles, form schemas, document templates |
 
 The `sources` array in the `POST /v1/mcp/chat` request body controls which providers are active for a given turn. An empty array activates all connected providers.
 
 ### Process Engine tools (`operaton`)
 
-The `OperatonMcpProvider` allows the following 16 tools from `operaton-mcp`:
+The `OperatonMcpProvider` spawns the `operaton-mcp` npm package as a stdio child process and allows the following 16 tools:
 
 `processDefinition_list`, `processDefinition_count`, `processDefinition_getByKey`, `processInstance_list`, `processInstance_count`, `processInstance_get`, `task_list`, `task_count`, `task_getById`, `decision_list`, `decision_getByKey`, `deployment_list`, `deployment_count`, `deployment_getById`, `incident_list`, `incident_count`
 
@@ -61,10 +68,39 @@ The `TriplyDbMcpProvider` spawns the bundled `src/mcp-servers/triplydb/index.ts`
 
 `dmn_list`, `dmn_get`, `dmn_chain_links`, `dmn_enhanced_chain_links`, `dmn_semantic_equivalences`, `organization_list`, `service_list`, `rule_list`, `concept_list`, `service_rules_metadata`, `sparql_query`
 
-The TriplyDB server requires `TRIPLYDB_ENDPOINT` and `TRIPLYDB_TOKEN` env vars. If the connection fails at startup, the provider is silently unavailable and does not appear in the `GET /v1/mcp/sources` response as connected.
+Requires `TRIPLYDB_ENDPOINT` and `TRIPLYDB_TOKEN`. If the connection fails at startup the provider is silently unavailable.
 
 !!! note "Knowledge graph vs live engine"
     The TriplyDB knowledge graph contains **documented metadata** about decision models, including their intended Operaton endpoints. It is not live deployment data. To verify what is actually running in Operaton, the Process Engine source must also be selected. The model is prompted to note this distinction in its responses.
+
+### Legislation tools (`cprmv`)
+
+The `CprmvMcpProvider` connects to the CPRMV HTTP MCP server at `acc.cprmv.open-regels.nl/mcp` using `StreamableHTTPClientTransport` — it is a remote HTTP endpoint, not a local subprocess. It exposes 3 tools:
+
+`rules_rules__rule_id_path__get` — retrieves a specific rule or rule set from BWB (national law), CVDR (municipal regulations), or EU CELLAR (European publications); supports path navigation to individual articles
+
+`ref_ref__referencemethod___reference__get` — resolves a rule reference by Juriconnect method (jci 1.3 / 1.31); supports `artikel`, `hoofdstuk`, `paragraaf`, `onderdeel`, `lid`
+
+`celex_cellar_by_celex__celexid___language___format__get` — finds EU CELLAR publications by CELEX id; returns ruleset IDs usable with the rules tool
+
+Requires `CPRMV_MCP_ENABLED=true`. `CPRMV_URL` defaults to `https://acc.cprmv.open-regels.nl/mcp`.
+
+### Process Library tools (`lde`)
+
+The `LdeMcpProvider` spawns the bundled `src/mcp-servers/lde/index.ts` and connects directly to the LDE PostgreSQL database (`lde_assets`). It exposes 6 tools:
+
+`bundle_list` — all deployed BPMN bundles with forms, documents, subprocesses, and linked DMN keys
+
+`bundle_get` — single bundle by `bpmnProcessId`
+
+`form_list` / `form_get` — form schema listing and full Camunda Form JSON schema by id (matches `camunda:formRef` in BPMN)
+
+`document_list` / `document_get` — document template listing and full template including zones and bindings (matches `ronl:documentRef` in BPMN)
+
+Requires `LDE_MCP_ENABLED=true` and `LDE_DATABASE_URL` pointing at the LDE `lde_assets` database.
+
+!!! note "LDE vs Operaton"
+    The Process Library reflects the LDE asset store — what has been authored and deployed from the LDE. The Process Engine source reflects what is currently live in Operaton. Combining both gives the most complete picture.
 
 ---
 
@@ -144,7 +180,7 @@ res.setHeader('X-Accel-Buffering', 'no'); // disables Caddy / nginx proxy buffer
 res.flushHeaders();
 ```
 
-A single `AbortController` covers both the 240-second hard timeout and client-disconnect cleanup (`req.on('close', ...)`). A `send()` helper guards `res.writableEnded` before each write so a disconnecting client cannot cause a write-after-end error.
+A single `AbortController` covers both the 480-second hard timeout and client-disconnect cleanup (`req.on('close', ...)`). A `send()` helper guards `res.writableEnded` before each write so a disconnecting client cannot cause a write-after-end error.
 
 **Audit log exclusion.** `POST /v1/mcp/chat` is excluded from `audit.middleware.ts` alongside `GET /v1/admin/audit`. Chat turns are high-frequency and do not require an audit trail.
 
@@ -236,21 +272,41 @@ for await (const event of businessApi.mcp.chatStream(message, history, sources, 
 ---
 
 ## Local development
+
 ```bash
 # packages/backend/.env
+
 MCP_ENABLED=true
 ANTHROPIC_API_KEY=sk-ant-...
+
+# Process Engine (required)
 OPERATON_BASE_URL=https://operaton.open-regels.nl/engine-rest
 OPERATON_USERNAME=demo
 OPERATON_PASSWORD=<password>
+
+# Knowledge Graph (optional)
+TRIPLYDB_MCP_ENABLED=true
+TRIPLYDB_ENDPOINT=https://api.open-regels.triply.cc/datasets/stevengort/RONL/services/RONL/sparql
+TRIPLYDB_TOKEN=
+
+# Legislation (optional)
+CPRMV_MCP_ENABLED=true
+CPRMV_URL=https://acc.cprmv.open-regels.nl/mcp
+
+# Process Library (optional)
+LDE_MCP_ENABLED=true
+LDE_DATABASE_URL=postgresql://lde_user:lde_password@localhost:5432/lde_assets
 ```
 
-Start the backend as normal. The MCP child process is spawned automatically at startup. Check the logs for:
+Start the backend as normal. All enabled providers connect at startup. Check the logs for one line per provider:
 ```
-INFO  mcp-client  MCP client connected  { operatonBaseUrl: "https://..." }
+INFO  operaton-provider  Operaton MCP provider connected
+INFO  triplydb-provider  TriplyDB MCP provider connected
+INFO  cprmv-provider     CPRMV MCP provider connected
+INFO  lde-provider       LDE MCP provider connected
 ```
 
-If the child process fails to connect within 30 seconds, the backend continues without MCP and the `/v1/mcp/chat` route returns `503 MCP_NOT_CONNECTED`.
+If a provider fails to connect within 30 seconds the backend continues without it. Failed providers do not appear as connected in `GET /v1/mcp/sources`. The `/v1/mcp/chat` route returns `503 MCP_NOT_CONNECTED` only when **all** selected providers are unavailable.
 
 ---
 
@@ -263,7 +319,13 @@ az webapp config appsettings set \
     MCP_ENABLED=true \
     ANTHROPIC_API_KEY="sk-ant-..." \
     OPERATON_USERNAME="<user>" \
-    OPERATON_PASSWORD="<pass>"
+    OPERATON_PASSWORD="<pass>" \
+    TRIPLYDB_MCP_ENABLED=true \
+    TRIPLYDB_ENDPOINT="https://api.open-regels.triply.cc/datasets/stevengort/RONL/services/RONL/sparql" \
+    TRIPLYDB_TOKEN="" \
+    CPRMV_MCP_ENABLED=true \
+    LDE_MCP_ENABLED=true \
+    LDE_DATABASE_URL="postgresql://...lde_assets?sslmode=verify-full"
 
 # Ensure Node 22 LTS runtime
 az webapp config set \
@@ -272,17 +334,21 @@ az webapp config set \
   --linux-fx-version "NODE|22-lts"
 ```
 
-After deployment, verify the MCP connection in the application logs:
+After deployment, verify all providers in the application logs:
 ```bash
 az webapp log tail --name ronl-business-api-acc --resource-group rg-ronl-acc
-# Look for: mcp-client MCP client connected
+# Look for one connected line per enabled provider:
+# operaton-provider  Operaton MCP provider connected
+# triplydb-provider  TriplyDB MCP provider connected
+# cprmv-provider     CPRMV MCP provider connected
+# lde-provider       LDE MCP provider connected
 ```
 
 ---
 
 ## Troubleshooting
 
-**`503 MCP_NOT_CONNECTED`** — The MCP child process did not connect within 30 seconds. Check that `MCP_ENABLED=true` is set, that `OPERATON_BASE_URL`, `OPERATON_USERNAME`, and `OPERATON_PASSWORD` are correct, that the App Service runtime is `NODE|22-lts` (the child process will silently fail on Node 20), and that `operaton-mcp` is present in `node_modules`.
+**`503 MCP_NOT_CONNECTED`** — All providers selected for the request are unavailable. Individual provider failures are non-fatal — the backend continues without them. Check `GET /v1/mcp/sources` to see which providers are connected. For the Process Engine specifically: verify `MCP_ENABLED=true`, `OPERATON_BASE_URL`, `OPERATON_USERNAME`, and `OPERATON_PASSWORD` are correct, and that the App Service runtime is `NODE|22-lts` (the child process will silently fail on Node 20). For `LdeMcpProvider`: verify `LDE_DATABASE_URL` is reachable and uses `sslmode=verify-full` (not `sslmode=require`) to avoid a pg-connection-string SSL warning.
 
 **`400 prompt is too long`** — A multi-round query accumulated too many tokens. This is handled automatically — each tool result is truncated to 12,000 characters. If it still occurs, the query is driving an unusual number of rounds with very large results; try a more specific question.
 
