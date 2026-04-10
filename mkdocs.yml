@@ -199,6 +199,7 @@ nav:
         - Form Editor: linked-data-explorer/features/form-editor.md
         - Document Composer: linked-data-explorer/features/document-composer.md
         - RoPA Records: linked-data-explorer/features/ropa-records.md
+        - DSO Viewer & Integration: linked-data-explorer/features/dso-integration-phase-plan.md
         - Governance & Validation: linked-data-explorer/features/governance-validation.md
         - Vendor Services: linked-data-explorer/features/vendor-services.md
     - User Guides:
