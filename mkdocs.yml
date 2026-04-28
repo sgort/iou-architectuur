@@ -199,7 +199,9 @@ nav:
         - Form Editor: linked-data-explorer/features/form-editor.md
         - Document Composer: linked-data-explorer/features/document-composer.md
         - RoPA Records: linked-data-explorer/features/ropa-records.md
-        - DSO Viewer & Integration: linked-data-explorer/features/dso-integration-phase-plan.md
+        - Multilingualism: linked-data-explorer/features/multilingualism.md
+        - DSO Viewer & Integration: linked-data-explorer/features/dso-integration.md
+        - DSO (WIP): linked-data-explorer/features/dso-integration-phase-plan.md
         - Governance & Validation: linked-data-explorer/features/governance-validation.md
         - Vendor Services: linked-data-explorer/features/vendor-services.md
     - User Guides:
@@ -213,6 +215,8 @@ nav:
         - Form Editor: linked-data-explorer/user-guide/form-editor.md
         - Document Composer: linked-data-explorer/user-guide/document-composer.md
         - RoPA Records: linked-data-explorer/user-guide/ropa-records.md
+        - Multilingualism: linked-data-explorer/user-guide/multilingualism.md
+        - DSO Explorer: linked-data-explorer/user-guide/dso-explorer.md
         - Governance Badges: linked-data-explorer/user-guide/governance-badges.md
         - Vendor Services: linked-data-explorer/user-guide/vendor-services.md
     - Developer Docs:
