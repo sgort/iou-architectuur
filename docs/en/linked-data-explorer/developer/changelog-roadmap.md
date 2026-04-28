@@ -2,7 +2,151 @@
 
 ---
 
+# Changelog & Roadmap
+
+---
+
 ## Changelog
+
+### v1.6.0 — Multilingualism & pending-until-Save editing (April 2026)
+
+**v1.6.0 — New Feature (April 27, 2026)**
+
+#### Multilingualism — language and organization metadata
+
+BPMN processes, Camunda forms, and document templates now carry an optional ISO 639-1 language code (`en`, `nl`, `de`) and an open-ended organization key. The model is sibling-artefact i18n: each artefact exists once per language, with the LDE deploy modal warning on mixed-language bundles. DMNs stay language-agnostic — variable keys remain stable English so a single DMN serves both English and Dutch sibling BPMNs.
+
+- **Database** — `language VARCHAR(2)` and `organization VARCHAR(100)` columns added to `process_definitions`, `form_schemas`, and `document_templates` with partial indexes; nullable, existing rows coexist as `NULL`
+- **BPMN moddle descriptor** — `LanguageMixin` and `OrganizationMixin` extending `bpmn:Process` in `ronlModdleDescriptor.json`; survive `saveXML` round-trip via the existing `ronl` namespace registration
+- **List panels** — new `ArtefactListToolbar` (search + language filter + match counter) shared by Process, Form, and Document lists; collapsible organization groups; subprocesses follow their shell's organization regardless of their own tag
+- **Editor footer panel** — uniform pattern across all three editors: `LanguageSelector` and `OrganizationSelector` (with autocomplete from existing organization keys); BPMN footer additionally retains RoPA and DSO selectors
+- **Filename-based language inference on import** — `.bpmn`, `.form`, `.document` files with a `<id>.<lang>.<ext>` suffix are auto-tagged on import; precedence: in-file value → filename → untagged
+- **Form export** — `Export .form` now wraps the form-js schema with top-level `language` and `organization` keys and uses a language-suffixed filename; round-trip integrity for all three artefact types
+- **Deploy-time language consistency check** — amber warning surfaces inline in the deploy modal when a bundle mixes languages, listing the offending codes; mirrors the existing RoPA-missing warning UX
+
+**Files:** `packages/backend/src/db/migrate.ts`, `packages/backend/src/db/types.ts`, `packages/backend/src/db/mappers.ts`, `packages/backend/src/domain/types.ts`, `packages/backend/src/services/assets.service.ts`, `packages/frontend/src/types/index.ts`, `packages/frontend/src/types/document.types.ts`, `packages/frontend/src/components/BpmnModeler/ronlModdleDescriptor.json`, `packages/frontend/src/components/common/LanguageSelector.tsx`, `packages/frontend/src/components/common/OrganizationSelector.tsx`, `packages/frontend/src/components/common/ArtefactListToolbar.tsx`, `packages/frontend/src/components/BpmnModeler/BpmnModeler.tsx`, `packages/frontend/src/components/BpmnModeler/BpmnCanvas.tsx`, `packages/frontend/src/components/BpmnModeler/ProcessList.tsx`, `packages/frontend/src/components/FormEditor/FormEditor.tsx`, `packages/frontend/src/components/FormEditor/FormCanvas.tsx`, `packages/frontend/src/components/FormEditor/FormList.tsx`, `packages/frontend/src/components/DocumentComposer/DocumentComposer.tsx`, `packages/frontend/src/components/DocumentComposer/DocumentList.tsx`, `packages/frontend/src/services/bpmnService.ts`, `packages/frontend/src/services/formService.ts`
+
+#### Pending-until-Save editing model
+
+Footer edits across BPMN, Form, and Document editors no longer persist immediately. They accumulate in a draft state on the editor parent and flush atomically when Save is clicked. Navigation guards confirm before discarding unsaved changes.
+
+- **Editor architecture** — footer state lifted to the editor parent (`BpmnModeler`, `FormEditor`, `DocumentComposer`); children receive effective values via props and report changes via callbacks; Save is the single point of persistence
+- **Shell → subprocess atomic save** — saving a BPMN shell propagates `language` and `organization` to all linked subprocesses in one write; idempotent (skips subprocesses already aligned); shell wins unconditionally; example subprocesses (`readonly: true`) are skipped
+- **Save button dirty tracking fixed** — Form Save button was always-enabled (regression); now starts disabled, enables on first edit, disables after Save
+- **Document load window** — `DocumentComposer` no longer flips `hasChanges` spuriously on document load; TipTap's mount-time `onUpdate` events are suppressed for the macrotask following load via `isLoadingRef`
+
+#### HR-capacity Dutch reference bundle
+
+The first multi-language reference bundle: 1 BPMN, 8 forms, 2 documents under `examples/organizations/flevoland/HR-capacity/nl/`, all tagged `language=nl`, `organization=flevoland`. Same `CapacityClaimRouting` DMN serves both the English and Dutch siblings.
+
+#### Bug fixes
+
+- BPMN persistence: `language` and `organization` now included in the `BpmnService.saveProcess` POST payload (previously dropped silently, causing values to vanish on hydration)
+- `OrganizationSelector` is now controlled (`value`/`onChange`) rather than uncontrolled (`defaultValue`/`onBlur`); switching artefacts refreshes the input correctly
+- `BpmnCanvas` no longer resets on parent re-renders — `handleElementSelect` stabilised via a ref, modeler-init effect deps narrowed to `xml`
+
+#### Known limitation
+
+The form-js properties panel loses input focus when typing pauses (Field label, Description, Key). Upstream form-js issue #86, marked wontfix by bpmn-io. Not LDE-caused, not fixable from React without forking form-js. Workaround: edit `.form` JSON in a code editor and re-import — filename-based language inference handles the language tag automatically.
+
+---
+
+### v1.5.3 — DSO Works tab & OIN preset fix (April 2026)
+
+**v1.5.3 — Patch (April 2026)**
+
+#### Works tab — new
+
+New **Works** tab in the DSO Explorer (between Concepts and Activities) backed by the Zoekinterface API.
+
+- Search werkzaamheden by user intent (e.g. "boom kappen") with autocomplete suggestions after 2 characters; selecting a suggestion immediately fires the search
+- Each result shows the human-readable `omschrijving`, the `functioneleStructuurRef` (full concept URI — the Phase 4 pivot to STTR files), and the short werkzaamheid URN
+- Selecting a result opens a detail panel showing the current version's `omschrijving`, validity period, and full version history with start/end dates and a "current" badge
+- Autocomplete uses `POST /werkzaamheden/_suggereer` with 300ms debounce
+- Reloads on DSO environment switch with the same clean-slate behaviour as the other tabs
+
+#### Activities tab — OIN preset fix
+
+The Lelystad and Flevoland presets now use `POST /activiteiten/_zoek` with `bestuursorgaan.oin` filter instead of `_wijzigingen` — returning activities valid on a given date rather than a delta sync of changed activities.
+
+- Activities now appear in the list with their full `omschrijving` visible immediately, without requiring parallel detail fetches
+- Date field defaults to today for OIN presets (yesterday offset removed — no longer needed with `_zoek`)
+- Pagination works correctly in OIN mode — Load button reloads the authority list for the selected date
+- Empty state distinguishes between no activities found in general vs no activities found for the selected authority on the selected date
+
+#### Bug fixes
+
+- Activity Detail panel always using pre-production DSO when opened from the Activities list — `env` was missing from the `getActiviteitDetail` call, causing 404 for production-only activities
+- Activity Detail panel not re-fetching when DSO environment is switched while a URN is already selected — `env` added to the `useEffect` dependency array
+- Activity Detail panel showing stale date context in OIN preset mode — `activeDatum` now set correctly by `loadByOin` alongside the result
+
+#### Backend — DSO service
+
+- `zoekinterfaceBaseUrl` and `opvragenWerkzaamhedenBaseUrl` added to both `dso` and `dsoProd` config blocks — defaults baked in, no new env vars required
+- `POST /v1/dso/werkzaamheden/zoek` — proxies Zoekinterface `/werkzaamheden/_zoek`
+- `POST /v1/dso/werkzaamheden/suggereer` — proxies Zoekinterface `/werkzaamheden/_suggereer`
+- `GET /v1/dso/werkzaamheden/:urn` — proxies Opvragen Werkzaamheden `/werkzaamheden/{urn}` (version history, without expand — `_expandScope` enum value not yet resolved)
+- `POST /v1/dso/activiteiten/oin` now uses `/activiteiten/_zoek` with `bestuursorgaan.oin` body field and `datum` instead of `_wijzigingen` with `datumVanaf`
+
+---
+
+### v1.5.2 — DSO Explorer enhancements (April 2026)
+
+**v1.5.2 — Patch (April 2026)**
+
+- DSO environment selector added to the Settings panel (gear icon): switch between pre-production and production DSO independently of the LDE environment, persisted across sessions in localStorage
+- Environment badge in the DSO Explorer header updates to reflect the active DSO environment (amber for pre-production, green for production)
+- Both DSO environments use separate API keys configured via `DSO_API_KEY` and `DSO_API_KEY_PROD` environment variables
+- Location presets (Lelystad, Flevoland) initially filter by authority OIN — replaced with `_zoek` in v1.5.3
+- Child activities in the detail panel now show human-readable names fetched in parallel after the parent detail loads
+- Graceful 404 handling in the detail panel: activities not available in the active DSO environment show a clear message instead of a raw error
+
+---
+
+### v1.5.1 — Dev infrastructure (April 2026)
+
+**v1.5.1 — Infrastructure (April 2026)**
+
+#### Docker readiness check
+
+New `packages/backend/scripts/check-docker.sh` verifies the `ronl-postgres` container is up and healthy before nodemon starts the backend.
+
+- Coloured terminal output: green for ready, yellow for unhealthy, red for missing or stopped
+- Suggests the exact `docker start` or `docker run` command if the container is missing
+- Backend `dev` script now runs the check first; `dev:full` and `dev:backend` scripts added to root `package.json` for one-command monorepo startup
+
+**Files:** `packages/backend/scripts/check-docker.sh`, `packages/backend/package.json`, `package.json`
+
+---
+
+### v1.5.0 — DSO Integration Phase 1 (March 2026)
+
+**v1.5.0 — New Feature (March 2026)**
+
+#### DSO Explorer
+
+New top-level view for browsing the Digitaal Stelsel Omgevingswet from inside LDE.
+
+- **Concepts tab** — full-text search across the Stelselcatalogus
+- **Activities tab** — RTR `activiteiten` list with date filtering and a detail panel showing `bestuursorgaan`, validity, parent and child activities, and which rule types (`Conclusie`, `Indieningsvereisten`, `Maatregelen`) are present
+
+#### BPMN — DSO activiteit linkage
+
+- New `ronl:dsoActiviteitUrn` mixin on `bpmn:Process` in `ronlModdleDescriptor.json`
+- New `DsoActiviteitSelector` component pinned to the BPMN Modeler footer (sibling of `RopaSelector`)
+- Live URN verification against DSO RTR; on success shows the omschrijving, authority block, and a direct link to the public RTR viewer
+- URN survives `saveXML` round-trips and shows up in process exports
+
+#### Backend — DSO service
+
+- New `src/services/dso.service.ts` covering Stelselcatalogus and RTR endpoints
+- New `src/routes/dso.routes.ts` at `/v1/dso/...`
+- Pre-production and production base URLs configurable via env; API keys per environment
+- Path-aware DSO environment selection via `X-Dso-Env` header
+
+**Files:** `packages/frontend/src/components/BpmnModeler/DsoActiviteitSelector.tsx`, `packages/frontend/src/services/dsoService.ts`, `packages/backend/src/services/dso.service.ts`, `packages/backend/src/routes/dso.routes.ts`
+
+---
 
 ### v1.4.0 — RoPA Records & GDPR Article 30 Compliance (March 2026)
 

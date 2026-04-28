@@ -184,6 +184,37 @@ See [RoPA Records](ropa-records.md) for the full feature description.
 
 ---
 
+## DSO activiteit linkage
+
+The BPMN Modeler footer panel includes a **DSO Activity** selector for linking a process to a DSO activiteit URN. Pasting a URN and clicking **Verify** queries the live DSO RTR; on success the panel shows the activity's omschrijving, authority block, and a link to the public RTR viewer. The URN is persisted on `<bpmn:process>` as the `ronl:dsoActiviteitUrn` attribute and survives `saveXML` round-trips.
+
+See [DSO Integration](dso-integration.md) for the full integration overview and [DSO Explorer user guide](../user-guide/dso-explorer.md) for the verification workflow.
+
+---
+
+## Language and organization
+
+The footer panel includes **Language** and **Organization** selectors:
+
+- **Language** — ISO 639-1 dropdown (Language-agnostic / English / Dutch / German). Persisted as `ronl:language` on `<bpmn:process>` and as the `process_definitions.language` DB column.
+- **Organization** — free-text input with autocomplete from existing organization keys. Persisted as `ronl:organization` and as the DB column.
+
+Both fields are pending-until-Save: typing in them updates the editor's draft state but does not regroup the artefact in the list panel until **Save** is clicked. Saving a shell process atomically propagates `language` and `organization` to all linked subprocesses.
+
+The list panel toolbar offers a language filter and a search box; cards are grouped under collapsible organization headers. Subprocesses follow their shell's organization regardless of their own tag.
+
+See [Multilingualism](multilingualism.md) for the full feature description and [Multilingualism user guide](../user-guide/multilingualism.md) for the tagging workflow.
+
+---
+
+## Deploy modal — language consistency check
+
+When the deploy modal opens, LDE walks the bundle resources (shell BPMN + subprocess BPMNs + linked forms + linked documents) and collects all distinct language tags. If more than one is present, an amber warning surfaces inline in the modal listing the offending codes. The warning is non-blocking — Deploy stays enabled. DMNs are excluded from the check (language-agnostic by design).
+
+The check sits alongside the existing RoPA-missing warning, both rendered between the resource list and the resource count.
+
+---
+
 ## Tree Felling Permit example
 
 On first launch, the Modeler auto-creates the **Tree Felling Permit** example process, demonstrating a complete municipal workflow: application submission, two `BusinessRuleTask` elements linked to DMN decision models (`TreeFellingDecision`, `ReplacementTreeDecision`), an exclusive gateway routing to permit granted or rejected outcomes. The example is protected from deletion and serves as a reference for process designers.

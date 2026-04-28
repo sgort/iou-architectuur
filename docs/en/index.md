@@ -28,13 +28,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.4.0** · *March 2026*
+-   **🔍 Linked Data Explorer — v1.6.0** · *April 2026*
 
     ---
 
-    **RoPA Records — GDPR Article 30 Compliance**
+    **Multilingualism & pending-until-Save editing**
 
-    v1.4.0 introduces a full Record of Processing Activities (RoPA) framework. The LDE RoPA Editor lets Product Owners author GDPR Art. 30 records per process bundle — with a legal basis SPARQL lookup, form-hydrated personal data field classification, and a BPMN link written as `ronl:ropaRef` on the process element. Active records are served from a CORS-open public endpoint and rendered on a dedicated static site (`ropa.open-regels.nl`) deployed separately from the LDE stack.
+    BPMN processes, Camunda forms, and document templates now carry an optional [language and organization](linked-data-explorer/features/multilingualism.md) — set via the editor footer panel, persisted to PostgreSQL and (for BPMN) to `ronl:language` / `ronl:organization` in the XML. List panels gain a search box, a language filter, and collapsible organization groups. The deploy modal warns inline when a bundle mixes languages. Footer edits across all three editors now use a pending-until-Save model with shell → subprocess atomic propagation. Ships with the Dutch HR-capacity reference bundle (1 BPMN, 8 forms, 2 documents) demonstrating stable English DMN keys with translated labels.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
