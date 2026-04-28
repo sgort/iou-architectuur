@@ -51,31 +51,44 @@ This means the editor always starts from local cache (instant render) and then s
 ### `process_definitions`
 ```sql
 CREATE TABLE process_definitions (
-  id                   UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
-  lde_id               VARCHAR(255) UNIQUE NOT NULL,
-  bpmn_process_id      VARCHAR(255) NOT NULL,
-  name                 VARCHAR(500) NOT NULL,
-  description          TEXT,
-  xml                  TEXT         NOT NULL,
-  process_role         VARCHAR(20)  NOT NULL DEFAULT 'standalone'
-                         CHECK (process_role IN ('shell', 'subprocess', 'standalone')),
-  called_element       VARCHAR(255),
-  linked_dmn_templates TEXT[]       NOT NULL DEFAULT '{}',
-  status               VARCHAR(20)  NOT NULL DEFAULT 'wip'
-                         CHECK (status IN ('example', 'wip')),
-  readonly             BOOLEAN      NOT NULL DEFAULT FALSE,
-  schema_version       INTEGER      NOT NULL DEFAULT 1,
-  created_at           TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-  updated_at           TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+  id                     UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  lde_id                 VARCHAR(255) UNIQUE NOT NULL,
+  bpmn_process_id        VARCHAR(255) NOT NULL,
+  name                   VARCHAR(500) NOT NULL,
+  description            TEXT,
+  xml                    TEXT         NOT NULL,
+  process_role           VARCHAR(20)  NOT NULL DEFAULT 'standalone'
+                           CHECK (process_role IN ('shell', 'subprocess', 'standalone')),
+  called_element         VARCHAR(255),
+  linked_dmn_templates   TEXT[]       NOT NULL DEFAULT '{}',
+  status                 VARCHAR(20)  NOT NULL DEFAULT 'wip'
+                           CHECK (status IN ('example', 'wip')),
+  readonly               BOOLEAN      NOT NULL DEFAULT FALSE,
+  schema_version         INTEGER      NOT NULL DEFAULT 1,
+  deployed_at            TIMESTAMPTZ,
+  operaton_url           TEXT,
+  operaton_deployment_id TEXT,
+  deployed_forms         TEXT[]       NOT NULL DEFAULT '{}',
+  deployed_documents     TEXT[]       NOT NULL DEFAULT '{}',
+  language               VARCHAR(2),                         -- v1.6.0
+  organization           VARCHAR(100),                        -- v1.6.0
+  created_at             TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  updated_at             TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_pd_bpmn_process_id ON process_definitions (bpmn_process_id);
 CREATE INDEX idx_pd_called_element  ON process_definitions (called_element)
   WHERE called_element IS NOT NULL;
 CREATE INDEX idx_pd_process_role    ON process_definitions (process_role);
+CREATE INDEX idx_pd_language        ON process_definitions (language)
+  WHERE language IS NOT NULL;
+CREATE INDEX idx_pd_organization    ON process_definitions (organization)
+  WHERE organization IS NOT NULL;
 ```
 
 `lde_id` is the internal LDE identifier (e.g. `process_1774384869117`). `bpmn_process_id` is the `<process id="...">` value from the BPMN XML — used for subprocess lookup during bundle assembly.
+
+`language` (ISO 639-1, nullable) and `organization` (open-ended key, nullable) were added in v1.6.0 to drive list-panel grouping and the deploy-time language consistency check; partial indexes skip the common `NULL` case. See [Multilingualism](../features/multilingualism.md). The `deployed_*` columns were added in v1.4.0 for the deployment metadata flowback used by `listPublicBundles()`.
 
 ### `form_schemas`
 ```sql
@@ -86,9 +99,16 @@ CREATE TABLE form_schemas (
   schema         JSONB       NOT NULL,
   status         TEXT        DEFAULT 'wip',
   schema_version INTEGER     NOT NULL DEFAULT 1,
+  language       VARCHAR(2),                  -- v1.6.0
+  organization   VARCHAR(100),                 -- v1.6.0
   created_at     TIMESTAMPTZ NOT NULL,
   updated_at     TIMESTAMPTZ NOT NULL
 );
+
+CREATE INDEX idx_fs_language     ON form_schemas (language)
+  WHERE language IS NOT NULL;
+CREATE INDEX idx_fs_organization ON form_schemas (organization)
+  WHERE organization IS NOT NULL;
 ```
 
 ### `document_templates`
@@ -104,9 +124,16 @@ CREATE TABLE document_templates (
   bindings       JSONB       NOT NULL DEFAULT '[]',
   assets         JSONB       NOT NULL DEFAULT '[]',
   status         TEXT        DEFAULT 'wip',
+  language       VARCHAR(2),                  -- v1.6.0
+  organization   VARCHAR(100),                 -- v1.6.0
   created_at     TIMESTAMPTZ NOT NULL,
   updated_at     TIMESTAMPTZ NOT NULL
 );
+
+CREATE INDEX idx_dt_language     ON document_templates (language)
+  WHERE language IS NOT NULL;
+CREATE INDEX idx_dt_organization ON document_templates (organization)
+  WHERE organization IS NOT NULL;
 ```
 
 ---

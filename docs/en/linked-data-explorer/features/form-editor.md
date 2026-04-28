@@ -86,6 +86,41 @@ See [BPMN Modeler — Form linking](bpmn-modeler.md#form-linking) and the [Form 
 
 ---
 
+## Language and organization
+
+The Form Editor footer panel mirrors the BPMN Modeler footer:
+
+- **Language** — ISO 639-1 dropdown (Language-agnostic / English / Dutch / German). Persisted as the `language` column on `form_schemas`.
+- **Organization** — free-text input with autocomplete from existing organization keys. Persisted as the `organization` column.
+
+Both live on the LDE `FormSchema` wrapper, not inside the form-js `schema` object — the form-js spec stays unmodified.
+
+The list panel toolbar offers free-text search and language filtering; forms are grouped under collapsible organization headers.
+
+### Filename-based language inference on import
+
+A file named `<form-id>.<lang>.form` (e.g. `capacity-claim-intake.nl.form`) is auto-tagged on import. Precedence:
+
+1. Top-level `language` key in the file's JSON (set by **Export .form**)
+2. Filename suffix `.<lang>.form`
+3. Untagged
+
+### Form export round-trip
+
+Clicking **Export .form** wraps the form-js schema with the active `language` and `organization` at the top of the exported JSON and uses a language-suffixed filename. Re-importing populates both fields automatically — round-trip integrity preserved without extending the form-js schema spec. The wrapper keys are stripped on import before the schema reaches form-js.
+
+### Save button dirty tracking
+
+Pending-until-Save: the **Save** button starts disabled, enables on the first canvas or footer edit, and disables again after a successful save. Typing in the footer dropdowns does not regroup the form in the list until you click Save.
+
+See [Multilingualism](multilingualism.md) for the architectural overview.
+
+### Known limitation — form-js properties panel focus loss
+
+The form-js properties panel loses input focus when typing pauses (Field label, Description, Key). Upstream form-js issue #86, marked wontfix by bpmn-io. Not LDE-caused, not fixable from React without forking form-js. Workaround: edit the `.form` JSON in a code editor and re-import.
+
+---
+
 ## Related documentation
 
 - [RONL Business API — Dynamic Forms](../../../ronl-business-api/features/dynamic-forms.md) — how the three AWB Kapvergunning forms are deployed and rendered at runtime in MijnOmgeving
