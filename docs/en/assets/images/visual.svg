@@ -1,0 +1,203 @@
+<svg xmlns="http://www.w3.org/2000/svg" aria-label="IOU Architecture Diagram" role="img" viewBox="0 0 1200 790"><defs><linearGradient id="bg-grad" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" stop-color="#eef3f9"/><stop offset="100%" stop-color="#f5f8fc"/></linearGradient><linearGradient id="bpmn-grad" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" stop-color="#e040fb"/><stop offset="50%" stop-color="#9c27b0"/><stop offset="100%" stop-color="#673ab7"/></linearGradient><linearGradient id="check-grad" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" stop-color="#2e7d32"/><stop offset="100%" stop-color="#1b5e20"/></linearGradient><linearGradient id="blue-header" x1="0%" x2="100%" y1="0%" y2="0%"><stop offset="0%" stop-color="#1a56a0"/><stop offset="100%" stop-color="#154273"/></linearGradient><linearGradient id="green-header" x1="0%" x2="100%" y1="0%" y2="0%"><stop offset="0%" stop-color="#1b6b35"/><stop offset="100%" stop-color="#0f4f25"/></linearGradient><linearGradient id="chain-header" x1="0%" x2="100%" y1="0%" y2="0%"><stop offset="0%" stop-color="#1a2a4a"/><stop offset="100%" stop-color="#243860"/></linearGradient><filter id="card-shadow" width="110%" height="120%" x="-5%" y="-5%"><feDropShadow dx="0" dy="3" flood-color="#0f2b5b" flood-opacity=".09" stdDeviation="8"/></filter><filter id="mockup-shadow" width="110%" height="120%" x="-5%" y="-5%"><feDropShadow dx="0" dy="2" flood-color="#0f2b5b" flood-opacity=".1" stdDeviation="5"/></filter><filter id="center-shadow" width="130%" height="140%" x="-15%" y="-15%"><feDropShadow dx="0" dy="4" flood-color="#0f2b5b" flood-opacity=".14" stdDeviation="12"/></filter><filter id="node-glow" width="140%" height="140%" x="-20%" y="-20%"><feDropShadow dx="0" dy="0" flood-color="#154273" flood-opacity=".25" stdDeviation="4"/></filter><marker id="arrow-green" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5"><path fill="#1b6b35" d="m0 0 10 3.5L0 7z"/></marker></defs><g class="main-container"><rect width="1200" height="790" fill="url(#bg-grad)" rx="20"/><path stroke="#a8bfce" stroke-dasharray="4,10" stroke-width=".5" d="M0 130h1200M0 260h1200M0 390h1200M0 520h1200M0 650h1200M240 0v790M480 0v790M720 0v790M960 0v790" opacity=".25"/><path fill="none" stroke="#1b6b35" stroke-width="2.5" marker-end="url(#arrow-green)" d="M503 186c107 0 257-16 337-4"/><rect width="74" height="21" x="634" y="155" fill="#e8f5e9" stroke="#81c784" stroke-width="1" rx="5"/><text x="671" y="170" fill="#1b5e20" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="500" text-anchor="middle">
+          TTL / RDF
+        </text><path fill="none" stroke="#1b6b35" stroke-width="2.5" marker-end="url(#arrow-green)" d="M970 280v100"/><rect width="74" height="21" x="940" y="300" fill="#e8f5e9" stroke="#81c784" stroke-width="1" rx="5"/><text x="975" y="315" fill="#1b5e20" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="500" text-anchor="middle">
+          SPARQL
+        </text><path fill="none" stroke="#1b6b35" stroke-width="2.5" marker-end="url(#arrow-green)" d="M310 320c0 70 225 130 255 170"/><rect width="82" height="21" x="353" y="393" fill="#e8f5e9" stroke="#81c784" stroke-width="1" rx="5"/><text x="394" y="408" fill="#1b5e20" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="500" text-anchor="middle">
+          DMN Files
+        </text><path fill="none" stroke="#1b6b35" stroke-width="2.5" marker-end="url(#arrow-green)" d="M693 565c-23 0-38-17-40-35"/><rect width="130" height="21" x="600" y="552" fill="#e8f5e9" stroke="#81c784" stroke-width="1" rx="5"/><text x="665" y="567" fill="#1b5e20" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="500" text-anchor="middle">
+          Deploy BPMN+DMN
+        </text><path fill="none" stroke="#1b6b35" stroke-width="2.5" marker-end="url(#arrow-green)" d="M506 565c-46 0-76 15-106 33"/><rect width="108" height="21" x="396" y="545" fill="#e8f5e9" stroke="#81c784" stroke-width="1" rx="5"/><text x="450" y="560" fill="#1b5e20" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="500" text-anchor="middle">
+          Business Rules
+        </text><rect width="483" height="300" x="20" y="20" fill="#fff" stroke="#94aec5" stroke-dasharray="10,6" stroke-width="2" filter="url(#card-shadow)" rx="18"/><circle cx="52" cy="52" r="17" fill="url(#check-grad)" filter="url(#node-glow)"/><text x="52" y="58" fill="#fff" font-size="16" text-anchor="middle">
+          ✓
+        </text><text x="78" y="43" fill="#0f2b5b" font-family="IBM Plex Sans, sans-serif" font-size="15" font-weight="600">
+          CPSV Editor
+        </text><text x="78" y="61" fill="#64748b" font-family="IBM Plex Sans, sans-serif" font-size="10.5">
+          Core Public Services Editor
+        </text><rect width="168" height="18" x="78" y="68" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1" rx="9"/><circle cx="90" cy="77" r="4" fill="#22c55e"/><text x="100" y="82" fill="#1d4ed8" font-family="IBM Plex Mono, monospace" font-size="8.5">
+          cpsv-editor.open-regels.nl
+        </text><circle cx="96" cy="152" r="22" fill="#dbeafe"/><circle cx="96" cy="145" r="13" fill="#93c5fd"/><path fill="#1d4ed8" d="M68 198q0-23 28-23t28 23Z"/><path stroke="#fff" stroke-linecap="round" stroke-width="2.5" d="M96 175v21"/><rect width="22" height="28" x="109" y="157" fill="#fff" stroke="#93c5fd" stroke-width="1.5" rx="3"/><rect width="9" height="5" x="111" y="155" fill="#3b82f6" rx="2"/><path stroke="#cbd5e1" stroke-width="1.2" d="M112 166h16m-16 6h16m-16 6h16"/><text x="96" y="212" fill="#475569" font-family="IBM Plex Sans, sans-serif" font-size="9.5" font-weight="500" text-anchor="middle">
+          Civil Servant
+        </text><path fill="none" stroke="#1b6b35" stroke-width="2" marker-end="url(#arrow-green)" d="M138 178h20"/><rect width="340" height="213" x="158" y="87" fill="#fff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#mockup-shadow)" rx="8"/><rect width="340" height="29" x="158" y="87" fill="url(#blue-header)" rx="8"/><path fill="url(#blue-header)" d="M158 101h340v15H158z"/><circle cx="174" cy="101" r="5" fill="rgba(255,255,255,0.3)"/><circle cx="190" cy="101" r="5" fill="rgba(255,255,255,0.3)"/><circle cx="206" cy="101" r="5" fill="rgba(255,255,255,0.3)"/><text x="224" y="106" fill="rgba(255,255,255,0.9)" font-family="IBM Plex Sans, sans-serif" font-size="8.5" font-weight="500">
+          Core Public Service Editor
+        </text><path fill="#eff6ff" d="M158 116h340v20H158z"/><rect width="36" height="14" x="163" y="118" fill="#1d4ed8" rx="3"/><text x="181" y="128" fill="#fff" font-family="IBM Plex Sans, sans-serif" font-size="7.5" text-anchor="middle">
+          Service
+        </text><text x="212" y="128" fill="#6b7280" font-family="IBM Plex Sans, sans-serif" font-size="7.5" text-anchor="middle">
+          Org
+        </text><text x="234" y="128" fill="#6b7280" font-family="IBM Plex Sans, sans-serif" font-size="7.5" text-anchor="middle">
+          Legal
+        </text><text x="255" y="128" fill="#6b7280" font-family="IBM Plex Sans, sans-serif" font-size="7.5" text-anchor="middle">
+          Rules
+        </text><text x="277" y="128" fill="#6b7280" font-family="IBM Plex Sans, sans-serif" font-size="7.5" text-anchor="middle">
+          CPSV
+        </text><text x="300" y="128" fill="#6b7280" font-family="IBM Plex Sans, sans-serif" font-size="7.5" text-anchor="middle">
+          DMN
+        </text><text x="328" y="128" fill="#6b7280" font-family="IBM Plex Sans, sans-serif" font-size="7.5" text-anchor="middle">
+          Channels
+        </text><path stroke="#e2e8f0" stroke-width="1" d="M164 136h327"/><text x="164" y="150" fill="#64748b" font-family="IBM Plex Sans, sans-serif" font-size="8">
+          Unique identifier
+        </text><rect width="326" height="13" x="164" y="153" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" rx="3"/><text x="164" y="177" fill="#64748b" font-family="IBM Plex Sans, sans-serif" font-size="8">
+          Official service name
+        </text><rect width="326" height="13" x="164" y="180" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" rx="3"/><text x="169" y="190" fill="#94a3b8" font-family="IBM Plex Sans, sans-serif" font-size="7">
+          e.g. Aanvraag bijstandsuitkering
+        </text><text x="164" y="203" fill="#64748b" font-family="IBM Plex Sans, sans-serif" font-size="8">
+          Description of service
+        </text><rect width="326" height="24" x="164" y="206" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" rx="3"/><rect width="62" height="14" x="164" y="240" fill="#1d4ed8" rx="4"/><text x="195" y="250" fill="#fff" font-family="IBM Plex Sans, sans-serif" font-size="7.5" font-weight="500" text-anchor="middle">
+          Export TTL
+        </text><rect width="52" height="14" x="233" y="240" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1" rx="4"/><text x="259" y="250" fill="#475569" font-family="IBM Plex Sans, sans-serif" font-size="7.5" text-anchor="middle">
+          Validate
+        </text><rect width="42" height="14" x="292" y="240" fill="#fef2f2" stroke="#fecaca" stroke-width="1" rx="4"/><text x="313" y="250" fill="#ef4444" font-family="IBM Plex Sans, sans-serif" font-size="7.5" text-anchor="middle">
+          Clear
+        </text><rect width="110" height="25" x="380" y="262" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1" rx="6"/><text x="435" y="273" fill="#1e40af" font-family="IBM Plex Mono, monospace" font-size="8" font-weight="500" text-anchor="middle">
+          React · CPSV-AP 3.2
+        </text><text x="435" y="283" fill="#3b82f6" font-family="IBM Plex Mono, monospace" font-size="7.5" text-anchor="middle">
+          RDF / Turtle / TriplyDB
+        </text><text x="932" y="34" fill="#0f2b5b" font-family="IBM Plex Sans, sans-serif" font-size="15" font-weight="600" text-anchor="middle">
+          Linked Open Data
+        </text><text x="932" y="52" fill="#64748b" font-family="IBM Plex Sans, sans-serif" font-size="11" text-anchor="middle">
+          TriplyDB Knowledge Graph
+        </text><rect width="144" height="18" x="860" y="59" fill="#fffbeb" stroke="#fde68a" stroke-width="1" rx="9"/><circle cx="873" cy="68" r="4" fill="#22c55e"/><text x="882" y="72" fill="#92400e" font-family="IBM Plex Mono, monospace" font-size="8.5">
+          triplydb.open-regels.nl
+        </text><path fill="none" stroke="#9ca3af" stroke-dasharray="5,4" stroke-width="1.5" d="m932 160-48-22m48 22 48-22m-48 22-40 32m40-32 40 32m-40-32v58m0-58v-52m-48 30 8 54m88-54-8 54m-80 0 40 26m40-26-40 26"/><circle cx="932" cy="160" r="19" fill="#0d9488" filter="url(#node-glow)"/><circle cx="932" cy="160" r="14" fill="#14b8a6"/><circle cx="932" cy="108" r="12" fill="#7c3aed" filter="url(#node-glow)"/><circle cx="932" cy="108" r="8" fill="#a78bfa"/><circle cx="884" cy="138" r="15" fill="#1e40af" filter="url(#node-glow)"/><circle cx="884" cy="138" r="11" fill="#3b82f6"/><circle cx="980" cy="138" r="15" fill="#b45309" filter="url(#node-glow)"/><circle cx="980" cy="138" r="11" fill="#f59e0b"/><circle cx="892" cy="192" r="13" fill="#c2410c" filter="url(#node-glow)"/><circle cx="892" cy="192" r="9" fill="#f97316"/><circle cx="972" cy="192" r="13" fill="#166534" filter="url(#node-glow)"/><circle cx="972" cy="192" r="9" fill="#22c55e"/><circle cx="932" cy="218" r="15" fill="#0369a1" filter="url(#node-glow)"/><circle cx="932" cy="218" r="11" fill="#38bdf8"/><rect width="56" height="18" x="847" y="243" fill="#fffbeb" stroke="#fde68a" stroke-width="1" rx="5"/><text x="875" y="255" fill="#92400e" font-family="IBM Plex Mono, monospace" font-size="8.5" text-anchor="middle">
+          RDF/TTL
+        </text><rect width="56" height="18" x="910" y="243" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1" rx="5"/><text x="938" y="255" fill="#1d4ed8" font-family="IBM Plex Mono, monospace" font-size="8.5" text-anchor="middle">
+          SPARQL
+        </text><rect width="60" height="18" x="973" y="243" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1" rx="5"/><text x="1003" y="255" fill="#166534" font-family="IBM Plex Mono, monospace" font-size="8.5" text-anchor="middle">
+          JSON-LD
+        </text><rect width="220" height="148" x="490" y="476" fill="#fff" stroke="#e2e8f0" stroke-width="2" filter="url(#center-shadow)" rx="18"/><rect width="52" height="52" x="540" y="490" fill="url(#bpmn-grad)" rx="12"/><rect width="16" height="16" x="547" y="497" fill="rgba(255,255,255,0.85)" rx="3"/><rect width="16" height="16" x="568" y="497" fill="rgba(255,255,255,0.85)" rx="3"/><rect width="16" height="16" x="547" y="518" fill="rgba(255,255,255,0.85)" rx="3"/><rect width="16" height="16" x="568" y="518" fill="rgba(255,255,255,0.85)" rx="3"/><path stroke="#e040fb" stroke-linecap="round" stroke-width="2.5" d="m550 500 10 10m0-10-10 10m0 11 10 10m0-10-10 10"/><path fill="none" stroke="#22c55e" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m571 506 5 5 5-10m-10 26 5 5 5-10"/><text x="600" y="558" fill="#0f2b5b" font-family="IBM Plex Sans, sans-serif" font-size="16" font-weight="600" text-anchor="middle">
+          BPMN / DMN
+        </text><text x="600" y="574" fill="#64748b" font-family="IBM Plex Sans, sans-serif" font-size="10.5" text-anchor="middle">
+          Operaton Engine
+        </text><rect width="152" height="28" x="524" y="582" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1" rx="8"/><text x="600" y="593" fill="#5b21b6" font-family="IBM Plex Mono, monospace" font-size="8" font-weight="500" text-anchor="middle">
+          operaton.open-regels.nl
+        </text><text x="600" y="605" fill="#7c3aed" font-family="IBM Plex Mono, monospace" font-size="7.5" text-anchor="middle">
+          Apache 2.0 Open Source
+        </text><rect width="466" height="310" x="20" y="450" fill="#fff" stroke="#94aec5" stroke-dasharray="10,6" stroke-width="2" filter="url(#card-shadow)" rx="18"/><circle cx="52" cy="480" r="17" fill="url(#check-grad)" filter="url(#node-glow)"/><text x="52" y="486" fill="#fff" font-size="16" text-anchor="middle">
+          ✓
+        </text><text x="78" y="472" fill="#0f2b5b" font-family="IBM Plex Sans, sans-serif" font-size="15" font-weight="600">
+          Self Service Portals &amp; Apps
+        </text><text x="78" y="490" fill="#64748b" font-family="IBM Plex Sans, sans-serif" font-size="10.5">
+          Municipality Portal
+        </text><rect width="152" height="18" x="78" y="496" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1" rx="9"/><circle cx="91" cy="505" r="4" fill="#22c55e"/><text x="100" y="509" fill="#166534" font-family="IBM Plex Mono, monospace" font-size="8.5">
+          mijn.open-regels.nl
+        </text><rect width="356" height="215" x="35" y="520" fill="#fff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#mockup-shadow)" rx="8"/><rect width="356" height="28" x="35" y="520" fill="url(#green-header)" rx="8"/><path fill="url(#green-header)" d="M35 534h356v14H35z"/><text x="50" y="537" fill="#fff" font-family="IBM Plex Sans, sans-serif" font-size="9.5" font-weight="600">
+          MijnOmgeving
+        </text><rect width="36" height="12" x="349" y="524" fill="rgba(255,255,255,0.2)" rx="3"/><text x="367" y="533" fill="#fff" font-family="IBM Plex Sans, sans-serif" font-size="7.5" text-anchor="middle">
+          Logout
+        </text><text x="42" y="558" fill="#475569" font-family="IBM Plex Sans, sans-serif" font-size="7.5" font-weight="500">
+          API Status: ● Active
+        </text><text x="42" y="573" fill="#374151" font-family="IBM Plex Sans, sans-serif" font-size="8" font-weight="500">
+          Zorgbewoning Rendement
+        </text><rect width="9" height="9" x="42" y="579" fill="none" stroke="#cbd5e1" stroke-width="1.2" rx="2"/><rect width="9" height="9" x="42" y="592" fill="#22c55e" rx="2"/><text x="46" y="600" fill="#fff" font-family="IBM Plex Sans, sans-serif" font-size="7" text-anchor="middle">
+          ✓
+        </text><rect width="9" height="9" x="42" y="605" fill="#22c55e" rx="2"/><text x="46" y="613" fill="#fff" font-family="IBM Plex Sans, sans-serif" font-size="7" text-anchor="middle">
+          ✓
+        </text><text x="56" y="587" fill="#6b7280" font-family="IBM Plex Sans, sans-serif" font-size="7.5">
+          Zorgwoning geschikt
+        </text><text x="56" y="600" fill="#374151" font-family="IBM Plex Sans, sans-serif" font-size="7.5">
+          Toeslagpartner aanwezig
+        </text><text x="56" y="613" fill="#374151" font-family="IBM Plex Sans, sans-serif" font-size="7.5">
+          Verzorgingsplaatsbewijs OK
+        </text><rect width="343" height="64" x="42" y="622" fill="#0f172a" rx="5"/><text x="50" y="636" fill="#64748b" font-family="IBM Plex Mono, monospace" font-size="7.5">
+
+        </text><text x="50" y="649" fill="#7dd3fc" font-family="IBM Plex Mono, monospace" font-size="7.5">
+          toeslag_bedrag
+          <tspan fill="#e2e8f0">data-better-svg-temp-__COLON__=&quot;__BOOLEAN__&quot;</tspan>
+          <tspan fill="#86efac">€ 248.50</tspan>
+        </text><text x="50" y="661" fill="#7dd3fc" font-family="IBM Plex Mono, monospace" font-size="7.5">
+          berechtigd
+          <tspan fill="#e2e8f0">data-better-svg-temp-__COLON__=&quot;__BOOLEAN__&quot;</tspan>
+          <tspan fill="#86efac">true</tspan>
+        </text><text x="50" y="673" fill="#7dd3fc" font-family="IBM Plex Mono, monospace" font-size="7.5">
+          regelset
+          <tspan fill="#e2e8f0">data-better-svg-temp-__COLON__=&quot;__BOOLEAN__&quot;</tspan>
+          <tspan fill="#fde68a">&quot;Zorgtoeslag-2024-v3&quot;</tspan>
+        </text><circle cx="428" cy="573" r="20" fill="#dcfce7"/><circle cx="428" cy="567" r="12" fill="#4ade80"/><path fill="#16a34a" d="M404 616q0-21 24-21t24 21Z"/><path stroke="#fff" stroke-linecap="round" stroke-width="2" d="M428 595v19"/><text x="428" y="629" fill="#475569" font-family="IBM Plex Sans, sans-serif" font-size="9.5" font-weight="500" text-anchor="middle">
+          Citizen
+        </text><path fill="none" stroke="#1b6b35" stroke-width="2" marker-end="url(#arrow-green)" d="M395 622h12"/><rect width="120" height="24" x="42" y="700" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1" rx="6"/><text x="102" y="711" fill="#1e40af" font-family="IBM Plex Mono, monospace" font-size="8" font-weight="500" text-anchor="middle">
+          React · OIDC/JWT
+        </text><text x="102" y="721" fill="#3b82f6" font-family="IBM Plex Mono, monospace" font-size="7.5" text-anchor="middle">
+          Keycloak IAM
+        </text><rect width="502" height="375" x="678" y="385" fill="#fff" stroke="#cbd5e1" stroke-width="2" filter="url(#card-shadow)" rx="18"/><circle cx="1152" cy="415" r="17" fill="url(#check-grad)" filter="url(#node-glow)"/><text x="1152" y="421" fill="#fff" font-size="16" text-anchor="middle">
+          ✓
+        </text><text x="693" y="407" fill="#0f2b5b" font-family="IBM Plex Sans, sans-serif" font-size="15" font-weight="600">
+          Chain Composer
+        </text><text x="693" y="424" fill="#64748b" font-family="IBM Plex Sans, sans-serif" font-size="10.5">
+          Linked Data Explorer
+        </text><rect width="174" height="18" x="693" y="430" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1" rx="9"/><circle cx="706" cy="439" r="4" fill="#22c55e"/><text x="715" y="443" fill="#166534" font-family="IBM Plex Mono, monospace" font-size="8.5">
+          linkeddata.open-regels.nl
+        </text><rect width="352" height="274" x="693" y="456" fill="#fff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#mockup-shadow)" rx="8"/><rect width="352" height="28" x="693" y="456" fill="url(#chain-header)" rx="8"/><path fill="url(#chain-header)" d="M693 470h352v14H693z"/><text x="703" y="474" fill="rgba(255,255,255,0.9)" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="500">
+          Linked Data Explorer
+        </text><rect width="58" height="14" x="978" y="460" fill="#1d4ed8" rx="4"/><text x="1007" y="470" fill="#fff" font-family="IBM Plex Sans, sans-serif" font-size="7.5" font-weight="500" text-anchor="middle">
+          + New Chain
+        </text><path fill="#f8fafc" d="M693 484h65v246h-65z"/><path stroke="#e2e8f0" stroke-width="1" d="M758 484v246"/><rect width="55" height="16" x="698" y="488" fill="#eff6ff" rx="3"/><text x="725" y="499" fill="#1d4ed8" font-family="IBM Plex Sans, sans-serif" font-size="7.5" font-weight="500" text-anchor="middle">
+          Explorer
+        </text><text x="725" y="514" fill="#9ca3af" font-family="IBM Plex Sans, sans-serif" font-size="7" text-anchor="middle">
+          Chains
+        </text><text x="725" y="528" fill="#9ca3af" font-family="IBM Plex Sans, sans-serif" font-size="7" text-anchor="middle">
+          SPARQL
+        </text><text x="725" y="542" fill="#9ca3af" font-family="IBM Plex Sans, sans-serif" font-size="7" text-anchor="middle">
+          Deploy
+        </text><text x="725" y="556" fill="#9ca3af" font-family="IBM Plex Sans, sans-serif" font-size="7" text-anchor="middle">
+          Settings
+        </text><text x="764" y="497" fill="#9ca3af" font-family="IBM Plex Sans, sans-serif" font-size="7.5" font-weight="500">
+          AVAILABLE APIS
+        </text><text x="896" y="497" fill="#9ca3af" font-family="IBM Plex Sans, sans-serif" font-size="7.5" font-weight="500">
+          CHAIN CONFIGURATION
+        </text><path stroke="#e2e8f0" stroke-width="1" d="M758 502h287m-155 0v228"/><rect width="122" height="26" x="762" y="507" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1" rx="5"/><text x="770" y="519" fill="#166534" font-family="IBM Plex Sans, sans-serif" font-size="7.5" font-weight="500">
+          BRP Personen API
+        </text><text x="770" y="529" fill="#6b7280" font-family="IBM Plex Mono, monospace" font-size="6.5">
+          v2.0 · REST
+        </text><rect width="122" height="26" x="762" y="538" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1" rx="5"/><text x="770" y="550" fill="#1d4ed8" font-family="IBM Plex Sans, sans-serif" font-size="7.5" font-weight="500">
+          Operaton DMN Engine
+        </text><text x="770" y="560" fill="#6b7280" font-family="IBM Plex Mono, monospace" font-size="6.5">
+          v1.0 · REST
+        </text><rect width="122" height="26" x="762" y="569" fill="#fffbeb" stroke="#fde68a" stroke-width="1" rx="5"/><text x="770" y="581" fill="#92400e" font-family="IBM Plex Sans, sans-serif" font-size="7.5" font-weight="500">
+          TriplyDB SPARQL
+        </text><text x="770" y="591" fill="#6b7280" font-family="IBM Plex Mono, monospace" font-size="6.5">
+          SPARQL 1.1
+        </text><rect width="122" height="26" x="762" y="600" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1" rx="5"/><text x="770" y="612" fill="#5b21b6" font-family="IBM Plex Sans, sans-serif" font-size="7.5" font-weight="500">
+          Zorgtoeslag Rules
+        </text><text x="770" y="622" fill="#6b7280" font-family="IBM Plex Mono, monospace" font-size="6.5">
+          DMN 1.3
+        </text><rect width="140" height="118" x="897" y="507" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" rx="5"/><text x="905" y="519" fill="#374151" font-family="IBM Plex Sans, sans-serif" font-size="7.5" font-weight="500">
+          Chain Steps
+        </text><path stroke="#e2e8f0" stroke-width="1" d="M897 523h140"/><circle cx="907" cy="534" r="5" fill="#1d4ed8"/><text x="907" y="538" fill="#fff" font-family="IBM Plex Sans, sans-serif" font-size="6.5" text-anchor="middle">
+          1
+        </text><text x="917" y="538" fill="#374151" font-family="IBM Plex Sans, sans-serif" font-size="7">
+          Fetch citizen data
+        </text><path stroke="#cbd5e1" stroke-dasharray="2,2" stroke-width="1" d="M907 539v9"/><circle cx="907" cy="553" r="5" fill="#22c55e"/><text x="907" y="557" fill="#fff" font-family="IBM Plex Sans, sans-serif" font-size="6.5" text-anchor="middle">
+          2
+        </text><text x="917" y="557" fill="#374151" font-family="IBM Plex Sans, sans-serif" font-size="7">
+          Evaluate DMN rules
+        </text><path stroke="#cbd5e1" stroke-dasharray="2,2" stroke-width="1" d="M907 558v9"/><circle cx="907" cy="572" r="5" fill="#9333ea"/><text x="907" y="576" fill="#fff" font-family="IBM Plex Sans, sans-serif" font-size="6.5" text-anchor="middle">
+          3
+        </text><text x="917" y="576" fill="#374151" font-family="IBM Plex Sans, sans-serif" font-size="7">
+          Deploy to Operaton
+        </text><path stroke="#cbd5e1" stroke-dasharray="2,2" stroke-width="1" d="M907 577v9"/><circle cx="907" cy="591" r="5" fill="#f59e0b"/><text x="907" y="595" fill="#fff" font-family="IBM Plex Sans, sans-serif" font-size="6.5" text-anchor="middle">
+          4
+        </text><text x="917" y="595" fill="#374151" font-family="IBM Plex Sans, sans-serif" font-size="7">
+          Return result to portal
+        </text><rect width="140" height="16" x="897" y="633" fill="#1d4ed8" rx="4"/><text x="967" y="644" fill="#fff" font-family="IBM Plex Sans, sans-serif" font-size="7.5" font-weight="500" text-anchor="middle">
+          ▶ Deploy Chain
+        </text><circle cx="1108" cy="563" r="22" fill="#ede9fe"/><circle cx="1108" cy="557" r="13" fill="#7c3aed"/><rect width="7" height="5" x="1100" y="554" fill="none" stroke="#fff" stroke-width="1.5" rx="2"/><rect width="7" height="5" x="1110" y="554" fill="none" stroke="#fff" stroke-width="1.5" rx="2"/><path stroke="#fff" stroke-width="1.2" d="M1107 557h3"/><path fill="#5b21b6" d="M1084 606q0-20 24-20t24 20Z"/><rect width="32" height="20" x="1092" y="590" fill="#1e293b" rx="3"/><rect width="28" height="16" x="1094" y="592" fill="#0f172a" rx="2"/><text x="1108" y="603" fill="#7dd3fc" font-family="IBM Plex Mono, monospace" font-size="7" text-anchor="middle">
+          &lt;/&gt;
+        </text><rect width="40" height="4" x="1088" y="610" fill="#334155" rx="2"/><text x="1108" y="625" fill="#475569" font-family="IBM Plex Sans, sans-serif" font-size="9.5" font-weight="500" text-anchor="middle">
+          Developer
+        </text><path fill="none" stroke="#1b6b35" stroke-width="2" marker-end="url(#arrow-green)" d="m1086 582-30 18"/><rect width="148" height="24" x="693" y="712" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1" rx="6"/><text x="767" y="723" fill="#1e40af" font-family="IBM Plex Mono, monospace" font-size="8" font-weight="500" text-anchor="middle">
+          React · Node.js API
+        </text><text x="767" y="733" fill="#3b82f6" font-family="IBM Plex Mono, monospace" font-size="7.5" text-anchor="middle">
+          SPARQL · REST · DMN 1.3
+        </text><path stroke="#e2e8f0" stroke-width="1" d="M20 763h1160"/><g transform="translate(20 772)"><circle cx="8" cy="6" r="6" fill="url(#check-grad)"/><text x="8" y="10" fill="#fff" font-size="8" text-anchor="middle">
+            ✓
+          </text><text x="20" y="10" fill="#64748b" font-family="IBM Plex Sans, sans-serif" font-size="9">
+            Live
+          </text><path stroke="#1b6b35" stroke-width="2" marker-end="url(#arrow-green)" d="M140 6h38"/><text x="188" y="10" fill="#64748b" font-family="IBM Plex Sans, sans-serif" font-size="9">
+            Data / message flow
+          </text><rect width="54" height="10" x="300" y="1" fill="none" stroke="#94aec5" stroke-dasharray="5,3" stroke-width="1.5" rx="3"/><text x="365" y="10" fill="#64748b" font-family="IBM Plex Sans, sans-serif" font-size="9">
+            Frontend Portal
+          </text><rect width="54" height="10" x="445" y="1" fill="none" stroke="#cbd5e1" stroke-width="1.5" rx="3"/><text x="508" y="10" fill="#64748b" font-family="IBM Plex Sans, sans-serif" font-size="9">
+            Backend Service
+          </text><text x="1140" y="10" fill="#94a3b8" font-family="'IBM Plex Sans', sans-serif" font-size="9" text-anchor="end">
+        IOU Architecture · EUPL v1.2 · open-regels.nl
+      </text></g></g></svg>

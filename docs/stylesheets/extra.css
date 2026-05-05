@@ -1,0 +1,378 @@
+/* Custom styling matching NL Design System */
+/* Based on colors from your existing demonstrator */
+
+:root {
+  /* Primary colors from NL Design System */
+  --primary-color: #154273;
+  --primary-light: #2a5a8a;
+  --primary-dark: #0d2f4f;
+  
+  /* Accent colors */
+  --accent-color: #e17000;
+  --accent-light: #f58220;
+  --accent-dark: #b35900;
+  
+  /* Status colors */
+  --status-compliant: #007a3d;
+  --status-in-progress: #275fa0;
+  --status-at-risk: #e17000;
+  --status-non-compliant: #cc0000;
+  
+  /* Neutral colors */
+  --background: #ffffff;
+  --surface: #f5f5f5;
+  --border: #d9d9d9;
+  --text-primary: #1a1a1a;
+  --text-secondary: #535353;
+}
+
+/* Header customization */
+.md-header {
+  background-color: var(--primary-color);
+}
+
+/* Navigation tabs */
+.md-tabs {
+  background-color: var(--primary-dark);
+}
+
+/* Links */
+a {
+  color: var(--accent-color);
+}
+
+a:hover {
+  color: var(--accent-dark);
+}
+
+/* Buttons */
+.md-button--primary {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+.md-button--primary:hover {
+  background-color: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+/* Code blocks */
+.highlight {
+  background-color: #f8f8f8;
+  border-left: 4px solid var(--primary-color);
+  padding: 1em;
+  margin: 1em 0;
+}
+
+/* Admonitions */
+.admonition {
+  border-left: 4px solid var(--primary-color);
+}
+
+.admonition.note {
+  border-left-color: var(--status-in-progress);
+}
+
+.admonition.warning {
+  border-left-color: var(--status-at-risk);
+}
+
+.admonition.danger {
+  border-left-color: var(--status-non-compliant);
+}
+
+.admonition.success {
+  border-left-color: var(--status-compliant);
+}
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5em 0;
+}
+
+th {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.75em;
+  text-align: left;
+  font-weight: 600;
+}
+
+td {
+  padding: 0.75em;
+  border-bottom: 1px solid var(--border);
+}
+
+tr:hover {
+  background-color: var(--surface);
+}
+
+/* RDF/Turtle code blocks styling */
+.language-turtle,
+.language-sparql,
+.language-rdf {
+  background-color: #f0f7ff;
+  border-left-color: var(--status-compliant);
+}
+
+/* Status badges (for requirements, etc.) */
+.status-badge {
+  display: inline-block;
+  padding: 0.25em 0.75em;
+  border-radius: 4px;
+  font-size: 0.875em;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-compliant {
+  background-color: var(--status-compliant);
+  color: white;
+}
+
+.status-in-progress {
+  background-color: var(--status-in-progress);
+  color: white;
+}
+
+.status-at-risk {
+  background-color: var(--status-at-risk);
+  color: white;
+}
+
+.status-non-compliant {
+  background-color: var(--status-non-compliant);
+  color: white;
+}
+
+/* Namespace URIs styling */
+.namespace-uri {
+  font-family: 'Roboto Mono', monospace;
+  background-color: #f5f5f5;
+  padding: 0.125em 0.375em;
+  border-radius: 3px;
+  font-size: 0.9em;
+  color: var(--primary-dark);
+}
+
+/* MIM level indicators */
+.mim-level {
+  display: inline-block;
+  background-color: var(--primary-light);
+  color: white;
+  padding: 0.125em 0.5em;
+  border-radius: 3px;
+  font-size: 0.875em;
+  font-weight: 600;
+  margin-left: 0.5em;
+}
+
+/* Responsive improvements */
+@media screen and (max-width: 768px) {
+  table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .md-tabs {
+    display: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .md-header,
+  .md-sidebar,
+  .md-footer {
+    display: none;
+  }
+  
+  .md-content {
+    max-width: 100%;
+  }
+  
+  a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: var(--text-secondary);
+  }
+}
+
+/* Accessibility improvements */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus indicators */
+a:focus,
+button:focus {
+  outline: 3px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Skip to content link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--accent-color);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Image layout utilities */
+.image-row {
+  display: flex;
+  gap: 20px;
+  margin: 20px 0;
+  align-items: flex-start;
+}
+
+.image-row > * {
+  flex: 1;
+}
+
+.image-row img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.image-row figcaption {
+  text-align: center;
+  font-style: italic;
+  margin-top: 8px;
+  font-size: 0.9em;
+}
+
+/* Three columns */
+.image-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .image-row {
+    flex-direction: column;
+  }
+  
+  .image-row-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =============================================================
+   What's New — colored grid cards on home page
+   Each card gets a coloured top border matching its component.
+   .md-typeset prefix + !important overrides Material's own card
+   border shorthand which would otherwise win the cascade.
+   ============================================================= */
+
+.md-typeset .whats-new-cards li:nth-child(1) {
+  border-top: 4px solid var(--primary-color) !important;     /* RONL Business API — Rijksoverheid blue */
+}
+
+.md-typeset .whats-new-cards li:nth-child(2) {
+  border-top: 4px solid var(--accent-color) !important;      /* CPSV Editor — orange */
+}
+
+.md-typeset .whats-new-cards li:nth-child(3) {
+  border-top: 4px solid var(--status-compliant) !important;  /* Linked Data Explorer — green */
+}
+
+.md-typeset .whats-new-cards li:nth-child(4) {
+  border-top: 4px solid #5bb8f5 !important;               /* CPRMV API — light blue */
+}
+
+/* =============================================================
+   Documentation Status — admonition table on home page
+   ============================================================= */
+
+/* Tighten the table inside the admonition — inherits th/td from
+   the global table rules above but overrides spacing and removes
+   the hover highlight that looks odd inside an admonition. */
+.doc-status-admonition .doc-status-table {
+  margin: 0.75em 0 0.25em;
+  font-size: 0.85em;
+}
+
+.doc-status-admonition .doc-status-table th {
+  background-color: var(--primary-color);
+  padding: 0.5em 0.75em;
+}
+
+.doc-status-admonition .doc-status-table td {
+  padding: 0.4em 0.75em;
+  vertical-align: middle;
+}
+
+.doc-status-admonition .doc-status-table tr:hover {
+  background-color: transparent;
+}
+
+.doc-status-admonition .doc-status-table a {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.95em;
+}
+
+/* Slightly smaller body text in What's New cards */
+.md-typeset .whats-new-cards li > p:not(:first-child) {
+  font-size: 0.82em;
+  line-height: 1.55;
+  color: var(--md-default-fg-color--light);
+}
+
+/* =============================================================
+   Environment badges — ACC / PROD
+   Used in the Documentation Status table and What's New cards.
+   ============================================================= */
+
+.env-badge {
+  display: inline-block;
+  padding: 0.15em 0.55em;
+  border-radius: 3px;
+  font-size: 0.75em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  vertical-align: middle;
+  line-height: 1.5;
+}
+
+.env-acc {
+  background-color: #f59e0b;
+  color: #fff;
+}
+
+.env-prod {
+  background-color: var(--status-compliant); /* reuses existing green */
+  color: #fff;
+}
+
+/* Slight offset so the badge sits comfortably after the version text
+   inside the What's New card <strong> element. */
+.whats-new-env-badge {
+  margin-left: 0.5em;
+  vertical-align: middle;
+}
