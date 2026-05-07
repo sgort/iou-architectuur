@@ -1,0 +1,327 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:1
+msgid "Security & Compliance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:3
+msgid ""
+"RONL Business API is designed to meet Dutch government security "
+"requirements. The following standards inform the security architecture and "
+"audit requirements."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:7
+msgid "Applicable standards"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:9
+msgid "Standard"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:9
+msgid "Scope"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:9
+msgid "**BIO** (Baseline Informatiebeveiliging Overheid)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:9
+msgid "Overall information security baseline for Dutch government"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:9
+msgid "**NEN 7510**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:9
+msgid ""
+"Information security in healthcare; applied here for sensitive citizen data"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:9
+msgid "**AVG / GDPR**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:9
+msgid "Data minimisation, audit trails, retention periods, right to access"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:9
+msgid "**DigiD Norm**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:9
+msgid "Authentication assurance levels for citizen-facing services"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:9
+msgid "**NCSC Guidelines**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:9
+msgid "Secure software development, dependency management"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:19
+msgid "Security controls"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:21
+msgid "HTTPS everywhere"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:23
+msgid ""
+"All traffic between components is encrypted. Caddy (the VM reverse proxy) "
+"handles TLS termination for Keycloak and Operaton using automatically-"
+"renewed Let's Encrypt certificates. Azure manages certificates for the "
+"Static Web App and App Service."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:25
+msgid "Helmet middleware"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:27
+msgid "The backend applies `helmet` with a strict Content Security Policy:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:29
+msgid ""
+"defaultSrc: [\"'self'\"]\n"
+"styleSrc:   [\"'self'\", \"'unsafe-inline'\"]\n"
+"scriptSrc:  [\"'self'\"]\n"
+"imgSrc:     [\"'self'\", \"data:\", \"https:\"]"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:36
+msgid "HSTS is enabled with `maxAge: 31536000` and `includeSubDomains: true`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:38
+msgid "Rate limiting"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:40
+msgid "Two rate limit policies are applied:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:42
+msgid ""
+"**General API** — 100 requests per 15 minutes per IP (or per tenant+IP if "
+"`RATE_LIMIT_PER_TENANT=true`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:43
+msgid "**Authentication endpoints** — 5 requests per 15 minutes per IP"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:45
+msgid ""
+"Keycloak adds brute-force protection independently: 5 failed login attempts "
+"trigger a 15-minute lockout with exponential backoff."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:47
+msgid "CORS"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:49
+msgid ""
+"The backend only accepts requests from its configured `CORS_ORIGIN` values:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:51
+msgid ""
+"https://mijn.open-regels.nl          (production)\n"
+"https://acc.mijn.open-regels.nl      (acceptance)\n"
+"http://localhost:5173                 (local development)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:57
+msgid ""
+"All other origins receive HTTP 403. Keycloak client settings mirror these "
+"origins in `Web Origins` and `Valid Redirect URIs`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:59
+msgid "JWT validation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:61
+msgid ""
+"Every request to a protected endpoint passes through the JWT middleware:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:63
+msgid "Signature verified against Keycloak JWKS (cached in Redis, TTL 300s)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:64
+msgid "`exp` checked — 15-minute token lifetime enforced"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:65
+msgid "`iss` verified against the configured Keycloak realm URL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:66
+msgid "`aud` verified to be `ronl-business-api`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:68
+msgid ""
+"Tokens failing any check are rejected with HTTP 401. No request data is "
+"processed before successful validation."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:70
+msgid "Secrets management"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:72
+msgid ""
+"Secrets are stored as Azure App Settings (environment variables on App "
+"Service) and VM `.env` files (not committed to git). The repository contains "
+"only `.env.example` templates. The following are never in version control:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:74
+msgid "Keycloak client secrets"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:75
+msgid "Database connection strings with passwords"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:76
+msgid "Redis primary keys"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:77
+msgid "Admin passwords"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:81
+msgid "Audit logging"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:83
+msgid ""
+"Every API call that results in a process action is written to the PostgreSQL "
+"audit log with:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "Field"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "Value"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "`user_id`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "JWT `sub` claim"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "`municipality`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "JWT `municipality` claim"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "`action`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "HTTP method + endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "`resource_id`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "Process instance ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "`timestamp`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "UTC timestamp"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "`ip_address`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "Client IP (from trusted proxy headers)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "`result`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:85
+msgid "HTTP response code"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:95
+msgid ""
+"Audit records have a configured retention of 2555 days (7 years) to satisfy "
+"BIO and AVG archiving requirements. The table schema is initialised by "
+"`config/postgres/init-databases.sql`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:99
+msgid "Data minimisation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:101
+msgid "The Business API applies AVG data minimisation:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:103
+msgid ""
+"BSN (Citizen Service Number) is encrypted at rest and never logged in "
+"plaintext"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:104
+msgid "The `userinfo_endpoint` is not exposed externally"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:105
+msgid ""
+"Process variables containing personal data are not included in error "
+"responses"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Csecurity-compliance.md:106
+msgid ""
+"Log entries at DEBUG level are disabled in production (`LOG_LEVEL=info`)"
+msgstr ""

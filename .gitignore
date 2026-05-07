@@ -89,3 +89,6 @@ $RECYCLE.BIN/
 .Trash-*
 
 flatten_directory.sh
+
+# Generated Dutch pages (built from PO files)
+docs/nl/

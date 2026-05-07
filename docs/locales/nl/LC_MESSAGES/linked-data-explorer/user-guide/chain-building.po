@@ -1,0 +1,177 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:1
+msgid "Building DMN Chains"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:3
+msgid ""
+"This guide covers the complete chain-building workflow, from discovering "
+"DMNs to executing a chain and interpreting results."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:7
+msgid "Opening the Chain Builder"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:9
+msgid ""
+"Click the GitBranch icon in the left sidebar. The view loads three panels: "
+"Available DMNs (left), Chain Composer (centre), Configuration (right)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:11
+msgid ""
+"On first load, the backend queries TriplyDB for all published DMN models. "
+"The Available DMNs panel populates within a few seconds. If it remains "
+"empty, check the active endpoint in the Configuration panel."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:15
+msgid "Inspecting DMNs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:17
+msgid ""
+"Each DMN card in the Available DMNs panel shows its title, identifier, "
+"variable counts, publishing organisation, and any governance badge. Click on "
+"a card to expand it and see the full variable list — inputs in blue, outputs "
+"in green, each with its identifier and datatype."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:19
+msgid ""
+"Before building a chain, identify which DMNs you want to connect and verify "
+"that the output variables of the first match the input variables of the "
+"second, either by exact identifier or by shared semantic concept."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:23
+msgid "Building the chain"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:25
+msgid ""
+"Drag a DMN card from the Available DMNs panel and drop it into the Chain "
+"Composer. A placeholder zone appears as you drag; release to place the card. "
+"Repeat for each subsequent DMN in the order you want them to execute."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:32
+msgid "The validation panel below the composer updates after each drop:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:34
+msgid ""
+"**Green — DRD-compatible**: all variable connections are exact identifier "
+"matches. The chain can be saved as a DRD for optimal performance."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:35
+msgid ""
+"**Amber — Sequential**: one or more connections rely on semantic concept "
+"matching. The chain will execute as sequential API calls."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:36
+msgid ""
+"**Red — Invalid**: one or more required inputs have no match. Hover over the "
+"red indicator to see which inputs are missing."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:40
+msgid "Providing inputs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:42
+msgid ""
+"The input form in the Configuration panel shows all variables the chain "
+"needs from you — those that are not satisfied by the output of an earlier "
+"DMN. Fill in each field with the appropriate value and type. Supported "
+"types: `String`, `Integer`, `Double`, `Boolean`, `Date` (YYYY-MM-DD)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:44
+msgid ""
+"If a DMN has been published with example `schema:value` data in TriplyDB, "
+"the input form pre-populates those values automatically."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:48
+msgid "Executing the chain"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:50
+msgid ""
+"Click **Execute** when the chain is valid and inputs are filled. The "
+"execution panel expands to show per-step progress. Each step shows which DMN "
+"is executing, which inputs it received, and which outputs it produced. "
+"Timing per step and total execution time appear on completion."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:52
+msgid ""
+"For sequential chains, output variables from each step are automatically "
+"mapped to the input variables of the next step, including semantic variable "
+"renaming where needed."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:56
+msgid "Reading results"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:58
+msgid ""
+"The final output panel shows the combined results from all steps. For DRD "
+"chains, this is the output of the entry-point decision. For sequential "
+"chains, it is the flattened output of the final DMN, together with "
+"intermediate outputs from earlier steps."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:62
+msgid "Removing a DMN from the chain"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:64
+msgid ""
+"Click the trash icon on a DMN card in the Chain Composer to remove it. The "
+"validation status updates immediately and the input form adjusts to reflect "
+"the new chain."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:68
+msgid "Reordering the chain"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:70
+msgid ""
+"Drag cards within the Chain Composer to reorder them. The validation status "
+"re-evaluates after the reorder."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:74
+msgid "Next steps"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:76
+msgid ""
+"[Saving & Executing DRDs]{1} — save a DRD-compatible chain as a reusable "
+"template"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cchain-building.md:77
+msgid ""
+"[Semantic Analysis]{1} — understand why some chains require sequential "
+"execution"
+msgstr ""

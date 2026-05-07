@@ -1,0 +1,785 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:1
+msgid "Logging In — Citizen & Caseworker"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:3
+msgid ""
+"This guide explains what happens when a citizen (burger) or caseworker "
+"(medewerker) logs into a municipality portal powered by RONL Business API. "
+"The two roles use different authentication paths, which are reflected in "
+"both the landing page and the Keycloak login experience."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:5
+msgid "**Environments:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:7
+msgid "URL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:7
+msgid "Acceptance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:7
+msgid "`https://acc.mijn.open-regels.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:7
+msgid "Production"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:7
+msgid "`https://mijn.open-regels.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:12
+msgid ""
+"In the test environment, use the Keycloak test accounts listed in [Local "
+"Development Setup]{1} instead of real DigiD or employee credentials."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:16
+msgid "Citizen login"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:18
+msgid ""
+"Citizens are Dutch residents, EU residents, or businesses accessing "
+"government services. They authenticate through a government-issued identity "
+"provider."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:20
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\login-flow.md:20"
+msgid "What you need"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:22
+msgid "A DigiD account (Dutch residents), or"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:23
+msgid "An eHerkenning account (businesses / organisations), or"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:24
+msgid "An eIDAS credential (EU residents without DigiD)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:26
+msgid "Step 1 — Visit the portal"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:28
+msgid ""
+"Open the municipality portal in your browser. You will see the "
+"**MijnOmgeving** landing page with four login options — three for citizens "
+"and one for caseworkers."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:35
+msgid "Step 2 — Choose your identity provider"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:37
+msgid "Select the option that matches your credential:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:39
+msgid ""
+"**🟠 DigiD** (Digitale Identiteit) For Dutch residents. Requires a valid "
+"DigiD account. Supports assurance levels basis, midden, and hoog."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:42
+msgid ""
+"**🔵 eHerkenning** For businesses and organisations. Requires an eHerkenning "
+"account. Supports mandates (machtiging) for acting on behalf of an "
+"organisation."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:45
+msgid ""
+"**🟣 eIDAS** For EU residents without DigiD. Cross-border authentication "
+"compliant with the eIDAS regulation."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:48
+msgid "Step 3 — Redirect to identity provider"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:50
+msgid "After clicking a citizen button, `AuthCallback.tsx` calls:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:52
+msgid ""
+"keycloak.init({\n"
+"  onLoad: 'login-required',\n"
+"  checkLoginIframe: false,\n"
+"  idpHint: 'digid' // or 'eherkenning' / 'eidas'\n"
+"});"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:60
+msgid ""
+"The `idpHint` tells Keycloak to skip its own login form and redirect "
+"immediately to the selected identity provider. In production, this takes you "
+"directly to DigiD, eHerkenning, or the eIDAS network. In the test "
+"environment (no real IdPs configured), Keycloak falls back to its native "
+"username/password form without a context banner."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:67
+msgid "Step 4 — Authenticate"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:69
+msgid ""
+"**DigiD:** Enter your DigiD username and password. Complete two-factor "
+"authentication if your assurance level requires it."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:71
+msgid ""
+"**eHerkenning:** Enter your eHerkenning credentials. Optionally select a "
+"mandate if acting on behalf of an organisation."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:73
+msgid ""
+"**eIDAS:** Authenticate through your EU member state's identity provider."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:75
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\login-flow.md:75"
+msgid "Step 5 — Token issuance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:77
+msgid ""
+"After successful authentication, Keycloak validates the identity provider "
+"response, maps user attributes (BSN for DigiD, KvK number for eHerkenning, "
+"eIDAS PersonIdentifier), applies municipality settings, and issues a signed "
+"JWT access token."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:79
+msgid "**Example JWT payload (citizen):**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:81
+msgid ""
+"{\n"
+"  \"sub\": \"abc123def456\",\n"
+"  \"name\": \"Jan de Vries\",\n"
+"  \"preferred_username\": \"test-citizen-utrecht\",\n"
+"  \"municipality\": \"utrecht\",\n"
+"  \"loa\": \"hoog\",\n"
+"  \"realm_access\": {\n"
+"    \"roles\": [\"citizen\"]\n"
+"  },\n"
+"  \"aud\": \"ronl-business-api\",\n"
+"  \"iss\": \"https://acc.keycloak.open-regels.nl/realms/ronl\",\n"
+"  \"exp\": 1708534800,\n"
+"  \"iat\": 1708533900\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:98
+msgid "Step 6 — Dashboard"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:100
+msgid ""
+"The portal receives the JWT and displays the citizen dashboard with "
+"municipality-specific theming and the zorgtoeslag calculator. The JWT is "
+"valid for 15 minutes and refreshed automatically while the session is active."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:104
+msgid "Caseworker login"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:106
+msgid ""
+"Caseworkers (medewerkers) are municipal employees managed directly in the "
+"Keycloak realm. They do not authenticate through DigiD or eHerkenning — they "
+"use Keycloak's native username/password form, which is visually "
+"distinguished from the citizen login with a dedicated context banner."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:108
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\login-flow.md:108"
+msgid "What you need"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:110
+msgid ""
+"A Keycloak account in the `ronl` realm with the `caseworker` role assigned"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:111
+msgid "The `municipality` attribute set to your municipality (e.g. `utrecht`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:113
+msgid "**Test environment accounts:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:115
+msgid "Username"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:115
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\login-flow.md:115"
+msgid "Municipality"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:115
+msgid "Role"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:115
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\login-flow.md:115"
+msgid "`test-caseworker-utrecht`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:115
+msgid "utrecht"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:115
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\login-flow.md:115"
+msgid "caseworker"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:115
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\login-flow.md:115"
+msgid "`test-caseworker-amsterdam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:115
+msgid "amsterdam"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:115
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\login-flow.md:115"
+msgid "`test-caseworker-rotterdam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:115
+msgid "rotterdam"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:115
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\login-flow.md:115"
+msgid "`test-caseworker-denhaag`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:115
+msgid "denhaag"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:122
+msgid "Password for all test accounts: `test123`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:124
+msgid "Step 1 — Visit the portal and select \"Inloggen als Medewerker\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:126
+msgid ""
+"On the MijnOmgeving landing page, scroll past the three citizen options. "
+"Below a \"MEDEWERKERS\" divider you will find the slate-coloured caseworker "
+"button."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:133
+msgid "Step 2 — AuthCallback checks for an existing SSO session"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:135
+msgid ""
+"Clicking \"Inloggen als Medewerker\" stores `medewerker` in `sessionStorage` "
+"and navigates to `/auth`. `AuthCallback.tsx` detects this and calls:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:137
+msgid ""
+"keycloak.init({\n"
+"  onLoad: 'check-sso',\n"
+"  checkLoginIframe: false,\n"
+"});"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:144
+msgid ""
+"Unlike the citizen flow (`login-required`), `check-sso` does **not** trigger "
+"a redirect. It silently checks whether a Keycloak SSO session already exists "
+"in the browser:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:146
+msgid ""
+"**Session found** → navigates directly to `/dashboard` without any login "
+"screen."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:147
+msgid "**No session** → proceeds to step 3."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:149
+msgid "Step 3 — Keycloak login with caseworker banner"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:151
+msgid "When no SSO session exists, `AuthCallback` calls:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:153
+msgid "keycloak.login({ loginHint: '__medewerker__' });"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:157
+msgid ""
+"This redirects to Keycloak and passes `__medewerker__` as the `login_hint` "
+"parameter. The `login.ftl` FreeMarker template reads this value via "
+"`login.username`, detects the sentinel string `__medewerker__`, and:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:159
+msgid ""
+"Sets the page title to **\"Medewerker portaal\"** instead of the default "
+"\"Inloggen\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:160
+msgid "Renders an indigo context banner: **\"Inloggen als medewerker\"**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:161
+msgid ""
+"Suppresses the sentinel value from the username field (the field renders "
+"empty, so the caseworker types their own username)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:168
+msgid "Step 4 — Enter credentials"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:170
+msgid ""
+"Enter the Keycloak username and password for the caseworker account. Click "
+"**Inloggen**."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:172
+msgid ""
+"A \"← Terug naar inlogkeuze\" link is available below the login button to "
+"return to the landing page without completing login."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:174
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\login-flow.md:174"
+msgid "Step 5 — Token issuance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:176
+msgid ""
+"Keycloak issues a JWT with `roles: [\"caseworker\"]` and the caseworker's "
+"`municipality` attribute."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:178
+msgid "**Example JWT payload (caseworker):**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:180
+msgid ""
+"{\n"
+"  \"sub\": \"xyz789abc012\",\n"
+"  \"name\": \"Petra van Dam\",\n"
+"  \"preferred_username\": \"test-caseworker-utrecht\",\n"
+"  \"municipality\": \"utrecht\",\n"
+"  \"loa\": \"hoog\",\n"
+"  \"realm_access\": {\n"
+"    \"roles\": [\"caseworker\"]\n"
+"  },\n"
+"  \"aud\": \"ronl-business-api\",\n"
+"  \"iss\": \"https://acc.keycloak.open-regels.nl/realms/ronl\",\n"
+"  \"exp\": 1708534800,\n"
+"  \"iat\": 1708533900\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:197
+msgid "Step 6 — Caseworker dashboard"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:199
+msgid ""
+"The portal detects the `caseworker` role in the JWT and renders the "
+"caseworker dashboard. See [Caseworker Workflow]{1} for what caseworkers can "
+"do once logged in."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:203
+msgid "Common behaviour"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:205
+msgid "Multi-municipality support"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:207
+msgid ""
+"The `municipality` claim in the JWT determines branding and data scope. The "
+"platform supports four municipalities:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\login-flow.md:209"
+msgid "Municipality"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgid "Primary colour"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgid "Citizen test user"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgid "Caseworker test user"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgid "Utrecht"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgid "Red"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgid "`test-citizen-utrecht`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\login-flow.md:209"
+msgid "`test-caseworker-utrecht`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgid "Amsterdam"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgid "Bright red"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgid "`test-citizen-amsterdam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\login-flow.md:209"
+msgid "`test-caseworker-amsterdam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgid "Rotterdam"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgid "Green"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgid "`test-citizen-rotterdam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\login-flow.md:209"
+msgid "`test-caseworker-rotterdam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgid "Den Haag"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgid "Blue"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgid "`test-citizen-denhaag`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:209
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\login-flow.md:209"
+msgid "`test-caseworker-denhaag`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:216
+msgid "Assurance levels (LoA) — citizen only"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:218
+msgid "DigiD supports three assurance levels:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "Level"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "Dutch"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "Use cases"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "`low`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "basis"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "Username + password"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "General information viewing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "`substantial`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "midden"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "Username + password + SMS"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "Most government services"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "`high`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "hoog"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "Username + password + DigiD app"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:220
+msgid "Sensitive data, financial transactions"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:226
+msgid ""
+"If the token's `loa` is insufficient for a requested operation, the Business "
+"API returns:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:228
+msgid ""
+"HTTP/1.1 403 Forbidden\n"
+"\n"
+"{\n"
+"  \"error\": {\n"
+"    \"code\": \"LOA_INSUFFICIENT\",\n"
+"    \"message\": \"This action requires assurance level 'substantial' or "
+"higher.\"\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:239
+msgid ""
+"Caseworker accounts are not subject to LoA enforcement — they authenticate "
+"with Keycloak-native credentials."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:241
+msgid "Token lifetime"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:243
+msgid ""
+"**Access token:** 15 minutes, automatically refreshed while the session is "
+"active"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:244
+msgid "**SSO session idle timeout:** 30 minutes of inactivity"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:245
+msgid "**SSO session maximum:** 10 hours"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:246
+msgid "Token is stored in memory only (never in `localStorage`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:248
+msgid "Logging out"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:250
+msgid ""
+"Click **Uitloggen** in the portal header. This calls Keycloak's "
+"`end_session_endpoint`, invalidates the SSO session, clears the in-memory "
+"token, and redirects to the landing page."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:254
+msgid "Troubleshooting"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:256
+msgid "\"Session expired\" message"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:258
+msgid ""
+"The SSO session timed out after 30 minutes of inactivity. Return to the "
+"landing page and log in again."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:260
+msgid "Redirect loop"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:262
+msgid "**Cause:** Invalid redirect URI configuration in Keycloak."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:264
+msgid "**Fix:** Verify the `ronl-business-api` client in Keycloak Admin has:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:265
+msgid ""
+"Valid Redirect URIs: https://acc.mijn.open-regels.nl/*\n"
+"Web Origins: +"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:270
+msgid "\"Terug naar inlogkeuze\" requires two clicks"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:272
+msgid ""
+"**Cause:** The `/auth` route (`AuthCallback.tsx`) is an intermediate step in "
+"the browser history. Navigating back once lands on `/auth`, which "
+"immediately redirects to Keycloak again."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:274
+msgid ""
+"**Fix:** The cancel link in `login.ftl` uses `history.go(-2)` to skip past `/"
+"auth` in a single click."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:276
+msgid "Wrong municipality shown after login"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:278
+msgid ""
+"**Cause:** The user account has an incorrect `municipality` attribute in "
+"Keycloak."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:280
+msgid ""
+"**Fix:** In Keycloak Admin Console → Users → select the user → Attributes → "
+"set `municipality` to the correct value, then log out and back in."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:282
+msgid "Caseworker banner not showing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:284
+msgid ""
+"**Cause:** The `__medewerker__` `login_hint` is not being passed, or the "
+"`login.ftl` template version on the server is outdated."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:286
+msgid ""
+"**Fix:** Verify that `sessionStorage` contains `selected_idp = medewerker` "
+"before `/auth` loads (check DevTools → Application → Session Storage). If "
+"the theme file is outdated, redeploy the theme and restart the Keycloak "
+"container (see [Keycloak Deployment]{1})."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:290
+msgid "Related documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:292
+msgid ""
+"[Authentication & IAM]{1} — Technical architecture of both authentication "
+"flows"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:293
+msgid "[Caseworker Workflow]{1} — What caseworkers can do after login"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:294
+msgid ""
+"[Frontend Development]{1} — `LoginChoice.tsx` and `AuthCallback.tsx` "
+"implementation details"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:295
+msgid ""
+"[Keycloak Deployment]{1} — Theme files, caseworker banner, container "
+"management"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Clogin-flow.md:296
+msgid "[JWT Claims Reference]{1} — Complete JWT token structure"
+msgstr ""

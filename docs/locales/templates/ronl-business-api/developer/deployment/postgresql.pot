@@ -1,0 +1,358 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:1
+msgid "PostgreSQL (Azure)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:3
+msgid ""
+"The RONL Business API uses **Azure PostgreSQL Flexible Server** as its "
+"persistent store for audit logs. The database is provisioned per environment "
+"— `ronl-postgres-acc` for ACC and `ronl-postgres-prod` for production — and "
+"is accessed exclusively by the backend running on Azure App Service."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:7
+msgid "Environments"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:9
+msgid "Environment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:9
+msgid "Server"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:9
+msgid "Database"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:9
+msgid "App Service"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:9
+msgid "ACC"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:9
+msgid "`ronl-postgres-acc.postgres.database.azure.com`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\postgresql.md:9"
+msgid "`audit_logs`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:9
+msgid "`ronl-business-api-acc`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:9
+msgid "PROD"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:9
+msgid "`ronl-postgres-prod.postgres.database.azure.com`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:9
+msgid "`ronl-business-api-prod`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:14
+msgid ""
+"Both environments use the same schema. The `audit_logs` database contains "
+"one table: `audit_logs` (request-level audit trail)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:18
+msgid "Initial setup"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:20
+msgid ""
+"Azure PostgreSQL Flexible Server does not run the local Docker init script "
+"(`config/postgres/init-databases.sql`) automatically. The database and "
+"schema must be created manually on first provisioning."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:22
+msgid "1. Open the firewall for your local IP"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:24
+msgid ""
+"The server is locked down by default. Add a temporary rule to allow your "
+"machine:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:26
+msgid ""
+"az postgres flexible-server firewall-rule create \\\n"
+"  --resource-group rg-ronl-acc \\\n"
+"  --name ronl-postgres-acc \\\n"
+"  --rule-name allow-my-ip \\\n"
+"  --start-ip-address $(curl -s https://api.ipify.org) \\\n"
+"  --end-ip-address $(curl -s https://api.ipify.org)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:35
+msgid "2. Install the PostgreSQL client"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:37
+msgid "sudo apt install postgresql-client -y"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:41
+msgid "3. Connect to the server"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:43
+msgid ""
+"psql \"postgresql://pgadmin:<password>@ronl-postgres-"
+"acc.postgres.database.azure.com:5432/postgres?sslmode=require\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:47
+msgid ""
+"Connect to the default `postgres` database first. If `audit_logs` does not "
+"yet exist, create it:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:49
+msgid "CREATE DATABASE audit_logs;"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:53
+msgid "Then reconnect to it:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:55
+msgid ""
+"psql \"postgresql://pgadmin:<password>@ronl-postgres-"
+"acc.postgres.database.azure.com:5432/audit_logs?sslmode=require\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:59
+msgid "4. Create the schema"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:61
+msgid ""
+"CREATE TABLE IF NOT EXISTS audit_logs (\n"
+"    id SERIAL PRIMARY KEY,\n"
+"    timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),\n"
+"    tenant_id VARCHAR(255) NOT NULL,\n"
+"    user_id VARCHAR(255) NOT NULL,\n"
+"    action VARCHAR(100) NOT NULL,\n"
+"    resource_type VARCHAR(100),\n"
+"    resource_id VARCHAR(255),\n"
+"    details JSONB,\n"
+"    ip_address INET,\n"
+"    user_agent TEXT,\n"
+"    result VARCHAR(50) NOT NULL,\n"
+"    error_message TEXT,\n"
+"    request_id VARCHAR(255),\n"
+"    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()\n"
+");\n"
+"\n"
+"CREATE INDEX IF NOT EXISTS idx_audit_logs_tenant_id ON audit_logs(tenant_id)"
+";\n"
+"CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);\n"
+"CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit_logs(timestamp)"
+";\n"
+"CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action);\n"
+"CREATE INDEX IF NOT EXISTS idx_audit_logs_request_id ON audit_logs"
+"(request_id);"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:88
+msgid "Firewall configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:90
+msgid ""
+"Azure PostgreSQL Flexible Server has no inbound access by default. Two rules "
+"are required."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:92
+msgid "Allow Azure App Service"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:94
+msgid ""
+"This permits the App Service backend to reach the database. The special "
+"address range `0.0.0.0`–`0.0.0.0` is Azure's notation for \"allow all Azure-"
+"internal traffic\":"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:96
+msgid ""
+"az postgres flexible-server firewall-rule create \\\n"
+"  --resource-group rg-ronl-acc \\\n"
+"  --name ronl-postgres-acc \\\n"
+"  --rule-name allow-azure-services \\\n"
+"  --start-ip-address 0.0.0.0 \\\n"
+"  --end-ip-address 0.0.0.0"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:105
+msgid "Allow local access (temporary)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:107
+msgid ""
+"For schema migrations or manual queries, add your local IP as shown in "
+"[Initial setup]{1} above. Remove the rule when done:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:109
+msgid ""
+"az postgres flexible-server firewall-rule delete \\\n"
+"  --resource-group rg-ronl-acc \\\n"
+"  --name ronl-postgres-acc \\\n"
+"  --rule-name allow-my-ip"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:118
+msgid "Connecting the App Service"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:120
+msgid ""
+"The backend reads `DATABASE_URL` from its environment. Set it on the App "
+"Service:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:122
+msgid ""
+"az webapp config appsettings set \\\n"
+"  --name ronl-business-api-acc \\\n"
+"  --resource-group rg-ronl-acc \\\n"
+"  --settings DATABASE_URL=\"postgresql://pgadmin:<password>@ronl-postgres-"
+"acc.postgres.database.azure.com:5432/audit_logs?sslmode=require\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:129
+msgid ""
+"`sslmode=require` is mandatory — Azure PostgreSQL Flexible Server enforces "
+"SSL. The connection string for the PROD environment uses `ronl-postgres-"
+"prod` and `rg-ronl-prod` accordingly."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:131
+msgid ""
+"The App Service restarts automatically when app settings are changed. The "
+"backend's `initDb()` call at startup will log a successful pool "
+"establishment:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:133
+msgid "Database connection pool established { poolMin: 2, poolMax: 10 }"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:137
+msgid ""
+"If `DATABASE_URL` is missing or points to an unreachable host, the backend "
+"falls back to in-memory audit logging and logs a warning — it does not crash."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:141
+msgid "Known issue — IP address format on Azure"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:143
+msgid ""
+"Azure App Service sets `req.ip` in the format `x.x.x.x:port` (IP with port "
+"appended), whereas the `ip_address` column is of PostgreSQL type `inet`, "
+"which does not accept a port suffix. Every `INSERT` into `audit_logs` will "
+"fail with:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:145
+msgid "invalid input syntax for type inet: \"77.161.155.118:40796\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:149
+msgid ""
+"This error is swallowed silently by `persistAuditLog()` — the API continues "
+"to function but no rows are written to the database."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:151
+msgid ""
+"The fix is in `packages/backend/src/services/audit.service.ts`, stripping "
+"the port before the insert:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:153
+msgid ""
+"ipAddress: entry.ipAddress ? entry.ipAddress.replace(/:\\d+$/, '') : null,"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:157
+msgid ""
+"!!! note \"Local development is not affected\" `req.ip` on a local Node.js/"
+"Express server returns a plain IP without a port, so this issue only "
+"manifests on Azure App Service."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:162
+msgid "Local development"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:164
+msgid ""
+"Locally, PostgreSQL runs as a Docker container defined in `docker-"
+"compose.yml`. The schema is applied automatically on first start via `config/"
+"postgres/init-databases.sql`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:166
+msgid "The local connection string in `.env.development`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:168
+msgid ""
+"DATABASE_URL=postgresql://audit_user:audit_password@localhost:5432/audit_logs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:172
+msgid "No firewall configuration is needed for local development."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:176
+msgid "Related documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:178
+msgid ""
+"[Backend Deployment]{1} — App Service environment variable configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:179
+msgid ""
+"[Environment Variables]{1} — Full variable reference including "
+"`DATABASE_POOL_MIN` and `DATABASE_POOL_MAX`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cpostgresql.md:180
+msgid ""
+"[Security & Compliance]{1} — Audit log retention policy (7-year / 2555 days)"
+msgstr ""

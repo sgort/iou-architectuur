@@ -1,0 +1,971 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:1
+msgid "DSO Integration — Phase Plan & Test Guidance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:3
+msgid "End goal"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:5
+msgid ""
+"A **DSO-driven AWB process bundle**: given a location and a werkzaamheid, "
+"LDE produces a deployable Operaton package — BPMN subprocess + DMN + form "
+"schema + document template — all seeded from authoritative DSO source data "
+"rather than authored by hand."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:9
+msgid "The data flow that makes this possible"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:11
+msgid ""
+"Werkzaamheid (what someone wants to do)\n"
+"    ↓  linked to\n"
+"Activiteit (the legal activity at that location)\n"
+"    ↓  has\n"
+"Regelbeheerobjecten\n"
+"    ├── indieningsvereisten  →  STTR file → Form fields (what must be "
+"submitted)\n"
+"    ├── conclusie            →  STTR file → DMN decision model (what the "
+"authority decides)\n"
+"    └── maatregelen          →  STTR file → Document template (conditions in "
+"the beschikking)\n"
+"    ↓  governed by\n"
+"BPMN subprocess (the AWB procedural shell wrapping all of the above)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:24
+msgid "The `functioneleStructuurRef` is the pivot"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:26
+msgid ""
+"Every regelBeheerobject on an activity carries a `functioneleStructuurRef`. "
+"This reference links the RTR activity taxonomy to the actual applicable rule "
+"files (STTR) in the Uitvoeren Gegevens API. The Zoekinterface returns it "
+"directly alongside each werkzaamheid result — visible in the Works tab as "
+"the `ref:` line on each row. The Activity Detail panel shows rule types "
+"present; the `functioneleStructuurRef` per rule type is returned by the RTR "
+"detail call and is the input to Step 1 of the next cycle."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:28
+msgid "The `functioneleStructuurRef` is a full concept URI. Two formats exist:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:30
+msgid ""
+"**Zoekinterface** (werkzaamheid-level): `http://toepasbare-"
+"regels.omgevingswet.overheid.nl/werkzaamheden/id/concept/GebouwPlaatsen`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:31
+msgid ""
+"**RTR detail** (regelBeheerobject-level): `http://toepasbare-"
+"regels.omgevingswet.overheid.nl/00000001005024249000/id/concept/"
+"Conclusienl.imow-gm0995.activiteit.a42ec23b8e4d464b8d32a1e88ac6d4cd`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:33
+msgid ""
+"Both are passed to `GET /toepasbareRegels?functioneleStructuurRef=...` in "
+"Phase 4 — the authority-scoped format from the RTR detail is the more "
+"precise one."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:37
+msgid "APIs involved"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:39
+msgid "Already integrated"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:41"
+msgid "API"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:41"
+msgid "Version"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:41
+msgid "Used for"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:41
+msgid "RTR CRUD (raadplegen)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:41"
+msgid "v2"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:41
+msgid ""
+"Activity list, detail, OIN-based browse via `_zoek` with `bestuursorgaan.oin`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:41
+msgid "Catalogus opvragen"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:41
+msgid "v3"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:41
+msgid "Concepts search"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:41"
+msgid "Zoekinterface"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:41
+msgid "v2.2.3"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:41
+msgid ""
+"Werkzaamheden search + autocomplete, `functioneleStructuurRef` retrieval"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:41"
+msgid "Opvragen Werkzaamheden"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:41"
+msgid "v1"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:41
+msgid "Werkzaamheid version history"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:48
+msgid "Pending integration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:50
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:50"
+msgid "API"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:50
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:50"
+msgid "Version"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:50
+msgid "Key capability"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:50
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:50"
+msgid "Uitvoeren Gegevens"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:50
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:50"
+msgid "v1"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:50
+msgid "STTR file metadata + download by `functioneleStructuurRef`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:50
+msgid "Samengestelde RTR services"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:50
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:50"
+msgid "v2"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:50
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:50"
+msgid "Rule type completeness check for werkzaamheid + location"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:55
+msgid "STTR standard (XSD)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:57
+msgid "XSD"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:57
+msgid "Relevant content"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:57
+msgid "`Bedrijfsregel_v2.xsd`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:57
+msgid ""
+"Root envelope: `<sttr versie=\"3\">` + `<functioneleStructuurRef "
+"href=\"...\"/>`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:57
+msgid "`Content_v2.xsd`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:57
+msgid ""
+"`maatregel` elements (nummer, maatregeltekst, toelichting, frequentie, "
+"volgorde, kenmerk, thema)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:57
+msgid "`DMN_v12.xsd`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:57
+msgid ""
+"Full DMN 1.2 schema — the `conclusie` STTR file embeds a complete DMN "
+"decision model"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:63
+msgid ""
+"**The critical insight:** an STTR file for a `conclusie` regelBeheerobject "
+"**is** a DMN file in an STTR envelope. Strip the envelope, register the DMN "
+"— it is deployable via the existing LDE bundle mechanism."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:65
+msgid "Known DSO API quirks"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:67
+msgid ""
+"**Opvragen Werkzaamheden `_expandScope`:** the spec documents "
+"`logischeRelaties` as the valid enum value but the runtime rejects both "
+"`logischeRelaties` and `LogischeRelaties`. `_expand=true` without "
+"`_expandScope` is also rejected. Current workaround: call without expand — "
+"returns version history with omschrijving and dates only. Keywords and "
+"logical relations pending until the correct enum value is confirmed with DSO "
+"support."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:68
+msgid ""
+"**RTR `_wijzigingen`:** is a **delta sync endpoint**, not a browse endpoint. "
+"It returns activities that changed since `datumVanaf`, not activities valid "
+"on a date. Empty results for recent dates are expected if nothing changed. "
+"Replaced by `POST /activiteiten/_zoek` with `bestuursorgaan.oin` for all OIN-"
+"based browsing in LDE."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:69
+msgid ""
+"**Manual date format:** `dd-MM-yyyy` throughout — no `Intl` dependency due "
+"to Azure App Service locale issues."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:70
+msgid ""
+"**`functioneleStructuurRef` format:** two variants exist (see above). The "
+"authority-scoped RTR detail format is needed for the Uitvoeren Gegevens "
+"lookup in Phase 4."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:72
+msgid "What each rule type yields from the STTR"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:74
+msgid "Rule type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:74
+msgid "STTR content"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:74
+msgid "LDE asset"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:74
+msgid "`conclusie`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:74
+msgid "Full DMN decision model embedded in STTR envelope"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:74
+msgid "Import as `.dmn`, deploy to Operaton via existing bundle mechanism"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:74
+msgid "`indieningsvereisten`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:74
+msgid "DMN questionnaire logic (questions, options, conditions)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:74
+msgid "Form field scaffold — each question → form-js field"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:74
+msgid "`maatregelen`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:74
+msgid ""
+"`<maatregel>` elements with nummer, maatregeltekst, toelichting, frequentie"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:74
+msgid "Document template zones — each maatregel → beschikking section"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:82
+msgid "Phased approach"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:84
+msgid "Phase 1 — Navigate ✅ Done (v1.5.0 / v1.5.3)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:86
+msgid "DSO Explorer panel with Concepts, Works, and Activities tabs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:87
+msgid "Concepts tab: full-text search across the Stelselcatalogus"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:88
+msgid ""
+"Works tab: Zoekinterface-backed werkzaamheden search with autocomplete, "
+"version history in detail panel, `functioneleStructuurRef` visible per result"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:89
+msgid ""
+"Activities tab: RTR activiteiten list with OIN presets (Lelystad, Flevoland) "
+"via `_zoek` + `bestuursorgaan.oin`, date filtering, activity detail panel "
+"with child/parent navigation, rule types present badges"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:90
+msgid ""
+"DSO environment toggle (pre-production / production) in Settings, "
+"independent of LDE environment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:91
+msgid ""
+"DSO activiteit URN linkable to BPMN subprocess via `ronl:dsoActiviteitUrn` "
+"moddleExtension"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:93
+msgid "Phase 2 — Locate (next)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:95
+msgid ""
+"Find the right activity and confirm its rule content is available before "
+"attempting generation."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:97
+msgid ""
+"**Step 2a — Applicable Rules panel in Activity Detail** (Uitvoeren Gegevens) "
+"← **highest priority**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:98
+msgid ""
+"When `conclusie` or `indieningsvereisten` is present, call `GET /"
+"toepasbareRegels?functioneleStructuurRef=...` using the authority-scoped URI "
+"from the RTR detail response"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:99
+msgid ""
+"Show metadata: STTR version, authority OIN, validity, aansluitpunt name, "
+"`modelName`, `decisionName`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:100
+msgid "Download STTR XML button"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:101
+msgid "Import into LDE button (Phase 4 trigger)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:103
+msgid "**Step 2b — Works tab → Applicable Rules shortcut**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:104
+msgid ""
+"Each werkzaamheid result carries `functioneleStructuurRef` — wire a \"View "
+"applicable rules\" action that calls the Uitvoeren Gegevens API directly, "
+"without navigating through the activity hierarchy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:106
+msgid "**Step 2c — Rule type completeness check** (Samengestelde services)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:107
+msgid ""
+"`POST /regelbeheerobjectedtypen` for a werkzaamheid + location: confirm "
+"which rule types are present before attempting generation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:109
+msgid "Phase 3 — Map (partially done in v1.5.0 / v1.5.3)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:111
+msgid ""
+"✅ `ronl:dsoActiviteitUrn` moddleExtension on `bpmn:Process` — persisted in "
+"BPMN XML"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:112
+msgid ""
+"✅ `DsoActiviteitSelector` in BPMN Modeler footer: paste URN, verify live, "
+"save to process"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:113
+msgid "✅ Direct link to RTR viewer after verification"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:114
+msgid "Pending: `indieningsvereisten` checklist in BPMN properties panel"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:115
+msgid ""
+"Pending: rule object type badges on subprocess element (✓ Form ✓ Decision ✓ "
+"Document)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:117
+msgid "Phase 4 — Generate"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:119
+msgid ""
+"**Step 4.1 — DMN import from STTR** (`conclusie`) ← entry point after Step 2a"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:120
+msgid ""
+"Backend parses STTR XML, extracts `<definitions>` element, returns as DMN"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:121
+msgid ""
+"\"Import into LDE\" button registers the DMN as a new asset linked to the "
+"subprocess"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:122
+msgid ""
+"Filter: `sttrBestandInhoudFilter=herbruikbareBeslissing` targets directly "
+"importable reusable decisions"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:124
+msgid "**Step 4.2 — Form scaffold from STTR** (`indieningsvereisten`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:125
+msgid "Each question node in the questionnaire DMN → form-js field"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:126
+msgid "Field type inferred from DSO data type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:128
+msgid "**Step 4.3 — Document template scaffold from STTR** (`maatregelen`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:129
+msgid ""
+"Each `<maatregel>` → beschikking document zone: `maatregeltekst` → label, "
+"`toelichting` → body"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:131
+msgid "**Step 4.4 — BPMN subprocess scaffold**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:132
+msgid ""
+"Complete subprocess XML wired to imported DMN, form, and document template "
+"via `ronl:` moddleExtensions"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:134
+msgid "Phase 5 — Deploy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:136
+msgid "Wire subprocess into AWB shell as call activity (Camunda Modeler)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:137
+msgid ""
+"Deploy bundle via existing LDE mechanism: BPMN + DMN + form refs + document "
+"template"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:138
+msgid "Process runnable in Operaton with DSO-authoritative rule content"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:142
+msgid "Implementation order for the next development cycle"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "Step"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:144"
+msgid "API"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "Deliverable"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "1"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:144"
+msgid "Uitvoeren Gegevens"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid ""
+"`GET /v1/dso/toepasbare-regels?functioneleStructuurRef=...` backend route"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "2"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:144"
+msgid "Uitvoeren Gegevens"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "`GET /v1/dso/toepasbare-regels/:id/sttr` backend route (raw XML)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "3"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:144"
+msgid "Uitvoeren Gegevens"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "Applicable Rules section in Activity Detail panel (metadata + Download)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "4"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:144"
+msgid "Uitvoeren Gegevens"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "STTR → DMN extraction; \"Import into LDE\" button"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "5"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:144"
+msgid "Opvragen Werkzaamheden"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid ""
+"Resolve correct `_expandScope` enum value with DSO support; add keywords + "
+"logical relations to Works detail panel"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "6"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:144"
+msgid "Zoekinterface"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "\"View applicable rules\" action on werkzaamheid list row"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "7"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "Content_v2.xsd"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "Maatregel extraction → document template scaffold"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "8"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgid "Samengestelde services"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:144
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:144"
+msgid "Rule type completeness check for werkzaamheid + location"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:155
+msgid ""
+"Steps 1–4 are the highest value items and unlock Phase 4 for `conclusie`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:159
+msgid "Current state — v1.5.3"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:161
+msgid "What is deployed and working"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "Capability"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "Status"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "DSO Concepts tab (Stelselcatalogus)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\features\\dso-integration-phase-plan.md:163"
+msgid "✅ Live"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "DSO Works tab — search + autocomplete + version history"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "DSO Activities tab — default list"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "DSO Activity Detail panel"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "Authority presets (Lelystad, Flevoland) via OIN + `_zoek`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "Date-filtered authority list"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "DSO environment toggle (pre/prod)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "DSO activiteit URN on BPMN subprocess"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "Live URN verification against DSO RTR"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "Child activity names in detail panel"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "Graceful 404 for cross-environment URNs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "Werkzaamheid keywords + logical relations"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "⏳ Pending (_expandScope enum resolution)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "Applicable Rules (STTR) in detail panel"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "⏳ Pending (Step 2a next cycle)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "STTR → DMN import"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:163
+msgid "⏳ Pending (Step 4.1 next cycle)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:180
+msgid ""
+"Confirmed Phase 4 candidate — \"Bed & Breakfast starten\" (Lelystad, "
+"production)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:182
+msgid ""
+"The first confirmed activity in production with both `Conclusie` and "
+"`Indieningsvereisten` present:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:184
+msgid "**omschrijving:** Bed & Breakfast starten"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:185
+msgid "**URN:** `nl.imow-gm0995.activiteit.a42ec23b8e4d464b8d32a1e88ac6d4cd`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:186
+msgid "**Authority:** gemeente (GM) · code 0995 · OIN `00000001005024249000`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:187
+msgid "**Validity:** from 09-07-2025 · no end date"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:188
+msgid "**Rule types:** Indieningsvereisten ✅ + Conclusie ✅"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:189
+msgid ""
+"**Conclusie `functioneleStructuurRef`:** `http://toepasbare-"
+"regels.omgevingswet.overheid.nl/00000001005024249000/id/concept/"
+"Conclusienl.imow-gm0995.activiteit.a42ec23b8e4d464b8d32a1e88ac6d4cd`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:190
+msgid ""
+"**Indieningsvereisten `functioneleStructuurRef`:** `http://toepasbare-"
+"regels.omgevingswet.overheid.nl/00000001005024249000/id/concept/"
+"IndieningsvereistenVergunningnl.imow-"
+"gm0995.activiteit.a42ec23b8e4d464b8d32a1e88ac6d4cd`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:191
+msgid ""
+"**Note:** `toonbaar: false` — not visible in the public Omgevingsloket but "
+"fully queryable via the API"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:193
+msgid ""
+"These two `functioneleStructuurRef` values are the direct inputs to Step 1 "
+"of the next development cycle."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:195
+msgid "Test anchor: \"boom kappen\" in gm0014 (Groningen, pre-production)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:197
+msgid "**URN:** `nl.imow-gm0014.activiteit.1d52a3b09a7a4b2f846ae1e171f6678d`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:198
+msgid "**Authority:** gemeente (GM) · code 0014"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:199
+msgid "**Validity:** from 30-01-2024 · no end date"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:200
+msgid "**Rule types:** Conclusie ✅"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:202
+msgid "Lelystad \"HoutopstandVellen\" (production only)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:204
+msgid ""
+"`nl.imow-gm0995.activiteit.HoutopstandVellen` — switch to production in "
+"Settings before searching"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:208
+msgid "Things worth paying attention to while testing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:210
+msgid "Works tab"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:212
+msgid ""
+"Search is sorted by `meestGekozen` by default — most-used Omgevingsloket "
+"werkzaamheden appear first"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:213
+msgid ""
+"The `ref:` line is the `functioneleStructuurRef` full URI — this is what "
+"gets passed to the Uitvoeren Gegevens API in Phase 4"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:214
+msgid ""
+"The short URN at the bottom of each row (e.g. `GebouwPlaatsen`) is the "
+"Opvragen Werkzaamheden identifier — different from the `ref:` URI, both are "
+"needed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:215
+msgid ""
+"Keywords and logical relations are not yet shown in the detail panel "
+"(pending `_expandScope` enum resolution with DSO support)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:217
+msgid "Activities tab — OIN presets"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:219
+msgid ""
+"Presets now use `_zoek` with `bestuursorgaan.oin` — results are activities "
+"valid on the selected date, not a change log"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:220
+msgid ""
+"Date defaults to today; changing the date and pressing Load reloads the "
+"authority list for that date"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:221
+msgid ""
+"Activities with `None registered` under Rule Types Present have no STTR "
+"files — not Phase 4 candidates"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:222
+msgid ""
+"Look for activities showing `Conclusie` and/or `Indieningsvereisten` — these "
+"are the Phase 4 candidates"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:224
+msgid "Rule type coverage"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:226
+msgid ""
+"`Conclusie` is the highest priority: if present, a STTR with an embedded DMN "
+"exists and is directly importable"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:227
+msgid ""
+"Activities with all three types (`conclusie` + `indieningsvereisten` + "
+"`maatregelen`) are the ideal complete Phase 4 candidates"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:229
+msgid "Cross-environment URN gaps"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:231
+msgid ""
+"Production-only activities will show the graceful \"not available in pre-"
+"production\" message when pre-production is selected in Settings"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:233
+msgid "BPMN linking"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:235
+msgid ""
+"Open `TreeFellingPermitSubProcess` in the BPMN Modeler, scroll below the "
+"RoPA selector to the DSO Activity section"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:236
+msgid ""
+"Paste `nl.imow-gm0014.activiteit.1d52a3b09a7a4b2f846ae1e171f6678d` and press "
+"Verify"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:237
+msgid "Confirm \"boom kappen · gemeente GM0014\" and save"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration-phase-plan.md:238
+msgid "Verify `ronl:dsoActiviteitUrn` appears in the BPMN XML"
+msgstr ""

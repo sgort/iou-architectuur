@@ -1,0 +1,107 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:1
+msgid "CI/CD"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:5
+msgid "CI/CD pipeline"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:7
+msgid ""
+"The `cprmv` repository uses GitLab CI (`.gitlab-ci.yml`) with three stages: "
+"`test`, `build`, `deploy`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:9
+msgid "Stages"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:11
+msgid "**test-cprmv-api** (`python:3.12-bookworm`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:13
+msgid ""
+"Runs on merge requests and pushes to `main` when `serve_api/**` files change:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:15
+msgid "Installs `libxml2-dev` and `libxslt-dev`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:16
+msgid "Installs `requirements-dev.txt`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:17
+msgid "Syntax-checks `src/serve.py` with `py_compile`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:18
+msgid "Import-checks the FastAPI app."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:19
+msgid "Verifies `data/cprmvmethods.ttl` is present."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:20
+msgid "Runs `pytest`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:22
+msgid "**build-cprmv-api** (`docker:24.0.5` with DinD)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:24
+msgid "Runs on pushes to `main` and `develop` when `serve_api/**` changes:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:26
+msgid ""
+"On `main`: builds and pushes `datafluisteraar/cprmv-api:latest` and "
+"`datafluisteraar/cprmv-api:{commit-sha}`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:27
+msgid ""
+"On `develop`: builds and pushes `datafluisteraar/cprmv-api:{branch-slug}`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:29
+msgid "Required CI/CD variables: `DOCKER_HUB_USERNAME`, `DOCKER_HUB_TOKEN`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:31
+msgid "**deploy-cprmv-api**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:33
+msgid ""
+"Prints the new image tag and pull commands. Actual container restart is a "
+"manual step on the deployment host (run `docker compose pull && docker "
+"compose up -d`)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:35
+msgid "ReSpec publication"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cci-cd.md:37
+msgid ""
+"A separate job (`create-pages`) builds the ReSpec HTML specification from "
+"`html/` using `node:lts` and publishes it to GitLab Pages at `html/public`."
+msgstr ""

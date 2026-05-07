@@ -1,0 +1,170 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:1
+msgid "Vendor Services"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:3
+msgid ""
+"Some DMN decision models published by government agencies have commercial "
+"implementations offered by software vendors. The Linked Data Explorer shows "
+"these alongside the reference implementation."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:7
+msgid "Finding vendor implementations"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:9
+msgid ""
+"Look for a blue badge with a number on a DMN card in the Available DMNs "
+"panel. The number indicates how many vendor implementations are registered "
+"for that decision model. DMN cards without a blue badge have only the open-"
+"source reference implementation."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:13
+msgid "Viewing vendor details"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:15
+msgid ""
+"Click the blue vendor badge on any DMN card. A modal opens listing all "
+"vendor implementations for that decision model."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:17
+msgid "Each vendor entry shows:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:19
+msgid "**Provider** — organisation name and logo"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:20
+msgid "**Platform** — the technology platform (e.g., Blueriq)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:21
+msgid "**License** — Commercial, Open Source, or Free"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:22
+msgid "**Access type** — IAM Required, Public Access, or API Key Required"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:23
+msgid ""
+"**Contact** — contact person, email (click to compose), phone (click to dial)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:24
+msgid ""
+"**Service URL** — click to open the vendor's implementation in a new tab"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:25
+msgid "**Homepage** — vendor website link"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:26
+msgid "**Description** — free-text summary of the vendor implementation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:30
+msgid "Understanding access types"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:32
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\user-guide\\vendor-services.md:32"
+msgid "Badge"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:32
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\user-guide\\vendor-services.md:32"
+msgid "What it means"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:32
+msgid "IAM Required"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:32
+msgid "Access requires Dutch government IAM authentication (DigiD/eIDAS)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:32
+msgid "Public Access"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:32
+msgid "The service is publicly accessible without authentication"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:32
+msgid "API Key Required"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:32
+msgid "Registration for an API key is required before access"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:40
+msgid "Understanding licence types"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:42
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\user-guide\\vendor-services.md:42"
+msgid "Badge"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:42
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\user-guide\\vendor-services.md:42"
+msgid "What it means"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:42
+msgid "Commercial"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:42
+msgid "Paid licence; typically includes SLA and support"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:42
+msgid "Open Source"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:42
+msgid "Source code available; free to use"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:42
+msgid "Free"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:42
+msgid "Free to use, possibly with usage limits"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:50
+msgid "Publishing vendor metadata (for vendors)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cvendor-services.md:52
+msgid ""
+"Vendor implementations are registered by publishing a `ronl:VendorService` "
+"resource to TriplyDB via the CPSV Editor's Vendor tab. For the full "
+"workflow, see [CPSV Editor — Vendor Integration]{1}."
+msgstr ""

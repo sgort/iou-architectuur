@@ -1,0 +1,373 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:1
+msgid "Semantic Mediation Reference Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:3
+msgid ""
+"This page documents the reference architecture for semantic mediation "
+"between business domain models and citizen-centric vocabularies. The CPSV "
+"Editor is the authoring tool that produces artefacts for the semantic "
+"mediation layer."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:7
+msgid "Visual overview"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:9
+msgid ""
+"┌────────────────────────────────────────────────────────────────────────┐\n"
+"│                          CITIZEN CONTEXT                               │\n"
+"│                                                                        │\n"
+"│   Citizen Services / Portals / Letters / Forms / Chatbots / Voice UX   │\n"
+"│                                                                        │\n"
+"│   ┌────────────────────────────────────────────────────────────────┐   │\n"
+"│   │           CITIZEN VOCABULARY (Presentation Model)              │   │\n"
+"│   │   • Plain-language wording                                     │   │\n"
+"│   │   • Life-event concepts                                        │   │\n"
+"│   │   • UX terminology                                             │   │\n"
+"│   │   • Multilingual variants                                      │   │\n"
+"│   └────────────────────────────────────────────────────────────────┘   │\n"
+"└────────────────────────────────────────────────────────────────────────┘\n"
+"                                   ↕  CONTEXTUAL TRANSLATION / MAPPING\n"
+"┌────────────────────────────────────────────────────────────────────────┐\n"
+"│                     SEMANTIC MEDIATION LAYER                           │\n"
+"│                                                                        │\n"
+"│   ┌────────────────────────────────────────────────────────────────┐   │\n"
+"│   │  Concept Mapping & Rules                                       │   │\n"
+"│   │  • Ontology alignment                                          │   │\n"
+"│   │  • Term mappings (citizen ↔ canonical)                         │   │\n"
+"│   │  • Context rules                                               │   │\n"
+"│   │  • Meaning validation                                          │   │\n"
+"│   │  • Simplification & transformation                             │   │\n"
+"│   └────────────────────────────────────────────────────────────────┘   │\n"
+"└────────────────────────────────────────────────────────────────────────┘\n"
+"                                   ↕  CANONICAL ALIGNMENT\n"
+"┌────────────────────────────────────────────────────────────────────────┐\n"
+"│                       BUSINESS SEMANTIC CORE                           │\n"
+"│                                                                        │\n"
+"│   ┌────────────────────────────────────────────────────────────────┐   │\n"
+"│   │          CANONICAL INFORMATION MODEL                           │   │\n"
+"│   │   • Harmonised core concepts                                   │   │\n"
+"│   │   • Legal definitions                                          │   │\n"
+"│   │   • Controlled vocabularies                                    │   │\n"
+"│   └────────────────────────────────────────────────────────────────┘   │\n"
+"│                                                                        │\n"
+"│   ┌────────────────────────────────────────────────────────────────┐   │\n"
+"│   │              BUSINESS DOMAIN MODEL                             │   │\n"
+"│   │   • Policy concepts                                            │   │\n"
+"│   │   • Service rules                                              │   │\n"
+"│   │   • Product structures                                         │   │\n"
+"│   └────────────────────────────────────────────────────────────────┘   │\n"
+"└────────────────────────────────────────────────────────────────────────┘\n"
+"                                   ↕  IMPLEMENTATION\n"
+"┌────────────────────────────────────────────────────────────────────────┐\n"
+"│                        APPLICATION & DATA LAYER                        │\n"
+"│                                                                        │\n"
+"│   • APIs / Microservices                                               │\n"
+"│   • Schemas & Databases                                                │\n"
+"│   • Workflow Engines                                                   │\n"
+"│   • Legacy Systems                                                     │\n"
+"└────────────────────────────────────────────────────────────────────────┘"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:67
+msgid "Semantic layers"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:69
+msgid "Layer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:69
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:69
+msgid "Citizen Context"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:69
+msgid "Interaction channels communicating in plain language"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:69
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\reference\\semantic-mediation-architecture.md:69"
+msgid "Citizen Vocabulary"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:69
+msgid "Presentation model with citizen-friendly terms"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:69
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\reference\\semantic-mediation-architecture.md:69"
+msgid "Semantic Mediation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:69
+msgid "Mapping, contextualisation, transformation, and validation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:69
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\reference\\semantic-mediation-architecture.md:69"
+msgid "Canonical Information Model"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:69
+msgid "Logical, harmonised semantic data model"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:69
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\reference\\semantic-mediation-architecture.md:69"
+msgid "Business Domain Model"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:69
+msgid "Policy and product conceptual models"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:69
+msgid "Application & Data Layer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:69
+msgid "Technical implementations"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:80
+msgid "Architecture purpose"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:82
+msgid ""
+"This reference architecture describes how business domain models are "
+"translated into citizen-centric vocabularies through an explicit semantic "
+"mediation layer, enabling clear and understandable communication with "
+"citizens, cross-system semantic interoperability, and legal and policy "
+"meaning preservation."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:86
+msgid "TOGAF ADM positioning"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:88
+msgid "ADM Phase"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:88
+msgid "Concern"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:88
+msgid "Architecture Vision"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:88
+msgid "Citizen-centric semantic alignment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:88
+msgid "Business Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:88
+msgid "Service concepts and citizen communication vocabulary"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:88
+msgid "Data Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:88
+msgid "Canonical models and controlled vocabularies"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:88
+msgid "Application Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:88
+msgid "Semantic mediation and translation services"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:88
+msgid "Technology Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:88
+msgid "API gateways, middleware, and integration platforms"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:98
+msgid "TOGAF terminology mapping"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:100
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\reference\\semantic-mediation-architecture.md:100"
+msgid "Reference Architecture Element"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:100
+msgid "TOGAF Term"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:100
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\reference\\semantic-mediation-architecture.md:100"
+msgid "Citizen Vocabulary"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:100
+msgid "Business Architecture — Stakeholder Viewpoints"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:100
+msgid "Semantic Mediation Layer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:100
+msgid "Application Architecture — Integration Services"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:100
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\reference\\semantic-mediation-architecture.md:100"
+msgid "Canonical Information Model"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:100
+msgid "Data Architecture — Logical Data Model"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:100
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\reference\\semantic-mediation-architecture.md:100"
+msgid "Business Domain Model"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:100
+msgid "Business Architecture — Business Objects"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:100
+msgid "Physical Schemas"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:100
+msgid "Data Architecture — Physical Data Model"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:100
+msgid "Citizen Channels"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:100
+msgid "Business Architecture — Front-Stage Processes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:111
+msgid "ArchiMate terminology mapping"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\reference\\semantic-mediation-architecture.md:113"
+msgid "Reference Architecture Element"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgid "ArchiMate Element"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\reference\\semantic-mediation-architecture.md:113"
+msgid "Citizen Vocabulary"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgid "Business Object + Representation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\reference\\semantic-mediation-architecture.md:113"
+msgid "Semantic Mediation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgid "Application Service + Application Component"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgid "Ontology Mapping"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgid "Application Function"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\reference\\semantic-mediation-architecture.md:113"
+msgid "Canonical Information Model"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgid "Data Object"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\reference\\semantic-mediation-architecture.md:113"
+msgid "Business Domain Model"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgid "Business Object"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgid "APIs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgid "Application Interface"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgid "Systems"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:113
+msgid "Application Component"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:125
+msgid "Positioning of the CPSV Editor"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:127
+msgid ""
+"The CPSV Editor operates at the **Business Domain Model** and **Canonical "
+"Information Model** levels. It produces CPSV-AP 3.2.0 compliant Turtle files "
+"that represent government services using standardised EU and Dutch "
+"vocabularies. These artefacts are the canonical representation that the "
+"semantic mediation layer uses to bridge to citizen-facing vocabulary."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Creference%5Csemantic-mediation-architecture.md:129
+msgid ""
+"The RPP architectural pattern (Rules–Policy–Parameters) further decomposes "
+"the Business Domain Model level into its governance layers, ensuring that "
+"the semantic chain from legislation to citizen communication is fully "
+"traceable."
+msgstr ""

@@ -1,0 +1,210 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:1
+msgid "Technology Stack"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:5
+msgid "Documentation Framework"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:7
+msgid ""
+"The site is built on MkDocs with the Material theme, the mkdocs-static-i18n "
+"plugin for dual-language support, and the git-revision-date-localized plugin "
+"for showing last-modified timestamps."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Component"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Technology"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Version"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Static site generator"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "MkDocs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "1.5+"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Theme"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Material for MkDocs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "9.5+"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Internationalisation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "mkdocs-static-i18n"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing\\doc-architecture\\technology-stack.md:9"
+msgid "1.2+"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Revision dates"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "git-revision-date-localized"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Diagram rendering"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Mermaid"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "via Material"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Hosting"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Azure Static Web Apps"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing\\doc-architecture\\technology-stack.md:9"
+msgid "—"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "CI/CD"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "GitHub Actions"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:19
+msgid ""
+"graph LR\n"
+"    subgraph \"Documentation Framework\"\n"
+"        MKDOCS[MkDocs 1.5+]\n"
+"        MATERIAL[Material Theme 9.5+]\n"
+"        I18N[mkdocs-static-i18n]\n"
+"        GIT_REV[git-revision-date-localized]\n"
+"    end\n"
+"\n"
+"    subgraph \"Content\"\n"
+"        MD[Markdown Files]\n"
+"        MERMAID[Mermaid Diagrams]\n"
+"        CODE[Syntax Highlighting]\n"
+"    end\n"
+"\n"
+"    subgraph \"Styling\"\n"
+"        CUSTOM[Custom CSS<br/>NL Design System]\n"
+"    end\n"
+"\n"
+"    subgraph \"Deployment\"\n"
+"        GH_ACTIONS[GitHub Actions]\n"
+"        AZURE_SWA[Azure Static Web Apps]\n"
+"        CDN[Global CDN]\n"
+"    end\n"
+"\n"
+"    MKDOCS --> MATERIAL\n"
+"    MATERIAL --> I18N\n"
+"    MATERIAL --> GIT_REV\n"
+"\n"
+"    MD --> MKDOCS\n"
+"    MERMAID --> MKDOCS\n"
+"    CODE --> MKDOCS\n"
+"\n"
+"    MATERIAL --> CUSTOM\n"
+"\n"
+"    MKDOCS --> GH_ACTIONS\n"
+"    GH_ACTIONS --> AZURE_SWA\n"
+"    AZURE_SWA --> CDN\n"
+"\n"
+"    style MKDOCS fill:#4a90e2\n"
+"    style MATERIAL fill:#e17000\n"
+"    style I18N fill:#50c878\n"
+"    style AZURE_SWA fill:#4a90e2"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:66
+msgid "Build & Deploy Pipeline"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:68
+msgid ""
+"Every push to `main` triggers a GitHub Actions workflow that builds the site "
+"and deploys to Azure Static Web Apps. The `acc` branch deploys to the "
+"acceptance environment."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:70
+msgid ""
+"graph TB\n"
+"    DEV[Developer] -->|Edit Markdown| LOCAL[Local Repository]\n"
+"    LOCAL -->|git push| GITHUB[GitHub Repository]\n"
+"\n"
+"    GITHUB -->|Trigger| CI[GitHub Actions]\n"
+"\n"
+"    CI -->|1. Install| DEPS[Python Dependencies<br/>mkdocs, mkdocs-"
+"material<br/>mkdocs-static-i18n]\n"
+"    DEPS -->|2. Build| BUILD{mkdocs build}\n"
+"\n"
+"    BUILD -->|3. Generate| EN_SITE[site/<br/>English Site at root]\n"
+"    BUILD -->|3. Generate| NL_SITE[site/nl/<br/>Dutch Site]\n"
+"\n"
+"    EN_SITE -->|4. Deploy| AZURE[Azure Static Web Apps]\n"
+"    NL_SITE -->|4. Deploy| AZURE\n"
+"\n"
+"    AZURE -->|5. Serve| PROD_EN[https://iou-architectuur.open-regels.nl/]\n"
+"    AZURE -->|5. Serve| PROD_NL[https://iou-architectuur.open-regels.nl/nl/"
+"]\n"
+"\n"
+"    USER[End Users] -->|Visit| PROD_EN\n"
+"    USER -->|Visit| PROD_NL\n"
+"\n"
+"    PROD_EN <-.Language Switch.-> PROD_NL\n"
+"\n"
+"    style DEV fill:#4a90e2\n"
+"    style GITHUB fill:#e17000\n"
+"    style AZURE fill:#50c878\n"
+"    style PROD_EN fill:#4a90e2\n"
+"    style PROD_NL fill:#e17000\n"
+"    style BUILD fill:#ffd700"
+msgstr ""

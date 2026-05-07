@@ -1,0 +1,2042 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:1
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\changelog-roadmap.md:1"
+msgid "Changelog & Roadmap"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:5
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\changelog-roadmap.md:5"
+msgid "Changelog & Roadmap"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:9
+msgid "Changelog"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:11
+msgid "v1.6.0 — Multilingualism & pending-until-Save editing (April 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:13
+msgid "**v1.6.0 — New Feature (April 27, 2026)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:15
+msgid "Multilingualism — language and organization metadata"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:17
+msgid ""
+"BPMN processes, Camunda forms, and document templates now carry an optional "
+"ISO 639-1 language code (`en`, `nl`, `de`) and an open-ended organization "
+"key. The model is sibling-artefact i18n: each artefact exists once per "
+"language, with the LDE deploy modal warning on mixed-language bundles. DMNs "
+"stay language-agnostic — variable keys remain stable English so a single DMN "
+"serves both English and Dutch sibling BPMNs."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:19
+msgid ""
+"**Database** — `language VARCHAR(2)` and `organization VARCHAR(100)` columns "
+"added to `process_definitions`, `form_schemas`, and `document_templates` "
+"with partial indexes; nullable, existing rows coexist as `NULL`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:20
+msgid ""
+"**BPMN moddle descriptor** — `LanguageMixin` and `OrganizationMixin` "
+"extending `bpmn:Process` in `ronlModdleDescriptor.json`; survive `saveXML` "
+"round-trip via the existing `ronl` namespace registration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:21
+msgid ""
+"**List panels** — new `ArtefactListToolbar` (search + language filter + "
+"match counter) shared by Process, Form, and Document lists; collapsible "
+"organization groups; subprocesses follow their shell's organization "
+"regardless of their own tag"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:22
+msgid ""
+"**Editor footer panel** — uniform pattern across all three editors: "
+"`LanguageSelector` and `OrganizationSelector` (with autocomplete from "
+"existing organization keys); BPMN footer additionally retains RoPA and DSO "
+"selectors"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:23
+msgid ""
+"**Filename-based language inference on import** — `.bpmn`, `.form`, "
+"`.document` files with a `<id>.<lang>.<ext>` suffix are auto-tagged on "
+"import; precedence: in-file value → filename → untagged"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:24
+msgid ""
+"**Form export** — `Export .form` now wraps the form-js schema with top-level "
+"`language` and `organization` keys and uses a language-suffixed filename; "
+"round-trip integrity for all three artefact types"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:25
+msgid ""
+"**Deploy-time language consistency check** — amber warning surfaces inline "
+"in the deploy modal when a bundle mixes languages, listing the offending "
+"codes; mirrors the existing RoPA-missing warning UX"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:27
+msgid ""
+"**Files:** `packages/backend/src/db/migrate.ts`, `packages/backend/src/db/"
+"types.ts`, `packages/backend/src/db/mappers.ts`, `packages/backend/src/"
+"domain/types.ts`, `packages/backend/src/services/assets.service.ts`, "
+"`packages/frontend/src/types/index.ts`, `packages/frontend/src/types/"
+"document.types.ts`, `packages/frontend/src/components/BpmnModeler/"
+"ronlModdleDescriptor.json`, `packages/frontend/src/components/common/"
+"LanguageSelector.tsx`, `packages/frontend/src/components/common/"
+"OrganizationSelector.tsx`, `packages/frontend/src/components/common/"
+"ArtefactListToolbar.tsx`, `packages/frontend/src/components/BpmnModeler/"
+"BpmnModeler.tsx`, `packages/frontend/src/components/BpmnModeler/"
+"BpmnCanvas.tsx`, `packages/frontend/src/components/BpmnModeler/"
+"ProcessList.tsx`, `packages/frontend/src/components/FormEditor/"
+"FormEditor.tsx`, `packages/frontend/src/components/FormEditor/"
+"FormCanvas.tsx`, `packages/frontend/src/components/FormEditor/FormList.tsx`, "
+"`packages/frontend/src/components/DocumentComposer/DocumentComposer.tsx`, "
+"`packages/frontend/src/components/DocumentComposer/DocumentList.tsx`, "
+"`packages/frontend/src/services/bpmnService.ts`, `packages/frontend/src/"
+"services/formService.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:29
+msgid "Pending-until-Save editing model"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:31
+msgid ""
+"Footer edits across BPMN, Form, and Document editors no longer persist "
+"immediately. They accumulate in a draft state on the editor parent and flush "
+"atomically when Save is clicked. Navigation guards confirm before discarding "
+"unsaved changes."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:33
+msgid ""
+"**Editor architecture** — footer state lifted to the editor parent "
+"(`BpmnModeler`, `FormEditor`, `DocumentComposer`); children receive "
+"effective values via props and report changes via callbacks; Save is the "
+"single point of persistence"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:34
+msgid ""
+"**Shell → subprocess atomic save** — saving a BPMN shell propagates "
+"`language` and `organization` to all linked subprocesses in one write; "
+"idempotent (skips subprocesses already aligned); shell wins unconditionally; "
+"example subprocesses (`readonly: true`) are skipped"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:35
+msgid ""
+"**Save button dirty tracking fixed** — Form Save button was always-enabled "
+"(regression); now starts disabled, enables on first edit, disables after Save"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:36
+msgid ""
+"**Document load window** — `DocumentComposer` no longer flips `hasChanges` "
+"spuriously on document load; TipTap's mount-time `onUpdate` events are "
+"suppressed for the macrotask following load via `isLoadingRef`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:38
+msgid "HR-capacity Dutch reference bundle"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:40
+msgid ""
+"The first multi-language reference bundle: 1 BPMN, 8 forms, 2 documents "
+"under `examples/organizations/flevoland/HR-capacity/nl/`, all tagged "
+"`language=nl`, `organization=flevoland`. Same `CapacityClaimRouting` DMN "
+"serves both the English and Dutch siblings."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:42
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\changelog-roadmap.md:42"
+msgid "Bug fixes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:44
+msgid ""
+"BPMN persistence: `language` and `organization` now included in the "
+"`BpmnService.saveProcess` POST payload (previously dropped silently, causing "
+"values to vanish on hydration)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:45
+msgid ""
+"`OrganizationSelector` is now controlled (`value`/`onChange`) rather than "
+"uncontrolled (`defaultValue`/`onBlur`); switching artefacts refreshes the "
+"input correctly"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:46
+msgid ""
+"`BpmnCanvas` no longer resets on parent re-renders — `handleElementSelect` "
+"stabilised via a ref, modeler-init effect deps narrowed to `xml`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:48
+msgid "Known limitation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:50
+msgid ""
+"The form-js properties panel loses input focus when typing pauses (Field "
+"label, Description, Key). Upstream form-js issue #86, marked wontfix by bpmn-"
+"io. Not LDE-caused, not fixable from React without forking form-js. "
+"Workaround: edit `.form` JSON in a code editor and re-import — filename-"
+"based language inference handles the language tag automatically."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:54
+msgid "v1.5.3 — DSO Works tab & OIN preset fix (April 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:56
+msgid "**v1.5.3 — Patch (April 2026)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:58
+msgid "Works tab — new"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:60
+msgid ""
+"New **Works** tab in the DSO Explorer (between Concepts and Activities) "
+"backed by the Zoekinterface API."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:62
+msgid ""
+"Search werkzaamheden by user intent (e.g. \"boom kappen\") with autocomplete "
+"suggestions after 2 characters; selecting a suggestion immediately fires the "
+"search"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:63
+msgid ""
+"Each result shows the human-readable `omschrijving`, the "
+"`functioneleStructuurRef` (full concept URI — the Phase 4 pivot to STTR "
+"files), and the short werkzaamheid URN"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:64
+msgid ""
+"Selecting a result opens a detail panel showing the current version's "
+"`omschrijving`, validity period, and full version history with start/end "
+"dates and a \"current\" badge"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:65
+msgid "Autocomplete uses `POST /werkzaamheden/_suggereer` with 300ms debounce"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:66
+msgid ""
+"Reloads on DSO environment switch with the same clean-slate behaviour as the "
+"other tabs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:68
+msgid "Activities tab — OIN preset fix"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:70
+msgid ""
+"The Lelystad and Flevoland presets now use `POST /activiteiten/_zoek` with "
+"`bestuursorgaan.oin` filter instead of `_wijzigingen` — returning activities "
+"valid on a given date rather than a delta sync of changed activities."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:72
+msgid ""
+"Activities now appear in the list with their full `omschrijving` visible "
+"immediately, without requiring parallel detail fetches"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:73
+msgid ""
+"Date field defaults to today for OIN presets (yesterday offset removed — no "
+"longer needed with `_zoek`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:74
+msgid ""
+"Pagination works correctly in OIN mode — Load button reloads the authority "
+"list for the selected date"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:75
+msgid ""
+"Empty state distinguishes between no activities found in general vs no "
+"activities found for the selected authority on the selected date"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:77
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\changelog-roadmap.md:77"
+msgid "Bug fixes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:79
+msgid ""
+"Activity Detail panel always using pre-production DSO when opened from the "
+"Activities list — `env` was missing from the `getActiviteitDetail` call, "
+"causing 404 for production-only activities"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:80
+msgid ""
+"Activity Detail panel not re-fetching when DSO environment is switched while "
+"a URN is already selected — `env` added to the `useEffect` dependency array"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:81
+msgid ""
+"Activity Detail panel showing stale date context in OIN preset mode — "
+"`activeDatum` now set correctly by `loadByOin` alongside the result"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:83
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\changelog-roadmap.md:83"
+msgid "Backend — DSO service"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:85
+msgid ""
+"`zoekinterfaceBaseUrl` and `opvragenWerkzaamhedenBaseUrl` added to both "
+"`dso` and `dsoProd` config blocks — defaults baked in, no new env vars "
+"required"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:86
+msgid ""
+"`POST /v1/dso/werkzaamheden/zoek` — proxies Zoekinterface `/werkzaamheden/"
+"_zoek`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:87
+msgid ""
+"`POST /v1/dso/werkzaamheden/suggereer` — proxies Zoekinterface `/"
+"werkzaamheden/_suggereer`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:88
+msgid ""
+"`GET /v1/dso/werkzaamheden/:urn` — proxies Opvragen Werkzaamheden `/"
+"werkzaamheden/{urn}` (version history, without expand — `_expandScope` enum "
+"value not yet resolved)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:89
+msgid ""
+"`POST /v1/dso/activiteiten/oin` now uses `/activiteiten/_zoek` with "
+"`bestuursorgaan.oin` body field and `datum` instead of `_wijzigingen` with "
+"`datumVanaf`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:93
+msgid "v1.5.2 — DSO Explorer enhancements (April 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:95
+msgid "**v1.5.2 — Patch (April 2026)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:97
+msgid ""
+"DSO environment selector added to the Settings panel (gear icon): switch "
+"between pre-production and production DSO independently of the LDE "
+"environment, persisted across sessions in localStorage"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:98
+msgid ""
+"Environment badge in the DSO Explorer header updates to reflect the active "
+"DSO environment (amber for pre-production, green for production)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:99
+msgid ""
+"Both DSO environments use separate API keys configured via `DSO_API_KEY` and "
+"`DSO_API_KEY_PROD` environment variables"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:100
+msgid ""
+"Location presets (Lelystad, Flevoland) initially filter by authority OIN — "
+"replaced with `_zoek` in v1.5.3"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:101
+msgid ""
+"Child activities in the detail panel now show human-readable names fetched "
+"in parallel after the parent detail loads"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:102
+msgid ""
+"Graceful 404 handling in the detail panel: activities not available in the "
+"active DSO environment show a clear message instead of a raw error"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:106
+msgid "v1.5.1 — Dev infrastructure (April 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:108
+msgid "**v1.5.1 — Infrastructure (April 2026)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:110
+msgid "Docker readiness check"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:112
+msgid ""
+"New `packages/backend/scripts/check-docker.sh` verifies the `ronl-postgres` "
+"container is up and healthy before nodemon starts the backend."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:114
+msgid ""
+"Coloured terminal output: green for ready, yellow for unhealthy, red for "
+"missing or stopped"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:115
+msgid ""
+"Suggests the exact `docker start` or `docker run` command if the container "
+"is missing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:116
+msgid ""
+"Backend `dev` script now runs the check first; `dev:full` and `dev:backend` "
+"scripts added to root `package.json` for one-command monorepo startup"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:118
+msgid ""
+"**Files:** `packages/backend/scripts/check-docker.sh`, `packages/backend/"
+"package.json`, `package.json`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:122
+msgid "v1.5.0 — DSO Integration Phase 1 (March 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:124
+msgid "**v1.5.0 — New Feature (March 2026)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:126
+msgid "DSO Explorer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:128
+msgid ""
+"New top-level view for browsing the Digitaal Stelsel Omgevingswet from "
+"inside LDE."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:130
+msgid "**Concepts tab** — full-text search across the Stelselcatalogus"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:131
+msgid ""
+"**Activities tab** — RTR `activiteiten` list with date filtering and a "
+"detail panel showing `bestuursorgaan`, validity, parent and child "
+"activities, and which rule types (`Conclusie`, `Indieningsvereisten`, "
+"`Maatregelen`) are present"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:133
+msgid "BPMN — DSO activiteit linkage"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:135
+msgid ""
+"New `ronl:dsoActiviteitUrn` mixin on `bpmn:Process` in "
+"`ronlModdleDescriptor.json`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:136
+msgid ""
+"New `DsoActiviteitSelector` component pinned to the BPMN Modeler footer "
+"(sibling of `RopaSelector`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:137
+msgid ""
+"Live URN verification against DSO RTR; on success shows the omschrijving, "
+"authority block, and a direct link to the public RTR viewer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:138
+msgid "URN survives `saveXML` round-trips and shows up in process exports"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:140
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\changelog-roadmap.md:140"
+msgid "Backend — DSO service"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:142
+msgid ""
+"New `src/services/dso.service.ts` covering Stelselcatalogus and RTR endpoints"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:143
+msgid "New `src/routes/dso.routes.ts` at `/v1/dso/...`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:144
+msgid ""
+"Pre-production and production base URLs configurable via env; API keys per "
+"environment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:145
+msgid "Path-aware DSO environment selection via `X-Dso-Env` header"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:147
+msgid ""
+"**Files:** `packages/frontend/src/components/BpmnModeler/"
+"DsoActiviteitSelector.tsx`, `packages/frontend/src/services/dsoService.ts`, "
+"`packages/backend/src/services/dso.service.ts`, `packages/backend/src/routes/"
+"dso.routes.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:151
+msgid "v1.4.0 — RoPA Records & GDPR Article 30 Compliance (March 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:153
+msgid "**v1.4.0 — New Feature (March 28, 2026)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:155
+msgid "RoPA Records — PostgreSQL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:157
+msgid ""
+"Two new tables appended to the `migrate.ts` DDL block. Migrations run "
+"automatically at backend startup — no manual schema step required."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:159
+msgid ""
+"`ropa_records` — one row per process (shell or subprocess); keyed on "
+"`bpmn_process_id` with a unique index so re-running the seed updates rows in "
+"place rather than inserting duplicates; `status` column (`draft` / "
+"`active` / `archived`) controls public visibility"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:160
+msgid ""
+"`ropa_personal_data_fields` — one row per personal data field collected by "
+"the linked forms; `ON DELETE CASCADE` from `ropa_records`; "
+"`special_category` boolean flags Art. 9/10 GDPR fields"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:161
+msgid ""
+"New `src/types/ropa.types.ts` — `RopaRecord`, `RopaPersonalDataField`, "
+"`PublicRopaRecord`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:162
+msgid ""
+"New `src/services/ropa.service.ts` — `listRopa`, `getRopaById`, "
+"`getRopaByBpmnProcessId`, `upsertRopa` (transactional: record header + field "
+"rows in one `BEGIN`/`COMMIT`), `deleteRopa`, `listPublicRopa`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:163
+msgid ""
+"New `src/db/seed-ropa.ts` — idempotent seed for four active records covering "
+"`AwbShellProcess`, `TreeFellingPermitSubProcess`, `AwbZorgtoeslagProcess`, "
+"and `ZorgtoeslagProvisionalSubProcess`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:165
+msgid ""
+"**Files:** `src/db/migrate.ts`, `src/types/ropa.types.ts`, `src/services/"
+"ropa.service.ts`, `src/db/seed-ropa.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:167
+msgid "RoPA Records — API routes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:169
+msgid ""
+"New `src/routes/ropa.routes.ts` — authenticated asset routes at `/v1/assets/"
+"ropa`: `GET` (list), `POST` (upsert, returns `{ id }`), `DELETE /:id`, `GET /"
+"by-bpmn-id/:bpmnProcessId`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:170
+msgid ""
+"New `src/routes/ropa.public.routes.ts` — CORS-open public route at `/v1/ropa/"
+"public`; `?organisation=` query parameter filters by `controller_name ILIKE "
+"'%…%'`; strips `controllerContact`, `dpoContact`, and `schemaVersion` before "
+"returning; only `status = 'active'` records returned"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:171
+msgid ""
+"Global CORS middleware in `src/index.ts` patched with path-aware logic: `/v1/"
+"ropa/public` bypasses the origin whitelist entirely (`origin: '*'`); all "
+"other routes remain subject to `CORS_ORIGIN` env var"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:173
+msgid ""
+"**Files:** `src/routes/ropa.routes.ts`, `src/routes/ropa.public.routes.ts`, "
+"`src/routes/index.ts`, `src/index.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:175
+msgid "RoPA Editor — LDE UI"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:177
+msgid ""
+"New **RoPA Records** view in the LDE sidebar (`ScrollText` icon). "
+"`ViewMode.ROPA` added to the enum in `types/index.ts`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:179
+msgid ""
+"`RopaEditor.tsx` — root orchestrator; list state, load/save/delete; passes "
+"`record={null}` for new records, `key={activeId}` on `RopaRecordEditor` for "
+"clean remount on selection change"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:180
+msgid ""
+"`RopaList.tsx` — left panel; shell records first, subprocess records second; "
+"DRAFT / ACTIVE / ARCHIVED badges; delete control per record"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:181
+msgid "`RopaRecordEditor.tsx` — four-tab editor:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:181
+msgid ""
+"**Record** — all GDPR Art. 30 mandatory fields; **Lookup from knowledge "
+"graph** button fires a SPARQL query against the TriplyDB RONL endpoint via "
+"`POST /v1/triplydb/query` and returns a pick-list of `eli:LegalResource` "
+"entries"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:181
+msgid ""
+"**Personal Data Fields** — **Hydrate from forms** reads `camunda:formRef` "
+"values from the process XML, loads matching form schemas from `FormService`, "
+"and appends one row per component with a `key` property; each row is "
+"classified with a data category and Art. 9/10 flag"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:181
+msgid ""
+"**BPMN Link** — reads `ronl:ropaRef` from the matching process XML via "
+"`BpmnService`; **Write ronl:ropaRef to BPMN** injects the attribute and "
+"persists via `BpmnService.saveProcess`; status indicator: not linked / "
+"linked (green) / points to different record (amber)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:181
+msgid ""
+"**Status** — three lifecycle buttons with confirmation dialog before "
+"activation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:186
+msgid ""
+"New `src/services/ropaService.ts` — fetch-based API client for all five "
+"backend operations"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:187
+msgid "New `src/types/ropa.types.ts` (frontend mirror)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:189
+msgid ""
+"**Files:** `src/components/RopaEditor/RopaEditor.tsx`, `RopaList.tsx`, "
+"`RopaRecordEditor.tsx`, `src/services/ropaService.ts`, `src/types/"
+"ropa.types.ts`, `src/types/index.ts`, `src/App.tsx`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:191
+msgid "RoPA Selector — BPMN Modeler"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:193
+msgid ""
+"New `src/components/BpmnModeler/RopaSelector.tsx` — renders as a fixed "
+"footer panel pinned below the scrollable process list in `ProcessList.tsx`; "
+"only shown when `activeProcess` is non-null; reads the current "
+"`ronl:ropaRef` from the process XML by regex; writes via "
+"`handleRopaRefChange` in `BpmnModeler.tsx`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:194
+msgid ""
+"`ProcessList.tsx` — two new props: `activeProcess: BpmnProcess | null` and "
+"`onRopaRefChange: (ropaRef: string | undefined) => void`; `RopaSelector` "
+"rendered outside the `overflow-y-auto` scroll container so it stays pinned "
+"regardless of list length"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:195
+msgid ""
+"`BpmnModeler.tsx` — new `handleRopaRefChange`: ensures `xmlns:ronl` "
+"declaration on `<definitions>`, then sets, updates, or removes "
+"`ronl:ropaRef` on the `<bpmn:process>` opening tag; persists via "
+"`BpmnService.saveProcess`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:196
+msgid ""
+"`ronlModdleDescriptor.json` — second type entry added: `RopaRefMixin` "
+"extends `bpmn:Process` with `ropaRef` as an `isAttr: true` String property; "
+"without this registration the attribute is silently dropped by bpmn-js on "
+"`saveXML()`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:197
+msgid ""
+"Deploy modal — `ropaRefMissing` flag set when `ronl:ropaRef` is absent from "
+"the process XML; amber non-blocking warning rendered between the resource "
+"list and the resource count line"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:199
+msgid ""
+"**Files:** `src/components/BpmnModeler/RopaSelector.tsx`, `ProcessList.tsx`, "
+"`BpmnModeler.tsx`, `BpmnCanvas.tsx`, `ronlModdleDescriptor.json`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:201
+msgid "RoPA Public Site — MVP"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:203
+msgid ""
+"New package `packages/ropa-site/` — a zero-dependency static HTML/CSS/JS "
+"site with no build step."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:205
+msgid ""
+"`index.html` — fetches `GET /v1/ropa/public`, renders collapsible cards per "
+"record with full GDPR Art. 30 field display, personal data fields table with "
+"colour-coded data categories and Art. 9/10 red badges, Provincie Flevoland "
+"dark green house style; shells rendered before subprocesses"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:206
+msgid ""
+"`staticwebapp.config.json` — Azure Static Web Apps navigation fallback and "
+"no-cache headers"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:207
+msgid ""
+"Deployed as a separate Azure Static Web Apps resource (`ropa-flevoland-acc`) "
+"independent of the LDE frontend; GitHub Actions workflow scoped to `packages/"
+"ropa-site/**` path filter"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:209
+msgid ""
+"**Files:** `packages/ropa-site/index.html`, `packages/ropa-site/"
+"staticwebapp.config.json`, `packages/ropa-site/README.md`, `.github/"
+"workflows/azure-static-web-apps-ropa-flevoland-acc.yml`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:213
+msgid "v1.3.0 — PostgreSQL Asset Storage & AWB Process Hierarchy (March 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:215
+msgid "**v1.3.0 — Infrastructure (March 25, 2026)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:217
+msgid "PostgreSQL asset storage"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:219
+msgid ""
+"BPMN processes, form schemas, and document templates now persist to "
+"PostgreSQL via the LDE backend rather than living exclusively in browser "
+"`localStorage`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:221
+msgid ""
+"New `src/db/pool.ts` — `pg.Pool` initialised from `DATABASE_URL`; null-"
+"guarded so the backend starts without a database configured"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:222
+msgid ""
+"New `src/db/migrate.ts` — idempotent DDL (`CREATE TABLE IF NOT EXISTS`) for "
+"`process_definitions`, `form_schemas`, and `document_templates`; called from "
+"`startServer()` before `app.listen()`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:223
+msgid ""
+"New `src/services/assets.service.ts` — `listBpmn`, `upsertBpmn`, "
+"`deleteBpmn`, `getBpmnByBpmnProcessId`, `listForms`, `upsertForm`, "
+"`deleteForm`, `listDocuments`, `upsertDocument`, `deleteDocument`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:224
+msgid ""
+"New `src/routes/assets.routes.ts` — `GET`/`POST`/`DELETE` for each asset "
+"type; `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId` for subprocess bundle "
+"resolution; all routes return `503 DB_NOT_CONFIGURED` when pool is null"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:225
+msgid "Registered at `/v1/assets` in `src/routes/index.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:226
+msgid ""
+"`packages/backend/package.json` — `pg: ^8` added to `dependencies`, `@types/"
+"pg: ^8` to `devDependencies`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:228
+msgid ""
+"**Write-through cache strategy:** saves update `localStorage` immediately "
+"and fire a background POST to the backend. Reads remain synchronous from "
+"`localStorage` — zero-latency UI at all times."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:230
+msgid ""
+"**Hydration on mount:** each editor runs `hydrateFromServer()` on mount — "
+"`GET /v1/assets/{type}` merges server records with local read-only examples "
+"and updates the `localStorage` cache. Falls back to local cache silently if "
+"the backend is unreachable."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:232
+msgid ""
+"**Files:** `src/db/pool.ts`, `src/db/migrate.ts`, `src/services/"
+"assets.service.ts`, `src/routes/assets.routes.ts`, `src/routes/index.ts`, "
+"`src/index.ts`, `packages/backend/package.json`, `src/services/"
+"bpmnService.ts`, `src/services/formService.ts`, `src/services/"
+"documentService.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:234
+msgid "AWB shell / subprocess hierarchy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:236
+msgid ""
+"The `BpmnProcess` type and process library now model the two-layer AWB shell "
+"pattern explicitly."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:238
+msgid ""
+"`BpmnProcess` interface extended with `bpmnProcessId?: string`, "
+"`processRole?: 'shell' | 'subprocess' | 'standalone'`, and `calledElement?: "
+"string`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:239
+msgid ""
+"`bpmnProcessId` is extracted from `<process id=\"...\">` in the XML "
+"automatically on save and import via `extractBpmnProcessId()`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:240
+msgid ""
+"All five seeded example processes carry explicit role and relationship "
+"metadata"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:241
+msgid ""
+"`ProcessList.tsx` renders a hierarchical grouped view: shell entries are top-"
+"level, their subprocesses are indented with a tree connector; standalone and "
+"unclassified processes appear as top-level entries"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:242
+msgid "`SHELL` (violet) and `SUB` (teal) role badges added to process cards"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:243
+msgid ""
+"`process_definitions` table stores `process_role`, `called_element`, and "
+"`bpmn_process_id` as indexed columns"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:245
+msgid ""
+"**Files:** `src/types/index.ts`, `src/components/BpmnModeler/"
+"BpmnModeler.tsx`, `src/components/BpmnModeler/ProcessList.tsx`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:247
+msgid "Schema versioning"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:249
+msgid ""
+"`schema_version INTEGER NOT NULL DEFAULT 1` column added to all three "
+"PostgreSQL tables, enabling server-side re-seeding of example assets across "
+"all users and devices when source files change."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:251
+msgid "Zorgtoeslag example processes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:253
+msgid ""
+"Three new versioned example processes added: `AwbZorgtoeslagProcess` (shell)"
+", `ZorgtoeslagProvisionalSubProcess`, and `ZorgtoeslagFinalSubProcess` (both "
+"subprocesses). Four new example forms: `zorgtoeslag-provisional-start`, "
+"`zorgtoeslag-provisional-review`, `zorgtoeslag-final-review`, `zorgtoeslag-"
+"notify-applicant`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:255
+msgid "**Files:** `src/utils/exampleVersions.ts`, `public/examples/toeslagen/`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:257
+msgid "Azure deployment — troubleshooting notes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:259
+msgid ""
+"During ACC deployment the following issues were encountered and resolved:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:261
+msgid ""
+"**`permission denied for schema public`** — Azure PostgreSQL Flexible Server "
+"(PostgreSQL 15+) revokes `CREATE` on the public schema from non-superusers "
+"by default. Fixed by running `GRANT ALL ON SCHEMA public TO lde_user` plus "
+"`ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO lde_user` "
+"as admin."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:262
+msgid ""
+"**CI/CD health check failing (`503`)** — caused by the above permission "
+"error crashing `migrate()` before `app.listen()` was reached. The App "
+"Service showed \"Application Error\" page with no log output via `az webapp "
+"log tail`; logs were only retrievable via `az webapp log download`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:264
+msgid ""
+"See [PostgreSQL Deployment]{1} for the full provisioning guide including "
+"these fixes."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:268
+msgid "v1.2.0 — RIP Phase 1 Bundle & eDOCS Integration (March 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:270
+msgid "**v1.2.0 — New Feature (March 14, 2026)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:272
+msgid "RIP Phase 1 Bundle"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:274
+msgid ""
+"New deployment bundle for the Regular Infrastructure Projects (RIP) Phase 1 "
+"workflow — Provincie Flevoland."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:276
+msgid ""
+"20-step BPMN process (`RipPhase1Process.bpmn`) covering project definition "
+"and preliminary design preparation: intake form, intake meeting, intake "
+"report, PSU organisation, PSU execution, PSU report, risk file preparation, "
+"preliminary design principles, and two approval gateways with rejection loops"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:277
+msgid ""
+"`RipProjectTypeAssignment.dmn` — assigns `candidateGroups` and "
+"`assignedRoles` from `projectType` and `department`; all rules resolve to "
+"`infra-projectteam` / `infra-medewerker`; designed for granular RBAC "
+"extension without BPMN changes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:278
+msgid ""
+"7 forms: `rip-intake`, `rip-intake-meeting`, `rip-intake-report`, `rip-psu-"
+"organize`, `rip-psu-execution`, `rip-risk-file`, `rip-approval` (reusable at "
+"both approval gateways)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:279
+msgid ""
+"3 document templates: `rip-intake-report.document` (column 2), `rip-psu-"
+"report.document` (column 3), `rip-pdp.document` (column 4)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:280
+msgid "Bundle deployed to `examples/organizations/flevoland/rip-phase1/`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:282
+msgid "**Files:** `examples/organizations/flevoland/rip-phase1/`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:284
+msgid "eDOCS Integration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:286
+msgid ""
+"New backend service and external task worker for OpenText eDOCS document "
+"management."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:288
+msgid ""
+"`EdocsService` wraps the eDOCS REST API: `connect` (session token caching "
+"with auto re-authentication on 401/403), `ensureWorkspace`, "
+"`uploadDocument`, `getWorkspaceDocuments`, `healthCheck`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:289
+msgid ""
+"`ExternalTaskWorker` polls Operaton via `fetchAndLock` (long-polling, 20s "
+"timeout) for two topics: `rip-edocs-workspace` (create/retrieve project "
+"workspace, write `edocsWorkspaceId`) and `rip-edocs-document` (render and "
+"upload document, write named output variable)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:290
+msgid ""
+"Stub mode (`EDOCS_STUB_MODE=true`, default) — all methods return realistic "
+"fake responses; full process runs end-to-end without a live eDOCS server; no "
+"code changes needed when switching to live"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:291
+msgid ""
+"Worker started in `app.listen()` callback; stopped cleanly on `SIGTERM`/"
+"`SIGINT`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:292
+msgid ""
+"4 new REST endpoints: `GET /v1/edocs/status`, `POST /v1/edocs/workspaces/"
+"ensure`, `POST /v1/edocs/documents`, `GET /v1/edocs/workspaces/:id/documents`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:293
+msgid ""
+"New environment variables: `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, "
+"`EDOCS_USER_ID`, `EDOCS_PASSWORD`, `EDOCS_STUB_MODE`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:295
+msgid ""
+"**Files:** `packages/backend/src/services/edocs.service.ts`, `packages/"
+"backend/src/services/externalTaskWorker.service.ts`, `packages/backend/src/"
+"routes/edocs.routes.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:297
+msgid "DMN Validator — Interaction Rules"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:299
+msgid ""
+"**INT-005** scoped to DRDs only — no longer fires on standalone single-"
+"decision DMNs; `<inputData>` elements on standalone models serve as input "
+"contract declarations for CPSV publishing and do not require "
+"`<informationRequirement>` wiring"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:300
+msgid ""
+"**INT-007** (new) — warns when an `<inputExpression>` references a variable "
+"name with no matching top-level `<inputData>` declaration; without this, the "
+"CPSV Editor generates an empty request body on deploy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:302
+msgid "**File:** `packages/backend/src/services/dmn-validation.service.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:304
+msgid "**v1.1.2 — Bug Fix (March 11, 2026)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:306
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\changelog-roadmap.md:306"
+msgid "Form Editor"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:308
+msgid ""
+"**Save** now correctly persists the current schema. `saveSchema()` in form-"
+"js 1.20.x returns the schema object directly — not wrapped in `{ schema }`. "
+"Destructuring assumption caused `undefined` to be written to `localStorage`, "
+"making the active form disappear on the next render."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:309
+msgid "**Export .form** fixed for the same reason."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:310
+msgid ""
+"Vite `dedupe` config added for `preact` / `preact/hooks` / `preact/compat` "
+"to prevent duplicate Preact instances after npm version round-trips "
+"involving `@bpmn-io/*` packages; fixes `TypeError: Cannot read properties of "
+"undefined (reading 'context')` on the form canvas."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:312
+msgid ""
+"**Known issue:** Typing in a properties panel field (label, key, etc.) loses "
+"focus after the first character. Upstream form-js 1.20.x issue — Preact re-"
+"renders the properties panel internally on every change event. Will be "
+"resolved when an upstream fix is available."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:314
+msgid ""
+"**File:** `packages/frontend/vite.config.ts`, `packages/frontend/src/"
+"components/FormEditor/FormCanvas.tsx`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:316
+msgid "**v1.1.1 — Enhancement (March 10, 2026)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:318
+msgid "Import from file"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:320
+msgid ""
+"**BPMN Modeler** — import `.bpmn` files via the Upload button in the process "
+"list header; process name derived from the `name` attribute on the `<process>"
+"` element, falling back to filename"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:321
+msgid ""
+"**Form Editor** — import `.form` files; name derived from the schema `id` "
+"field, falling back to filename"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:322
+msgid ""
+"**Document Composer** — import `.document` files; receives a fresh `id` and "
+"timestamps on import to avoid collisions with existing templates"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:323
+msgid ""
+"All imported items open immediately in their respective editor and are "
+"persisted to `localStorage`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:325
+msgid ""
+"**Files:** `BpmnModeler/BpmnModeler.tsx`, `FormEditor/FormEditor.tsx`, "
+"`DocumentComposer/DocumentComposer.tsx`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:329
+msgid "v1.1.0 — Document Composer (March 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:331
+msgid "**v1.1.0 — New Feature (March 8, 2026)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:333
+msgid "Document Composer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:335
+msgid ""
+"New **Document Composer** view for authoring formal government decision "
+"document templates (*beschikkingen*)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:337
+msgid ""
+"Three-panel layout matching BPMN Modeler and Chain Builder conventions: "
+"document list (left), zone canvas (centre), Bindings panel (right)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:338
+msgid ""
+"Fixed-zone document structure: Letterhead, Contact Information, Reference, "
+"Body, Closing, Sign-off, and optional Annex"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:339
+msgid ""
+"Five draggable block types: rich text (TipTap with bold, italic, headings, "
+"lists), variable placeholder, image (from TriplyDB), separator, horizontal "
+"rule, and spacer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:340
+msgid ""
+"Blocks dragged from the Content library onto zones; reordering within and "
+"across zones by drag"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:341
+msgid "Image library tab fetches assets from the active TriplyDB dataset"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:342
+msgid ""
+"Documents stored in `localStorage` under "
+"`linkedDataExplorer_documentTemplates`; create, rename, delete, and **Save as"
+"…** actions"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:343
+msgid "Export document template as a `.document` JSON file"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:344
+msgid ""
+"Read-only example document pre-loaded: **Kapvergunning Beschikking** (linked "
+"to `AwbShellProcess`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:346
+msgid ""
+"**Files:** `DocumentComposer.tsx`, `DocumentCanvas.tsx`, `DocumentList.tsx`, "
+"`ZonePanel.tsx`, `TextBlockEditor.tsx`, `ImageBlock.tsx`, "
+"`VariableBlock.tsx`, `BindingPanel.tsx`, `document.types.ts`, "
+"`documentService.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:348
+msgid "Variable Bindings"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:350
+msgid ""
+"Bindings panel maps `{{placeholder}}` tokens in rich-text blocks to Operaton "
+"process variable keys"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:351
+msgid ""
+"**Discover Variables** button queries `GET /v1/process/:key/variable-hints` "
+"for all variables used by completed instances of a given process definition "
+"key"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:352
+msgid ""
+"Discovered variables shown as clickable chips labelled with type (`String`, "
+"`Boolean`, `Double`, etc.)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:353
+msgid ""
+"Each binding records placeholder, variable key, source (`process` or "
+"`dmn_output`), and optional label"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:355
+msgid "**File:** `BindingPanel.tsx`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:357
+msgid "BPMN Modeler integration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:359
+msgid ""
+"**Link decision template** dropdown injected into the bpmn-js properties "
+"panel for `UserTask` elements (not `StartEvent`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:360
+msgid "Selecting a template writes `camunda:documentRef` to the BPMN XML"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:361
+msgid ""
+"Purple badge (📄) rendered on the canvas below the element, below the "
+"existing green form badge"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:362
+msgid ""
+"Badge positioned at `bottom: -36` (vs. `bottom: -22` for the form badge) so "
+"both badges are visible simultaneously"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:363
+msgid ""
+"`DocumentTemplateSelector.tsx` follows the identical injection pattern as "
+"`FormTemplateSelector.tsx`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:365
+msgid "**Files:** `BpmnModeler/DocumentTemplateSelector.tsx`, `BpmnCanvas.tsx`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:369
+msgid "v1.0.1 — Bug Fix & Internal (March 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:371
+msgid "**v1.0.1 — Bug Fix (March 7, 2026)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:373
+msgid "Bug fix"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:375
+msgid ""
+"Fixed `Task_Phase6_Notify` and `Task_RequestMissingInfo` appearing pre-"
+"claimed in the caseworker dashboard. `camunda:assignee=\"demo\"` removed; "
+"`camunda:candidateGroups=\"caseworker\"` added to both tasks so they are "
+"correctly visible in the task queue."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:377
+msgid "Internal — example file migration and version registry"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:379
+msgid ""
+"Example `.bpmn` and `.form` files moved to `public/examples/flevoland/` as "
+"the single source of truth. Inline schemas removed from `bpmnTemplates.ts` "
+"and `FormEditor.tsx`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:380
+msgid ""
+"Added `exampleVersions.ts` with `EXAMPLE_VERSIONS` record (keyed by example "
+"name, value is an integer version). The app compares stored versions in "
+"`localStorage` key `linkedDataExplorer_exampleVersions` against "
+"`EXAMPLE_VERSIONS` and re-fetches any example whose version has been "
+"incremented."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:381
+msgid ""
+"**Developer workflow:** edit the file in `public/examples/`, mirror the "
+"change to `examples/organizations/`, increment the version in "
+"`exampleVersions.ts`, commit. Existing users receive the updated example "
+"without clearing `localStorage`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:383
+msgid ""
+"**Files:** `exampleVersions.ts`, `bpmnTemplates.ts`, `FormEditor.tsx`, "
+"`public/examples/flevoland/`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:387
+msgid "v1.0.0 — Form Editor & One-Click Deploy (March 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:389
+msgid "**v1.0.0 — Major Release**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:391
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\changelog-roadmap.md:391"
+msgid "Form Editor"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:393
+msgid ""
+"New **Form Editor** view powered by `@bpmn-io/form-js` (schemaVersion 16, "
+"MIT licensed). Forms are authored as JSON schema, stored in `localStorage`, "
+"and available immediately to the BPMN Modeler."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:395
+msgid ""
+"Two-panel layout: form list (left) and `@bpmn-io/form-js` editor canvas "
+"(right)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:396
+msgid ""
+"Create, rename, and delete WIP forms; three seed EXAMPLE forms are read-only"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:397
+msgid ""
+"Three built-in examples: `kapvergunning-start` (citizen-facing), `tree-"
+"felling-review` (caseworker review), `awb-notify-applicant` (caseworker "
+"notification)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:398
+msgid ""
+"Export individual forms as `.form` JSON files compatible with Camunda "
+"Modeler and Operaton"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:399
+msgid ""
+"`FormService` localStorage CRUD shared with the BPMN Modeler — no sync step "
+"required"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:401
+msgid ""
+"**Files:** `FormEditor.tsx`, `FormCanvas.tsx`, `FormList.tsx`, "
+"`formService.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:403
+msgid "BPMN Modeler — Form integration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:405
+msgid ""
+"**Link to Form** dropdown in the properties panel for `UserTask` and "
+"`StartEvent` elements"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:406
+msgid ""
+"Writes `camunda:formRef` and `camunda:formRefBinding=\"latest\"` to the BPMN "
+"XML"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:407
+msgid ""
+"`camunda:formRefBinding=\"latest\"` means Operaton always resolves the most "
+"recent deployment of that form ID — no version pinning needed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:408
+msgid ""
+"Green badge overlay on `UserTask` and `StartEvent` elements when a form is "
+"linked"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:409
+msgid ""
+"`DmnTemplateSelector` pre-selection bug fixed — dropdown now correctly "
+"reflects an existing `camunda:decisionRef` when opening properties for an "
+"already-linked element"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:411
+msgid "**Files:** `BpmnCanvas.tsx`, `FormTemplateSelector.tsx`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:413
+msgid "BPMN Modeler — One-click deploy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:415
+msgid ""
+"**Deploy** button opens a modal listing all resources to be bundled: main "
+"BPMN, subprocess BPMNs (resolved via `calledElement` attributes), and all "
+"`.form` files referenced by `camunda:formRef`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:416
+msgid ""
+"All resources deployed in a single multipart `POST /api/dmns/process/deploy` "
+"to Operaton — `camunda:formRef` resolves at runtime because BPMN and forms "
+"share the same deployment ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:417
+msgid ""
+"Configurable Operaton endpoint field pre-filled from `VITE_OPERATON_BASE_URL`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:418
+msgid "Optional HTTP Basic Auth credentials per deployment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:419
+msgid ""
+"Unmatched form references (in BPMN but not in localStorage) shown in modal "
+"before deploying"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:420
+msgid ""
+"Deploy button disabled after a successful deployment to prevent accidental "
+"re-deploy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:422
+msgid ""
+"**Files:** `BpmnCanvas.tsx` (frontend), `dmn.routes.ts` + "
+"`operaton.service.ts` (backend)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:426
+msgid "v0.9.x — DMN Syntactic Validation (February 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:428
+msgid "**v0.9.1 — Date Input Validation Fix**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:430
+msgid ""
+"Fixed a false \"Missing 1 required input(s)\" error in the Chain Composer "
+"when a DMN contains an optional `Date` input whose test value is "
+"intentionally `null` (e.g. `overlijdensdatum` in `zorgtoeslag_resultaat`)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:432
+msgid ""
+"The root cause was a two-part gap between how RDF stores test data and how "
+"the validator tracks input state. In TriplyDB, a `null` value cannot be "
+"represented as a `schema:value` triple, so optional date variables have no "
+"`testValue` property at all on the `DmnVariable` object returned by the "
+"backend. The Fill with test data button in `InputForm.tsx` only wrote a key "
+"into the `inputs` state object when `testValue` was defined — silently "
+"skipping `null`-default dates. The validator in `ChainBuilder.tsx` then "
+"checked `input.identifier in inputs`, found the key absent, and pushed the "
+"variable into `missingInputs`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:434
+msgid "Two fixes were applied:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:436
+msgid ""
+"**`InputForm.tsx`** — the Fill button now explicitly sets `Date` inputs to "
+"`null` when `testValue` is `undefined`, ensuring the key is always "
+"registered in state after filling."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:437
+msgid ""
+"**`ChainBuilder.tsx`** — the validator now exempts `Date` inputs from the "
+"missing-input check when no value is present, consistent with the existing "
+"exemption for `Boolean` inputs (which default to `false` without user action)"
+". An unset date is a valid input state, not an authoring error."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:439
+msgid "**v0.9.0 — DMN Validator**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:441
+msgid ""
+"Added DMN Validator feature. The DMN Validator lets you validate one or more "
+"DMN files against the RONL DMN+ syntactic layers. It is accessible from the "
+"shield icon (🛡) in the sidebar. You can drop any number of .dmn or .xml "
+"files onto the validator at once, or add files incrementally — the drop zone "
+"remains visible at the top of the panel whenever files are loaded. Files are "
+"validated independently and displayed side-by-side for easy comparison."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:443
+msgid ""
+"The validator runs on the shared backend at `POST /v1/dmns/validate` and is "
+"used both by this Linked Data Explorer's standalone DMN Validator view and "
+"by the CPSV Editor's inline validation in the [DMN tab]{1}."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:445
+msgid "v0.8.x — Governance & Vendor Integration (February 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:447
+msgid "**v0.8.4 — Vendor Services**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:449
+msgid ""
+"Added vendor service discovery: `ronl:VendorService` resources are queried "
+"alongside DMN metadata, surfaced as blue count badges on DMN cards, and "
+"displayed in a detail modal with full provider information."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:451
+msgid "**v0.8.3 — DMN Governance Badges**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:453
+msgid ""
+"Three-state validation badge system using RONL Ontology v1.0 properties "
+"(`ronl:validationStatus`, `ronl:validatedBy`, `ronl:validatedAt`). Badges "
+"visible in both the DMN list and the Chain Composer. Organisation names "
+"resolved via `skos:prefLabel`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:455
+msgid "**v0.8.1 — BPMN DRD/DMN Selector**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:457
+msgid ""
+"`DmnTemplateSelector` now loads both locally-saved DRD templates and regular "
+"DMNs from the backend, displayed in grouped options. Purple info card for "
+"DRDs shows chain composition. Auto-populates `camunda:decisionRef` with "
+"prefixed DRD entry-point identifier."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:461
+msgid "v0.7.x — BPMN Modeler & DRD Templates (February 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:463
+msgid "**v0.7.3 — DRD Template Linking (partial)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:465
+msgid ""
+"DMN template dropdown in BPMN properties panel implemented. Exact identifier "
+"auto-population working; variable compatibility validation planned for a "
+"future release."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:467
+msgid "**v0.7.2 — DRD Template System**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:469
+msgid ""
+"Users can save DRD-compatible chains as named templates stored in "
+"localStorage. Templates are endpoint-scoped. DRD templates load via the new "
+"\"My Templates\" panel."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:471
+msgid "**v0.7.1 — Semantic Variable Matching Fix**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:473
+msgid ""
+"Fixed `findEnhancedChainLinks` SPARQL query to correctly detect both exact "
+"and semantic matches. Heusdenpas chain now shows all 10 variable "
+"relationships across 3 DMNs."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:475
+msgid "**v0.7.0 — BPMN Modeler Foundation**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:477
+msgid ""
+"Full BPMN 2.0 editor using bpmn-js v18.12.0 with official Camunda/Operaton "
+"properties panel (`bpmn-js-properties-panel`). Three-panel layout: process "
+"list, canvas, properties. Tree Felling Permit example auto-loaded on first "
+"visit. localStorage persistence and `.bpmn` export."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:481
+msgid "v0.6.x — DRD Generation & Enhanced Validation (February 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:483
+msgid "**v0.6.2 — Semantic Analysis Tab**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:485
+msgid ""
+"Semantic Analysis tab added to Chain Builder. Displays cross-agency variable "
+"equivalences and chain suggestions. Backend endpoints: `/api/dmns/semantic-"
+"equivalences`, `/api/dmns/enhanced-chain-links`, `/api/dmns/cycles`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:487
+msgid "**v0.6.1 — DRD Generation**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:489
+msgid ""
+"Save DRD-compatible chains as single executable DRD files deployed to "
+"Operaton. Automatic `<informationRequirement>` wiring, entry-point "
+"detection, and deployment ID tracking."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:491
+msgid "**v0.6.0 — Enhanced Validation**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:493
+msgid ""
+"Validation engine distinguishes DRD-compatible chains (all exact matches) "
+"from sequential chains (semantic matches present). Clear UI states: green "
+"(DRD), amber (sequential), red (invalid). Separate save paths."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:497
+msgid "v0.5.x — Multi-Endpoint & Test Data (January 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:499
+msgid "**v0.5.5 — SPARQL & Export Improvements**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:501
+msgid ""
+"Added \"Service Rules Metadata\" query (`cprmv:Rule → eli:LegalResource → "
+"cpsv:PublicService`). CSV export with timestamped filenames and proper "
+"escaping. RDF URI collision fix for `cprmv:Rule` instances."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:503
+msgid "**v0.5.4 — Multi-Endpoint Chain Execution**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:505
+msgid ""
+"Chain execution now correctly uses the selected endpoint throughout the full "
+"execution flow. Automatic test data population from `schema:value` in "
+"TriplyDB TTL files. Fallback to `testData.json` for legacy DMNs."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:507
+msgid "**v0.5.3 — Dynamic Endpoint Selection**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:509
+msgid ""
+"Switch between TriplyDB datasets in real time without page reload. Backend "
+"caches DMN metadata per endpoint (5-minute TTL). Connection indicator shows "
+"direct vs proxied connection status."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:513
+msgid "v0.4.x — API Versioning & Export (January 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:515
+msgid "**v0.4.0 — Backend API v1**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:517
+msgid ""
+"Migrated all endpoints to `/v1/*` following Dutch Government API Design "
+"Rules. Legacy `/api/*` endpoints retained with `Deprecation` headers. `API-"
+"Version` header in all responses. Chain export as JSON or BPMN 2.0 diagram."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:521
+msgid "v0.3.x — Chain Builder UI (January 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:523
+msgid "**v0.3.1 — Bug Fixes**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:525
+msgid ""
+"Enhanced error messages for Operaton failures. Synchronized test data "
+"between preset and manual chain. Fixed execution progress visibility on "
+"first run."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:527
+msgid "**v0.3.0 — Chain Builder UI**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:529
+msgid ""
+"Visual drag-and-drop chain builder. Real-time validation with input "
+"requirements. Dynamic form generation for DMN inputs. Chain execution with "
+"step-by-step progress tracking. In-app tutorial (accessible via ? icon). "
+"Deployment metadata display."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:533
+msgid "v0.2.0 — DMN Discovery & Orchestration View (January 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:535
+msgid ""
+"SPARQL-based DMN discovery using CPRMV vocabulary. Three-panel orchestration "
+"view: DMN list, chain composer placeholder, details panel. Real-time search "
+"and filter. Input/output variable inspection. Automatic chain detection by "
+"variable matching. SPARQL result parsing for multiple query response formats."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:539
+msgid "v0.1.0 — Initial Release (January 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:541
+msgid ""
+"React-based SPARQL visualisation and query tool. Interactive D3.js force-"
+"directed graph. Multiple endpoint support. Query editor with sample library "
+"and CORS proxy fallback. SELECT query results table. TypeScript interfaces "
+"and Vite build tooling."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:545
+msgid "Notable backend bug fixes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:547
+msgid ""
+"These fixes are documented here because they involve non-obvious root causes "
+"that are likely to recur."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:549
+msgid "TriplyDB health check returning HTTP 400"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:551
+msgid ""
+"**Root cause:** The health check was calling `axios.get(triplydbEndpoint)` "
+"without a query parameter. SPARQL endpoints reject bare GET requests — they "
+"require either a POST with a query body or a GET with a `?query=` parameter."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:553
+msgid ""
+"**Fix:** Updated `health.routes.ts` to call `sparqlService.healthCheck()`, "
+"which executes a minimal `SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 1` query."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:555
+msgid "**File:** `packages/backend/src/routes/health.routes.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:559
+msgid "`/v1/*` endpoints returning 404 after Azure deployment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:561
+msgid ""
+"**Root cause:** The GitHub Actions deployment step used `cp -r dist/* deploy/"
+"`, which flattened the compiled output. The `package.json` start script "
+"references `dist/index.js`, and `health.routes.js` inside `dist/routes/` "
+"uses `require('../../package.json')` — both paths broke when the `dist/` "
+"folder was removed."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:563
+msgid ""
+"**Fix:** Changed the deployment step to `cp -r dist deploy/`, preserving the "
+"directory structure."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:565
+msgid ""
+"# Before (broken)\n"
+"cp -r dist/* deploy/\n"
+"\n"
+"# After (correct)\n"
+"cp -r dist deploy/"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:573
+msgid ""
+"**Files:** `.github/workflows/azure-backend-acc.yml`, `.github/workflows/"
+"azure-backend-production.yml`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:577
+msgid "Root endpoint referencing deprecated `/api/*` paths"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:579
+msgid ""
+"**Root cause:** The `GET /` root response had not been updated when API "
+"versioning was introduced, so it still advertised `/api/health` and `/api/` "
+"as the documentation and health URLs."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:581
+msgid ""
+"**Fix:** Updated `index.ts` to reference `/v1/*` endpoints in the root "
+"response and added a `legacy` block explicitly marking the old paths as "
+"deprecated."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:583
+msgid "**File:** `packages/backend/src/index.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:587
+msgid "Roadmap"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:589
+msgid "Frontend — Phase 2"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:591
+msgid ""
+"The following items are planned but not yet scheduled. Phase 1 features "
+"(v0.1–v0.8) are complete."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:593
+msgid "**Database migration**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:595
+msgid ""
+"Move chain templates and BPMN processes from `localStorage` to a server-side "
+"database. Enables user authentication and ownership, process versioning with "
+"history, and public sharing with access control. PostgreSQL is the planned "
+"backend, consistent with the RONL Business API stack."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:597
+msgid "**Collaborative editing**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:599
+msgid ""
+"Multiple users editing shared process definitions. Real-time or optimistic-"
+"update model TBD."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:601
+msgid "**Advanced BPMN properties panel**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:603
+msgid ""
+"Full editing of all BPMN element properties: form fields, execution "
+"listeners, input/output mappings, conditional expressions, timers. Currently "
+"only name and DMN reference are editable."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:605
+msgid "**DRD export and versioning**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:607
+msgid ""
+"Export generated DRD XML for versioning and sharing. Track DRD version "
+"history alongside template evolution."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:609
+msgid "**Certification registry**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:611
+msgid ""
+"A queryable view of all `ronl:VendorService` resources with "
+"`ronl:certificationStatus \"certified\"`, enabling cross-service comparison "
+"of certified vendor implementations."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:613
+msgid "**Multi-hop semantic chains**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:615
+msgid ""
+"The current semantic validation checks only adjacent DMN pairs. Phase 2 will "
+"extend this to multi-hop: `DMN1 → DMN2 → DMN3` where the connection between "
+"DMN1 and DMN3 is bridged semantically through DMN2."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:617
+msgid "**Semantic concept browser**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:619
+msgid ""
+"UI to explore the `skos:exactMatch` network: graph view of all concepts and "
+"their relationships, filterable by DMN or variable type, with search by "
+"concept URI."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:623
+msgid "Backend API — versioning roadmap"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:625
+msgid "**v0.5.0 (planned)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:627
+msgid ""
+"OpenAPI 3.0 specification served at `/v1/openapi.json`. Request/response "
+"validation against the spec. Rate limiting. Per-endpoint response caching "
+"layer."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:629
+msgid "**v1.0.0 (planned)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:631
+msgid ""
+"Full Dutch Government API Design Rules compliance (API-16, API-51, API-02, "
+"API-10). Production-grade monitoring and alerting. Performance target: "
+"<800ms for any chain execution. Comprehensive structured error handling "
+"across all services."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:633
+msgid "**v2.0.0 (future)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cchangelog-roadmap.md:635
+msgid ""
+"Remove all legacy `/api/*` endpoints. Evaluate Dutch naming for business "
+"resources (`/v2/besluitmodellen` etc.) per API-04. Enhanced orchestration: "
+"parallel chain execution where dependency graph allows. Batch execution "
+"support for multiple input sets."
+msgstr ""

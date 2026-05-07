@@ -1,0 +1,189 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:1
+msgid "Governance Implementation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:3
+msgid ""
+"This page covers the backend SPARQL query, TypeScript interfaces, and "
+"frontend components that implement the DMN validation badge system."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:7
+msgid "Backend — SPARQL query"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:9
+msgid ""
+"Validation metadata is fetched alongside DMN data in `findAllDmns` using "
+"`OPTIONAL` blocks that do not break when governance data is absent:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:11
+msgid ""
+"PREFIX ronl: <https://regels.overheid.nl/ontology#>\n"
+"\n"
+"SELECT ...\n"
+"WHERE {\n"
+"  ?dmn a cprmv:DecisionModel ;\n"
+"       dct:identifier ?identifier ;\n"
+"       dct:title ?title .\n"
+"\n"
+"  # Governance metadata (all optional)\n"
+"  OPTIONAL { ?dmn ronl:validationStatus ?validationStatus }\n"
+"  OPTIONAL {\n"
+"    ?dmn ronl:validatedBy ?validatedBy .\n"
+"    OPTIONAL { ?validatedBy skos:prefLabel ?validatedByName . }\n"
+"  }\n"
+"  OPTIONAL { ?dmn ronl:validatedAt ?validatedAt }\n"
+"  OPTIONAL { ?dmn ronl:validationNote ?validationNote }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:31
+msgid ""
+"The `validatedByName` is resolved via `skos:prefLabel` on the organisation "
+"URI (`ronl:validatedBy` points to a URI, not a literal). If the organisation "
+"resource has no `skos:prefLabel`, the badge renders without the organisation "
+"name — graceful degradation."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:35
+msgid "Backend — TypeScript interface"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:37
+msgid ""
+"// In sparql.service.ts DmnModel interface\n"
+"interface DmnModel {\n"
+"  id: string;\n"
+"  identifier: string;\n"
+"  title: string;\n"
+"  // ... core fields ...\n"
+"\n"
+"  // Governance fields\n"
+"  validationStatus?: 'validated' | 'in-review' | 'not-validated';\n"
+"  validatedBy?: string;        // Organisation URI\n"
+"  validatedByName?: string;    // Resolved skos:prefLabel\n"
+"  validatedAt?: string;        // ISO 8601 date string\n"
+"  validationNote?: string;\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:56
+msgid "Frontend — ValidationBadge component"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:58
+msgid ""
+"`ValidationBadge.tsx` renders conditionally based on `validationStatus`. No "
+"badge renders for `\"not-validated\"` or when `validationStatus` is absent:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:60
+msgid ""
+"interface ValidationBadgeProps {\n"
+"  status: 'validated' | 'in-review' | 'not-validated' | undefined;\n"
+"  validatedByName?: string;\n"
+"  validatedAt?: string;\n"
+"  compact?: boolean;\n"
+"}\n"
+"\n"
+"const ValidationBadge: React.FC<ValidationBadgeProps> = ({\n"
+"  status, validatedByName, validatedAt, compact\n"
+"}) => {\n"
+"  if (!status || status === 'not-validated') return null;\n"
+"\n"
+"  const isValidated = status === 'validated';\n"
+"\n"
+"  return (\n"
+"    <span\n"
+"      className={`badge ${isValidated ? 'badge-green' : 'badge-amber'}`}\n"
+"      title={`${validatedByName ?? ''} ${validatedAt ?? ''}`}\n"
+"    >\n"
+"      {isValidated ? '✓ Gevalideerd' : '⏱ In Review'}\n"
+"    </span>\n"
+"  );\n"
+"};"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:86
+msgid ""
+"The `compact` prop reduces the badge to a small indicator for use on Chain "
+"Composer cards where space is limited."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:90
+msgid "Frontend — integration points"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:92
+msgid "`DmnList.tsx` — badge appears on each card in the Available DMNs panel"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:93
+msgid ""
+"`ChainComposer.tsx` — badge persists on cards after they are dropped into "
+"the chain"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:97
+msgid "RDF data structure"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:99
+msgid "The canonical RDF for a validated DMN:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:101
+msgid ""
+"@prefix ronl:  <https://regels.overheid.nl/ontology#> .\n"
+"@prefix cprmv: <https://cprmv.open-regels.nl/0.3.0/> .\n"
+"@prefix dct:   <http://purl.org/dc/terms/> .\n"
+"@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .\n"
+"@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .\n"
+"@prefix org:   <http://www.w3.org/ns/org#> .\n"
+"\n"
+"<https://organisaties.overheid.nl/28212263/Sociale_Verzekeringsbank>\n"
+"  a org:Organization ;\n"
+"  skos:prefLabel \"Sociale Verzekeringsbank\"@nl .\n"
+"\n"
+"<https://regels.overheid.nl/services/aow-leeftijd/dmn>\n"
+"  a cprmv:DecisionModel ;\n"
+"  dct:identifier \"SVB_LeeftijdsInformatie\" ;\n"
+"  ronl:validationStatus \"validated\"^^xsd:string ;\n"
+"  ronl:validatedBy <https://organisaties.overheid.nl/28212263/"
+"Sociale_Verzekeringsbank> ;\n"
+"  ronl:validatedAt \"2026-02-14\"^^xsd:date ;\n"
+"  ronl:validationNote \"Validated against AOW legislation Article 7a\"@nl ."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:122
+msgid ""
+"This data is published from the CPSV Editor. See the [CPSV Editor — "
+"Publishing to TriplyDB]{1} guide for the publisher workflow."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:126
+msgid "RONL Ontology reference"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cgovernance.md:128
+msgid ""
+"For the full property specification, see [CPSV Editor — RONL Ontology]{1}. "
+"The properties used by the governance badge system are "
+"`ronl:validationStatus`, `ronl:validatedBy`, `ronl:validatedAt`, and "
+"`ronl:validationNote`."
+msgstr ""

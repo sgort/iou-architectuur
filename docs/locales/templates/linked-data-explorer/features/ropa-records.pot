@@ -1,0 +1,401 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:1
+msgid "RoPA Records"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:3
+msgid ""
+"The RoPA Records feature lets Product Owners author and maintain a **Record "
+"of Processing Activities** (RoPA) for every deployed process bundle, "
+"fulfilling the mandatory GDPR Article 30 obligation for government "
+"processing activities. Records are stored in PostgreSQL, linked to their "
+"BPMN process via `ronl:ropaRef`, and published to a public-facing website "
+"isolated from the LDE stack."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:12
+msgid "Two-panel layout"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:14
+msgid ""
+"The RoPA Records view follows the same two-panel convention as the Form "
+"Editor:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:16
+msgid ""
+"**Left panel** — Record list. All RoPA records grouped as shell processes "
+"first, subprocesses second, each with a DRAFT / ACTIVE / ARCHIVED status "
+"badge and a delete control."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:17
+msgid ""
+"**Right panel** — Record editor. Four tabs covering the full GDPR Art. 30 "
+"data model, BPMN linkage, and lifecycle management."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:21
+msgid "Record list"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:23
+msgid ""
+"Each entry in the list shows the record title, the `bpmnProcessId` it "
+"covers, and its current status. Shell records are top-level entries; "
+"subprocess records are indented beneath their parent shell with a tree "
+"connector — mirroring the hierarchy in the BPMN Modeler process list."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:30
+msgid ""
+"Clicking a record opens it in the editor. The **+** button in the panel "
+"header creates a new blank record."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:34
+msgid "Record tab"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:36
+msgid "The Record tab collects all GDPR Article 30 mandatory fields:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Field"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Title"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Human-readable name for the processing activity"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "BPMN process ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid ""
+"The `<process id=\"...\">` value from the BPMN XML — used to link the record "
+"to its process"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Process level"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "`Shell` or `Subprocess` — reflects the AWB two-layer architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Controller name"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Name of the data controller organisation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Controller contact"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Contact address for the controller"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "DPO contact"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Data Protection Officer contact (optional)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Purpose"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Description of why the personal data is processed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "GDPR article"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Legal basis from the dropdown — Art. 6(1)(a) through (f)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Legal basis"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "`eli:LegalResource` URI and human-readable label"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Data subjects"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Categories of persons whose data is processed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Recipients"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Who receives the data, including internal and external parties"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Third country transfers"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Toggle — reveals a detail field if transfers exist"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Retention period"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "How long data is kept and under which statutory basis"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Security measures"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:38
+msgid "Technical and organisational measures in place"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:55
+msgid "Legal basis lookup"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:57
+msgid ""
+"The **Lookup from knowledge graph** button fires a SPARQL query against the "
+"TriplyDB RONL endpoint to retrieve all `eli:LegalResource` resources linked "
+"to `cpsv:PublicService` entries. Results appear as a pick-list; selecting "
+"one populates both the URI and label fields automatically."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:66
+msgid "Personal Data Fields tab"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:68
+msgid ""
+"This tab lists every personal data field collected by the forms linked to "
+"this process. The **Hydrate from forms** button reads all `camunda:formRef` "
+"values from the process XML, loads the matching form schemas from the Form "
+"Editor storage, and appends one row per form component that has a `key` "
+"property — skipping headings, text blocks, and buttons."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:75
+msgid "For each field the Product Owner classifies:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:77
+msgid ""
+"**Data category** — `identity`, `financial`, `residence`, `health`, `civil "
+"status`, `criminal`, or `other`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:78
+msgid ""
+"**Art. 9/10** — checkbox for health data (Art. 9) and criminal data (Art. "
+"10) — renders as a red badge on the public site"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:80
+msgid ""
+"Non-personal fields (routing variables, computed outputs) can be removed "
+"from the table using the × button on each row."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:84
+msgid "BPMN Link tab"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:86
+msgid ""
+"The BPMN Link tab writes `ronl:ropaRef` into the process XML, formally "
+"linking the record to its BPMN definition. The record must be saved first so "
+"it has a UUID."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:93
+msgid ""
+"Clicking **Write ronl:ropaRef to BPMN** injects the attribute into the "
+"process XML and saves via `BpmnService`. If the `xmlns:ronl` namespace "
+"declaration is absent from the `<definitions>` element, it is added "
+"automatically."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:95
+msgid "The status indicator shows three states:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:97
+msgid "**Not linked** — no `ronl:ropaRef` present in the XML"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:98
+msgid "**Linked** (green) — `ronl:ropaRef` matches this record's ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:99
+msgid ""
+"**Points to a different record** (amber) — the XML has a `ronl:ropaRef` but "
+"it references a different record ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:103
+msgid "Status tab"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:105
+msgid "The Status tab controls the publication lifecycle of the record."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:107
+msgid "Status"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:107
+msgid "Meaning"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:107
+msgid "**Draft**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:107
+msgid "Internal only — not returned by the public endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:107
+msgid "**Active**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:107
+msgid "Publicly visible via `GET /v1/ropa/public` — appears on the public site"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:107
+msgid "**Archived**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:107
+msgid "Hidden from public site — retained for audit purposes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:113
+msgid ""
+"Activating a record shows a confirmation dialog: *\"Activating this record "
+"will make it publicly visible on ropa.flevoland.nl. Continue?\"* Status "
+"changes take effect after saving the record with the **Save** button in the "
+"top bar."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:117
+msgid "RoPA Selector in the BPMN Modeler"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:119
+msgid ""
+"When a process is open in the BPMN Modeler, a **RoPA Record** panel appears "
+"pinned to the bottom of the process list — below the scrollable card list. "
+"It shows a dropdown of all available RoPA records and writes `ronl:ropaRef` "
+"directly into the process XML on selection, without requiring any canvas "
+"element to be selected."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:128
+msgid "Deploy modal warning"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:130
+msgid ""
+"When deploying a bundle to Operaton, the deploy modal checks whether "
+"`ronl:ropaRef` is present on the process element. If absent, an amber "
+"warning is shown between the resource list and the resource count:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:137
+msgid ""
+"The warning is non-blocking — the **Deploy** button remains active. It is "
+"intended to prompt the Product Owner to complete the RoPA record before "
+"promoting to production."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:141
+msgid "Public website"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:143
+msgid ""
+"Active RoPA records are served from a CORS-open public endpoint and rendered "
+"on a dedicated static site **[ropa.open-regels.nl]{1}** deployed separately "
+"from the LDE. The site displays collapsible cards — one per record — with "
+"all GDPR Art. 30 fields including the personal data fields table with colour-"
+"coded data categories and Art. 9/10 flags."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:150
+msgid ""
+"See [RoPA Records developer docs]{1} for the API endpoint, database schema, "
+"and public site deployment."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:154
+msgid "Related documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:156
+msgid "[RoPA Records user guide]{1} — step-by-step authoring workflow"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:157
+msgid ""
+"[RoPA Records developer docs]{1} — database schema, API routes, public site"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:158
+msgid "[BPMN Modeler — RoPA linkage]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cropa-records.md:159
+msgid "[Document Composer]{1} — authoring decision document templates"
+msgstr ""

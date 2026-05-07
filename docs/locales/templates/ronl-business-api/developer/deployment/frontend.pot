@@ -1,0 +1,1085 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:1
+msgid "Frontend (Azure Static Web Apps)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:3
+msgid ""
+"The frontend is deployed to Azure Static Web Apps via GitHub Actions. "
+"Separate instances run for ACC and PROD environments."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:7
+msgid "Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:9
+msgid ""
+"┌──────────────────────────────────────────┐\n"
+"│   GitHub Repository (ronl-business-api)  │\n"
+"│                                          │\n"
+"│  ┌─────────────────────────────────────┐ │\n"
+"│  │  packages/frontend/                 │ │\n"
+"│  │  ├── src/                           │ │\n"
+"│  │  ├── public/                        │ │\n"
+"│  │  │   ├── tenants.json               │ │\n"
+"│  │  │   └── staticwebapp.config.json   │ │ ← SPA routing config\n"
+"│  │  ├── vite.config.ts                 │ │\n"
+"│  │  └── package.json                   │ │\n"
+"│  └─────────────────────────────────────┘ │\n"
+"│                 │                        │\n"
+"│                 │ Push to 'acc' branch   │\n"
+"│                 ▼                        │\n"
+"│  ┌─────────────────────────────────────┐ │\n"
+"│  │  .github/workflows/                 │ │\n"
+"│  │  ├── azure-frontend-acc.yml         │ │\n"
+"│  │  └── azure-frontend-prod.yml        │ │\n"
+"│  └─────────────────────────────────────┘ │\n"
+"└──────────────────────────────────────────┘\n"
+"                 │\n"
+"                 │ GitHub Actions\n"
+"                 ▼\n"
+"┌─────────────────────────────────────────┐\n"
+"│      Azure Static Web Apps              │\n"
+"│                                         │\n"
+"│  ACC:  acc.mijn.open-regels.nl          │\n"
+"│  PROD: mijn.open-regels.nl              │\n"
+"│                                         │\n"
+"│  ✅ Global CDN                          │\n"
+"│  ✅ Automatic SSL                       │\n"
+"│  ✅ Custom domains                      │\n"
+"│  ✅ SPA fallback routing                │\n"
+"└─────────────────────────────────────────┘"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:49
+msgid "GitHub Actions Workflows"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:51
+msgid "ACC Workflow"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:53
+msgid "**File:** `.github/workflows/azure-frontend-acc.yml`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:55
+msgid ""
+"name: Deploy Frontend to ACC\n"
+"\n"
+"on:\n"
+"  push:\n"
+"    branches:\n"
+"      - acc\n"
+"    paths:\n"
+"      - 'packages/frontend/**'\n"
+"      - '.github/workflows/azure-frontend-acc.yml'\n"
+"\n"
+"jobs:\n"
+"  build_and_deploy:\n"
+"    runs-on: ubuntu-latest\n"
+"    name: Build and Deploy to ACC\n"
+"    steps:\n"
+"      - uses: actions/checkout@v3\n"
+"        with:\n"
+"          submodules: true\n"
+"\n"
+"      - name: Setup Node.js\n"
+"        uses: actions/setup-node@v3\n"
+"        with:\n"
+"          node-version: '20'\n"
+"          cache: 'npm'\n"
+"\n"
+"      - name: Install dependencies\n"
+"        run: |\n"
+"          npm ci\n"
+"          npm ci --workspace=packages/frontend\n"
+"\n"
+"      - name: Build frontend\n"
+"        run: npm run build --workspace=packages/frontend\n"
+"        env:\n"
+"          VITE_KEYCLOAK_URL: ${{ secrets.ACC_KEYCLOAK_URL }}\n"
+"          VITE_API_URL: ${{ secrets.ACC_API_URL }}\n"
+"\n"
+"      - name: Deploy to Azure Static Web Apps\n"
+"        uses: Azure/static-web-apps-deploy@v1\n"
+"        with:\n"
+"          azure_static_web_apps_api_token: ${{ secrets.ACC_AZURE_SWA_TOKEN }}"
+"\n"
+"          repo_token: ${{ secrets.GITHUB_TOKEN }}\n"
+"          action: 'upload'\n"
+"          app_location: 'packages/frontend'\n"
+"          output_location: 'dist'\n"
+"          skip_app_build: true"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:103
+msgid "**Triggers:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:104
+msgid "Push to `acc` branch"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:105
+msgid "Changes in `packages/frontend/**`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:106
+msgid "Changes to workflow file itself"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:108
+msgid "PROD Workflow"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:110
+msgid "**File:** `.github/workflows/azure-frontend-prod.yml`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:112
+msgid "Same structure as ACC but with:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:114
+msgid "Branch: `main` or `prod`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:115
+msgid ""
+"PROD secrets (`PROD_KEYCLOAK_URL`, `PROD_API_URL`, `PROD_AZURE_SWA_TOKEN`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:116
+msgid "Additional approval gate (manual approval before deployment)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:120
+msgid "SPA Routing Configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:122
+msgid ""
+"**Critical for React Router:** Azure Static Web Apps needs "
+"`staticwebapp.config.json` to handle client-side routing."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:124
+msgid "**File:** `packages/frontend/public/staticwebapp.config.json`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:126
+msgid ""
+"{\n"
+"  \"navigationFallback\": {\n"
+"    \"rewrite\": \"/index.html\",\n"
+"    \"exclude\": [\"/assets/*\", \"/*.js\", \"/*.css\", \"/*.json\", \"/"
+"*.png\", \"/*.jpg\", \"/*.svg\"]\n"
+"  },\n"
+"  \"globalHeaders\": {\n"
+"    \"cache-control\": \"no-cache, no-store, must-revalidate\"\n"
+"  },\n"
+"  \"mimeTypes\": {\n"
+"    \".json\": \"application/json\",\n"
+"    \".css\": \"text/css\",\n"
+"    \".js\": \"application/javascript\"\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:143
+msgid "**What it does:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:145
+msgid "✅ All routes (`/`, `/auth`, `/dashboard`) → served by `index.html`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:146
+msgid "✅ React Router handles routing client-side"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:147
+msgid "✅ Static assets excluded from fallback"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:148
+msgid "✅ Proper cache headers"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:149
+msgid "✅ Correct MIME types"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:151
+msgid ""
+"**Without this file:** Routes like `/auth` and `/dashboard` return 404 "
+"errors after Keycloak redirect."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:155
+msgid "Build and Deployment Steps"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:157
+msgid "Step 1 — Trigger"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:159
+msgid "Push changes to `acc` branch:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:161
+msgid ""
+"cd ~/Development/ronl-business-api\n"
+"\n"
+"# Make frontend changes\n"
+"nano packages/frontend/src/pages/Dashboard.tsx\n"
+"\n"
+"# Commit and push\n"
+"git add packages/frontend/\n"
+"git commit -m \"feat: update dashboard styling\"\n"
+"git push origin acc"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:173
+msgid "Step 2 — GitHub Actions Build"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:175
+msgid "The workflow automatically:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:177
+msgid "Checks out code"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:178
+msgid "Sets up Node.js 20"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:179
+msgid "Installs dependencies (monorepo aware)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:180
+msgid "Builds frontend with environment variables"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:181
+msgid "Outputs to `packages/frontend/dist/`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:183
+msgid "**Build artifacts:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:184
+msgid ""
+"dist/\n"
+"├── index.html                 # Entry point\n"
+"├── assets/\n"
+"│   ├── index-[hash].js        # Main bundle\n"
+"│   ├── index-[hash].css       # Styles\n"
+"│   └── [other assets]\n"
+"├── tenants.json               # Municipality config (copied from public/)\n"
+"└── staticwebapp.config.json   # SPA routing (copied from public/)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:195
+msgid "Step 3 — Azure Deployment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:197
+msgid "The `Azure/static-web-apps-deploy@v1` action:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:199
+msgid "Authenticates with Azure using API token"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:200
+msgid "Uploads `dist/` folder to Azure Storage"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:201
+msgid "Invalidates CDN cache"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:202
+msgid "Updates routing rules from `staticwebapp.config.json`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:203
+msgid "Makes new version live"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:205
+msgid "**Deployment time:** ~2-3 minutes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:207
+msgid "Step 4 — Verification"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:209
+msgid ""
+"# Check deployment status\n"
+"# GitHub Actions → Workflows → Deploy Frontend to ACC\n"
+"\n"
+"# Test URLs\n"
+"curl -I https://acc.mijn.open-regels.nl\n"
+"# Should return: 200 OK\n"
+"\n"
+"curl -I https://acc.mijn.open-regels.nl/auth\n"
+"# Should return: 200 OK (not 404!)\n"
+"\n"
+"# Test in browser\n"
+"# Visit: https://acc.mijn.open-regels.nl\n"
+"# Click \"Inloggen met DigiD\"\n"
+"# After Keycloak auth, /auth route should work\n"
+"# Dashboard should load at /dashboard"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:229
+msgid "Environment Files"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:231
+msgid "Environment variables are configured as GitHub Secrets:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:233
+msgid "ACC Secrets"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:235
+msgid ""
+"ACC_KEYCLOAK_URL=https://acc.keycloak.open-regels.nl\n"
+"ACC_API_URL=https://acc.api.open-regels.nl/v1\n"
+"ACC_AZURE_SWA_TOKEN=<deployment-token>"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:241
+msgid "PROD Secrets"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:243
+msgid ""
+"PROD_KEYCLOAK_URL=https://keycloak.open-regels.nl\n"
+"PROD_API_URL=https://api.open-regels.nl/v1\n"
+"PROD_AZURE_SWA_TOKEN=<deployment-token>"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:249
+msgid "Adding/Updating Secrets"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:251
+msgid "**GitHub Repository** → Settings → Secrets and variables → Actions"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:252
+msgid "Click **New repository secret**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:253
+msgid "Name: `ACC_KEYCLOAK_URL`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:254
+msgid "Value: `https://acc.keycloak.open-regels.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:255
+msgid "Click **Add secret**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:259
+msgid "Azure Static Web App Configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:261
+msgid "Resource Details"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:263
+msgid "**ACC:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:265
+msgid "**Name:** `ronl-frontend-acc`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:266
+msgid "**Resource Group:** `rg-ronl-acc`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:267
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\frontend.md:267"
+msgid "**Region:** West Europe"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:268
+msgid "**Custom Domain:** `acc.mijn.open-regels.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:269
+msgid "**Pricing:** Free tier (sufficient for this application)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:271
+msgid "**PROD:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:273
+msgid "**Name:** `ronl-frontend-prod`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:274
+msgid "**Resource Group:** `rg-ronl-prod`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:275
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\frontend.md:275"
+msgid "**Region:** West Europe"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:276
+msgid "**Custom Domain:** `mijn.open-regels.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:277
+msgid "**Pricing:** Standard tier (for production SLA)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:279
+msgid "Deployment Token"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:281
+msgid "**Retrieve token from Azure Portal:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:283
+msgid "Navigate to Static Web App resource"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:284
+msgid "Left menu → **Deployment tokens**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:285
+msgid "Copy **Deployment token**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:286
+msgid "Store in GitHub Secrets as `ACC_AZURE_SWA_TOKEN`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:288
+msgid "**Token permissions:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:290
+msgid "Upload build artifacts"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:291
+msgid "Update routing configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:292
+msgid "Invalidate CDN cache"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:294
+msgid "Custom Domain Setup"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:296
+msgid "**ACC domain (`acc.mijn.open-regels.nl`):**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:298
+msgid "Azure Portal → Static Web App → Custom domains"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:299
+msgid "Click **Add**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:300
+msgid "Enter: `acc.mijn.open-regels.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:301
+msgid "Choose: **Other DNS**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:302
+msgid "Add DNS records:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:302
+msgid ""
+"Type: CNAME\n"
+"Name: acc.mijn\n"
+"Value: <generated-url>.azurestaticapps.net"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:308
+msgid "Verify and add"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:310
+msgid "**SSL certificate:** Automatically provisioned by Azure (Let's Encrypt)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:314
+msgid "Post-Deployment Verification"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:316
+msgid "Automated Tests (Future)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:318
+msgid ""
+"# Add to workflow after deployment\n"
+"- name: Test deployed app\n"
+"  run: |\n"
+"    # Test root route\n"
+"    curl -f https://acc.mijn.open-regels.nl\n"
+"\n"
+"    # Test SPA routes\n"
+"    curl -f https://acc.mijn.open-regels.nl/auth\n"
+"    curl -f https://acc.mijn.open-regels.nl/dashboard\n"
+"\n"
+"    # Test static assets\n"
+"    curl -f https://acc.mijn.open-regels.nl/tenants.json"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:333
+msgid "Manual Testing Checklist"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:335
+msgid "[ ] Landing page loads (https://acc.mijn.open-regels.nl)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:336
+msgid "[ ] Three IDP buttons visible and styled correctly"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:337
+msgid "[ ] Changelog panel opens/closes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:338
+msgid "[ ] DigiD button → redirects to Keycloak"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:339
+msgid "[ ] After auth → `/auth` route works (no 404)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:340
+msgid "[ ] Dashboard loads at `/dashboard`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:341
+msgid "[ ] Municipality theme applied correctly"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:342
+msgid "[ ] Calculator form submits"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:343
+msgid "[ ] Mobile responsive (test on phone)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:344
+msgid "[ ] No console errors in browser DevTools"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:348
+msgid "Manual Deployment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:350
+msgid "If GitHub Actions fails or for emergency hotfix:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:352
+msgid "Step 1 — Build locally"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:354
+msgid ""
+"cd ~/Development/ronl-business-api/packages/frontend\n"
+"\n"
+"# Set environment variables\n"
+"export VITE_KEYCLOAK_URL=https://acc.keycloak.open-regels.nl\n"
+"export VITE_API_URL=https://acc.api.open-regels.nl/v1\n"
+"\n"
+"# Build\n"
+"npm run build\n"
+"\n"
+"# Output: dist/ directory\n"
+"ls -la dist/"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:368
+msgid "Step 2 — Deploy via Azure CLI"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:370
+msgid ""
+"# Install Azure CLI (if not installed)\n"
+"curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash\n"
+"\n"
+"# Login to Azure\n"
+"az login\n"
+"\n"
+"# Deploy to ACC\n"
+"az staticwebapp deploy \\\n"
+"  --name ronl-frontend-acc \\\n"
+"  --resource-group rg-ronl-acc \\\n"
+"  --source ./dist \\\n"
+"  --no-use-keychain\n"
+"\n"
+"# Wait for deployment (~2-3 minutes)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:387
+msgid "Step 3 — Verify"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:389
+msgid ""
+"# Test deployment\n"
+"curl -I https://acc.mijn.open-regels.nl\n"
+"# Should return: 200 OK\n"
+"\n"
+"# Open in browser\n"
+"# Visit: https://acc.mijn.open-regels.nl"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:400
+msgid "Keycloak Redirect URIs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:402
+msgid "**Critical:** Keycloak client must allow redirects from deployed URLs."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:404
+msgid "ACC Configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:406
+msgid "Keycloak Admin Console:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:408
+msgid "Realm: `ronl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:409
+msgid "Clients → `ronl-business-api`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:410
+msgid "**Valid Redirect URIs:** `https://acc.mijn.open-regels.nl/*`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:411
+msgid "**Valid Post Logout Redirect URIs:** `+` (inherits from redirect URIs)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:412
+msgid "**Web Origins:** `https://acc.mijn.open-regels.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:419
+msgid "PROD Configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:421
+msgid "Same as ACC but with:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:423
+msgid "**Valid Redirect URIs:** `https://mijn.open-regels.nl/*`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:424
+msgid "**Web Origins:** `https://mijn.open-regels.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:428
+msgid "Rollback Procedure"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:430
+msgid "If deployment causes issues:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:432
+msgid "Option 1 — Revert via GitHub"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:434
+msgid ""
+"# Find last working commit\n"
+"git log --oneline packages/frontend/\n"
+"\n"
+"# Revert to that commit\n"
+"git revert <commit-hash>\n"
+"\n"
+"# Push to trigger new deployment\n"
+"git push origin acc"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:445
+msgid "Option 2 — Rollback in Azure Portal"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:447
+msgid "Azure Portal → Static Web App"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:448
+msgid "Left menu → **Environments**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:449
+msgid "Select previous deployment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:450
+msgid "Click **Promote**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:454
+msgid "Troubleshooting"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:456
+msgid "404 on routes after deployment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:458
+msgid ""
+"**Symptoms:** Landing page works, but `/auth` and `/dashboard` return 404."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:460
+msgid "**Cause:** `staticwebapp.config.json` missing or not deployed."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:462
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\frontend.md:462"
+msgid "**Solution:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:464
+msgid ""
+"# Verify file exists in source\n"
+"ls -la packages/frontend/public/staticwebapp.config.json\n"
+"\n"
+"# File must be in public/ to be copied to dist/ during build\n"
+"\n"
+"# If missing, create it:\n"
+"cat > packages/frontend/public/staticwebapp.config.json << 'EOF'\n"
+"{\n"
+"  \"navigationFallback\": {\n"
+"    \"rewrite\": \"/index.html\",\n"
+"    \"exclude\": [\"/assets/*\", \"/*.js\", \"/*.css\", \"/*.json\"]\n"
+"  }\n"
+"}\n"
+"EOF\n"
+"\n"
+"# Commit and redeploy\n"
+"git add packages/frontend/public/staticwebapp.config.json\n"
+"git commit -m \"fix: add SPA routing configuration\"\n"
+"git push origin acc"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:486
+msgid "Environment variables not applied"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:488
+msgid "**Symptoms:** App loads but can't connect to Keycloak or API."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:490
+msgid "**Cause:** Build-time environment variables not set."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:492
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\frontend.md:492"
+msgid "**Solution:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:494
+msgid ""
+"# Check GitHub Secrets are configured\n"
+"# Repository → Settings → Secrets and variables → Actions\n"
+"\n"
+"# Required secrets:\n"
+"# - ACC_KEYCLOAK_URL\n"
+"# - ACC_API_URL\n"
+"\n"
+"# Verify workflow uses them:\n"
+"# .github/workflows/azure-frontend-acc.yml\n"
+"env:\n"
+"  VITE_KEYCLOAK_URL: ${{ secrets.ACC_KEYCLOAK_URL }}\n"
+"  VITE_API_URL: ${{ secrets.ACC_API_URL }}\n"
+"\n"
+"# Re-run workflow after fixing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:511
+msgid "CORS errors in browser console"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:513
+msgid "**Symptoms:** Browser shows CORS policy errors when calling API."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:515
+msgid "**Cause:** Keycloak or API not configured for frontend origin."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:517
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\frontend.md:517"
+msgid "**Solution:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:519
+msgid ""
+"# Keycloak: Web Origins should be '+'\n"
+"# This inherits all Valid Redirect URIs as allowed origins\n"
+"\n"
+"# API: Backend must allow frontend origin in CORS config\n"
+"# packages/backend/src/index.ts\n"
+"app.use(cors({\n"
+"  origin: [\n"
+"    'https://acc.mijn.open-regels.nl',\n"
+"    'https://mijn.open-regels.nl'\n"
+"  ],\n"
+"  credentials: true\n"
+"}));"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:534
+msgid "Deployment takes too long or fails"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:536
+msgid "**Symptoms:** GitHub Actions workflow runs for 10+ minutes or fails."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:538
+msgid "**Cause:** Azure Static Web Apps service issues or incorrect token."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:540
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\frontend.md:540"
+msgid "**Solution:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:542
+msgid ""
+"# Check Azure service status\n"
+"# Visit: https://status.azure.com/\n"
+"\n"
+"# Verify deployment token is valid\n"
+"# Azure Portal → Static Web App → Deployment tokens\n"
+"# Regenerate if needed and update GitHub Secret\n"
+"\n"
+"# Check workflow logs for specific error\n"
+"# GitHub Actions → Failed workflow → View logs\n"
+"\n"
+"# Common errors:\n"
+"# - \"401 Unauthorized\" → Token invalid, regenerate\n"
+"# - \"429 Too Many Requests\" → Wait and retry later"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:558
+msgid "Build succeeds but app doesn't update"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:560
+msgid ""
+"**Symptoms:** Deployment completes successfully but changes not visible."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:562
+msgid "**Cause:** Browser cache or CDN cache."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:564
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\frontend.md:564"
+msgid "**Solution:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:566
+msgid ""
+"# Hard refresh browser\n"
+"# Chrome: Ctrl+Shift+R (Windows/Linux) or Cmd+Shift+R (Mac)\n"
+"# Firefox: Ctrl+F5 (Windows/Linux) or Cmd+Shift+R (Mac)\n"
+"\n"
+"# Check deployed version\n"
+"# View source: https://acc.mijn.open-regels.nl\n"
+"# Look for timestamp or version comments\n"
+"\n"
+"# CDN cache usually invalidates within 5 minutes\n"
+"# Wait and try again if issue persists"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:581
+msgid "Performance Optimization"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:583
+msgid "Bundle Size"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:585
+msgid "Current build stats (~production):"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:587
+msgid "**Total bundle:** ~250 KB gzipped"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:588
+msgid "**index.js:** ~200 KB (React, React Router, Keycloak, Axios)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:589
+msgid "**index.css:** ~50 KB (Tailwind CSS)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:591
+msgid "**Optimization opportunities:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:593
+msgid "✅ Vite code splitting (already enabled)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:594
+msgid "✅ Tree shaking (already enabled)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:595
+msgid "⚠️ Consider lazy loading routes for larger apps"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:596
+msgid "⚠️ Consider removing unused Tailwind classes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:598
+msgid "CDN Performance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:600
+msgid "Azure Static Web Apps provides:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:602
+msgid "✅ Global CDN distribution"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:603
+msgid "✅ Automatic gzip/brotli compression"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:604
+msgid "✅ HTTP/2 support"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:605
+msgid "✅ Edge caching (configured via `staticwebapp.config.json`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:607
+msgid "**Cache headers:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:608
+msgid ""
+"{\n"
+"  \"globalHeaders\": {\n"
+"    \"cache-control\": \"no-cache, no-store, must-revalidate\"\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:616
+msgid "Currently set to no-cache for development. For production, consider:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:617
+msgid ""
+"{\n"
+"  \"routes\": [\n"
+"    {\n"
+"      \"route\": \"/assets/*\",\n"
+"      \"headers\": {\n"
+"        \"cache-control\": \"public, max-age=31536000, immutable\"\n"
+"      }\n"
+"    }\n"
+"  ]\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:632
+msgid "Related Documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:634
+msgid "[Frontend Development]{1} — Local development setup"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:635
+msgid "[Keycloak Deployment]{1} — Redirect URI configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:636
+msgid "[Backend Deployment]{1} — API CORS configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:637
+msgid "[Deployment Overview]{1} — Full architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:638
+msgid "[CI/CD Guide]{1} — GitHub Actions workflows"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cfrontend.md:642
+msgid ""
+"**Questions or issues?** See [Troubleshooting]{1} or contact the DevOps team."
+msgstr ""

@@ -1,0 +1,279 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:1
+msgid "Project Structure"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:3
+msgid ""
+"**Version:** 1.9.x (fully modularised)\n"
+"**Framework:** React 18.3.1"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:8
+msgid "Directory layout"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:10
+msgid ""
+"cpsv-editor/\n"
+"├── public/\n"
+"│   ├── index.html\n"
+"│   ├── favicon.svg\n"
+"│   ├── manifest.json\n"
+"│   └── examples/\n"
+"│       └── organizations/\n"
+"│           ├── toeslagen/          # Zorgtoeslag example DMN + test cases\n"
+"│           ├── duo/                # DUO example DMN + test cases\n"
+"│           └── svb/                # SVB AOW example DMN + test cases\n"
+"│\n"
+"├── src/\n"
+"│   ├── App.js                      # Main orchestrator: layout, navigation, "
+"import\n"
+"│   ├── App.css\n"
+"│   ├── index.js                    # React entry point\n"
+"│   ├── index.css                   # Global styles, Tailwind imports\n"
+"│   │\n"
+"│   ├── components/\n"
+"│   │   ├── PreviewPanel.jsx        # Live TTL preview side panel\n"
+"│   │   ├── PublishDialog.jsx       # TriplyDB publish dialog\n"
+"│   │   └── tabs/\n"
+"│   │       ├── index.js            # Barrel export\n"
+"│   │       ├── ServiceTab.jsx\n"
+"│   │       ├── OrganizationTab.jsx\n"
+"│   │       ├── LegalTab.jsx\n"
+"│   │       ├── RulesTab.jsx        # RPP: Rules\n"
+"│   │       ├── ParametersTab.jsx   # RPP: Parameters\n"
+"│   │       ├── CPRMVTab.jsx        # RPP: Policy\n"
+"│   │       ├── DMNTab.jsx          # DMN upload, deploy, test\n"
+"│   │       ├── VendorTab.jsx       # Vendor integration\n"
+"│   │       ├── IKnowMappingTab.jsx # iKnow import\n"
+"│   │       └── ChangelogTab.jsx\n"
+"│   │\n"
+"│   ├── hooks/\n"
+"│   │   ├── useEditorState.js       # Centralised state management\n"
+"│   │   └── useArrayHandlers.js     # DRY CRUD for array-based fields\n"
+"│   │\n"
+"│   ├── utils/\n"
+"│   │   ├── index.js                # Barrel export\n"
+"│   │   ├── constants.js            # Shared constants, dropdown options\n"
+"│   │   ├── ttlGenerator.js         # TTL generation class\n"
+"│   │   ├── importHandler.js        # Import logic\n"
+"│   │   ├── dmnHelpers.js           # DMN-specific utilities\n"
+"│   │   ├── validators.js           # Form validation\n"
+"│   │   ├── parseTTL.enhanced.js    # TTL parser with DMN preservation\n"
+"│   │   ├── triplydbHelper.js       # TriplyDB API integration\n"
+"│   │   ├── ronlHelper.js           # RONL vocabulary SPARQL queries\n"
+"│   │   └── iknowParser.js          # iKnow XML parser\n"
+"│   │\n"
+"│   ├── data/\n"
+"│   │   ├── changelog.json          # Powers ChangelogTab\n"
+"│   │   ├── roadmap.json            # Planned features for ChangelogTab\n"
+"│   │   └── cprmv-example.json      # Example data for CPRMV \"Load "
+"Example\"\n"
+"│   │\n"
+"│   └── config/\n"
+"│       ├── vocabularies_config.js  # RDF vocabulary mappings for parser\n"
+"│       └── iknow-mappings.js       # iKnow default field mapping templates\n"
+"│\n"
+"├── .github/\n"
+"│   └── workflows/\n"
+"│       └── azure-static-web-apps.yml\n"
+"│\n"
+"└── package.json"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:78
+msgid "Key modules"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:80
+msgid "`src/hooks/useEditorState.js`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:82
+msgid "Centralises all editor state into a single custom hook, providing:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:84
+msgid ""
+"State slices for every tab (service, organization, legalResource, "
+"temporalRules, parameters, cprmvRules, cost, output, dmnData, "
+"iknowMappingConfig)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:85
+msgid "A `clearAllData()` action that resets the entire editor"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:87
+msgid ""
+"This replaces dozens of individual `useState` calls that were previously "
+"spread across `App.js`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:89
+msgid "`src/hooks/useArrayHandlers.js`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:91
+msgid ""
+"Provides DRY CRUD handlers for any array-based state (rules, parameters, "
+"CPRMV rules):"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:93
+msgid ""
+"{\n"
+"  handleAdd,        // Append new item with auto-incremented ID\n"
+"  handleUpdate,     // Update item by ID with partial patch\n"
+"  handleRemove,     // Remove item by ID\n"
+"  handleUpdateField,// Update a single field (convenience wrapper)\n"
+"  handleClear,      // Clear the entire array\n"
+"  handleReplace     // Replace the entire array\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:104
+msgid ""
+"IDs use `Math.max(...ids) + 1` — stable under rapid additions, unlike "
+"`Date.now()`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:106
+msgid "`src/utils/ttlGenerator.js`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:108
+msgid ""
+"Class-based TTL generation. Each tab section has a corresponding generate "
+"method. Called by `App.js` on export and by `PreviewPanel` on every state "
+"change."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:110
+msgid "`src/utils/parseTTL.enhanced.js`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:112
+msgid ""
+"Full TTL parser. Handles vocabulary detection, multi-line values, namespace "
+"resolution, date parsing, array extraction (keywords), and DMN block capture "
+"and preservation. Returns a data structure matching the editor state shape "
+"for direct use in `useEditorState`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:114
+msgid "`src/config/vocabularies_config.js`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:116
+msgid ""
+"Configuration-driven vocabulary management. Defines namespace-to-prefix "
+"mappings, RDF type-to-editor-section mappings, and property aliases. See "
+"[Vocabulary Configuration]{1} for how to extend it."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:120
+msgid "RPP tab mapping"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "Layer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "Tab"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "Badge label"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "Colour"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "Rules"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "RulesTab"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "RPP Layer: Rules"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "Blue"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "Policy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "CPRMVTab"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "RPP Layer: Policy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "Purple"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "Parameters"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "ParametersTab"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "RPP Layer: Parameters"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:122
+msgid "Green"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:130
+msgid "State flow"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:132
+msgid "**Import:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:134
+msgid ""
+"TTL file → importHandler.js → parseTTL.enhanced.js → useEditorState.set*() → "
+"tabs re-render"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:138
+msgid "**Export / Live preview:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cproject-structure.md:140
+msgid ""
+"useEditorState → ttlGenerator.js generate() → combine sections → "
+"PreviewPanel / download"
+msgstr ""

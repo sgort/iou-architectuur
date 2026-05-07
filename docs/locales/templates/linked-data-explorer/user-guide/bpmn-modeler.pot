@@ -1,0 +1,420 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:1
+msgid "BPMN Modeler"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:3
+msgid ""
+"The BPMN Modeler lets you design government service workflows and link "
+"decision model references directly to DMNs and DRDs you have discovered or "
+"saved in the Chain Builder."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:7
+msgid "Opening the Modeler"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:9
+msgid ""
+"Click the Workflow icon in the left sidebar. The Modeler opens with the "
+"process list on the left, the canvas in the centre, and the properties panel "
+"on the right."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:11
+msgid ""
+"On your first visit, the **Tree Felling Permit** example process loads "
+"automatically. It demonstrates a complete municipal workflow and serves as a "
+"reference — examine it before creating your own processes."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:15
+msgid "Creating a process"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:17
+msgid "Click the blue **+** button at the top of the process list."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:18
+msgid ""
+"A new process named \"New Process\" appears in the list and the canvas shows "
+"an empty diagram with a start event."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:19
+msgid "Double-click the process name in the list to rename it."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:23
+msgid "Building a diagram"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:25
+msgid ""
+"Drag elements from the palette on the left edge of the canvas onto the "
+"diagram area. Connect elements by clicking the source element and dragging "
+"the blue arrow handle that appears on hover to the target element."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:27
+msgid ""
+"Available element types: start events, intermediate events, end events, "
+"tasks (user, service, business rule), gateways (exclusive, parallel, "
+"inclusive, event-based), sub-processes, data objects, pools, and text "
+"annotations."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:31
+msgid "Linking a BusinessRuleTask to a decision"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:33
+msgid ""
+"Select a **BusinessRuleTask** on the canvas. The properties panel on the "
+"right shows the element details, including a **DMN/DRD Decision Reference** "
+"section."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:40
+msgid "Click **Link to DMN/DRD** to open the dropdown."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:41
+msgid "The dropdown shows two groups:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:41
+msgid ""
+"**🔗 DRDs (Unified Chains)** — DRD templates saved from the Chain Builder"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:41
+msgid ""
+"**📋 Single DMNs** — individual decision models from the active TriplyDB "
+"endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:44
+msgid ""
+"Select an option. The `camunda:decisionRef` field auto-populates with the "
+"correct identifier and a suggested `camunda:resultVariable` value appears."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:45
+msgid ""
+"An info card confirms your selection. DRD cards show the constituent DMNs "
+"the DRD combines; single DMN cards show the decision identifier."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:49
+msgid "Linking a UserTask or StartEvent to a form"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:51
+msgid ""
+"`UserTask` and `StartEvent` elements can be linked to Camunda Forms authored "
+"in the [Form Editor]{1}. Once linked, Operaton renders the form at runtime "
+"for the citizen or caseworker assigned to that task."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:53
+msgid ""
+"Select a **UserTask** or **StartEvent** on the canvas. The properties panel "
+"shows a **Link to Form** section beneath the standard element fields."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:60
+msgid ""
+"Click the **Link to Form** dropdown. It lists all forms currently saved in "
+"the Form Editor."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:61
+msgid "Select the form you want to link."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:62
+msgid ""
+"A confirmation card appears below the dropdown showing the form name and the "
+"resulting `camunda:formRef` value."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:63
+msgid ""
+"A **green badge** appears below the element on the canvas, confirming the "
+"link."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:65
+msgid ""
+"The dropdown writes `camunda:formRef` and "
+"`camunda:formRefBinding=\"latest\"` into the BPMN XML. `binding: latest` "
+"means Operaton always uses the most recently deployed version of that form — "
+"you do not need to pin a specific version."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:67
+msgid ""
+"To unlink a form, open the dropdown and select the blank option at the top."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:69
+msgid ""
+"!!! tip \"Form not in the list?\" Open the **Form Editor** view and create "
+"or save the form first. Forms appear in the dropdown immediately after "
+"saving — no page reload required."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:74
+msgid "Deploying to Operaton"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:76
+msgid ""
+"The Modeler can deploy your process — including subprocess BPMNs and linked "
+"forms — to Operaton in a single step."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:78
+msgid ""
+"Click the **Deploy** button in the canvas toolbar. The deploy modal opens "
+"and lists:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:80
+msgid "The current BPMN file"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:81
+msgid ""
+"Any subprocess BPMNs it calls via `calledElement` (resolved from your saved "
+"processes)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:82
+msgid ""
+"All `.form` files whose IDs match `camunda:formRef` references in the bundle"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:83
+msgid ""
+"All `.document` files whose IDs match `ronl:documentRef` references in the "
+"bundle"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:85
+msgid ""
+"!!! note \"DMNs are not part of the deploy bundle\" Decision models "
+"referenced via `camunda:decisionRef` on `BusinessRuleTask` elements are "
+"**not** included in this deployment. DMNs reach Operaton through a separate "
+"path: they are published to TriplyDB by the [CPSV Editor]{1} and deployed to "
+"Operaton from there. The BPMN process resolves `camunda:decisionRef` at "
+"runtime against whatever is already deployed — as long as the DMN key "
+"matches, no additional action is needed here."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:93
+msgid ""
+"Review the resource list. If a referenced form ID is shown as unmatched, "
+"open the Form Editor and save a form with that ID before deploying."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:94
+msgid ""
+"Confirm or edit the **Operaton endpoint** URL. It is pre-filled from the "
+"environment configuration."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:95
+msgid ""
+"If your Operaton instance requires authentication, enter the **Username** "
+"and **Password**."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:96
+msgid "Click **Deploy**. All resources are sent in one multipart request."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:97
+msgid ""
+"On success, a deployment ID is shown and the Deploy button is disabled to "
+"prevent accidental re-deploy."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:99
+msgid ""
+"Because the BPMN and all its forms land in the same Operaton deployment, "
+"`camunda:formRef` resolves correctly at runtime with no additional steps."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:103
+msgid "Editing element properties"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:105
+msgid ""
+"**Name**: editable in the right properties panel for any selected element"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:106
+msgid "**Element ID**: shown read-only (managed by bpmn-js)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:107
+msgid ""
+"**BusinessRuleTask specific**: `camunda:decisionRef`, "
+"`camunda:resultVariable`, `camunda:mapDecisionResult`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:111
+msgid "Zoom and navigation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:113
+msgid "**Scroll wheel** — zoom in and out"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:114
+msgid "**+ / − buttons** in the toolbar — zoom in/out in steps"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:115
+msgid ""
+"**Fit to viewport** button — centres and scales the diagram to fill the "
+"canvas"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:116
+msgid "**Click and drag** on empty canvas — pan"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:120
+msgid "Storage"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:122
+msgid ""
+"Processes are stored in PostgreSQL via the LDE backend and cached in browser "
+"`localStorage` for instant access. On editor load, the service fetches the "
+"authoritative list from the server and replaces the local cache. If the "
+"backend is unreachable, the local cache is used as a fallback without any "
+"error surfaced to the user."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:124
+msgid ""
+"Example processes (`readonly: true`) are seeded from `public/examples/` on "
+"the frontend and are never written to the database."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:126
+msgid "See [Asset Storage]{1} for the full architecture."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:128
+msgid ""
+"Click **Export** to download a `.bpmn` file for deployment to Operaton. You "
+"can also deploy directly from the Modeler using the **Deploy** button. See "
+"[Deploying to Operaton]{1} above."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:132
+msgid "The Tree Felling Permit example"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:134
+msgid "The example process cannot be deleted. It demonstrates:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:136
+msgid "`UserTask` for application submission"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:137
+msgid ""
+"`BusinessRuleTask` (Assess Felling Permit) linked to `TreeFellingDecision`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:138
+msgid "`ExclusiveGateway` routing on the decision outcome"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:139
+msgid ""
+"`BusinessRuleTask` (Assess Replacement Requirement) linked to "
+"`ReplacementTreeDecision`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:140
+msgid "Two end events: Permit Granted and Permit Rejected"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:142
+msgid ""
+"To use it as a starting point, export it, create a new process, and paste "
+"the exported XML."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:146
+msgid "AWB shell and subprocess examples"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:148
+msgid ""
+"The process library ships with two AWB shell processes and their "
+"subprocesses:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:150
+msgid ""
+"**AWB Generic Process** (`SHELL`) — the universal eight-phase AWB procedural "
+"shell for the Kapvergunning (tree felling permit). Calls "
+"`TreeFellingPermitSubProcess` via a Call Activity at Phase 4+5."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:152
+msgid ""
+"└── **Tree Felling Permit** (`SUB`) — evaluates the substantive tree felling "
+"decision and routes to caseworker review."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:154
+msgid ""
+"**AWB Zorgtoeslag — Provisional Entitlement** (`SHELL`) — AWB shell wired "
+"for the Zorgtoeslag provisional entitlement subprocess."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:156
+msgid ""
+"└── **Zorgtoeslag — Provisional Entitlement** (`SUB`) — validates "
+"application, retrieves income data, evaluates the `resultaat_zorgtoeslag` "
+"DMN, and routes to caseworker review."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:158
+msgid ""
+"└── **Zorgtoeslag — Final Settlement** (`SUB`) — started via the "
+"`FinalIncomeReceived` message event once final annual income data arrives "
+"from Belastingdienst. Evaluates confirmed income and sets the settlement "
+"outcome."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cbpmn-modeler.md:160
+msgid ""
+"All example processes are protected (`EXAMPLE` badge, delete disabled). To "
+"use one as a starting point, export it and import the copy as a new process."
+msgstr ""

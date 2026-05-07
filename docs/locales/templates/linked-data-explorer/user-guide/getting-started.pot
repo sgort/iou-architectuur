@@ -1,0 +1,239 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:1
+msgid "Getting Started"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:3
+msgid ""
+"This guide walks you through the Linked Data Explorer for the first time, "
+"from opening the application to executing your first DMN chain."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:7
+msgid "Prerequisites"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:9
+msgid ""
+"Access to [linkeddata.open-regels.nl]{1} or the [acceptance environment]{2}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:10
+msgid ""
+"A modern browser (Chrome, Firefox, Safari, or Edge — latest two versions)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:11
+msgid "No login required for the reference TriplyDB endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:15
+msgid "Application layout"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:17
+msgid ""
+"The application has a narrow left sidebar with navigation icons, and a main "
+"content area that changes depending on the active view."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "Icon"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "View"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "Search / query"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "SPARQL Query Editor"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "GitBranch"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "Chain Builder (Orchestration)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "Flowchart"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "BPMN Modeler"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "ShieldCheck"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "DMN Validator"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "Graph"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "Graph Visualisation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "HelpCircle"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "Help"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "BookOpen"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:24
+msgid "Changelog"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:36
+msgid "Your first chain execution — 5-minute walkthrough"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:38
+msgid ""
+"This walkthrough uses the Heusdenpas chain: three DMNs from SVB, SZW, and "
+"the Heusden municipality that together assess eligibility for the Heusdenpas "
+"social benefit pass."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:40
+msgid "**Step 1 — Open the Chain Builder**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:42
+msgid ""
+"Click the GitBranch icon in the left sidebar. The view splits into three "
+"panels: Available DMNs (left), Chain Composer (centre), and Configuration "
+"(right)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:44
+msgid "**Step 2 — Verify DMNs are loaded**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:46
+msgid ""
+"The Available DMNs panel should show several DMN cards. If it is empty, "
+"check that the active endpoint is set to the RONL TriplyDB dataset in the "
+"configuration panel. You should see `SVB_LeeftijdsInformatie`, "
+"`SZW_BijstandsnormInformatie`, and at minimum one Heusden DMN."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:48
+msgid "**Step 3 — Build the chain**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:50
+msgid ""
+"Drag `SVB_LeeftijdsInformatie` into the Chain Composer. Then drag "
+"`SZW_BijstandsnormInformatie` below it. The validation panel should show a "
+"green checkmark: \"Chain is valid and ready to execute.\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:52
+msgid "**Step 4 — Provide inputs**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:54
+msgid ""
+"The input form in the Configuration panel shows the inputs the chain needs "
+"from you. Fill in a `geboortedatum` (date of birth in YYYY-MM-DD format, "
+"e.g., `1960-01-01`)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:56
+msgid "**Step 5 — Execute**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:58
+msgid ""
+"Click **Execute**. The execution panel shows per-step progress with timing. "
+"When complete, the results panel shows the final output values."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:62
+msgid "Smoke test checklist"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:64
+msgid "Use this after any configuration change to verify core functionality:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:66
+msgid ""
+"[ ] Backend health: `GET https://backend.linkeddata.open-regels.nl/v1/"
+"health` returns `\"status\": \"healthy\"`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:67
+msgid "[ ] DMN list loads in Chain Builder (at least 3 cards)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:68
+msgid ""
+"[ ] Dragging two DMNs into the composer produces either a green or amber "
+"validation status (not an error)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:69
+msgid ""
+"[ ] An exact-match chain (SVB → SZW) shows green validation and active "
+"Execute/Save/Export buttons"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:70
+msgid ""
+"[ ] Clicking Execute with valid inputs returns results without console errors"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:71
+msgid ""
+"[ ] SPARQL Query Editor: clicking Run Query returns results in the table"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:75
+msgid "Next steps"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:77
+msgid ""
+"[Running SPARQL Queries]{1} — use the query editor to explore the knowledge "
+"graph directly"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:78
+msgid "[Building DMN Chains]{1} — detailed chain-building workflow"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cgetting-started.md:79
+msgid "[BPMN Modeler]{1} — embed decision references in BPMN process diagrams"
+msgstr ""

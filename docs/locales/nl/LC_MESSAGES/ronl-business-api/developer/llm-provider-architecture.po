@@ -1,0 +1,283 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:1
+msgid "LLM Provider Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:3
+msgid ""
+"The AI Assistant decouples the agentic loop from any specific LLM SDK "
+"through a `LlmProvider` interface and a `LlmRegistry` singleton. Adding a "
+"new LLM (Mistral, Azure OpenAI, Google Gemini, etc.) requires only "
+"implementing the interface and registering the provider at startup — no "
+"changes to the chat service, routes, or frontend are needed."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:5
+msgid ""
+"See [MCP AI Assistant]{1} for the overall architecture and MCP source "
+"registry."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:9
+msgid "Interface"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:11
+msgid ""
+"`packages/backend/src/services/llm/LlmProvider.ts` defines the contract "
+"every provider must satisfy."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:12
+msgid ""
+"export interface LlmProvider {\n"
+"  readonly meta: LlmProviderMeta;\n"
+"  isAvailable(): boolean;\n"
+"  streamTurn(\n"
+"    params: LlmStreamParams,\n"
+"    onDelta: (text: string) => void,\n"
+"    signal?: AbortSignal\n"
+"  ): Promise<LlmTurnResult>;\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:24
+msgid ""
+"`isAvailable()` returns `false` when the provider's API key is not "
+"configured. Unavailable providers are registered but their models are "
+"excluded from `GET /v1/mcp/models`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:26
+msgid ""
+"`streamTurn()` receives a provider-agnostic `AgentMessage[]` history, a "
+"system prompt, and tool definitions. It calls `onDelta` for each text chunk "
+"and returns an `LlmTurnResult` containing the full response text, any tool "
+"use blocks, and the stop reason. The chat service (`mcpChat.service.ts`) "
+"never imports any SDK directly."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:28
+msgid "Message types"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:29
+msgid ""
+"export type AgentMessage =\n"
+"  | { role: 'user';              content: string }\n"
+"  | { role: 'assistant';         content: string }\n"
+"  | { role: 'assistant_tool_use'; toolUses: AgentToolUse[] }\n"
+"  | { role: 'tool_results';      results: AgentToolResult[] };"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:37
+msgid ""
+"Each provider's `streamTurn()` implementation converts these to its SDK's "
+"native format. `toAnthropicMessage()` and `toOpenAIMessage()` in the "
+"respective provider files handle the mapping."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:41
+msgid "Registry"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:43
+msgid "`LlmRegistry` maps model IDs to their owning provider."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:44
+msgid ""
+"llmRegistry.register(new AnthropicLlmProvider());\n"
+"llmRegistry.register(new OpenAILlmProvider());"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:49
+msgid ""
+"`llmRegistry.getProvider(modelId)` is called by `runChatStream()` to resolve "
+"which provider handles the request. `llmRegistry.getAvailableModels()` "
+"returns all models from connected providers, used by `GET /v1/mcp/models`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:53
+msgid "Registered providers"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:55
+msgid "`AnthropicLlmProvider`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:57
+msgid "Uses `@anthropic-ai/sdk`. Enabled when `ANTHROPIC_API_KEY` is set."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:59
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\llm-provider-architecture.md:59"
+msgid "Model ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:59
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\llm-provider-architecture.md:59"
+msgid "Display name"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:59
+msgid "`claude-sonnet-4-20250514`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:59
+msgid "Claude Sonnet 4"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:59
+msgid "`claude-opus-4-20250514`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:59
+msgid "Claude Opus 4"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:59
+msgid "`claude-haiku-4-5-20251001`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:59
+msgid "Claude Haiku 4.5"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:65
+msgid "`OpenAILlmProvider`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:67
+msgid "Uses `openai`. Enabled when `OPENAI_API_KEY` is set."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:69
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\llm-provider-architecture.md:69"
+msgid "Model ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:69
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\llm-provider-architecture.md:69"
+msgid "Display name"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:69
+msgid "`gpt-4o`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:69
+msgid "GPT-4o"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:69
+msgid "`gpt-4o-mini`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:69
+msgid "GPT-4o Mini"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:76
+msgid "Response delivery: streaming vs. buffered"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:78
+msgid ""
+"`onDelta` is called per token as the stream arrives. This produces a visible "
+"build-up effect in the assistant bubble — the user sees progress during long "
+"multi-tool queries rather than a blank wait followed by a sudden full "
+"response."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:80
+msgid ""
+"The pre-registry behavior (one emission of the full text after "
+"`stream.finalMessage()`) can be restored in `AnthropicLlmProvider.streamTurn"
+"()` by buffering and emitting once:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:81
+msgid ""
+"// Buffered (all-at-once) variant\n"
+"const response = await stream.finalMessage();\n"
+"const text = response.content\n"
+"  .filter((b): b is Anthropic.TextBlock => b.type === 'text')\n"
+"  .map((b) => b.text)\n"
+"  .join('');\n"
+"if (text) onDelta(text);"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:91
+msgid ""
+"The streaming variant is the current default. Which is preferable is subject "
+"to user feedback."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:95
+msgid "Frontend — model selector"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:97
+msgid "`GET /v1/mcp/models` returns all available models with their provider:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:98
+msgid ""
+"export interface LlmModelEntry {\n"
+"  id: string;\n"
+"  displayName: string;\n"
+"  providerId: string;\n"
+"  providerDisplayName: string;\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:107
+msgid ""
+"`McpChatSection` fetches this on mount and renders a `<select>` below the "
+"source toggles when more than one model is available. The selected `modelId` "
+"is sent on every `POST /v1/mcp/chat` request. When only one model is "
+"available the selector is hidden."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:111
+msgid "Adding a new provider"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:113
+msgid ""
+"Create `packages/backend/src/services/llm/YourLlmProvider.ts` implementing "
+"`LlmProvider`. Declare `meta.models` with the model IDs you want to expose. "
+"Implement `toYourMessage()` to convert `AgentMessage` to the SDK's native "
+"format and handle the `assistant_tool_use` / `tool_results` roles."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:114
+msgid "Add the API key to `Config` in `config.ts` and to `.env.example`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:115
+msgid "Register in `packages/backend/src/index.ts`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:116
+msgid "llmRegistry.register(new YourLlmProvider());"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cllm-provider-architecture.md:120
+msgid ""
+"The new provider's models appear in `GET /v1/mcp/models` immediately after "
+"deployment, as long as `isAvailable()` returns `true`."
+msgstr ""

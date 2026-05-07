@@ -1,0 +1,211 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:1
+msgid "Vendor Services Implementation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:3
+msgid ""
+"This page covers the SPARQL query, TypeScript interfaces, and UI components "
+"that implement the vendor badge and detail modal."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:7
+msgid "Backend — SPARQL query"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:9
+msgid "Vendor data is queried alongside DMN metadata using `OPTIONAL` blocks:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:11
+msgid ""
+"PREFIX ronl:   <https://regels.overheid.nl/ontology#>\n"
+"PREFIX schema: <http://schema.org/> .\n"
+"PREFIX foaf:   <http://xmlns.com/foaf/0.1/> .\n"
+"\n"
+"SELECT ?identifier\n"
+"       ?vendorService ?vendorPlatform\n"
+"       ?providerName ?providerLogo ?providerHomepage\n"
+"       ?contactName ?contactEmail ?contactPhone\n"
+"       ?serviceUrl ?license ?accessType ?description\n"
+"WHERE {\n"
+"  ?dmn a cprmv:DecisionModel ;\n"
+"       dct:identifier ?identifier .\n"
+"\n"
+"  OPTIONAL {\n"
+"    ?vendorService a ronl:VendorService ;\n"
+"                   ronl:basedOn ?dmn ;\n"
+"                   ronl:implementedBy ?vendorPlatform .\n"
+"    OPTIONAL {\n"
+"      ?vendorService schema:provider ?provider .\n"
+"      OPTIONAL { ?provider schema:name ?providerName . }\n"
+"      OPTIONAL { ?provider schema:image ?providerLogo . }\n"
+"      OPTIONAL { ?provider foaf:homepage ?providerHomepage . }\n"
+"      OPTIONAL {\n"
+"        ?provider schema:contactPoint ?contact .\n"
+"        OPTIONAL { ?contact schema:name ?contactName . }\n"
+"        OPTIONAL { ?contact schema:email ?contactEmail . }\n"
+"        OPTIONAL { ?contact schema:telephone ?contactPhone . }\n"
+"      }\n"
+"    }\n"
+"    OPTIONAL { ?vendorService schema:url ?serviceUrl . }\n"
+"    OPTIONAL { ?vendorService schema:license ?license . }\n"
+"    OPTIONAL { ?vendorService ronl:accessType ?accessType . }\n"
+"    OPTIONAL { ?vendorService dct:description ?description . }\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:49
+msgid ""
+"The backend groups multiple vendor records per DMN identifier in post-"
+"processing, building the `vendors` array on each `DmnModel`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:53
+msgid "TypeScript interfaces"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:55
+msgid ""
+"interface VendorService {\n"
+"  uri: string;\n"
+"  platform?: string;          // ronl:implementedBy URI\n"
+"  providerName?: string;\n"
+"  providerLogo?: string;      // Image URI\n"
+"  providerHomepage?: string;\n"
+"  contactName?: string;\n"
+"  contactEmail?: string;\n"
+"  contactPhone?: string;\n"
+"  serviceUrl?: string;\n"
+"  license?: 'Commercial' | 'Open Source' | 'Free';\n"
+"  accessType?: 'iam-required' | 'public' | 'api-key';\n"
+"  description?: string;\n"
+"}\n"
+"\n"
+"// Added to DmnModel\n"
+"interface DmnModel {\n"
+"  // ... existing fields ...\n"
+"  vendorCount: number;\n"
+"  vendors: VendorService[];\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:81
+msgid "Frontend — vendor badge"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:83
+msgid ""
+"The vendor count badge on a DMN card renders only when `vendorCount > 0`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:85
+msgid ""
+"{dmn.vendorCount > 0 && (\n"
+"  <button\n"
+"    className=\"vendor-badge\"\n"
+"    onClick={(e) => { e.stopPropagation(); openVendorModal(dmn); }}\n"
+"  >\n"
+"    🏢 {dmn.vendorCount}\n"
+"  </button>\n"
+")}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:96
+msgid ""
+"`e.stopPropagation()` prevents the card expand/collapse from triggering when "
+"the badge is clicked."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:100
+msgid "Frontend — vendor modal"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:102
+msgid ""
+"The vendor modal renders a section per vendor in `dmn.vendors`. Key "
+"rendering logic for licence and access type badges:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:104
+msgid ""
+"const licenceBadge = {\n"
+"  'Commercial': 'badge-purple',\n"
+"  'Open Source': 'badge-green',\n"
+"  'Free': 'badge-blue',\n"
+"};\n"
+"\n"
+"const accessBadge = {\n"
+"  'iam-required': { label: 'IAM Required', style: 'badge-amber' },\n"
+"  'public': { label: 'Public Access', style: 'badge-green' },\n"
+"  'api-key': { label: 'API Key Required', style: 'badge-blue' },\n"
+"};"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:118
+msgid ""
+"Contact fields render as links: `href=\"mailto:{email}\"`, `href=\"tel:"
+"{phone}\"`, `href=\"{serviceUrl}\"` with `target=\"_blank\"`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:122
+msgid "RDF data structure"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:124
+msgid ""
+"Vendor metadata is published via the CPSV Editor and stored in TriplyDB as:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:126
+msgid ""
+"@prefix ronl:   <https://regels.overheid.nl/ontology#> .\n"
+"@prefix schema: <http://schema.org/> .\n"
+"@prefix foaf:   <http://xmlns.com/foaf/0.1/> .\n"
+"@prefix dct:    <http://purl.org/dc/terms/> .\n"
+"\n"
+"<https://regels.overheid.nl/services/aow-leeftijd/vendor/blueriq>\n"
+"  a ronl:VendorService ;\n"
+"  ronl:basedOn <https://regels.overheid.nl/services/aow-leeftijd/dmn> ;\n"
+"  ronl:implementedBy <https://regels.overheid.nl/termen/Blueriq> ;\n"
+"  schema:provider [\n"
+"    a schema:Organization ;\n"
+"    schema:name \"Blueriq B.V.\" ;\n"
+"    schema:image <./assets/Blueriq_vendor_logo.png> ;\n"
+"    foaf:homepage <https://www.blueriq.com> ;\n"
+"    schema:contactPoint [\n"
+"      schema:name \"John Doe\" ;\n"
+"      schema:email \"john.doe@blueriq.com\" ;\n"
+"      schema:telephone \"+31 6 12 34 56 78\"\n"
+"    ]\n"
+"  ] ;\n"
+"  schema:url <https://regelservices.blueriq.com/shortcut/Doccle> ;\n"
+"  schema:license \"Commercial\" ;\n"
+"  ronl:accessType \"iam-required\" ;\n"
+"  dct:description \"Pensioen Regelservice voor gebruik in combinatie met "
+"Doccle.\"@nl ."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:155
+msgid "RONL Ontology reference"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cvendor-services.md:157
+msgid ""
+"The vendor vocabulary (`ronl:VendorService`, `ronl:basedOn`, "
+"`ronl:implementedBy`, `ronl:accessType`) is part of the RONL Ontology v1.0. "
+"For the full specification, see [CPSV Editor — RONL Ontology]{1}."
+msgstr ""

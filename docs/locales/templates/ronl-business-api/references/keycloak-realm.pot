@@ -1,0 +1,710 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:1
+msgid "Keycloak Realm Configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:3
+msgid ""
+"The `ronl` realm is defined in `config/keycloak/ronl-realm.json`. It is "
+"imported automatically on first Keycloak container start and can be re-"
+"imported at any time without data loss (using `--override true`)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:7
+msgid "Realm settings"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:9"
+msgid "Setting"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:9"
+msgid "Value"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgid "Realm name"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgid "`ronl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgid "Display name"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgid "RONL — Regels Overheid Nederland"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgid "SSL required"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgid "External requests only"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgid "Registration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:9"
+msgid "Disabled"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgid "Brute force protection"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:9"
+msgid "Enabled"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgid "Max failed attempts"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgid "5"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgid "Wait increment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:9"
+msgid "60 seconds"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgid "Max delta time"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:9
+msgid "12 hours"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:22
+msgid "Token lifespans"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:24
+msgid "Token"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:24
+msgid "Lifespan"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:24
+msgid "Access token"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:24
+msgid "15 minutes (`accessTokenLifespan: 900`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:24
+msgid "Access token (implicit flow)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:24
+msgid "15 minutes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:24
+msgid "SSO session idle"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:24
+msgid "30 minutes (`ssoSessionIdleTimeout: 1800`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:24
+msgid "SSO session max"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:24
+msgid "10 hours (`ssoSessionMaxLifespan: 36000`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:24
+msgid "Offline session idle"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:24
+msgid "30 days"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:24
+msgid "Auth code"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:24
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:24"
+msgid "60 seconds"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:35
+msgid "Client: `ronl-business-api`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:37"
+msgid "Setting"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:37"
+msgid "Value"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgid "Client ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgid "`ronl-business-api`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgid "Client authentication"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgid "Off (public client)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgid "Standard flow"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:37"
+msgid "Enabled"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgid "Implicit flow"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:37"
+msgid "Disabled"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgid "Direct access grants"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgid "Enabled (test users only)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgid "Service accounts"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:37"
+msgid "Disabled"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgid "PKCE"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgid "Code challenge method: S256"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgid "Valid redirect URIs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:37"
+msgid "`*` (restrict in production)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:37
+msgid "Web origins"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:51
+msgid "Protocol mappers"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:53
+msgid ""
+"The following protocol mappers are configured on the `ronl-business-api-"
+"dedicated` client scope:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgid "Mapper name"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgid "Token claim"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgid "Source attribute"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:55"
+msgid "`municipality`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:55"
+msgid "User Attribute"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:55"
+msgid "`organisation_type`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:55"
+msgid "`assurance_level`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgid "`loa`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:55"
+msgid "`mandate`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgid "`realm_roles`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgid "User Realm Role"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgid "`realm_access.roles`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:55"
+msgid "Realm roles"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgid "`audience-mapper`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgid "Audience"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgid "`aud`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgid "Fixed: `ronl-business-api`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:55"
+msgid "`employee_id`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:55
+msgid "`employeeId`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:65
+msgid ""
+"All mappers have `id.token.claim`, `access.token.claim`, and "
+"`userinfo.token.claim` set to `true`. The `employeeId` claim is present only "
+"for users who have the `employee_id` attribute set (caseworkers and HR staff)"
+". It is used by the dashboard to auto-fetch onboarding data on login without "
+"requiring a manual ID input."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:70
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:70"
+msgid "Realm roles"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgid "Role"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:72"
+msgid "`citizen`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgid "Regular citizen using municipality services"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgid "`representative`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgid "Representative acting on behalf of a citizen (with mandate)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:72"
+msgid "`caseworker`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgid "Municipality caseworker processing applications"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgid "`hr-medewerker`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgid "HR department employee who manages staff onboarding"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgid "`infra-projectteam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgid "Infrastructure project team member — can claim RIP Phase 1 tasks"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgid "`infra-medewerker`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgid "Infrastructure employee role assigned via HR onboarding DMN"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgid "`admin`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:72
+msgid "Municipality administrator"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:84
+msgid "Test users"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:86
+msgid ""
+"All test users have password `test123` and `directAccessGrantsEnabled: true`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "Username"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`municipality`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`organisation_type`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "Realm roles"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`test-citizen-utrecht`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`utrecht`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`municipality`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`citizen`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`test-caseworker-utrecht`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`municipality`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`caseworker`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`test-citizen-amsterdam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`amsterdam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`municipality`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`citizen`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`test-caseworker-amsterdam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`municipality`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`caseworker`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`test-citizen-rotterdam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`rotterdam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`municipality`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`citizen`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`test-caseworker-rotterdam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`municipality`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`caseworker`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`test-citizen-denhaag`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`denhaag`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`municipality`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`citizen`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`test-caseworker-denhaag`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`municipality`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`caseworker`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`test-hr-denhaag`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`municipality`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`caseworker`, `hr-medewerker`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`test-onboarded-denhaag`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`municipality`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`caseworker`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`test-caseworker-flevoland`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`flevoland`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`province`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`caseworker`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`test-hr-flevoland`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`test-infra-flevoland`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`caseworker`, `infra-projectteam`, `infra-medewerker`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`test-caseworker-uwv`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`uwv`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgid "`national`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:88
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\keycloak-realm.md:88"
+msgid "`caseworker`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:105
+msgid ""
+"`test-hr-denhaag` is the primary HR test account — it holds the `hr-"
+"medewerker` realm role and can start onboarding processes and view the "
+"Afgeronde onboardingen archive. `test-onboarded-denhaag` simulates an "
+"employee who has already been onboarded; logging in with this account "
+"triggers an auto-fetch of the completed onboarding record for `emp-test-01`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:107
+msgid ""
+"`test-hr-flevoland` is the Flevoland HR account for onboarding "
+"infrastructure employees. `test-infra-flevoland` is a pre-configured "
+"infrastructure team member (`employeeId: EMP-FLV-001`) who can start and "
+"work through the RIP Fase 1 process."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:111
+msgid "Re-importing the realm"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:113
+msgid "After modifying `config/keycloak/ronl-realm.json`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Ckeycloak-realm.md:115
+msgid ""
+"# On the VM, for ACC\n"
+"docker exec keycloak-acc /opt/keycloak/bin/kc.sh import \\\n"
+"  --file /opt/keycloak/data/import/ronl-realm.json \\\n"
+"  --override true\n"
+"\n"
+"# Restart to apply\n"
+"cd ~/keycloak/acc\n"
+"docker compose restart keycloak-acc\n"
+"\n"
+"# On the VM, for PROD\n"
+"docker exec keycloak-prod /opt/keycloak/bin/kc.sh import \\\n"
+"  --file /opt/keycloak/data/import/ronl-realm.json \\\n"
+"  --override true\n"
+"\n"
+"cd ~/keycloak/prod\n"
+"docker compose restart keycloak-prod"
+msgstr ""

@@ -1,0 +1,215 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:1
+msgid "Local Development"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:3
+msgid ""
+"This guide covers setting up and running the CPSV Editor — and the backend "
+"it depends on — locally for development and testing."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:7
+msgid "When you need a local backend"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:9
+msgid ""
+"The editor's frontend works standalone for form editing, TTL generation, "
+"import, and export. You need the shared backend running locally when making "
+"changes to:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:11
+msgid "Backend API endpoints (new routes, modifications)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:12
+msgid "Backend services (SPARQL, TriplyDB, Operaton integration)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:13
+msgid "CORS configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:14
+msgid "API versioning or the `/v1/*` endpoint structure"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:16
+msgid ""
+"The backend serves both the CPSV Editor and the Linked Data Explorer. "
+"Breaking it in one context can affect the other."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:20
+msgid "Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:22
+msgid ""
+"┌──────────────────────────────────────────────────────┐\n"
+"│  Local Development Environment                       │\n"
+"├──────────────────────────────────────────────────────┤\n"
+"│                                                      │\n"
+"│  CPSV Editor              Linked Data Explorer       │\n"
+"│  http://localhost:3000    http://localhost:5173      │\n"
+"│  (React / CRA)            (React / Vite)             │\n"
+"│           │                       │                  │\n"
+"│           └──────────┬────────────┘                  │\n"
+"│                      ↓                               │\n"
+"│              Shared Backend                          │\n"
+"│           http://localhost:3001                      │\n"
+"│        (Node.js + Express + TypeScript)              │\n"
+"│                      │                               │\n"
+"│                      ↓                               │\n"
+"│     External Services (always remote)                │\n"
+"│     • TriplyDB — api.open-regels.triply.cc           │\n"
+"│     • Operaton — operaton.open-regels.nl             │\n"
+"└──────────────────────────────────────────────────────┘"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:44
+msgid ""
+"External services do not need to be running locally. They are always "
+"accessed remotely."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:48
+msgid "Prerequisites"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:50
+msgid "Node.js 20.x or higher"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:51
+msgid "npm 10.x or higher"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:52
+msgid "Git"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:53
+msgid "Access to the `cpsv-editor` and `linked-data-explorer` repositories"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:57
+msgid "Setup"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:59
+msgid "Frontend (CPSV Editor)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:61
+msgid ""
+"git clone https://github.com/your-org/cpsv-editor.git\n"
+"cd cpsv-editor\n"
+"npm install\n"
+"npm start"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:68
+msgid "Opens at `http://localhost:3000`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:70
+msgid "Shared backend"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:72
+msgid ""
+"git clone https://github.com/your-org/linked-data-explorer.git\n"
+"cd linked-data-explorer\n"
+"npm install\n"
+"npm run dev:backend"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:79
+msgid "Backend starts at `http://localhost:3001`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:81
+msgid "Linked Data Explorer (optional, for full regression testing)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:83
+msgid ""
+"cd linked-data-explorer\n"
+"npm run dev:frontend"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:88
+msgid "Opens at `http://localhost:5173`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:92
+msgid "Pre-deployment checklist"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:94
+msgid "Before pushing to ACC, verify:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:96
+msgid "[ ] All verification tests pass locally"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:97
+msgid "[ ] Both CPSV Editor and Linked Data Explorer work correctly"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:98
+msgid "[ ] No CORS errors in the browser console"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:99
+msgid "[ ] Backend logs show no errors"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:100
+msgid "[ ] New features work as expected"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:101
+msgid "[ ] Existing features show no regression"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:102
+msgid "[ ] Git commit messages are clear and descriptive"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:106
+msgid "Deploying to ACC"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Clocal-development.md:108
+msgid ""
+"# 1. Commit your changes\n"
+"git add .\n"
+"git commit -m \"feat: your change description\"\n"
+"\n"
+"# 2. Push to ACC branch\n"
+"git push origin acc\n"
+"\n"
+"# 3. Monitor the GitHub Actions workflow\n"
+"# https://github.com/your-org/cpsv-editor/actions\n"
+"\n"
+"# 4. Verify the ACC deployment\n"
+"curl https://acc.cpsv-editor.open-regels.nl"
+msgstr ""

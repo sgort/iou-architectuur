@@ -1,0 +1,282 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:1
+msgid "Changelog & Roadmap"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:5
+msgid "Changelog"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:7
+msgid "v0.4.0 — Initial Release (February 2026)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:9
+msgid ""
+"This changelog is going to be maintained starting from CPRMV / CPRMV API "
+"v0.4.0. Usage of earlier versions is deprecated and at own risk. Note that "
+"CPRMV / CPRMV API still is highly subjected to change"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:13
+msgid "**v0.4.0 - CPRMV**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:15
+msgid ""
+"More elaborated and updated RDFS/OWL/SHACL specification of CPRMV. Adds "
+"several new classes like types of methods. Adds start for alignment with ELI."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:16
+msgid ""
+"Changes the official cprmv URI to one that resolves to the respective "
+"documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:17
+msgid ""
+"Normative section generated from RDFS/OWL/SHACL in the ReSpec documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:18
+msgid "Generated class diagram in ReSpec documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:20
+msgid "**v0.4.0 - CPRMV API**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:22
+msgid "bugfixes around support for BWB schema (now supports circulaire’s)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:23
+msgid ""
+"Adds /respec section hosting the respec documentation (besides the official "
+"URI)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:24
+msgid ""
+"Adds /ref endpoint which is going to support all reference methods (but "
+"currently only implements juriconnect at a basic level)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:25
+msgid ""
+"Allows for retrieving DMN 1.3 rulesets published in acknowledged (in value "
+"list in cprmvmethods.ttl) Operaton servers (currently only operaton.open-"
+"regels.nl)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:29
+msgid "Roadmap"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:31
+msgid "Completed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:33
+msgid "Feature"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:33
+msgid "Version"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:33
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\developer\\changelog-roadmap.md:33"
+msgid "CPRMV"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:33
+msgid "v0.4.0"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:33
+msgid "v0.3.1"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:40
+msgid "Planned"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:42
+msgid "v0.4.x — Features & ReSpec documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:44
+msgid "**v0.4.1 — Respec documentation**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:46
+msgid "Documentation on properties in the ReSpec documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:47
+msgid "Improved class diagram layout in the ReSpec documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:48
+msgid "Examples and link to RDF definitions in the ReSpec documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:49
+msgid ""
+"Adds a property “:publication-location” (or similar) which refers to the "
+"location a RuleSet is officially published (which is something different "
+"from :isBasedOn)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:51
+msgid "**v0.4.1 - CPRMV API**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:53
+msgid ""
+"/cellar-by-celex endpoint : redirects to the output of CELLAR instead of "
+"giving the user a URL to CELLAR"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:54
+msgid ""
+"/cellar-by-eli endpoint : new variant of /cellar-by-celex which accepts a "
+"full ELI URI as argument. Also redirecting to output of CELLAR."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:55
+msgid ""
+"/ref endpoint : new version which accepts supported types of references, "
+"currently being ELI and Juriconnect.. For the CPRMV API style reference one "
+"can just use the /rules endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:56
+msgid "Link to /respec section from within the /docs section"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:57
+msgid ""
+"The /rules endpoint allows for retrieving the raw unprocessed source (the "
+"whole ruleset, not transformed into a CPRMV ruleset if the source isn’t a "
+"CPRMV ruleset)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:58
+msgid ""
+"The /rules endpoint adds :publication-location property to RuleSet’s with an "
+"URI’s as value (This will be the link to repository.overheid.nl in case for "
+"BWB,CVDR, an ELI reference in case of Formex 4 (these are seen as root "
+"sources for now). In the case of DMN it is the URI to the Operaton server"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:59
+msgid ""
+"Fix escaping of quotes and newlines in transformations to RDF, which up "
+"until 0.4.1 can cause some sources to fail to load"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:60
+msgid ""
+"Improved and more complete support for BWB, CVDR, Formex 4 and DMN 1.3 "
+"standards through usage of the existing XML Schema’s independent from XSL "
+"stylesheets (CPRMV uses a generic single stylesheet for all XML based "
+"standards which are constrained through schema checking)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:61
+msgid "Adds (basic) support for using the CPRMV API as MCP server"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:63
+msgid "**v0.4.2 - CPRMV**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:65
+msgid "Improved and more complete cprmv methods knowledge / value lists"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:66
+msgid "Better defined relation with with official organisation registers (EU)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:67
+msgid "Start of a CPRMV-NL variant, based on MIM and CPSV-NL and the ROO"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:68
+msgid ""
+"Adds acknowledgement of RegelSpraak as a FormalisationMethod and ALEF as "
+"tooling related to it"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:69
+msgid ""
+"Adds acknowledgement of OpenFisca as a FormalisationMethod and tooling "
+"related to it"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:71
+msgid "**v0.4.2 - CPRMV API**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:73
+msgid ""
+"Support for using the /rules endpoint to find multiple published ruleset’s, "
+"which is a modus separate from referencing a single published ruleset. In "
+"the case of multiple ruleset’s the CPRMV API returns a list with references "
+"RuleSets which can be used with the CPRMV API to retrieve them."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:74
+msgid ""
+"Support for utilizing organisation and product and services catalog "
+"information within references in the /rules endpoint."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:75
+msgid ""
+"Support for utilizing :isBasedOn relations within references in the /rules "
+"endpoint. It should be possible to refer to."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:76
+msgid ""
+"Support for using ELI and where possible juriconnect references for other "
+"publication methods than typically supported by these reference types."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:77
+msgid ""
+"Adds a /browser section offering a minimal viable web based GUI to browse "
+"organisations, services and rulesets. Offers a searchable tree control at "
+"the left and a resource viewer at the right from which should offer users to "
+"start processes related to the resources (as defined by services)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:78
+msgid ""
+"Adds user friendly access to method knowledge in the /browser section "
+"relating to defined services for governance on value lists"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cdeveloper%5Cchangelog-roadmap.md:79
+msgid ""
+"Adds basic support for RegelSpraak sources (depending on where these will "
+"get published)"
+msgstr ""

@@ -1,0 +1,694 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:1
+msgid "Backend Development"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:3
+msgid ""
+"The backend is `packages/backend` (`@ronl/backend`) — a Node.js 20 Express "
+"application written in TypeScript."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:7
+msgid "Project structure"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:9
+msgid ""
+"packages/backend/src/\n"
+"├── index.ts                    # Express app bootstrap, middleware "
+"registration\n"
+"├── routes/\n"
+"│   ├── index.ts                # Route registration (v1/* and legacy api/*)"
+"\n"
+"│   ├── health.routes.ts        # GET /v1/health\n"
+"│   ├── decision.routes.ts      # POST /v1/decision/:key/evaluate\n"
+"│   ├── m2m.routes.ts           # GET|POST|DELETE /v1/m2m/* (M2M, "
+"jwtMiddleware only)\n"
+"│   ├── process.routes.ts       # POST /v1/process/:key/start, GET/DELETE\n"
+"│   ├── template.routes.ts      # GET /v1/chains/templates\n"
+"│   ├── triplydb.routes.ts      # GET /v1/triplydb (TriplyDB proxy)\n"
+"│   ├── vendor.routes.ts        # GET /v1/vendors\n"
+"│   └── cache.routes.ts         # GET/DELETE /v1/cache\n"
+"├── middleware/\n"
+"│   ├── error.middleware.ts     # Global error handler, 404 handler\n"
+"│   ├── version.middleware.ts   # Adds API-Version header to all responses\n"
+"│   ├── audit.middleware.ts     # Writes audit log entry for every request\n"
+"│   └── tenant.middleware.ts    # Extracts and validates municipality claim\n"
+"├── auth/\n"
+"│   └── jwt.middleware.ts       # JWT signature validation, JWKS caching\n"
+"├── services/\n"
+"│   ├── operaton.service.ts     # Operaton REST API client\n"
+"│   ├── audit.service.ts        # Audit log database writes\n"
+"│   ├── edocs.service.ts        # OpenText eDOCS REST API client (stub + "
+"live)\n"
+"│   └── externalTaskWorker.service.ts  # Operaton external task long-poll "
+"worker\n"
+"└── utils/\n"
+"    ├── config.ts               # Typed configuration from environment "
+"variables\n"
+"    ├── logger.ts               # Winston logger (JSON format in prod)\n"
+"    └── errors.ts               # getErrorMessage() helper"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:42
+msgid "Middleware stack"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:44
+msgid "Middleware is registered in this order in `src/index.ts`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:46
+msgid "`helmet()` — security headers (CSP, HSTS, etc.)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:47
+msgid "`cors()` — CORS policy from `CORS_ORIGIN` env var"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:48
+msgid "`rateLimit()` — request rate limiting"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:49
+msgid "`express.json()` — body parsing, limit 1 MB"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:50
+msgid "Request logging — logs method, path, IP"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:51
+msgid "`versionMiddleware` — adds `API-Version` response header"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:52
+msgid "`auditMiddleware` — writes audit entry post-response"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:53
+msgid "Route handlers (`routes/index.ts`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:54
+msgid "`notFoundHandler` — 404 for unmatched paths"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:55
+msgid "`errorHandler` — catches and formats all thrown errors"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:57
+msgid ""
+"JWT validation (`jwt.middleware.ts`) is applied per-route on protected "
+"endpoints, not globally. Public endpoints (e.g. `GET /v1/health`) do not "
+"require authentication."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:61
+msgid "Adding a new route"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:63
+msgid "Create `src/routes/myfeature.routes.ts` following the existing pattern:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:65
+msgid ""
+"import { Router, Request, Response } from 'express';\n"
+"import { ApiResponse } from '@ronl/shared';\n"
+"import logger from '@utils/logger';\n"
+"\n"
+"const router = Router();\n"
+"\n"
+"router.get('/', async (req: Request, res: Response) => {\n"
+"  try {\n"
+"    res.json({\n"
+"      success: true,\n"
+"      data: { ... },\n"
+"      timestamp: new Date().toISOString(),\n"
+"    } as ApiResponse);\n"
+"  } catch (error) {\n"
+"    logger.error('myfeature error', error);\n"
+"    res.status(500).json({ success: false, error: { code: 'ERROR', message: "
+"String(error) } });\n"
+"  }\n"
+"});\n"
+"\n"
+"export default router;"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:88
+msgid "Register it in `src/routes/index.ts`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:90
+msgid ""
+"import myfeatureRoutes from './myfeature.routes';\n"
+"\n"
+"router.use('/v1/myfeature', myfeatureRoutes);\n"
+"router.use('/api/myfeature', deprecationMiddleware('/v1/myfeature'), "
+"myfeatureRoutes);"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:99
+msgid "eDOCS service and external task worker"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:101
+msgid ""
+"`edocs.service.ts` wraps the OpenText eDOCS REST API. It authenticates once "
+"via `POST /connect`, caches the `X-DM-DST` session token extracted from the "
+"`Set-Cookie` response header, and re-authenticates automatically on `401`/"
+"`403`. Key methods:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:103
+msgid ""
+"ensureWorkspace(projectNumber: string, projectName: string): "
+"Promise<EdocsWorkspaceResult>\n"
+"uploadDocument(workspaceId: string, filename: string, contentBase64: string, "
+"metadata: EdocsDocumentMetadata): Promise<EdocsDocumentResult>\n"
+"getWorkspaceDocuments(workspaceId: string): Promise<...>\n"
+"healthCheck(): Promise<{ status: 'up' | 'down' | 'stub' }>"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:110
+msgid ""
+"When `EDOCS_STUB_MODE=true` (the default), all methods return realistic fake "
+"data and log what they would have done. The stub is transparent — callers "
+"cannot distinguish it from a live server."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:112
+msgid ""
+"`externalTaskWorker.service.ts` polls Operaton's external task API (`POST /"
+"external-task/fetchAndLock`) using long-polling (`asyncResponseTimeout: 20 "
+"000 ms`). It handles two topics:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:114
+msgid "Topic"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:114
+msgid "Reads"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:114
+msgid "Writes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:114
+msgid "`rip-edocs-workspace`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:114
+msgid "`projectNumber`, `projectName`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:114
+msgid "`edocsWorkspaceId`, `edocsWorkspaceName`, `edocsWorkspaceCreated`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:114
+msgid "`rip-edocs-document`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:114
+msgid ""
+"`edocsWorkspaceId`, `documentTemplateId`, `edocsDocumentVariableName`, + "
+"template variables"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:114
+msgid "`<edocsDocumentVariableName>` (e.g. `edocsIntakeReportId`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:119
+msgid ""
+"The worker is started inside the `app.listen()` callback and stopped in both "
+"`SIGTERM` and `SIGINT` handlers. It will not begin polling until the HTTP "
+"server is fully bound."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:121
+msgid ""
+"For configuration and live-mode switchover, see [Copilot Studio — eDOCS "
+"OAuth Integration]{1}."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:125
+msgid "M2M route group"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:127
+msgid ""
+"`m2m.routes.ts` exposes the full Operaton surface to machine-to-machine "
+"clients without tenant scoping. It applies `jwtMiddleware` only — "
+"`tenantMiddleware` is intentionally absent."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:129
+msgid ""
+"A `M2M_ALLOWED_OPERATIONS` constant at the top of the file controls which "
+"operations are active. Commenting out an entry returns `403 "
+"OPERATION_NOT_PERMITTED` for that operation with no other code changes "
+"required."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:131
+msgid ""
+"The route group is instantiated with a dedicated `OperatonService` when "
+"`OPERATON_M2M_BASE_URL` is set, otherwise it reuses the shared singleton:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:133
+msgid ""
+"const m2mOperatonService = config.operaton.m2mBaseUrl\n"
+"  ? new OperatonService(\n"
+"      config.operaton.m2mBaseUrl,\n"
+"      config.operaton.m2mUsername,\n"
+"      config.operaton.m2mPassword\n"
+"    )\n"
+"  : operatonService;"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:143
+msgid ""
+"See [Operaton MCP Client]{1} for the full endpoint reference and Keycloak "
+"setup."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:147
+msgid "Authentication on protected routes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:149
+msgid "Apply the JWT middleware to any route that requires a logged-in user:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:151
+msgid ""
+"import { authenticateJWT } from '@auth/jwt.middleware';\n"
+"\n"
+"router.post('/sensitive', authenticateJWT, async (req, res) => {\n"
+"  const { sub, municipality, roles } = req.user!;\n"
+"  // ...\n"
+"});"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:160
+msgid ""
+"After `authenticateJWT`, `req.user` is populated with the decoded JWT claims."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:164
+msgid "TypeScript path aliases"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:166
+msgid "The `tsconfig.json` configures path aliases for clean imports:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:168
+msgid ""
+"@routes/*    → src/routes/*\n"
+"@services/*  → src/services/*\n"
+"@middleware/* → src/middleware/*\n"
+"@auth/*      → src/auth/*\n"
+"@utils/*     → src/utils/*"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:176
+msgid ""
+"`tsc-alias` resolves these aliases during the build step (`npm run build`)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:180
+msgid "Development commands"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:182
+msgid ""
+"npm run dev           # Start with tsx watch (hot-reload)\n"
+"npm run build         # Compile TypeScript → dist/\n"
+"npm run start         # Run compiled dist/index.js\n"
+"npm run lint          # ESLint 9 flat config\n"
+"npm run lint:fix      # ESLint with auto-fix\n"
+"npm run type-check    # tsc --noEmit (no output, type check only)\n"
+"npm test              # Jest with coverage\n"
+"npm run test:unit     # Unit tests only\n"
+"npm run test:integration  # Integration tests only"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:196
+msgid "Shared types"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:198
+msgid ""
+"Types shared between backend and frontend are in `packages/shared/src/`. "
+"Import them as `@ronl/shared`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:200
+msgid "import { ApiResponse, TenantConfig } from '@ronl/shared';"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:204
+msgid ""
+"After modifying shared types, rebuild the package before the backend picks "
+"up the changes:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:206
+msgid "npm run build --workspace=@ronl/shared"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:212
+msgid "Security implementation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:214
+msgid ""
+"The following code patterns are used across the middleware stack. These are "
+"the actual implementations — not configuration values — for reference when "
+"modifying security behaviour."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:216
+msgid "JWT validation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:218
+msgid "`auth/jwt.middleware.ts` validates every protected request:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:220
+msgid ""
+"const authHeader = req.headers.authorization;\n"
+"const token = authHeader?.split(' ')[1];\n"
+"\n"
+"// Fetch JWKS from Keycloak (cached in Redis, TTL 300s)\n"
+"const jwks = await fetchJWKS(config.keycloakUrl, config.keycloakRealm);\n"
+"const decoded = jwt.verify(token, jwks);\n"
+"\n"
+"// Validate standard claims\n"
+"if (decoded.exp < Date.now() / 1000) {\n"
+"  throw new Error('Token expired');\n"
+"}\n"
+"if (decoded.aud !== config.jwtAudience) {\n"
+"  throw new Error('Invalid audience');\n"
+"}\n"
+"if (!decoded.iss.startsWith(config.keycloakUrl)) {\n"
+"  throw new Error('Invalid issuer');\n"
+"}\n"
+"\n"
+"// Attach to request for downstream handlers\n"
+"req.user = decoded;"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:243
+msgid "Rate limiting"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:245
+msgid "Two policies applied in `src/index.ts`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:247
+msgid ""
+"import rateLimit from 'express-rate-limit';\n"
+"\n"
+"// General API: 100 requests per 15 minutes per IP\n"
+"const apiLimiter = rateLimit({\n"
+"  windowMs: 15 * 60 * 1000,\n"
+"  max: 100,\n"
+"  message: 'Too many requests from this IP',\n"
+"});\n"
+"\n"
+"// Auth endpoints: 5 requests per 15 minutes per IP\n"
+"const authLimiter = rateLimit({\n"
+"  windowMs: 15 * 60 * 1000,\n"
+"  max: 5,\n"
+"  message: 'Too many login attempts',\n"
+"});\n"
+"\n"
+"app.use('/v1', apiLimiter);\n"
+"app.use('/v1/auth', authLimiter);"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:268
+msgid "CORS"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:270
+msgid ""
+"import cors from 'cors';\n"
+"\n"
+"const allowedOrigins = config.corsOrigin.map((o) => o.trim());\n"
+"\n"
+"const corsOptions: cors.CorsOptions = {\n"
+"  origin: (origin, callback) => {\n"
+"    if (!origin) { callback(null, true); return; }  // allow server-to-"
+"server\n"
+"    if (allowedOrigins.includes(origin)) { callback(null, true); return; }\n"
+"    callback(new Error(`CORS blocked for origin: ${origin}`));\n"
+"  },\n"
+"  credentials: true,\n"
+"  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],\n"
+"  allowedHeaders: ['Content-Type', 'Authorization'],\n"
+"};\n"
+"\n"
+"app.use(cors(corsOptions));\n"
+"app.options('*', cors(corsOptions));"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:290
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\backend-development.md:290"
+msgid ""
+"`CORS_ORIGIN` in `.env` is a comma-separated list. In production it is "
+"`https://mijn.open-regels.nl`. In ACC it is `https://acc.mijn.open-"
+"regels.nl`. In local development it is `http://localhost:5173`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:292
+msgid "Secrets in production (Azure Key Vault)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:294
+msgid ""
+"Azure App Settings are the standard secrets store (injected as environment "
+"variables). For an additional layer, the Key Vault SDK can be used:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:296
+msgid ""
+"import { SecretClient } from '@azure/keyvault-secrets';\n"
+"import { DefaultAzureCredential } from '@azure/identity';\n"
+"\n"
+"const credential = new DefaultAzureCredential();\n"
+"const client = new SecretClient(process.env.KEY_VAULT_URL!, credential);\n"
+"\n"
+"const dbPassword = await client.getSecret('db-password');"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:306
+msgid ""
+"The App Service managed identity must be granted `Key Vault Secrets User` on "
+"the vault."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:308
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\backend-development.md:308"
+msgid ""
+"`CORS_ORIGIN` in `.env` is a comma-separated list. In production it is "
+"`https://mijn.open-regels.nl`. In ACC it is `https://acc.mijn.open-"
+"regels.nl`. In local development it is `http://localhost:5173`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:312
+msgid "Audit logging"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:314
+msgid "Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:316
+msgid "Audit logging spans two files:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:318
+msgid ""
+"`src/types/audit.types.ts` — `AuditLogEntry` interface, the single source of "
+"truth for the shape of an audit record"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:319
+msgid ""
+"`src/middleware/audit.middleware.ts` — `auditMiddleware` (automatic per-"
+"request logging) and `auditLog()` (explicit action logging from route "
+"handlers); re-exports `AuditLogEntry` for backward compatibility"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:320
+msgid ""
+"`src/services/audit.service.ts` — pg-promise connection pool and "
+"`persistAuditLog()`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:322
+msgid "Automatic vs. explicit logging"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:324
+msgid ""
+"Every authenticated request is logged automatically by `auditMiddleware`, "
+"which wraps `res.end` and calls `createAuditLog()` after the response is "
+"sent. The action is `${req.method} ${req.path}` and the result is derived "
+"from the HTTP status code:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:326
+msgid "Status range"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:326
+msgid "Result"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:326
+msgid "200–399"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:326
+msgid "`success`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:326
+msgid "400–499"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:326
+msgid "`failure`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:326
+msgid "500+"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:326
+msgid "`error`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:332
+msgid ""
+"Route handlers can additionally call `auditLog()` directly to record domain-"
+"level actions with richer detail:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:333
+msgid ""
+"auditLog(req, 'process.start.zorgtoeslag', 'success', {\n"
+"  processInstanceId: instance.id,\n"
+"});"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:339
+msgid "Database persistence"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:341
+msgid ""
+"`persistAuditLog()` in `audit.service.ts` writes each entry to the "
+"`audit_logs` table on Azure PostgreSQL Flexible Server using a pg-promise "
+"named-parameter `INSERT`. It is called fire-and-forget from `createAuditLog()"
+"` — errors are caught and logged but never propagated to the request cycle, "
+"so a database outage does not affect API availability."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:343
+msgid ""
+"`initDb()` is called at server startup to verify connectivity. If the "
+"database is unreachable at startup, the backend falls back to in-memory "
+"logging and logs a warning. In-memory entries are not persisted to the "
+"database later; they exist only for the lifetime of the process."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:345
+msgid ""
+"See [PostgreSQL Deployment]{1} for schema, firewall, and connection string "
+"setup."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:347
+msgid "Skipping self-referential entries"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:349
+msgid ""
+"`GET /audit` requests are excluded from the audit log to prevent the Audit "
+"Log viewer from recording its own page loads. The skip is applied inside "
+"`auditMiddleware` before `createAuditLog()` is called:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:350
+msgid ""
+"if (req.path === '/audit') {\n"
+"  return originalEnd.apply(this, args as any);\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:356
+msgid "Known issues fixed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:358
+msgid "**IP address format on Azure App Service**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:360
+msgid ""
+"`req.ip` on Azure App Service includes the port (`77.161.155.118:40796`). "
+"PostgreSQL's `inet` type does not accept a port suffix, causing every "
+"`INSERT` to fail silently. Fixed in `audit.service.ts` by stripping the port "
+"before the insert:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:361
+msgid ""
+"ipAddress: entry.ipAddress ? entry.ipAddress.replace(/:\\d+$/, '') : null,"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:365
+msgid "This only affects Azure — local Express sets `req.ip` without a port."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:367
+msgid "**Audit log viewer pagination reset**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cbackend-development.md:369
+msgid ""
+"The `useEffect` that triggers `loadAuditLogs(0)` on section entry "
+"incorrectly included `auditLogs.length` in its dependency array. When \"Meer "
+"laden\" appended records, the length change re-fired the effect and reset "
+"pagination to offset 0. Fixed by removing `auditLogs.length` from the "
+"dependency array — `activeSection` changing to `audit-overzicht` or `audit-"
+"details` is sufficient to trigger the initial load."
+msgstr ""

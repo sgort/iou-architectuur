@@ -1,0 +1,280 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:1
+msgid "Form Editor"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:3
+msgid ""
+"The Form Editor lets you design Camunda Forms visually and export them as "
+"`.form` files. Forms you create here are automatically available to the BPMN "
+"Modeler for linking to `UserTask` and `StartEvent` elements."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:7
+msgid "Opening the Form Editor"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:9
+msgid ""
+"Click the **Form Editor** icon (layout template / grid icon) in the left "
+"sidebar. The editor opens with the form list on the left and the canvas area "
+"on the right."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:11
+msgid ""
+"On your first visit, three example forms are pre-loaded automatically. Open "
+"the **Kapvergunning Start** example to see a complete citizen-facing form "
+"before creating your own."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:15
+msgid "Exploring the example forms"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:17
+msgid ""
+"Select any entry in the form list to open it in the canvas. The three seed "
+"examples are read-only (marked **EXAMPLE**) — you can inspect and export "
+"them but not rename or delete them."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:26
+msgid "Creating a new form"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:28
+msgid "Click the blue **+** button at the top of the form list."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:29
+msgid ""
+"A new form called \"New Form\" appears in the list and the canvas opens with "
+"an empty schema."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:30
+msgid "Double-click the form name in the list to rename it."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:34
+msgid "Building a form"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:36
+msgid "The canvas is a full `@bpmn-io/form-js` graphical editor."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:43
+msgid "Adding fields"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:45
+msgid "Drag a component type from the left palette onto the canvas:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:47
+msgid ""
+"**Text field** — single-line text input, maps to a string process variable"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:48
+msgid "**Number** — numeric input"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:49
+msgid ""
+"**Select** / **Radio** — option lists defined inline as `label / value` pairs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:50
+msgid "**Checkbox** — boolean field"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:51
+msgid "**Text** — static display text, supports Markdown headings and lists"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:52
+msgid ""
+"**Button** — required at the end of every form with `action: submit` to "
+"trigger the submit event"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:54
+msgid ""
+"!!! warning \"Submit button required\" `@bpmn-io/form-js` does not inject a "
+"submit button automatically. Every form **must** end with a `Button` "
+"component set to `action: submit`. Without it, the form renders but never "
+"fires the submit event in Operaton."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:57
+msgid "Setting field properties"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:59
+msgid "Select any component on the canvas to edit its properties on the right:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:61
+msgid "Property"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:61
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:61
+msgid "**Label**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:61
+msgid "Display label shown to the user"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:61
+msgid "**Key**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:61
+msgid "The process variable name this field maps to"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:61
+msgid "**Validation**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:61
+msgid "Required, min/max, pattern"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:61
+msgid "**Read-only**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:61
+msgid ""
+"Show the value but prevent editing (useful for pre-populated DMN results)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:61
+msgid "**Condition**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:61
+msgid ""
+"FEEL expression that controls visibility (e.g., `reviewAction = \"change\"`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:71
+msgid "Saving a form"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:73
+msgid ""
+"Click **Save** in the toolbar. The button activates only when there are "
+"unsaved changes. The schema is persisted to `localStorage` and immediately "
+"available in the BPMN Modeler."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:77
+msgid "Exporting a form as `.form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:79
+msgid ""
+"Click **Export `.form`** to download the schema as a JSON file. The filename "
+"is the form's schema ID (e.g., `kapvergunning-start.form`)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:81
+msgid "Exported files are compatible with:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:83
+msgid "Camunda Modeler (form editor and BPMN linking)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:84
+msgid "Operaton (direct REST deployment)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:85
+msgid ""
+"The BPMN Modeler's one-click deploy, which bundles `.form` files with the "
+"BPMN automatically"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:89
+msgid "Linking a form to a BPMN task"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:91
+msgid ""
+"You do not need to export the form to link it to a BPMN task. Forms saved in "
+"the Form Editor appear automatically in the **Link to Form** dropdown in the "
+"BPMN Modeler."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:93
+msgid "Switch to the **BPMN Modeler** view."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:94
+msgid "Select a `UserTask` or `StartEvent` on the canvas."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:95
+msgid ""
+"In the properties panel, find **Link to Form** and pick the form from the "
+"dropdown."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:97
+msgid ""
+"See [BPMN Modeler — Linking a UserTask or StartEvent to a form]{1} for full "
+"instructions."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:101
+msgid "Renaming a form"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:103
+msgid ""
+"Double-click a form name in the list (WIP forms only) to activate inline "
+"editing. Press **Enter** or click away to save the new name."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:107
+msgid "Deleting a form"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:109
+msgid ""
+"Click the trash icon on a WIP form entry. A confirmation dialog appears "
+"before the form is removed from `localStorage`. Example forms cannot be "
+"deleted."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cform-editor.md:111
+msgid ""
+"!!! note If a deleted form is still referenced by a `camunda:formRef` in a "
+"saved BPMN process, that reference becomes unresolvable. The BPMN Modeler "
+"will still show the form ID in the properties panel, but the deploy modal "
+"will list it as an unmatched form reference."
+msgstr ""

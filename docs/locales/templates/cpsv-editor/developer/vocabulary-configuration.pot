@@ -1,0 +1,285 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:1
+msgid "Vocabulary Configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:3
+msgid ""
+"The `src/config/vocabularies_config.js` file is the central configuration "
+"for all RDF vocabulary handling in the editor. It controls how the parser "
+"recognises entities and properties in imported Turtle files. Adding support "
+"for a new vocabulary requires only configuration changes — no parser code "
+"modifications."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:7
+msgid "File structure"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:9
+msgid ""
+"export const VOCABULARY_CONFIG = {\n"
+"  version: '1.0.0',\n"
+"  lastUpdated: '2025-10-27',\n"
+"\n"
+"  namespaces: { /* URI → prefix mappings */ },\n"
+"  entityTypes: { /* RDF type → editor section mappings */ },\n"
+"  propertyAliases: { /* alternative property → canonical property */ },\n"
+"};"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:22
+msgid "Namespaces"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:24
+msgid "Maps namespace URIs to the prefix(es) accepted in Turtle files."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:26
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\developer\\vocabulary-configuration.md:26"
+msgid "**Current configuration:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:28
+msgid ""
+"namespaces: {\n"
+"  'http://purl.org/vocab/cpsv#':               ['cpsv'],\n"
+"  'http://data.europa.eu/m8g/':                ['cv', 'cpsv-ap'],\n"
+"  'http://www.w3.org/ns/org#':                 ['org'],\n"
+"  'http://xmlns.com/foaf/0.1/':                ['foaf'],\n"
+"  'http://data.europa.eu/eli/ontology#':       ['eli'],\n"
+"  'https://regels.overheid.nl/termen/':        ['ronl'],\n"
+"  'https://cprmv.open-regels.nl/0.3.0/':       ['cprmv'],\n"
+"  'http://purl.org/dc/terms/':                 ['dct'],\n"
+"  'http://www.w3.org/ns/dcat#':                ['dcat'],\n"
+"  'http://www.w3.org/2004/02/skos/core#':      ['skos'],\n"
+"  'http://www.w3.org/2001/XMLSchema#':         ['xsd'],\n"
+"  'http://schema.org/':                        ['schema'],\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:45
+msgid "**Adding a namespace:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:47
+msgid ""
+"namespaces: {\n"
+"  // existing entries...\n"
+"  'http://www.w3.org/ns/prov#': ['prov'],\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:56
+msgid "Entity types"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:58
+msgid ""
+"Defines which RDF types are recognised and which editor section they map to."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:60
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\developer\\vocabulary-configuration.md:60"
+msgid "**Current configuration:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:62
+msgid ""
+"entityTypes: {\n"
+"  service: {\n"
+"    acceptedTypes: ['cpsv:PublicService', 'cpsv-ap:PublicService'],\n"
+"    canonicalType: 'cpsv:PublicService'\n"
+"  },\n"
+"  organization: {\n"
+"    acceptedTypes: ['org:Organization', 'foaf:Organization'],\n"
+"    canonicalType: 'org:Organization'\n"
+"  },\n"
+"  legalResource: {\n"
+"    acceptedTypes: ['eli:LegalResource'],\n"
+"    canonicalType: 'eli:LegalResource'\n"
+"  },\n"
+"  temporalRule: {\n"
+"    acceptedTypes: ['ronl:TemporalRule'],\n"
+"    canonicalType: 'ronl:TemporalRule'\n"
+"  },\n"
+"  parameter: {\n"
+"    acceptedTypes: ['skos:Concept', 'ronl:ParameterWaarde'],\n"
+"    canonicalType: 'skos:Concept'\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:87
+msgid "**Adding a type to an existing section:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:89
+msgid ""
+"parameter: {\n"
+"  acceptedTypes: [\n"
+"    'skos:Concept',\n"
+"    'ronl:ParameterWaarde',\n"
+"    'custom:Parameter'       // ← add here, never remove existing\n"
+"  ],\n"
+"  canonicalType: 'skos:Concept'\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:100
+msgid ""
+"Always add new types alongside existing ones. Removing an accepted type "
+"breaks import of files that use it."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:104
+msgid "Property aliases"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:106
+msgid ""
+"Maps alternative property expressions to the canonical form the editor uses "
+"internally."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:108
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor\\developer\\vocabulary-configuration.md:108"
+msgid "**Current configuration:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:110
+msgid ""
+"propertyAliases: {\n"
+"  // Organization name variants\n"
+"  'foaf:name':      'skos:prefLabel',\n"
+"  'org:name':       'skos:prefLabel',\n"
+"\n"
+"  // CPSV-AP to CV property mapping\n"
+"  'cpsv-ap:hasCompetentAuthority': 'cv:hasCompetentAuthority',\n"
+"  'cpsv-ap:thematicArea':          'cv:thematicArea',\n"
+"  'cpsv-ap:sector':                'cv:sector',\n"
+"  'cpsv-ap:hasChannel':            'cv:hasChannel',\n"
+"  'cpsv-ap:hasContactPoint':       'cv:hasContactPoint',\n"
+"  'cpsv-ap:hasCost':               'cv:hasCost',\n"
+"  'cpsv-ap:hasOutput':             'cv:hasOutput',\n"
+"  'cpsv-ap:hasLegalResource':      'cv:hasLegalResource',\n"
+"\n"
+"  // CPRMV to RONL property mapping\n"
+"  'cprmv:validFrom':       'ronl:validFrom',\n"
+"  'cprmv:validUntil':      'ronl:validUntil',\n"
+"  'cprmv:confidence':      'ronl:confidenceLevel',\n"
+"  'cprmv:confidenceLevel': 'ronl:confidenceLevel',\n"
+"  'cprmv:extends':         'ronl:extends'\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:137
+msgid "Helper functions"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:139
+msgid "The config file exports several utility functions used by the parser:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:141
+msgid ""
+"**`isKnownPrefix(prefix)`** — Returns true if the prefix is registered in "
+"`namespaces`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:143
+msgid ""
+"**`resolveNamespace(prefix)`** — Returns the full URI for a prefix, or null."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:145
+msgid ""
+"**`getCanonicalType(sectionName)`** — Returns the canonical RDF type for a "
+"given editor section."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:147
+msgid ""
+"**`extractPrefixMap(ttlContent)`** — Parses all `@prefix` declarations from "
+"a Turtle string and returns a `{ prefix: uri }` map."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:149
+msgid ""
+"**`validatePrefixes(ttlContent, { silent })`** — Checks whether essential "
+"prefixes are present in the Turtle string. Returns `{ valid: boolean, "
+"warnings: string[] }`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:153
+msgid "Testing configuration changes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:155
+msgid "After modifying the configuration:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:157
+msgid "Create a minimal Turtle file using the new vocabulary:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:159
+msgid ""
+"@prefix custom: <https://example.org/vocab#> .\n"
+"@prefix dct: <http://purl.org/dc/terms/> .\n"
+"\n"
+"<https://example.nl/test/1> a custom:NewType ;\n"
+"    dct:title \"Test Service\"@nl ."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:167
+msgid ""
+"Start the editor (`npm start`), click **Import TTL File**, and select the "
+"test file."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:168
+msgid "Verify the data appears in the expected tab with no console errors."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:169
+msgid ""
+"Export (Download TTL) and import the result to verify round-trip fidelity."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:173
+msgid "Troubleshooting"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:175
+msgid ""
+"**Entity not appearing in any tab** — The RDF type is not in `acceptedTypes` "
+"for any section. Add it."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:177
+msgid ""
+"**Property value is empty after import** — The property needs an alias, or "
+"it is not handled by the parser. Check `parseTTL.enhanced.js` for the "
+"property and add an alias if needed."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cvocabulary-configuration.md:179
+msgid ""
+"**Console warning about missing prefix** — Add the namespace URI to "
+"`namespaces`."
+msgstr ""

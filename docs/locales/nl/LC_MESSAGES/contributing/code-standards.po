@@ -1,0 +1,49 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:1
+msgid "Code Standards"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:3
+msgid ""
+"!!! info \"Documentation In Progress\" This page is being developed. Content "
+"will be added soon."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:8
+msgid "Coming Soon"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:10
+msgid ""
+"This section will contain comprehensive documentation about Code Standards."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:12
+msgid "For now, please refer to:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:13
+msgid "The main [documentation index]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:14
+msgid "Related sections in the navigation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:18
+msgid ""
+"**Status**: Draft\n"
+"**Last Updated**: January 2026"
+msgstr ""

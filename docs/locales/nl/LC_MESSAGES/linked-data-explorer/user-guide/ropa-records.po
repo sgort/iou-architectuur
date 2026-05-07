@@ -1,0 +1,244 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:1
+msgid "RoPA Records"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:3
+msgid ""
+"This guide walks through creating a complete RoPA record for a deployed "
+"process bundle — from opening the editor to activating the record for public "
+"publication."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:7
+msgid "Prerequisites"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:9
+msgid ""
+"A process bundle must already exist in the BPMN Modeler with at least one "
+"linked form (so the **Hydrate from forms** button has something to read)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:10
+msgid ""
+"The LDE backend must be connected to PostgreSQL — the RoPA feature requires "
+"database access."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:14
+msgid "Step 1 — Open the RoPA Records view"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:16
+msgid ""
+"Click the **ScrollText** icon (🗒) in the left sidebar. If no records exist "
+"yet the right panel shows an empty state. Click the **+** button in the "
+"panel header to create a new record."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:20
+msgid "Step 2 — Fill in the Record tab"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:22
+msgid "Start with the two identifier fields at the top:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:24
+msgid ""
+"**Title** — a clear, human-readable name for the processing activity, e.g. "
+"*Tree Felling Permit — material law assessment*."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:25
+msgid ""
+"**BPMN process ID** — copy the exact `id` attribute from the `<bpmn:process>"
+"` element, e.g. `TreeFellingPermitSubProcess`. This is the value shown on "
+"the process card in the BPMN Modeler."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:26
+msgid ""
+"**Process level** — select `Shell` if this record covers the AWB procedural "
+"shell, or `Subprocess` if it covers a product-specific subprocess."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:28
+msgid ""
+"Then complete all GDPR Art. 30 mandatory fields: controller name and "
+"contact, purpose, GDPR article, data subjects, recipients, retention period, "
+"and security measures."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:30
+msgid "Looking up the legal basis"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:32
+msgid ""
+"Click **Lookup from knowledge graph** next to the Legal basis field. The LDE "
+"queries the RONL TriplyDB endpoint and returns a list of `eli:LegalResource` "
+"entries linked to public services. Click the correct entry — both the URI "
+"and label fields are populated automatically."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:34
+msgid ""
+"If the service is not yet registered in the knowledge graph, type the label "
+"and URI manually."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:38
+msgid "Step 3 — Hydrate personal data fields"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:40
+msgid ""
+"Switch to the **Personal Data Fields** tab. Click **Hydrate from forms**."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:42
+msgid ""
+"The LDE reads the BPMN XML for the process ID you entered on the Record tab, "
+"extracts all `camunda:formRef` values, loads those form schemas, and creates "
+"one table row per field that has a `key` property. Fields without a `key` "
+"(headings, text blocks, submit buttons) are skipped automatically."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:44
+msgid "For each row:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:46
+msgid ""
+"Confirm the **Label** — it is pre-filled from the form schema but can be "
+"edited."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:47
+msgid "Set the **Category** dropdown to the most appropriate data category."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:48
+msgid ""
+"Tick **Art. 9/10** for any field that collects health data (Art. 9 GDPR) or "
+"criminal data (Art. 10 GDPR). The zorgtoeslag form fields "
+"`statusZorgverzekerd` (health insurance status) and `gedetineerd` (detained) "
+"are examples."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:50
+msgid ""
+"Remove any rows that represent routing variables or computed outputs that do "
+"not constitute personal data by clicking the × on that row."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:54
+msgid "Step 4 — Save the record"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:56
+msgid ""
+"Click **Save** in the top bar. The record is persisted to PostgreSQL and "
+"appears in the left panel list with a **DRAFT** badge. The record now has a "
+"UUID which is needed for the next step."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:60
+msgid "Step 5 — Link to the BPMN process"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:62
+msgid ""
+"Switch to the **BPMN Link** tab. You will see the BPMN process ID, the "
+"record's UUID, and the current value of `ronl:ropaRef` in the process XML."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:64
+msgid ""
+"Click **Write ronl:ropaRef to BPMN**. The UUID is injected into the BPMN XML "
+"and the status indicator changes to green with a **✓ Linked** label."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:66
+msgid ""
+"!!! tip You can also link the record from the BPMN Modeler directly — open "
+"the process there and use the **RoPA Record** dropdown panel at the bottom "
+"of the process list. Both methods produce the same result."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:71
+msgid "Step 6 — Activate the record"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:73
+msgid ""
+"Switch to the **Status** tab. The current status is **Draft**. Click **Set "
+"Active**. Confirm the dialog — *\"Activating this record will make it "
+"publicly visible. Continue?\"*"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:75
+msgid ""
+"Click **Save** again. The badge in the left panel changes to **ACTIVE** and "
+"the record is now returned by `GET /v1/ropa/public` and visible on the "
+"public site."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:79
+msgid "Editing an existing record"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:81
+msgid ""
+"Click any record in the left panel to open it. Edit the fields as needed and "
+"click **Save**. Changes to personal data fields (adding, removing, "
+"reclassifying) take effect immediately after saving."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:83
+msgid ""
+"!!! note Changing the **BPMN process ID** on an existing record does not "
+"automatically update the `ronl:ropaRef` in the old process XML. If you "
+"change the process ID, go to the BPMN Link tab and write the link again."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:88
+msgid "Archiving a record"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:90
+msgid ""
+"When a process bundle is retired, switch the record to **Archived** on the "
+"Status tab and save. Archived records are removed from the public site but "
+"remain in the database for audit purposes."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:94
+msgid "Related documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:96
+msgid "[RoPA Records features]{1} — full feature reference"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:97
+msgid "[RoPA Records developer docs]{1} — database schema and API"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cropa-records.md:98
+msgid "[BPMN Modeler user guide]{1} — linking forms and document templates"
+msgstr ""

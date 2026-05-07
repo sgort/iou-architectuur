@@ -1,0 +1,312 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:1
+msgid "Commercial Organisation Integration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:3
+msgid ""
+"The RONL Business API supports **commercial organisations** as a first-class "
+"tenant category alongside municipalities, provinces, and national agencies. "
+"This enables private-sector parties — such as health insurers — to offer a "
+"branded MijnOmgeving portal to their customers while delegating the actual "
+"administrative processing to the appropriate government authority."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:9
+msgid "Organisation types"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:11
+msgid "The `OrganisationType` union currently covers four values:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:13
+msgid "Value"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:13
+msgid "Example tenants"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:13
+msgid "Has MijnOmgeving"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:13
+msgid "Processes AWB"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:13
+msgid "`municipality`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:13
+msgid "Utrecht, Den Haag"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:13
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\features\\commercial-org-integration.md:13"
+msgid "✅"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:13
+msgid "`province`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:13
+msgid "Flevoland"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:13
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\features\\commercial-org-integration.md:13"
+msgid "`national`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:13
+msgid "UWV, Toeslagen"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:13
+msgid "caseworker only"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:13
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\features\\commercial-org-integration.md:13"
+msgid "`commercial`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:13
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\features\\commercial-org-integration.md:13"
+msgid "Unive Verzekeringen"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:13
+msgid "❌ (delegates)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:20
+msgid ""
+"The `organisation_type` user attribute in Keycloak determines which category "
+"a user belongs to. It is injected into every JWT as the `organisation_type` "
+"claim via a protocol mapper and propagated through `AuthenticatedUser` into "
+"all backend middleware and BPMN process variables."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:25
+msgid "Cross-tenant processing authority"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:27
+msgid ""
+"A commercial organisation can surface government services — such as the AWB "
+"zorgtoeslag application — within its own branded portal. The government "
+"authority responsible for the actual processing is a separate national "
+"tenant."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:31
+msgid "For zorgtoeslag this works as follows:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:33
+msgid ""
+"Citizen (municipality = unive)\n"
+"    ↓ logs in via DigiD, enters Unive MijnOmgeving\n"
+"    ↓ submits AwbZorgtoeslagProcess via ProcessStartFormViewer\n"
+"Backend POST /v1/process/AwbZorgtoeslagProcess/start\n"
+"    ↓ overrides municipality variable → \"toeslagen\"\n"
+"    ↓ records originTenantId → \"unive\"\n"
+"Operaton (AwbZorgtoeslagProcess instance, municipality = toeslagen)\n"
+"    ↓ caseworker task queue filtered by municipality = toeslagen\n"
+"test-caseworker-toeslagen picks up the task\n"
+"    ↓ completes AWB review phases\n"
+"Decision document available\n"
+"    ↓ citizen reads it from Unive MijnOmgeving via applicantId ownership "
+"check"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:48
+msgid ""
+"The key design principle is that **the channel and the processing authority "
+"are decoupled**. The citizen never leaves the Unive MijnOmgeving, but the "
+"dossier is handled entirely by Dienst Toeslagen."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:52
+msgid "Processing authority override"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:54
+msgid ""
+"The `POST /v1/process/:key/start` route applies a per-process-key override "
+"for `AwbZorgtoeslagProcess`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:57
+msgid ""
+"`municipality` is set to `toeslagen` regardless of the requesting user's "
+"tenant"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:58
+msgid ""
+"`originTenantId` records the originating channel (e.g. `unive`) for reporting"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:60
+msgid ""
+"This override runs after variable coercion and before forwarding to Operaton."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:62
+msgid "Cross-tenant access control"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:64
+msgid ""
+"Two endpoints implement a dual-check access model to allow commercial org "
+"citizens to read their own dossiers even when the underlying process ran "
+"under a different processing authority:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:68
+msgid ""
+"**`GET /v1/process/:id/historic-variables`** and **`GET /v1/process/"
+":instanceId/decision-document`**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:71
+msgid "Access is granted when **either**:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:73
+msgid ""
+"`municipality` on the process matches the requesting user's `tenantId` "
+"(normal same-tenant access), **or**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:75
+msgid ""
+"`applicantId` on the process matches the requesting user's `userId` (citizen "
+"self-access across tenant boundaries)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:78
+msgid ""
+"This means a Unive citizen can read their own zorgtoeslag decision document. "
+"A Toeslagen caseworker can still access all processes in their municipality "
+"scope. No other tenant can cross boundaries."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:82
+msgid "History endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:84
+msgid ""
+"`GET /v1/process/history` normally filters by both `applicantId` and "
+"`municipality`. For users with `organisationType = commercial` the "
+"`municipality` filter is omitted, so the citizen's own dossiers are returned "
+"regardless of which authority processed them."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:89
+msgid "Tenant configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:91
+msgid ""
+"Each commercial organisation is registered as a tenant in `tenants.json` "
+"with:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:93
+msgid "`organisationType: \"commercial\"`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:94
+msgid "A branded theme (primary colour, etc.)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:95
+msgid "`features.zorgtoeslag: true` (or whichever services apply)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:96
+msgid "Standard `leftPanelSections` for the citizen portal"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:98
+msgid ""
+"A corresponding Keycloak user carries `organisation_type: commercial` and "
+"`municipality: <tenant-id>` as user attributes, which are mapped to JWT "
+"claims by the existing protocol mappers. No additional Keycloak "
+"configuration is needed beyond adding the user."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:103
+msgid "Reference tenants"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:105
+msgid "Tenant ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:105
+msgid "Name"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:105
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:105
+msgid "Role"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:105
+msgid "`unive`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:105
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\features\\commercial-org-integration.md:105"
+msgid "Unive Verzekeringen"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:105
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\features\\commercial-org-integration.md:105"
+msgid "`commercial`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:105
+msgid "Channel — citizen portal"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:105
+msgid "`toeslagen`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:105
+msgid "Dienst Toeslagen"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:105
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\features\\commercial-org-integration.md:105"
+msgid "`national`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Ccommercial-org-integration.md:105
+msgid "Processing authority — AWB zorgtoeslag"
+msgstr ""

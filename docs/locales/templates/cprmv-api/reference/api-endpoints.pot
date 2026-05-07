@@ -1,0 +1,334 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:1
+msgid "API Endpoints"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:3
+msgid "Interactive documentation is available at the live environments:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:5
+msgid "**Production:** [https://cprmv.open-regels.nl/docs]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:6
+msgid "**Acceptance:** [https://acc.cprmv.open-regels.nl/docs]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:10
+msgid "GET /"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:12
+msgid "Returns the API title and version."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:14
+msgid "**Response:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:16
+msgid "{\"CPRMV Rules Serve API\": \"0.4.0\"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:22
+msgid "GET /methods"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:24
+msgid ""
+"Returns the Methods Knowledge Graph (cprmvmethods.ttl + cprmv.ttl merged)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:26
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:26"
+msgid "**Query parameters:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:28
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:28"
+msgid "Parameter"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:28
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:28"
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:28
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:28"
+msgid "Default"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:28
+msgid "Values"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:28
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:28"
+msgid "`format`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:28
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:28"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:28
+msgid "`json-ld`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:28
+msgid "`json-ld`, `xml`, `turtle`, `ttl`, `n3`, `turtle2`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:32
+msgid "**Response:** Plain text in the requested RDF serialisation."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:36
+msgid "GET /rules/{rule_id_path}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:38
+msgid "Retrieves a rule or rule set from an official publication repository."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:40
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:40"
+msgid "**Path parameters:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:42
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:42"
+msgid "Parameter"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:42
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:42"
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:42
+msgid "Constraints"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:42
+msgid "`rule_id_path`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:42
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:42"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:42
+msgid "10–500 characters. Format: `{RuleSetId}[, {RuleId1}[, {RuleId2}...]]`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:46
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:46"
+msgid "**Query parameters:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:48"
+msgid "Parameter"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:48"
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:48"
+msgid "Default"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:48"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgid "`path_delimiter`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:48"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgid "`,`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgid "Delimiter between identifiers in `rule_id_path`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:48"
+msgid "`format`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:48"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgid "`cprmv-json`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgid ""
+"Output format: `cprmv-json`, `json-ld`, `xml`, `turtle`, `ttl`, `n3`, "
+"`turtle2`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgid "`language`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:48"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgid "`null`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgid "Language for output (currently `nl` only; limited effect)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgid "`unformat`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:48"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgid "`\"\"`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:48
+msgid ""
+"`parse` pattern for structured extraction from `cprmv:definition`. Forces "
+"`cprmv-json`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:55
+msgid "**Response:** Plain text in the requested format."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:57
+msgid "**Error response:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:59
+msgid ""
+"{\"error\": \"No supported publication repository use identifiers with the "
+"format of the given Ruleset Id.\"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:63
+msgid "**Supported Rule Set ID formats:** See [ID Formats]{1}."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:67
+msgid "GET /ref/{referencemethod}/{reference}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:69
+msgid ""
+"Resolves an external legal reference URI to a CPRMV API `/rules/` path and "
+"returns an HTTP redirect."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:71
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:71"
+msgid "**Path parameters:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:73
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:73"
+msgid "Parameter"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:73
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:73"
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:73
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:73"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:73
+msgid "`referencemethod`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:73
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:73"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:73
+msgid "Reference system. Currently: `Juriconnect`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:73
+msgid "`reference`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:73
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\reference\\api-endpoints.md:73"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:73
+msgid ""
+"The reference URI (e.g. `jci1.3:c:BWBR0015703&artikel=20&z=2025-07-01&g=2025-"
+"07-01`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:78
+msgid ""
+"**Response:** `302 Found` redirect to the corresponding `/rules/` path, or "
+"`null`/error if the reference cannot be resolved."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:80
+msgid "**Supported reference types:** See [Reference Resolution]{1}."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:84
+msgid "Static: /respec/"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Creference%5Capi-endpoints.md:86
+msgid ""
+"Serves the CPRMV specification as a static ReSpec HTML site. Navigate to `/"
+"respec/` in a browser."
+msgstr ""

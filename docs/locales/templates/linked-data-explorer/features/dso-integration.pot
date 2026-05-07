@@ -1,0 +1,290 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:1
+msgid "DSO Integration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:3
+msgid "Overview"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:5
+msgid ""
+"The Linked Data Explorer integrates with the **Digitaal Stelsel Omgevingswet "
+"(DSO)** — the national catalogue and registry stack underpinning the Dutch "
+"Environment and Planning Act. This integration lets process designers link "
+"BPMN subprocesses directly to their authoritative DSO activiteit, browse the "
+"Stelselcatalogus and werkzaamheden registry from inside LDE, and verify "
+"references against live DSO data."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:7
+msgid "The integration spans three DSO APIs:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:9
+msgid ""
+"**Stelselcatalogus** — the conceptual model (concepts, properties, value "
+"lists)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:10
+msgid ""
+"**Zoekinterface** — search interface over werkzaamheden (the citizen-facing "
+"tasks like \"boom kappen\")"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:11
+msgid ""
+"**RTR (Registratie Toepasbare Regels)** — the activity registry where each "
+"authority's activiteiten and rule types live"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:13
+msgid ""
+"A toggle in Settings selects between the **pre-production** and "
+"**production** DSO environments independently of the LDE environment."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:22
+msgid "DSO environment toggle"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:24
+msgid ""
+"The DSO environment is set in **Settings → DSO environment** and persisted "
+"to localStorage. It is independent of the LDE environment toggle — pre-"
+"production LDE can talk to production DSO and vice versa, which matters "
+"because some authority data is only available in one environment."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:26
+msgid "LDE setting"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:26
+msgid "API target"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:26
+msgid "**Pre-production**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:26
+msgid "`service.pre.omgevingswet.overheid.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:26
+msgid "**Production**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:26
+msgid "`service.omgevingswet.overheid.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:31
+msgid ""
+"A coloured badge in the DSO Explorer header reflects the active environment "
+"— amber for pre-production, green for production."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:40
+msgid "Concepts tab"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:42
+msgid ""
+"Full-text search over the Stelselcatalogus. Returns concepts with their URI, "
+"label, definition, and source. Useful for discovering the canonical "
+"conceptual reference behind a citizen-facing term."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:46
+msgid "Works tab — werkzaamheden"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:48
+msgid ""
+"Search the Zoekinterface for werkzaamheden (the citizen-facing tasks that "
+"anchor a permit application — \"boom kappen\", \"Bed & Breakfast starten\"). "
+"Autocomplete fires after two characters with 300ms debounce."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:50
+msgid "Each result shows:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:52
+msgid "The human-readable **omschrijving** (e.g. \"Bed & Breakfast starten\")"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:53
+msgid ""
+"The full **`functioneleStructuurRef`** URI — the pivot to STTR files for the "
+"upcoming Phase 4 import"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:54
+msgid "The short werkzaamheid URN"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:56
+msgid ""
+"Selecting a result opens a detail panel with the current version's metadata, "
+"validity period, and full version history (each version showing start/end "
+"dates and a \"current\" badge)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:63
+msgid ""
+"Default sort order is `meestGekozen` — the most-used Omgevingsloket "
+"werkzaamheden appear first."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:67
+msgid "Activities tab — activiteiten"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:69
+msgid ""
+"Browse the RTR (Registratie Toepasbare Regels) for activiteiten. The default "
+"view lists recent activities; the **authority presets** (Lelystad, "
+"Flevoland) filter the list by authority OIN (Organisatie-"
+"identificatienummer) using `POST /activiteiten/_zoek` with "
+"`bestuursorgaan.oin` as the body filter."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:71
+msgid ""
+"The date input above the list defaults to today; changing the date and "
+"clicking **Load** re-fetches the authority list valid on that date."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:78
+msgid ""
+"Each activity card shows badges for the rule types declared on the activity:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:80
+msgid "**Conclusie** — full DMN decision content available"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:81
+msgid ""
+"**Indieningsvereisten** — application requirements (questionnaire-style DMN)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:82
+msgid "**Maatregelen** — measures (textual content, structured per maatregel)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:84
+msgid ""
+"These badges flag which downstream LDE assets can eventually be derived from "
+"the activity in Phase 4 (DMN, form, document template)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:86
+msgid "Activity Detail panel"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:88
+msgid "Clicking an activity row opens the detail panel. It shows:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:90
+msgid "omschrijving and full URN"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:91
+msgid "bestuursorgaan (authority) — bestuurslaag, organisatieType, code, OIN"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:92
+msgid "validity (begindatum / einddatum)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:93
+msgid "parent activity link (if any)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:94
+msgid "child activities — names fetched in parallel after the parent loads"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:95
+msgid "rule types present, with download links"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:102
+msgid ""
+"If an activity is queried from the wrong DSO environment (e.g. trying to "
+"view a production-only URN while the toggle is on pre-production), the "
+"detail panel shows a clear \"not available in this environment\" message "
+"rather than a raw 404."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:106
+msgid "Linking a BPMN subprocess to a DSO activiteit"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:108
+msgid ""
+"The BPMN Modeler footer panel has a **DSO Activity** selector. Pasting a URN "
+"and clicking **Verify** queries the live DSO RTR — on success, the panel "
+"shows the omschrijving, authority, and a direct link to the public RTR "
+"viewer. The URN is then persisted on the BPMN process element as "
+"`ronl:dsoActiviteitUrn`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:115
+msgid ""
+"The verified URN survives saveXML round-trips and follows the same pattern "
+"as other `ronl:` extensions (RoPA, language, organization)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:119
+msgid "Phase plan"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:121
+msgid ""
+"The integration is delivered in phases. The detailed plan, current status, "
+"confirmed test anchors, and remaining work for each phase are tracked in "
+"[DSO Integration Phase Plan]{1}. Phases 1–3 are live as of v1.5.3; Phase 4 "
+"(STTR → DMN/form/document import) is the next development cycle."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:125
+msgid "Related documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:127
+msgid "[DSO Explorer user guide]{1} — step-by-step search and link workflow"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:128
+msgid ""
+"[DSO Integration Phase Plan]{1} — phase status, test anchors, implementation "
+"order"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:129
+msgid "[BPMN Modeler — DSO activiteit linkage]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdso-integration.md:130
+msgid "[Backend API reference — DSO routes]{1}"
+msgstr ""

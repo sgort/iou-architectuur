@@ -1,0 +1,149 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:1
+msgid "Deployment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:5
+msgid "Environments"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:7
+msgid "Environment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:7
+msgid "URL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:7
+msgid "Branch"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:7
+msgid "Production"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:7
+msgid "https://cpsv-editor.open-regels.nl"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:7
+msgid "`main`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:7
+msgid "Acceptance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:7
+msgid "https://acc.cpsv-editor.open-regels.nl"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:7
+msgid "`acc`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:12
+msgid ""
+"All changes go to `acc` first. After acceptance testing, they are merged to "
+"`main` for production deployment."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:16
+msgid "CI/CD pipeline"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:18
+msgid ""
+"Git push to branch\n"
+"       ↓\n"
+"GitHub Actions workflow\n"
+"(.github/workflows/azure-static-web-apps.yml)\n"
+"       ↓\n"
+"npm ci  →  npm run build\n"
+"       ↓\n"
+"Azure Static Web Apps deployment\n"
+"       ↓\n"
+"https://cpsv-editor.open-regels.nl  (main)\n"
+"https://acc.cpsv-editor.open-regels.nl  (acc)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:32
+msgid ""
+"The workflow triggers on every push to `main` and `acc`. No manual "
+"deployment steps are required."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:36
+msgid "Pull request workflow"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:38
+msgid "Create a feature branch from `acc`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:39
+msgid "Make changes and test locally."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:40
+msgid "Push the branch and open a PR targeting `acc`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:41
+msgid "Review and merge to `acc`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:42
+msgid "Verify behaviour on the ACC environment."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:43
+msgid "Open a PR from `acc` to `main` for production release."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:47
+msgid "Azure Static Web Apps"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:49
+msgid ""
+"The application is deployed as a static site. No server-side rendering is "
+"involved. The build output is the `build/` directory produced by `npm run "
+"build` (Create React App)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:51
+msgid ""
+"Configuration for routing and CORS is in `staticwebapp.config.json` at the "
+"repository root."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:55
+msgid "Environment variables"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:57
+msgid ""
+"The frontend has no required environment variables for basic operation. The "
+"TriplyDB base URL, account, dataset, and API token are entered by the user "
+"at runtime and stored in browser localStorage."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cdeveloper%5Cdeployment.md:59
+msgid ""
+"If the optional backend proxy is deployed, its URL can be configured — see "
+"the backend documentation in the Linked Data Explorer repository."
+msgstr ""

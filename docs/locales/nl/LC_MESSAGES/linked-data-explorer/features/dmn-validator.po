@@ -1,0 +1,265 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:1
+msgid "DMN Validator"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:3
+msgid ""
+"The DMN Validator lets you validate one or more DMN files against the RONL "
+"DMN+ syntactic layers before publishing them to TriplyDB. It is accessible "
+"from the shield icon (🛡) in the sidebar."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:12
+msgid "Multi-file validation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:14
+msgid ""
+"You can drop any number of `.dmn` or `.xml` files onto the validator at "
+"once, or add files incrementally — the drop zone remains visible at the top "
+"of the panel whenever files are loaded. Files are validated independently "
+"and displayed side-by-side for easy comparison."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:16
+msgid "Each file card shows:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:18
+msgid "File name and size"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:19
+msgid "A **Validate** button to trigger validation for that file individually"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:20
+msgid ""
+"A **Validate all** button in the header to validate all loaded files at once"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:21
+msgid ""
+"The validation result with a summary badge and collapsible layer sections"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:22
+msgid "A remove (×) button to dismiss the file"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:24
+msgid ""
+"Navigation state is preserved: switching to another view (SPARQL editor, "
+"chain builder, etc.) and returning does not clear the loaded files or their "
+"results."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:28
+msgid "Validation layers"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:30
+msgid ""
+"Results are grouped into five layers. Each layer can be expanded to see "
+"individual issues. Issues carry a severity, a typed code, and a human-"
+"readable message."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "Layer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "Badge"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "Covers"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "Base DMN"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "BASE-*"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "XML well-formedness, namespace, root element, required attributes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "Business Rules"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "BIZ-*"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid ""
+"Hit policy, typeRef presence and correctness, rule entry counts, hit-policy "
+"overlap detection"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "Execution Rules"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "EXEC-*"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "CPRMV extension attributes, enum values, date formats, BWB IDs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "Interaction Rules"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "INT-*"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid ""
+"DRD wiring — href resolution, orphaned inputs (DRDs only), variable name "
+"consistency, missing `inputData` declarations (INT-007)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "Content"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "CON-*"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:32
+msgid "Metadata quality — descriptions, typeRef, text annotations"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:40
+msgid ""
+"A file is **valid** when no layer produces an error. Warnings and "
+"informational messages are advisory; they highlight quality improvements "
+"recommended for RONL publishing but do not block use."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:42
+msgid ""
+"For the complete specification of every code and its rationale, see the [DMN "
+"Validation Reference]{1}."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:46
+msgid "Severity levels"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:48
+msgid "Icon"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:48
+msgid "Level"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:48
+msgid "Meaning"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:48
+msgid "🔴"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:48
+msgid "Error"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:48
+msgid ""
+"The DMN has a structural or semantic problem that will likely cause "
+"deployment or execution failure. Must be resolved."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:48
+msgid "🟡"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:48
+msgid "Warning"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:48
+msgid ""
+"The DMN will work but deviates from RONL publishing standards. Should be "
+"resolved before publishing."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:48
+msgid "🔵"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:48
+msgid "Info"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:48
+msgid "A quality suggestion. No functional impact."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:56
+msgid "Validation example"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:58
+msgid ""
+"The screenshot below shows `BIZ-008-009-test.dmn` — a file deliberately "
+"authored with two hit-policy violations — loaded in the validator. The "
+"Business Rules layer reports one error and one warning."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:67
+msgid "Comparing files"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:69
+msgid ""
+"Load multiple files to compare their validation profiles side-by-side. This "
+"is particularly useful when:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:71
+msgid "Reviewing a set of DMNs before a batch publish to TriplyDB"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:72
+msgid "Comparing an updated version of a DMN against its predecessor"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:73
+msgid ""
+"Checking that a vendor's DMN implementation meets the same standards as the "
+"reference model"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-validator.md:75
+msgid ""
+"Each card scrolls independently, so you can inspect the layer details of one "
+"file without losing your position in another."
+msgstr ""

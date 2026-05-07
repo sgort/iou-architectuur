@@ -1,0 +1,374 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:1
+msgid "JWT Claims"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:3
+msgid ""
+"RONL Business API validates every request against a JWT access token issued "
+"by Keycloak. The token contains standard OIDC claims plus custom claims "
+"injected via Keycloak protocol mappers."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:7
+msgid "Full token example"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:9
+msgid ""
+"{\n"
+"  \"header\": {\n"
+"    \"alg\": \"RS256\",\n"
+"    \"typ\": \"JWT\",\n"
+"    \"kid\": \"key-id-123\"\n"
+"  },\n"
+"  \"payload\": {\n"
+"    \"exp\": 1740492000,\n"
+"    \"iat\": 1740491100,\n"
+"    \"iss\": \"https://keycloak.open-regels.nl/realms/ronl\",\n"
+"    \"aud\": \"ronl-business-api\",\n"
+"    \"sub\": \"user-uuid-abc-123\",\n"
+"    \"typ\": \"Bearer\",\n"
+"    \"azp\": \"ronl-business-api\",\n"
+"    \"preferred_username\": \"test-citizen-utrecht\",\n"
+"    \"email_verified\": false,\n"
+"    \"municipality\": \"utrecht\",\n"
+"    \"organisation_type\": \"municipality\",\n"
+"    \"roles\": [\"citizen\"],\n"
+"    \"loa\": \"substantial\"\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:36
+msgid "Standard OIDC claims"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\jwt-claims.md:38"
+msgid "Claim"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\jwt-claims.md:38"
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\jwt-claims.md:38"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgid "`iss`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\jwt-claims.md:38"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgid "Token issuer — Keycloak realm URL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgid "`aud`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgid "Intended audience — must be `ronl-business-api`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgid "`sub`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgid "Subject — unique user UUID, used as `userId` in audit logs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgid "`exp`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\jwt-claims.md:38"
+msgid "number"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgid "Expiry — Unix timestamp; token lifetime is 15 minutes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgid "`iat`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgid "Issued at — Unix timestamp"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgid "`preferred_username`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgid "Human-readable username"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgid "`typ`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:38
+msgid "Always `Bearer`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:50
+msgid "Custom RONL claims"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:52
+msgid ""
+"These claims are added by Keycloak protocol mappers configured on the `ronl-"
+"business-api` client:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\jwt-claims.md:54"
+msgid "Claim"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\jwt-claims.md:54"
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid "Mapper type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\jwt-claims.md:54"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid "`municipality`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\jwt-claims.md:54"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\jwt-claims.md:54"
+msgid "User Attribute"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid "Tenant identifier — maps to `TenantConfig.id`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid "`organisation_type`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\jwt-claims.md:54"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid "Organisation category: `municipality`, `province`, or `national`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid "`roles`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid "string[]"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid "User Realm Role"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid "Roles assigned in the Keycloak realm"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid "`loa`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\jwt-claims.md:54"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid "Level of Assurance from DigiD (`low`, `substantial`, `high`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid "`mandate`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\jwt-claims.md:54"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid ""
+"Representation authority (optional — `legal-guardian`, `power-of-attorney`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid "`bsn`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\jwt-claims.md:54"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid "Citizen Service Number (encrypted in production, placeholder in test)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid "`employeeId`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\jwt-claims.md:54"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:54
+msgid ""
+"Employee ID injected from `employee_id` user attribute. Present on "
+"caseworker accounts that have been onboarded via `HrOnboardingProcess`; "
+"absent for citizens and non-onboarded caseworkers."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:66
+msgid "How claims are used by the backend"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:68
+msgid ""
+"After successful JWT validation in `jwt.middleware.ts`, the decoded payload "
+"is attached to `req.user`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:70
+msgid ""
+"interface JwtClaims {\n"
+"  sub: string; // → userId in audit log\n"
+"  municipality: string; // → tenant isolation filter\n"
+"  organisation_type: string; // → propagated to BPMN process variables\n"
+"  roles: string[]; // → authorization checks\n"
+"  loa: string; // → LoA-gated endpoint checks\n"
+"  preferred_username: string;\n"
+"  mandate?: string;\n"
+"  bsn?: string;\n"
+"  employeeId?: string; // → HR onboarding profile lookup\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:84
+msgid ""
+"The tenant middleware reads `req.user.municipality` to load the "
+"`TenantConfig` and apply the feature allowlist for the request."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:88
+msgid "Inspecting a token in the browser"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:90
+msgid ""
+"// In browser DevTools console after login:\n"
+"const token = /* keycloak.token */;\n"
+"JSON.parse(atob(token.split('.')[1]));"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:96
+msgid "Or paste the token at [jwt.io]{1} for a formatted view."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:100
+msgid "Token lifetime"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:102
+msgid "Setting"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:102
+msgid "Value"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:102
+msgid "Keycloak config key"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:102
+msgid "Access token"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:102
+msgid "15 minutes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:102
+msgid "`accessTokenLifespan: 900`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:102
+msgid "SSO session idle"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:102
+msgid "30 minutes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:102
+msgid "`ssoSessionIdleTimeout: 1800`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:102
+msgid "SSO session max"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:102
+msgid "10 hours"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:102
+msgid "`ssoSessionMaxLifespan: 36000`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cjwt-claims.md:108
+msgid ""
+"The Keycloak JS adapter in the frontend automatically refreshes the access "
+"token before it expires, as long as the SSO session is still valid."
+msgstr ""

@@ -1,0 +1,1208 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:1
+msgid "BPMN Modeler Implementation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:3
+msgid ""
+"The BPMN Modeler wraps the `bpmn-js` library in a three-panel React "
+"component. This page covers the component structure, the canvas setup "
+"decisions, and known rendering issues with their fixes."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:7
+msgid "Component structure"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:9
+msgid ""
+"packages/frontend/src/components/BpmnModeler/\n"
+"├── BpmnModeler.tsx            main orchestrator, manages selected process "
+"state\n"
+"├── BpmnCanvas.tsx             bpmn-js canvas wrapper (modeler lifecycle, "
+"badge overlays, deploy trigger)\n"
+"├── BpmnProperties.tsx         properties panel (right), includes "
+"DmnTemplateSelector\n"
+"├── ProcessList.tsx            process list (left), CRUD operations\n"
+"├── DmnTemplateSelector.tsx    DMN/DRD dropdown for BusinessRuleTask "
+"linking\n"
+"├── FormTemplateSelector.tsx   Form dropdown for UserTask / StartEvent "
+"linking\n"
+"├── DocumentTemplateSelector.tsx  Document template dropdown for UserTask "
+"linking  ← new in v1.1.0\n"
+"└── BpmnModeler.css            custom styles for canvas rendering fixes and "
+"badge overlays\n"
+"\n"
+"packages/frontend/src/\n"
+"├── services/\n"
+"│   ├── bpmnService.ts         localStorage CRUD for BpmnProcess records\n"
+"│   └── formService.ts         localStorage CRUD for FormSchema records "
+"(shared with FormEditor)\n"
+"└── utils/\n"
+"    └── bpmnTemplates.ts       default BPMN XML templates (new process, "
+"example)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:30
+msgid "Canvas initialisation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:32
+msgid "`BpmnCanvas.tsx` manages the bpmn-js modeler instance lifecycle:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:34
+msgid ""
+"const modeler = new Modeler({\n"
+"  container: containerRef.current,\n"
+"  moddleExtensions: {\n"
+"    camunda: camundaModdleDescriptor,\n"
+"  },\n"
+"});\n"
+"\n"
+"await modeler.importXML(xml);\n"
+"const canvas = modeler.get('canvas');\n"
+"canvas.zoom('fit-viewport');"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:47
+msgid ""
+"`camunda-bpmn-moddle` is used instead of an Operaton equivalent because no "
+"`operaton-bpmn-moddle` package exists. Operaton accepts both `camunda:` and "
+"`operaton:` namespace attributes, so `camunda:` is safe to use and ensures "
+"compatibility with the broader Camunda 7 tooling ecosystem."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:51
+msgid "Scroll-to-zoom override"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:53
+msgid ""
+"The bpmn-js default requires `Ctrl+Scroll` to zoom. This was overridden to "
+"plain scroll for consistency with the rest of the application:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:55
+msgid ""
+"const handleWheel = (e: WheelEvent) => {\n"
+"  e.preventDefault();\n"
+"  const canvas = modelerRef.current?.get('canvas') as any;\n"
+"  const currentZoom = canvas.zoom();\n"
+"  const delta = e.deltaY > 0 ? -0.1 : 0.1;\n"
+"  canvas.zoom(Math.max(0.2, Math.min(4, currentZoom + delta)));\n"
+"};\n"
+"\n"
+"container.addEventListener('wheel', handleWheel, { passive: false });"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:67
+msgid ""
+"`passive: false` is required so `preventDefault()` is effective on wheel "
+"events."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:71
+msgid "Rendering artifact fix"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:73
+msgid ""
+"bpmn-js produces black circles and stray lines during drag operations when "
+"SVG layer pointer events conflict. The fix in `BpmnModeler.css`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:75
+msgid ""
+".bpmn-container .djs-overlay-container,\n"
+".bpmn-container .djs-hit-container,\n"
+".bpmn-container .djs-outline-container {\n"
+"  pointer-events: none;\n"
+"}\n"
+"\n"
+".bpmn-container .djs-element {\n"
+"  pointer-events: all;\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:87
+msgid ""
+"This separates hit detection (on elements) from overlay rendering (no "
+"pointer events), eliminating the visual artifacts."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:91
+msgid "FormTemplateSelector — form linking for UserTask and StartEvent"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:93
+msgid ""
+"`FormTemplateSelector` is a React component injected into the bpmn-js "
+"properties panel when a `UserTask` or `StartEvent` is selected. It reads "
+"available forms from `FormService` and writes `camunda:formRef` / "
+"`camunda:formRefBinding` to the element's BPMN extension attributes via the "
+"bpmn-js `modeling` API."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:95
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\bpmn-modeler.md:95"
+msgid "Injection"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:97
+msgid ""
+"The injection follows the same pattern as `DmnTemplateSelector`. Inside "
+"`BpmnCanvas.tsx`, the `selectionChanged` listener distinguishes element type "
+"and mounts the appropriate selector:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:99
+msgid ""
+"} else if (elementType === 'bpmn:UserTask' || elementType === "
+"'bpmn:StartEvent') {\n"
+"  const selectorContainer = document.createElement('div');\n"
+"  selectorContainer.id = `form-template-custom-${selectedElement.id}`;\n"
+"  propertiesPanel.appendChild(selectorContainer);\n"
+"\n"
+"  const root = ReactDOM.createRoot(selectorContainer);\n"
+"  root.render(\n"
+"    <FormTemplateSelector\n"
+"      element={selectedElement}\n"
+"      modeling={modeling}\n"
+"      selectedFormRef={businessObject.get('camunda:formRef')}\n"
+"    />\n"
+"  );\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:116
+msgid ""
+"The `cleanupReactRoots()` helper unmounts the previous React root whenever "
+"the selection changes, preventing stale instances."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:118
+msgid "Writing attributes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:120
+msgid "When the user selects a form:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:122
+msgid ""
+"modeling.updateProperties(element, {\n"
+"  'camunda:formRef': schemaId,        // the schema.id from the FormSchema "
+"JSON\n"
+"  'camunda:formRefBinding': 'latest',\n"
+"  'camunda:formKey': undefined,       // clears any legacy HTML formKey\n"
+"});"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:130
+msgid ""
+"`schemaId` is `(form.schema as Record<string, unknown>).id` — the ID "
+"embedded in the form's JSON schema, not the outer `FormSchema.id` used as "
+"the localStorage record key."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:132
+msgid "Clearing a link"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:134
+msgid "Selecting the blank option calls:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:136
+msgid ""
+"modeling.updateProperties(element, {\n"
+"  'camunda:formRef': undefined,\n"
+"  'camunda:formRefBinding': undefined,\n"
+"});"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:145
+msgid "Form badge overlay"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:147
+msgid ""
+"When any `UserTask` or `StartEvent` has `camunda:formRef` set, "
+"`BpmnCanvas.tsx` renders a green badge overlay below the element using the "
+"bpmn-js `overlays` service. This is applied on `import.done` and on every "
+"`element.changed` event."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:149
+msgid ""
+"overlays.add(element.id, 'form-linked', {\n"
+"  position: { bottom: -22, left: leftOffset },\n"
+"  html: `<div class=\"form-linked-badge\" title=\"${formRef}\">📝 ${formRef}"
+"</div>`,\n"
+"});"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:156
+msgid ""
+"The badge offset uses `leftOffset = Math.round((element.width - "
+"badgeWidth) / 2)` to centre the badge horizontally beneath the element. A "
+"separate CSS class `form-linked-badge--start` applies smaller font/padding "
+"for `StartEvent` elements, which have a narrower default width."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:158
+msgid "Styles are defined in `BpmnModeler.css`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:160
+msgid ""
+".form-linked-badge {\n"
+"  background: #16a34a;   /* green-600 */\n"
+"  color: white;\n"
+"  font-size: 10px;\n"
+"  font-weight: 600;\n"
+"  padding: 2px 6px;\n"
+"  border-radius: 4px;\n"
+"  max-width: 130px;\n"
+"  overflow: hidden;\n"
+"  text-overflow: ellipsis;\n"
+"  pointer-events: none;\n"
+"  box-shadow: 0 1px 3px rgba(0,0,0,0.2);\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:176
+msgid ""
+"`pointer-events: none` prevents the badge from interfering with element "
+"selection on the canvas."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:180
+msgid "DocumentTemplateSelector — document template linking for UserTask"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:182
+msgid ""
+"`DocumentTemplateSelector` is a React component injected into the bpmn-js "
+"properties panel when a `UserTask` is selected (not `StartEvent`). It reads "
+"available document templates from `DocumentService` and writes "
+"`camunda:documentRef` to the element via the bpmn-js `modeling` API. It "
+"follows the identical injection pattern as `FormTemplateSelector`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:184
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\bpmn-modeler.md:184"
+msgid "Injection"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:186
+msgid ""
+"Inside the `selectionChanged` listener in `BpmnCanvas.tsx`, after the "
+"`FormTemplateSelector` is mounted for a `UserTask`, the document selector is "
+"appended immediately below it:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:188
+msgid ""
+"// UserTask only — not StartEvent\n"
+"if (elementType === 'bpmn:UserTask') {\n"
+"  const docSelectorContainer = document.createElement('div');\n"
+"  docSelectorContainer.id = `document-template-custom-${selectedElement.id}"
+"`;\n"
+"  propertiesPanel.appendChild(docSelectorContainer);\n"
+"\n"
+"  const currentDocumentRef = businessObject.get('camunda:documentRef');\n"
+"\n"
+"  const docRoot = ReactDOM.createRoot(docSelectorContainer);\n"
+"  docRoot.render(\n"
+"    \n"
+"  );\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:204
+msgid ""
+"`cleanupReactRoots()` unmounts all injected React roots (form and document) "
+"when the selection changes."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:206
+msgid "Writing and clearing the attribute"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:208
+msgid "Selecting a template:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:210
+msgid ""
+"modeling.updateProperties(element, {\n"
+"  'camunda:documentRef': templateId,\n"
+"});"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:216
+msgid "Selecting the blank option:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:218
+msgid ""
+"modeling.updateProperties(element, {\n"
+"  'camunda:documentRef': undefined,\n"
+"});"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:226
+msgid "Document badge overlay"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:228
+msgid ""
+"When a `UserTask` has `camunda:documentRef` set, `BpmnCanvas.tsx` renders a "
+"purple badge below the element. This is applied in `refreshDmnOverlays()` "
+"alongside the DMN and form badges:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:230
+msgid ""
+"overlays.remove({ type: 'document-linked' });\n"
+"\n"
+"// ...inside the elementRegistry.forEach loop, after the form badge check:\n"
+"if (element.type === 'bpmn:UserTask') {\n"
+"  const documentRef = element.businessObject.get('camunda:documentRef');\n"
+"  if (documentRef) {\n"
+"    const badgeWidth = 130;\n"
+"    const leftOffset = Math.round((element.width - badgeWidth) / 2);\n"
+"    overlays.add(element.id, 'document-linked', {\n"
+"      position: { bottom: -36, left: leftOffset }, // below the form badge "
+"at -22\n"
+"      html: `📄 ${documentRef}`,\n"
+"    });\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:247
+msgid ""
+"The badge offset is `bottom: -36` (vs. `bottom: -22` for the form badge), so "
+"both badges stack below the element without overlapping."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:249
+msgid "CSS"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:251
+msgid "Defined in `BpmnModeler.css`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:253
+msgid ""
+".document-linked-badge {\n"
+"  background: #7c3aed;   /* violet-700 */\n"
+"  color: white;\n"
+"  font-size: 10px;\n"
+"  font-weight: 600;\n"
+"  padding: 2px 6px;\n"
+"  border-radius: 4px;\n"
+"  white-space: nowrap;\n"
+"  max-width: 130px;\n"
+"  overflow: hidden;\n"
+"  text-overflow: ellipsis;\n"
+"  pointer-events: none;\n"
+"  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:270
+msgid "Badge stacking order"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "Overlay type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "CSS class"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "Colour"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "`bottom` offset"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "`dmn-linked`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "`.dmn-linked-badge`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "Blue (`#2563eb`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "`8` (inside element)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "`form-linked`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "`.form-linked-badge`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "Green (`#16a34a`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "`-22` (below element)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "`document-linked`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "`.document-linked-badge`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "Violet (`#7c3aed`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:272
+msgid "`-36` (below form badge)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:278
+msgid ""
+"`refreshDmnOverlays()` calls `overlays.remove({ type: 'document-linked' })` "
+"before re-adding, so stale badges are cleared on every `element.changed` "
+"event."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:282
+msgid "Deploy modal"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:284
+msgid ""
+"The deploy modal is triggered by the **Deploy** button in the canvas "
+"toolbar. `BpmnCanvas.tsx` assembles the resource bundle before opening the "
+"modal:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:286
+msgid "Resource collection"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:288
+msgid ""
+"// 1. Save current BPMN to get latest XML\n"
+"const { xml } = await modelerRef.current.saveXML({ format: true });\n"
+"\n"
+"// 2. Extract subprocess calledElement references (recursive)\n"
+"const calledElements = extractCalledElements(xml);\n"
+"// → match against saved BpmnProcess records by process/@id\n"
+"\n"
+"// 3. Extract all camunda:formRef values from main + subprocess XMLs\n"
+"const allFormRefs = new Set([\n"
+"  ...extractFormRefs(xml),\n"
+"  ...subProcessXmls.flatMap(sp => extractFormRefs(sp.xml)),\n"
+"]);\n"
+"\n"
+"// 4. Match form refs against FormService.getForms() by schema.id\n"
+"const forms = allFormRefs → matched FormSchema records"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:306
+msgid ""
+"Unmatched form refs (referenced in BPMN but not in localStorage) are passed "
+"to the modal as `unmatchedForms` for display."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:308
+msgid "API call"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:310
+msgid "On **Deploy**, `BpmnCanvas.tsx` sends a JSON body to the backend:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:312
+msgid ""
+"await fetch(`${API_BASE_URL}/api/dmns/process/deploy`, {\n"
+"  method: 'POST',\n"
+"  headers: { 'Content-Type': 'application/json' },\n"
+"  body: JSON.stringify({\n"
+"    bpmnXml: xml,\n"
+"    deploymentName: processKey,   // from BPMN process/@id\n"
+"    forms,                        // [{ id, schema }]\n"
+"    subProcesses,                 // [{ filename, xml }]\n"
+"    operatonUrl,                  // from modal field\n"
+"    operatonUsername,\n"
+"    operatonPassword,\n"
+"  }),\n"
+"});"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:328
+msgid "Backend endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:330
+msgid ""
+"`POST /api/dmns/process/deploy` (in `dmn.routes.ts`) delegates to "
+"`operatonService.deployProcess()`. That method builds a `multipart/form-"
+"data` request with each resource appended as a named field matching Camunda "
+"Modeler behaviour:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:332
+msgid "Main BPMN: field name = `${processKey}.bpmn`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:333
+msgid "Subprocess BPMNs: field name = the subprocess filename"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:334
+msgid "Forms: field name = `${formId}.form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:336
+msgid ""
+"A custom Operaton URL in the request body causes `deployProcess()` to "
+"construct a new Axios client targeting that URL, with optional Basic Auth "
+"credentials, instead of using the default `OPERATON_BASE_URL` from the "
+"backend environment."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:340
+msgid "DmnTemplateSelector"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:342
+msgid ""
+"`DmnTemplateSelector.tsx` loads from two sources in parallel when mounted "
+"for a `BusinessRuleTask`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:344
+msgid ""
+"const loadOptions = async () => {\n"
+"  // Remote: regular DMNs from backend\n"
+"  const response = await fetch(`${API_BASE_URL}/v1/dmns?endpoint=${endpoint}"
+"`);\n"
+"  const dmnArray: DmnModel[] = data.data.dmns;\n"
+"\n"
+"  // Local: DRD templates from localStorage\n"
+"  const userTemplates = getUserTemplates(endpoint);\n"
+"  const drdOptions = userTemplates\n"
+"    .filter(t => t.isDrd && t.drdEntryPointId)\n"
+"    .map(t => ({\n"
+"      identifier: t.drdEntryPointId!,\n"
+"      title: `${t.name} (DRD)`,\n"
+"      isDrd: true,\n"
+"      originalChain: t.drdOriginalChain,\n"
+"    }));\n"
+"\n"
+"  setOptions({ drds: drdOptions, dmns: dmnArray });\n"
+"};"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:365
+msgid ""
+"The dropdown renders two `<optgroup>` elements: \"🔗 DRDs (Unified Chains)\" "
+"and \"📋 Single DMNs\". Selection auto-populates `camunda:decisionRef` and "
+"suggests a `camunda:resultVariable` value (derived from the decision title, "
+"camelCased)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:367
+msgid "DmnTemplateSelector pre-selection fix"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:369
+msgid ""
+"Before v1.0.0, opening the properties panel for a `BusinessRuleTask` that "
+"already had `camunda:decisionRef` set would show an empty dropdown. The fix "
+"reads `currentDecisionRef` from `businessObject.get('camunda:decisionRef')` "
+"and passes it as `selectedDecisionRef` to `DmnTemplateSelector`, which "
+"initialises its `useState` from that prop."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:373
+msgid "Process persistence"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:375
+msgid ""
+"`bpmnService.ts` stores processes as `BpmnProcess` records in PostgreSQL via "
+"the backend, using `localStorage` as a synchronous read cache. See [Asset "
+"Storage]{1} for the full write-through cache and hydration architecture."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:377
+msgid ""
+"The `BpmnProcess` type includes three relationship fields added in v1.3.0:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:378
+msgid ""
+"interface BpmnProcess {\n"
+"  // ... existing fields ...\n"
+"  bpmnProcessId?: string;                               // <process "
+"id=\"...\"> from XML\n"
+"  processRole?: 'shell' | 'subprocess' | 'standalone';\n"
+"  calledElement?: string;                               // parent shell's "
+"bpmnProcessId\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:387
+msgid "`bpmnProcessId` is extracted from the XML on save using:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:388
+msgid ""
+"const extractBpmnProcessId = (xml: string): string => {\n"
+"  const match = xml.match(/<(?:bpmn:)?process[^>]+\\bid=\"([^\"]+)\"/);\n"
+"  return match?.[1] ?? 'unknown';\n"
+"};"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:395
+msgid ""
+"`ProcessList.tsx` uses `calledElement === shell.bpmnProcessId` to group "
+"subprocesses under their parent shell in the hierarchical view."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:397
+msgid "Bundle assembly after migration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:399
+msgid ""
+"`BpmnCanvas.tsx` resolves subprocess XMLs for deployment by matching "
+"`calledElement` values from the active BPMN against stored `BpmnProcess` "
+"records. After the PostgreSQL migration the lookup continues to work "
+"identically — `hydrateFromServer()` ensures the local cache reflects the "
+"database state on mount, so the in-memory lookup in `BpmnService.getProcesses"
+"()` always has current data."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:401
+msgid ""
+"The backend additionally exposes `GET /v1/assets/bpmn/by-bpmn-id/"
+":bpmnProcessId` for direct server-side subprocess lookup by BPMN process id."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:405
+msgid "RoPA linkage — moddleDescriptor and ProcessList"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:407
+msgid "ronlModdleDescriptor.json"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:409
+msgid ""
+"`ronlModdleDescriptor.json` registers all custom `ronl:` extensions against "
+"bpmn-js so the attributes survive `saveXML()` serialisation. Without "
+"registration, bpmn-js silently strips unknown namespaced attributes on every "
+"save."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:411
+msgid "The descriptor currently declares five type entries:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "Extends"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "Attribute"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "Added in"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "`DocumentRefMixin`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "`bpmn:UserTask`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "`documentRef`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "v1.1.0"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "`RopaRefMixin`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\bpmn-modeler.md:413"
+msgid "`bpmn:Process`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "`ropaRef`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "v1.4.0"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "`DsoActiviteitMixin`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "`dsoActiviteitUrn`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "v1.5.0"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "`LanguageMixin`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "`language`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\bpmn-modeler.md:413"
+msgid "v1.6.0"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "`OrganizationMixin`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:413
+msgid "`organization`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:421
+msgid "Each entry has the same shape, e.g. for `LanguageMixin`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:422
+msgid ""
+"{\n"
+"  \"name\": \"LanguageMixin\",\n"
+"  \"extends\": [\"bpmn:Process\"],\n"
+"  \"properties\": [\n"
+"    { \"name\": \"language\", \"isAttr\": true, \"type\": \"String\" }\n"
+"  ]\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:432
+msgid ""
+"When adding a new attribute on `bpmn:Process` or `bpmn:UserTask`, append a "
+"new mixin entry rather than altering existing ones — each entry is self-"
+"contained."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:434
+msgid "RopaSelector placement"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:436
+msgid ""
+"`RopaSelector.tsx` is rendered as a sibling of the scrollable list container "
+"inside `ProcessList.tsx`, not as a child. The JSX structure is:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:437
+msgid ""
+"<div className=\"w-80 bg-white border-r ...\">   ← outer wrapper\n"
+"  <div className=\"h-14 ...\">                   ← header\n"
+"  <div className=\"flex-1 overflow-y-auto ...\"> ← scrollable list\n"
+"  </div>\n"
+"  {activeProcess && (                          ← RopaSelector — outside "
+"scroll container\n"
+"    <div className=\"border-t ... shrink-0\">\n"
+"      <RopaSelector ... />\n"
+"    </div>\n"
+"  )}\n"
+"</div>"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:450
+msgid ""
+"Placing the panel inside the scroll container caused it to scroll away with "
+"the list — it must be a sibling to stay pinned."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:452
+msgid "handleRopaRefChange"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:454
+msgid "`handleRopaRefChange` in `BpmnModeler.tsx` handles three cases:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:456
+msgid ""
+"`ropaRef` is a non-empty string and `ronl:ropaRef` already exists → regex "
+"replace the existing value"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:457
+msgid ""
+"`ropaRef` is a non-empty string and `ronl:ropaRef` is absent → inject into "
+"the `<bpmn:process>` opening tag before its `>` or `/>`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:458
+msgid ""
+"`ropaRef` is `undefined` → remove the attribute entirely with a regex that "
+"also strips the preceding whitespace"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:460
+msgid ""
+"In all cases it first checks for `xmlns:ronl=` in the XML and injects the "
+"namespace declaration on the `<definitions>` element if absent."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:464
+msgid "Example process seeding"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:466
+msgid ""
+"On mount, `BpmnModeler.tsx` runs a versioned seed effect. For each example "
+"defined in `EXAMPLE_VERSIONS`, if the stored version is lower than the "
+"current version the file is re-fetched from `public/examples/` and the "
+"record is overwritten in `localStorage`. Example records carry `readonly: "
+"true` and are excluded from backend writes."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:468
+msgid "The current example processes and their roles:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgid "Seed ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgid "`processRole`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgid "`bpmnProcessId`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgid "`calledElement`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgid "`example_awb_process`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\bpmn-modeler.md:470"
+msgid "`shell`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\bpmn-modeler.md:470"
+msgid "`AwbShellProcess`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\bpmn-modeler.md:470"
+msgid "—"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgid "`example_tree_felling`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\bpmn-modeler.md:470"
+msgid "`subprocess`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgid "`TreeFellingPermitSubProcess`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgid "`example_awb_zorgtoeslag`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\bpmn-modeler.md:470"
+msgid "`AwbZorgtoeslagProcess`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgid "`example_zorgtoeslag_provisional`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgid "`ZorgtoeslagProvisionalSubProcess`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgid "`example_zorgtoeslag_final`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgid "`ZorgtoeslagFinalSubProcess`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgid "`wip_asylum_migration`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgid "`standalone`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:470
+msgid "`Process_Migratie_en_Asiel`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:479
+msgid ""
+"After the seed effect, a separate hydration effect runs "
+"`BpmnService.hydrateFromServer()` to merge any user-authored processes "
+"stored in PostgreSQL into the local list."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:483
+msgid "Pending-until-Save editing model"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:485
+msgid ""
+"Footer edits — `language`, `organization`, `ropaRef`, `dsoActiviteitUrn` — "
+"accumulate in a draft on `BpmnModeler.tsx` rather than persisting "
+"immediately. The pattern:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:487
+msgid ""
+"type FooterDraft = {\n"
+"  language?: BpmnProcess['language'];\n"
+"  organization?: string;\n"
+"  ropaRef?: string;\n"
+"  dsoActiviteitUrn?: string;\n"
+"};\n"
+"\n"
+"const [draft, setDraft] = useState<FooterDraft>({});\n"
+"const [hasFooterChanges, setHasFooterChanges] = useState(false);\n"
+"const [hasCanvasChanges, setHasCanvasChanges] = useState(false);"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:500
+msgid "Footer handlers update only the draft:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:502
+msgid ""
+"const handleLanguageChange = (language: string | undefined) => {\n"
+"  if (!activeProcessId) return;\n"
+"  setDraft((d) => ({ ...d, language: language as BpmnProcess['language'] }))"
+";\n"
+"  setHasFooterChanges(true);\n"
+"};"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:510
+msgid ""
+"`handleSaveProcess` flushes the draft into both the in-memory `BpmnProcess` "
+"object and the BPMN XML's `ronl:` attributes, then resets the draft. "
+"Distinguishing \"user touched the field\" from \"user explicitly cleared "
+"it\" matters — the `'language' in draft` idiom preserves the difference "
+"between *unset* and *cleared*:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:512
+msgid "language: 'language' in draft ? draft.language : process.language,"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:516
+msgid ""
+"The list panel reads from committed `processes` state so visible grouping "
+"doesn't shift while the user is typing in the footer. The footer reads its "
+"display value via a `readEffective()` helper: draft wins when the field has "
+"been touched, else the committed `BpmnProcess` field, else the `ronl:` "
+"attribute extracted from the XML."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:518
+msgid ""
+"Navigation guards (`handleCreateProcess`, `handleLoadProcess`, "
+"`handleCloseProcess`) check the combined `hasUnsavedChanges = "
+"hasCanvasChanges || hasFooterChanges` and prompt the user to confirm before "
+"discarding. `BpmnCanvas` exposes its own dirty state via `onDirtyChange?: "
+"(dirty: boolean) => void` so the parent can combine canvas content edits "
+"with footer edits into a single guard."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:520
+msgid "`applyRonlAttr` helper"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:522
+msgid ""
+"A single helper consolidates the four duplicated XML-mutation snippets that "
+"previously lived in each footer handler. It ensures the `xmlns:ronl=` "
+"namespace is declared on `<definitions>`, then either rewrites an existing "
+"`ronl:<attr>=` value, injects a new attribute on the `<bpmn:process>` "
+"opening tag, or strips the attribute when the value is `undefined`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:524
+msgid ""
+"function applyRonlAttr(xml: string, attr: string, value: string | undefined)"
+": string;"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:528
+msgid ""
+"`handleSaveProcess` calls it once per draft field present (`language`, "
+"`organization`, `ropaRef`, `dsoActiviteitUrn`)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:530
+msgid "Shell → subprocess atomic save"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:532
+msgid ""
+"After saving a shell, `handleSaveProcess` walks `processes` for subprocesses "
+"where `processRole === 'subprocess'` and `calledElement === "
+"shell.bpmnProcessId`. For each match, the shell's `language` and "
+"`organization` are applied to the subprocess XML (via `applyRonlAttr`) and "
+"to the in-memory `BpmnProcess` fields, then persisted via "
+"`BpmnService.saveProcess` in sequence. The propagation triggers on every "
+"shell save when the shell has either field set, regardless of whether the "
+"user touched the footer in this session — the architectural rule \"shell "
+"wins\" must hold across editing sessions."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:534
+msgid ""
+"Idempotent: subprocesses already aligned on both fields are skipped (no "
+"`updatedAt` bump, no backend write). Example subprocesses (`readonly: true`) "
+"are skipped. RoPA and DSO are NOT propagated — each subprocess has its own "
+"RoPA record and DSO context."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:538
+msgid "Testing checklist"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:540
+msgid "After changes to any BPMN Modeler component:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:542
+msgid ""
+"[ ] Create new process — process appears in list, empty canvas with start "
+"event"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:543
+msgid "[ ] Rename process — double-click list item, save on blur"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:544
+msgid "[ ] Delete process — confirmation dialog, list updates"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:545
+msgid "[ ] Cannot delete example — delete button disabled with tooltip"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:546
+msgid "[ ] Save — process persists across hard refresh"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:547
+msgid "[ ] Export — `.bpmn` file downloads with valid XML"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:548
+msgid "[ ] Drag element from palette — element appears on canvas"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:549
+msgid "[ ] Connect elements — arrow tool works"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:550
+msgid "[ ] Select element — properties panel updates"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:551
+msgid "[ ] BusinessRuleTask selected — DMN/DRD dropdown appears and loads"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:552
+msgid "[ ] DRD selected — purple info card shows chain composition"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:553
+msgid "[ ] Single DMN selected — blue info card shows identifier"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:554
+msgid "[ ] Scroll to zoom — wheel event zooms without requiring Ctrl"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:555
+msgid "[ ] Fit to viewport — canvas centres diagram"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbpmn-modeler.md:556
+msgid ""
+"[ ] No rendering artifacts during drag — no black circles or stray lines"
+msgstr ""

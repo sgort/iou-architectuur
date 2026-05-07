@@ -1,0 +1,822 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:1
+msgid "Backend Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:3
+msgid ""
+"The backend is a Node.js/Express TypeScript API. It sits between the React "
+"frontend and two external services: TriplyDB (SPARQL knowledge graph) and "
+"Operaton (DMN execution engine). Its responsibilities are SPARQL querying, "
+"DMN chain orchestration, variable mapping between chain steps, and proxying "
+"dynamic TriplyDB endpoint calls."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:7
+msgid "API versioning"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:9
+msgid ""
+"All endpoints follow `/v1/*`. Legacy `/api/*` endpoints exist with "
+"`Deprecation` response headers for backward compatibility. The version is "
+"included in every response via the `API-Version` header, following Dutch "
+"Government API Design Rules API-20 and API-57."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:13
+msgid "Endpoints"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:15
+msgid "Health"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:17
+msgid "GET /v1/health"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:21
+msgid ""
+"Returns service health including TriplyDB and Operaton latency checks. Used "
+"by CI/CD pipelines and the frontend status indicator."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:23
+msgid ""
+"{\n"
+"  \"name\": \"Linked Data Explorer Backend\",\n"
+"  \"version\": \"0.4.0\",\n"
+"  \"environment\": \"production\",\n"
+"  \"status\": \"healthy\",\n"
+"  \"uptime\": 3600,\n"
+"  \"services\": {\n"
+"    \"triplydb\": { \"status\": \"up\", \"latency\": 145 },\n"
+"    \"operaton\": { \"status\": \"up\", \"latency\": 98 }\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:37
+msgid "DMN discovery"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:39
+msgid "GET /v1/dmns?endpoint={sparql_endpoint_url}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:43
+msgid ""
+"Queries TriplyDB for all `cprmv:DecisionModel` resources at the given "
+"endpoint. Returns models with full variable lists and governance/vendor "
+"metadata. Cached per endpoint for 5 minutes."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:45
+msgid "GET /v1/dmns/:identifier?endpoint={url}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:49
+msgid "Returns full metadata for a single DMN by its `dct:identifier` value."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:51
+msgid "GET /v1/dmns/enhanced-chain-links?endpoint={url}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:55
+msgid ""
+"Returns all chain links including both exact identifier matches and semantic "
+"`skos:exactMatch` matches. Each link includes a `matchType` field: "
+"`\"exact\"`, `\"semantic\"`, or `\"both\"`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:57
+msgid "GET /v1/dmns/semantic-equivalences?endpoint={url}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:61
+msgid ""
+"Returns all variable pairs from different DMNs that share a "
+"`skos:exactMatch` concept URI."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:63
+msgid "GET /v1/dmns/cycles?endpoint={url}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:67
+msgid ""
+"Returns circular dependencies detected via semantic links (3-hop traversal)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:69
+msgid "Chain discovery"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:71
+msgid "GET /v1/chains?endpoint={url}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:75
+msgid ""
+"Returns all DMN pairs where an output variable of one model matches an input "
+"variable of another by exact identifier."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:77
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\backend.md:77"
+msgid "Chain execution"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:79
+msgid "POST /v1/chains/execute"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:83
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\backend.md:83"
+msgid "Request body:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:85
+msgid ""
+"{\n"
+"  \"chain\": [\"SVB_LeeftijdsInformatie\", "
+"\"SZW_BijstandsnormInformatie\"],\n"
+"  \"inputs\": { \"geboortedatum\": \"1960-01-01\" },\n"
+"  \"endpoint\": \"https://api.open-regels.triply.cc/...\"\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:93
+msgid ""
+"Executes the chain sequentially, flattening outputs into inputs between "
+"steps. Returns per-step results and combined final output."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:95
+msgid "POST /v1/chains/execute/heusdenpas"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:99
+msgid ""
+"Convenience endpoint for the fixed three-step Heusdenpas chain with "
+"production test data. Target execution time: <1000ms. See [API Reference]{1} "
+"for the full request/response."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:101
+msgid "POST /v1/chains/export"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:105
+msgid ""
+"Generates a DRD XML file from a chain and deploys it to Operaton. See [DRD "
+"Generation]{1}."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:107
+msgid "eDOCS"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:109
+msgid ""
+"GET  /v1/edocs/status\n"
+"POST /v1/edocs/workspaces/ensure\n"
+"POST /v1/edocs/documents\n"
+"GET  /v1/edocs/workspaces/:workspaceId/documents"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:116
+msgid ""
+"Integrates with the OpenText eDOCS document management system. Used by the "
+"RIP Phase 1 process to create project workspaces and file documents. In stub "
+"mode (`EDOCS_STUB_MODE=true`, default) all methods return realistic fake "
+"responses so the process runs end-to-end before a live eDOCS server is "
+"available."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:118
+msgid ""
+"See [eDOCS Integration]{1} and the [API Reference]{2} for request/response "
+"details."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:120
+msgid "TriplyDB proxy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:122
+msgid "POST /v1/triplydb/query"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:126
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\backend.md:126"
+msgid "Request body:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:128
+msgid ""
+"{\n"
+"  \"endpoint\": \"https://api.open-regels.triply.cc/...\",\n"
+"  \"query\": \"SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 5\"\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:135
+msgid ""
+"Proxies a SPARQL query to any TriplyDB endpoint, bypassing CORS "
+"restrictions. Used by the frontend Query Editor for dynamic endpoint support."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:139
+msgid "Asset storage"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:140
+msgid ""
+"GET    /v1/assets/bpmn\n"
+"POST   /v1/assets/bpmn\n"
+"DELETE /v1/assets/bpmn/:id\n"
+"GET    /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId\n"
+"\n"
+"GET    /v1/assets/forms\n"
+"POST   /v1/assets/forms\n"
+"DELETE /v1/assets/forms/:id\n"
+"\n"
+"GET    /v1/assets/documents\n"
+"POST   /v1/assets/documents\n"
+"DELETE /v1/assets/documents/:id"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:155
+msgid ""
+"Persists BPMN processes, form schemas, and document templates to PostgreSQL. "
+"All routes return `503 DB_NOT_CONFIGURED` when `DATABASE_URL` is absent. See "
+"[Asset Storage]{1} for the service architecture and [API Reference]{2} for "
+"full request/response documentation."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:159
+msgid "Database"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:161
+msgid ""
+"The backend connects to a PostgreSQL database via a `pg.Pool`. The pool is "
+"initialised in `src/db/pool.ts` when `DATABASE_URL` is present in the "
+"environment. If the variable is absent, `pool` is `null` and all asset "
+"endpoints respond with `503`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:163
+msgid ""
+"Schema migrations run automatically on startup via `migrate()` in `src/db/"
+"migrate.ts`, called from `startServer()` before `app.listen()`. The "
+"migration is idempotent (`CREATE TABLE IF NOT EXISTS`)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:164
+msgid ""
+"src/db/\n"
+"├── pool.ts       — pg.Pool initialisation, error listener, null-if-"
+"unconfigured guard\n"
+"└── migrate.ts    — idempotent DDL: process_definitions, form_schemas, "
+"document_templates"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:170
+msgid "See [PostgreSQL Deployment]{1} for Azure provisioning."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:174
+msgid "SPARQL service"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:176
+msgid ""
+"`sparql.service.ts` builds and executes all SPARQL queries against TriplyDB. "
+"Key functions:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:178
+msgid ""
+"findAllDmns(endpoint: string): Promise<DmnModel[]>\n"
+"findEnhancedChainLinks(endpoint: string): Promise<EnhancedChainLink[]>\n"
+"findSemanticEquivalences(endpoint: string): Promise<SemanticEquivalence[]>"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:184
+msgid ""
+"The `findEnhancedChainLinks` query uses a `BIND(IF(...))` pattern to "
+"categorise each link as `exact`, `semantic`, or `both`, then expands `both` "
+"entries into two separate records post-query. This is the mechanism "
+"described in [Enhanced Validation]{1}."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:188
+msgid "Orchestration service"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:190
+msgid "`orchestration.service.ts` executes sequential chains:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:192
+msgid "Fetch DMN metadata for each step from the SPARQL service (cached)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:193
+msgid "For the first step, use the user-supplied inputs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:194
+msgid "For each subsequent step, build inputs by:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:194
+msgid "Flattening all previous step outputs into a single map"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:194
+msgid ""
+"For semantic matches: rename output variable keys to match the expected "
+"input identifiers"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:194
+msgid "Merge with any additional user-supplied inputs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:198
+msgid "Call `operaton.service.ts` for each step"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:199
+msgid "Accumulate results"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:201
+msgid ""
+"Variable flattening means a semantic chain like `heeftJuisteLeeftijd → "
+"leeftijd_requirement` is transparently bridged — the output value is passed "
+"under the input's expected key."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:205
+msgid "Operaton service"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:207
+msgid "`operaton.service.ts` calls the Operaton REST API:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:209
+msgid "POST {OPERATON_BASE_URL}/decision-definition/key/{decisionRef}/evaluate"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:213
+msgid "Request payload maps to Operaton's variable format:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:215
+msgid ""
+"{\n"
+"  \"variables\": {\n"
+"    \"geboortedatum\": { \"value\": \"1960-01-01\", \"type\": \"String\" }\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:223
+msgid ""
+"For DRD execution, the same endpoint is used with the DRD entry-point "
+"identifier. Operaton handles internal decision dependency evaluation."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:227
+msgid "eDOCS service"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:229
+msgid ""
+"`edocs.service.ts` wraps the OpenText eDOCS REST API. It authenticates once "
+"via `POST /connect`, caches the `X-DM-DST` session token, and re-"
+"authenticates automatically on `401`/`403`. Key methods:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:231
+msgid ""
+"ensureWorkspace(projectNumber: string, projectName: string): "
+"Promise<EdocsWorkspaceResult>\n"
+"uploadDocument(workspaceId: string, filename: string, contentBase64: string, "
+"metadata: EdocsDocumentMetadata): Promise<EdocsDocumentResult>\n"
+"getWorkspaceDocuments(workspaceId: string): Promise<...>\n"
+"healthCheck(): Promise<{ status: 'up' | 'down' | 'stub' }>"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:238
+msgid ""
+"When `EDOCS_STUB_MODE=true`, all methods return realistic fake data and log "
+"what they would have done. The stub is transparent to all callers."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:242
+msgid "External task worker"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:244
+msgid ""
+"`externalTaskWorker.service.ts` polls Operaton's external task API (`POST /"
+"external-task/fetchAndLock`) using long-polling (`asyncResponseTimeout: 20 "
+"000 ms`). It handles two topics:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:246
+msgid "Topic"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:246
+msgid "Reads"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:246
+msgid "Writes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:246
+msgid "`rip-edocs-workspace`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:246
+msgid "`projectNumber`, `projectName`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:246
+msgid "`edocsWorkspaceId`, `edocsWorkspaceName`, `edocsWorkspaceCreated`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:246
+msgid "`rip-edocs-document`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:246
+msgid ""
+"`edocsWorkspaceId`, `documentTemplateId`, `edocsDocumentVariableName`, + "
+"template variables"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:246
+msgid "`<edocsDocumentVariableName>` (e.g. `edocsIntakeReportId`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:251
+msgid ""
+"`documentTemplateId` and `edocsDocumentVariableName` are injected per "
+"ServiceTask via `camunda:inputParameter` in the BPMN, making the single "
+"topic handler reusable across all three document upload steps in the RIP "
+"Phase 1 process."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:253
+msgid ""
+"The worker starts inside the `app.listen()` callback and stops in both "
+"`SIGTERM` and `SIGINT` handlers."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:257
+msgid "Logging"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:259
+msgid ""
+"Winston structured logging with JSON output. All service calls log at "
+"`[INFO]` level with context (endpoint, query length, result count, latency). "
+"Errors log at `[ERROR]` with stack traces. Log level is configurable via "
+"`LOG_LEVEL` environment variable."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:263
+msgid "Error handling"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:265
+msgid ""
+"A central `errorHandler.ts` middleware catches unhandled errors and returns "
+"standardised JSON error responses with appropriate HTTP status codes. SPARQL "
+"and Operaton errors are wrapped with descriptive messages before being "
+"returned to the frontend. No sensitive data is included in error responses."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:269
+msgid "Performance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:271
+msgid "**Targets:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:273
+msgid "Operation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:273
+msgid "Target"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:273
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\backend.md:273"
+msgid "Chain execution"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:273
+msgid "< 1000ms"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:273
+msgid "Health check response"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:273
+msgid "< 100ms"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:273
+msgid "DMN list query"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:273
+msgid "< 500ms"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:273
+msgid "API response time (p95)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:273
+msgid "< 200ms"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:280
+msgid "**Production baselines (Heusdenpas chain, 3 DMNs):**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:282
+msgid "Measurement"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:282
+msgid "Observed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:282
+msgid "Full chain execution"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:282
+msgid "~827ms"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:282
+msgid "Health check (incl. TriplyDB + Operaton)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:282
+msgid "~180ms"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:282
+msgid "DMN discovery (SPARQL + parsing)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:282
+msgid "~350ms"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:282
+msgid "TriplyDB round-trip latency"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:282
+msgid "150–200ms"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:282
+msgid "Operaton per-DMN execution"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:282
+msgid "80–120ms"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:292
+msgid "Security"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:294
+msgid ""
+"**HTTP headers** — [Helmet]{1} is configured to set comprehensive security "
+"headers on all responses, including `Content-Security-Policy`, `X-Content-"
+"Type-Options`, `X-Frame-Options`, and `Strict-Transport-Security`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:296
+msgid ""
+"**CORS** — only origins listed in `CORS_ORIGIN` are permitted. In production "
+"this is restricted to `https://linkeddata.open-regels.nl` and `https://"
+"cpsv.open-regels.nl`. All other origins receive a CORS rejection."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:298
+msgid ""
+"**Input validation** — type checking is applied to all request inputs. "
+"Variable names, DMN identifiers, and SPARQL endpoint URLs are validated "
+"before any service call is made. Request body size is limited to 10 MB."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:300
+msgid ""
+"**Environment variables** — all sensitive configuration (TriplyDB endpoint "
+"URLs, Operaton API URLs, CORS origins, eDOCS credentials) is stored in "
+"environment variables and never hardcoded. eDOCS-specific variables: "
+"`EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, `EDOCS_PASSWORD`, "
+"`EDOCS_STUB_MODE`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:302
+msgid ""
+"**Error responses** — the central error handler scrubs stack traces and "
+"internal context before returning responses to clients, ensuring no "
+"implementation details are exposed."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:306
+msgid "Dutch Government API Design Rules compliance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:308
+msgid ""
+"The API follows the [Dutch Government API Design Rules]{1} for "
+"interoperability and standardisation."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:310
+msgid "**Implemented rules:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\backend.md:312"
+msgid "Rule"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\backend.md:312"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "Implementation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "API-20"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "Major version in URI"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "`/v1/*` endpoints"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "API-57"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "Version header in responses"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "`API-Version: 0.4.0` on every response"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "API-05"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "Use nouns for resources"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "`dmns`, `chains`, `health`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "API-54"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "Plural/singular naming"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "Correct usage throughout"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "API-48"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "No trailing slashes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "Enforced in routing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "API-53"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "Hide implementation details"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:312
+msgid "Clean service abstractions"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:321
+msgid ""
+"**Language note (API-04)** — technical endpoint names (`health`, `version`) "
+"follow international convention in English. Business resource names (`dmns`, "
+"`chains`) follow the source data. Dutch variable names (e.g., "
+"`geboortedatum`) are preserved as-is from the DMN definitions."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:323
+msgid "**Planned:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:325
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\backend.md:325"
+msgid "Rule"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:325
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\backend.md:325"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:325
+msgid "Target version"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:325
+msgid "API-16, API-51"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:325
+msgid "OpenAPI 3.0 spec at `/v1/openapi.json`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:325
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\backend.md:325"
+msgid "v0.5.0"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:325
+msgid "API-02"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:325
+msgid "Standard error response format"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:325
+msgid "API-10"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:325
+msgid "Resource collections with pagination"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Cbackend.md:325
+msgid "v1.0.0"
+msgstr ""

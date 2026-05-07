@@ -1,0 +1,324 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:1
+msgid "Backend Deployment (Azure App Service)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:3
+msgid ""
+"The backend deploys to **Azure App Service** (Node.js 20) via GitHub "
+"Actions. There are two independent deployment targets: ACC and PROD. PROD "
+"requires a manual approval step."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:7
+msgid "GitHub Actions workflows"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:9
+msgid "Workflow file"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:9
+msgid "Trigger"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:9
+msgid "Target"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:9
+msgid "Approval"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:9
+msgid "`.github/workflows/azure-backend-acc.yml`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:9
+msgid ""
+"Push to `acc` branch with changes in `packages/backend/**` or `packages/"
+"shared/**`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:9
+msgid "`ronl-business-api-acc` (App Service)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:9
+msgid "Automatic"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:9
+msgid "`.github/workflows/azure-backend-production.yml`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:9
+msgid "Push to `main` branch (same path filters) or manual `workflow_dispatch`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:9
+msgid "`ronl-business-api-prod` (App Service)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:9
+msgid "**Manual required**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:16
+msgid "Build and deployment steps"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:18
+msgid "Both workflows follow the same build process:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:20
+msgid ""
+"1. Checkout code\n"
+"2. Setup Node.js 20\n"
+"3. npm ci                          (install all workspace dependencies)\n"
+"4. Build shared package            (npm run build --workspace=@ronl/shared)\n"
+"5. Lint backend                    (npm run lint in packages/backend)\n"
+"6. Build TypeScript                (npm run build in packages/backend → "
+"dist/)\n"
+"7. Verify dist/index.js exists\n"
+"8. Prepare deployment package:\n"
+"     deploy/\n"
+"       dist/                       (compiled TypeScript, structure preserved)"
+"\n"
+"       package.json                (backend package.json at deploy root)\n"
+"       node_modules/@ronl/shared/  (shared package dist + package.json)\n"
+"       node_modules/               (production dependencies only)\n"
+"       .deployment                 (SCM_DO_BUILD_DURING_DEPLOYMENT=false)\n"
+"9. Deploy to Azure Web App         (azure/webapps-deploy@v3, package: ./"
+"packages/backend/deploy)\n"
+"10. Wait 30 seconds\n"
+"11. Health check with 5 retries (10-second intervals) → GET /v1/health\n"
+"12. Verify /v1/health and /v1/dmns return HTTP 200"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:41
+msgid ""
+"!!! warning \"Deployment package structure\" The `dist/` folder must be "
+"copied as a folder (`cp -r dist deploy/`), not flattened (`cp -r dist/* "
+"deploy/`). Flattening breaks TypeScript module resolution paths and causes "
+"404 errors on all `/v1/*` endpoints after deployment."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:46
+msgid "Azure App Service configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:48
+msgid ""
+"**App name:** `ronl-business-api-acc` / `ronl-business-api-prod`\n"
+"**Runtime:** Node.js 20\n"
+"**Startup command:** `node dist/index.js`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:52
+msgid ""
+"Azure App Settings (environment variables) are configured via CLI or the "
+"Azure Portal. Set the production values from `docs/deployment/environment-"
+"variables.md`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:54
+msgid ""
+"az webapp config appsettings set \\\n"
+"  --name ronl-business-api-prod \\\n"
+"  --resource-group rg-ronl-prod \\\n"
+"  --settings \\\n"
+"    NODE_ENV=production \\\n"
+"    PORT=8080 \\\n"
+"    KEYCLOAK_URL=https://keycloak.open-regels.nl \\\n"
+"    KEYCLOAK_REALM=ronl \\\n"
+"    KEYCLOAK_CLIENT_ID=ronl-business-api \\\n"
+"    KEYCLOAK_CLIENT_SECRET=<secret> \\\n"
+"    JWT_ISSUER=https://keycloak.open-regels.nl/realms/ronl \\\n"
+"    JWT_AUDIENCE=ronl-business-api \\\n"
+"    CORS_ORIGIN=https://mijn.open-regels.nl \\\n"
+"    OPERATON_BASE_URL=https://operaton.open-regels.nl/engine-rest \\\n"
+"    DATABASE_URL=\"postgresql://pgadmin:<password>@ronl-postgres-"
+"prod.postgres.database.azure.com:5432/audit_logs?sslmode=require\" \\\n"
+"    REDIS_URL=\"redis://ronl-redis-"
+"prod.redis.cache.windows.net:6380?password=<key>&ssl=true\" \\\n"
+"    LOG_LEVEL=info \\\n"
+"    HELMET_ENABLED=true \\\n"
+"    SECURE_COOKIES=true \\\n"
+"    TRUST_PROXY=true \\\n"
+"    AUDIT_LOG_ENABLED=true \\\n"
+"    ENABLE_TENANT_ISOLATION=true"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:79
+msgid "The full variable reference is in [Environment Variables]{1}."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:81
+msgid "Complete command for **ACC** (all 30+ variables in one call):"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:83
+msgid ""
+"az webapp config appsettings set \\\n"
+"  --name ronl-business-api-acc \\\n"
+"  --resource-group rg-ronl-acc \\\n"
+"  --settings \\\n"
+"    NODE_ENV=production \\\n"
+"    PORT=8080 \\\n"
+"    HOST=0.0.0.0 \\\n"
+"    CORS_ORIGIN=\"https://acc.mijn.open-regels.nl\" \\\n"
+"    KEYCLOAK_URL=\"https://acc.keycloak.open-regels.nl\" \\\n"
+"    KEYCLOAK_REALM=\"ronl\" \\\n"
+"    KEYCLOAK_CLIENT_ID=\"ronl-business-api\" \\\n"
+"    KEYCLOAK_CLIENT_SECRET=\"<YOUR_CLIENT_SECRET>\" \\\n"
+"    JWT_ISSUER=\"https://acc.keycloak.open-regels.nl/realms/ronl\" \\\n"
+"    JWT_AUDIENCE=\"ronl-business-api\" \\\n"
+"    TOKEN_CACHE_TTL=\"300\" \\\n"
+"    OPERATON_BASE_URL=\"https://operaton.open-regels.nl/engine-rest\" \\\n"
+"    OPERATON_TIMEOUT=\"30000\" \\\n"
+"    DATABASE_URL=\"postgresql://pgadmin:<PASSWORD>@ronl-postgres-"
+"acc.postgres.database.azure.com:5432/audit_logs?sslmode=require\" \\\n"
+"    DATABASE_POOL_MIN=\"2\" \\\n"
+"    DATABASE_POOL_MAX=\"10\" \\\n"
+"    REDIS_URL=\"redis://ronl-redis-"
+"acc.redis.cache.windows.net:6380?password=<PRIMARY_KEY>&ssl=true\" \\\n"
+"    REDIS_TTL=\"3600\" \\\n"
+"    RATE_LIMIT_WINDOW_MS=\"60000\" \\\n"
+"    RATE_LIMIT_MAX_REQUESTS=\"100\" \\\n"
+"    RATE_LIMIT_PER_TENANT=\"true\" \\\n"
+"    LOG_LEVEL=\"info\" \\\n"
+"    LOG_FORMAT=\"json\" \\\n"
+"    LOG_FILE_ENABLED=\"true\" \\\n"
+"    LOG_FILE_PATH=\"/home/site/wwwroot/logs\" \\\n"
+"    LOG_FILE_MAX_SIZE=\"10m\" \\\n"
+"    LOG_FILE_MAX_FILES=\"7\" \\\n"
+"    AUDIT_LOG_ENABLED=\"true\" \\\n"
+"    AUDIT_LOG_INCLUDE_IP=\"true\" \\\n"
+"    AUDIT_LOG_RETENTION_DAYS=\"2555\" \\\n"
+"    HELMET_ENABLED=\"true\" \\\n"
+"    SECURE_COOKIES=\"true\" \\\n"
+"    TRUST_PROXY=\"true\" \\\n"
+"    ENABLE_SWAGGER=\"false\" \\\n"
+"    ENABLE_METRICS=\"true\" \\\n"
+"    ENABLE_HEALTH_CHECKS=\"true\" \\\n"
+"    ENABLE_TENANT_ISOLATION=\"true\" \\\n"
+"    DEFAULT_MAX_PROCESS_INSTANCES=\"1000\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:128
+msgid ""
+"For PROD, substitute `ronl-business-api-acc` → `ronl-business-api-prod`, `rg-"
+"ronl-acc` → `rg-ronl-prod`, and the ACC URLs → PROD URLs."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:132
+msgid "Approving a PROD deployment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:134
+msgid "When a push to `main` triggers the production workflow:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:136
+msgid "The build and lint steps run automatically"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:137
+msgid "The workflow pauses at the `deploy` job waiting for approval"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:138
+msgid "Go to **GitHub → Actions → the running workflow → Review deployments**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:139
+msgid "Select the `production` environment → **Approve and deploy**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:143
+msgid "Post-deployment health check"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:145
+msgid "The workflow automatically verifies the deployment:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:147
+msgid ""
+"# Retries up to 5 times with 10-second intervals\n"
+"curl -s -o /dev/null -w \"%{http_code}\" https://api.open-regels.nl/v1/"
+"health\n"
+"# Expected: 200"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:153
+msgid ""
+"If the health check fails after 5 attempts, the workflow fails and the "
+"deployment is marked unsuccessful. Roll back by redeploying the previous "
+"commit or using an Azure deployment slot swap."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:157
+msgid "Manual deployment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:159
+msgid "To deploy without GitHub Actions (emergency or first-time setup):"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Cbackend.md:161
+msgid ""
+"# Prepare package (same structure as CI)\n"
+"\n"
+"# From project root\n"
+"cd packages/shared\n"
+"npm run build\n"
+"cd ../backend\n"
+"\n"
+"# Build backend\n"
+"npm run build\n"
+"\n"
+"# Prepare deployment package\n"
+"mkdir -p deploy\n"
+"cp -r dist deploy/\n"
+"cp package.json deploy/\n"
+"\n"
+"# Copy shared package\n"
+"mkdir -p deploy/node_modules/@ronl\n"
+"cp -r ../shared/dist deploy/node_modules/@ronl/shared\n"
+"cp ../shared/package.json deploy/node_modules/@ronl/shared/\n"
+"\n"
+"# Install production dependencies\n"
+"cd deploy && npm install --production --omit=dev && cd ..\n"
+"\n"
+"# Create zip file\n"
+"cd deploy\n"
+"zip -r ../deployment-acc.zip .\n"
+"cd ..\n"
+"\n"
+"# Deploy using Azure CLI\n"
+"az webapp deploy \\\n"
+"  --name ronl-business-api-acc \\\n"
+"  --resource-group rg-ronl-acc \\\n"
+"  --src-path deployment-acc.zip \\\n"
+"  --type zip\n"
+"\n"
+"# Cleanup\n"
+"rm -rf deploy\n"
+"rm deployment-acc.zip"
+msgstr ""

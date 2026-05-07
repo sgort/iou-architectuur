@@ -1,0 +1,713 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:1
+msgid "Local Development"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:3
+msgid ""
+"This guide covers setting up the full local development environment: the "
+"Linked Data Explorer frontend and its backend. Both must run simultaneously "
+"because the frontend calls the backend for all SPARQL and Operaton "
+"operations."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:7
+msgid "Prerequisites"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:9
+msgid "Node.js 20.0.0 or higher"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:10
+msgid "npm 10.0.0 or higher"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:11
+msgid "Git"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:12
+msgid ""
+"Access to the TriplyDB and Operaton remote services (no local setup needed — "
+"they are always available remotely)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:16
+msgid "Setup"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:18
+msgid ""
+"# 1. Clone the repository\n"
+"git clone https://github.com/sgort/linked-data-explorer.git\n"
+"cd linked-data-explorer\n"
+"\n"
+"# 2. Install all workspace dependencies\n"
+"npm install"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:29
+msgid "Backend configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:31
+msgid ""
+"cd packages/backend\n"
+"cp .env.example .env"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:36
+msgid "Edit `.env`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:38
+msgid ""
+"# Server\n"
+"NODE_ENV=development\n"
+"PORT=3001\n"
+"HOST=localhost\n"
+"\n"
+"# CORS — must include both frontend dev ports\n"
+"CORS_ORIGIN=http://localhost:3000,http://localhost:5173\n"
+"\n"
+"# TriplyDB — default SPARQL endpoint\n"
+"TRIPLYDB_ENDPOINT=https://api.open-regels.triply.cc/datasets/stevengort/DMN-"
+"discovery/services/DMN-discovery/sparql\n"
+"TRIPLYDB_TIMEOUT=30000\n"
+"\n"
+"# Operaton\n"
+"OPERATON_BASE_URL=https://operaton.open-regels.nl/engine-rest\n"
+"OPERATON_TIMEOUT=10000\n"
+"\n"
+"# Logging\n"
+"LOG_LEVEL=debug\n"
+"LOG_FORMAT=json\n"
+"\n"
+"# Performance\n"
+"CHAIN_EXECUTION_TIMEOUT=5000\n"
+"MAX_CHAIN_DEPTH=10\n"
+"ENABLE_CACHING=false"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:67
+msgid "PostgreSQL setup (local)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:69
+msgid ""
+"For local development, reuse the `ronl-postgres` container already running "
+"as part of the RONL Business API stack. Create the LDE database and user "
+"once:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:70
+msgid ""
+"docker exec -it ronl-postgres psql -U postgres -c \\\n"
+"  \"CREATE USER lde_user WITH PASSWORD 'lde_password';\"\n"
+"\n"
+"docker exec -it ronl-postgres psql -U postgres -c \\\n"
+"  \"CREATE DATABASE lde_assets OWNER lde_user;\"\n"
+"\n"
+"docker exec -it ronl-postgres psql -U postgres -c \\\n"
+"  \"GRANT ALL PRIVILEGES ON DATABASE lde_assets TO lde_user;\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:81
+msgid "Then add to `packages/backend/.env`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:82
+msgid ""
+"DATABASE_URL=postgresql://lde_user:lde_password@localhost:5432/lde_assets"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:86
+msgid ""
+"The migration runs automatically on `npm run dev` startup. Look for `[DB] "
+"Migrations applied` in the console."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:88
+msgid "To verify the tables were created:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:89
+msgid ""
+"docker exec -it ronl-postgres psql -U lde_user -d lde_assets -c \"\\dt\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:93
+msgid ""
+"If `DATABASE_URL` is absent, the backend logs `[DB] Skipping migrations — "
+"database not configured` and continues without asset storage — localStorage "
+"fallback remains fully functional for development."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:95
+msgid ""
+"!!! note \"Shared container, isolated database\" The `ronl-postgres` "
+"container hosts multiple databases. The LDE uses `lde_assets` with a "
+"dedicated `lde_user` scoped to that database only. The RONL Business API "
+"uses `audit_logs` with `audit_user`. The two databases are fully isolated."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:100
+msgid "RoPA Records — local setup"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:102
+msgid "Seed example records"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:104
+msgid ""
+"After the database is running and the backend has started (tables created by "
+"migration), seed the four example RoPA records from `packages/backend`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:105
+msgid ""
+"cd packages/backend\n"
+"npx ts-node --project tsconfig.json src/db/seed-ropa.ts"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:110
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\local-development.md:110"
+msgid "Expected output:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:111
+msgid ""
+"[seed-ropa] Seeding RoPA records…\n"
+"[seed-ropa] AwbShellProcess (Flevoland) → <uuid>\n"
+"[seed-ropa] TreeFellingPermitSubProcess → <uuid>\n"
+"[seed-ropa] AwbZorgtoeslagProcess → <uuid>\n"
+"[seed-ropa] ZorgtoeslagProvisionalSubProcess → <uuid>\n"
+"[seed-ropa] Done."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:120
+msgid ""
+"The seed is idempotent — re-running it updates existing rows in place via "
+"`ON CONFLICT (bpmn_process_id) DO UPDATE`. It is safe to run multiple times."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:122
+msgid "Verify records in the database"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:123
+msgid ""
+"docker exec -it ronl-postgres psql -U lde_user -d lde_assets \\\n"
+"  -c \"SELECT bpmn_process_id, process_level, status FROM ropa_records ORDER "
+"BY process_level;\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:128
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\local-development.md:128"
+msgid "Expected output:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:129
+msgid ""
+"bpmn_process_id          | process_level | status\n"
+"----------------------------------+---------------+--------\n"
+" AwbShellProcess                  | shell         | active\n"
+" AwbZorgtoeslagProcess            | shell         | active\n"
+" TreeFellingPermitSubProcess      | subprocess    | active\n"
+" ZorgtoeslagProvisionalSubProcess | subprocess    | active\n"
+"(4 rows)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:139
+msgid "Verify the public endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:140
+msgid ""
+"curl \"http://localhost:3001/v1/ropa/public?organisation=flevoland\" | jq "
+"'.data | length'"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:144
+msgid ""
+"Should return `4`. If you get `0`, the `controller_name` values in the "
+"seeded records do not contain \"flevoland\" — re-run the seed after "
+"verifying the controller names in `src/db/seed-ropa.ts`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:146
+msgid "Test the public site locally"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:148
+msgid ""
+"`packages/ropa-site/index.html` has the API URL hardcoded. For local "
+"development change it to the local backend:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:149
+msgid ""
+"const API_URL =\n"
+"  'http://localhost:3001/v1/ropa/public?organisation=flevoland';"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:154
+msgid "Open the file directly in a browser (`file://`) or serve it:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:155
+msgid ""
+"cd packages/ropa-site\n"
+"npx serve ."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:160
+msgid ""
+"!!! warning \"CORS when opening as file://\" When `index.html` is opened "
+"directly from disk, the browser sends `Origin: null`. The global CORS "
+"middleware rejects `null` origins. The path-aware CORS fix in `index.ts` "
+"that serves `/v1/ropa/public` with `origin: '*'` bypasses this — but only if "
+"that fix is in place. If you see a CORS error when opening from `file://`, "
+"confirm `index.ts` has the path-aware cors middleware, not just the route-"
+"level cors in `ropa.public.routes.ts`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:163
+msgid ""
+"!!! note \"Revert before committing\" Remember to revert `const API_URL` to "
+"the ACC or production URL before committing `packages/ropa-site/index.html`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:168
+msgid "Environment comparison"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:170
+msgid ""
+"The table below summarises how the LDE stack differs between local "
+"development and ACC deployment."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "Aspect"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "Local development"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "ACC"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "Backend URL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "`http://localhost:3001`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "`https://acc.backend.linkeddata.open-regels.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "Frontend URL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "`http://localhost:5173`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "`https://acc.linkeddata.open-regels.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "PostgreSQL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "`ronl-postgres` Docker container, `lde_assets` DB"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "Azure PostgreSQL Flexible Server, `lde_assets` DB"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "`DATABASE_URL`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "`postgresql://lde_user:lde_password@localhost:5432/lde_assets`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "Set as Azure App Service env var with `?sslmode=require`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "DB migrations"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "Run automatically on `npm run dev`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "Run automatically on App Service startup (CI/CD deploy)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "RoPA seed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "Run manually: `npx ts-node ... src/db/seed-ropa.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "Run manually once after first ACC deploy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "RoPA public endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "`http://localhost:3001/v1/ropa/public`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "`https://acc.backend.linkeddata.open-regels.nl/v1/ropa/public`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "`ropa-site` API URL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "`http://localhost:3001/v1/ropa/public` (hardcoded in `index.html`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid ""
+"`https://acc.backend.linkeddata.open-regels.nl/v1/ropa/public` (hardcoded in "
+"`index.html`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "`ropa-site` deployment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "Open `index.html` directly or `npx serve .`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid ""
+"Azure Static Web Apps (`ropa-flevoland-acc`), deployed via GitHub Actions on "
+"push to `acc` with path filter `packages/ropa-site/**`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "CORS for public route"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "Path-aware middleware in `index.ts` bypasses `CORS_ORIGIN` whitelist"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid ""
+"Same — `origin: '*'` for `/v1/ropa/public` regardless of `CORS_ORIGIN` env "
+"var"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "RoPA Editor"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid "Available in LDE at `http://localhost:5173` under the ScrollText icon"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:172
+msgid ""
+"Available at `https://acc.linkeddata.open-regels.nl` under the ScrollText "
+"icon"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:188
+msgid "Frontend configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:190
+msgid ""
+"The frontend reads environment variables via Vite. The `packages/frontend/"
+".env.development` file is pre-configured:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:192
+msgid ""
+"VITE_API_BASE_URL=http://localhost:3001\n"
+"VITE_OPERATON_BASE_URL=https://operaton.open-regels.nl/engine-rest"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:197
+msgid "No changes needed for standard local development."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:201
+msgid "Starting the services"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:203
+msgid "Open three terminal windows."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:205
+msgid "Docker readiness check (v1.5.1+)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:207
+msgid ""
+"Before starting the backend, the `npm run dev` script in `packages/backend` "
+"runs `scripts/check-docker.sh`. The script verifies the `ronl-postgres` "
+"container is up and healthy, fails fast with a clear remediation message if "
+"not, and prevents nodemon from starting against a broken database."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:209
+msgid "Coloured output:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:211
+msgid "**Green** — container is running and healthy → dev server starts"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:212
+msgid ""
+"**Yellow** — container is running but not yet healthy (still initialising) → "
+"wait briefly and retry"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:213
+msgid ""
+"**Red** — container is missing, stopped, or Docker daemon not running → "
+"script prints the exact `docker start` or `docker run` command for the "
+"missing container and exits non-zero"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:215
+msgid ""
+"If you bypass the check (e.g. running `nodemon` directly), the backend will "
+"still try to migrate against `DATABASE_URL` and you'll get a connection "
+"error at startup. Just run `npm run dev` instead."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:217
+msgid "Convenience scripts at the repo root"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:219
+msgid ""
+"Two scripts at the monorepo root let you start everything with one command:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:221
+msgid ""
+"npm run dev:full       # backend (with check-docker.sh) and frontend in "
+"parallel\n"
+"npm run dev:backend    # backend only, with the Docker check"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:226
+msgid ""
+"Both chain through to the per-workspace `npm run dev` so the docker check "
+"still runs for the backend."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:228
+msgid "Per-terminal startup"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:230
+msgid "**Terminal 1 — Backend:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:232
+msgid ""
+"cd packages/backend\n"
+"npm run dev"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:237
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\local-development.md:237"
+msgid "Expected output:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:238
+msgid ""
+"[INFO] Server started\n"
+"[INFO] environment: development\n"
+"[INFO] host: localhost\n"
+"[INFO] port: 3001\n"
+"[INFO] corsOrigin: http://localhost:3000,http://localhost:5173\n"
+"[INFO] API available at: http://localhost:3001/v1\n"
+"[INFO] Health check: http://localhost:3001/v1/health"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:248
+msgid "**Terminal 2 — Frontend:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:250
+msgid ""
+"cd packages/frontend\n"
+"npm run dev"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:255
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\local-development.md:255"
+msgid "Expected output:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:256
+msgid ""
+"VITE v6.x ready in XXX ms\n"
+"➜  Local:   http://localhost:5173/"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:261
+msgid ""
+"The frontend runs at `http://localhost:5173`. The backend runs at `http://"
+"localhost:3001`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:265
+msgid "Verifying the setup"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:267
+msgid "**Health check:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:269
+msgid "curl http://localhost:3001/v1/health | jq '.'"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:273
+msgid "Expected response:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:274
+msgid ""
+"{\n"
+"  \"name\": \"Linked Data Explorer Backend\",\n"
+"  \"version\": \"0.x.x\",\n"
+"  \"environment\": \"development\",\n"
+"  \"status\": \"healthy\",\n"
+"  \"services\": {\n"
+"    \"triplydb\": { \"status\": \"up\", \"latency\": 150 },\n"
+"    \"operaton\": { \"status\": \"up\", \"latency\": 120 }\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:287
+msgid ""
+"If either service shows `\"status\": \"down\"`, check your internet "
+"connection — both TriplyDB and Operaton are remote services."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:289
+msgid "**Browser check:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:291
+msgid "Open `http://localhost:5173`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:292
+msgid "Click the GitBranch icon (Chain Builder)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:293
+msgid "DMN cards should load in the left panel within a few seconds"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:294
+msgid "Open browser DevTools → Console: no CORS errors should appear"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:298
+msgid "Running backend tests"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:300
+msgid ""
+"cd packages/backend\n"
+"npm test                  # run all tests\n"
+"npm run test:watch        # watch mode\n"
+"npm run test:coverage     # with coverage report"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:309
+msgid "Code quality"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:311
+msgid ""
+"# Lint and format (from repo root)\n"
+"npm run lint              # lint all packages\n"
+"npm run lint:fix          # auto-fix\n"
+"npm run format            # prettier all packages\n"
+"npm run check-format      # check without writing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:319
+msgid ""
+"Pre-commit hooks (husky + lint-staged) run lint and format automatically on "
+"staged files in `packages/frontend/`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:323
+msgid "Pushing to ACC"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:325
+msgid "After local verification:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:327
+msgid ""
+"# From repo root\n"
+"git add packages/backend/src/ packages/frontend/src/\n"
+"git commit -m \"feat: your description\"\n"
+"git push origin acc"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Clocal-development.md:334
+msgid ""
+"Monitor the GitHub Actions run for the `acc` branch. The ACC frontend "
+"deploys to `https://acc.linkeddata.open-regels.nl` and the ACC backend to "
+"`https://acc.backend.linkeddata.open-regels.nl`. Verify the ACC deployment "
+"before opening a PR to `main`."
+msgstr ""

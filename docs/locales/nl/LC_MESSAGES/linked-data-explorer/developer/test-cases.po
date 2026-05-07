@@ -1,0 +1,379 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:1
+msgid "Test Cases"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:3
+msgid ""
+"This page covers end-to-end test procedures for the validation system, "
+"semantic chain detection, DRD compatibility checks, and template management. "
+"Use this as a QA checklist before pushing to ACC."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:7
+msgid "Prerequisites"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:9
+msgid "Backend running locally: `npm run dev` in `packages/backend`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:10
+msgid "Frontend running locally: `npm run dev` in `packages/frontend`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:11
+msgid ""
+"Active TriplyDB endpoint: `https://api.open-regels.triply.cc/datasets/"
+"stevengort/DMN-discovery/services/DMN-discovery/sparql`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:12
+msgid ""
+"`ZorgtoeslagVoorwaardenCheck.ttl` uploaded to the test TriplyDB dataset "
+"(required for semantic chain tests)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:16
+msgid "Scenario 1 — Exact match chain (DRD-compatible)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:18
+msgid "**Chain:** `SVB_LeeftijdsInformatie → SZW_BijstandsnormInformatie`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:20
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\test-cases.md:20"
+msgid "**Steps:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:22
+msgid "Open Chain Builder"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:23
+msgid "Drag `SVB_LeeftijdsInformatie` into composer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:24
+msgid "Drag `SZW_BijstandsnormInformatie` below it"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:26
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\test-cases.md:26"
+msgid "**Expected results:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:28
+msgid "Console: `[SemanticLinks] ✓ Loaded 26 links (16 semantic)`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:29
+msgid "Console: `[Validation] ✓ DRD | 0 missing | 0 semantic`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:30
+msgid ""
+"Validation panel: green checkmark, \"Chain is valid and ready to execute\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:31
+msgid "Buttons: Execute, Save, Export all active"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:32
+msgid "Save modal: purple \"🎯 DRD Template\" badge, \"Save as DRD\" button"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:36
+msgid "Scenario 2 — Semantic chain (sequential only)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:38
+msgid "**Chain:** `ZorgtoeslagVoorwaardenCheck → berekenrechtenhoogtezorg`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:40
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\test-cases.md:40"
+msgid "**Steps:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:42
+msgid "Clear composer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:43
+msgid "Drag `ZorgtoeslagVoorwaardenCheck` into composer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:44
+msgid "Drag `berekenrechtenhoogtezorg` below it"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:46
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\developer\\test-cases.md:46"
+msgid "**Expected results:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:48
+msgid "Console: `[Validation] ⚠️ Sequential | 0 missing | 6 semantic`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:49
+msgid ""
+"Six semantic match log entries for: `isIngezetene`, `heeftJuisteLeeftijd`, "
+"`betalingsregelingOK`, `vrijVanDetentie`, `heeftGeldigeVerzekering`, "
+"`inkomenBinnenGrenzen`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:50
+msgid ""
+"Validation panel: amber warning, \"Sequential execution required (semantic "
+"links)\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:51
+msgid "Save modal: sequential template badge, no \"Save as DRD\" option"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:55
+msgid "Scenario 3 — DRD save and execute"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:57
+msgid "Continuation from Scenario 1 with a DRD-compatible chain:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:59
+msgid "Click **Save**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:60
+msgid "Enter name: \"Test DRD\" → click **Save as DRD**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:61
+msgid "Wait for deployment success message with deployment ID (UUID format)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:63
+msgid "**Verify localStorage:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:65
+msgid ""
+"const templates = JSON.parse(\n"
+"  localStorage.getItem('linkeddata-explorer-user-templates')\n"
+");\n"
+"const endpoint = 'https://api.open-regels.triply.cc/...';\n"
+"const testDrd = templates[endpoint].find(t => t.name === 'Test DRD');\n"
+"console.log('drdDeploymentId:', testDrd.drdDeploymentId); // UUID\n"
+"console.log('drdEntryPointId:', testDrd.drdEntryPointId); // dmn1_SZW_...\n"
+"console.log('type:', testDrd.type);                       // \"drd\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:76
+msgid "Load the template from My Templates"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:77
+msgid "Fill `geboortedatum: 1960-01-01`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:78
+msgid ""
+"Click **Execute** → verify single API call in backend logs, results appear"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:82
+msgid "Scenario 4 — Template system"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:84
+msgid "Build the SVB → SZW chain and save as DRD (\"Chain A\")"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:85
+msgid ""
+"Build the Zorg → Belasting semantic chain and save as sequential (\"Chain "
+"B\")"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:86
+msgid ""
+"Check My Templates: \"Chain A\" shows 🔗 DRD badge; \"Chain B\" shows no DRD "
+"badge"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:87
+msgid ""
+"Switch to a different endpoint: verify neither template appears (endpoint-"
+"scoped)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:88
+msgid "Switch back: both templates reappear"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:89
+msgid ""
+"Delete \"Chain A\" from My Templates: verify it disappears from the list"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:93
+msgid "Scenario 5 — BPMN Modeler + DRD linking"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:95
+msgid "Navigate to BPMN Modeler"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:96
+msgid "Open the Tree Felling Permit example"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:97
+msgid "Click the \"Assess Felling Permit\" BusinessRuleTask"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:98
+msgid "In the properties panel, click **Link to DMN/DRD**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:99
+msgid "Verify two option groups appear: \"🔗 DRDs\" and \"📋 Single DMNs\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:100
+msgid "If a DRD was saved in Scenario 3, verify it appears in the DRDs group"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:101
+msgid ""
+"Select it: verify `camunda:decisionRef` populates with the `dmn1_` prefixed "
+"identifier"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:102
+msgid "Verify the purple DRD info card appears with the chain composition"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:106
+msgid "Scenario 6 — Governance badges"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:108
+msgid "Open Chain Builder with an endpoint that has validation metadata"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:109
+msgid "Locate a DMN with `ronl:validationStatus \"validated\"` in TriplyDB"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:110
+msgid "Verify a green \"✓ Gevalideerd\" badge appears on the card"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:111
+msgid "Hover over the badge: verify tooltip shows organisation name and date"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:112
+msgid "Drag the card into composer: verify badge persists on the composer card"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:116
+msgid "Scenario 7 — Vendor services"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:118
+msgid "Open Chain Builder with an endpoint that has vendor metadata"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:119
+msgid "Locate a DMN with an associated `ronl:VendorService` in TriplyDB"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:120
+msgid "Verify a blue vendor count badge appears on the card"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:121
+msgid "Click the badge: verify modal opens with provider details"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:122
+msgid "Verify all links work (email, phone, service URL, homepage)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:123
+msgid "Close modal via close button, backdrop click, and ESC key"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:127
+msgid "Common issues"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:129
+msgid "**No semantic links loaded:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:130
+msgid ""
+"Check TriplyDB for `dct:subject` integrity — must point to variable URI, not "
+"DMN URI"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:131
+msgid ""
+"Check `skos:exactMatch` URIs — must be identical between the two concepts"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:132
+msgid "Check `dct:type` values — case-sensitive, must match exactly"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:134
+msgid "**DRD deployment fails:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:135
+msgid ""
+"Verify Operaton is accessible: `curl https://operaton.open-regels.nl/engine-"
+"rest/version`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:136
+msgid "Check backend logs for specific Operaton error message"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:137
+msgid ""
+"Try removing the `<dmndi:DMNDI>` block from the generated XML temporarily"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:139
+msgid "**Validation shows amber for an exact-match chain:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:140
+msgid "Open browser console, look for `[Validation]` log line"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Ctest-cases.md:141
+msgid ""
+"If `semantic > 0` despite visual identifier match, check for variable type "
+"mismatch in TriplyDB (`\"Boolean\"` vs `\"boolean\"`)"
+msgstr ""

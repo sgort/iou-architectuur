@@ -1,0 +1,1266 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:1
+msgid "Timeline Implementation - Developer Guide"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:5
+msgid "Table of Contents"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:7
+msgid "[Adding New Test Personas]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:8
+msgid "[Extending Timeline with New Event Types]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:9
+msgid "[Adding Address History]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:10
+msgid "[Customizing Timeline Appearance]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:11
+msgid "[Testing Timeline Features]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:15
+msgid "Adding New Test Personas"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:17
+msgid ""
+"Currently, all test users map to Wessel Kooyman (BSN: 999992235). To add "
+"more diverse personas:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:19
+msgid "Step 1: Add Test Data to BRP API Mock"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:21
+msgid ""
+"If you control the BRP API mock, add new persona data. Otherwise, you'll "
+"need to use different BSN numbers that exist in the mock."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:23
+msgid "**Example personas to add:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:25
+msgid "Single person without partner/children"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:26
+msgid "Divorced person with children"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:27
+msgid "Person with multiple marriages"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:28
+msgid "Person with address changes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:30
+msgid "Step 2: Update BSN Mapping"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:32
+msgid "**File:** `packages/frontend/src/services/bsn.mapping.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:34
+msgid ""
+"const testUserBSNMapping: Record<string, string> = {\n"
+"  // Existing\n"
+"  'test-citizen-utrecht': '999992235',        // Wessel Kooyman (married, 3 "
+"children)\n"
+"  \n"
+"  // Add new personas\n"
+"  'test-citizen-single': '999991111',         // Single person, no partner/"
+"children\n"
+"  'test-citizen-divorced': '999992222',       // Divorced, 2 children\n"
+"  'test-citizen-remarried': '999993333',      // Multiple marriages\n"
+"  'test-citizen-young': '999994444',          // Born 2000, no major events "
+"yet\n"
+"};"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:47
+msgid "Step 3: Create Keycloak Test Users"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:49
+msgid "**Keycloak Admin Console** → Realms → `ronl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:50
+msgid "**Users** → **Add user**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:51
+msgid "Configure:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:51
+msgid "**Username**: `test-citizen-single`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:51
+msgid "**Email**: `single@test.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:51
+msgid "**First Name**: `Jan`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:51
+msgid "**Last Name**: `Jansen`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:56
+msgid "**Credentials** tab → Set password: `test123` (temporary: OFF)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:57
+msgid "**Attributes** tab → Add:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:57
+msgid "`municipality`: `utrecht`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:57
+msgid "`assurance_level`: `hoog`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:60
+msgid "**Role Mappings** tab → Assign role: `citizen`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:61
+msgid "Save"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:63
+msgid "Step 4: Test New Persona"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:65
+msgid ""
+"# Login as new user\n"
+"# Navigate to timeline\n"
+"# Verify correct data appears"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:73
+msgid "Extending Timeline with New Event Types"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:75
+msgid "Supported Event Types (Current)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:77
+msgid "type BRPEventType = 'birth' | 'marriage' | 'divorce';"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:81
+msgid "Adding New Event Type: Divorce"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:83
+msgid "Step 1: Update Type Definition"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:85
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\implementing-timeline.md:85"
+msgid "**File:** `packages/frontend/src/types/brp.types.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:87
+msgid ""
+"export type BRPEventType = \n"
+"  | 'birth' \n"
+"  | 'marriage' \n"
+"  | 'divorce'      // ✅ Add this\n"
+"  | 'address_change';  // ✅ Future\n"
+"\n"
+"export interface BRPEvent {\n"
+"  id: string;\n"
+"  type: BRPEventType;\n"
+"  date: Date;\n"
+"  label: string;\n"
+"  description: string;\n"
+"  icon?: string;     // ✅ Add optional icon\n"
+"  color?: string;    // ✅ Add optional color\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:105
+msgid "Step 2: Extract Divorce Events"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:107
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\implementing-timeline.md:107"
+msgid "**File:** `packages/frontend/src/services/brp.timeline.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:109
+msgid "Add to `extractEvents()` function:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:111
+msgid ""
+"export function extractEvents(personState: PersonState): BRPEvent[] {\n"
+"  const events: BRPEvent[] = [];\n"
+"\n"
+"  // ... existing birth and marriage events ...\n"
+"\n"
+"  // ✅ Add: Divorce/separation events\n"
+"  if (personState.partners) {\n"
+"    personState.partners.forEach((partner, idx) => {\n"
+"      // Check if partnership ended\n"
+"      if (partner.ontbindingHuwelijkPartnerschap?.datum?.datum) {\n"
+"        events.push({\n"
+"          id: `divorce-${idx}`,\n"
+"          type: 'divorce',\n"
+"          date: new Date(partner.ontbindingHuwelijkPartnerschap.datum.datum)"
+",\n"
+"          label: 'Scheiding',\n"
+"          description: `Einde huwelijk met ${partner.naam.voornamen} $"
+"{partner.naam.geslachtsnaam}`,\n"
+"          icon: '💔',\n"
+"          color: '#DC2626', // Red color\n"
+"        });\n"
+"      }\n"
+"    });\n"
+"  }\n"
+"\n"
+"  return events.sort((a, b) => a.date.getTime() - b.date.getTime());\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:139
+msgid "Step 3: Update Historical State Calculation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:141
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\implementing-timeline.md:141"
+msgid "**File:** `packages/frontend/src/services/brp.timeline.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:143
+msgid "Modify `calculateHistoricalState()`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:145
+msgid ""
+"// Filter partners based on marriage AND divorce dates\n"
+"if (currentState.partners && currentState.partners.length > 0) {\n"
+"  historicalState.partners = currentState.partners.filter((partner) => {\n"
+"    const marriageDate = new Date"
+"(partner.aangaanHuwelijkPartnerschap.datum.datum);\n"
+"    \n"
+"    // Check if partnership ended\n"
+"    const divorceDate = "
+"partner.ontbindingHuwelijkPartnerschap?.datum?.datum\n"
+"      ? new Date(partner.ontbindingHuwelijkPartnerschap.datum.datum)\n"
+"      : null;\n"
+"    \n"
+"    // Show partner only between marriage and divorce (or now if still "
+"married)\n"
+"    return targetDate >= marriageDate && (!divorceDate || targetDate < "
+"divorceDate);\n"
+"  });\n"
+"\n"
+"  if (historicalState.partners.length === 0) {\n"
+"    delete historicalState.partners;\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:166
+msgid "Step 4: Update Timeline Component"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:168
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\implementing-timeline.md:168"
+msgid "**File:** `packages/frontend/src/components/Timeline.tsx`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:170
+msgid "Add visual styling for divorce events:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:172
+msgid ""
+"{/* Event markers on timeline */}\n"
+"{events.map((event) => {\n"
+"  const position = dateToPercentage(event.date);\n"
+"  \n"
+"  // ✅ Add: Different colors per event type\n"
+"  const eventColor = event.color || \n"
+"    (event.type === 'birth' ? 'var(--color-primary)' : \n"
+"     event.type === 'marriage' ? '#10B981' : \n"
+"     event.type === 'divorce' ? '#DC2626' : \n"
+"     'var(--color-accent)');\n"
+"  \n"
+"  return (\n"
+"    <div\n"
+"      key={event.id}\n"
+"      className=\"absolute top-1/2 transform -translate-x-1/2 -translate-y-1/"
+"2 cursor-pointer z-10\"\n"
+"      style={{ left: `${position}%` }}\n"
+"      onClick={() => onDateChange(event.date)}\n"
+"      title={event.description}\n"
+"    >\n"
+"      <div\n"
+"        className=\"w-4 h-4 rounded-full border-2 border-white\"\n"
+"        style={{ backgroundColor: eventColor }}\n"
+"      />\n"
+"      {event.icon && (\n"
+"        <div className=\"absolute -top-6 left-1/2 transform -translate-x-1/2 "
+"text-lg\">\n"
+"          {event.icon}\n"
+"        </div>\n"
+"      )}\n"
+"    </div>\n"
+"  );\n"
+"})}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:206
+msgid "Adding Event Type: Death"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:208
+msgid "**⚠️ Sensitive Implementation Note:** Handle with care for UX."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:210
+msgid ""
+"// In extractEvents()\n"
+"if (personState.overlijden?.datum?.datum) {\n"
+"  events.push({\n"
+"    id: 'death',\n"
+"    type: 'death',\n"
+"    date: new Date(personState.overlijden.datum.datum),\n"
+"    label: 'Overleden',\n"
+"    description: 'Overlijden',\n"
+"    icon: '🕊️',\n"
+"    color: '#6B7280', // Gray\n"
+"  });\n"
+"}\n"
+"\n"
+"// In calculateHistoricalState()\n"
+"// If target date is after death, show memorial state\n"
+"const deathDate = currentState.overlijden?.datum?.datum\n"
+"  ? new Date(currentState.overlijden.datum.datum)\n"
+"  : null;\n"
+"\n"
+"if (deathDate && targetDate >= deathDate) {\n"
+"  // Show \"In Memoriam\" or special state\n"
+"  return {\n"
+"    ...historicalState,\n"
+"    _memorial: true, // Custom flag\n"
+"  };\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:241
+msgid "Adding Address History (Verblijfplaatshistorie)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:243
+msgid "Step 1: Add Backend Route"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:245
+msgid "**File:** `packages/backend/src/routes/brp.routes.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:247
+msgid ""
+"/**\n"
+" * POST /v1/brp/verblijfplaatshistorie\n"
+" * Fetch address history for a person\n"
+" */\n"
+"router.post('/verblijfplaatshistorie', jwtMiddleware, async (req: Request, "
+"res: Response) => {\n"
+"  try {\n"
+"    logger.info('BRP verblijfplaatshistorie request', {\n"
+"      userId: req.user?.userId,\n"
+"      requestBody: req.body,\n"
+"    });\n"
+"\n"
+"    // Forward to BRP verblijfplaatshistorie API\n"
+"    const response = await axios.post(\n"
+"      `${BRP_API_BASE_URL}/verblijfplaatshistorie`,\n"
+"      req.body,\n"
+"      {\n"
+"        headers: {\n"
+"          'Content-Type': 'application/json; charset=utf-8',\n"
+"          'Accept': 'application/json',\n"
+"        },\n"
+"        timeout: 10000,\n"
+"        validateStatus: (status) => status < 500,\n"
+"      }\n"
+"    );\n"
+"\n"
+"    if (response.status >= 400) {\n"
+"      logger.error('BRP API returned error', {\n"
+"        status: response.status,\n"
+"        data: response.data,\n"
+"      });\n"
+"      \n"
+"      return res.status(response.status).json({\n"
+"        success: false,\n"
+"        error: {\n"
+"          code: 'BRP_API_ERROR',\n"
+"          message: 'BRP API returned an error',\n"
+"          details: response.data,\n"
+"        },\n"
+"      });\n"
+"    }\n"
+"\n"
+"    auditLog(req, 'brp.verblijfplaatshistorie.fetch', 'success', {\n"
+"      bsn: req.body.burgerservicenummer?.[0],\n"
+"    });\n"
+"\n"
+"    res.json({\n"
+"      success: true,\n"
+"      data: response.data,\n"
+"    });\n"
+"  } catch (error) {\n"
+"    logger.error('BRP verblijfplaatshistorie request failed', {\n"
+"      error: error instanceof Error ? error.message : 'Unknown error',\n"
+"    });\n"
+"\n"
+"    res.status(500).json({\n"
+"      success: false,\n"
+"      error: {\n"
+"        code: 'BRP_API_ERROR',\n"
+"        message: 'Verblijfplaatshistorie request failed',\n"
+"      },\n"
+"    });\n"
+"  }\n"
+"});"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:313
+msgid "Step 2: Add Frontend Service"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:315
+msgid "**File:** `packages/frontend/src/services/brp.api.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:317
+msgid ""
+"/**\n"
+" * Fetch address history by BSN\n"
+" */\n"
+"async getVerblijfplaatshistorie(\n"
+"  bsn: string,\n"
+"  datumVan?: string,\n"
+"  datumTot?: string\n"
+"): Promise<VerblijfplaatsHistorie[] | null> {\n"
+"  try {\n"
+"    const response = await this.client.post<{\n"
+"      success: boolean;\n"
+"      data: { verblijfplaatshistorie: VerblijfplaatsHistorie[] };\n"
+"    }>('/brp/verblijfplaatshistorie', {\n"
+"      type: 'RaadpleegMetPeriode',\n"
+"      burgerservicenummer: [bsn],\n"
+"      datumVan: datumVan || undefined,\n"
+"      datumTot: datumTot || undefined,\n"
+"    });\n"
+"\n"
+"    if (\n"
+"      response.data.success &&\n"
+"      response.data.data.verblijfplaatshistorie\n"
+"    ) {\n"
+"      return response.data.data.verblijfplaatshistorie;\n"
+"    }\n"
+"\n"
+"    return null;\n"
+"  } catch (error) {\n"
+"    console.error(`Failed to fetch verblijfplaatshistorie for BSN ${bsn}:`, "
+"error);\n"
+"    throw error;\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:352
+msgid "Step 3: Add TypeScript Types"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:354
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\implementing-timeline.md:354"
+msgid "**File:** `packages/frontend/src/types/brp.types.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:356
+msgid ""
+"export interface VerblijfplaatsHistorie {\n"
+"  datumVan: {\n"
+"    datum: string;\n"
+"    langFormaat: string;\n"
+"  };\n"
+"  datumTot?: {\n"
+"    datum: string;\n"
+"    langFormaat: string;\n"
+"  };\n"
+"  verblijfadres: {\n"
+"    straat: string;\n"
+"    huisnummer: number;\n"
+"    huisletter?: string;\n"
+"    huisnummertoevoeging?: string;\n"
+"    postcode: string;\n"
+"    woonplaats: string;\n"
+"  };\n"
+"  gemeenteVanInschrijving: {\n"
+"    code: string;\n"
+"    omschrijving: string;\n"
+"  };\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:381
+msgid "Step 4: Extract Address Events"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:383
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\implementing-timeline.md:383"
+msgid "**File:** `packages/frontend/src/services/brp.timeline.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:385
+msgid ""
+"export function extractAddressEvents(\n"
+"  verblijfplaatshistorie: VerblijfplaatsHistorie[]\n"
+"): BRPEvent[] {\n"
+"  return verblijfplaatshistorie.map((vph, idx) => ({\n"
+"    id: `address-${idx}`,\n"
+"    type: 'address_change',\n"
+"    date: new Date(vph.datumVan.datum),\n"
+"    label: 'Verhuizing',\n"
+"    description: `Verhuisd naar ${vph.verblijfadres.straat} $"
+"{vph.verblijfadres.huisnummer}, ${vph.verblijfadres.woonplaats}`,\n"
+"    icon: '🏠',\n"
+"    color: '#F59E0B', // Orange\n"
+"  }));\n"
+"}\n"
+"\n"
+"// Update getPersonTimeline to fetch address history too\n"
+"export async function getPersonTimeline(bsn: string): "
+"Promise<BRPPersonHistoricalData | null> {\n"
+"  try {\n"
+"    const currentState = await brpApi.getPersonByBSN(bsn);\n"
+"    if (!currentState) return null;\n"
+"\n"
+"    // ✅ Add: Fetch address history\n"
+"    const addressHistory = await brpApi.getVerblijfplaatshistorie(bsn);\n"
+"\n"
+"    const personEvents = extractEvents(currentState);\n"
+"    const addressEvents = addressHistory ? extractAddressEvents"
+"(addressHistory) : [];\n"
+"    \n"
+"    // Combine and sort all events\n"
+"    const events = [...personEvents, ...addressEvents].sort(\n"
+"      (a, b) => a.date.getTime() - b.date.getTime()\n"
+"    );\n"
+"\n"
+"    const birthDate = new Date(currentState.geboorte.datum.datum);\n"
+"    const earliestDate = new Date(birthDate);\n"
+"    earliestDate.setFullYear(earliestDate.getFullYear() - 2);\n"
+"    \n"
+"    const futureDate = new Date();\n"
+"    futureDate.setFullYear(futureDate.getFullYear() + 10);\n"
+"\n"
+"    return {\n"
+"      bsn,\n"
+"      events,\n"
+"      earliestDate,\n"
+"      latestDate: futureDate,\n"
+"      currentState,\n"
+"      addressHistory, // ✅ Include in response\n"
+"    };\n"
+"  } catch (error) {\n"
+"    console.error('Failed to generate person timeline:', error);\n"
+"    return null;\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:439
+msgid "Step 5: Display Address in Timeline"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:441
+msgid "**File:** `packages/frontend/src/components/PersonalDataPanel.tsx`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:443
+msgid "Add address section:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:445
+msgid ""
+"{/* ✅ Add: Address section */}\n"
+"{addressAtDate && (\n"
+"  <div className=\"bg-white rounded-lg shadow-md p-6 mb-4\">\n"
+"    <h2 className=\"text-xl font-semibold mb-4 flex items-center\">\n"
+"      <span className=\"mr-2\">🏠</span>\n"
+"      Adres\n"
+"    </h2>\n"
+"    <div className=\"space-y-2\">\n"
+"      <div>\n"
+"        <span className=\"text-gray-600\">Straat:</span>{' '}\n"
+"        <span className=\"font-medium\">\n"
+"          {addressAtDate.verblijfadres.straat} "
+"{addressAtDate.verblijfadres.huisnummer}\n"
+"        </span>\n"
+"      </div>\n"
+"      <div>\n"
+"        <span className=\"text-gray-600\">Postcode:</span>{' '}\n"
+"        <span className=\"font-medium\">"
+"{addressAtDate.verblijfadres.postcode}</span>\n"
+"      </div>\n"
+"      <div>\n"
+"        <span className=\"text-gray-600\">Woonplaats:</span>{' '}\n"
+"        <span className=\"font-medium\">"
+"{addressAtDate.verblijfadres.woonplaats}</span>\n"
+"      </div>\n"
+"      <div>\n"
+"        <span className=\"text-gray-600\">Gemeente:</span>{' '}\n"
+"        <span className=\"font-medium\">\n"
+"          {addressAtDate.gemeenteVanInschrijving.omschrijving}\n"
+"        </span>\n"
+"      </div>\n"
+"    </div>\n"
+"  </div>\n"
+")}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:481
+msgid "Customizing Timeline Appearance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:483
+msgid "Changing Theme Colors"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:485
+msgid "Timeline uses CSS custom properties for theming:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:487
+msgid "**File:** `packages/frontend/src/services/tenant.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:489
+msgid "Colors are set per municipality:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:491
+msgid ""
+"const tenantConfigs: Record<string, TenantConfig> = {\n"
+"  utrecht: {\n"
+"    theme: {\n"
+"      primary: '#C41E3A',      // Timeline marker color\n"
+"      primaryDark: '#9B1830',   // Hover states\n"
+"      primaryLight: '#E85770',  // Light accents\n"
+"      secondary: '#2C5F2D',     // Secondary buttons\n"
+"      accent: '#FF6B00',        // Event markers\n"
+"    },\n"
+"  },\n"
+"};"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:505
+msgid "Customizing Timeline Range"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:507
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\implementing-timeline.md:507"
+msgid "**File:** `packages/frontend/src/services/brp.timeline.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:509
+msgid ""
+"// Adjust padding before birth\n"
+"const earliestDate = new Date(birthDate);\n"
+"earliestDate.setFullYear(earliestDate.getFullYear() - 2); // ← Change this\n"
+"\n"
+"// Adjust future range\n"
+"const futureDate = new Date(today);\n"
+"futureDate.setFullYear(futureDate.getFullYear() + 10); // ← Change this"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:519
+msgid "Adjusting Year Marker Intervals"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:521
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\implementing-timeline.md:521"
+msgid "**File:** `packages/frontend/src/components/Timeline.tsx`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:523
+msgid ""
+"const generateYearMarkers = () => {\n"
+"  const roundedStartYear = Math.floor(startYear / 5) * 5; // ← Change "
+"interval\n"
+"  \n"
+"  for (let year = roundedStartYear; year <= endYear; year += 5) { // ← "
+"Change step\n"
+"    // ...\n"
+"  }\n"
+"};"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:533
+msgid "Custom Event Icons"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:535
+msgid "Add custom icons per event type:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:537
+msgid ""
+"const eventIcons: Record<BRPEventType, string> = {\n"
+"  birth: '👶',\n"
+"  marriage: '💍',\n"
+"  divorce: '💔',\n"
+"  address_change: '🏠',\n"
+"  death: '🕊️',\n"
+"};\n"
+"\n"
+"// In Timeline.tsx\n"
+"{events.map((event) => (\n"
+"  <div>\n"
+"    <span>{eventIcons[event.type]}</span>\n"
+"    {/* ... */}\n"
+"  </div>\n"
+"))}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:557
+msgid "Testing Timeline Features"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:559
+msgid "Unit Testing Historical State Calculation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:561
+msgid ""
+"**File:** `packages/frontend/src/services/__tests__/brp.timeline.test.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:563
+msgid ""
+"import { calculateHistoricalState } from '../brp.timeline';\n"
+"import type { PersonState } from '../../types/brp.types';\n"
+"\n"
+"describe('calculateHistoricalState', () => {\n"
+"  const mockPersonState: PersonState = {\n"
+"    burgerservicenummer: '999992235',\n"
+"    leeftijd: 45,\n"
+"    naam: {\n"
+"      volledigeNaam: 'Wessel Kooyman',\n"
+"      voornamen: 'Wessel',\n"
+"      geslachtsnaam: 'Kooyman',\n"
+"    },\n"
+"    geboorte: {\n"
+"      datum: { datum: '1980-12-12', langFormaat: '12 december 1980' },\n"
+"      plaats: { omschrijving: 'Leerdam' },\n"
+"    },\n"
+"    partners: [{\n"
+"      naam: {\n"
+"        voornamen: 'Catootje',\n"
+"        geslachtsnaam: 'Altena',\n"
+"      },\n"
+"      aangaanHuwelijkPartnerschap: {\n"
+"        datum: { datum: '2002-02-02', langFormaat: '2 februari 2002' },\n"
+"      },\n"
+"    }],\n"
+"    kinderen: [{\n"
+"      burgerservicenummer: '999991231',\n"
+"      naam: {\n"
+"        voornamen: 'Stefano',\n"
+"        geslachtsnaam: 'Kooyman',\n"
+"      },\n"
+"      geboorte: {\n"
+"        datum: { datum: '2003-03-03', langFormaat: '3 maart 2003' },\n"
+"      },\n"
+"    }],\n"
+"  };\n"
+"\n"
+"  test('before marriage - no partner visible', () => {\n"
+"    const targetDate = new Date('2001-01-01');\n"
+"    const result = calculateHistoricalState(mockPersonState, targetDate);\n"
+"    \n"
+"    expect(result).not.toBeNull();\n"
+"    expect(result?.partners).toBeUndefined();\n"
+"    expect(result?.leeftijd).toBe(20); // Age in 2001\n"
+"  });\n"
+"\n"
+"  test('after marriage - partner visible', () => {\n"
+"    const targetDate = new Date('2002-06-01');\n"
+"    const result = calculateHistoricalState(mockPersonState, targetDate);\n"
+"    \n"
+"    expect(result?.partners).toHaveLength(1);\n"
+"    expect(result?.leeftijd).toBe(21);\n"
+"  });\n"
+"\n"
+"  test('before children born - no children visible', () => {\n"
+"    const targetDate = new Date('2003-01-01');\n"
+"    const result = calculateHistoricalState(mockPersonState, targetDate);\n"
+"    \n"
+"    expect(result?.kinderen).toBeUndefined();\n"
+"  });\n"
+"\n"
+"  test('after children born - children visible with correct age', () => {\n"
+"    const targetDate = new Date('2005-01-01');\n"
+"    const result = calculateHistoricalState(mockPersonState, targetDate);\n"
+"    \n"
+"    expect(result?.kinderen).toHaveLength(1);\n"
+"    expect(result?.kinderen?.[0].leeftijd).toBe(1); // Child age in 2005\n"
+"  });\n"
+"\n"
+"  test('before birth - returns null', () => {\n"
+"    const targetDate = new Date('1979-01-01');\n"
+"    const result = calculateHistoricalState(mockPersonState, targetDate);\n"
+"    \n"
+"    expect(result).toBeNull();\n"
+"  });\n"
+"});"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:642
+msgid "Integration Testing Timeline Component"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:644
+msgid ""
+"**File:** `packages/frontend/src/components/__tests__/Timeline.test.tsx`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:646
+msgid ""
+"import { render, screen, fireEvent } from '@testing-library/react';\n"
+"import Timeline from '../Timeline';\n"
+"import type { BRPEvent } from '../../types/brp.types';\n"
+"\n"
+"describe('Timeline Component', () => {\n"
+"  const mockEvents: BRPEvent[] = [\n"
+"    {\n"
+"      id: 'birth',\n"
+"      type: 'birth',\n"
+"      date: new Date('1980-12-12'),\n"
+"      label: 'Geboren',\n"
+"      description: 'Geboorte Wessel Kooyman',\n"
+"    },\n"
+"    {\n"
+"      id: 'marriage',\n"
+"      type: 'marriage',\n"
+"      date: new Date('2002-02-02'),\n"
+"      label: 'Getrouwd',\n"
+"      description: 'Huwelijk met Catootje Altena',\n"
+"    },\n"
+"  ];\n"
+"\n"
+"  const mockOnDateChange = jest.fn();\n"
+"\n"
+"  test('renders timeline with events', () => {\n"
+"    render(\n"
+"      <Timeline\n"
+"        events={mockEvents}\n"
+"        minDate={new Date('1978-01-01')}\n"
+"        maxDate={new Date('2030-01-01')}\n"
+"        selectedDate={new Date()}\n"
+"        onDateChange={mockOnDateChange}\n"
+"        isLoading={false}\n"
+"      />\n"
+"    );\n"
+"\n"
+"    expect(screen.getByText('Vandaag')).toBeInTheDocument();\n"
+"    expect(screen.getByText('Geboren')).toBeInTheDocument();\n"
+"    expect(screen.getByText('Getrouwd')).toBeInTheDocument();\n"
+"  });\n"
+"\n"
+"  test('clicking event button calls onDateChange', () => {\n"
+"    render(\n"
+"      <Timeline\n"
+"        events={mockEvents}\n"
+"        minDate={new Date('1978-01-01')}\n"
+"        maxDate={new Date('2030-01-01')}\n"
+"        selectedDate={new Date()}\n"
+"        onDateChange={mockOnDateChange}\n"
+"        isLoading={false}\n"
+"      />\n"
+"    );\n"
+"\n"
+"    fireEvent.click(screen.getByText('Geboren'));\n"
+"    expect(mockOnDateChange).toHaveBeenCalledWith(new Date('1980-12-12'));\n"
+"  });\n"
+"\n"
+"  test('shows loading overlay when isLoading is true', () => {\n"
+"    render(\n"
+"      <Timeline\n"
+"        events={mockEvents}\n"
+"        minDate={new Date('1978-01-01')}\n"
+"        maxDate={new Date('2030-01-01')}\n"
+"        selectedDate={new Date()}\n"
+"        onDateChange={mockOnDateChange}\n"
+"        isLoading={true}\n"
+"      />\n"
+"    );\n"
+"\n"
+"    expect(screen.getByText(/laden/i)).toBeInTheDocument();\n"
+"  });\n"
+"});"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:721
+msgid "E2E Testing with Playwright"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:723
+msgid "**File:** `e2e/timeline.spec.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:725
+msgid ""
+"import { test, expect } from '@playwright/test';\n"
+"\n"
+"test.describe('Timeline Navigation', () => {\n"
+"  test.beforeEach(async ({ page }) => {\n"
+"    // Login\n"
+"    await page.goto('http://localhost:5173');\n"
+"    await page.fill('input[name=\"username\"]', 'test-citizen-utrecht');\n"
+"    await page.fill('input[name=\"password\"]', 'test123');\n"
+"    await page.click('button[type=\"submit\"]');\n"
+"    await page.waitForURL('**/dashboard');\n"
+"  });\n"
+"\n"
+"  test('loads timeline with events', async ({ page }) => {\n"
+"    // Click timeline button\n"
+"    await page.click('button:has-text(\"Toon Tijdlijn\")');\n"
+"\n"
+"    // Wait for timeline to load\n"
+"    await page.waitForSelector('text=Geboren');\n"
+"\n"
+"    // Verify events are visible\n"
+"    await expect(page.locator('text=Geboren')).toBeVisible();\n"
+"    await expect(page.locator('text=Getrouwd')).toBeVisible();\n"
+"    await expect(page.locator('text=Kinderen geboren')).toBeVisible();\n"
+"  });\n"
+"\n"
+"  test('clicking event jumps to date', async ({ page }) => {\n"
+"    await page.click('button:has-text(\"Toon Tijdlijn\")');\n"
+"    await page.waitForSelector('text=Geboren');\n"
+"\n"
+"    // Click \"Geboren\" event\n"
+"    await page.click('button:has-text(\"Geboren\")');\n"
+"\n"
+"    // Verify age is 0 (at birth)\n"
+"    await expect(page.locator('text=Leeftijd: 0 jaar')).toBeVisible();\n"
+"\n"
+"    // Verify no partner/children sections\n"
+"    await expect(page.locator('text=Partner')).not.toBeVisible();\n"
+"    await expect(page.locator('text=Kinderen')).not.toBeVisible();\n"
+"  });\n"
+"\n"
+"  test('shows partner after marriage date', async ({ page }) => {\n"
+"    await page.click('button:has-text(\"Toon Tijdlijn\")');\n"
+"    await page.waitForSelector('text=Getrouwd');\n"
+"\n"
+"    // Click \"Getrouwd\" event\n"
+"    await page.click('button:has-text(\"Getrouwd\")');\n"
+"\n"
+"    // Verify partner section is visible\n"
+"    await expect(page.locator('text=Partner')).toBeVisible();\n"
+"    await expect(page.locator('text=Catootje Altena')).toBeVisible();\n"
+"  });\n"
+"});"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:782
+msgid "Common Development Tasks"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:784
+msgid "Task: Add New Field to Person Display"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:786
+msgid "Check if field exists in BRP API response"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:787
+msgid "Add to `timeline-config.json`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:787
+msgid ""
+"{\n"
+"  \"displayFields\": {\n"
+"    \"person\": [\n"
+"      \"burgerservicenummer\",\n"
+"      \"geslacht.omschrijving\"  // ✅ Add new field\n"
+"    ]\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:798
+msgid "Update `PersonalDataPanel.tsx` to render the field"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:800
+msgid "Task: Change Timeline Date Range"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:802
+msgid "Modify `getPersonTimeline()` in `brp.timeline.ts`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:804
+msgid ""
+"// Start from first address instead of birth\n"
+"const firstAddressDate = addressHistory?.[0]?.datumVan?.datum\n"
+"  ? new Date(addressHistory[0].datumVan.datum)\n"
+"  : birthDate;\n"
+"\n"
+"const earliestDate = new Date(firstAddressDate);\n"
+"earliestDate.setFullYear(earliestDate.getFullYear() - 1);"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:814
+msgid "Task: Add Event Filtering"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:816
+msgid "Allow users to show/hide event types:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:818
+msgid ""
+"// In Dashboard.tsx state\n"
+"const [visibleEventTypes, setVisibleEventTypes] = useState<BRPEventType[]>"
+"([\n"
+"  'birth',\n"
+"  'marriage',\n"
+"  'address_change',\n"
+"]);\n"
+"\n"
+"// Filter events before passing to Timeline\n"
+"const filteredEvents = timelineData.events.filter((e) =>\n"
+"  visibleEventTypes.includes(e.type)\n"
+");\n"
+"\n"
+"// Add checkboxes to toggle event types\n"
+"<label>\n"
+"  <input\n"
+"    type=\"checkbox\"\n"
+"    checked={visibleEventTypes.includes('marriage')}\n"
+"    onChange={(e) => {\n"
+"      if (e.target.checked) {\n"
+"        setVisibleEventTypes([...visibleEventTypes, 'marriage']);\n"
+"      } else {\n"
+"        setVisibleEventTypes(visibleEventTypes.filter((t) => t !== "
+"'marriage'));\n"
+"      }\n"
+"    }}\n"
+"  />\n"
+"  Toon huwelijken\n"
+"</label>"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:850
+msgid "Debugging Tips"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:852
+msgid "Timeline Not Loading"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:854
+msgid "**Check browser console** for errors"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:855
+msgid "**Verify backend route** is registered:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:855
+msgid "curl http://localhost:3002/v1/health"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:859
+msgid "**Check JWT token** has `preferred_username`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:859
+msgid ""
+"// In browser console\n"
+"JSON.parse(atob(localStorage.getItem('kc_token').split('.')[1]));"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:864
+msgid "**Verify BSN mapping**:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:864
+msgid ""
+"console.log('User:', user);\n"
+"console.log('BSN:', getUserBSN(user));"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:870
+msgid "Events Not Appearing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:872
+msgid "**Check BRP API response** in Network tab"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:873
+msgid "**Verify date parsing**:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:873
+msgid ""
+"console.log('Raw date:', partner.aangaanHuwelijkPartnerschap.datum.datum);\n"
+"console.log('Parsed date:', new Date('2002-02-02'));"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:878
+msgid "**Check event extraction**:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:878
+msgid ""
+"const events = extractEvents(currentState);\n"
+"console.log('Extracted events:', events);"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:884
+msgid "Historical State Incorrect"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:886
+msgid "**Log calculation inputs**:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:886
+msgid ""
+"console.log('Current state:', currentState);\n"
+"console.log('Target date:', targetDate);\n"
+"console.log('Historical state:', historicalState);"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:892
+msgid "**Verify date comparisons**:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:892
+msgid ""
+"const marriageDate = new Date"
+"(partner.aangaanHuwelijkPartnerschap.datum.datum);\n"
+"console.log('Marriage date:', marriageDate);\n"
+"console.log('Target >= Marriage?', targetDate >= marriageDate);"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:901
+msgid "Performance Optimization"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:903
+msgid "Memoize Historical Calculations"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:905
+msgid ""
+"import { useMemo } from 'react';\n"
+"\n"
+"// In Dashboard.tsx\n"
+"const historicalState = useMemo(\n"
+"  () => calculateHistoricalState(timelineData.currentState, selectedDate),\n"
+"  [timelineData.currentState, selectedDate]\n"
+");"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:915
+msgid "Debounce Slider Updates"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:917
+msgid ""
+"import { useDebouncedCallback } from 'use-debounce';\n"
+"\n"
+"const debouncedDateChange = useDebouncedCallback(\n"
+"  (date: Date) => {\n"
+"    setSelectedDate(date);\n"
+"  },\n"
+"  100 // 100ms delay\n"
+");\n"
+"\n"
+"<Timeline onDateChange={debouncedDateChange} />"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:930
+msgid "Lazy Load Address History"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:932
+msgid ""
+"// Only fetch when user scrolls to address section\n"
+"const [addressHistory, setAddressHistory] = useState(null);\n"
+"\n"
+"useEffect(() => {\n"
+"  if (showAddressSection && !addressHistory) {\n"
+"    brpApi.getVerblijfplaatshistorie(bsn).then(setAddressHistory);\n"
+"  }\n"
+"}, [showAddressSection, addressHistory, bsn]);"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:945
+msgid "Related Documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:947
+msgid "[Feature Overview]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:948
+msgid "[Technical Architecture]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cimplementing-timeline.md:949
+msgid "[API Reference]{1}"
+msgstr ""

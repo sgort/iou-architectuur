@@ -1,0 +1,197 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:1
+msgid "RONL Ontology"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:3
+msgid ""
+"The Linked Data Explorer uses a subset of the RONL Ontology v1.0 for two "
+"features: governance validation badges and vendor service discovery."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:5
+msgid ""
+"For the full ontology specification — all 9 governance properties, the "
+"vendor vocabulary, namespace definitions, parser configuration, and UI "
+"validation rules — see:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:7
+msgid "**[CPSV Editor → References → RONL Ontology]{1}**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:11
+msgid "Properties used in the Linked Data Explorer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:13
+msgid "Governance badges"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:15
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\reference\\ronl-ontology.md:15"
+msgid "Property"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:15
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\reference\\ronl-ontology.md:15"
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:15
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\reference\\ronl-ontology.md:15"
+msgid "Used for"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:15
+msgid "`ronl:validationStatus`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:15
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\reference\\ronl-ontology.md:15"
+msgid "`xsd:string`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:15
+msgid "Badge state: `\"validated\"`, `\"in-review\"`, `\"not-validated\"`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:15
+msgid "`ronl:validatedBy`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:15
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\reference\\ronl-ontology.md:15"
+msgid "URI"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:15
+msgid ""
+"Organisation that performed validation (resolved to name via "
+"`skos:prefLabel`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:15
+msgid "`ronl:validatedAt`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:15
+msgid "`xsd:date`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:15
+msgid "Validation date shown in badge tooltip"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:15
+msgid "`ronl:validationNote`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:15
+msgid "`rdf:langString`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:15
+msgid "Optional note shown in badge tooltip"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:22
+msgid "Applied to: `cprmv:DecisionModel`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:24
+msgid "Vendor services"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:26
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\reference\\ronl-ontology.md:26"
+msgid "Property"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:26
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\reference\\ronl-ontology.md:26"
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:26
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\reference\\ronl-ontology.md:26"
+msgid "Used for"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:26
+msgid "`ronl:VendorService`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:26
+msgid "Class"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:26
+msgid "A commercial implementation of a government decision model"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:26
+msgid "`ronl:basedOn`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:26
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\reference\\ronl-ontology.md:26"
+msgid "URI"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:26
+msgid "Links vendor service to the reference `cprmv:DecisionModel`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:26
+msgid "`ronl:implementedBy`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:26
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\reference\\ronl-ontology.md:26"
+msgid "URI"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:26
+msgid "Platform URI (e.g., `<https://regels.overheid.nl/termen/Blueriq>`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:26
+msgid "`ronl:accessType`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:26
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer\\reference\\ronl-ontology.md:26"
+msgid "`xsd:string`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:26
+msgid "`\"iam-required\"`, `\"public\"`, `\"api-key\"`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:33
+msgid ""
+"Combined with `schema:provider`, `schema:url`, `schema:license`, "
+"`foaf:homepage` for contact and service details."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:37
+msgid "Namespace"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Creference%5Cronl-ontology.md:39
+msgid "@prefix ronl: <https://regels.overheid.nl/ontology#> ."
+msgstr ""

@@ -1,0 +1,484 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:1
+msgid "IOU Architecture Documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:3
+msgid ""
+"Welcome to the comprehensive documentation for the IOU Architecture "
+"Framework and the RONL ecosystem."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:7
+msgid "🆕 What's New"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:11
+msgid "**⚙️ RONL Business API — v2.9.7** · *April 2026*"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:11
+msgid "**AI Assistant — MCP providers & multi-model LLM registry**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:11
+msgid ""
+"AI Assistant extended with three independent MCP providers — CPRMV "
+"legislation (Dutch & EU law), LDE Process Library (deployed BPMN bundles, "
+"forms, document templates), and a multi-model LLM registry supporting both "
+"Claude and GPT-4o. New Procesbibliotheek section on the Home tab lets "
+"caseworkers browse deployed processes without login. IOU tab for Flevoland: "
+"use-case submission with file attachments, feedback with screenshot upload, "
+"and read-only GitLab issue lists."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:11
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:11"
+msgid "[:octicons-arrow-right-24: Full changelog]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:21
+msgid "**✏️ CPSV Editor — v1.9.3** · *February 2026*"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:21
+msgid "**DMN Syntactic Validation**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:21
+msgid ""
+"Inline [DMN validation]{1} immediately after upload: five-layer syntactic "
+"checks with severity-coded results (error / warning / info), element "
+"references, and line numbers — directly in the DMN file card."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:21
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:21"
+msgid "[:octicons-arrow-right-24: Full changelog]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:31
+msgid "**🔍 Linked Data Explorer — v1.6.0** · *April 2026*"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:31
+msgid "**Multilingualism & pending-until-Save editing**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:31
+msgid ""
+"BPMN processes, Camunda forms, and document templates now carry an optional "
+"[language and organization]{1} — set via the editor footer panel, persisted "
+"to PostgreSQL and (for BPMN) to `ronl:language` / `ronl:organization` in the "
+"XML. List panels gain a search box, a language filter, and collapsible "
+"organization groups. The deploy modal warns inline when a bundle mixes "
+"languages. Footer edits across all three editors now use a pending-until-"
+"Save model with shell → subprocess atomic propagation. Ships with the Dutch "
+"HR-capacity reference bundle (1 BPMN, 8 forms, 2 documents) demonstrating "
+"stable English DMN keys with translated labels."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:31
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:31"
+msgid "[:octicons-arrow-right-24: Full changelog]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:41
+msgid "**📜 CPRMV API — v0.4.0** · *February 2026*"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:41
+msgid "**On-the-fly Rule Retrieval**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:41
+msgid ""
+"Live retrieval and CPRMV transformation of Dutch and EU legislation from "
+"BWB, CVDR, and EU CELLAR repositories. Automatic latest-version resolution, "
+"seven output formats, definition extraction with parse patterns, and "
+"Juriconnect reference resolution."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:41"
+msgid "[:octicons-arrow-right-24: Full changelog]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:55
+msgid "What is IOU Architecture?"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:57
+msgid ""
+"The Information Architecture Framework for IOU integrates semantic web "
+"technologies, decision models, and Dutch government standards into a unified "
+"system for managing regulatory compliance and spatial planning."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:71
+msgid "Architecture Overview"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:73
+msgid ""
+"graph TB\n"
+"    subgraph \"IOU Architecture Ecosystem\"\n"
+"        A[Municipality Portal<br/>React] -->|OIDC/JWT| B[Keycloak IAM]\n"
+"        B -->|Validated Token| C[Business API<br/>Node.js]\n"
+"        C -->|REST| D[Operaton BPMN<br/>Business Rules]\n"
+"\n"
+"        E[CPSV Editor<br/>React] -->|TTL| F[TriplyDB<br/>Knowledge Graph]\n"
+"        E -->|DMN Files| D\n"
+"\n"
+"        F -->|SPARQL| G[Orchestration Service<br/>Node.js]\n"
+"        G -->|Deploy BPMN+DMN| D\n"
+"        G -->|asset storage| K[PostgreSQL<br/>lde_assets]\n"
+"\n"
+"        H[Linked Data Explorer<br/>React] -->|API Calls| G\n"
+"        H -->|Direct SPARQL| F\n"
+"\n"
+"        I[CPRMV API<br/>Python/FastAPI] -->|XML download| J[BWB / CVDR / "
+"CELLAR]\n"
+"        I -->|cprmv-json / RDF| F\n"
+"        I -->|cprmv-json / RDF| H\n"
+"    end"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:98
+msgid "Ecosystem Components"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:100
+msgid "⚙️ RONL Business API"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:102
+msgid ""
+"The core business API layer that provides secure authentication and process "
+"orchestration for Dutch government services."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:104
+msgid "**Live App**: [mijn.open-regels.nl]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:106
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:106"
+msgid "[View Documentation →]{1}{ .md-button }"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:108
+msgid "✏️ CPSV Editor"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:110
+msgid ""
+"React-based application for creating CPSV-AP 3.2.0 compliant RDF/Turtle "
+"files for Dutch government services."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:112
+msgid "**Live App**: [cpsv-editor.open-regels.nl]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:114
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:114"
+msgid "[View Documentation →]{1}{ .md-button }"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:116
+msgid "🔍 Linked Data Explorer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:118
+msgid ""
+"Web application for SPARQL queries and BPMN & DMN orchestration with "
+"TriplyDB integration."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:120
+msgid "**Live App**: [linkeddata.open-regels.nl]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:122
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:122"
+msgid "[View Documentation →]{1}{ .md-button }"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:124
+msgid "📜 CPRMV API"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:126
+msgid ""
+"Python/FastAPI service that fetches individual rules from Dutch and European "
+"legal publications on the fly, transforming them to CPRMV-structured RDF. "
+"Implements the Core Public Rule Management Vocabulary standard and hosts the "
+"CPRMV specification."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:128
+msgid "**Live App**: [cprmv.open-regels.nl/docs]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:130
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:130"
+msgid "[View Documentation →]{1}{ .md-button }"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:134
+msgid "Documentation Status"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:144
+msgid "Quick Links"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "Resource"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "Link"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "**CPSV Editor**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "[cpsv-editor.open-regels.nl]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "**Linked Data Explorer**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "[linkeddata.open-regels.nl]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "**Backend API**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "[backend.linkeddata.open-regels.nl]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "**Keycloak IAM**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "[keycloak.open-regels.nl]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "**Custom Business API**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "[api.open-regels.nl]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "**Operaton**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "[operaton.open-regels.nl]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "**CPRMV API**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:146
+msgid "[cprmv.open-regels.nl/docs]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:158
+msgid "Technology Stack"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:160
+msgid ""
+"The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built "
+"entirely on **open source technologies**:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "Component"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "Technology"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "License"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "**IAM**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "Keycloak"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162"
+msgid "Apache 2.0"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "**BPMN Engine**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "Operaton"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "**Backend**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "Node.js + Express"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162"
+msgid "MIT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "**Frontend**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "React"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "**Database**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "PostgreSQL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "PostgreSQL License"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "**Cache**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "Redis"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "BSD 3-Clause"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "**Reverse Proxy**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "Caddy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "**Knowledge Graph**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "TriplyDB"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162"
+msgid "-"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "**Document Mngmnt**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "eDOCS"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "**Rule API**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "Python / FastAPI"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:162
+msgid "EUPL-1.2"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:177
+msgid "Standards Compliance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:179
+msgid "**CPSV-AP 3.2.0** - EU Public Service Vocabulary"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:180
+msgid "**CPRMV** - Core Public Rule Management Vocabulary"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:181
+msgid "**RONL** - Dutch Rules Vocabulary"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:182
+msgid "**BIO** - Baseline Informatiebeveiliging Overheid"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:183
+msgid "**NEN 7510** - Healthcare information security"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:184
+msgid "**AVG/GDPR** - Data protection"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:188
+msgid "Contributing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:190
+msgid "We welcome contributions! See the [Contributing Guide]{1} for details."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/index.md:194
+msgid ""
+"**Documentation Version**: 1.0\n"
+"**Last Updated**: February 2026\n"
+"**License**: EUPL v1.2"
+msgstr ""

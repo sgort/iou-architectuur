@@ -1,0 +1,229 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:1
+msgid "Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:3
+msgid ""
+"The Linked Data Explorer is a monorepo with two packages: a React frontend "
+"SPA and a Node.js/Express backend API. The frontend renders in the browser; "
+"the backend handles SPARQL queries, Operaton calls, and chain orchestration."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:7
+msgid "System architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:9
+msgid ""
+"Browser\n"
+"  └── Frontend (React + TypeScript, Azure Static Web Apps)\n"
+"            │ HTTPS/REST\n"
+"  └── Backend (Node.js + Express, Azure App Service)\n"
+"            ├── SPARQL ──────► TriplyDB (knowledge graph)\n"
+"            └── REST API ────► Operaton (DMN execution engine)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:18
+msgid ""
+"The frontend never calls TriplyDB or Operaton directly in production. All "
+"calls go through the backend, which handles authentication, CORS, caching, "
+"and variable orchestration. In local development, the frontend can also use "
+"a CORS proxy fallback for public SPARQL endpoints."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:22
+msgid "Frontend architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:24
+msgid ""
+"The frontend is a single-page application with no routing library. "
+"Navigation state is managed as an enum (`ViewMode`) in the top-level "
+"`App.tsx`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:26
+msgid ""
+"App.tsx\n"
+"├── Sidebar navigation (ViewMode selector)\n"
+"├── QueryEditor view\n"
+"│   ├── SparqlEditor (query input)\n"
+"│   ├── ResultsTable (tabular results)\n"
+"│   └── GraphView (D3.js force-directed graph)\n"
+"├── ChainBuilder view\n"
+"│   ├── DmnList (available DMNs, left panel)\n"
+"│   ├── ChainComposer (drag-drop zone, centre panel)\n"
+"│   │   └── SemanticAnalysis tab\n"
+"│   ├── ChainConfig (inputs + execution, right panel)\n"
+"│   │   ├── InputForm\n"
+"│   │   ├── ExecutionProgress\n"
+"│   │   ├── ChainResults\n"
+"│   │   └── ExportChain (JSON / BPMN 2.0)\n"
+"│   └── ValidationPanel\n"
+"├── BpmnModeler view\n"
+"│   ├── ProcessList (left panel)\n"
+"│   ├── BpmnCanvas (bpmn-js wrapper, centre)\n"
+"│   │   └── Deploy modal (one-click Operaton deployment)\n"
+"│   └── BpmnProperties (right panel)\n"
+"│       ├── DmnTemplateSelector (BusinessRuleTask)\n"
+"│       └── FormTemplateSelector (UserTask / StartEvent)  ← new in v1.0.0\n"
+"├── FormEditor view                                       ← new in v1.0.0\n"
+"│   ├── FormList (left panel)\n"
+"│   └── FormCanvas (@bpmn-io/form-js editor, centre)\n"
+"└── Changelog / Help view"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:56
+msgid ""
+"The `FormEditor` view and `BpmnModeler` view share the `FormService` "
+"localStorage layer — forms authored in `FormEditor` are immediately "
+"available to `FormTemplateSelector` in the BPMN properties panel with no "
+"explicit synchronisation step."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:58
+msgid ""
+"State is managed with React hooks at the component level. There is no global "
+"state library. The `templateService.ts` utility provides the only persistent "
+"state — localStorage CRUD for chain templates and BPMN processes."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:62
+msgid "Backend architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:64
+msgid ""
+"The backend is a structured Express application following the Dutch "
+"Government API Design Rules (API-20, API-57)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:66
+msgid ""
+"src/\n"
+"├── index.ts              entry point, server startup\n"
+"├── routes/\n"
+"│   ├── index.ts          registers all route groups\n"
+"│   ├── dmn.routes.ts     GET /v1/dmns, /v1/dmns/chains, /v1/dmns/semantic-"
+"equivalences\n"
+"│   ├── chain.routes.ts   POST /v1/chains/execute, POST /v1/chains/export\n"
+"│   ├── triplydb.routes.ts POST /v1/triplydb/query\n"
+"│   └── health.routes.ts  GET /v1/health\n"
+"├── services/\n"
+"│   ├── sparql.service.ts       SPARQL queries against TriplyDB\n"
+"│   ├── operaton.service.ts     Operaton REST API calls\n"
+"│   ├── orchestration.service.ts chain execution and variable mapping\n"
+"│   └── triplydb.service.ts     direct TriplyDB proxy (dynamic endpoints)\n"
+"├── middleware/\n"
+"│   ├── cors.ts\n"
+"│   └── errorHandler.ts\n"
+"└── utils/\n"
+"    ├── logger.ts         Winston structured logging\n"
+"    └── config.ts         environment config with validation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:88
+msgid ""
+"Legacy `/api/*` routes exist with deprecation headers for backward "
+"compatibility. All new work uses `/v1/*`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:92
+msgid "Data flow — chain execution"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:94
+msgid ""
+"1. Frontend POST /v1/chains/execute\n"
+"   { chain: [dmnId1, dmnId2], inputs: {...}, endpoint: \"...\" }\n"
+"\n"
+"2. orchestration.service.ts\n"
+"   for each DMN in chain:\n"
+"     a. sparql.service.ts → fetch DMN metadata from TriplyDB (cached 5 min)\n"
+"     b. Flatten previous step outputs into current step inputs\n"
+"     c. operaton.service.ts → POST /engine-rest/decision-definition/key/{id}/"
+"evaluate\n"
+"     d. Collect and flatten results\n"
+"\n"
+"3. Return combined results to frontend"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:110
+msgid "Caching"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:112
+msgid ""
+"The backend caches DMN metadata per endpoint with a 5-minute TTL. The cache "
+"key is the endpoint URL. Switching endpoints in the frontend bypasses the "
+"cache and triggers a fresh SPARQL query."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:116
+msgid "Environment variables"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:118
+msgid "See [Deployment]{1} for the full list. Key variables:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:120
+msgid "Variable"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:120
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:120
+msgid "`TRIPLYDB_ENDPOINT`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:120
+msgid "Default SPARQL endpoint URL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:120
+msgid "`OPERATON_BASE_URL`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:120
+msgid "Operaton engine REST base URL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:120
+msgid "`CORS_ORIGIN`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:120
+msgid "Comma-separated list of allowed frontend origins"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:120
+msgid "`NODE_ENV`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:120
+msgid "`development`, `acceptance`, or `production`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:120
+msgid "`PORT`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Carchitecture.md:120
+msgid "Backend listen port (default 3001 local, 8080 Azure)"
+msgstr ""

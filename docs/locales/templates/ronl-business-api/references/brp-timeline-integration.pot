@@ -1,0 +1,1130 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:1
+msgid "BRP Timeline Integration - Technical Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:5
+msgid "Architecture Overview"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:7
+msgid ""
+"┌────────────────────────────────────────────────────────────────┐\n"
+"│                      Browser (Citizen)                         │\n"
+"│  ┌──────────────────────────────────────────────────────────┐  │\n"
+"│  │          Municipality Frontend (React)                   │  │\n"
+"│  │  ┌────────────┐  ┌──────────────┐  ┌──────────────────┐  │  │\n"
+"│  │  │  Timeline  │  │  BRP Service │  │ Historical State │  │  │\n"
+"│  │  │ Component  │→ │   (brp.api)  │→ │   Calculation    │  │  │\n"
+"│  │  └────────────┘  └──────────────┘  └──────────────────┘  │  │\n"
+"│  └────────────────────────┬─────────────────────────────────┘  │\n"
+"│                           │ JWT Token                          │\n"
+"└───────────────────────────┼────────────────────────────────────┘\n"
+"                            │ HTTPS\n"
+"                            ↓\n"
+"┌───────────────────────────────────────────────────────────────┐\n"
+"│                Business API (Node.js/Express)                 │\n"
+"│  ┌─────────────────────────────────────────────────────────┐  │\n"
+"│  │  POST /v1/brp/personen (Proxy Route)                    │  │\n"
+"│  │  ┌──────────────┐  ┌────────────┐  ┌────────────────┐   │  │\n"
+"│  │  │ JWT Validate │→ │ Audit Log  │→ │ Forward to BRP │   │  │\n"
+"│  │  └──────────────┘  └────────────┘  └────────────────┘   │  │\n"
+"│  └─────────────────────────┬───────────────────────────────┘  │\n"
+"└────────────────────────────┼──────────────────────────────────┘\n"
+"                             │ HTTPS\n"
+"                             ↓\n"
+"┌───────────────────────────────────────────────────────────────┐\n"
+"│          BRP API (Haal Centraal - External Service)           │\n"
+"│              https://brp-api-mock.open-regels.nl              │\n"
+"└───────────────────────────────────────────────────────────────┘"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:40
+msgid "Component Structure"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:42
+msgid "Frontend Components"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:44
+msgid ""
+"packages/frontend/src/\n"
+"├── components/\n"
+"│   ├── Timeline.tsx              # Interactive timeline UI\n"
+"│   └── PersonalDataPanel.tsx     # Dynamic data display\n"
+"├── services/\n"
+"│   ├── brp.api.ts               # BRP API client (via proxy)\n"
+"│   ├── brp.timeline.ts          # Timeline logic & state calculation\n"
+"│   └── bsn.mapping.ts           # Test user BSN mapping\n"
+"├── types/\n"
+"│   └── brp.types.ts             # BRP data type definitions\n"
+"└── pages/\n"
+"    └── Dashboard.tsx            # Main page with timeline toggle"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:59
+msgid "Backend Routes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:61
+msgid ""
+"packages/backend/src/\n"
+"└── routes/\n"
+"    └── brp.routes.ts            # POST /v1/brp/personen proxy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:69
+msgid "Data Flow"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:71
+msgid "1. Timeline Initialization"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:73
+msgid ""
+"User clicks \"Toon Tijdlijn\"\n"
+"    ↓\n"
+"Dashboard.tsx triggers useEffect\n"
+"    ↓\n"
+"getUserBSN(user) → Maps username to BSN (test env)\n"
+"    ↓\n"
+"getPersonTimeline(bsn) called\n"
+"    ↓\n"
+"brpApi.getPersonByBSN(bsn)\n"
+"    ↓\n"
+"POST https://acc.api.open-regels.nl/v1/brp/personen\n"
+"    ↓\n"
+"Backend validates JWT, logs, forwards to BRP API\n"
+"    ↓\n"
+"BRP API returns current person data\n"
+"    ↓\n"
+"extractEvents() finds life events from data\n"
+"    ↓\n"
+"Timeline component renders with events"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:95
+msgid "2. Date Selection & State Update"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:97
+msgid ""
+"User drags slider or clicks event button\n"
+"    ↓\n"
+"Timeline.onDateChange(newDate) triggered\n"
+"    ↓\n"
+"Dashboard updates selectedDate state\n"
+"    ↓\n"
+"calculateHistoricalState(currentState, targetDate)\n"
+"    ↓\n"
+"Filter partner: targetDate >= marriageDate?\n"
+"Filter children: targetDate >= birthDate?\n"
+"Update ages: Math.floor((targetDate - birthDate) / year)\n"
+"    ↓\n"
+"PersonalDataPanel re-renders with historical data"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:115
+msgid "Backend Proxy Implementation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:117
+msgid "Why We Need a Proxy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:119
+msgid ""
+"**Problem:** Browser CORS policy blocks direct calls from `localhost:5173` "
+"to `brp-api-mock.open-regels.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:121
+msgid "**Solution:** Route through our backend which:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:123
+msgid "Accepts authenticated frontend requests"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:124
+msgid "Validates JWT tokens"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:125
+msgid "Logs all requests for audit"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:126
+msgid "Forwards to BRP API"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:127
+msgid "Returns sanitized responses"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:129
+msgid "Route Implementation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:131
+msgid "**File:** `packages/backend/src/routes/brp.routes.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:133
+msgid ""
+"import express, { Request, Response } from 'express';\n"
+"import axios from 'axios';\n"
+"import jwtMiddleware from '../auth/jwt.middleware';\n"
+"import { auditLog } from '../middleware/audit.middleware';\n"
+"import { createLogger } from '../utils/logger';\n"
+"\n"
+"const router = express.Router();\n"
+"const logger = createLogger('brp-routes');\n"
+"\n"
+"const BRP_API_BASE_URL = 'https://brp-api-mock.open-regels.nl/haalcentraal/"
+"api/brp';\n"
+"\n"
+"router.post('/personen', jwtMiddleware, async (req: Request, res: Response) "
+"=> {\n"
+"  try {\n"
+"    // Log request\n"
+"    logger.info('BRP personen request', {\n"
+"      userId: req.user?.userId,\n"
+"      tenantId: req.user?.tenantId,\n"
+"      requestBody: req.body,\n"
+"    });\n"
+"\n"
+"    // Forward to BRP API\n"
+"    const response = await axios.post(`${BRP_API_BASE_URL}/personen`, "
+"req.body, {\n"
+"      headers: {\n"
+"        'Content-Type': 'application/json; charset=utf-8',\n"
+"        'Accept': 'application/json',\n"
+"      },\n"
+"      timeout: 10000,\n"
+"      validateStatus: (status) => status < 500,\n"
+"    });\n"
+"\n"
+"    // Check response status\n"
+"    if (response.status >= 400) {\n"
+"      logger.error('BRP API returned error', {\n"
+"        status: response.status,\n"
+"        data: response.data,\n"
+"      });\n"
+"      \n"
+"      return res.status(response.status).json({\n"
+"        success: false,\n"
+"        error: {\n"
+"          code: 'BRP_API_ERROR',\n"
+"          message: 'BRP API returned an error',\n"
+"          details: response.data,\n"
+"        },\n"
+"      });\n"
+"    }\n"
+"\n"
+"    // Audit log success\n"
+"    auditLog(req, 'brp.personen.fetch', 'success', {\n"
+"      bsn: req.body.burgerservicenummer?.[0],\n"
+"    });\n"
+"\n"
+"    // Return data\n"
+"    res.json({\n"
+"      success: true,\n"
+"      data: response.data,\n"
+"    });\n"
+"  } catch (error) {\n"
+"    logger.error('BRP API request failed', {\n"
+"      error: error instanceof Error ? error.message : 'Unknown error',\n"
+"      userId: req.user?.userId,\n"
+"    });\n"
+"\n"
+"    auditLog(req, 'brp.personen.fetch', 'error', {\n"
+"      error: error instanceof Error ? error.message : 'Unknown error',\n"
+"    });\n"
+"\n"
+"    res.status(500).json({\n"
+"      success: false,\n"
+"      error: {\n"
+"        code: 'BRP_API_ERROR',\n"
+"        message: 'BRP API request failed',\n"
+"      },\n"
+"    });\n"
+"  }\n"
+"});\n"
+"\n"
+"export default router;"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:214
+msgid "**Registration in `packages/backend/src/index.ts`:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:216
+msgid ""
+"import brpRoutes from './routes/brp.routes';\n"
+"\n"
+"// ... other routes ...\n"
+"\n"
+"app.use('/v1/brp', brpRoutes);"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:226
+msgid "Historical State Calculation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:228
+msgid "Algorithm"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:230
+msgid ""
+"The timeline doesn't store historical snapshots. Instead, it **derives** "
+"historical state from:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:231
+msgid "Current BRP data (source of truth)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:232
+msgid "Event dates (marriage, births)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:233
+msgid "Selected target date"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:235
+msgid "Implementation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:237
+msgid "**File:** `packages/frontend/src/services/brp.timeline.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:239
+msgid ""
+"export function calculateHistoricalState(\n"
+"  currentState: PersonState,\n"
+"  targetDate: Date\n"
+"): PersonState | null {\n"
+"  const birthDate = new Date(currentState.geboorte.datum.datum);\n"
+"  \n"
+"  // Person not born yet\n"
+"  if (targetDate < birthDate) {\n"
+"    return null;\n"
+"  }\n"
+"\n"
+"  // Calculate age at target date\n"
+"  const age = Math.floor(\n"
+"    (targetDate.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24 * "
+"365.25)\n"
+"  );\n"
+"\n"
+"  // Start with basic person data\n"
+"  const historicalState: PersonState = {\n"
+"    ...currentState,\n"
+"    leeftijd: age,\n"
+"  };\n"
+"\n"
+"  // Filter partners based on marriage date\n"
+"  if (currentState.partners && currentState.partners.length > 0) {\n"
+"    historicalState.partners = currentState.partners.filter((partner) => {\n"
+"      const marriageDate = new Date"
+"(partner.aangaanHuwelijkPartnerschap.datum.datum);\n"
+"      return targetDate >= marriageDate;\n"
+"    });\n"
+"\n"
+"    if (historicalState.partners.length === 0) {\n"
+"      delete historicalState.partners; // Hide section if no partners at "
+"this date\n"
+"    }\n"
+"  }\n"
+"\n"
+"  // Filter children and update ages\n"
+"  if (currentState.kinderen && currentState.kinderen.length > 0) {\n"
+"    historicalState.kinderen = currentState.kinderen\n"
+"      .filter((kind) => {\n"
+"        const childBirthDate = new Date(kind.geboorte.datum.datum);\n"
+"        return targetDate >= childBirthDate;\n"
+"      })\n"
+"      .map((kind) => {\n"
+"        const childBirthDate = new Date(kind.geboorte.datum.datum);\n"
+"        const childAge = Math.floor(\n"
+"          (targetDate.getTime() - childBirthDate.getTime()) / (1000 * 60 * "
+"60 * 24 * 365.25)\n"
+"        );\n"
+"        return {\n"
+"          ...kind,\n"
+"          leeftijd: childAge >= 0 ? childAge : undefined,\n"
+"        };\n"
+"      });\n"
+"\n"
+"    if (historicalState.kinderen.length === 0) {\n"
+"      delete historicalState.kinderen; // Hide section if no children at "
+"this date\n"
+"    }\n"
+"  }\n"
+"\n"
+"  return historicalState;\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:301
+msgid "Event Extraction"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:303
+msgid ""
+"export function extractEvents(personState: PersonState): BRPEvent[] {\n"
+"  const events: BRPEvent[] = [];\n"
+"\n"
+"  // Birth event\n"
+"  events.push({\n"
+"    id: 'birth',\n"
+"    type: 'birth',\n"
+"    date: new Date(personState.geboorte.datum.datum),\n"
+"    label: 'Geboren',\n"
+"    description: `Geboorte ${personState.naam.volledigeNaam}`,\n"
+"  });\n"
+"\n"
+"  // Marriage events\n"
+"  if (personState.partners) {\n"
+"    personState.partners.forEach((partner, idx) => {\n"
+"      events.push({\n"
+"        id: `marriage-${idx}`,\n"
+"        type: 'marriage',\n"
+"        date: new Date(partner.aangaanHuwelijkPartnerschap.datum.datum),\n"
+"        label: 'Getrouwd',\n"
+"        description: `Huwelijk met ${partner.naam.voornamen} $"
+"{partner.naam.geslachtsnaam}`,\n"
+"      });\n"
+"    });\n"
+"  }\n"
+"\n"
+"  // Children birth events (grouped by date for twins/triplets)\n"
+"  if (personState.kinderen) {\n"
+"    const childrenByDate = new Map<string, typeof personState.kinderen>();\n"
+"    \n"
+"    personState.kinderen.forEach((kind) => {\n"
+"      const dateKey = kind.geboorte.datum.datum;\n"
+"      if (!childrenByDate.has(dateKey)) {\n"
+"        childrenByDate.set(dateKey, []);\n"
+"      }\n"
+"      childrenByDate.get(dateKey)!.push(kind);\n"
+"    });\n"
+"\n"
+"    childrenByDate.forEach((children, dateKey) => {\n"
+"      const birthDate = new Date(dateKey);\n"
+"      \n"
+"      if (children.length === 1) {\n"
+"        events.push({\n"
+"          id: `child-birth-${children[0].burgerservicenummer}`,\n"
+"          type: 'birth',\n"
+"          date: birthDate,\n"
+"          label: 'Kind geboren',\n"
+"          description: `Geboorte ${children[0].naam.voornamen}`,\n"
+"        });\n"
+"      } else {\n"
+"        const count = children.length === 2 ? 'tweeling' : children.length "
+"=== 3 ? 'drieling' : `${children.length}-ling`;\n"
+"        events.push({\n"
+"          id: `child-birth-${dateKey}`,\n"
+"          type: 'birth',\n"
+"          date: birthDate,\n"
+"          label: `Kinderen geboren (${count})`,\n"
+"          description: `Geboorte ${children.map((k) => k.naam.voornamen).join"
+"(', ')}`,\n"
+"        });\n"
+"      }\n"
+"    });\n"
+"  }\n"
+"\n"
+"  return events.sort((a, b) => a.date.getTime() - b.date.getTime());\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:371
+msgid "BSN Mapping for Test Environment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:373
+msgid ""
+"In production, BSN comes from DigiD via Keycloak. For testing, we map "
+"usernames to BSNs."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:375
+msgid "**File:** `packages/frontend/src/services/bsn.mapping.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:377
+msgid ""
+"/**\n"
+" * Maps Keycloak test usernames to BSN numbers for BRP API demo\n"
+" */\n"
+"const testUserBSNMapping: Record<string, string> = {\n"
+"  'test-citizen-utrecht': '999992235',      // Wessel Kooyman\n"
+"  'test-citizen-amsterdam': '999992235',\n"
+"  'test-citizen-rotterdam': '999992235',\n"
+"  'test-citizen-denhaag': '999992235',\n"
+"  'test-caseworker-utrecht': '999992235',\n"
+"  'test-caseworker-amsterdam': '999992235',\n"
+"  'test-caseworker-rotterdam': '999992235',\n"
+"  'test-caseworker-denhaag': '999992235',\n"
+"};\n"
+"\n"
+"/**\n"
+" * Municipality fallback mapping (when preferred_username missing)\n"
+" */\n"
+"const municipalityBSNMapping: Record<string, string> = {\n"
+"  'utrecht': '999992235',\n"
+"  'amsterdam': '999992235',\n"
+"  'rotterdam': '999992235',\n"
+"  'denhaag': '999992235',\n"
+"};\n"
+"\n"
+"export function getUserBSN(user: { \n"
+"  sub: string; \n"
+"  preferred_username?: string; \n"
+"  bsn?: string; \n"
+"  municipality?: string;\n"
+"}): string | null {\n"
+"  // 1. Production: BSN from DigiD in JWT\n"
+"  if (user.bsn) {\n"
+"    return user.bsn;\n"
+"  }\n"
+"\n"
+"  // 2. Test: Username mapping\n"
+"  if (user.preferred_username && user.preferred_username in "
+"testUserBSNMapping) {\n"
+"    return testUserBSNMapping[user.preferred_username];\n"
+"  }\n"
+"\n"
+"  // 3. Fallback: Municipality mapping\n"
+"  if (user.municipality && user.municipality in municipalityBSNMapping) {\n"
+"    console.log(`Using municipality-based BSN mapping for $"
+"{user.municipality}`);\n"
+"    return municipalityBSNMapping[user.municipality];\n"
+"  }\n"
+"\n"
+"  console.warn('No BSN found for user', user);\n"
+"  return null;\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:431
+msgid "Security Considerations"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:433
+msgid "Authentication & Authorization"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:435
+msgid ""
+"**JWT Validation** - All `/v1/brp/personen` requests require valid JWT token"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:436
+msgid ""
+"**User Context** - BSN derived from authenticated user (no arbitrary BSN "
+"queries)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:437
+msgid ""
+"**Audit Logging** - All BRP requests logged with userId, tenantId, timestamp"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:438
+msgid ""
+"**Rate Limiting** - Inherited from Business API rate limits (per-tenant)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:440
+msgid "Privacy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:442
+msgid ""
+"**No Data Storage** - Timeline calculations done client-side, no persistence"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:443
+msgid "**Personal Data Only** - Users can only access their own BRP data"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:444
+msgid "**Encrypted Transit** - All communication over HTTPS"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:445
+msgid "**Audit Trail** - 7-year retention for compliance (AVG/GDPR)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:447
+msgid "DigiD Integration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:449
+msgid "For production with real DigiD:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:451
+msgid ""
+"**LoA Requirement** - Timeline requires DigiD LoA \"hoog\" (substantial "
+"assurance)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:452
+msgid "**BSN in Token** - DigiD provides BSN via SAML → Keycloak → JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:453
+msgid "**Session Management** - Keycloak handles DigiD session timeout"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:454
+msgid ""
+"**Mandate Support** - (Future) Representatives can view citizen timelines "
+"with proper mandate"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:458
+msgid "Performance Considerations"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:460
+msgid "Caching Strategy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:462
+msgid "**Current:** No caching (real-time BRP data)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:464
+msgid "**Future Optimization:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:466
+msgid "Cache BRP responses for 5 minutes (Redis)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:467
+msgid "Invalidate on known events (marriage registration, birth)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:468
+msgid "Cache key: `brp:person:${bsn}`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:470
+msgid "Load Times"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:472
+msgid "Typical timeline load:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:474
+msgid "BRP API call: ~500-1000ms"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:475
+msgid "Event extraction: <10ms"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:476
+msgid "Historical state calculation: <5ms per date change"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:477
+msgid "Total initial load: ~1-1.5 seconds"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:479
+msgid "Scalability"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:481
+msgid "**Backend Proxy** - Stateless, horizontally scalable"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:482
+msgid "**BRP API** - External service, rate limits apply"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:483
+msgid "**Client Calculation** - No server load for date changes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:487
+msgid "Error Handling"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:489
+msgid "Frontend"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:491
+msgid ""
+"try {\n"
+"  const data = await getPersonTimeline(bsn);\n"
+"  setTimelineData(data);\n"
+"} catch (error) {\n"
+"  console.error('Failed to load timeline:', error);\n"
+"  // Show user-friendly error message\n"
+"  setIsLoadingTimeline(false);\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:502
+msgid "Backend"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:504
+msgid ""
+"// Axios errors from BRP API\n"
+"if (axios.isAxiosError(error)) {\n"
+"  const status = error.response?.status || 500;\n"
+"  const message = error.response?.data?.message || error.message;\n"
+"  return res.status(status).json({\n"
+"    success: false,\n"
+"    error: { code: 'BRP_API_ERROR', message },\n"
+"  });\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:516
+msgid "Common Errors"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "Error"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "Cause"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "Solution"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "406 Not Acceptable"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "Missing Accept header"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "Added explicit `Accept: application/json`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "401 Unauthorized"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "Invalid/expired JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "User must re-login"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "404 Not Found"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "BSN not in BRP"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "Verify BSN mapping"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "500 Server Error"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "BRP API down"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "Retry or show maintenance message"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "Network Error"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "CORS or connectivity"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:518
+msgid "Check proxy configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:528
+msgid "Configuration Changes Required"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:530
+msgid "1. Keycloak Protocol Mapper"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:532
+msgid "**Add `preferred_username` to JWT token:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:534
+msgid "Keycloak Admin Console → Realms → `ronl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:535
+msgid "Clients → `ronl-business-api`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:536
+msgid "Client scopes → `ronl-business-api-dedicated`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:537
+msgid "Mappers → Add mapper → By configuration → User Property"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:538
+msgid "Configure:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:538
+msgid "**Name**: `username`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:538
+msgid "**Property**: `username`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:538
+msgid "**Token Claim Name**: `preferred_username`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:538
+msgid "**Claim JSON Type**: `String`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:538
+msgid "**Add to ID token**: ON"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:538
+msgid "**Add to access token**: ON"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:538
+msgid "**Add to userinfo**: ON"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:546
+msgid "Save"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:548
+msgid ""
+"**Why:** Frontend needs `preferred_username` to map test users to BSN "
+"numbers."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:550
+msgid "2. Backend TypeScript Configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:552
+msgid "**Remove `composite: true` from `packages/backend/tsconfig.json`:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:554
+msgid ""
+"{\n"
+"  \"compilerOptions\": {\n"
+"    // ... all existing settings ...\n"
+"    // ❌ REMOVE THIS LINE:\n"
+"    // \"composite\": true\n"
+"  },\n"
+"  \"include\": [\"src/**/*\", \"package.json\"],\n"
+"  \"exclude\": [\"node_modules\", \"dist\", \"tests\"]\n"
+"  // ❌ REMOVE THIS LINE:\n"
+"  // \"references\": [{ \"path\": \"../shared\" }]\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:568
+msgid ""
+"**Why:** Project references caused type-checking errors. The path alias "
+"`\"@ronl/shared\": [\"../shared/src\"]` was removed, and imports now resolve "
+"via npm workspaces to the compiled `dist` folder."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:570
+msgid "3. Shared Package TypeScript Configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:572
+msgid "**`packages/shared/tsconfig.json` - Keep simple:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:574
+msgid ""
+"{\n"
+"  \"compilerOptions\": {\n"
+"    \"target\": \"ES2022\",\n"
+"    \"module\": \"commonjs\",\n"
+"    \"lib\": [\"ES2022\"],\n"
+"    \"outDir\": \"./dist\",\n"
+"    \"rootDir\": \"./src\",\n"
+"    \"declaration\": true,\n"
+"    \"declarationMap\": true,\n"
+"    \"sourceMap\": true,\n"
+"    \"strict\": true,\n"
+"    \"esModuleInterop\": true,\n"
+"    \"skipLibCheck\": true,\n"
+"    \"forceConsistentCasingInFileNames\": true,\n"
+"    \"resolveJsonModule\": true,\n"
+"    \"moduleResolution\": \"node\"\n"
+"    // ❌ NO composite: true\n"
+"  },\n"
+"  \"include\": [\"src/**/*\"],\n"
+"  \"exclude\": [\"node_modules\", \"dist\"]\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:598
+msgid ""
+"**Why:** The `composite: true` setting was preventing proper `.d.ts` file "
+"generation."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:602
+msgid "Deployment Notes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:604
+msgid "Manual Backend Deployment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:606
+msgid ""
+"# 1. Rebuild shared package (important after type changes)\n"
+"cd packages/shared\n"
+"npm run build\n"
+"\n"
+"# 2. Build backend\n"
+"cd ../backend\n"
+"npm run build\n"
+"\n"
+"# 3. Prepare deployment package\n"
+"mkdir -p deploy\n"
+"cp -r dist deploy/\n"
+"cp package.json deploy/\n"
+"mkdir -p deploy/node_modules/@ronl\n"
+"cp -r ../shared/dist deploy/node_modules/@ronl/shared\n"
+"cp ../shared/package.json deploy/node_modules/@ronl/shared/\n"
+"\n"
+"# 4. Install production dependencies\n"
+"cd deploy && npm install --production --omit=dev && cd ..\n"
+"\n"
+"# 5. Create zip and deploy\n"
+"cd deploy\n"
+"zip -r ../deployment-acc.zip .\n"
+"cd ..\n"
+"\n"
+"az webapp deploy \\\n"
+"  --name ronl-business-api-acc \\\n"
+"  --resource-group rg-ronl-acc \\\n"
+"  --src-path deployment-acc.zip \\\n"
+"  --type zip\n"
+"\n"
+"# 6. Cleanup\n"
+"rm -rf deploy deployment-acc.zip"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:641
+msgid "Frontend Deployment Workflow"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:643
+msgid "**Update `.github/workflows/azure-frontend-acc.yml`:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:645
+msgid ""
+"- name: Update API URLs for ACC\n"
+"  working-directory: packages/frontend\n"
+"  run: |\n"
+"    sed -i \"s|http://localhost:3002/v1|https://acc.api.open-regels.nl/"
+"v1|g\" src/services/api.ts\n"
+"    sed -i \"s|http://localhost:3002/v1|https://acc.api.open-regels.nl/"
+"v1|g\" src/services/brp.api.ts\n"
+"    sed -i \"s|http://localhost:8080|https://acc.keycloak.open-regels.nl|g\" "
+"src/services/keycloak.ts"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:654
+msgid ""
+"**Why:** The new `brp.api.ts` file also contains `localhost:3002` URLs that "
+"need to be replaced."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:658
+msgid "Testing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:660
+msgid "Local Testing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:662
+msgid ""
+"# 1. Start backend (with BRP routes registered)\n"
+"cd packages/backend\n"
+"npm run dev\n"
+"\n"
+"# 2. Start frontend\n"
+"cd packages/frontend\n"
+"npm run dev\n"
+"\n"
+"# 3. Login as test-citizen-utrecht\n"
+"# 4. Click \"Toon Tijdlijn\"\n"
+"# 5. Verify timeline loads with 3 events\n"
+"# 6. Drag slider and verify data updates"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:677
+msgid "ACC Testing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:679
+msgid ""
+"# Test BRP proxy endpoint\n"
+"curl -X POST https://acc.api.open-regels.nl/v1/brp/personen \\\n"
+"  -H \"Authorization: Bearer YOUR_JWT_TOKEN\" \\\n"
+"  -H \"Content-Type: application/json\" \\\n"
+"  -d '{\n"
+"    \"type\": \"RaadpleegMetBurgerservicenummer\",\n"
+"    \"burgerservicenummer\": [\"999992235\"],\n"
+"    \"fields\": "
+"[\"burgerservicenummer\",\"naam\",\"geboorte\",\"partners\",\"kinderen\",\"leeftijd\"]\n"
+"  }'"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:693
+msgid "Future Enhancements"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:695
+msgid "1. Verblijfplaatshistorie Integration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:697
+msgid "Add address history to timeline:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:699
+msgid ""
+"// New endpoint: POST /v1/brp/verblijfplaatshistorie\n"
+"router.post('/verblijfplaatshistorie', jwtMiddleware, async (req, res) => {\n"
+"  // Forward to BRP verblijfplaatshistorie API\n"
+"});\n"
+"\n"
+"// Extract address events\n"
+"function extractAddressEvents(verblijfplaatshistorie): BRPEvent[] {\n"
+"  return verblijfplaatshistorie.map(vp => ({\n"
+"    type: 'address_change',\n"
+"    date: new Date(vp.datumVan.datum),\n"
+"    label: 'Verhuizing',\n"
+"    description: `Verhuisd naar ${vp.verblijfadres.straat}`,\n"
+"  }));\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:716
+msgid "2. Cached BRP Data"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:718
+msgid "Implement Redis caching:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:720
+msgid ""
+"// Cache BRP responses for 5 minutes\n"
+"const cacheKey = `brp:person:${bsn}`;\n"
+"const cached = await redis.get(cacheKey);\n"
+"\n"
+"if (cached) {\n"
+"  return JSON.parse(cached);\n"
+"}\n"
+"\n"
+"const data = await brpApi.getPersonByBSN(bsn);\n"
+"await redis.setex(cacheKey, 300, JSON.stringify(data)); // 5 min TTL\n"
+"return data;"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:734
+msgid "3. Historical Application Data"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:736
+msgid "Store zorgtoeslag calculations:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:738
+msgid ""
+"// Link timeline to historical applications\n"
+"interface HistoricalApplication {\n"
+"  date: Date;\n"
+"  type: 'zorgtoeslag' | 'kinderbijslag';\n"
+"  amount: number;\n"
+"  status: 'approved' | 'denied';\n"
+"}\n"
+"\n"
+"// Show on timeline as events"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:752
+msgid "Related Documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:754
+msgid "[Feature Overview]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:755
+msgid "[Developer Guide]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cbrp-timeline-integration.md:756
+msgid "[API Reference]{1}"
+msgstr ""

@@ -1,0 +1,179 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:1
+msgid "DMN Discovery & Chain Building"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:3
+msgid ""
+"The Chain Builder is the central feature of the Linked Data Explorer. It "
+"queries the active TriplyDB endpoint for all published DMN decision models, "
+"displays them with their input and output variables, and lets you compose "
+"them into executable chains."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:12
+msgid "DMN discovery"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:14
+msgid ""
+"When you open the Chain Builder, it queries TriplyDB using the CPRMV "
+"vocabulary to find all published `cprmv:DecisionModel` resources. Each model "
+"appears as a card in the **Available DMNs** panel showing its title, "
+"identifier, variable counts, and publishing organisation. A real-time search "
+"field filters the list by title or identifier."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:16
+msgid ""
+"Expanding a card reveals its full variable list: input variables in blue, "
+"output variables in green, each with its name, identifier, and datatype "
+"(`Integer`, `String`, `Boolean`, `Date`)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:20
+msgid "Chain composition"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:22
+msgid ""
+"Drag a DMN card from the Available DMNs panel into the **Chain Composer** to "
+"add it to your chain. Cards stack vertically in execution order. The "
+"composer evaluates variable compatibility in real time:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:24
+msgid ""
+"If an output variable of the preceding DMN matches the input identifier of "
+"the next DMN exactly, the connection is **DRD-compatible** — the chain can "
+"be saved as a unified Decision Requirements Diagram."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:25
+msgid ""
+"If the match is only via `skos:exactMatch` semantic concepts, the chain is "
+"**sequential** — it will execute as a series of individual API calls with "
+"runtime variable mapping."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:26
+msgid ""
+"If a required input has neither an exact nor a semantic match from earlier "
+"in the chain, the user must provide it manually in the input form."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:28
+msgid ""
+"The validation panel below the composer shows the current status and lists "
+"any missing inputs or semantic matches."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:32
+msgid "Validation states"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:34
+msgid "Status"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:34
+msgid "Icon"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:34
+msgid "Meaning"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:34
+msgid "DRD-compatible"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:34
+msgid "✓ green"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:34
+msgid ""
+"All variable connections are exact identifier matches. Can be saved as a DRD."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:34
+msgid "Sequential"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:34
+msgid "⚠ amber"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:34
+msgid ""
+"One or more connections rely on semantic matching. Will execute as "
+"sequential calls."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:34
+msgid "Invalid"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:34
+msgid "✗ red"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:34
+msgid ""
+"One or more required inputs are unresolved. Chain cannot execute until "
+"inputs are provided."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:42
+msgid "Chain execution"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:44
+msgid ""
+"Once the chain is valid, fill in any required inputs in the dynamic form and "
+"click **Execute**. The execution panel shows per-step progress, intermediate "
+"results, timing, and the final combined output."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:48
+msgid "Export"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:50
+msgid ""
+"A completed chain can be exported as a **JSON** configuration file or as a "
+"**BPMN 2.0** diagram for import into an Operaton process definition."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:54
+msgid "Related features"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:56
+msgid "[DRD Generation]{1} — save a compatible chain as a unified DRD template"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:57
+msgid ""
+"[Semantic Analysis]{1} — inspect the semantic concept links that enable "
+"cross-agency chains"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cfeatures%5Cdmn-chain-building.md:58
+msgid ""
+"[Enhanced Validation]{1} — implementation details of the validation engine"
+msgstr ""

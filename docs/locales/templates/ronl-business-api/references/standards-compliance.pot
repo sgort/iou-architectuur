@@ -1,0 +1,311 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:1
+msgid "Standards & Compliance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:5
+msgid "Dutch government standards"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:7
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\standards-compliance.md:7"
+msgid "Standard"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:7
+msgid "Relevance to RONL Business API"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:7
+msgid "**BIO** (Baseline Informatiebeveiliging Overheid)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:7
+msgid ""
+"Overall information security baseline. RONL implements BIO controls "
+"including access management (Keycloak RBAC), audit logging (PostgreSQL), and "
+"secure transmission (TLS everywhere)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:7
+msgid "**NEN 7510**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:7
+msgid ""
+"Information security in healthcare settings. Applied to the handling of "
+"citizen health-related data (zorgtoeslag eligibility)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:7
+msgid "**AVG / GDPR**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:7
+msgid ""
+"Data minimisation (BSN encrypted, not logged in plaintext), audit trail (7-"
+"year retention), purpose limitation (process variables scoped to the "
+"requesting service)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:7
+msgid "**DigiD Norm**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:7
+msgid ""
+"Authentication assurance levels (LoA) for citizen-facing services. RONL "
+"enforces LoA checks on sensitive endpoints via the `loa` JWT claim."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:7
+msgid "**NCSC Beveiligingsrichtlijnen**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:7
+msgid ""
+"Secure software development practices, dependency management, vulnerability "
+"disclosure."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:17
+msgid "API design rules"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "Rule"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "Applied in RONL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "**API-05**: Use nouns for resource names"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "`/process`, `/decision`, `/health`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "**API-20**: Major version in URI"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "`/v1/*`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "**API-48**: No trailing slashes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "Enforced in routing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "**API-51**: Deprecation signalling"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "`Deprecation: true` + `Link` header on `/api/*` routes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "**API-53**: Hide implementation details"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "Operaton-internal IDs not exposed in responses"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "**API-54**: Plural/singular naming"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "Collections use plural, single resources use ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "**API-57**: Version header in responses"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:19
+msgid "`API-Version: 1.0.0` on all responses"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:29
+msgid "Reference: [Nederlandse API Strategie]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:33
+msgid "Authentication & identity standards"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:35
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\standards-compliance.md:35"
+msgid "Standard"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:35
+msgid "Implementation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:35
+msgid "**OpenID Connect 1.0**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:35
+msgid "OIDC Authorization Code Flow + PKCE via Keycloak"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:35
+msgid "**OAuth 2.0 (RFC 6749)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:35
+msgid "Token exchange, scopes, audience validation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:35
+msgid "**JWT (RFC 7519)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:35
+msgid "RS256 signed access tokens"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:35
+msgid "**JWKS (RFC 7517)**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:35
+msgid "Public key distribution for JWT validation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:35
+msgid "**SAML 2.0**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:35
+msgid "DigiD / eHerkenning / eIDAS federation via Keycloak IdP brokering"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:45
+msgid "Licences"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgid "Component"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgid "Licence"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgid "RONL Business API"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgid "EUPL-1.2"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgid "Keycloak"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\standards-compliance.md:47"
+msgid "Apache 2.0"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgid "Operaton"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgid "Node.js"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\standards-compliance.md:47"
+msgid "MIT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgid "Express"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgid "React"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgid "PostgreSQL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgid "PostgreSQL Licence"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgid "Redis"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgid "BSD 3-Clause"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:47
+msgid "Caddy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:59
+msgid ""
+"All dependencies use government-compatible open source licences. No "
+"proprietary software is required."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:63
+msgid "External references"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:65
+msgid "[Nederlandse API Strategie]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:66
+msgid "[BIO — Baseline Informatiebeveiliging Overheid]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:67
+msgid "[OpenID Connect specification]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:68
+msgid "[Keycloak 23 documentation]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:69
+msgid "[Operaton documentation]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cstandards-compliance.md:70
+msgid "[EUPL-1.2 licence text]{1}"
+msgstr ""

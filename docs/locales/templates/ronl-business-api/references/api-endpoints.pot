@@ -1,0 +1,2909 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:1
+msgid "API Endpoints"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:3
+msgid ""
+"All current endpoints use the `/v1/` prefix. Legacy `/api/*` endpoints are "
+"deprecated and will be removed in v2.0.0. They return `Deprecation: true` "
+"and `Link: <successor>; rel=\"successor-version\"` headers."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:7
+msgid "Root & Health"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:9"
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:9"
+msgid "Endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:9"
+msgid "Auth"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:9"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:9"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgid "`/`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:9"
+msgid "None"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgid "API name, version, status, endpoint map"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgid "`/v1/health`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgid "Health check with service latencies (Keycloak + Operaton)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgid "`/v1/health/live`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgid "Liveness probe — returns `{ status: \"alive\" }`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgid "`/v1/health/ready`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgid "Readiness probe — checks Operaton availability"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgid "`/v1/health/external`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgid ""
+"Reachability check for CPRMV API, TriplyDB, and LDE. Performs server-side "
+"HEAD requests (5-second timeout) to avoid CORS. Returns `{ status: \"up\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgid "\"down\", latency: number }` per service."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgid "`/api/health`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:9"
+msgid "⚠ Deprecated"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:18
+msgid "**`GET /v1/health` response:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:20
+msgid ""
+"{\n"
+"  \"name\": \"RONL Business API\",\n"
+"  \"version\": \"1.0.0\",\n"
+"  \"environment\": \"production\",\n"
+"  \"status\": \"healthy\",\n"
+"  \"uptime\": 3600.0,\n"
+"  \"timestamp\": \"2026-02-20T10:00:00.000Z\",\n"
+"  \"services\": {\n"
+"    \"keycloak\": { \"status\": \"up\", \"latency\": 45 },\n"
+"    \"operaton\": { \"status\": \"up\", \"latency\": 112 }\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:35
+msgid ""
+"Health status values: `healthy` (HTTP 200), `degraded` (HTTP 503), "
+"`unhealthy` (HTTP 503)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:39
+msgid "Decision evaluation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:41"
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:41"
+msgid "Endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:41"
+msgid "Auth"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:41"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:41"
+msgid "`POST`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:41
+msgid "`/v1/decision/:key/evaluate`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:41"
+msgid "Bearer JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:41"
+msgid "Evaluate a DMN decision table by key"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:41"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:41
+msgid "`/api/decision`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:41"
+msgid "⚠ Deprecated"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:46
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:46"
+msgid "**Request body:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:47
+msgid ""
+"{\n"
+"  \"variables\": {\n"
+"    \"ingezeteneVanNederland\": true,\n"
+"    \"inkomenEnVermogen\": 24000\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:56
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:56"
+msgid "**Response:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:57
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": {\n"
+"    \"eligible\": true,\n"
+"    \"amount\": 1150\n"
+"  },\n"
+"  \"timestamp\": \"2026-02-20T10:00:00.000Z\"\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:70
+msgid "Process management"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "Endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "Auth"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "`POST`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid "`/v1/process/:key/start`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "Bearer JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid "Start a BPMN process instance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid "`/v1/process/:id/status`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "Bearer JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "Get process instance status"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid "`/v1/process/:id/variables`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "Bearer JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid "Get process instance output variables"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "`DELETE`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid "`/v1/process/:id`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "Bearer JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "Cancel a process instance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid "`/v1/process/history`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "Bearer JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid ""
+"List completed and active process instances for the authenticated citizen "
+"(`?applicantId=`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid "`/v1/process/:key/start-form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "Bearer JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid ""
+"Fetch the deployed Camunda Form schema for a process start event. Returns "
+"404 `FORM_NOT_FOUND` if no form is linked; 415 `UNSUPPORTED_FORM_TYPE` if an "
+"embedded HTML form is linked."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid "`/v1/process/:id/historic-variables`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "Bearer JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid ""
+"Fetch the final variable state of a completed process instance from Operaton "
+"history. Applies tenant isolation via the `municipality` variable."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid "`/v1/process/:id/decision-document`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "Bearer JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid ""
+"Fetch the `DocumentTemplate` bundled in the Operaton deployment for a "
+"completed process instance. Reads `ronl:documentRef` from the BPMN "
+"`UserTask` element and returns the named `.document` resource. Returns 404 "
+"`DOCUMENT_NOT_FOUND` when no `ronl:documentRef` is present or the resource "
+"is absent. Applies tenant isolation via the `municipality` variable."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid "`/v1/process/:key/variable-hints`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:72"
+msgid "Bearer JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:72
+msgid ""
+"Fetch deduplicated variable names and their inferred types from the historic "
+"variable store for a given process definition key. Used by the caseworker "
+"dashboard to pre-populate form fields."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:85
+msgid "Public content"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:87
+msgid ""
+"These endpoints require no authentication and are accessible before login. "
+"They are used by both the MijnOmgeving landing page and the caseworker "
+"dashboard Home tab."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "Endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "Auth"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid "`/v1/public/nieuws`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "None"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid ""
+"National news from the Government.nl RSS feed. Supports `?limit=` (max 20) "
+"and `?offset=`. Cached 10 minutes server-side; stale cache returned on feed "
+"unavailability."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid "`/v1/public/berichten`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "None"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid "Returns announcements from the Provincie Flevoland news RSS feed."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid "`/v1/public/berichten/:id`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "None"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid ""
+"Returns a single bericht by its RSS `<guid>`. Reads from the in-memory cache "
+"populated by the list endpoint; returns `404 BERICHT_NOT_FOUND` if the cache "
+"is empty or the id is not present."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid "`/v1/public/producten-diensten`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "None"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid ""
+"Returns the Provincie Flevoland product and services catalogue. No "
+"authentication required. Currently only populated for the Flevoland tenant; "
+"other tenants receive an empty list."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid "`/v1/public/regelcatalogus`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "None"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid ""
+"RONL knowledge graph data: services, organisations, NL-SBB concepts, and "
+"implementation rules. Five parallel SPARQL queries against TriplyDB. Each "
+"data slice cached 5 minutes in-memory; stale cache returned on TriplyDB "
+"failure."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "`POST`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid "`/v1/public/use-case`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "None"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid ""
+"Submit a use-case scenario as a GitLab issue in the IOU Architecture "
+"project. Returns the created issue's `iid` and `web_url`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid "`/v1/public/use-cases`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "None"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid ""
+"List GitLab issues for the IOU Architecture project. Query: `?state=opened` "
+"(default) or `?state=closed`. Returns up to 100 items sorted by `created_at` "
+"descending."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "`POST`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid "`/v1/public/feedback`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "None"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid ""
+"Submit feedback with optional screenshot attachments as a GitLab issue. "
+"Accepts `multipart/form-data`. Images are uploaded to the GitLab project "
+"uploads API and embedded as markdown references in the issue body."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "`POST`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid "`/v1/public/upload-file`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:89"
+msgid "None"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:89
+msgid ""
+"Upload a single file of any type to the GitLab project and receive its "
+"markdown reference. Used by the use-case form to pre-upload attachments "
+"before JSON submission. Accepts `multipart/form-data` with a single file "
+"under the field name `file`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:101
+msgid "**`GET /v1/public/nieuws` response shape:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:103
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": {\n"
+"    \"items\": [\n"
+"      {\n"
+"        \"id\": \"guid-from-rss\",\n"
+"        \"title\": \"Titel van het bericht\",\n"
+"        \"summary\": \"Samenvatting...\",\n"
+"        \"category\": null,\n"
+"        \"publishedAt\": \"2026-03-12T08:00:00.000Z\",\n"
+"        \"url\": \"https://www.government.nl/...\",\n"
+"        \"source\": { \"id\": \"government\", \"name\": \"Government.nl\" }\n"
+"      }\n"
+"    ],\n"
+"    \"pagination\": { \"limit\": 10, \"offset\": 0, \"total\": 40, "
+"\"hasMore\": true }\n"
+"  },\n"
+"  \"meta\": { \"generatedAt\": \"2026-03-12T12:00:00.000Z\" }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:124
+msgid "**`GET /v1/public/berichten` response shape:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:126
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": {\n"
+"    \"items\": [\n"
+"      {\n"
+"        \"id\": \"https://flevoland.nl/actueel/nieuws/2026/...\",\n"
+"        \"subject\": \"Titel van het bericht\",\n"
+"        \"preview\": \"Korte beschrijving...\",\n"
+"        \"content\": \"<p>Korte beschrijving...</p>\",\n"
+"        \"type\": \"announcement\",\n"
+"        \"status\": \"published\",\n"
+"        \"audience\": \"all\",\n"
+"        \"sender\": { \"id\": \"flevoland\", \"name\": \"Provincie "
+"Flevoland\" },\n"
+"        \"publishedAt\": \"2026-03-12T08:00:00.000Z\",\n"
+"        \"expiresAt\": null,\n"
+"        \"priority\": \"normal\",\n"
+"        \"isRead\": false,\n"
+"        \"action\": { \"label\": \"Lees meer\", \"url\": \"https://"
+"flevoland.nl/actueel/nieuws/2026/...\" }\n"
+"      }\n"
+"    ],\n"
+"    \"pagination\": { \"limit\": 10, \"offset\": 0, \"total\": 25, "
+"\"hasMore\": true }\n"
+"  },\n"
+"  \"meta\": { \"generatedAt\": \"2026-03-12T12:00:00.000Z\" }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:153
+msgid ""
+"Returns announcements from the Provincie Flevoland news RSS feed. No "
+"authentication required."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:155
+msgid ""
+"**Query parameters:** `limit` (default 10, max 20), `offset` (default 0)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:157
+msgid ""
+"**Data source:** `https://flevoland.nl/Content/Pages/Loket?rss=news` — "
+"parsed server-side, cached 10 minutes. Stale cache is returned on feed "
+"unavailability."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:159
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:159"
+msgid "**Response:** `application/json`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:161
+msgid ""
+"Each item contains: `id` (RSS `<guid>`), `subject`, `preview`, `content`, "
+"`type`, (`announcement`), `sender` (`{ id: \"flevoland\", name: \"Provincie "
+"Flevoland\" }`), `publishedAt`, `priority` (`normal`), `isRead` (`false`), "
+"`action` (`{ label: \"Lees meer\", url: \"<link>\" }` when the RSS item "
+"carries a `<link>` element, otherwise `null`)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:163
+msgid "**`GET /v1/public/berichten/:id`**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:165
+msgid "No authentication required."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:167
+msgid "**`GET /v1/public/producten-diensten` response shape**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:169
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": {\n"
+"    \"items\": [\n"
+"      {\n"
+"        \"id\": \"12345\",\n"
+"        \"title\": \"Kapvergunning aanvragen\",\n"
+"        \"description\": \"Wilt u een boom kappen? Dan heeft u mogelijk een "
+"omgevingsvergunning nodig...\",\n"
+"        \"url\": \"https://flevoland.nl/loket/producten/kapvergunning\",\n"
+"        \"audience\": [\"particulier\", \"ondernemer\"],\n"
+"        \"onlineAanvragen\": true,\n"
+"        \"modified\": \"2026-01-15\"\n"
+"      }\n"
+"    ],\n"
+"    \"pagination\": { \"limit\": 50, \"offset\": 0, \"total\": 142, "
+"\"hasMore\": true }\n"
+"  },\n"
+"  \"meta\": { \"generatedAt\": \"2026-03-12T12:00:00.000Z\" }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:190
+msgid ""
+"**Query parameters:** `limit` (default 50, max 200), `offset` (default 0)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:192
+msgid ""
+"**Data source:** `https://flevoland.nl/loket/loketoverview?sc40=true` — "
+"SC4.0 XML feed parsed server-side using regex, cached 30 minutes. Stale "
+"cache is returned on feed unavailability."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:194
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:194"
+msgid "**Response:** `application/json`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:196
+msgid ""
+"Each item contains: `id` (`productID` element), `title` (`dcterms:title`), "
+"`description`, (`dcterms:abstract`), `url` (`dcterms:identifier`), "
+"`audience` (array of `\"ondernemer\"` | `\"particulier\"`), "
+"`onlineAanvragen` (boolean, `true` when the `<onlineAanvragen>` element is "
+"`\"ja\"`), `modified` (`dcterms:modified` or `null`). HTML entities are "
+"decoded server-side."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:198
+msgid "Items with no title are filtered out."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:200
+msgid "**`GET /v1/public/regelcatalogus` response shape:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:202
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": {\n"
+"    \"services\": [\n"
+"      {\n"
+"        \"uri\": \"https://example.org/service/zorgtoeslag\",\n"
+"        \"title\": \"Zorgtoeslag\",\n"
+"        \"description\": \"Healthcare allowance for low-income "
+"households.\",\n"
+"        \"organisationUri\": \"https://example.org/org/belastingdienst\"\n"
+"      }\n"
+"    ],\n"
+"    \"organisations\": [\n"
+"      {\n"
+"        \"uri\": \"https://example.org/org/belastingdienst\",\n"
+"        \"name\": \"Belastingdienst\",\n"
+"        \"homepage\": \"https://belastingdienst.nl\",\n"
+"        \"logo\": \"https://api.triplydb.com/assets/...\"\n"
+"      }\n"
+"    ],\n"
+"    \"concepts\": [\n"
+"      {\n"
+"        \"uri\": \"https://example.org/concept/toetsingsinkomen\",\n"
+"        \"prefLabel\": \"Toetsingsinkomen\",\n"
+"        \"serviceTitle\": \"Zorgtoeslag\",\n"
+"        \"exactMatch\": \"https://wetten.overheid.nl/...\"\n"
+"      }\n"
+"    ],\n"
+"    \"rules\": [\n"
+"      {\n"
+"        \"uri\": \"https://example.org/rule/zorgtoeslag-artikel-1\",\n"
+"        \"ruleTitle\": \"Zorgtoeslag artikel 1\",\n"
+"        \"description\": \"Beschrijving van de regel...\",\n"
+"        \"serviceTitle\": \"Zorgtoeslag\",\n"
+"        \"validFrom\": \"2026-01-01\",\n"
+"        \"confidence\": \"high\"\n"
+"      }\n"
+"    ]\n"
+"  },\n"
+"  \"meta\": { \"generatedAt\": \"2026-03-12T12:00:00.000Z\" }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:247
+msgid "**`POST /v1/public/use-case` request body:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:248
+msgid ""
+"{\n"
+"  \"title\": \"Subsidietoets voor Flevolandse inwoners\",\n"
+"  \"description\": \"## 1. Submitter · Indiener\\n\\n| Veld | Waarde |\\n|---"
+"|---|\\n| Naam | Jan de Vries |\"\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:255
+msgid "**`POST /v1/public/use-case` response:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:256
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": {\n"
+"    \"iid\": 42,\n"
+"    \"web_url\": \"https://git.open-regels.nl/showcases/iou-architectuur/-/"
+"issues/42\"\n"
+"  },\n"
+"  \"meta\": { \"generatedAt\": \"2026-04-01T10:00:00.000Z\" }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:267
+msgid ""
+"The `title` is automatically prefixed with `[Use Case]` before creation. "
+"Requires `GITLAB_TOKEN`, `GITLAB_BASE_URL`, and `GITLAB_PROJECT_PATH` to be "
+"set on the backend. Returns `503 GITLAB_NOT_CONFIGURED` when any of these "
+"are missing."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:269
+msgid "**`GET /v1/public/use-cases` response shape:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:270
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": [\n"
+"    {\n"
+"      \"iid\": 42,\n"
+"      \"title\": \"[Use Case] Subsidietoets voor Flevolandse inwoners\",\n"
+"      \"state\": \"opened\",\n"
+"      \"created_at\": \"2026-04-01T10:00:00.000Z\",\n"
+"      \"updated_at\": \"2026-04-01T10:00:00.000Z\",\n"
+"      \"web_url\": \"https://git.open-regels.nl/showcases/iou-architectuur/-/"
+"issues/42\",\n"
+"      \"labels\": [\"Submitted\"],\n"
+"      \"assignees\": [],\n"
+"      \"description\": \"## 1. Submitter · Indiener\\n\\n...\"\n"
+"    }\n"
+"  ]\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:289
+msgid "**`POST /v1/public/feedback` request (multipart/form-data fields):**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:291"
+msgid "Field"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:291"
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:291"
+msgid "Required"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:291"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgid "`name`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:291"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:291"
+msgid "Yes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgid "Submitter name"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgid "`org`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:291"
+msgid "No"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgid "Organisation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgid "`role`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgid "Function / role"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgid "`contact`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgid "Contact e-mail address"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgid "`description`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgid "Feedback description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgid "`screenshots`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgid "file[]"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:291
+msgid "Up to 5 image files, max 10 MB each"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:300
+msgid "**`POST /v1/public/feedback` response:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:301
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": {\n"
+"    \"iid\": 43,\n"
+"    \"web_url\": \"https://git.open-regels.nl/showcases/iou-architectuur/-/"
+"issues/43\"\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:311
+msgid "**`POST /v1/public/upload-file` request (multipart/form-data fields):**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:313
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:313"
+msgid "Field"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:313
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:313"
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:313
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:313"
+msgid "Required"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:313
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:313"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:313
+msgid "`file`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:313
+msgid "file"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:313
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:313"
+msgid "Yes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:313
+msgid "Any file type, max 10 MB"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:317
+msgid "**`POST /v1/public/upload-file` response:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:318
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": {\n"
+"    \"markdown\": \"![filename](/uploads/abc123/filename.pdf)\"\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:327
+msgid ""
+"The returned `markdown` string is the GitLab-hosted reference. The use-case "
+"form collects these references for all attachments and appends them as a `## "
+"Bijlagen · Attachments` section to the issue body before calling `POST /v1/"
+"public/use-case`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:331
+msgid "HR Onboarding"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:333
+msgid ""
+"These endpoints require a valid JWT with the `caseworker` or `hr-medewerker` "
+"role. Tenant isolation is applied via the `municipality` JWT claim — a "
+"caseworker from Utrecht cannot retrieve Den Haag's onboarding records."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:335
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:335"
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:335
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:335"
+msgid "Endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:335
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:335"
+msgid "Auth"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:335
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:335"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:335
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:335"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:335
+msgid "`/v1/hr/onboarding/profile`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:335
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:335"
+msgid "Bearer JWT (caseworker)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:335
+msgid ""
+"Returns the flattened historic variables for a completed "
+"`HrOnboardingProcess` instance identified by `?employeeId=`. Any caseworker "
+"may look up their own record; `hr-medewerker` may look up any employee's "
+"record within the same municipality. Returns 500 `HR_PROFILE_FAILED` when no "
+"completed instance is found."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:335
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:335"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:335
+msgid "`/v1/hr/onboarding/completed`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:335
+msgid ""
+"Returns all completed `HrOnboardingProcess` instances for the caseworker's "
+"municipality, enriched with `employeeId`, `firstName`, `lastName`, "
+"`startTime`, and `endTime`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:340
+msgid "**`GET /v1/hr/onboarding/profile` request:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:342
+msgid ""
+"GET /v1/hr/onboarding/profile?employeeId=emp-001\n"
+"Authorization: Bearer <token>"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:347
+msgid "**`GET /v1/hr/onboarding/completed` response shape:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:349
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": [\n"
+"    {\n"
+"      \"id\": \"process-instance-uuid\",\n"
+"      \"startTime\": \"2026-03-11T09:00:00.000Z\",\n"
+"      \"endTime\": \"2026-03-11T10:30:00.000Z\",\n"
+"      \"employeeId\": \"emp-001\",\n"
+"      \"firstName\": \"Jan\",\n"
+"      \"lastName\": \"de Vries\"\n"
+"    }\n"
+"  ]\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:367
+msgid "RIP Phase 1"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:369
+msgid ""
+"These endpoints require a valid JWT with the `caseworker` role. Tenant "
+"isolation is applied via the `municipality` process variable compared to the "
+"JWT `municipality` claim."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:371"
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:371"
+msgid "Endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:371"
+msgid "Auth"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:371"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:371"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgid "`/v1/rip/phase1/active`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:371"
+msgid "Bearer JWT (caseworker)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgid ""
+"Lists all active `RipPhase1Process` instances for the authenticated user's "
+"municipality, enriched with `projectNumber`, `projectName`, and "
+"`edocsWorkspaceId`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:371"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgid "`/v1/rip/phase1/:instanceId/documents`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:371"
+msgid "Bearer JWT (caseworker)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgid ""
+"Returns all three document templates bundled in the deployment for a given "
+"process instance, together with current process variables. Documents not yet "
+"produced return `null`. Applies tenant isolation via the `municipality` "
+"process variable."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:371"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgid "`/v1/rip/phase1/completed`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:371"
+msgid "Bearer JWT (caseworker)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:371
+msgid ""
+"Lists all completed `RipPhase1Process` instances for the authenticated "
+"user's municipality, enriched with `projectNumber`, `projectName`, "
+"`edocsWorkspaceId`, and `endTime`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:377
+msgid "**`GET /v1/rip/phase1/active` response shape:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:378
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": [\n"
+"    {\n"
+"      \"id\": \"process-instance-uuid\",\n"
+"      \"startTime\": \"2026-03-13T09:00:00.000Z\",\n"
+"      \"projectNumber\": \"123456789\",\n"
+"      \"projectName\": \"Test\",\n"
+"      \"edocsWorkspaceId\": \"stub-ws-123456789\"\n"
+"    }\n"
+"  ]\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:393
+msgid "**`GET /v1/rip/phase1/:instanceId/documents` response shape:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:394
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": {\n"
+"    \"variables\": {\n"
+"      \"projectNumber\": \"123456789\",\n"
+"      \"projectName\": \"Test\",\n"
+"      \"municipality\": \"flevoland\"\n"
+"    },\n"
+"    \"intakeReport\": { },\n"
+"    \"psuReport\": null,\n"
+"    \"pdp\": null\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:410
+msgid ""
+"`intakeReport`, `psuReport`, and `pdp` are `DocumentTemplate` objects when "
+"the corresponding ServiceTask has completed, or `null` when not yet produced."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:412
+msgid "**`GET /v1/rip/phase1/completed` response shape:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:413
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": [\n"
+"    {\n"
+"      \"id\": \"process-instance-uuid\",\n"
+"      \"startTime\": \"2026-03-13T09:00:00.000Z\",\n"
+"      \"endTime\": \"2026-03-13T14:30:00.000Z\",\n"
+"      \"projectNumber\": \"123456789\",\n"
+"      \"projectName\": \"Test\",\n"
+"      \"edocsWorkspaceId\": \"stub-ws-123456789\"\n"
+"    }\n"
+"  ]\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:431
+msgid "eDOCS"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:433
+msgid ""
+"All `/v1/edocs` endpoints require a Bearer JWT issued by Keycloak (`aud: "
+"ronl-business-api`). They are intended for machine-to-machine access — the "
+"primary consumer is Microsoft Copilot Studio via the `copilot-studio-edocs` "
+"Keycloak client, though they can be called by any authenticated client."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:435
+msgid ""
+"When `EDOCS_STUB_MODE=true` (default on ACC), all endpoints return realistic "
+"fake responses. No live eDOCS server is contacted."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:437"
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:437"
+msgid "Endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:437"
+msgid "Auth"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:437"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:437"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgid "`/v1/edocs/status`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:437"
+msgid "Bearer JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgid ""
+"Returns service health: `status` (`stub`, `up`, or `down`), `library`, "
+"`stubMode`, and optional `latencyMs`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:437"
+msgid "`POST`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgid "`/v1/edocs/workspaces/ensure`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:437"
+msgid "Bearer JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgid ""
+"Creates or retrieves a project workspace. Returns `workspaceId`, "
+"`workspaceName`, `created`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:437"
+msgid "`POST`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgid "`/v1/edocs/documents`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:437"
+msgid "Bearer JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgid ""
+"Uploads a base64-encoded document to a workspace. Returns `documentId`, "
+"`documentNumber`, `workspaceId`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:437"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgid "`/v1/edocs/workspaces/:workspaceId/documents`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:437"
+msgid "Bearer JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:437
+msgid "Lists all documents in a workspace"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:444
+msgid "**`GET /v1/edocs/status` response:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:446
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": {\n"
+"    \"status\": \"stub\",\n"
+"    \"library\": \"DOCUVITT\",\n"
+"    \"stubMode\": true\n"
+"  },\n"
+"  \"timestamp\": \"2026-03-14T20:32:47.462Z\"\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:458
+msgid "**`POST /v1/edocs/workspaces/ensure` request body:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:460
+msgid ""
+"{\n"
+"  \"projectNumber\": \"FL-INF-2025-042\",\n"
+"  \"projectName\": \"N308 Reconstructie\"\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:467
+msgid "**`POST /v1/edocs/documents` request body:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:469
+msgid ""
+"{\n"
+"  \"workspaceId\": \"2993896\",\n"
+"  \"filename\": \"rip-intake-report-FL-INF-2025-042.txt\",\n"
+"  \"contentBase64\": \"<base64-encoded content>\",\n"
+"  \"metadata\": {\n"
+"    \"docName\": \"FL-INF-2025-042 — Intake Report — N308 Reconstructie\",\n"
+"    \"appId\": \"INFRA\"\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:481
+msgid "**`GET /v1/edocs/workspaces/:workspaceId/documents` response:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:483
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": {\n"
+"    \"workspaceId\": \"2993896\",\n"
+"    \"documents\": [\n"
+"      {\n"
+"        \"id\": \"stub-doc-1\",\n"
+"        \"name\": \"rip-intake-report.pdf\",\n"
+"        \"documentNumber\": \"2993898\"\n"
+"      }\n"
+"    ]\n"
+"  },\n"
+"  \"timestamp\": \"2026-03-14T20:32:53.462Z\"\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:500
+msgid ""
+"For OAuth setup and curl verification, see [Copilot Studio — eDOCS OAuth "
+"Integration]{1}."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:504
+msgid "Operaton MCP AI Assistant"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:506
+msgid "**`GET /v1/mcp/sources`**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:508
+msgid ""
+"Returns all registered MCP providers with their connection status. Used by "
+"the frontend to populate the source selector in the Gereedschap tab. Returns "
+"an empty array when `MCP_ENABLED=false`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:510
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:510"
+msgid "**Auth:** JWT required — `caseworker` or `admin` role."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:512
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:512"
+msgid "**Response:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:513
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": [\n"
+"    {\n"
+"      \"id\": \"operaton\",\n"
+"      \"displayName\": \"Process Engine\",\n"
+"      \"description\": \"Operaton BPMN/DMN — process instances, tasks, "
+"decisions, deployments\",\n"
+"      \"connected\": true\n"
+"    },\n"
+"    {\n"
+"      \"id\": \"triplydb\",\n"
+"      \"displayName\": \"Knowledge Graph\",\n"
+"      \"description\": \"TriplyDB SPARQL — decision models, services, "
+"organisations, rules\",\n"
+"      \"connected\": true\n"
+"    }\n"
+"  ]\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:535
+msgid "**`POST /v1/mcp/chat`**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:537
+msgid ""
+"Runs a single agentic chat turn through the MCP loop and streams the "
+"response via Server-Sent Events."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:540
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:540"
+msgid "**Auth:** JWT required — `caseworker` or `admin` role."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:542
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:542"
+msgid "**Request body:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:543
+msgid ""
+"{\n"
+"  \"message\": \"How many active process instances are running?\",\n"
+"  \"history\": [\n"
+"    { \"role\": \"user\", \"content\": \"...\" },\n"
+"    { \"role\": \"assistant\", \"content\": \"...\" }\n"
+"  ],\n"
+"  \"sources\": [\"operaton\", \"triplydb\"]\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:554
+msgid ""
+"The `sources` array controls which MCP providers are active for this turn. "
+"An empty array activates all connected providers. Provider IDs are returned "
+"by `GET /v1/mcp/sources`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:556
+msgid "**Response:** `Content-Type: text/event-stream`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:558
+msgid ""
+"Headers are flushed immediately. Events arrive as newline-delimited `data:` "
+"frames:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:559
+msgid ""
+"data: {\"type\":\"status\",\"message\":\"Calling processInstance_count…\"}\n"
+"\n"
+"data: {\"type\":\"delta\",\"text\":\"There are currently \"}\n"
+"\n"
+"data: {\"type\":\"delta\",\"text\":\"42 active process instances.\"}\n"
+"\n"
+"data: {\"type\":\"done\"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:569
+msgid ""
+"Pre-flight errors (MCP disabled, MCP not connected, missing message) are "
+"returned as standard JSON with the appropriate HTTP status code before the "
+"stream is opened."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:572
+msgid "Event type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:572
+msgid "When"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:572
+msgid "`status`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:572
+msgid "Before each MCP tool call"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:572
+msgid "`delta`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:572
+msgid "Each text token from Claude"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:572
+msgid "`done`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:572
+msgid "Loop completed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:572
+msgid "`error`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:572
+msgid "Timeout, tool failure, or Anthropic API error"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:579
+msgid "**Timeout:** 240 seconds. **Not recorded in the audit log.**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:583
+msgid "M2M — Operaton"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:585
+msgid ""
+"All `/v1/m2m` endpoints require a Bearer JWT issued by Keycloak (`aud: ronl-"
+"business-api`). Only `jwtMiddleware` is applied — no tenant scoping. These "
+"endpoints are intended for the `operaton-mcp-client` Keycloak client and "
+"other system-level callers."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:587
+msgid ""
+"The `M2M_ALLOWED_OPERATIONS` constant in `m2m.routes.ts` gates which "
+"operations are active. Commenting out an entry returns `403 "
+"OPERATION_NOT_PERMITTED` for that operation — no other code changes "
+"required. See [Operaton MCP Client]{1} for Keycloak setup and authentication "
+"details."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:589
+msgid "Process"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:591"
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:591"
+msgid "Endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:591"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:591"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid "`/v1/m2m/process`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid ""
+"List active process instances across all organisations. Query params "
+"forwarded to Operaton."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:591"
+msgid "`POST`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid "`/v1/m2m/process/:key/start`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid "Start a process instance by definition key"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:591"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid "`/v1/m2m/process/history`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid "Query process history. Request body forwarded to Operaton."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:591"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid "`/v1/m2m/process/:id/status`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:591"
+msgid "Get process instance status"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:591"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid "`/v1/m2m/process/:id/variables`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid "Get current process variables (plain values)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:591"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid "`/v1/m2m/process/:id/historic-variables`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid "Get final variable state of a completed instance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:591"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid "`/v1/m2m/process/:id/decision-document`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid ""
+"Fetch the DocumentTemplate linked via `ronl:documentRef`. Returns 404 "
+"`DOCUMENT_NOT_FOUND` if no `ronl:documentRef` is present."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:591"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid "`/v1/m2m/process/:key/start-form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid ""
+"Fetch the deployed Camunda Form schema for a process start event. Returns "
+"404 `FORM_NOT_FOUND` if no form is linked."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:591"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid "`/v1/m2m/process/:key/variable-hints`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid "Fetch deduplicated variable names and types from history"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:591"
+msgid "`DELETE`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgid "`/v1/m2m/process/:id`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:591
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:591"
+msgid "Cancel a process instance"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:604
+msgid "Task"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:606"
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:606"
+msgid "Endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:606"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:606"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgid "`/v1/m2m/task`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgid "List all open tasks across all organisations"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:606"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgid "`/v1/m2m/task/:id`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:606"
+msgid "Get a single task by ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:606"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgid "`/v1/m2m/task/:id/variables`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:606"
+msgid "Get all process variables for a task"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:606"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgid "`/v1/m2m/task/:id/form-schema`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgid ""
+"Fetch the deployed Camunda Form schema for a task. Returns 404 "
+"`FORM_NOT_FOUND` if no form is linked."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:606"
+msgid "`POST`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgid "`/v1/m2m/task/:id/claim`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgid ""
+"Claim a task. Body: `{ \"userId\": \"...\" }` (optional — falls back to "
+"token subject)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:606"
+msgid "`POST`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgid "`/v1/m2m/task/:id/complete`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:606
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:606"
+msgid "Complete a task with submitted variables"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:615
+msgid "Decision"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:617
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:617"
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:617
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:617"
+msgid "Endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:617
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:617"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:617
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:617"
+msgid "`POST`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:617
+msgid "`/v1/m2m/decision/:key/evaluate`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:617
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:617"
+msgid "Evaluate a DMN decision table by key"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:617
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:617"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:617
+msgid "`/v1/m2m/decision/:key`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:617
+msgid "Fetch decision definition metadata"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:622
+msgid "**`POST /v1/m2m/decision/:key/evaluate` request body:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:623
+msgid ""
+"{\n"
+"  \"variables\": {\n"
+"    \"treeDiameter\": 45,\n"
+"    \"protectedArea\": false\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:632
+msgid "Test script"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:634
+msgid ""
+"`scripts/test-m2m-routes.sh` validates all M2M routes against a running "
+"instance. It obtains a token via Client Credentials, checks JWT claims, "
+"exercises every active operation, and verifies tenant isolation remains "
+"intact on the standard caseworker routes."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:636
+msgid ""
+"**Prerequisites:** `curl` and `jq` must be available on `$PATH`. The "
+"`operaton-mcp-client` Keycloak client must be configured with "
+"`CAMUNDA_BPM_AUTHORIZATION_ENABLED=false` on the target Operaton instance "
+"(or equivalent authorization grants in place) — without this, process, "
+"history, and deployment endpoints return 404."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:638
+msgid "**Usage:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:639
+msgid "CLIENT_SECRET=<secret> bash scripts/test-m2m-routes.sh"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:643
+msgid "**Overridable environment variables:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "Variable"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "Default"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:645"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "`BASE_URL`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "`https://acc.api.open-regels.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "RONL Business API base URL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "`KEYCLOAK_URL`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "`https://acc.keycloak.open-regels.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "Keycloak base URL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "`CLIENT_ID`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "`operaton-mcp-client`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "Keycloak client ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "`CLIENT_SECRET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "_(required)_"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "Keycloak client secret"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "`DECISION_KEY`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "`TreeFellingDecision`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:645
+msgid "DMN key used for the decision evaluate test"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:653
+msgid "**What it checks:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:655
+msgid ""
+"Token obtained and JWT claims valid (`azp`, `aud`, `municipality` absent)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:656
+msgid ""
+"All active operations return HTTP 200 (404 accepted for `form-schema`, "
+"`start-form`, `decision-document` — resource may not exist in the deployment)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:657
+msgid "All disabled operations return `403 OPERATION_NOT_PERMITTED`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:658
+msgid ""
+"`GET /v1/task` with an M2M token returns `403 MISSING_TENANT` — confirming "
+"tenant-scoped routes remain isolated"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:662
+msgid "Task management"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "Endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "Auth"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgid "`/v1/task`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "Bearer JWT (caseworker)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgid "List all open tasks for the caseworker's municipality"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgid "`/v1/task/:id`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "Bearer JWT (caseworker)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "Get a single task by ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgid "`/v1/task/:id/variables`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "Bearer JWT (caseworker)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "Get all process variables for a task"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "`POST`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgid "`/v1/task/:id/claim`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "Bearer JWT (caseworker)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgid "Claim a task for the authenticated caseworker"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "`POST`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgid "`/v1/task/:id/complete`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "Bearer JWT (caseworker)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "Complete a task with submitted variables"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgid "`/v1/task/:id/form-schema`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "Bearer JWT (caseworker)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgid ""
+"Fetch the deployed Camunda Form schema for a task. Returns 404 "
+"`FORM_NOT_FOUND` if no `camunda:formRef` is set; treats Operaton 400 "
+"responses as 404."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgid "`/v1/task/history`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:664"
+msgid "Bearer JWT (caseworker)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:664
+msgid ""
+"List completed tasks for the caseworker's municipality. Tenant-scoped via "
+"`municipality` process variable. Returns up to 200 tasks sorted by `endTime` "
+"descending. Route registered before `/:id` to prevent shadowing."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:674
+msgid "**`POST /v1/task/:id/complete` request body:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:675
+msgid ""
+"{\n"
+"  \"variables\": {\n"
+"    \"reviewAction\": \"confirm\",\n"
+"    \"notificationMethod\": \"email\"\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:684
+msgid ""
+"Tasks are filtered to the caseworker's municipality via the `municipality` "
+"process variable. A caseworker from Utrecht cannot see Amsterdam's tasks."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:688
+msgid "Process definition deployment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:690
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:690"
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:690
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:690"
+msgid "Endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:690
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:690"
+msgid "Auth"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:690
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:690"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:690
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:690"
+msgid "`POST`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:690
+msgid "`/api/dmns/process/deploy`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:690
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:690"
+msgid "Bearer JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:690
+msgid "Deploy a BPMN process bundle to Operaton in a single multipart request"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:694
+msgid ""
+"This endpoint accepts an `application/json` request body and deploys all "
+"provided resources as one named Operaton deployment. It is used by the LDE "
+"BPMN Modeler one-click deploy feature."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:696
+msgid "**Request body fields:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:698"
+msgid "Field"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:698"
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:698"
+msgid "Required"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:698"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "`bpmnXml`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:698"
+msgid "`string`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:698"
+msgid "Yes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "The primary BPMN XML content"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "`deploymentName`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:698"
+msgid "Yes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "Name for the Operaton deployment (typically the BPMN process ID)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "`forms`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "`{ id: string, schema: object }[]`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:698"
+msgid "No"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "Camunda Form schemas to include in the deployment. Defaults to `[]`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "`documents`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "`{ id: string, template: object }[]`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:698"
+msgid "No"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid ""
+"Document template JSON files to include in the deployment. Each `template` "
+"is a `DocumentTemplate` object authored in the LDE Document Composer. "
+"Defaults to `[]`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "`subProcesses`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "`{ filename: string, xml: string }[]`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:698"
+msgid "No"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "Subprocess BPMN XML content. Defaults to `[]`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "`operatonUrl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:698"
+msgid "No"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "Override the default Operaton base URL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "`operatonUsername`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:698"
+msgid "No"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "Override Operaton basic-auth username"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "`operatonPassword`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:698"
+msgid "No"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:698
+msgid "Override Operaton basic-auth password"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:709
+msgid "See [Dynamic Forms — Deployment]{1} for the full deploy workflow."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:713
+msgid "Admin"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:715
+msgid ""
+"The `/v1/admin` endpoints require a valid JWT with the `admin` role. Non-"
+"admin caseworkers receive `403 FORBIDDEN`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:717
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:717"
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:717
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:717"
+msgid "Endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:717
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:717"
+msgid "Auth"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:717
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:717"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:717
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:717"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:717
+msgid "`/v1/admin/audit`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:717
+msgid "Bearer JWT (`admin`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:717
+msgid ""
+"Returns paginated audit log records from PostgreSQL. Query: `?limit=` "
+"(default 50, max 200), `?offset=` (default 0). Excluded from its own audit "
+"trail."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:721
+msgid "**`GET /v1/admin/audit` response shape:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:722
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": {\n"
+"    \"items\": [\n"
+"      {\n"
+"        \"id\": 1,\n"
+"        \"timestamp\": \"2026-03-19T12:00:00.000Z\",\n"
+"        \"tenant_id\": \"flevoland\",\n"
+"        \"user_id\": \"sub-uuid-from-jwt\",\n"
+"        \"action\": \"task.claim\",\n"
+"        \"resource_type\": null,\n"
+"        \"resource_id\": null,\n"
+"        \"details\": { \"taskId\": \"task-uuid\" },\n"
+"        \"result\": \"success\",\n"
+"        \"error_message\": null,\n"
+"        \"request_id\": null\n"
+"      }\n"
+"    ],\n"
+"    \"pagination\": { \"limit\": 50, \"offset\": 0, \"total\": 312, "
+"\"hasMore\": true }\n"
+"  }\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:746
+msgid ""
+"For M2M tokens, `tenant_id` is set to the Keycloak `azp` claim (e.g. "
+"`operaton-mcp-client`) because service account tokens carry no "
+"`municipality` claim."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:750
+msgid "Response headers"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:752
+msgid "All responses include:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:754
+msgid ""
+"API-Version: 1.0.0\n"
+"Content-Type: application/json"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:759
+msgid "Deprecated endpoints additionally include:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:761
+msgid ""
+"Deprecation: true\n"
+"Link: </v1/health>; rel=\"successor-version\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:768
+msgid "Error codes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "Code"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "HTTP status"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "Meaning"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`UNAUTHORIZED`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "401"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "Missing or invalid JWT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`FORBIDDEN`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:770"
+msgid "403"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "Valid JWT but insufficient role or LoA"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`LOA_INSUFFICIENT`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "Required assurance level not met"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`RATE_LIMIT_EXCEEDED`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "429"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "Too many requests"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`VALIDATION_ERROR`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:770"
+msgid "400"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "Request body failed validation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`PROCESS_NOT_FOUND`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:770"
+msgid "404"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "Process key or instance ID not found"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`OPERATON_ERROR`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:770"
+msgid "502"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "Upstream Operaton call failed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`QUERY_ERROR`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:770"
+msgid "500"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "Internal error"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`TASK_NOT_FOUND`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "Task ID does not exist"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`TASK_CLAIM_FAILED`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "Operaton rejected the claim request"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`TASK_COMPLETE_FAILED`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "Operaton rejected the complete request"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`TASK_VARIABLES_FAILED`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "Could not retrieve process variables for task"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`MISSING_TENANT`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid ""
+"M2M token used on a tenant-scoped route — no `municipality` claim present"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`OPERATION_NOT_PERMITTED`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "M2M operation is disabled in `M2M_ALLOWED_OPERATIONS`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`GITLAB_NOT_CONFIGURED`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\api-endpoints.md:770"
+msgid "503"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid ""
+"Required GitLab env vars (`GITLAB_TOKEN`, `GITLAB_PROJECT_PATH`) are missing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`GITLAB_ERROR`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "GitLab API rejected the request"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`GITLAB_UNREACHABLE`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "GitLab API could not be reached"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`USE_CASE_INVALID`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`title` or `description` missing from use-case submission"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`MISSING_FIELDS`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "Required fields absent from feedback or file upload request"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`NO_FILE`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`POST /v1/public/upload-file` called without a file"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`MCP_DISABLED`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`MCP_ENABLED=false` — MCP endpoints are inactive"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`MCP_NOT_CONNECTED`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "No connected MCP providers match the requested `sources`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "`DB_ERROR`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Capi-endpoints.md:770
+msgid "PostgreSQL query failed in admin/audit endpoint"
+msgstr ""

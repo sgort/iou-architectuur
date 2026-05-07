@@ -1,0 +1,1139 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:1
+msgid "RIP Phase 1 Workflow"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:3
+msgid ""
+"From v2.6.0, the RONL Business API caseworker dashboard includes a **RIP "
+"Phase 1 flow** that lets infrastructure project team members start, track, "
+"and complete the two-phase project definition and preliminary design "
+"preparation process entirely within MijnOmgeving. The process is backed by "
+"the `RipPhase1Process` BPMN and the `RipProjectTypeAssignment` DMN, using "
+"the same claim-first caseworker task queue as the AWB Kapvergunning and HR "
+"onboarding."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:5
+msgid ""
+"This implementation is specific to **Provincie Flevoland** and uses the "
+"`infra-projectteam` realm role as the access gate."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:9
+msgid "Who can use this"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:11
+msgid "Role"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:11
+msgid "What they can do"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:11
+msgid "`caseworker`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:11
+msgid "View own Profiel, Rollen & rechten, Taken"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:11
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:11"
+msgid "`infra-projectteam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:11
+msgid ""
+"All of the above, plus start RIP Fase 1 processes, view WIP and completed "
+"project documents"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:16
+msgid ""
+"The `infra-projectteam` role is a Keycloak realm role assigned to "
+"infrastructure employees after they complete the HR onboarding flow (via "
+"`EmployeeRoleAssignment` DMN output `candidateGroups`)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:18
+msgid ""
+"In test environments, `test-infra-flevoland` holds this role for Flevoland."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:22
+msgid "Projecten tab — three RIP sections"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:24
+msgid ""
+"After login with the Flevoland tenant, the **Projecten** top-nav item "
+"exposes three RIP-specific left-panel sections in addition to Taken:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:26
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:26"
+msgid "Section"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:26
+msgid "Label"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:26
+msgid "Accessible to"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:26
+msgid "`rip-fase1`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:26
+msgid "RIP Fase 1 starten"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:26
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:26"
+msgid "`infra-projectteam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:26
+msgid "`rip-fase1-wip`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:26
+msgid "RIP Fase 1 WIP"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:26
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:26"
+msgid "`infra-projectteam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:26
+msgid "`rip-fase1-gereed`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:26
+msgid "RIP Fase 1 gereed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:26
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:26"
+msgid "`infra-projectteam`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:34
+msgid "Starting a process — RIP Fase 1 starten"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:36
+msgid ""
+"The **RIP Fase 1 starten** section starts a new `RipPhase1Process` instance:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:38
+msgid ""
+"**Step 1** — Click **RIP Fase 1 starten**. The button calls `POST /v1/"
+"process/RipPhase1Process/start` with an empty variables body."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:40
+msgid ""
+"**Step 2** — A success card confirms the process has started and points to "
+"**Projecten → Taken** to continue."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:42
+msgid ""
+"**Step 3** — In the task queue, the first task **Complete intake form** "
+"appears with status **Openstaand**."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:51
+msgid "Process flow — 17 steps"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:53
+msgid ""
+"The `RipPhase1Process` covers two phases: project definition (intake) and "
+"preliminary design preparation (PSU + PDP). All user tasks use "
+"`candidateGroups=\"infra-projectteam\"`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "Step"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "Task"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "Form / Document"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "1"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "Complete intake form"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:55"
+msgid "`rip-intake.form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:55"
+msgid "—"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "DMN: determine project roles"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "`RipProjectTypeAssignment`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "ServiceTask: create eDOCS workspace"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "writes `edocsWorkspaceId`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "2"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "Organise intake meeting"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:55"
+msgid "`rip-intake-meeting.form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "3"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "Complete intake report"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "`rip-intake-report.form` + `rip-intake-report.document`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "ServiceTask: save intake report to eDOCS"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "writes `edocsIntakeReportId`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "4"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "Approve intake report"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:55"
+msgid "`rip-approval.form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:55"
+msgid "↺"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "Rejected → loops back to step 3"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "5"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "Organise PSU"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:55"
+msgid "`rip-psu-organize.form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "6"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "PSU execution"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:55"
+msgid "`rip-psu-execution.form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "7"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "Complete PSU report"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:55"
+msgid "`rip-psu-report.document`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "ServiceTask: save PSU report to eDOCS"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "writes `edocsPsuReportId`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "8"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "Prepare risk file"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:55"
+msgid "`rip-risk-file.form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "9"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "Complete preliminary design principles"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:55"
+msgid "`rip-pdp.document`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "ServiceTask: save PDP to eDOCS"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "writes `edocsPdpId`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "10"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "Approve preliminary design principles"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "Rejected → loops back to step 9"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "End"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:55
+msgid "Phase 1 complete"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:76
+msgid "Key process variables"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "Variable"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:78"
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "Set by"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "`projectNumber`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:78"
+msgid "String"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "Intake form — eDOCS workspace key"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "`projectName`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "Intake form"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "`projectType`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:78"
+msgid "Intake form — DMN input"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "`department`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "`candidateGroups`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:78"
+msgid "DMN output"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "`assignedRoles`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "`edocsWorkspaceId`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "eDOCS workspace ServiceTask"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "`edocsIntakeReportId`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:78"
+msgid "eDOCS document ServiceTask"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "`edocsPsuReportId`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "`edocsPdpId`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "`approvalStatus`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:78
+msgid "Approval form — `\"approved\"` or `\"rejected\"`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:94
+msgid "Working through tasks — Taken"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:96
+msgid "Each task in the queue follows the standard claim-first pattern:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:98
+msgid "Navigate to **Projecten → Taken**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:99
+msgid ""
+"Select the task — Procesgegevens shows current project variables (collapsed "
+"by default when task is claimed)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:100
+msgid "Click **Taak claimen** — status changes to **Geclaimd**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:101
+msgid "Fill in the form and click **Submit**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:102
+msgid "The next task in the process appears in the queue"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:111
+msgid "Tracking live projects — RIP Fase 1 WIP"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:113
+msgid ""
+"The **RIP Fase 1 WIP** section lists all active `RipPhase1Process` instances "
+"for the current organisation via `GET /v1/rip/phase1/active`. Each card "
+"shows:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:115
+msgid "Project name and number"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:116
+msgid "eDOCS workspace ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:117
+msgid "Start date"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:119
+msgid "Clicking a project expands it to show the three document sections:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:121
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:121"
+msgid "Section"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:121
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:121"
+msgid "Document"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:121
+msgid "Available when"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:121
+msgid "Intakeverslag (Kolom 2)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:121
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:121"
+msgid "`rip-intake-report.document`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:121
+msgid "After step 3 completed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:121
+msgid "PSU-verslag (Kolom 3)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:121
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:121"
+msgid "`rip-psu-report.document`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:121
+msgid "After step 7 completed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:121
+msgid "Voorlopige Ontwerpuitgangspunten (Kolom 4)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:121
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:121"
+msgid "`rip-pdp.document`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:121
+msgid "After step 9 completed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:127
+msgid ""
+"Documents not yet produced show **Nog niet beschikbaar**. All three "
+"documents render using the same TipTap/ProseMirror zone renderer as the "
+"citizen DecisionViewer, with process variables substituted inline."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:136
+msgid "Completed projects — RIP Fase 1 gereed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:138
+msgid ""
+"The **RIP Fase 1 gereed** section lists all completed `RipPhase1Process` "
+"instances via `GET /v1/rip/phase1/completed`. The layout is identical to the "
+"WIP view, with completion date instead of start date. All three documents "
+"are rendered in the same collapsible sections."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:147
+msgid "RipPhase1Process — BPMN overview"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:149
+msgid ""
+"flowchart LR\n"
+"\n"
+"subgraph Intake[\"Intake\"]\n"
+"    Start((Start)) --> IntakeTask[Intake]\n"
+"    IntakeTask --> Approval1{Approved?}\n"
+"end\n"
+"\n"
+"subgraph PSU[\"PSU\"]\n"
+"    PSUWork[Execute PSU]\n"
+"end\n"
+"\n"
+"subgraph PDP[\"PDP\"]\n"
+"    PDPWork[PDP & Risk File]\n"
+"    Approval2{Approved?}\n"
+"    End((End))\n"
+"end\n"
+"\n"
+"Approval1 -- No --> IntakeTask\n"
+"Approval1 -- Yes --> PSUWork\n"
+"\n"
+"PSUWork --> PDPWork --> Approval2\n"
+"Approval2 -- No --> PDPWork\n"
+"Approval2 -- Yes --> End"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:177
+msgid "RipProjectTypeAssignment DMN"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:179
+msgid "**Inputs**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:179
+msgid "`projectType`, `department`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:179
+msgid "**Outputs**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:179
+msgid "`candidateGroups`, `assignedRoles`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:179
+msgid "**Hit policy**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:179
+msgid "FIRST"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:185
+msgid ""
+"All current rules resolve to `infra-projectteam` / `infra-medewerker`, "
+"allowing any team member to claim tasks. The table is structured to accept "
+"granular per-role rules in future iterations — new rows can be added and the "
+"bundle redeployed without BPMN changes."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:189
+msgid "LDE build — what to deploy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:191
+msgid ""
+"The full RIP Phase 1 bundle lives in `examples/organizations/flevoland/rip-"
+"phase1/` and must be deployed as a single Operaton deployment. The LDE one-"
+"click deploy bundles BPMN, DMN, forms, and documents together."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:193
+msgid "Files in the bundle"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "File"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:195"
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:195"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "`RipPhase1Process.bpmn`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "BPMN"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "Main process definition"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "`RipProjectTypeAssignment.dmn`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "DMN"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "Role assignment rules"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:195"
+msgid "`rip-intake.form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:195"
+msgid "Form"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "Project details — step 1"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:195"
+msgid "`rip-intake-meeting.form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "Meeting confirmation — step 2"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "`rip-intake-report.form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "Intake report fields — step 3"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:195"
+msgid "`rip-psu-organize.form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "PSU organisation — step 5"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:195"
+msgid "`rip-psu-execution.form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "PSU execution notes — step 6"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:195"
+msgid "`rip-risk-file.form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "Risk file confirmation — step 8"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:195"
+msgid "`rip-approval.form`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "Reusable approval/rejection — steps 4 and 10"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:195"
+msgid "`rip-intake-report.document`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:195"
+msgid "Document"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "Intake Report (Column 2)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:195"
+msgid "`rip-psu-report.document`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:195"
+msgid "Document"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "PSU Report (Column 3)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:195"
+msgid "`rip-pdp.document`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:195"
+msgid "Document"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:195
+msgid "Preliminary Design Principles (Column 4)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:210
+msgid "LDE deploy steps"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:212
+msgid "Open the LDE BPMN Canvas and load `RipPhase1Process.bpmn`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:213
+msgid ""
+"Ensure all seven forms are authored and linked to their respective UserTasks "
+"via `camunda:formRef`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:214
+msgid ""
+"Ensure the three documents are authored in the Document Composer and linked "
+"to their UserTasks via `ronl:documentRef` in the properties panel"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:215
+msgid ""
+"Click **Deploy** — the LDE packages all files into a single Operaton "
+"deployment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:216
+msgid "Verify the deployment in the Operaton Cockpit under `RipPhase1Process`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:218
+msgid ""
+"!!! note \"DMNs are not part of the deploy bundle\" Decision models "
+"referenced via `camunda:decisionRef` on `BusinessRuleTask` elements are "
+"**not** included in this deployment. DMNs reach Operaton through a separate "
+"path: they are published to TriplyDB by the [CPSV Editor]{1} and deployed to "
+"Operaton from there. The BPMN process resolves `camunda:decisionRef` at "
+"runtime against whatever is already deployed — as long as the DMN key "
+"matches, no additional action is needed here."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:226
+msgid "Also deploy — HR Onboarding update"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:228
+msgid ""
+"The `EmployeeRoleAssignment` DMN in the HR onboarding bundle was updated to "
+"prepend `infra-projectteam` to the `candidateGroups` output for all "
+"`infrastructuur` department rules. This update must be redeployed as part of "
+"the same release so that infra employees onboarded via HR get the `infra-"
+"projectteam` candidate group automatically."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:230
+msgid ""
+"Bundle: `examples/organizations/flevoland/HrOnboardingProcess.bpmn` + "
+"`EmployeeRoleAssignment.dmn` + all HR forms + `hr-it-handover.document`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:234
+msgid "eDOCS integration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:236
+msgid ""
+"The `RipPhase1Process` uses the Operaton external task pattern for eDOCS "
+"integration. The LDE backend worker polls two topics:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:238
+msgid "Topic"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:238
+msgid "Triggered by"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:238
+msgid "Reads"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:238
+msgid "Writes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:238
+msgid "`rip-edocs-workspace`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:238
+msgid "`Task_EnsureWorkspace`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:238
+msgid "`projectNumber`, `projectName`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:238
+msgid "`edocsWorkspaceId`, `edocsWorkspaceName`, `edocsWorkspaceCreated`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:238
+msgid "`rip-edocs-document`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:238
+msgid "`Task_SaveIntakeReport`, `Task_SavePsuReport`, `Task_SavePDP`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:238
+msgid "`edocsWorkspaceId`, `documentTemplateId`, all template variables"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:238
+msgid "`edocsIntakeReportId` / `edocsPsuReportId` / `edocsPdpId`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:243
+msgid ""
+"**Stub mode** (`EDOCS_STUB_MODE=true`, default in development): all eDOCS "
+"calls return realistic fake responses. Set `EDOCS_STUB_MODE=false` and "
+"configure `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, and "
+"`EDOCS_PASSWORD` to connect to a live OpenText eDOCS server."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:247
+msgid "Backend endpoints"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid "Endpoint"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid "Auth"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:249"
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:249"
+msgid "`GET`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid "`/v1/rip/phase1/active`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:249"
+msgid "Bearer JWT (`caseworker`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid ""
+"Lists active `RipPhase1Process` instances for the municipality, enriched "
+"with `projectNumber`, `projectName`, `edocsWorkspaceId`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid "`/v1/rip/phase1/:instanceId/documents`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid ""
+"Returns all three document templates + current process variables for one "
+"instance. Absent documents are `null`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid "`/v1/rip/phase1/completed`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid ""
+"Lists completed `RipPhase1Process` instances, enriched with `projectNumber`, "
+"`projectName`, `edocsWorkspaceId`, `endTime`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid "`/v1/edocs/status`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid "eDOCS connectivity status and stub mode flag"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:249"
+msgid "`POST`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid "`/v1/edocs/workspaces/ensure`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid "Create or retrieve a project workspace in eDOCS"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid "`/v1/edocs/documents`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid "Upload a rendered document to a workspace"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid "`/v1/edocs/workspaces/:id/documents`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:249
+msgid "List documents in an eDOCS workspace"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:259
+msgid ""
+"All `/v1/rip/` endpoints apply municipality-based tenant isolation: the "
+"`municipality` process variable is compared to the JWT `municipality` claim."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:263
+msgid "Test accounts"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:265
+msgid "Username"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:265
+msgid "Organisation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:265
+msgid "Roles"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:265
+msgid "`test-hr-flevoland`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:265
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\rip-phase1-workflow.md:265"
+msgid "Flevoland"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:265
+msgid "`caseworker`, `hr-medewerker`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:265
+msgid "`test-infra-flevoland`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:265
+msgid "`caseworker`, `infra-projectteam`, `infra-medewerker`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:270
+msgid "Password for all test accounts: `test123`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:272
+msgid ""
+"`test-hr-flevoland` is used to onboard `test-infra-flevoland` via the HR "
+"onboarding flow. `test-infra-flevoland` arrives with `employeeId: EMP-FLV-"
+"001` pre-configured and can immediately start RIP Fase 1 processes."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:276
+msgid "Related documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:278
+msgid "[Caseworker Workflow]{1} — General task queue and claim-first pattern"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:279
+msgid ""
+"[HR Onboarding Workflow]{1} — How `infra-projectteam` roles get assigned"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:280
+msgid "[API Endpoints]{1} — RIP and eDOCS endpoints"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:281
+msgid ""
+"[Keycloak Realm Configuration]{1} — `infra-projectteam`, `infra-medewerker` "
+"roles and test users"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Crip-phase1-workflow.md:282
+msgid ""
+"[BPMN Design Criteria]{1} — `candidateGroups`, `ronl:documentRef` pattern"
+msgstr ""

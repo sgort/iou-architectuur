@@ -1,0 +1,326 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:1
+msgid "Municipality Themes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:3
+msgid ""
+"Each municipality has a colour theme defined in `packages/frontend/public/"
+"tenants.json`. The theme is applied at login time based on the "
+"`municipality` JWT claim."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:7
+msgid "Configured themes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:9
+msgid "Utrecht"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:11
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:11"
+msgid "Property"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:11
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:11"
+msgid "Value"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:11
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:11"
+msgid "`primary`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:11
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:11"
+msgid "`#C41E3A`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:11
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:11"
+msgid "`primaryDark`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:11
+msgid "`#9B1830`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:11
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:11"
+msgid "`primaryLight`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:11
+msgid "`#E56B7D`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:11
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:11"
+msgid "`secondary`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:11
+msgid "`#2C5F2D`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:11
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:11"
+msgid "`accent`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:19
+msgid "Amsterdam"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:21
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:21"
+msgid "Property"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:21
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:21"
+msgid "Value"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:21
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:21"
+msgid "`primary`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:21
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:21"
+msgid "`#EC0000`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:21
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:21"
+msgid "`primaryDark`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:21
+msgid "`#C00000`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:21
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:21"
+msgid "`primaryLight`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:21
+msgid "`#FF6666`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:21
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:21"
+msgid "`secondary`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:21
+msgid "`#003B5C`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:21
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:21"
+msgid "`accent`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:29
+msgid "Rotterdam"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:31
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:31"
+msgid "Property"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:31
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:31"
+msgid "Value"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:31
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:31"
+msgid "`primary`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:31
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:31"
+msgid "`#00811F`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:31
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:31"
+msgid "`primaryDark`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:31
+msgid "`#006619`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:31
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:31"
+msgid "`primaryLight`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:31
+msgid "`#4DB86A`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:31
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:31"
+msgid "`secondary`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:31
+msgid "`#0C2340`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:31
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:31"
+msgid "`accent`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:39
+msgid "Den Haag"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:41"
+msgid "Property"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:41"
+msgid "Value"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:41"
+msgid "`primary`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:41"
+msgid "`#007BC7`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:41"
+msgid "`primaryDark`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:41
+msgid "`#005A99`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:41"
+msgid "`primaryLight`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:41
+msgid "`#4DA6E0`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:41"
+msgid "`secondary`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:41
+msgid "`#E17000`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:41
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\references\\municipality-themes.md:41"
+msgid "`accent`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:51
+msgid "TenantConfig schema"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:53
+msgid ""
+"interface TenantTheme {\n"
+"  primary: string;       // Main brand colour — buttons, active nav\n"
+"  primaryDark: string;   // Hover/focus states\n"
+"  primaryLight: string;  // Backgrounds, borders\n"
+"  secondary: string;     // Accent colour for secondary actions\n"
+"  accent: string;        // Highlight colour\n"
+"}\n"
+"\n"
+"interface TenantFeatures {\n"
+"  zorgtoeslag: boolean;     // Healthcare allowance service\n"
+"  kinderbijslag: boolean;   // Child benefit service\n"
+"  huurtoeslag: boolean;     // Rent allowance service\n"
+"  processes: string[];      // Allowed Operaton process keys\n"
+"}\n"
+"\n"
+"interface TenantContact {\n"
+"  phone: string;\n"
+"  email: string;\n"
+"  address: string;\n"
+"  postalCode: string;\n"
+"  city: string;\n"
+"}\n"
+"\n"
+"interface TenantConfig {\n"
+"  id: string;                 // Must match JWT `municipality` claim\n"
+"  name: string;               // Internal identifier\n"
+"  displayName: string;        // Shown in portal header (e.g. \"Gemeente "
+"Utrecht\")\n"
+"  municipalityCode: string;   // CBS municipality code (4 digits)\n"
+"  theme: TenantTheme;\n"
+"  features: TenantFeatures;\n"
+"  contact: TenantContact;\n"
+"  enabled: boolean;           // Set to false to disable without deleting\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:91
+msgid "CSS custom properties"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:93
+msgid ""
+"`applyTenantTheme()` sets these properties on `document.documentElement`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:95
+msgid ""
+"--color-primary\n"
+"--color-primary-dark\n"
+"--color-primary-light\n"
+"--color-secondary\n"
+"--color-accent"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:103
+msgid ""
+"Tailwind utility classes in the frontend use `var(--color-primary)` etc. as "
+"their colour values. This means the entire theme switches dynamically — no "
+"page reload, no per-municipality CSS bundle."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:107
+msgid "Adding a theme"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Creferences%5Cmunicipality-themes.md:109
+msgid "See [Adding a Municipality]{1} for the complete onboarding process."
+msgstr ""

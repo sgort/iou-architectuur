@@ -1,0 +1,381 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:1
+msgid "Asset Storage"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:3
+msgid ""
+"From v1.3.0, BPMN processes, form schemas, and document templates are "
+"persisted to PostgreSQL via the LDE backend. The frontend uses a **write-"
+"through cache with async hydration**: all reads are synchronous from "
+"`localStorage` (zero-latency UI), writes update `localStorage` immediately "
+"and then POST to the backend in the background, and on editor mount a `GET` "
+"hydration call replaces local non-readonly records with the authoritative "
+"server state."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:7
+msgid "Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:8
+msgid ""
+"graph TD\n"
+"    A[Editor component] -->|mount| B[hydrateFromServer]\n"
+"    A -->|save| C[localStorage cache]\n"
+"    B -->|background fetch| D[LDE Backend]\n"
+"    D --> E[(PostgreSQL — lde_assets)]"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:18
+msgid "Write-through cache strategy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:20
+msgid "On **save**, each service:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:22
+msgid ""
+"Writes the updated record to `localStorage` immediately — the UI reflects "
+"the change synchronously with zero latency."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:23
+msgid ""
+"Fires a background `fetch` to `POST /v1/assets/{type}` — no `await`, no "
+"spinner. If the network call fails, a warning is logged to the browser "
+"console but the user experience is unaffected."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:25
+msgid "On **delete**, each service:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:27
+msgid "Removes the record from `localStorage` immediately."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:28
+msgid "Fires a background `DELETE /v1/assets/{type}/:id`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:30
+msgid ""
+"Example assets (`readonly: true`) are never written to the backend. They are "
+"seeded on the frontend from static files in `public/examples/` and "
+"`defaultTemplates.ts`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:34
+msgid "Hydration on mount"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:36
+msgid ""
+"Each editor component runs a second `useEffect` alongside the example seed "
+"effect:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:37
+msgid ""
+"useEffect(() => {\n"
+"  BpmnService.hydrateFromServer().then(setProcesses);\n"
+"}, []);"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:43
+msgid ""
+"`hydrateFromServer()` calls `GET /v1/assets/bpmn`, merges the server "
+"response with the local readonly examples, writes the merged list back to "
+"`localStorage`, and returns it. If the request fails for any reason the "
+"existing `localStorage` contents are returned unchanged and a warning is "
+"logged."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:45
+msgid ""
+"This means the editor always starts from local cache (instant render) and "
+"then silently updates with authoritative server data within one network "
+"round-trip."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:49
+msgid "Database schema"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:51
+msgid "`process_definitions`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:52
+msgid ""
+"CREATE TABLE process_definitions (\n"
+"  id                     UUID         PRIMARY KEY DEFAULT gen_random_uuid()"
+",\n"
+"  lde_id                 VARCHAR(255) UNIQUE NOT NULL,\n"
+"  bpmn_process_id        VARCHAR(255) NOT NULL,\n"
+"  name                   VARCHAR(500) NOT NULL,\n"
+"  description            TEXT,\n"
+"  xml                    TEXT         NOT NULL,\n"
+"  process_role           VARCHAR(20)  NOT NULL DEFAULT 'standalone'\n"
+"                           CHECK (process_role IN ('shell', 'subprocess', "
+"'standalone')),\n"
+"  called_element         VARCHAR(255),\n"
+"  linked_dmn_templates   TEXT[]       NOT NULL DEFAULT '{}',\n"
+"  status                 VARCHAR(20)  NOT NULL DEFAULT 'wip'\n"
+"                           CHECK (status IN ('example', 'wip')),\n"
+"  readonly               BOOLEAN      NOT NULL DEFAULT FALSE,\n"
+"  schema_version         INTEGER      NOT NULL DEFAULT 1,\n"
+"  deployed_at            TIMESTAMPTZ,\n"
+"  operaton_url           TEXT,\n"
+"  operaton_deployment_id TEXT,\n"
+"  deployed_forms         TEXT[]       NOT NULL DEFAULT '{}',\n"
+"  deployed_documents     TEXT[]       NOT NULL DEFAULT '{}',\n"
+"  language               VARCHAR(2),                         -- v1.6.0\n"
+"  organization           VARCHAR(100),                        -- v1.6.0\n"
+"  created_at             TIMESTAMPTZ  NOT NULL DEFAULT NOW(),\n"
+"  updated_at             TIMESTAMPTZ  NOT NULL DEFAULT NOW()\n"
+");\n"
+"\n"
+"CREATE INDEX idx_pd_bpmn_process_id ON process_definitions (bpmn_process_id)"
+";\n"
+"CREATE INDEX idx_pd_called_element  ON process_definitions (called_element)\n"
+"  WHERE called_element IS NOT NULL;\n"
+"CREATE INDEX idx_pd_process_role    ON process_definitions (process_role);\n"
+"CREATE INDEX idx_pd_language        ON process_definitions (language)\n"
+"  WHERE language IS NOT NULL;\n"
+"CREATE INDEX idx_pd_organization    ON process_definitions (organization)\n"
+"  WHERE organization IS NOT NULL;"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:89
+msgid ""
+"`lde_id` is the internal LDE identifier (e.g. `process_1774384869117`). "
+"`bpmn_process_id` is the `<process id=\"...\">` value from the BPMN XML — "
+"used for subprocess lookup during bundle assembly."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:91
+msgid ""
+"`language` (ISO 639-1, nullable) and `organization` (open-ended key, "
+"nullable) were added in v1.6.0 to drive list-panel grouping and the deploy-"
+"time language consistency check; partial indexes skip the common `NULL` "
+"case. See [Multilingualism]{1}. The `deployed_*` columns were added in "
+"v1.4.0 for the deployment metadata flowback used by `listPublicBundles()`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:93
+msgid "`form_schemas`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:94
+msgid ""
+"CREATE TABLE form_schemas (\n"
+"  id             TEXT        PRIMARY KEY,\n"
+"  name           TEXT        NOT NULL,\n"
+"  description    TEXT,\n"
+"  schema         JSONB       NOT NULL,\n"
+"  status         TEXT        DEFAULT 'wip',\n"
+"  schema_version INTEGER     NOT NULL DEFAULT 1,\n"
+"  language       VARCHAR(2),                  -- v1.6.0\n"
+"  organization   VARCHAR(100),                 -- v1.6.0\n"
+"  created_at     TIMESTAMPTZ NOT NULL,\n"
+"  updated_at     TIMESTAMPTZ NOT NULL\n"
+");\n"
+"\n"
+"CREATE INDEX idx_fs_language     ON form_schemas (language)\n"
+"  WHERE language IS NOT NULL;\n"
+"CREATE INDEX idx_fs_organization ON form_schemas (organization)\n"
+"  WHERE organization IS NOT NULL;"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:114
+msgid "`document_templates`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:115
+msgid ""
+"CREATE TABLE document_templates (\n"
+"  id             TEXT        PRIMARY KEY,\n"
+"  name           TEXT        NOT NULL,\n"
+"  description    TEXT,\n"
+"  process_key    TEXT,\n"
+"  service_id     TEXT,\n"
+"  schema_version INTEGER     NOT NULL DEFAULT 1,\n"
+"  zones          JSONB       NOT NULL,\n"
+"  bindings       JSONB       NOT NULL DEFAULT '[]',\n"
+"  assets         JSONB       NOT NULL DEFAULT '[]',\n"
+"  status         TEXT        DEFAULT 'wip',\n"
+"  language       VARCHAR(2),                  -- v1.6.0\n"
+"  organization   VARCHAR(100),                 -- v1.6.0\n"
+"  created_at     TIMESTAMPTZ NOT NULL,\n"
+"  updated_at     TIMESTAMPTZ NOT NULL\n"
+");\n"
+"\n"
+"CREATE INDEX idx_dt_language     ON document_templates (language)\n"
+"  WHERE language IS NOT NULL;\n"
+"CREATE INDEX idx_dt_organization ON document_templates (organization)\n"
+"  WHERE organization IS NOT NULL;"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:141
+msgid "Migrations"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:143
+msgid ""
+"Schema migrations run automatically on backend startup via `migrate()` in "
+"`src/db/migrate.ts`, called from `startServer()` in `src/index.ts`. The "
+"migration uses inline SQL with `CREATE TABLE IF NOT EXISTS` guards, making "
+"it idempotent and safe to run on every deploy."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:144
+msgid ""
+"// src/index.ts\n"
+"const startServer = async () => {\n"
+"  await migrate();  // runs before app.listen()\n"
+"  // ...\n"
+"};"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:154
+msgid "Frontend service files"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:156
+msgid "File"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:156
+msgid "Storage key"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:156
+msgid "Backend prefix"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:156
+msgid "`src/services/bpmnService.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:156
+msgid "`linkedDataExplorer_bpmnProcesses`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:156
+msgid "`/v1/assets/bpmn`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:156
+msgid "`src/services/formService.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:156
+msgid "`linkedDataExplorer_formSchemas`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:156
+msgid "`/v1/assets/forms`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:156
+msgid "`src/services/documentService.ts`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:156
+msgid "`linkedDataExplorer_documentTemplates`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:156
+msgid "`/v1/assets/documents`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:162
+msgid ""
+"All three services follow the same interface: `getAll()`, `save(record)`, "
+"`delete(id)`, `getById(id)`, `hydrateFromServer()`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:166
+msgid "`BpmnProcess` type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:167
+msgid ""
+"interface BpmnProcess {\n"
+"  id: string;\n"
+"  name: string;\n"
+"  description?: string;\n"
+"  xml: string;\n"
+"  createdAt: string;\n"
+"  updatedAt: string;\n"
+"  linkedDmnTemplates: string[];\n"
+"  readonly?: boolean;\n"
+"  status?: 'example' | 'wip';\n"
+"  bpmnProcessId?: string;                               // <process "
+"id=\"...\"> from XML\n"
+"  processRole?: 'shell' | 'subprocess' | 'standalone'; // hierarchy role\n"
+"  calledElement?: string;                               // parent shell's "
+"bpmnProcessId\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:186
+msgid "Type safety — DB row types and mappers"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:188
+msgid ""
+"The `assets.service.ts` functions use the three-layer DB type pattern to "
+"safely bridge PostgreSQL row data and service-layer domain objects. "
+"`pool.query<T>()` is typed with a row type from `src/db/types.ts`, and "
+"results are transformed to camelCase domain objects via pure mapper "
+"functions in `src/db/mappers.ts`. This eliminates implicit `any` casts that "
+"TypeScript strict mode rejects on some platforms, and keeps all snake_case → "
+"camelCase and `null` → `undefined` conversion in one place."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:190
+msgid ""
+"See [DB Type Layer]{1} for the full pattern description and guidance on "
+"adding new entities."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:194
+msgid "Related pages"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:196
+msgid "[Backend Architecture]{1} — route and service overview"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:197
+msgid "[Local Development]{1} — PostgreSQL setup for local dev"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:198
+msgid "[DB Type Layer]{1} — DB row types, domain types, and mapper pattern"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:199
+msgid "[Deployment]{1} — Azure provisioning and App Settings"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cdeveloper%5Casset-storage.md:200
+msgid "[API Reference — Asset Storage]{1}"
+msgstr ""

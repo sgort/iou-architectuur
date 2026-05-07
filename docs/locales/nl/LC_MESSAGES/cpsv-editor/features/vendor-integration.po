@@ -1,0 +1,106 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Cvendor-integration.md:1
+msgid "Vendor Integration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Cvendor-integration.md:3
+msgid ""
+"Government reference implementations of decision models are open-source and "
+"validated by the responsible authority. Commercial vendors build their own "
+"implementations on top of these reference models, offering enterprise "
+"support, SLAs, and additional capabilities. The Vendor tab lets service "
+"owners document these vendor implementations and their certification status "
+"as part of the service's Linked Data record."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Cvendor-integration.md:7
+msgid "Multi-vendor architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Cvendor-integration.md:9
+msgid ""
+"The vendor list is loaded dynamically from the RONL vocabulary in TriplyDB, "
+"querying for all `ronl:MethodConcept` instances. This means new vendors "
+"appear in the dropdown automatically when they are added to the vocabulary — "
+"no editor update is required. Currently 17 vendor platforms are listed, with "
+"full integration implemented for iKnow and the Blueriq metadata form serving "
+"as the reference implementation for the broader pattern."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Cvendor-integration.md:11
+msgid ""
+"Each vendor implementation is modelled as a `ronl:VendorService`, linked to "
+"the reference service via `ronl:basedOn` and to the implementing "
+"organisation via `schema:provider`. The TTL output uses Schema.org and RONL "
+"vocabularies for contact, technical, and certification metadata."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Cvendor-integration.md:15
+msgid "iKnow integration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Cvendor-integration.md:17
+msgid ""
+"iKnow is a legislative analysis and knowledge management platform. The iKnow "
+"integration allows field mappings from iKnow XML exports to CPSV-AP "
+"properties to be configured and saved, then used to import actual iKnow data "
+"files."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Cvendor-integration.md:19
+msgid ""
+"The integration works in two modes. In **Configure** mode, an example XML "
+"file is uploaded and each XML field is mapped to the corresponding CPSV-AP "
+"property for each editor section (Service, Legal, Rules, Parameters, CPRMV). "
+"The configuration is saved as a reusable JSON file. In **Import** mode, the "
+"actual iKnow data file is uploaded, the saved configuration is selected, and "
+"the mapped data is previewed before importing into the editor."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Cvendor-integration.md:23
+msgid "Certification workflow"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Cvendor-integration.md:25
+msgid ""
+"The Vendor tab includes a certification tracking workflow. A vendor "
+"implementation can be marked with one of several certification statuses. "
+"When the status is set to `certified`, the certifying organisation "
+"(typically the competent authority from the Organisation tab) and "
+"certification date are required. A certification modal guides users through "
+"this process."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Cvendor-integration.md:27
+msgid ""
+"The certification details are included in the Turtle output as "
+"`ronl:certificationStatus`, `ronl:certifiedBy`, `ronl:certifiedAt`, and "
+"`ronl:certificationNote` properties, making certification status queryable "
+"via SPARQL."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Cvendor-integration.md:36
+msgid "Adding new vendors"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Cvendor-integration.md:38
+msgid ""
+"The architecture is designed for extension. Each vendor integration is a "
+"separate component in `src/components/tabs/vendors/`, rendered conditionally "
+"based on the selected vendor URI. Adding a new vendor integration requires "
+"creating the vendor-specific form component, implementing its data parser, "
+"creating a field mapping configuration, and adding state management — "
+"without modifying any existing vendor components."
+msgstr ""

@@ -1,0 +1,275 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:1
+msgid "User guide: applying for zorgtoeslag via Unive"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:3
+msgid ""
+"This guide walks through the complete end-to-end journey for the AWB "
+"zorgtoeslag cross-organisation scenario. No prior knowledge of the platform "
+"is needed — follow the steps in order."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:5
+msgid ""
+"**What this demonstrates:** A citizen logs into a private insurer's (Unive) "
+"portal, calculates their zorgtoeslag entitlement, submits a formal AWB "
+"application, and receives a decision — all without leaving the Unive "
+"environment. The application is handled by a Dienst Toeslagen caseworker on "
+"the government side."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:7
+msgid "**Environment:** [https://acc.mijn.open-regels.nl]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:11
+msgid "Step 1 — Log in as the Unive citizen"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:13
+msgid ""
+"Open [https://acc.mijn.open-regels.nl]{1} in your browser. You will see the "
+"login choice screen. Click **Inloggen met DigiD** to proceed to the Keycloak "
+"login form and enter the following credentials:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:15
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\zorgtoeslag-cross-org-journey.md:15"
+msgid "Field"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:15
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\zorgtoeslag-cross-org-journey.md:15"
+msgid "Value"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:15
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\zorgtoeslag-cross-org-journey.md:15"
+msgid "Username"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:15
+msgid "`test-citizen-unive`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:15
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\zorgtoeslag-cross-org-journey.md:15"
+msgid "Password"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:15
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\zorgtoeslag-cross-org-journey.md:15"
+msgid "`test123`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:20
+msgid ""
+"After login you are redirected to MijnOmgeving. The portal renders in the "
+"**Unive theme** — a magenta/pink primary colour. The header reads **Unive "
+"Verzekeringen**."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:29
+msgid "Step 2 — Calculate and apply for zorgtoeslag"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:31
+msgid ""
+"Click the **Zorgtoeslag** service card. The zorgtoeslag view opens with a "
+"calculator card and an Aanvragen button."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:33
+msgid "2a — Run the calculation (optional but recommended)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:35
+msgid ""
+"Fill in or adjust the following fields in the **Zorgtoeslag Berekenen** card:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:37
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\zorgtoeslag-cross-org-journey.md:37"
+msgid "Field"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:37
+msgid "Example value"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:37
+msgid "Geboortedatum"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:37
+msgid "`2000-01-10`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:37
+msgid "Toetsingsinkomen"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:37
+msgid "`30000`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:37
+msgid "Woonlandfactor"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:37
+msgid "`1.0`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:37
+msgid "Status zorgverzekering"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:37
+msgid "`Binnenlands zorgverzekerd`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:37
+msgid "Woonachtig in Nederland"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:37
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\zorgtoeslag-cross-org-journey.md:37"
+msgid "✅"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:37
+msgid "Rechtmatig verblijf NL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:37
+msgid "Gedetineerd"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:37
+msgid "☐"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:47
+msgid ""
+"Click **Berekenen**. The result card shows whether there is entitlement and "
+"the estimated annual and monthly amounts."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:54
+msgid "2b — Submit the application"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:56
+msgid ""
+"Click **Aanvragen**. The view switches to the **Zorgtoeslag aanvragen** "
+"card, which renders the deployed `zorgtoeslag-provisional-start` form via "
+"the Operaton process definition. The form fields are pre-filled from the "
+"values you entered in the calculator. Review the pre-filled values and "
+"submit the form to start the `AwbZorgtoeslagProcess`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:63
+msgid ""
+"After submission a success card appears showing the **dossiernummer**. The "
+"process is now running under Dienst Toeslagen (`municipality = toeslagen`)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:72
+msgid "Step 3 — Process the application as the Toeslagen caseworker"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:74
+msgid ""
+"Open a new browser session (incognito or a different browser) and go to "
+"[https://acc.mijn.open-regels.nl]{1}. Click **Inloggen als medewerker** on "
+"the login choice screen and enter the following credentials:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:76
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\zorgtoeslag-cross-org-journey.md:76"
+msgid "Field"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:76
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\zorgtoeslag-cross-org-journey.md:76"
+msgid "Value"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:76
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\zorgtoeslag-cross-org-journey.md:76"
+msgid "Username"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:76
+msgid "`test-caseworker-toeslagen`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:76
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\zorgtoeslag-cross-org-journey.md:76"
+msgid "Password"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:76
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\user-guide\\zorgtoeslag-cross-org-journey.md:76"
+msgid "`test123`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:81
+msgid ""
+"Navigate to the **Taken** section in the left panel. The zorgtoeslag task "
+"submitted by the Unive citizen appears in the task queue."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:88
+msgid ""
+"Click the task to open the detail panel. Click **Claimen** to assign it to "
+"yourself. The status changes to **Geclaimd**."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:95
+msgid ""
+"The task form renders via `TaskFormViewer`. Fill in the review fields and "
+"click **Submit review** to complete the task. Work through any subsequent "
+"tasks (`Sub_CaseReview`, `Task_Phase6_Notify`) in the same way until the "
+"process reaches its end event."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:104
+msgid "Step 4 — View the decision in the Unive portal"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:106
+msgid ""
+"Return to the first browser session (the Unive citizen). Click **Mijn "
+"aanvragen** in the tab bar. The dossier appears in the list with the label "
+"**Zorgtoeslag aanvragen** and the status **Afgerond**."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:113
+msgid ""
+"Click **Bekijk beslissing** on the dossier row. The `DecisionViewer` "
+"component fetches the document template bundled in the process deployment "
+"and renders it with the final process variables — including the provisional "
+"decision, amounts, and dossier reference."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cuser-guide%5Czorgtoeslag-cross-org-journey.md:120
+msgid ""
+"The citizen has now received their zorgtoeslag decision entirely within the "
+"Unive MijnOmgeving, while the process was handled by Dienst Toeslagen."
+msgstr ""

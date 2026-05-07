@@ -1,0 +1,1361 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:1
+msgid "Keycloak Deployment (VM)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:3
+msgid ""
+"Keycloak runs in Docker on the VM (`open-regels.nl`). Two fully isolated "
+"instances run in parallel: ACC and PROD. Each has its own PostgreSQL "
+"database container and custom RONL theme."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:12
+msgid "Repository structure"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:14
+msgid ""
+"ronl-business-api/\n"
+"├── deployment/vm/keycloak/\n"
+"│   ├── acc/\n"
+"│   │   ├── docker-compose.yml      # ACC configuration\n"
+"│   │   ├── README.md               # ACC setup guide\n"
+"│   │   └── .env.example            # ACC environment template\n"
+"│   ├── prod/\n"
+"│   │   ├── docker-compose.yml      # PROD configuration\n"
+"│   │   ├── README.md               # PROD setup guide\n"
+"│   │   └── .env.example            # PROD environment template\n"
+"│   └── themes/\n"
+"│       └── ronl/                   # Custom RONL theme\n"
+"│           └── login/\n"
+"│               ├── login.ftl       # FreeMarker template\n"
+"│               ├── theme.properties\n"
+"│               ├── resources/css/\n"
+"│               │   └── login.css   # Custom styles\n"
+"│               └── messages/\n"
+"│                   └── messages_nl.properties\n"
+"└── config/keycloak/\n"
+"    └── ronl-realm.json             # Realm configuration (users, clients, "
+"mappers)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:40
+msgid "Prerequisites"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:42
+msgid "On the VM (Ubuntu 24.04 LTS):"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:44
+msgid "Docker Engine 24+"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:45
+msgid "Docker Compose 2.x"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:46
+msgid "Domain `open-regels.nl` with DNS configured"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:47
+msgid "Ports 80 and 443 open"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:48
+msgid "Caddy running (see [Caddy Deployment]{1})"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:49
+msgid "SSH access restricted to authorized IPs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:53
+msgid "Custom RONL Theme"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:55
+msgid ""
+"The RONL theme provides a consistent visual experience from the MijnOmgeving "
+"landing page through the authentication flow."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:62
+msgid "Theme Features"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:64
+msgid "**Visual Design:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:66
+msgid "✅ Blue gradient header (`from-blue-600 to-blue-700`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:67
+msgid "✅ Modern rounded input fields with focus states"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:68
+msgid "✅ Custom styled buttons with hover animations"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:69
+msgid "✅ Responsive mobile-first design"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:70
+msgid "✅ Dutch language throughout"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:71
+msgid "✅ Identity provider button styling (DigiD/eHerkenning/eIDAS)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:73
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\keycloak.md:73"
+msgid "**Technical:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:75
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\keycloak.md:75"
+msgid "**Technical:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:77
+msgid "✅ FreeMarker templates for login flow"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:78
+msgid "✅ Custom CSS with government colour schemes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:79
+msgid "✅ Dutch translations (messages_nl.properties)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:80
+msgid "✅ Optimised for accessibility (WCAG 2.1 AA)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:81
+msgid "✅ Caseworker context banner via `loginHint` sentinel detection"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:82
+msgid "✅ \"← Terug naar inlogkeuze\" cancel link using `history.go(-2)`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:84
+msgid "Theme Structure"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:86
+msgid ""
+"ronl/login/\n"
+"├── login.ftl                          # Main login template\n"
+"├── theme.properties                   # Theme configuration\n"
+"├── resources/\n"
+"│   └── css/\n"
+"│       └── login.css                  # Custom styles (~500 lines)\n"
+"└── messages/\n"
+"    └── messages_nl.properties         # Dutch translations (40+ strings)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:97
+msgid "**Key CSS Components:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:99
+msgid ""
+"/* Blue gradient header */\n"
+"#kc-header {\n"
+"  background: linear-gradient(to right, #2563eb, #1d4ed8);\n"
+"  color: white;\n"
+"  padding: 2rem;\n"
+"  text-align: center;\n"
+"}\n"
+"\n"
+"/* Rounded modern inputs */\n"
+".pf-c-form-control {\n"
+"  border-radius: 0.5rem;\n"
+"  border: 1px solid #e5e7eb;\n"
+"  padding: 0.75rem 1rem;\n"
+"}\n"
+"\n"
+"/* Styled login button */\n"
+"#kc-login {\n"
+"  background: linear-gradient(to right, #3b82f6, #2563eb);\n"
+"  border-radius: 0.75rem;\n"
+"  padding: 0.875rem;\n"
+"  font-weight: 600;\n"
+"  transition: all 0.2s;\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:125
+msgid "Caseworker context banner"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:127
+msgid ""
+"The `login.ftl` template distinguishes citizen and caseworker login using a "
+"sentinel value passed via Keycloak's `login_hint` parameter. When "
+"`AuthCallback.tsx` calls `keycloak.login({ loginHint: '__medewerker__' })`, "
+"Keycloak populates `login.username` with this sentinel before rendering "
+"`login.ftl`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:129
+msgid "The template detects the sentinel at the top of the file:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:131
+msgid "<#assign isMedewerker = (login.username!'') == '__medewerker__'>"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:135
+msgid "When `isMedewerker` is true:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:137
+msgid ""
+"The page `<header>` section renders **\"Medewerker portaal\"** instead of "
+"the default \"Inloggen\" title"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:138
+msgid "An indigo context banner is rendered above the form:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:140
+msgid ""
+"<#if isMedewerker>\n"
+"<div id=\"kc-context-banner\" class=\"kc-context-medewerker\">\n"
+"    <!-- briefcase SVG icon -->\n"
+"    Inloggen als gemeentemedewerker\n"
+"</div>\n"
+"</#if>"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:149
+msgid ""
+"The username `<input>` suppresses the sentinel so the caseworker sees an "
+"empty field:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:151
+msgid ""
+"<input ... value=\"<#if !isMedewerker>${(login.username!'')}</#if>\" ... />"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:155
+msgid "The corresponding CSS in `login.css`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:157
+msgid ""
+"#kc-context-banner {\n"
+"  display: flex;\n"
+"  align-items: center;\n"
+"  gap: 0.5rem;\n"
+"  padding: 0.625rem 1rem;\n"
+"  margin-bottom: 1.5rem;\n"
+"  background: #f0f4ff;\n"
+"  border: 1px solid #c7d7fd;\n"
+"  border-radius: 8px;\n"
+"  color: #3730a3;\n"
+"  font-size: 0.875rem;\n"
+"  font-weight: 500;\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:173
+msgid ""
+"No JavaScript is involved — all detection and suppression happens server-"
+"side in FreeMarker before the HTML reaches the browser."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:175
+msgid "Cancel link"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:177
+msgid ""
+"Both citizen (test/fallback) and caseworker login forms include a \"← Terug "
+"naar inlogkeuze\" link below the submit button. It uses `history.go(-2)` to "
+"skip over the `/auth` intermediate route:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:179
+msgid ""
+"<div id=\"kc-cancel-container\">\n"
+"    <a id=\"kc-cancel\" href=\"${client.baseUrl!'/'}\"\n"
+"       onclick=\"history.go(-2); return false;\" tabindex=\"7\">\n"
+"        <!-- left-arrow SVG -->\n"
+"        Terug naar inlogkeuze\n"
+"    </a>\n"
+"</div>"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:189
+msgid ""
+"The `href` fallback (`client.baseUrl`) points to the frontend root URL "
+"configured in Keycloak Admin → Clients → `ronl-business-api` → Root URL. "
+"This is only used if JavaScript is disabled. The `history.go(-2)` skip is "
+"necessary because the browser history stack at this point is: `/ → /auth → "
+"[Keycloak]`, and `history.back()` would land on `/auth`, which immediately "
+"redirects back to Keycloak."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:191
+msgid ""
+"!!! note \"Container restart required after theme changes\" Keycloak caches "
+"theme templates at startup. Any change to `.ftl` or `.css` files requires a "
+"container restart to take effect — regardless of whether Keycloak is running "
+"in development or production mode. Theme changes do not require an image "
+"rebuild."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:196
+msgid "Deploying to ACC"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:198
+msgid "Step 1 — Prepare theme files"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:200
+msgid "On your local machine:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:202
+msgid ""
+"cd ~/Development/ronl-business-api\n"
+"\n"
+"# Create theme tarball\n"
+"cd deployment/vm/keycloak/themes\n"
+"tar -czf ronl-theme.tar.gz ronl/\n"
+"\n"
+"# Upload to VM\n"
+"scp ronl-theme.tar.gz user@your-vm:/tmp/"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:213
+msgid "Step 2 — Deploy theme on VM"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:215
+msgid "SSH into the VM:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:217
+msgid ""
+"ssh user@your-vm\n"
+"\n"
+"# Create themes directory (one-time setup)\n"
+"sudo mkdir -p /opt/keycloak/themes\n"
+"sudo chown 1000:1000 /opt/keycloak/themes\n"
+"sudo chmod 755 /opt/keycloak/themes\n"
+"\n"
+"# Extract theme\n"
+"cd /tmp\n"
+"tar -xzf ronl-theme.tar.gz\n"
+"\n"
+"# Install theme\n"
+"sudo rm -rf /opt/keycloak/themes/ronl\n"
+"sudo mv ronl /opt/keycloak/themes/\n"
+"\n"
+"# Set permissions (Keycloak runs as UID 1000)\n"
+"sudo chown -R 1000:1000 /opt/keycloak/themes/ronl\n"
+"sudo chmod -R 755 /opt/keycloak/themes/ronl\n"
+"sudo find /opt/keycloak/themes/ronl -type f -exec chmod 644 {} \\;\n"
+"\n"
+"# Verify\n"
+"ls -la /opt/keycloak/themes/ronl/login/\n"
+"\n"
+"# Cleanup\n"
+"rm /tmp/ronl-theme.tar.gz"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:245
+msgid "Step 3 — Update docker-compose.yml"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:247
+msgid "The docker-compose.yml must mount the themes directory:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:249
+msgid ""
+"services:\n"
+"  keycloak-acc:\n"
+"    image: quay.io/keycloak/keycloak:23.0\n"
+"    container_name: keycloak-acc\n"
+"    volumes:\n"
+"      - ./ronl-realm.json:/opt/keycloak/data/import/ronl-realm.json:ro\n"
+"      - keycloak-acc-data:/opt/keycloak/data\n"
+"      - /opt/keycloak/themes:/opt/keycloak/themes:ro  # Theme volume mount"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:260
+msgid "**Update on VM:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:262
+msgid ""
+"cd /home/steven/keycloak/acc\n"
+"\n"
+"# Backup current config\n"
+"cp docker-compose.yml docker-compose.yml.backup\n"
+"\n"
+"# Edit to add theme volume\n"
+"nano docker-compose.yml\n"
+"# Add: - /opt/keycloak/themes:/opt/keycloak/themes:ro\n"
+"\n"
+"# Recreate container to apply volume mount\n"
+"docker compose down\n"
+"docker compose up -d\n"
+"\n"
+"# Wait for startup\n"
+"sleep 30\n"
+"\n"
+"# Check logs\n"
+"docker compose logs keycloak-acc --tail 50"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:283
+msgid "Step 4 — Copy configuration files to VM"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:285
+msgid ""
+"# On local machine\n"
+"cd ~/Development/ronl-business-api\n"
+"\n"
+"# Copy docker-compose.yml\n"
+"scp deployment/vm/keycloak/acc/docker-compose.yml user@your-vm:~/keycloak/"
+"acc/\n"
+"\n"
+"# Copy realm file\n"
+"scp config/keycloak/ronl-realm.json user@your-vm:~/keycloak/acc/"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:296
+msgid "Step 5 — Create environment file"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:298
+msgid ""
+"# On VM\n"
+"cd ~/keycloak/acc\n"
+"\n"
+"# Generate secure password\n"
+"ADMIN_PW=$(openssl rand -base64 32)\n"
+"\n"
+"# Create .env file\n"
+"cat > .env << EOF\n"
+"KEYCLOAK_ADMIN_PASSWORD=$ADMIN_PW\n"
+"EOF\n"
+"\n"
+"chmod 600 .env\n"
+"\n"
+"# Save password securely\n"
+"echo \"ACC Admin: $ADMIN_PW\" >> ~/keycloak-passwords-acc.txt\n"
+"chmod 600 ~/keycloak-passwords-acc.txt"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:317
+msgid "Step 6 — Start Keycloak"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:319
+msgid ""
+"cd ~/keycloak/acc\n"
+"\n"
+"# Start services\n"
+"docker compose up -d\n"
+"\n"
+"# Watch logs\n"
+"docker compose logs -f keycloak-acc\n"
+"\n"
+"# Wait for: \"Keycloak started\" and \"Realm 'ronl' imported\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:331
+msgid "Step 7 — Configure theme in Admin Console"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:333
+msgid "**Open Admin Console:** https://acc.keycloak.open-regels.nl/admin"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:334
+msgid "**Login** with admin credentials (from `~/keycloak-passwords-acc.txt`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:335
+msgid "**Select realm:** Switch to `ronl` realm (top-left dropdown)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:336
+msgid "**Configure theme:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:336
+msgid "Left menu → **Realm Settings**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:336
+msgid "Tab → **Themes**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:336
+msgid "**Login Theme:** Select `ronl` from dropdown"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:336
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\keycloak.md:336"
+msgid "Click **Save**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:341
+msgid "**Configure localization:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:341
+msgid "Tab → **Localization**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:341
+msgid "**Internationalization:** Toggle ON"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:341
+msgid "**Supported Locales:** Ensure `nl` and `en` are checked"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:341
+msgid "**Default Locale:** Select `nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:341
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\keycloak.md:341"
+msgid "Click **Save**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:353
+msgid "Step 8 — Verify deployment"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:355
+msgid ""
+"# Check container status\n"
+"docker ps | grep keycloak-acc\n"
+"# Should show: (healthy)\n"
+"\n"
+"# Test health endpoint\n"
+"curl https://acc.keycloak.open-regels.nl/health/ready\n"
+"# Should return: {\"status\":\"UP\"}\n"
+"\n"
+"# Verify theme is mounted\n"
+"docker exec keycloak-acc ls -la /opt/keycloak/themes/ronl/login/\n"
+"# Should show: login.ftl, theme.properties, resources/, messages/\n"
+"\n"
+"# Test in browser (incognito to skip cache)\n"
+"# Visit: https://acc.mijn.open-regels.nl\n"
+"# Click \"Inloggen met DigiD\"\n"
+"# Should see themed login page with blue gradient header"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:376
+msgid "Deploying to PROD"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:378
+msgid ""
+"Follow the same steps using `deployment/vm/keycloak/prod/` and hostname "
+"`keycloak.open-regels.nl`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:380
+msgid "**Important differences for PROD:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:382
+msgid "Use separate admin password (stored in `~/keycloak-passwords-prod.txt`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:383
+msgid "Update `KC_HOSTNAME` to `keycloak.open-regels.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:384
+msgid "Use `KC_LOG_LEVEL: warn` instead of `info`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:385
+msgid "Test thoroughly in ACC before deploying to PROD"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:386
+msgid "Deploy during maintenance window"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:387
+msgid "Notify users of planned downtime"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:391
+msgid "Realm import"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:393
+msgid ""
+"The `ronl-realm.json` is imported on the first container start via the `--"
+"import-realm` flag in `docker-compose.yml`. It configures:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:395
+msgid "**Realm `ronl`** with brute-force protection"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:396
+msgid "**Client `ronl-business-api`** with PKCE and CORS settings"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:397
+msgid "**Protocol mappers:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:397
+msgid "`municipality` (user attribute)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:397
+msgid "`roles` (realm roles)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:397
+msgid "`loa` (assurance level - user attribute)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:401
+msgid "**Test users** with per-municipality attributes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:402
+msgid "**Token lifespans:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:402
+msgid "Access token: 15 minutes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:402
+msgid "SSO session: 30 minutes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:402
+msgid "Refresh token: 30 minutes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:407
+msgid "Re-importing the realm"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:409
+msgid "After modifying `config/keycloak/ronl-realm.json`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:411
+msgid ""
+"!!! note \"v2.6.0 — RIP Phase 1 roles\" This release adds two realm roles "
+"(`infra-projectteam`, `infra-medewerker`) and one test user (`test-infra-"
+"flevoland`). Re-import the realm on both ACC and PROD before deploying the "
+"updated frontend and backend."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:414
+msgid ""
+"# On localhost root dir\n"
+"scp config/keycloak/ronl-realm.json user@your-vm:~/keycloak/acc/ or /prod/\n"
+"\n"
+"# On the VM, for ACC\n"
+"# Copy the updated realm file to the container\n"
+"docker cp ~/keycloak/acc/ronl-realm.json keycloak-acc:/tmp/ronl-realm.json\n"
+"\n"
+"# Import with override\n"
+"docker exec keycloak-acc /opt/keycloak/bin/kc.sh import \\\n"
+"  --file /opt/keycloak/data/import/ronl-realm.json \\\n"
+"  --override true\n"
+"\n"
+"# Restart to apply\n"
+"cd ~/keycloak/acc\n"
+"docker compose restart keycloak-acc\n"
+"\n"
+"# On the VM, for PROD\n"
+"# Copy the updated realm file to the container\n"
+"docker cp ~/keycloak/prod/ronl-realm.json keycloak-prod:/tmp/ronl-"
+"realm.json\n"
+"\n"
+"# Import with override\n"
+"docker exec keycloak-prod /opt/keycloak/bin/kc.sh import \\\n"
+"  --file /opt/keycloak/data/import/ronl-realm.json \\\n"
+"  --override true\n"
+"\n"
+"# Restart to apply\n"
+"cd ~/keycloak/prod\n"
+"docker compose restart keycloak-prod"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:447
+msgid "Updating the Theme"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:449
+msgid "When theme files change (CSS updates, translations, etc.):"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:451
+msgid "Step 1 — Update in repository"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:453
+msgid ""
+"cd ~/Development/ronl-business-api\n"
+"\n"
+"# Make changes to theme files\n"
+"nano deployment/vm/keycloak/themes/ronl/login/resources/css/login.css\n"
+"\n"
+"# Commit changes\n"
+"git add deployment/vm/keycloak/themes/\n"
+"git commit -m \"style: update Keycloak theme styling [no ci]\"\n"
+"git push origin acc"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:465
+msgid "Step 2 — Deploy to VM"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:467
+msgid ""
+"# Create new tarball\n"
+"cd deployment/vm/keycloak/themes\n"
+"tar -czf ronl-theme.tar.gz ronl/\n"
+"\n"
+"# Upload to VM\n"
+"scp ronl-theme.tar.gz user@your-vm:/tmp/\n"
+"\n"
+"# SSH into VM\n"
+"ssh user@your-vm\n"
+"\n"
+"# Extract and replace\n"
+"cd /tmp\n"
+"tar -xzf ronl-theme.tar.gz\n"
+"sudo rm -rf /opt/keycloak/themes/ronl\n"
+"sudo mv ronl /opt/keycloak/themes/\n"
+"sudo chown -R 1000:1000 /opt/keycloak/themes/ronl\n"
+"sudo chmod -R 755 /opt/keycloak/themes/ronl\n"
+"\n"
+"# Restart Keycloak\n"
+"cd /home/steven/keycloak/acc\n"
+"docker compose restart keycloak-acc\n"
+"\n"
+"# Wait 30 seconds\n"
+"sleep 30\n"
+"\n"
+"# Test in browser (incognito mode)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:496
+msgid ""
+"**Note:** Keycloak caches themes. Always test in incognito/private browsing "
+"mode or clear browser cache."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:500
+msgid "Backup"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:502
+msgid "Database Backup"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:504
+msgid ""
+"# Daily backup of ACC Keycloak database\n"
+"docker exec keycloak-postgres-acc pg_dump -U keycloak keycloak \\\n"
+"  > /backup/keycloak-acc-$(date +%Y%m%d).sql\n"
+"\n"
+"# Daily backup of PROD Keycloak database\n"
+"docker exec keycloak-postgres-prod pg_dump -U keycloak keycloak \\\n"
+"  > /backup/keycloak-prod-$(date +%Y%m%d).sql"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:514
+msgid ""
+"Store backups off-VM (e.g., Azure Blob Storage with a 30-day retention "
+"policy)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:516
+msgid "Theme Backup"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:518
+msgid "Theme files are version-controlled in the Git repository:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:519
+msgid "`deployment/vm/keycloak/themes/ronl/`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:521
+msgid "No separate backup needed—restore from Git if needed."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:523
+msgid "Volume Backup"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:525
+msgid "For complete binary backup of the PostgreSQL data volume:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:527
+msgid ""
+"# Weekly volume backup\n"
+"docker run --rm \\\n"
+"  -v keycloak-acc-db-data:/data \\\n"
+"  -v /backup:/backup \\\n"
+"  alpine tar czf /backup/keycloak-acc-$(date +%Y%m%d).tar.gz /data"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:537
+msgid "Monitoring"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:539
+msgid "Health Checks"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:541
+msgid ""
+"# ACC health\n"
+"curl https://acc.keycloak.open-regels.nl/health/ready\n"
+"curl https://acc.keycloak.open-regels.nl/realms/ronl/.well-known/openid-"
+"configuration\n"
+"\n"
+"# PROD health\n"
+"curl https://keycloak.open-regels.nl/health/ready\n"
+"curl https://keycloak.open-regels.nl/realms/ronl/.well-known/openid-"
+"configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:551
+msgid "Container Status"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:553
+msgid ""
+"# On VM\n"
+"docker ps | grep keycloak\n"
+"# Should show: (healthy) status\n"
+"\n"
+"# Check resource usage\n"
+"docker stats keycloak-acc --no-stream\n"
+"docker stats keycloak-prod --no-stream"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:563
+msgid "Log Monitoring"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:565
+msgid ""
+"# View recent logs\n"
+"docker compose logs keycloak-acc --tail 100\n"
+"\n"
+"# Follow logs in real-time\n"
+"docker compose logs keycloak-acc -f\n"
+"\n"
+"# Check for errors\n"
+"docker compose logs keycloak-acc | grep -i error\n"
+"docker compose logs keycloak-acc | grep -i exception"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:579
+msgid "Troubleshooting"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:581
+msgid "Theme not appearing in dropdown"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:583
+msgid ""
+"**Symptoms:** Theme `ronl` not visible in Keycloak Admin Console theme "
+"dropdown."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:585
+msgid "**Cause:** Theme files not properly mounted or container not recreated."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:587
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\keycloak.md:587"
+msgid "**Solution:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:589
+msgid ""
+"# Verify theme exists in container\n"
+"docker exec keycloak-acc ls -la /opt/keycloak/themes/ronl/login/\n"
+"\n"
+"# Should show: login.ftl, theme.properties, resources/, messages/\n"
+"\n"
+"# If empty, check docker-compose.yml has volume mount\n"
+"# Then recreate container\n"
+"docker compose down\n"
+"docker compose up -d"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:601
+msgid "Theme selected but not applied"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:603
+msgid ""
+"**Symptoms:** Theme selected in Admin Console but still seeing default "
+"Keycloak theme."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:605
+msgid "**Cause:** Browser cache or theme not properly configured."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:607
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\keycloak.md:607"
+msgid "**Solution:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:609
+msgid ""
+"# 1. Clear browser cache or use incognito mode\n"
+"# 2. Verify theme is actually selected\n"
+"# Admin Console → Realm Settings → Themes → Login Theme = ronl\n"
+"\n"
+"# 3. Check theme files are valid\n"
+"docker exec keycloak-acc cat /opt/keycloak/themes/ronl/login/"
+"theme.properties\n"
+"\n"
+"# Should contain:\n"
+"# parent=base\n"
+"# import=common/keycloak\n"
+"# locales=nl,en\n"
+"\n"
+"# 4. Check logs for theme errors\n"
+"docker compose logs keycloak-acc | grep -i theme"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:626
+msgid "CSS not loading"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:628
+msgid "**Symptoms:** Login page shows but styling is broken."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:630
+msgid "**Cause:** CSS file permissions or path incorrect."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:632
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\keycloak.md:632"
+msgid "**Solution:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:634
+msgid ""
+"# Check CSS file exists\n"
+"docker exec keycloak-acc ls -la /opt/keycloak/themes/ronl/login/resources/"
+"css/login.css\n"
+"\n"
+"# Check permissions (should be 644)\n"
+"docker exec keycloak-acc stat /opt/keycloak/themes/ronl/login/resources/css/"
+"login.css\n"
+"\n"
+"# If wrong, fix on VM:\n"
+"sudo find /opt/keycloak/themes/ronl -type f -exec chmod 644 {} \\;\n"
+"docker compose restart keycloak-acc"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:646
+msgid "Caseworker banner not appearing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:648
+msgid ""
+"**Symptoms:** Caseworker login shows generic Keycloak form without the "
+"indigo banner or \"Medewerker portaal\" title."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:650
+msgid ""
+"**Cause 1:** Outdated `login.ftl` on the server — the sentinel detection "
+"code is missing."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:652
+msgid "**Solution:** Verify the installed template:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:653
+msgid ""
+"docker exec keycloak-acc grep -n 'isMedewerker' \\\n"
+"  /opt/keycloak/themes/ronl/login/login.ftl\n"
+"# Should return line numbers for the assign and if blocks"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:658
+msgid ""
+"If nothing is returned, redeploy the theme files and restart the container."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:660
+msgid ""
+"**Cause 2:** `sessionStorage` is not carrying `selected_idp = medewerker` to "
+"`/auth`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:662
+msgid ""
+"**Solution:** Open DevTools → Application → Session Storage → `http://"
+"localhost:5173` (or the ACC URL). Confirm `selected_idp` equals `medewerker` "
+"before the `/auth` route is hit. If it is missing or a different value, the "
+"`handleIDPSelection` call in `LoginChoice.tsx` is not firing correctly."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:664
+msgid "Username field pre-filled with `__medewerker__`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:666
+msgid ""
+"**Symptoms:** The caseworker login form shows `__medewerker__` in the "
+"username field."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:668
+msgid ""
+"**Cause:** The `login.ftl` on the server does not include the sentinel "
+"suppression condition on the `value` attribute."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:670
+msgid "**Solution:** The input must use:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:671
+msgid "value=\"<#if !isMedewerker>${(login.username!'')}</#if>\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:674
+msgid ""
+"Ensure the deployed `login.ftl` matches the version in the repository and "
+"restart the container."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:676
+msgid "Dutch translations not working"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:678
+msgid "**Symptoms:** Theme applied but text still in English."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:680
+msgid "**Cause:** Locale not configured or messages file missing."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:682
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\keycloak.md:682"
+msgid "**Solution:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:684
+msgid ""
+"# 1. Check messages file exists\n"
+"docker exec keycloak-acc ls -la /opt/keycloak/themes/ronl/login/messages/"
+"messages_nl.properties\n"
+"\n"
+"# 2. Verify realm localization settings\n"
+"# Admin Console → Realm Settings → Localization\n"
+"# - Internationalization: ON\n"
+"# - Default Locale: nl\n"
+"# - Supported Locales: nl, en (both checked)\n"
+"\n"
+"# 3. Check user's browser language preference\n"
+"# Browser should be set to Dutch (nl-NL) or accept Dutch as preferred "
+"language"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:698
+msgid "Container unhealthy after restart"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:700
+msgid "**Symptoms:** Container starts but health check fails."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:702
+msgid "**Cause:** Database connection issues or Keycloak startup timeout."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:704
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\keycloak.md:704"
+msgid "**Solution:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:706
+msgid ""
+"# Check database is running\n"
+"docker ps | grep postgres-acc\n"
+"\n"
+"# Check database logs\n"
+"docker compose logs keycloak-postgres-acc --tail 50\n"
+"\n"
+"# Check Keycloak logs for database connection errors\n"
+"docker compose logs keycloak-acc | grep -i \"database\\|connection\\|jdbc\"\n"
+"\n"
+"# If database is healthy, increase health check timeout\n"
+"# In docker-compose.yml:\n"
+"healthcheck:\n"
+"  start_period: 90s  # Increase from 60s"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:722
+msgid "Realm not imported on first start"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:724
+msgid "**Symptoms:** Keycloak starts but realm `ronl` doesn't exist."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:726
+msgid "**Cause:** Realm file not mounted or import flag missing."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:728
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\deployment\\keycloak.md:728"
+msgid "**Solution:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:730
+msgid ""
+"# Check realm file is mounted\n"
+"docker exec keycloak-acc ls -la /opt/keycloak/data/import/\n"
+"\n"
+"# Should show: ronl-realm.json\n"
+"\n"
+"# Check command includes import flag\n"
+"# In docker-compose.yml command section:\n"
+"command:\n"
+"  - start-dev\n"
+"  - --import-realm  # Must be present\n"
+"\n"
+"# Manually import if needed\n"
+"docker exec keycloak-acc /opt/keycloak/bin/kc.sh import \\\n"
+"  --file /opt/keycloak/data/import/ronl-realm.json"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:749
+msgid "Security Considerations"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:751
+msgid "Production Hardening"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:753
+msgid "For PROD deployment:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:755
+msgid ""
+"**Use production mode:** Change `start-dev` to `start` in docker-compose.yml"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:756
+msgid "**Enable HTTPS:** Keycloak should be behind Caddy with SSL"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:757
+msgid "**Strong passwords:** Use 32+ character random passwords for admin"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:758
+msgid "**Restrict admin access:** Limit admin console access to specific IPs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:759
+msgid "**Enable MFA:** Configure TOTP for admin accounts"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:760
+msgid "**Regular updates:** Keep Keycloak and PostgreSQL updated"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:761
+msgid "**Audit logging:** Enable and monitor Keycloak admin events"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:763
+msgid "Network Security"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:765
+msgid "✅ Keycloak not directly exposed (behind Caddy reverse proxy)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:766
+msgid "✅ PostgreSQL only accessible within Docker network"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:767
+msgid "✅ No unnecessary ports exposed"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:768
+msgid "✅ VM firewall configured (ports 22, 80, 443 only)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:769
+msgid "✅ SSH restricted to authorized IPs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:771
+msgid "Secrets Management"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:773
+msgid "❌ Never commit `.env` files to Git"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:774
+msgid "❌ Never commit admin passwords to Git"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:775
+msgid "✅ Store passwords in password manager (1Password, Bitwarden)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:776
+msgid "✅ Keep separate passwords for ACC and PROD"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:777
+msgid "✅ Rotate passwords regularly (quarterly recommended)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:781
+msgid "URLs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:783
+msgid "**ACC Environment:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:785
+msgid "**Admin Console:** https://acc.keycloak.open-regels.nl/admin"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:786
+msgid "**Health Check:** https://acc.keycloak.open-regels.nl/health/ready"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:787
+msgid "**Realm:** https://acc.keycloak.open-regels.nl/realms/ronl"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:788
+msgid ""
+"**OIDC Config:** https://acc.keycloak.open-regels.nl/realms/ronl/.well-known/"
+"openid-configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:789
+msgid "**Test Login:** https://acc.mijn.open-regels.nl"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:791
+msgid "**PROD Environment:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:793
+msgid "**Admin Console:** https://keycloak.open-regels.nl/admin"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:794
+msgid "**Health Check:** https://keycloak.open-regels.nl/health/ready"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:795
+msgid "**Realm:** https://keycloak.open-regels.nl/realms/ronl"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:796
+msgid ""
+"**OIDC Config:** https://keycloak.open-regels.nl/realms/ronl/.well-known/"
+"openid-configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:797
+msgid "**Production Portal:** https://mijn.open-regels.nl"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:801
+msgid "Related Documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:803
+msgid "[Authentication & IAM Features]{1} — Keycloak integration overview"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:804
+msgid "[Login Flow User Guide]{1} — End-user authentication experience"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:805
+msgid "[Frontend Development]{1} — Keycloak JS adapter integration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:806
+msgid "[Deployment Overview]{1} — Full deployment architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:807
+msgid "[Caddy Reverse Proxy]{1} — SSL termination and routing"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Cdeployment%5Ckeycloak.md:811
+msgid ""
+"**Questions or issues?** See [Troubleshooting]{1} or contact the "
+"infrastructure team."
+msgstr ""

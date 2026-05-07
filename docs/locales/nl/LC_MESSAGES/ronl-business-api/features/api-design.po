@@ -1,0 +1,182 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:1
+msgid "API Design"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:3
+msgid ""
+"RONL Business API follows the **Dutch Government API Design Rules** "
+"(Nederlandse API Strategie). The API is versioned, uses standard HTTP "
+"semantics, and provides machine-readable metadata via response headers."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:7
+msgid "Versioning"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:9
+msgid ""
+"All current endpoints are served under the `/v1/` prefix (rule API-20: major "
+"version in the URI path). A response header `API-Version` is added to every "
+"response (rule API-57):"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:11
+msgid ""
+"HTTP/1.1 200 OK\n"
+"API-Version: 1.0.0\n"
+"Content-Type: application/json"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:17
+msgid ""
+"Legacy endpoints under `/api/*` continue to work but are deprecated. They "
+"return additional headers (rule API-51):"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:19
+msgid ""
+"Deprecation: true\n"
+"Link: </v1/health>; rel=\"successor-version\""
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:24
+msgid "Legacy support will be removed in v2.0.0."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:28
+msgid "Naming conventions"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:30
+msgid "Rule"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:30
+msgid "Applied as"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:30
+msgid "API-05: use nouns"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:30
+msgid "`process`, `decision`, `health`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:30
+msgid "API-54: plural/singular"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:30
+msgid ""
+"Collections use plural (`/v1/process`), single resource uses singular with ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:30
+msgid "API-48: no trailing slashes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:30
+msgid "Enforced in routing configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:30
+msgid "API-53: hide implementation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:30
+msgid "No Operaton-internal identifiers exposed in responses"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:30
+msgid "API-04: language"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:30
+msgid ""
+"Technical endpoints in English; business variable names follow Dutch source "
+"data"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:40
+msgid "Request / response format"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:42
+msgid ""
+"All endpoints use `application/json`. Request bodies are validated using "
+"`express-validator`. Responses follow a consistent envelope:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:44
+msgid "**Success:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:45
+msgid ""
+"{\n"
+"  \"success\": true,\n"
+"  \"data\": { ... },\n"
+"  \"timestamp\": \"2026-02-20T10:00:00.000Z\"\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:53
+msgid "**Error:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:54
+msgid ""
+"{\n"
+"  \"success\": false,\n"
+"  \"error\": {\n"
+"    \"code\": \"VALIDATION_ERROR\",\n"
+"    \"message\": \"income must be a positive number\"\n"
+"  },\n"
+"  \"timestamp\": \"2026-02-20T10:00:00.000Z\"\n"
+"}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:67
+msgid "Rate limiting headers"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:69
+msgid ""
+"Rate limit state is communicated via standard headers (`RateLimit-Limit`, "
+"`RateLimit-Remaining`, `RateLimit-Reset`) when approaching the limit."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:73
+msgid "OpenAPI documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:75
+msgid ""
+"An OpenAPI 3.0 specification is planned at `/v1/openapi.json` (rule API-16 / "
+"API-51). It is currently enabled only in non-production environments via "
+"`ENABLE_SWAGGER=true`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:79
+msgid "Route inventory"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cfeatures%5Capi-design.md:81
+msgid ""
+"The full list of registered routes, including legacy `/api/*` equivalents, "
+"is documented in [API Endpoints]{1}."
+msgstr ""

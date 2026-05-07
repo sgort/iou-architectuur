@@ -1,0 +1,364 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:1
+msgid "Multilingualism"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:3
+msgid ""
+"A step-by-step walkthrough for tagging design artefacts with a language and "
+"organization, importing translated artefacts, and working with the HR-"
+"capacity Dutch reference bundle. For the architectural overview, see "
+"[Multilingualism]{1}."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:7
+msgid "Workflow 1 — Tag an existing artefact"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:9
+msgid ""
+"Open the artefact in its editor (BPMN Modeler, Form Editor, or Document "
+"Composer)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:10
+msgid "Scroll to the footer panel below the list."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:11
+msgid ""
+"**Language** — pick from the dropdown: Language-agnostic (default), English, "
+"Dutch, German."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:12
+msgid ""
+"**Organization** — type the key, or pick from the autocomplete suggestions "
+"populated from existing organizations."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:13
+msgid ""
+"Click **Save** in the canvas toolbar. The artefact is committed and the list "
+"panel regroups it under the new organization header."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:20
+msgid ""
+"Until you click Save, the artefact stays in its old group — the list panel "
+"reflects the committed state, not the in-progress draft. Type without "
+"commitment."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:22
+msgid ""
+"If you change the shell of a multi-process bundle and click Save, the "
+"shell's language and organization propagate to every linked subprocess in "
+"the same atomic write — even if you only edited the shell."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:26
+msgid "Workflow 2 — Filter the list panel"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:28
+msgid ""
+"In any list panel (Processes, Forms, Documents), use the **search box** at "
+"the top for free-text matching against name, description, and identifier."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:29
+msgid "Use the **language dropdown** next to the search box to narrow by tag:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:29
+msgid "`All languages` — every artefact, tagged or not"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:29
+msgid ""
+"`Untagged` — only artefacts with no language tag (useful for finding "
+"artefacts that still need tagging)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:29
+msgid "A specific language — only that code"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:33
+msgid ""
+"The match counter shows `<matched>/<total>` so you can see how many "
+"artefacts match."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:34
+msgid "Click an organization header to collapse or expand the group."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:41
+msgid ""
+"Untagged artefacts always match the `All languages` filter — they only "
+"disappear when you switch to a specific language. Use the `Untagged` option "
+"to find artefacts that still need tagging."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:45
+msgid "Workflow 3 — Import a translated artefact"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:47
+msgid ""
+"The cleanest way to add a translated sibling is to drop a properly-named "
+"file into the importer."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:49
+msgid ""
+"Save your translated file with a language suffix: `<artefact-id>.<lang>.<ext>"
+"` — e.g. `capacity-claim-intake.nl.form`, `MyProcess.de.bpmn`, `decision-"
+"letter.nl.document`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:50
+msgid "Click the upload icon in the editor's list panel."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:51
+msgid "Select the file (or multiple files at once for a whole bundle)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:52
+msgid ""
+"The imported artefact is automatically tagged with the inferred language. "
+"Set the organization in the footer if the file doesn't already carry it."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:53
+msgid "Click Save."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:55
+msgid ""
+"If you exported the file from LDE earlier with **Export .form** (or the "
+"equivalent), the language and organization are baked into the JSON and "
+"survive the round-trip — no need to re-tag."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:57
+msgid "The order of precedence for inferring the language on import is:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:59
+msgid ""
+"Language inside the file (`ronl:language` for BPMN, top-level `language` for "
+"form/document JSON)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:60
+msgid "Filename suffix `.<lang>.<ext>`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:61
+msgid "Untagged"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:65
+msgid "Workflow 4 — Translate an existing artefact in place"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:67
+msgid ""
+"When you have an existing artefact and want to produce a translated sibling:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:69
+msgid ""
+"**For forms:** Click **Export .form** on the original. Open the downloaded "
+"JSON in a code editor, translate the user-visible text (labels, "
+"descriptions, button text, option labels) keeping `id` and `key` fields "
+"stable. Save with a language-suffixed filename. Re-import."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:70
+msgid ""
+"**For BPMN:** Export the BPMN, copy to a sibling file in your repo with "
+"`.<lang>.bpmn` suffix, translate `name` attributes (process, tasks, "
+"gateways, flows). Keep `id` values, `conditionExpression` values, `formRef` "
+"(suffix with `-<lang>` if you want a separate Dutch form sibling), and "
+"`decisionRef` unchanged. Re-import."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:71
+msgid ""
+"**For documents:** Documents authored in the LDE Document Composer can also "
+"be exported and re-imported the same way; structural fields (zone IDs, "
+"binding placeholders) stay stable across translations."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:73
+msgid ""
+"The principle: **user-visible strings translate, code-level identifiers do "
+"not**. DMN variable keys, BPMN flow IDs, form field keys, and document "
+"binding placeholders all stay in their original (English) form. Only labels, "
+"descriptions, headings, and button text change."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:77
+msgid "Workflow 5 — Deploy a multi-language bundle"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:79
+msgid "If you've built a Dutch sibling of a process and want to deploy it:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:81
+msgid "Open the Dutch BPMN in the BPMN Modeler."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:82
+msgid ""
+"Click **Deploy**. The deploy modal lists the resources it will deploy (shell "
+"BPMN, subprocesses, forms, documents)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:83
+msgid ""
+"**Check for the amber language-mismatch warning.** If you see it, the bundle "
+"is mixing languages — typically because one of the linked forms or documents "
+"is still pointing at an English sibling. The warning lists the offending "
+"codes (e.g. `en, nl`)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:84
+msgid ""
+"Resolve the mismatch: open the misaligned form/document and either retag it "
+"or replace it with the Dutch sibling. Save and reopen the deploy modal — the "
+"warning should be gone."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:85
+msgid "Click **Deploy** in the modal."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:87
+msgid ""
+"The warning is advisory, not blocking — you can deploy through it for "
+"testing. For production, fix the mismatch first."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:96
+msgid "Workflow 6 — Explore the HR-capacity Dutch bundle"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:98
+msgid ""
+"A reference bundle ships with v1.6.0 to demonstrate end-to-end "
+"multilingualism."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:100
+msgid ""
+"Open the BPMN Modeler. Find **Beheer capaciteitsclaim — proces (Voorbeeld, "
+"NL)** under the FLEVOLAND group, marked with both `EXAMPLE` and Dutch "
+"language."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:101
+msgid ""
+"Open it. The canvas shows the translated process: tasks like *Overleggen en "
+"classificeren*, *Formatieclaim opstellen*, *Directiebesluit*, gateway labels "
+"like *Type aanvraag?* and flow labels like *formatie* / *inhuur* / "
+"*akkoord* / *afgewezen*."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:102
+msgid ""
+"Open one of its linked forms (e.g. *HR — Overleggen en classificeren "
+"(Voorbeeld, NL)*). Every label, description, and option label is in Dutch."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:103
+msgid ""
+"Now open the **CapacityClaimRouting** DMN. Note that the variable keys "
+"(`requestType`, `department`, `decisionRoute`, `advisoryGroup`) are still "
+"English. The same DMN serves both the English and Dutch sibling BPMNs — this "
+"is what stable English DMN keys buy you."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:105
+msgid ""
+"The bundle is the canonical example of how to do this for your own "
+"translations."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:109
+msgid "Common situations"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:111
+msgid ""
+"**I tagged a form with a language and the list didn't update.** Check that "
+"you clicked Save in the canvas toolbar. Until then, the change is in the "
+"draft only — the list shows the committed state."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:113
+msgid ""
+"**The amber language-mismatch warning won't go away.** Open each artefact "
+"listed in the deploy modal in turn and check its language tag in the footer. "
+"The mismatch is usually a form whose tag was left at the wrong value."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:115
+msgid ""
+"**I imported a `.nl.form` and the language wasn't picked up.** Confirm the "
+"filename ends `.nl.form` exactly (lowercase). Suffixes like `.NL.form` or "
+"`.nl.FORM` won't trigger the inference."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:117
+msgid ""
+"**Switching to a different artefact prompts about unsaved changes I didn't "
+"make.** This used to happen on document load before v1.6.0 due to a TipTap "
+"mount-time event. If you see it on the current version, treat it as a real "
+"bug and report it."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:119
+msgid ""
+"**The footer panel for forms is missing the RoPA and DSO sections.** That's "
+"expected — only BPMN processes have RoPA and DSO context. Forms and "
+"documents only carry language and organization."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:123
+msgid "Related documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:125
+msgid "[Multilingualism feature]{1} — overview, model, deploy check"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:126
+msgid "[BPMN Modeler]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:127
+msgid "[Form Editor]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/linked-data-explorer%5Cuser-guide%5Cmultilingualism.md:128
+msgid "[Document Composer]{1}"
+msgstr ""

@@ -1,0 +1,203 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:1
+msgid "Rules, Policy & Parameters"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:3
+msgid ""
+"The editor implements the **Rules–Policy–Parameters (RPP)** architectural "
+"pattern for structuring government business rule management. Three separate "
+"tabs map to the three layers of this pattern, each visually distinguished by "
+"colour and labelled with its RPP role."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:22
+msgid "The three layers"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "Layer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "Tab"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "Colour"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "RDF class"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "**Rules**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "Rules"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "🔵 Blue"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "`cpsv:Rule, ronl:TemporalRule`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "Executable decision logic that operationalises policy"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "**Policy**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "CPRMV"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "🟣 Purple"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "`cprmv:Rule`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "Normative values derived directly from legislation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "**Parameters**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "Parameters"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "🟢 Green"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "`ronl:ParameterWaarde`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:24
+msgid "Configurable values that tune rule behaviour"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:32
+msgid "Rules layer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:34
+msgid ""
+"Rules are time-bounded (`ronl:TemporalRule`) business rules that implement "
+"policy decisions. Each rule carries a mandatory identifier and title, an "
+"optional URI, temporal validity dates (`ronl:validFrom`, `ronl:validUntil`), "
+"a confidence level, and an extension reference (`ronl:extends`) that links "
+"the rule to a specific article or version of the legal resource."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:36
+msgid ""
+"The dual typing `a cpsv:Rule, ronl:TemporalRule` ensures both CPSV-AP 3.2.0 "
+"compliance and compatibility with Dutch RONL extensions."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:40
+msgid "Policy layer (CPRMV)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:42
+msgid ""
+"The CPRMV tab captures normative rules extracted directly from legislation — "
+"the values mandated by law rather than the computational logic that applies "
+"them. These are modelled as `cprmv:Rule` and imported either by pasting JSON "
+"(normenbrief format) or by filling in individual fields."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:44
+msgid ""
+"Each CPRMV rule has six mandatory fields: identifier, title, definition "
+"(full legal text), situational context, the normative value itself, and the "
+"legal source path (`cprmv:ruleIdPath`)."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:46
+msgid ""
+"An informational banner in the CPRMV tab shows the currently linked legal "
+"resource and the `cprmv:implements` property that creates an explicit "
+"semantic link between a policy rule and the versioned legislation it "
+"implements — enabling clean SPARQL queries without fragile string parsing."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:50
+msgid "Parameters layer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:52
+msgid ""
+"Parameters are configurable constants that tune rule behaviour without "
+"changing the rules themselves — for example, income thresholds, age limits, "
+"or regional rates. Modelled as `ronl:ParameterWaarde`, each parameter "
+"carries a machine-readable notation (`skos:notation`), a numeric value and "
+"unit (`schema:value`, `schema:unitCode`), and optional temporal validity."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:56
+msgid "Why this separation matters"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:58
+msgid ""
+"The RPP pattern creates a clear chain of traceability: **Law → Policy → Rule "
+"→ Parameter → Decision**. The practical benefits are:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:60
+msgid ""
+"**Legal traceability.** Every decision can be traced back to the specific "
+"article of legislation that mandates it. When legislation changes, the "
+"affected layer is immediately identifiable."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:62
+msgid ""
+"**Organisational agility.** Parameters can be adjusted (e.g. a regional "
+"pilot rate) without touching the rules or redeploying decision models. Rules "
+"can be versioned without touching the underlying policy statements."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:64
+msgid ""
+"**Governance clarity.** Each layer has distinct ownership. Policy rules are "
+"owned by legal teams, computational rules by analysts, and parameters by "
+"operational teams. Approval workflows can be scoped to the layer that "
+"actually changed."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cpsv-editor%5Cfeatures%5Crules-policy-parameters.md:66
+msgid "See [RPP Architecture Reference]{1} for the formal specification."
+msgstr ""

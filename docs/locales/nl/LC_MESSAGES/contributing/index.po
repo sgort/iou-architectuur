@@ -1,0 +1,350 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:1
+msgid "Contributing to IOU Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:3
+msgid ""
+"The IOU Architecture Framework is an open-source project published under the "
+"[European Union Public Licence v1.2 (EUPL-1.2)]{1}. Contributions of any "
+"kind — documentation improvements, bug reports, feature suggestions, or code "
+"— are welcome from everyone."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:10
+msgid "Code of Conduct"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:12
+msgid ""
+"This project adheres to the principles of the [Contributor Covenant Code of "
+"Conduct]{1}. By participating you agree to uphold these principles:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:16
+msgid ""
+"**Be respectful and inclusive.** Treat all participants with dignity "
+"regardless of background, experience level, gender, ethnicity, religion, or "
+"nationality."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:18
+msgid ""
+"**Assume good faith.** Interpret ambiguous contributions charitably and ask "
+"for clarification before escalating concerns."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:20
+msgid ""
+"**Be constructive.** Feedback should focus on the work, not the person. "
+"Offer concrete suggestions rather than criticism alone."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:22
+msgid ""
+"**Respect the scope.** Keep discussions on-topic for the project. Off-topic, "
+"harassing, or abusive behaviour will not be tolerated."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:25
+msgid ""
+"Violations can be reported confidentially to [steven.gort@ictu.nl]{1}. All "
+"reports will be handled with discretion and care."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:30
+msgid "Repositories"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:32
+msgid ""
+"Each component of the IOU Architecture ecosystem lives in its own repository "
+"on the [open-regels.nl GitLab instance]{1}."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "Component"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "Repository"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "Issues"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "IOU Architecture Docs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "[showcases/iou-architectuur]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing\\index.md:35"
+msgid "[Issues]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "RONL Business API"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "[hosting/ronl-business-api]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "CPSV Editor"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "[showcases/ttl-editor]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "Linked Data Explorer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "[hosting/linked-data-explorer]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "CPRMV API"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "[standards/cprmv]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:43
+msgid ""
+"For component-specific development setup, refer to each component's "
+"Developer Docs:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:45
+msgid "[RONL Business API — Local Development]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:46
+msgid "[CPSV Editor — Local Development]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:47
+msgid "[Linked Data Explorer — Local Development]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:48
+msgid "[CPRMV API — Local Development]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:52
+msgid "How to Contribute for Users"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:54
+msgid "[Submit a use case →]{1}{ .md-button .md-button--primary }"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:56
+msgid "How to Contribute for Developers"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:58
+msgid "1. Open an issue first"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:60
+msgid ""
+"Before starting any significant work, open an issue in the relevant "
+"repository to describe what you intend to do. This avoids duplicate effort "
+"and allows early feedback. For small corrections (typos, broken links, "
+"formatting) you can skip straight to a merge request."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:64
+msgid "2. Fork the repository"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:66
+msgid "Fork the relevant repository to your own GitLab account or namespace."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:68
+msgid "3. Create a feature branch"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:70
+msgid "Always work on a dedicated branch, never directly on `main` or `acc`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:72
+msgid ""
+"git checkout acc                          # start from the acceptance "
+"branch\n"
+"git pull origin acc                       # make sure it is up to date\n"
+"git checkout -b feature/your-topic-name  # create your feature branch"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:78
+msgid "Branch naming convention:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "Prefix"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "Use for"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "`feature/`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "New content or functionality"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "`fix/`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "Corrections and bug fixes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "`docs/`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "Documentation-only changes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "`refactor/`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "Restructuring without content change"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:87
+msgid "4. Make your changes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:89
+msgid "Run the documentation site locally while you work:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:91
+msgid ""
+"python -m venv venv && source venv/bin/activate\n"
+"pip install -r requirements.txt\n"
+"mkdocs serve"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:97
+msgid "The site is then available at `http://127.0.0.1:8000/`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:99
+msgid ""
+"For every English page you add or change, also update the corresponding "
+"Dutch placeholder under `docs/nl/`. Dutch placeholders use an info "
+"admonition linking back to the English source — see any existing file under "
+"`docs/nl/` for the correct format."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:103
+msgid "5. Commit your changes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:105
+msgid "Follow the [Conventional Commits]{1} specification:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:108
+msgid ""
+"docs: add troubleshooting section to LDE user guide\n"
+"fix: correct broken link in CPSV Editor overview\n"
+"feat: add CPRMV API authentication reference page"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:114
+msgid "6. Open a merge request"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:116
+msgid ""
+"Push your branch to your fork and open a merge request against the `acc` "
+"branch of the upstream repository."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:119
+msgid "git push origin feature/your-topic-name"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:123
+msgid "In the merge request description:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:125
+msgid "Reference the related issue (`Closes #123`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:126
+msgid "Briefly describe what changed and why"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:127
+msgid "Note any follow-up work that is out of scope for this MR"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:129
+msgid ""
+"Merge requests are reviewed by the maintainer. Feedback is given directly in "
+"the MR thread. Once approved, the maintainer merges into `acc` and promotes "
+"to `main` as part of the regular release cycle."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:133
+msgid "[Read Code Standards →]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:137
+msgid "Contact"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:139
+msgid ""
+"For questions, feature requests, or anything else related to the IOU "
+"Architecture that does not fit a GitLab issue, you can reach the project "
+"maintainer directly:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:142
+msgid ""
+"**Steven Gort — ICTU**\n"
+"[steven.gort@ictu.nl]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:147
+msgid "*Licensed under [EUPL-1.2]{1}.*"
+msgstr ""

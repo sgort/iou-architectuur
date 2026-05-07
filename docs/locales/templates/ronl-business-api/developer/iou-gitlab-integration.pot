@@ -1,0 +1,419 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:1
+msgid ""
+"---\n"
+"\n"
+"# IOU GitLab Integration\n"
+"\n"
+"The RONL Business API includes a lightweight proxy to the IOU Architecture "
+"GitLab repository (`git.open-regels.nl`). It is used by the IOU tab in the "
+"Flevoland tenant of the caseworker dashboard to allow external contributors "
+"to submit use-case scenarios, provide feedback, and browse submitted work "
+"items — without requiring a GitLab account.\n"
+"\n"
+"---\n"
+"\n"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:1
+msgid "Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:2
+msgid ""
+"Browser (IOU tab)\n"
+"    ↓ HTTP (no auth required for public endpoints)\n"
+"RONL Business API /v1/public/*\n"
+"    ↓ PRIVATE-TOKEN header (GITLAB_TOKEN)\n"
+"GitLab API (git.open-regels.nl)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:10
+msgid ""
+"All three public endpoints in this integration require no user "
+"authentication. The backend uses its own `GITLAB_TOKEN` service account to "
+"call the GitLab API on the caller's behalf."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:14
+msgid "Endpoints"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:16
+msgid "`POST /v1/public/use-case`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:18
+msgid ""
+"Receives a use-case submission and creates a GitLab issue with the label "
+"defined in `GITLAB_UC_LABEL`. The title is automatically prefixed with `[Use "
+"Case]`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:20
+msgid "**Request body (JSON):**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:22
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:22"
+msgid "Field"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:22
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:22"
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:22
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:22"
+msgid "Required"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:22
+msgid "`title`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:22
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:22"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:22
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:22"
+msgid "Yes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:22
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:22"
+msgid "`description`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:22
+msgid "Yes — full markdown body"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:27
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:27"
+msgid "**Response:** `201 { success: true, data: { iid, web_url } }`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:29
+msgid ""
+"The frontend component `IouGebruiksscenarioSection.tsx` builds the markdown "
+"body from a 10-section form. The organisation field is pre-filled as "
+"\"Provincie Flevoland\" for the Flevoland tenant."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:33
+msgid "`GET /v1/public/use-cases`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:35
+msgid ""
+"Lists GitLab issues for the project. Used by both the Actieve zaken and "
+"Archief sections in the IOU tab."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:37
+msgid "**Query param:** `state=opened` (default) | `closed`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:39
+msgid ""
+"**Response fields per item:** `iid`, `title`, `state`, `created_at`, "
+"`updated_at`, `web_url`, `labels`, `assignees[]`, `description`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:41
+msgid "Up to 100 items are returned, sorted by `created_at` descending."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:45
+msgid "`POST /v1/public/feedback`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:47
+msgid ""
+"Accepts a `multipart/form-data` form with optional screenshot attachments. "
+"Each file is uploaded to the GitLab project uploads API first; the returned "
+"markdown image references are embedded in the issue body."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:49
+msgid "**Form fields:**"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:51"
+msgid "Field"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:51"
+msgid "Type"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:51"
+msgid "Required"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgid "`name`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:51"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:51"
+msgid "Yes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgid "`org`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:51"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:51"
+msgid "No"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgid "`role`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:51"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgid "`contact`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:51"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:51"
+msgid "Yes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:51"
+msgid "`description`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:51"
+msgid "string"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:51"
+msgid "Yes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgid "`screenshots`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgid "file[]"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:51
+msgid "No — up to 5 images, 10 MB each"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:60
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api\\developer\\iou-gitlab-integration.md:60"
+msgid "**Response:** `201 { success: true, data: { iid, web_url } }`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:62
+msgid ""
+"Multer is configured with in-memory storage and an image-only MIME filter. "
+"The file size limit is enforced per file, not for the whole request."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:66
+msgid "`POST /v1/public/upload-file`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:68
+msgid ""
+"Uploads a single file of any type to the GitLab project uploads API and "
+"returns the GitLab Markdown reference. Used by `IouGebruiksscenarioSection` "
+"to pre-upload attachments before the use-case JSON body is submitted, so "
+"that the file markdown references can be embedded in the issue description."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:70
+msgid "**Form field:** `file` (single file, any MIME type, up to 10 MB)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:72
+msgid ""
+"**Response:** `201 { success: true, data: { markdown: \"![filename](upload-"
+"url)\" } }`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:74
+msgid ""
+"Uses a dedicated `uploadAny` multer instance without the image-only "
+"`fileFilter` applied to the `/feedback` route. No authentication required."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:76
+msgid ""
+"!!! note \"Why separate from `/use-case`\" The `/use-case` route accepts "
+"`Content-Type: application/json`. Combining file uploads with text fields in "
+"a single `multipart/form-data` request caused multer v2 to silently discard "
+"all text fields (`req.body` was empty regardless of field presence). Pre-"
+"uploading via `/upload-file` and embedding the returned references in the "
+"JSON body avoids this."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:81
+msgid "Configuration"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:83
+msgid "Variable"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:83
+msgid "Description"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:83
+msgid "`GITLAB_TOKEN`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:83
+msgid "Personal access token with `api` scope"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:83
+msgid "`GITLAB_BASE_URL`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:83
+msgid "Default: `https://git.open-regels.nl`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:83
+msgid "`GITLAB_PROJECT_PATH`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:83
+msgid "URL-encoded path, e.g. `showcases%2Fiou-architectuur`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:83
+msgid "`GITLAB_UC_LABEL`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:83
+msgid "Label for new use-case issues, e.g. `Submitted`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:90
+msgid ""
+"All four variables must be set for any of the three endpoints to function. "
+"Missing `GITLAB_TOKEN` or `GITLAB_PROJECT_PATH` causes the endpoint to "
+"return `503 GITLAB_NOT_CONFIGURED`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:94
+msgid "Enabling the IOU tab for a tenant"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:96
+msgid ""
+"The IOU tab is rendered only when `leftPanelSections.iou` is present in the "
+"tenant's `tenants.json` entry. To enable it for a tenant, add:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:97
+msgid ""
+"\"iou\": [\n"
+"  { \"id\": \"iou-gebruiksscenario\", \"label\": \"Gebruiksscenario "
+"indienen\", \"isPublic\": false },\n"
+"  { \"id\": \"iou-feedback\",         \"label\": \"Feedback "
+"geven\",            \"isPublic\": false },\n"
+"  { \"id\": \"iou-actieve-zaken\",    \"label\": \"Actieve "
+"zaken\",             \"isPublic\": true  },\n"
+"  { \"id\": \"iou-archief\",          \"label\": "
+"\"Archief\",                   \"isPublic\": true  }\n"
+"]"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:106
+msgid ""
+"The `isPublic: true` sections (`iou-actieve-zaken`, `iou-archief`) are "
+"visible without login. The submission sections require authentication."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:110
+msgid "Adding a new IOU section"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:112
+msgid ""
+"Add a new entry to `leftPanelSections.iou` in `tenants.json`, create a React "
+"component for the section, and add the corresponding `case` to the "
+"`renderContent()` switch in `CaseworkerDashboard.tsx`:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:113
+msgid ""
+"case 'iou-my-new-section':\n"
+"  return <MyNewIouSection />;"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:118
+msgid ""
+"No backend changes are required if the section only reads from existing "
+"endpoints."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:122
+msgid "Related documentation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:124
+msgid "[Caseworker Dashboard]{1} — IOU tab and tenant-scoped sections"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:125
+msgid "[API Endpoints]{1} — Full endpoint reference"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/ronl-business-api%5Cdeveloper%5Ciou-gitlab-integration.md:126
+msgid "[Environment Variables]{1} — GitLab configuration"
+msgstr ""

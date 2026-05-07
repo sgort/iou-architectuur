@@ -1,0 +1,338 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 14:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:1
+msgid "Publication Repositories"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:3
+msgid ""
+"The CPRMV API supports four publication methods, each registered in `data/"
+"cprmvmethods.ttl` under the `cprmvmethods:analysismethods` or "
+"`cprmvmethods:formalisationmethods` collection. The method detection logic "
+"in `serve.py` (`detect_cprmv_serve_acknowledged_method`) walks these RDF "
+"lists and attempts to parse the incoming rule set identifier against the "
+"`cprmv-serve:normalized-id-format` pattern of each method."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:7
+msgid "BWB — Basis Wettenbestand (Dutch national law)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:9
+msgid ""
+"The BWB repository holds consolidated versions of Dutch national "
+"legislation. The API supports three identifier forms:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:11
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:11"
+msgid "Form"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:11
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:11"
+msgid "Example"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:11
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:11"
+msgid "Behaviour"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:11
+msgid "`{BWBID}_{DATE}_{INDEX}`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:11
+msgid "`BWBR0015703_2025-07-01_0`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:11
+msgid "Fetches the specific indexed publication"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:11
+msgid "`{BWBID}_{DATE}_latest`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:11
+msgid "`BWBR0015703_2025-07-02_latest`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:11
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:11"
+msgid "SRU search for version valid on that date"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:11
+msgid "`{BWBID}`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:11
+msgid "`BWBR0015703`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:11
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:11"
+msgid "SRU search for version valid today"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:17
+msgid "For `latest` and bare-ID forms, the API queries the BWB SRU endpoint:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:19
+msgid ""
+"https://zoekservice.overheid.nl/sru/Search?x-"
+"connection=BWB&operation=searchRetrieve\n"
+"  &version=2.0&maximumRecords=1\n"
+"  &query=dcterms.identifier=BWBR0015703 and overheidbwb.geldigheidsdatum="
+"{valid-on}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:25
+msgid "The response identifies the publication XML at:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:27
+msgid ""
+"https://repository.officiele-overheidspublicaties.nl/bwb/{BWBID}/{DATE}_"
+"{INDEX}/xml/{BWBFILENAME}.xml"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:31
+msgid ""
+"Transform: `data/bwb2cprmv.xsl` — converts BWB `toestand` XML structure "
+"(hoofdstuk / paragraaf / artikel / lid / li) to nested CPRMV Turtle with "
+"`cprmv:id`, `cprmv:definition`, and `cprmv:hasPart` relations."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:35
+msgid ""
+"CVDR — Centrale Voorziening Decentrale Regelgeving (municipal regulations)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:37
+msgid ""
+"The CVDR repository holds regulations from Dutch municipalities, provinces, "
+"and water boards. Identifier forms:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:39
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:39"
+msgid "Form"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:39
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:39"
+msgid "Example"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:39
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:39"
+msgid "Behaviour"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:39
+msgid "`{CVDRID}_{INDEX}`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:39
+msgid "`CVDR712517_1`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:39
+msgid "Fetches the specific indexed version"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:39
+msgid "`{CVDRID}_{DATE}_latest`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:39
+msgid "`CVDR712517_2025-07-02_latest`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:39
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:39"
+msgid "SRU search for version valid on that date"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:39
+msgid "`{CVDRID}`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:39
+msgid "`CVDR712517`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:39
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:39"
+msgid "SRU search for version valid today"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:45
+msgid "SRU endpoint used for `latest`/bare forms:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:47
+msgid ""
+"https://zoekservice.overheid.nl/sru/Search?x-"
+"connection=cvdr&operation=searchRetrieve\n"
+"  &version=2.0&maximumRecords=1\n"
+"  &query=dcterms.identifier=CVD{rulesetid}_* and "
+"overheidrg.inwerkingtredingDatum<={valid-on}\n"
+"  sortby overheidrg.inwerkingtredingDatum/descending"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:54
+msgid "Transform: `data/cvdr2cprmv.xsl`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:58
+msgid "EU CELLAR — European Union legislation (Formex v4)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:60
+msgid ""
+"EU legislation in Formex v4 format is fetched from the Publications Office "
+"of the EU. Identifier form:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:62
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:62"
+msgid "Form"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:62
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:62"
+msgid "Example"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:62
+msgid "`CFMX4{CELLAR_ID}_{ITEM_ID}`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:62
+msgid "`CFMX483e4752e-f2e5-11e8-9982-01aa75ed71a1.0017.02_DOC_2`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:66
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:66"
+msgid "Publication URL:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:68
+msgid "https://publications.europa.eu/resource/cellar/{rulesetid}/{docid}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:72
+msgid ""
+"Date-based version resolution is not yet supported for CELLAR publications."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:74
+msgid "Transform: `data/fmx4cellar2cprmv.xsl`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:78
+msgid "DMN 1.3 via Operaton (experimental)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:80
+msgid ""
+"Decision models deployed to the Operaton BPMN/DMN engine can also be "
+"fetched. The identifier embeds the Operaton deployment ID and resource ID:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:82
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:82"
+msgid "Form"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:82
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:82"
+msgid "Example"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:82
+msgid "`DMN1.3_{deploymentid}R{resourceid}_{date}_{index}`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:82
+msgid "(from Operaton deployment API)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:86
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api\\features\\publication-repositories.md:86"
+msgid "Publication URL:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:88
+msgid ""
+"https://operaton.open-regels.nl/engine-rest/deployment/{deploymentid}/"
+"resources/{resourceid}/data"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:92
+msgid "Transform: `data/dmn13operaton2cprmv.xsl`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:94
+msgid ""
+"!!! warning \"Experimental\" The DMN 1.3 method is explicitly marked "
+"experimental. The deployment/resource ID extraction relies on a positional "
+"parsing hack in `serve.py` and is subject to change."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:99
+msgid "Analysis methods (non-publication)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:101
+msgid ""
+"`cprmvmethods.ttl` also registers analysis methods that are not publication "
+"endpoints — these describe how a rule set was analysed but do not provide "
+"publication URLs:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:103
+msgid "Method"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:103
+msgid "ID"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:103
+msgid "Law Analysis / Wetsanalyse (JAS)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:103
+msgid "`cprmvmethods:lawanalysis`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:103
+msgid "Calculemus / FLINT"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:103
+msgid "`cprmvmethods:calculemusflint`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/cprmv-api%5Cfeatures%5Cpublication-repositories.md:108
+msgid ""
+"These are used to annotate rule sets via `cprmv:hasMethod` in TTL files but "
+"are not matched by the serve API's method detection for retrieval purposes."
+msgstr ""
