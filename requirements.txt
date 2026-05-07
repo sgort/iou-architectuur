@@ -15,4 +15,4 @@ pymdown-extensions>=10.7
 click==8.2.1
 
 # weblate
-pip install -r docs/i18n-requirements.txt
+-r docs/i18n-requirements.txt

@@ -1,13 +1,4 @@
-# Omgevingsvariabelen
-
-!!! info "Documentatie in ontwikkeling"
-    De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
-    Raadpleeg de <a href="/ronl-business-api/references/environment-variables/">Engelse versie</a> voor de huidige inhoud.
-
----
-
-**Status:** Concept  
-**Engelstalige bron:** `ronl-business-api/references/environment-variables.md`
+# Environment Variables
 
 ---
 
@@ -15,44 +6,231 @@
 
 ### Server
 
+| Variable   | Required | Default     | Description                                  |
+| ---------- | -------- | ----------- | -------------------------------------------- |
+| `NODE_ENV` | Yes      | —           | `development`, `acceptance`, or `production` |
+| `PORT`     | Yes      | `3002`      | HTTP listen port (Azure uses `8080`)         |
+| `HOST`     | Yes      | `localhost` | Bind address (`0.0.0.0` on Azure)            |
+
 ### CORS
+
+| Variable      | Required | Description                                                          |
+| ------------- | -------- | -------------------------------------------------------------------- |
+| `CORS_ORIGIN` | Yes      | Comma-separated allowed origins (e.g. `https://mijn.open-regels.nl`) |
 
 ### Keycloak / JWT
 
+| Variable                 | Required   | Description                                                    |                           |
+| ------------------------ | ---------- | -------------------------------------------------------------- | ------------------------- |
+| `KEYCLOAK_URL`           | Yes        | Keycloak base URL (e.g. `https://keycloak.open-regels.nl`)     |                           |
+| `KEYCLOAK_REALM`         | Yes        | Realm name — always `ronl`                                     |                           |
+| `KEYCLOAK_CLIENT_ID`     | Yes        | Client ID — always `ronl-business-api`                         |                           |
+| `KEYCLOAK_CLIENT_SECRET` | Yes (prod) | Client secret from Keycloak                                    |                           |
+| `JWT_ISSUER`             | Yes        | Full issuer URL: `https://keycloak.open-regels.nl/realms/ronl` |                           |
+| `JWT_AUDIENCE`           | Yes        | Must match token `aud` claim — always `ronl-business-api`      |                           |
+| `TOKEN_CACHE_TTL`        | No         | `300`                                                          | JWKS cache TTL in seconds |
+
 ### Operaton
+
+| Variable                | Required | Description                                                                                            |
+| ----------------------- | -------- | ------------------------------------------------------------------------------------------------------ |
+| `OPERATON_BASE_URL`     | Yes      | `https://operaton.open-regels.nl/engine-rest`                                                          |
+| `OPERATON_TIMEOUT`      | `30000`  | Operaton request timeout in ms                                                                         |
+| `OPERATON_M2M_BASE_URL` | —        | Dedicated Operaton `engine-rest` base URL for M2M routes. Falls back to `OPERATON_BASE_URL` when unset |
+| `OPERATON_M2M_USERNAME` | —        | Basic auth username for the M2M Operaton instance                                                      |
+| `OPERATON_M2M_PASSWORD` | —        | Basic auth password for the M2M Operaton instance                                                      |
+
+### MCP AI Assistant
+
+| Variable                | Required    | Default                                             | Description                                                                                                                                                                                                                      |
+| ----------------------- | ----------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `MCP_ENABLED`           | No          | `false`                                             | Enables the MCP client and `POST /v1/mcp/chat`. Must be `true` on ACC/PROD.                                                                                                                                                      |
+| `ANTHROPIC_API_KEY`     | —           | Anthropic API key; required when `MCP_ENABLED=true` |                                                                                                                                                                                                                                  |
+| `MCP_SKIP_HEALTH_CHECK` | No          | `false`                                             | Skips provider health checks on startup. Useful when providers start slowly on first deployment.                                                                                                                                 |
+| `ANTHROPIC_API_KEY`     | Conditional | —                                                   | Anthropic API key. Required when `MCP_ENABLED=true` and `AnthropicLlmProvider` is active.                                                                                                                                        |
+| `OPENAI_API_KEY`        | No          | —                                                   | Enables `OpenAILlmProvider` and exposes `gpt-4o` and `gpt-4o-mini` in the model selector. Leave unset to use Anthropic only. Requires the `openai` package: `npm install openai --workspace=@ronl/backend`.                      |
+| `TRIPLYDB_MCP_ENABLED`  | No          | `false`                                             | Enables the TriplyDB Knowledge Graph MCP provider.                                                                                                                                                                               |
+| `TRIPLYDB_ENDPOINT`     | Conditional | —                                                   | SPARQL endpoint URL. Required when `TRIPLYDB_MCP_ENABLED=true`. Use `https://api.open-regels.triply.cc/datasets/stevengort/RONL/services/RONL/sparql` for the canonical RONL graph.                                              |
+| `TRIPLYDB_TOKEN`        | No          | —                                                   | TriplyDB API token. May be empty for public datasets.                                                                                                                                                                            |
+| `CPRMV_MCP_ENABLED`     | No          | `false`                                             | Enables the CPRMV legislation provider (Dutch and EU law via HTTP MCP).                                                                                                                                                          |
+| `CPRMV_URL`             | No          | `https://acc.cprmv.open-regels.nl/mcp`              | CPRMV MCP server URL. Override for PROD deployment.                                                                                                                                                                              |
+| `LDE_MCP_ENABLED`       | No          | `false`                                             | Enables the LDE Process Library provider. Exposes deployed BPMN bundles, form schemas, and document templates to the AI Assistant.                                                                                               |
+| `LDE_DATABASE_URL`      | Conditional | —                                                   | PostgreSQL connection string for the `lde_assets` database. Required when `LDE_MCP_ENABLED=true`. On Azure: use a separate Flexible Server and append `?sslmode=require`. Locally: reuse the existing `ronl-postgres` container. |
+
+> `OPERATON_USERNAME` and `OPERATON_PASSWORD` are also passed to the
+> `operaton-mcp` child process. Ensure they are set before enabling MCP.
+
+### Operaton — M2M
+
+| Variable                | Required | Default | Description                                                                                                                                                                 |
+| ----------------------- | -------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `OPERATON_M2M_BASE_URL` | No       | —       | Base URL for a dedicated Operaton instance used by M2M routes only. Falls back to `OPERATON_BASE_URL` when unset. On ACC: `https://operaton-doc.open-regels.nl/engine-rest` |
+| `OPERATON_M2M_USERNAME` | No       | —       | Basic auth username for the M2M Operaton instance                                                                                                                           |
+| `OPERATON_M2M_PASSWORD` | No       | —       | Basic auth password for the M2M Operaton instance                                                                                                                           |
+
+### eDOCS
+
+| Variable          | Required        | Default    | Description                                                                                                                                                                                                |
+| ----------------- | --------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `EDOCS_BASE_URL`  | Yes (live mode) | —          | eDOCS REST API base URL, e.g. `https://docuvitt-host/edocsapi/v1.0`                                                                                                                                        |
+| `EDOCS_LIBRARY`   | Yes (live mode) | `DOCUVITT` | eDOCS library name                                                                                                                                                                                         |
+| `EDOCS_USER_ID`   | Yes (live mode) | —          | eDOCS service account user ID                                                                                                                                                                              |
+| `EDOCS_PASSWORD`  | Yes (live mode) | —          | eDOCS service account password                                                                                                                                                                             |
+| `EDOCS_STUB_MODE` | No              | `true`     | When `true`, all eDOCS service methods return realistic fake responses. Set to `false` to enable live calls. Never commit real credentials to the repository — use Azure App Service Application settings. |
+
+### GitLab integration
+
+| Variable              | Default                      | Description                                                    |
+| --------------------- | ---------------------------- | -------------------------------------------------------------- |
+| `GITLAB_TOKEN`        | —                            | Personal access token with `api` scope for the GitLab instance |
+| `GITLAB_BASE_URL`     | `https://git.open-regels.nl` | GitLab instance base URL                                       |
+| `GITLAB_PROJECT_PATH` | —                            | URL-encoded project path (e.g. `showcases%2Fiou-architectuur`) |
+| `GITLAB_UC_LABEL`     | `Submitted`                  | Label applied to newly created use-case issues                 |
 
 ### Database (PostgreSQL)
 
+| Variable            | Required | Description                                                  |                          |
+| ------------------- | -------- | ------------------------------------------------------------ | ------------------------ |
+| `DATABASE_URL`      | Yes      | Full connection string with `?sslmode=require` in production |                          |
+| `DATABASE_POOL_MIN` | No       | `2`                                                          | Minimum pool connections |
+| `DATABASE_POOL_MAX` | No       | `10`                                                         | Maximum pool connections |
+
 ### Redis
+
+| Variable    | Required | Description             |                            |
+| ----------- | -------- | ----------------------- | -------------------------- |
+| `REDIS_URL` | Yes      | Redis connection string |                            |
+| `REDIS_TTL` | No       | `3600`                  | Default key TTL in seconds |
 
 ### Rate limiting
 
+| Variable                  | Required | Default | Description               |
+| ------------------------- | -------- | ------- | ------------------------- |
+| `RATE_LIMIT_WINDOW_MS`    | No       | `60000` | Rate limit window in ms   |
+| `RATE_LIMIT_MAX_REQUESTS` | No       | `100`   | Max requests per window   |
+| `RATE_LIMIT_PER_TENANT`   | No       | `false` | Scope limit per tenant+IP |
+
 ### Logging
+
+| Variable             | Required | Default | Description                             |
+| -------------------- | -------- | ------- | --------------------------------------- |
+| `LOG_LEVEL`          | No       | `info`  | `debug`, `info`, `warn`, `error`        |
+| `LOG_FORMAT`         | No       | `json`  | `json` (production) or `pretty` (local) |
+| `LOG_FILE_ENABLED`   | No       | `false` | Write logs to file                      |
+| `LOG_FILE_PATH`      | No       | —       | Log file directory                      |
+| `LOG_FILE_MAX_SIZE`  | No       | `10m`   | Max log file size before rotation       |
+| `LOG_FILE_MAX_FILES` | No       | `7`     | Number of rotated log files to keep     |
 
 ### Audit logging
 
+| Variable                   | Required | Default | Description                            |
+| -------------------------- | -------- | ------- | -------------------------------------- |
+| `AUDIT_LOG_ENABLED`        | No       | `true`  | Enable audit log writes                |
+| `AUDIT_LOG_INCLUDE_IP`     | No       | `true`  | Include client IP in audit records     |
+| `AUDIT_LOG_RETENTION_DAYS` | No       | `2555`  | Days to retain audit records (7 years) |
+
 ### Security
 
+| Variable         | Required | Default | Description                                                |
+| ---------------- | -------- | ------- | ---------------------------------------------------------- |
+| `HELMET_ENABLED` | No       | `true`  | Enable Helmet security headers                             |
+| `SECURE_COOKIES` | No       | `false` | Set Secure flag on cookies (enable in prod)                |
+| `TRUST_PROXY`    | No       | `false` | Trust Azure/proxy `X-Forwarded-*` headers (enable in prod) |
+
 ### Features
+
+| Variable                        | Required | Default                        | Description                                                                           |
+| ------------------------------- | -------- | ------------------------------ | ------------------------------------------------------------------------------------- |
+| `ENABLE_SWAGGER`                | No       | `false`                        | Enable OpenAPI docs at `/v1/openapi.json`                                             |
+| `ENABLE_METRICS`                | No       | `true`                         | Enable metrics endpoint                                                               |
+| `ENABLE_HEALTH_CHECKS`          | No       | `true`                         | Enable `/v1/health` endpoint                                                          |
+| `ENABLE_TENANT_ISOLATION`       | No       | `true`                         | Enforce per-tenant data isolation                                                     |
+| `DEFAULT_MAX_PROCESS_INSTANCES` | No       | `1000`                         | Max active instances per tenant                                                       |
+| `RONL_SPARQL_ENDPOINT`          | No       | `https://api.triplydb.com/...` | Override the default RONL TriplyDB SPARQL endpoint used by the Regelcatalogus service |
 
 ---
 
 ## Frontend — `packages/frontend/.env`
 
+| Variable            | Required | Description                                                                                                                                                                                         |
+| ------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_API_URL`      | Yes      | Business API base URL (e.g. `https://api.open-regels.nl/v1`)                                                                                                                                        |
+| `VITE_KEYCLOAK_URL` | Yes      | Keycloak base URL (e.g. `https://keycloak.open-regels.nl`)                                                                                                                                          |
+| `VITE_LDE_API_URL`  | Yes      | LDE public API base URL. Used by `ProcesBibliotheek` to fetch deployed BPMN bundles. ACC: `https://acc.backend.linkeddata.open-regels.nl/v1`. PROD: `https://backend.linkeddata.open-regels.nl/v1`. |
+
 ---
 
 ## DNS records
 
+These CNAME records must exist in the `open-regels.nl` DNS zone before
+deploying:
+
+```
 # ACC
+acc.api       CNAME   ronl-business-api-acc.azurewebsites.net
+acc.mijn      CNAME   <acc-static-web-app>.azurestaticapps.net
 
 # PROD
+api           CNAME   ronl-business-api-prod.azurewebsites.net
+mijn          CNAME   <prod-static-web-app>.azurestaticapps.net
+```
+
+VM subdomains use A records pointing to the VM's public IP:
+
+```
+acc.keycloak  A   <VM_IP>
+keycloak      A   <VM_IP>
+operaton      A   <VM_IP>
+```
 
 ---
 
 ## GitHub repository secrets
 
+These secrets must be configured in the GitHub repository before any workflow
+can deploy:
+
+| Secret name                            | Where to get it                                                           |
+| -------------------------------------- | ------------------------------------------------------------------------- |
+| `AZURE_WEBAPP_PUBLISH_PROFILE_ACC`     | Azure Portal → App Service `ronl-business-api-acc` → Get publish profile  |
+| `AZURE_WEBAPP_PUBLISH_PROFILE_PROD`    | Azure Portal → App Service `ronl-business-api-prod` → Get publish profile |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN_ACC`  | Azure Portal → Static Web App ACC → Manage deployment token               |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN_PROD` | Azure Portal → Static Web App PROD → Manage deployment token              |
+
 ---
 
 ## Generating environment passwords
 
+Save and run this script locally to generate all secrets for an environment:
+
+```bash
+#!/bin/bash
+set -e
+
+ENV=${1:-acc}   # usage: ./setup-env.sh acc  OR  ./setup-env.sh prod
+
+POSTGRES_PASSWORD=$(openssl rand -base64 32)
+KEYCLOAK_PASSWORD=$(openssl rand -base64 32)
+
+mkdir -p ~/.ronl-secrets
+
+cat > ~/.ronl-secrets/${ENV}-passwords.txt << EOF
 # RONL ${ENV^^} Environment — Generated: $(date)
+
+PostgreSQL:
+  Username: pgadmin
+  Password: ${POSTGRES_PASSWORD}
+
+Keycloak Admin:
+  Username: admin
+  Password: ${KEYCLOAK_PASSWORD}
+
+Connection strings:
+  DATABASE_URL: postgresql://pgadmin:${POSTGRES_PASSWORD}@ronl-postgres-${ENV}.postgres.database.azure.com:5432/audit_logs?sslmode=require
+  Keycloak VM .env: KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_PASSWORD}
+EOF
+
+chmod 600 ~/.ronl-secrets/${ENV}-passwords.txt
+echo "Passwords saved to: ~/.ronl-secrets/${ENV}-passwords.txt"
+echo "Back this file up securely before proceeding."
+```

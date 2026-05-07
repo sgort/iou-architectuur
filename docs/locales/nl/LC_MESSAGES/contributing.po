@@ -1,0 +1,797 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 15:22+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.19.8\n"
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:1
+msgid "Code Standards"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:3
+msgid ""
+"!!! info \"Documentation In Progress\" This page is being developed. Content "
+"will be added soon."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:8
+msgid "Coming Soon"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:10
+msgid ""
+"This section will contain comprehensive documentation about Code Standards."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:12
+msgid "For now, please refer to:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:13
+msgid "The main [documentation index]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:14
+msgid "Related sections in the navigation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Ccode-standards.md:18
+msgid ""
+"**Status**: Draft\n"
+"**Last Updated**: January 2026"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Cnavigation.md:1
+msgid "Navigation Structure"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Cnavigation.md:3
+msgid ""
+"The site uses MkDocs Material's tabbed navigation. Each top-level tab "
+"corresponds to a major component. Within each tab, pages are grouped into "
+"Features, User Guides, Developer Docs, and References."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Cnavigation.md:7
+msgid "Site Navigation Tree"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Cnavigation.md:9
+msgid ""
+"IOU Architecture Docs\n"
+"│\n"
+"├── 🇬🇧 English (/)\n"
+"│   ├── 📖 Home\n"
+"│   ├── ⚙️ RONL Business API\n"
+"│   │   ├── Overview\n"
+"│   │   ├── Features\n"
+"│   │   │   ├── Overview\n"
+"│   │   │   ├── Authentication & IAM\n"
+"│   │   │   ├── Multi-Tenant Portal\n"
+"│   │   │   ├── Business Rules Execution\n"
+"│   │   │   ├── API Design\n"
+"│   │   │   └── Security & Compliance\n"
+"│   │   ├── User Guides\n"
+"│   │   │   ├── Login & DigiD Flow\n"
+"│   │   │   ├── Caseworker Workflow\n"
+"│   │   │   ├── Submitting a Calculation\n"
+"│   │   │   └── Adding a Municipality\n"
+"│   │   ├── Developer Docs\n"
+"│   │   │   ├── Local Development\n"
+"│   │   │   ├── Backend Development\n"
+"│   │   │   ├── Frontend Development\n"
+"│   │   │   ├── Shared Package\n"
+"│   │   │   ├── Testing\n"
+"│   │   │   ├── CI/CD\n"
+"│   │   │   ├── Troubleshooting\n"
+"│   │   │   └── Deployment\n"
+"│   │   │       ├── Overview\n"
+"│   │   │       ├── Backend\n"
+"│   │   │       ├── Frontend\n"
+"│   │   │       ├── Keycloak\n"
+"│   │   │       ├── Operaton\n"
+"│   │   │       └── Caddy\n"
+"│   │   └── References\n"
+"│   │       ├── API Endpoints\n"
+"│   │       ├── Environment Variables\n"
+"│   │       ├── JWT Claims\n"
+"│   │       ├── Keycloak Realm Configuration\n"
+"│   │       ├── Municipality Themes\n"
+"│   │       ├── Standards & Compliance\n"
+"│   │       └── Changelog\n"
+"│   ├── ✏️ CPSV Editor\n"
+"│   │   ├── Overview\n"
+"│   │   ├── Features\n"
+"│   │   ├── User Guides\n"
+"│   │   ├── Developer Docs\n"
+"│   │   └── References\n"
+"│   ├── 🔍 Linked Data Explorer\n"
+"│   │   ├── Overview\n"
+"│   │   ├── Features\n"
+"│   │   ├── User Guides\n"
+"│   │   ├── Developer Docs\n"
+"│   │   └── References\n"
+"│   └── 🤝 Contributing\n"
+"│       ├── Overview\n"
+"│       ├── Documentation Architecture\n"
+"│       │   ├── Overview\n"
+"│       │   ├── Navigation Structure\n"
+"│       │   └── Technology Stack\n"
+"│       └── Code Standards\n"
+"│\n"
+"└── 🇳🇱 Nederlands (/nl/)\n"
+"    └── (mirrors English structure — Dutch translations or placeholders)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Coverview.md:1
+msgid "Overview"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Coverview.md:3
+msgid ""
+"This documentation site serves as the central reference for the IOU "
+"Architecture Framework and the RONL ecosystem. It is built with MkDocs and "
+"published to Azure Static Web Apps, supporting both English and Dutch."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Coverview.md:7
+msgid "Site Structure"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Coverview.md:9
+msgid ""
+"The site is organised into two language trees sharing a common set of "
+"assets, stylesheets, and abbreviations."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Coverview.md:11
+msgid ""
+"graph TB\n"
+"    subgraph \"IOU Architecture Documentation Site\"\n"
+"        subgraph \"English (Primary)\"\n"
+"            EN_HOME[Home/Index]\n"
+"            EN_RONL[RONL Business API]\n"
+"            EN_CPSV[CPSV Editor]\n"
+"            EN_LDE[Linked Data Explorer]\n"
+"            EN_CONTRIB[Contributing]\n"
+"        end\n"
+"\n"
+"        subgraph \"Nederlands (Translation)\"\n"
+"            NL_HOME[Home/Index]\n"
+"            NL_RONL[RONL Business API]\n"
+"            NL_CPSV[CPSV Editor]\n"
+"            NL_LDE[Linked Data Explorer]\n"
+"            NL_CONTRIB[Bijdragen]\n"
+"        end\n"
+"\n"
+"        subgraph \"Shared Resources\"\n"
+"            ASSETS[Assets<br/>images, diagrams, screenshots]\n"
+"            CSS[Custom CSS<br/>NL Design System]\n"
+"            ABBREV[Abbreviations<br/>& Snippets]\n"
+"        end\n"
+"    end\n"
+"\n"
+"    EN_HOME --> EN_RONL\n"
+"    EN_HOME --> EN_CPSV\n"
+"    EN_HOME --> EN_LDE\n"
+"    EN_HOME --> EN_CONTRIB\n"
+"\n"
+"    NL_HOME --> NL_RONL\n"
+"    NL_HOME --> NL_CPSV\n"
+"    NL_HOME --> NL_LDE\n"
+"    NL_HOME --> NL_CONTRIB\n"
+"\n"
+"    EN_CPSV -.uses.-> ASSETS\n"
+"    EN_LDE -.uses.-> ASSETS\n"
+"    NL_CPSV -.uses.-> ASSETS\n"
+"    NL_LDE -.uses.-> ASSETS\n"
+"\n"
+"    EN_HOME -.styled by.-> CSS\n"
+"    NL_HOME -.styled by.-> CSS\n"
+"    EN_HOME -.includes.-> ABBREV\n"
+"    NL_HOME -.includes.-> ABBREV\n"
+"\n"
+"    LANG_SWITCH[Language Switcher] -.->|EN| EN_HOME\n"
+"    LANG_SWITCH -.->|NL| NL_HOME\n"
+"\n"
+"    style EN_HOME fill:#4a90e2\n"
+"    style NL_HOME fill:#e17000\n"
+"    style ASSETS fill:#50c878\n"
+"    style LANG_SWITCH fill:#ffd700"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Coverview.md:68
+msgid "Content Sources"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Coverview.md:70
+msgid ""
+"English pages are the primary source of truth. Dutch pages are translations "
+"or placeholders that link back to the English version until a translation is "
+"available. Component documentation originates in each component's own "
+"repository and is synced into this site."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Coverview.md:72
+msgid ""
+"graph LR\n"
+"    subgraph \"Source Repositories\"\n"
+"        SRC_RONL[RONL Business API<br/>README + Docs]\n"
+"        SRC_CPSV[CPSV Editor<br/>README + Docs]\n"
+"        SRC_LDE[Linked Data Explorer<br/>README + Docs]\n"
+"    end\n"
+"\n"
+"    subgraph \"Sync Process\"\n"
+"        SCRIPT[sync-content<br/>Manual Extraction]\n"
+"    end\n"
+"\n"
+"    subgraph \"IOU Docs Site\"\n"
+"        DOC_RONL[docs/en/ronl-business-api/]\n"
+"        DOC_CPSV[docs/en/cpsv-editor/]\n"
+"        DOC_LDE[docs/en/linked-data-explorer/]\n"
+"    end\n"
+"\n"
+"    SRC_RONL -->|via| SCRIPT\n"
+"    SRC_CPSV -->|via| SCRIPT\n"
+"    SRC_LDE -->|via| SCRIPT\n"
+"\n"
+"    SCRIPT --> DOC_RONL\n"
+"    SCRIPT --> DOC_CPSV\n"
+"    SCRIPT --> DOC_LDE\n"
+"\n"
+"    DOC_RONL -.translate.-> NL_RONL[docs/nl/ronl-business-api/]\n"
+"    DOC_CPSV -.translate.-> NL_CPSV[docs/nl/cpsv-editor/]\n"
+"    DOC_LDE -.translate.-> NL_LDE[docs/nl/linked-data-explorer/]\n"
+"\n"
+"    style SRC_RONL fill:#ffe1e1\n"
+"    style SRC_CPSV fill:#ffe1e1\n"
+"    style SRC_LDE fill:#e1ffe1\n"
+"    style SCRIPT fill:#ffd700\n"
+"    style NL_RONL fill:#e17000\n"
+"    style NL_CPSV fill:#e17000\n"
+"    style NL_LDE fill:#e17000"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:1
+msgid "Technology Stack"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:5
+msgid "Documentation Framework"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:7
+msgid ""
+"The site is built on MkDocs with the Material theme, the mkdocs-static-i18n "
+"plugin for dual-language support, and the git-revision-date-localized plugin "
+"for showing last-modified timestamps."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing\\doc-architecture\\technology-stack.md:9"
+msgid "Component"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Technology"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Version"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Static site generator"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "MkDocs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "1.5+"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Theme"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Material for MkDocs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "9.5+"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Internationalisation"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "mkdocs-static-i18n"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing\\doc-architecture\\technology-stack.md:9"
+msgid "1.2+"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Revision dates"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "git-revision-date-localized"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Diagram rendering"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Mermaid"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "via Material"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Hosting"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "Azure Static Web Apps"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing\\doc-architecture\\technology-stack.md:9"
+msgid "—"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "CI/CD"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:9
+msgid "GitHub Actions"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:19
+msgid ""
+"graph LR\n"
+"    subgraph \"Documentation Framework\"\n"
+"        MKDOCS[MkDocs 1.5+]\n"
+"        MATERIAL[Material Theme 9.5+]\n"
+"        I18N[mkdocs-static-i18n]\n"
+"        GIT_REV[git-revision-date-localized]\n"
+"    end\n"
+"\n"
+"    subgraph \"Content\"\n"
+"        MD[Markdown Files]\n"
+"        MERMAID[Mermaid Diagrams]\n"
+"        CODE[Syntax Highlighting]\n"
+"    end\n"
+"\n"
+"    subgraph \"Styling\"\n"
+"        CUSTOM[Custom CSS<br/>NL Design System]\n"
+"    end\n"
+"\n"
+"    subgraph \"Deployment\"\n"
+"        GH_ACTIONS[GitHub Actions]\n"
+"        AZURE_SWA[Azure Static Web Apps]\n"
+"        CDN[Global CDN]\n"
+"    end\n"
+"\n"
+"    MKDOCS --> MATERIAL\n"
+"    MATERIAL --> I18N\n"
+"    MATERIAL --> GIT_REV\n"
+"\n"
+"    MD --> MKDOCS\n"
+"    MERMAID --> MKDOCS\n"
+"    CODE --> MKDOCS\n"
+"\n"
+"    MATERIAL --> CUSTOM\n"
+"\n"
+"    MKDOCS --> GH_ACTIONS\n"
+"    GH_ACTIONS --> AZURE_SWA\n"
+"    AZURE_SWA --> CDN\n"
+"\n"
+"    style MKDOCS fill:#4a90e2\n"
+"    style MATERIAL fill:#e17000\n"
+"    style I18N fill:#50c878\n"
+"    style AZURE_SWA fill:#4a90e2"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:66
+msgid "Build & Deploy Pipeline"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:68
+msgid ""
+"Every push to `main` triggers a GitHub Actions workflow that builds the site "
+"and deploys to Azure Static Web Apps. The `acc` branch deploys to the "
+"acceptance environment."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cdoc-architecture%5Ctechnology-stack.md:70
+msgid ""
+"graph TB\n"
+"    DEV[Developer] -->|Edit Markdown| LOCAL[Local Repository]\n"
+"    LOCAL -->|git push| GITHUB[GitHub Repository]\n"
+"\n"
+"    GITHUB -->|Trigger| CI[GitHub Actions]\n"
+"\n"
+"    CI -->|1. Install| DEPS[Python Dependencies<br/>mkdocs, mkdocs-"
+"material<br/>mkdocs-static-i18n]\n"
+"    DEPS -->|2. Build| BUILD{mkdocs build}\n"
+"\n"
+"    BUILD -->|3. Generate| EN_SITE[site/<br/>English Site at root]\n"
+"    BUILD -->|3. Generate| NL_SITE[site/nl/<br/>Dutch Site]\n"
+"\n"
+"    EN_SITE -->|4. Deploy| AZURE[Azure Static Web Apps]\n"
+"    NL_SITE -->|4. Deploy| AZURE\n"
+"\n"
+"    AZURE -->|5. Serve| PROD_EN[https://iou-architectuur.open-regels.nl/]\n"
+"    AZURE -->|5. Serve| PROD_NL[https://iou-architectuur.open-regels.nl/nl/"
+"]\n"
+"\n"
+"    USER[End Users] -->|Visit| PROD_EN\n"
+"    USER -->|Visit| PROD_NL\n"
+"\n"
+"    PROD_EN <-.Language Switch.-> PROD_NL\n"
+"\n"
+"    style DEV fill:#4a90e2\n"
+"    style GITHUB fill:#e17000\n"
+"    style AZURE fill:#50c878\n"
+"    style PROD_EN fill:#4a90e2\n"
+"    style PROD_NL fill:#e17000\n"
+"    style BUILD fill:#ffd700"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:1
+msgid "Contributing to IOU Architecture"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:3
+msgid ""
+"The IOU Architecture Framework is an open-source project published under the "
+"[European Union Public Licence v1.2 (EUPL-1.2)]{1}. Contributions of any "
+"kind — documentation improvements, bug reports, feature suggestions, or code "
+"— are welcome from everyone."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:10
+msgid "Code of Conduct"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:12
+msgid ""
+"This project adheres to the principles of the [Contributor Covenant Code of "
+"Conduct]{1}. By participating you agree to uphold these principles:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:16
+msgid ""
+"**Be respectful and inclusive.** Treat all participants with dignity "
+"regardless of background, experience level, gender, ethnicity, religion, or "
+"nationality."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:18
+msgid ""
+"**Assume good faith.** Interpret ambiguous contributions charitably and ask "
+"for clarification before escalating concerns."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:20
+msgid ""
+"**Be constructive.** Feedback should focus on the work, not the person. "
+"Offer concrete suggestions rather than criticism alone."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:22
+msgid ""
+"**Respect the scope.** Keep discussions on-topic for the project. Off-topic, "
+"harassing, or abusive behaviour will not be tolerated."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:25
+msgid ""
+"Violations can be reported confidentially to [steven.gort@ictu.nl]{1}. All "
+"reports will be handled with discretion and care."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:30
+msgid "Repositories"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:32
+msgid ""
+"Each component of the IOU Architecture ecosystem lives in its own repository "
+"on the [open-regels.nl GitLab instance]{1}."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing\\index.md:35"
+msgid "Component"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "Repository"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "Issues"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "IOU Architecture Docs"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "[showcases/iou-architectuur]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgctxt "C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing\\index.md:35"
+msgid "[Issues]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "RONL Business API"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "[hosting/ronl-business-api]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "CPSV Editor"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "[showcases/ttl-editor]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "Linked Data Explorer"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "[hosting/linked-data-explorer]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "CPRMV API"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:35
+msgid "[standards/cprmv]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:43
+msgid ""
+"For component-specific development setup, refer to each component's "
+"Developer Docs:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:45
+msgid "[RONL Business API — Local Development]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:46
+msgid "[CPSV Editor — Local Development]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:47
+msgid "[Linked Data Explorer — Local Development]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:48
+msgid "[CPRMV API — Local Development]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:52
+msgid "How to Contribute for Users"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:54
+msgid "[Submit a use case →]{1}{ .md-button .md-button--primary }"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:56
+msgid "How to Contribute for Developers"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:58
+msgid "1. Open an issue first"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:60
+msgid ""
+"Before starting any significant work, open an issue in the relevant "
+"repository to describe what you intend to do. This avoids duplicate effort "
+"and allows early feedback. For small corrections (typos, broken links, "
+"formatting) you can skip straight to a merge request."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:64
+msgid "2. Fork the repository"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:66
+msgid "Fork the relevant repository to your own GitLab account or namespace."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:68
+msgid "3. Create a feature branch"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:70
+msgid "Always work on a dedicated branch, never directly on `main` or `acc`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:72
+msgid ""
+"git checkout acc                          # start from the acceptance "
+"branch\n"
+"git pull origin acc                       # make sure it is up to date\n"
+"git checkout -b feature/your-topic-name  # create your feature branch"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:78
+msgid "Branch naming convention:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "Prefix"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "Use for"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "`feature/`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "New content or functionality"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "`fix/`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "Corrections and bug fixes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "`docs/`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "Documentation-only changes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "`refactor/`"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:80
+msgid "Restructuring without content change"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:87
+msgid "4. Make your changes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:89
+msgid "Run the documentation site locally while you work:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:91
+msgid ""
+"python -m venv venv && source venv/bin/activate\n"
+"pip install -r requirements.txt\n"
+"mkdocs serve"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:97
+msgid "The site is then available at `http://127.0.0.1:8000/`."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:99
+msgid ""
+"For every English page you add or change, also update the corresponding "
+"Dutch placeholder under `docs/nl/`. Dutch placeholders use an info "
+"admonition linking back to the English source — see any existing file under "
+"`docs/nl/` for the correct format."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:103
+msgid "5. Commit your changes"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:105
+msgid "Follow the [Conventional Commits]{1} specification:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:108
+msgid ""
+"docs: add troubleshooting section to LDE user guide\n"
+"fix: correct broken link in CPSV Editor overview\n"
+"feat: add CPRMV API authentication reference page"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:114
+msgid "6. Open a merge request"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:116
+msgid ""
+"Push your branch to your fork and open a merge request against the `acc` "
+"branch of the upstream repository."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:119
+msgid "git push origin feature/your-topic-name"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:123
+msgid "In the merge request description:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:125
+msgid "Reference the related issue (`Closes #123`)"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:126
+msgid "Briefly describe what changed and why"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:127
+msgid "Note any follow-up work that is out of scope for this MR"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:129
+msgid ""
+"Merge requests are reviewed by the maintainer. Feedback is given directly in "
+"the MR thread. Once approved, the maintainer merges into `acc` and promotes "
+"to `main` as part of the regular release cycle."
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:133
+msgid "[Read Code Standards →]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:137
+msgid "Contact"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:139
+msgid ""
+"For questions, feature requests, or anything else related to the IOU "
+"Architecture that does not fit a GitLab issue, you can reach the project "
+"maintainer directly:"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:142
+msgid ""
+"**Steven Gort — ICTU**\n"
+"[steven.gort@ictu.nl]{1}"
+msgstr ""
+
+#: C:/Users/gorts01/Development/iou-architectuur/docs/en/contributing%5Cindex.md:147
+msgid "*Licensed under [EUPL-1.2]{1}.*"
+msgstr ""

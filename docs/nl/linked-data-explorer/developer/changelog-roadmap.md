@@ -1,53 +1,971 @@
 # Changelog & Roadmap
 
-!!! info "Documentatie in ontwikkeling"
-    De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
-    Raadpleeg de <a href="/linked-data-explorer/developer/changelog-roadmap/">Engelse versie</a> voor de huidige inhoud.
-
 ---
 
-**Status:** Concept
-**Engelstalige bron:** `linked-data-explorer/developer/changelog-roadmap.md`
+# Changelog & Roadmap
 
 ---
 
 ## Changelog
 
+### v1.6.0 — Multilingualism & pending-until-Save editing (April 2026)
+
+**v1.6.0 — New Feature (April 27, 2026)**
+
+#### Multilingualism — language and organization metadata
+
+BPMN processes, Camunda forms, and document templates now carry an optional ISO
+639-1 language code (`en`, `nl`, `de`) and an open-ended organization key. The
+model is sibling-artefact i18n: each artefact exists once per language, with the
+LDE deploy modal warning on mixed-language bundles. DMNs stay language-agnostic
+— variable keys remain stable English so a single DMN serves both English and
+Dutch sibling BPMNs.
+
+- **Database** — `language VARCHAR(2)` and `organization VARCHAR(100)` columns
+  added to `process_definitions`, `form_schemas`, and `document_templates` with
+  partial indexes; nullable, existing rows coexist as `NULL`
+- **BPMN moddle descriptor** — `LanguageMixin` and `OrganizationMixin` extending
+  `bpmn:Process` in `ronlModdleDescriptor.json`; survive `saveXML` round-trip
+  via the existing `ronl` namespace registration
+- **List panels** — new `ArtefactListToolbar` (search + language filter + match
+  counter) shared by Process, Form, and Document lists; collapsible organization
+  groups; subprocesses follow their shell's organization regardless of their own
+  tag
+- **Editor footer panel** — uniform pattern across all three editors:
+  `LanguageSelector` and `OrganizationSelector` (with autocomplete from existing
+  organization keys); BPMN footer additionally retains RoPA and DSO selectors
+- **Filename-based language inference on import** — `.bpmn`, `.form`,
+  `.document` files with a `<id>.<lang>.<ext>` suffix are auto-tagged on import;
+  precedence: in-file value → filename → untagged
+- **Form export** — `Export .form` now wraps the form-js schema with top-level
+  `language` and `organization` keys and uses a language-suffixed filename;
+  round-trip integrity for all three artefact types
+- **Deploy-time language consistency check** — amber warning surfaces inline in
+  the deploy modal when a bundle mixes languages, listing the offending codes;
+  mirrors the existing RoPA-missing warning UX
+
+**Files:** `packages/backend/src/db/migrate.ts`,
+`packages/backend/src/db/types.ts`, `packages/backend/src/db/mappers.ts`,
+`packages/backend/src/domain/types.ts`,
+`packages/backend/src/services/assets.service.ts`,
+`packages/frontend/src/types/index.ts`,
+`packages/frontend/src/types/document.types.ts`,
+`packages/frontend/src/components/BpmnModeler/ronlModdleDescriptor.json`,
+`packages/frontend/src/components/common/LanguageSelector.tsx`,
+`packages/frontend/src/components/common/OrganizationSelector.tsx`,
+`packages/frontend/src/components/common/ArtefactListToolbar.tsx`,
+`packages/frontend/src/components/BpmnModeler/BpmnModeler.tsx`,
+`packages/frontend/src/components/BpmnModeler/BpmnCanvas.tsx`,
+`packages/frontend/src/components/BpmnModeler/ProcessList.tsx`,
+`packages/frontend/src/components/FormEditor/FormEditor.tsx`,
+`packages/frontend/src/components/FormEditor/FormCanvas.tsx`,
+`packages/frontend/src/components/FormEditor/FormList.tsx`,
+`packages/frontend/src/components/DocumentComposer/DocumentComposer.tsx`,
+`packages/frontend/src/components/DocumentComposer/DocumentList.tsx`,
+`packages/frontend/src/services/bpmnService.ts`,
+`packages/frontend/src/services/formService.ts`
+
+#### Pending-until-Save editing model
+
+Footer edits across BPMN, Form, and Document editors no longer persist
+immediately. They accumulate in a draft state on the editor parent and flush
+atomically when Save is clicked. Navigation guards confirm before discarding
+unsaved changes.
+
+- **Editor architecture** — footer state lifted to the editor parent
+  (`BpmnModeler`, `FormEditor`, `DocumentComposer`); children receive effective
+  values via props and report changes via callbacks; Save is the single point of
+  persistence
+- **Shell → subprocess atomic save** — saving a BPMN shell propagates `language`
+  and `organization` to all linked subprocesses in one write; idempotent (skips
+  subprocesses already aligned); shell wins unconditionally; example
+  subprocesses (`readonly: true`) are skipped
+- **Save button dirty tracking fixed** — Form Save button was always-enabled
+  (regression); now starts disabled, enables on first edit, disables after Save
+- **Document load window** — `DocumentComposer` no longer flips `hasChanges`
+  spuriously on document load; TipTap's mount-time `onUpdate` events are
+  suppressed for the macrotask following load via `isLoadingRef`
+
+#### HR-capacity Dutch reference bundle
+
+The first multi-language reference bundle: 1 BPMN, 8 forms, 2 documents under
+`examples/organizations/flevoland/HR-capacity/nl/`, all tagged `language=nl`,
+`organization=flevoland`. Same `CapacityClaimRouting` DMN serves both the
+English and Dutch siblings.
+
+#### Bug fixes
+
+- BPMN persistence: `language` and `organization` now included in the
+  `BpmnService.saveProcess` POST payload (previously dropped silently, causing
+  values to vanish on hydration)
+- `OrganizationSelector` is now controlled (`value`/`onChange`) rather than
+  uncontrolled (`defaultValue`/`onBlur`); switching artefacts refreshes the
+  input correctly
+- `BpmnCanvas` no longer resets on parent re-renders — `handleElementSelect`
+  stabilised via a ref, modeler-init effect deps narrowed to `xml`
+
+#### Known limitation
+
+The form-js properties panel loses input focus when typing pauses (Field label,
+Description, Key). Upstream form-js issue #86, marked wontfix by bpmn-io. Not
+LDE-caused, not fixable from React without forking form-js. Workaround: edit
+`.form` JSON in a code editor and re-import — filename-based language inference
+handles the language tag automatically.
+
+---
+
+### v1.5.3 — DSO Works tab & OIN preset fix (April 2026)
+
+**v1.5.3 — Patch (April 2026)**
+
+#### Works tab — new
+
+New **Works** tab in the DSO Explorer (between Concepts and Activities) backed
+by the Zoekinterface API.
+
+- Search werkzaamheden by user intent (e.g. "boom kappen") with autocomplete
+  suggestions after 2 characters; selecting a suggestion immediately fires the
+  search
+- Each result shows the human-readable `omschrijving`, the
+  `functioneleStructuurRef` (full concept URI — the Phase 4 pivot to STTR
+  files), and the short werkzaamheid URN
+- Selecting a result opens a detail panel showing the current version's
+  `omschrijving`, validity period, and full version history with start/end dates
+  and a "current" badge
+- Autocomplete uses `POST /werkzaamheden/_suggereer` with 300ms debounce
+- Reloads on DSO environment switch with the same clean-slate behaviour as the
+  other tabs
+
+#### Activities tab — OIN preset fix
+
+The Lelystad and Flevoland presets now use `POST /activiteiten/_zoek` with
+`bestuursorgaan.oin` filter instead of `_wijzigingen` — returning activities
+valid on a given date rather than a delta sync of changed activities.
+
+- Activities now appear in the list with their full `omschrijving` visible
+  immediately, without requiring parallel detail fetches
+- Date field defaults to today for OIN presets (yesterday offset removed — no
+  longer needed with `_zoek`)
+- Pagination works correctly in OIN mode — Load button reloads the authority
+  list for the selected date
+- Empty state distinguishes between no activities found in general vs no
+  activities found for the selected authority on the selected date
+
+#### Bug fixes
+
+- Activity Detail panel always using pre-production DSO when opened from the
+  Activities list — `env` was missing from the `getActiviteitDetail` call,
+  causing 404 for production-only activities
+- Activity Detail panel not re-fetching when DSO environment is switched while a
+  URN is already selected — `env` added to the `useEffect` dependency array
+- Activity Detail panel showing stale date context in OIN preset mode —
+  `activeDatum` now set correctly by `loadByOin` alongside the result
+
+#### Backend — DSO service
+
+- `zoekinterfaceBaseUrl` and `opvragenWerkzaamhedenBaseUrl` added to both `dso`
+  and `dsoProd` config blocks — defaults baked in, no new env vars required
+- `POST /v1/dso/werkzaamheden/zoek` — proxies Zoekinterface
+  `/werkzaamheden/_zoek`
+- `POST /v1/dso/werkzaamheden/suggereer` — proxies Zoekinterface
+  `/werkzaamheden/_suggereer`
+- `GET /v1/dso/werkzaamheden/:urn` — proxies Opvragen Werkzaamheden
+  `/werkzaamheden/{urn}` (version history, without expand — `_expandScope` enum
+  value not yet resolved)
+- `POST /v1/dso/activiteiten/oin` now uses `/activiteiten/_zoek` with
+  `bestuursorgaan.oin` body field and `datum` instead of `_wijzigingen` with
+  `datumVanaf`
+
+---
+
+### v1.5.2 — DSO Explorer enhancements (April 2026)
+
+**v1.5.2 — Patch (April 2026)**
+
+- DSO environment selector added to the Settings panel (gear icon): switch
+  between pre-production and production DSO independently of the LDE
+  environment, persisted across sessions in localStorage
+- Environment badge in the DSO Explorer header updates to reflect the active DSO
+  environment (amber for pre-production, green for production)
+- Both DSO environments use separate API keys configured via `DSO_API_KEY` and
+  `DSO_API_KEY_PROD` environment variables
+- Location presets (Lelystad, Flevoland) initially filter by authority OIN —
+  replaced with `_zoek` in v1.5.3
+- Child activities in the detail panel now show human-readable names fetched in
+  parallel after the parent detail loads
+- Graceful 404 handling in the detail panel: activities not available in the
+  active DSO environment show a clear message instead of a raw error
+
+---
+
+### v1.5.1 — Dev infrastructure (April 2026)
+
+**v1.5.1 — Infrastructure (April 2026)**
+
+#### Docker readiness check
+
+New `packages/backend/scripts/check-docker.sh` verifies the `ronl-postgres`
+container is up and healthy before nodemon starts the backend.
+
+- Coloured terminal output: green for ready, yellow for unhealthy, red for
+  missing or stopped
+- Suggests the exact `docker start` or `docker run` command if the container is
+  missing
+- Backend `dev` script now runs the check first; `dev:full` and `dev:backend`
+  scripts added to root `package.json` for one-command monorepo startup
+
+**Files:** `packages/backend/scripts/check-docker.sh`,
+`packages/backend/package.json`, `package.json`
+
+---
+
+### v1.5.0 — DSO Integration Phase 1 (March 2026)
+
+**v1.5.0 — New Feature (March 2026)**
+
+#### DSO Explorer
+
+New top-level view for browsing the Digitaal Stelsel Omgevingswet from inside
+LDE.
+
+- **Concepts tab** — full-text search across the Stelselcatalogus
+- **Activities tab** — RTR `activiteiten` list with date filtering and a detail
+  panel showing `bestuursorgaan`, validity, parent and child activities, and
+  which rule types (`Conclusie`, `Indieningsvereisten`, `Maatregelen`) are
+  present
+
+#### BPMN — DSO activiteit linkage
+
+- New `ronl:dsoActiviteitUrn` mixin on `bpmn:Process` in
+  `ronlModdleDescriptor.json`
+- New `DsoActiviteitSelector` component pinned to the BPMN Modeler footer
+  (sibling of `RopaSelector`)
+- Live URN verification against DSO RTR; on success shows the omschrijving,
+  authority block, and a direct link to the public RTR viewer
+- URN survives `saveXML` round-trips and shows up in process exports
+
+#### Backend — DSO service
+
+- New `src/services/dso.service.ts` covering Stelselcatalogus and RTR endpoints
+- New `src/routes/dso.routes.ts` at `/v1/dso/...`
+- Pre-production and production base URLs configurable via env; API keys per
+  environment
+- Path-aware DSO environment selection via `X-Dso-Env` header
+
+**Files:**
+`packages/frontend/src/components/BpmnModeler/DsoActiviteitSelector.tsx`,
+`packages/frontend/src/services/dsoService.ts`,
+`packages/backend/src/services/dso.service.ts`,
+`packages/backend/src/routes/dso.routes.ts`
+
+---
+
+### v1.4.0 — RoPA Records & GDPR Article 30 Compliance (March 2026)
+
+**v1.4.0 — New Feature (March 28, 2026)**
+
+#### RoPA Records — PostgreSQL
+
+Two new tables appended to the `migrate.ts` DDL block. Migrations run
+automatically at backend startup — no manual schema step required.
+
+- `ropa_records` — one row per process (shell or subprocess); keyed on
+  `bpmn_process_id` with a unique index so re-running the seed updates rows in
+  place rather than inserting duplicates; `status` column (`draft` / `active` /
+  `archived`) controls public visibility
+- `ropa_personal_data_fields` — one row per personal data field collected by the
+  linked forms; `ON DELETE CASCADE` from `ropa_records`; `special_category`
+  boolean flags Art. 9/10 GDPR fields
+- New `src/types/ropa.types.ts` — `RopaRecord`, `RopaPersonalDataField`,
+  `PublicRopaRecord`
+- New `src/services/ropa.service.ts` — `listRopa`, `getRopaById`,
+  `getRopaByBpmnProcessId`, `upsertRopa` (transactional: record header + field
+  rows in one `BEGIN`/`COMMIT`), `deleteRopa`, `listPublicRopa`
+- New `src/db/seed-ropa.ts` — idempotent seed for four active records covering
+  `AwbShellProcess`, `TreeFellingPermitSubProcess`, `AwbZorgtoeslagProcess`, and
+  `ZorgtoeslagProvisionalSubProcess`
+
+**Files:** `src/db/migrate.ts`, `src/types/ropa.types.ts`,
+`src/services/ropa.service.ts`, `src/db/seed-ropa.ts`
+
+#### RoPA Records — API routes
+
+- New `src/routes/ropa.routes.ts` — authenticated asset routes at
+  `/v1/assets/ropa`: `GET` (list), `POST` (upsert, returns `{ id }`), `DELETE
+  /:id`, `GET /by-bpmn-id/:bpmnProcessId`
+- New `src/routes/ropa.public.routes.ts` — CORS-open public route at
+  `/v1/ropa/public`; `?organisation=` query parameter filters by
+  `controller_name ILIKE '%…%'`; strips `controllerContact`, `dpoContact`, and
+  `schemaVersion` before returning; only `status = 'active'` records returned
+- Global CORS middleware in `src/index.ts` patched with path-aware logic:
+  `/v1/ropa/public` bypasses the origin whitelist entirely (`origin: '*'`); all
+  other routes remain subject to `CORS_ORIGIN` env var
+
+**Files:** `src/routes/ropa.routes.ts`, `src/routes/ropa.public.routes.ts`,
+`src/routes/index.ts`, `src/index.ts`
+
+#### RoPA Editor — LDE UI
+
+New **RoPA Records** view in the LDE sidebar (`ScrollText` icon).
+`ViewMode.ROPA` added to the enum in `types/index.ts`.
+
+- `RopaEditor.tsx` — root orchestrator; list state, load/save/delete; passes
+  `record={null}` for new records, `key={activeId}` on `RopaRecordEditor` for
+  clean remount on selection change
+- `RopaList.tsx` — left panel; shell records first, subprocess records second;
+  DRAFT / ACTIVE / ARCHIVED badges; delete control per record
+- `RopaRecordEditor.tsx` — four-tab editor:
+  - **Record** — all GDPR Art. 30 mandatory fields; **Lookup from knowledge
+    graph** button fires a SPARQL query against the TriplyDB RONL endpoint via
+    `POST /v1/triplydb/query` and returns a pick-list of `eli:LegalResource`
+    entries
+  - **Personal Data Fields** — **Hydrate from forms** reads `camunda:formRef`
+    values from the process XML, loads matching form schemas from `FormService`,
+    and appends one row per component with a `key` property; each row is
+    classified with a data category and Art. 9/10 flag
+  - **BPMN Link** — reads `ronl:ropaRef` from the matching process XML via
+    `BpmnService`; **Write ronl:ropaRef to BPMN** injects the attribute and
+    persists via `BpmnService.saveProcess`; status indicator: not linked /
+    linked (green) / points to different record (amber)
+  - **Status** — three lifecycle buttons with confirmation dialog before
+    activation
+- New `src/services/ropaService.ts` — fetch-based API client for all five
+  backend operations
+- New `src/types/ropa.types.ts` (frontend mirror)
+
+**Files:** `src/components/RopaEditor/RopaEditor.tsx`, `RopaList.tsx`,
+`RopaRecordEditor.tsx`, `src/services/ropaService.ts`,
+`src/types/ropa.types.ts`, `src/types/index.ts`, `src/App.tsx`
+
+#### RoPA Selector — BPMN Modeler
+
+- New `src/components/BpmnModeler/RopaSelector.tsx` — renders as a fixed footer
+  panel pinned below the scrollable process list in `ProcessList.tsx`; only
+  shown when `activeProcess` is non-null; reads the current `ronl:ropaRef` from
+  the process XML by regex; writes via `handleRopaRefChange` in
+  `BpmnModeler.tsx`
+- `ProcessList.tsx` — two new props: `activeProcess: BpmnProcess | null` and
+  `onRopaRefChange: (ropaRef: string | undefined) => void`; `RopaSelector`
+  rendered outside the `overflow-y-auto` scroll container so it stays pinned
+  regardless of list length
+- `BpmnModeler.tsx` — new `handleRopaRefChange`: ensures `xmlns:ronl`
+  declaration on `<definitions>`, then sets, updates, or removes `ronl:ropaRef`
+  on the `<bpmn:process>` opening tag; persists via `BpmnService.saveProcess`
+- `ronlModdleDescriptor.json` — second type entry added: `RopaRefMixin` extends
+  `bpmn:Process` with `ropaRef` as an `isAttr: true` String property; without
+  this registration the attribute is silently dropped by bpmn-js on `saveXML()`
+- Deploy modal — `ropaRefMissing` flag set when `ronl:ropaRef` is absent from
+  the process XML; amber non-blocking warning rendered between the resource list
+  and the resource count line
+
+**Files:** `src/components/BpmnModeler/RopaSelector.tsx`, `ProcessList.tsx`,
+`BpmnModeler.tsx`, `BpmnCanvas.tsx`, `ronlModdleDescriptor.json`
+
+#### RoPA Public Site — MVP
+
+New package `packages/ropa-site/` — a zero-dependency static HTML/CSS/JS site
+with no build step.
+
+- `index.html` — fetches `GET /v1/ropa/public`, renders collapsible cards per
+  record with full GDPR Art. 30 field display, personal data fields table with
+  colour-coded data categories and Art. 9/10 red badges, Provincie Flevoland
+  dark green house style; shells rendered before subprocesses
+- `staticwebapp.config.json` — Azure Static Web Apps navigation fallback and
+  no-cache headers
+- Deployed as a separate Azure Static Web Apps resource (`ropa-flevoland-acc`)
+  independent of the LDE frontend; GitHub Actions workflow scoped to
+  `packages/ropa-site/**` path filter
+
+**Files:** `packages/ropa-site/index.html`,
+`packages/ropa-site/staticwebapp.config.json`, `packages/ropa-site/README.md`,
+`.github/workflows/azure-static-web-apps-ropa-flevoland-acc.yml`
+
+---
+
 ### v1.3.0 — PostgreSQL Asset Storage & AWB Process Hierarchy (March 2026)
+
+**v1.3.0 — Infrastructure (March 25, 2026)**
+
+#### PostgreSQL asset storage
+
+BPMN processes, form schemas, and document templates now persist to PostgreSQL
+via the LDE backend rather than living exclusively in browser `localStorage`.
+
+- New `src/db/pool.ts` — `pg.Pool` initialised from `DATABASE_URL`; null-guarded
+  so the backend starts without a database configured
+- New `src/db/migrate.ts` — idempotent DDL (`CREATE TABLE IF NOT EXISTS`) for
+  `process_definitions`, `form_schemas`, and `document_templates`; called from
+  `startServer()` before `app.listen()`
+- New `src/services/assets.service.ts` — `listBpmn`, `upsertBpmn`, `deleteBpmn`,
+  `getBpmnByBpmnProcessId`, `listForms`, `upsertForm`, `deleteForm`,
+  `listDocuments`, `upsertDocument`, `deleteDocument`
+- New `src/routes/assets.routes.ts` — `GET`/`POST`/`DELETE` for each asset type;
+  `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId` for subprocess bundle
+  resolution; all routes return `503 DB_NOT_CONFIGURED` when pool is null
+- Registered at `/v1/assets` in `src/routes/index.ts`
+- `packages/backend/package.json` — `pg: ^8` added to `dependencies`,
+  `@types/pg: ^8` to `devDependencies`
+
+**Write-through cache strategy:** saves update `localStorage` immediately and
+fire a background POST to the backend. Reads remain synchronous from
+`localStorage` — zero-latency UI at all times.
+
+**Hydration on mount:** each editor runs `hydrateFromServer()` on mount — `GET
+/v1/assets/{type}` merges server records with local read-only examples and
+updates the `localStorage` cache. Falls back to local cache silently if the
+backend is unreachable.
+
+**Files:** `src/db/pool.ts`, `src/db/migrate.ts`,
+`src/services/assets.service.ts`, `src/routes/assets.routes.ts`,
+`src/routes/index.ts`, `src/index.ts`, `packages/backend/package.json`,
+`src/services/bpmnService.ts`, `src/services/formService.ts`,
+`src/services/documentService.ts`
+
+#### AWB shell / subprocess hierarchy
+
+The `BpmnProcess` type and process library now model the two-layer AWB shell
+pattern explicitly.
+
+- `BpmnProcess` interface extended with `bpmnProcessId?: string`, `processRole?:
+  'shell' | 'subprocess' | 'standalone'`, and `calledElement?: string`
+- `bpmnProcessId` is extracted from `<process id="...">` in the XML
+  automatically on save and import via `extractBpmnProcessId()`
+- All five seeded example processes carry explicit role and relationship
+  metadata
+- `ProcessList.tsx` renders a hierarchical grouped view: shell entries are
+  top-level, their subprocesses are indented with a tree connector; standalone
+  and unclassified processes appear as top-level entries
+- `SHELL` (violet) and `SUB` (teal) role badges added to process cards
+- `process_definitions` table stores `process_role`, `called_element`, and
+  `bpmn_process_id` as indexed columns
+
+**Files:** `src/types/index.ts`, `src/components/BpmnModeler/BpmnModeler.tsx`,
+`src/components/BpmnModeler/ProcessList.tsx`
+
+#### Schema versioning
+
+`schema_version INTEGER NOT NULL DEFAULT 1` column added to all three PostgreSQL
+tables, enabling server-side re-seeding of example assets across all users and
+devices when source files change.
+
+#### Zorgtoeslag example processes
+
+Three new versioned example processes added: `AwbZorgtoeslagProcess` (shell),
+`ZorgtoeslagProvisionalSubProcess`, and `ZorgtoeslagFinalSubProcess` (both
+subprocesses). Four new example forms: `zorgtoeslag-provisional-start`,
+`zorgtoeslag-provisional-review`, `zorgtoeslag-final-review`,
+`zorgtoeslag-notify-applicant`.
+
+**Files:** `src/utils/exampleVersions.ts`, `public/examples/toeslagen/`
+
+#### Azure deployment — troubleshooting notes
+
+During ACC deployment the following issues were encountered and resolved:
+
+- **`permission denied for schema public`** — Azure PostgreSQL Flexible Server
+  (PostgreSQL 15+) revokes `CREATE` on the public schema from non-superusers by
+  default. Fixed by running `GRANT ALL ON SCHEMA public TO lde_user` plus `ALTER
+  DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO lde_user` as admin.
+- **CI/CD health check failing (`503`)** — caused by the above permission error
+  crashing `migrate()` before `app.listen()` was reached. The App Service showed
+  "Application Error" page with no log output via `az webapp log tail`; logs
+  were only retrievable via `az webapp log download`.
+
+See [PostgreSQL Deployment](deployment-postgresql.md) for the full provisioning
+guide including these fixes.
+
+---
 
 ### v1.2.0 — RIP Phase 1 Bundle & eDOCS Integration (March 2026)
 
+**v1.2.0 — New Feature (March 14, 2026)**
+
+#### RIP Phase 1 Bundle
+
+New deployment bundle for the Regular Infrastructure Projects (RIP) Phase 1
+workflow — Provincie Flevoland.
+
+- 20-step BPMN process (`RipPhase1Process.bpmn`) covering project definition and
+  preliminary design preparation: intake form, intake meeting, intake report,
+  PSU organisation, PSU execution, PSU report, risk file preparation,
+  preliminary design principles, and two approval gateways with rejection loops
+- `RipProjectTypeAssignment.dmn` — assigns `candidateGroups` and `assignedRoles`
+  from `projectType` and `department`; all rules resolve to `infra-projectteam`
+  / `infra-medewerker`; designed for granular RBAC extension without BPMN
+  changes
+- 7 forms: `rip-intake`, `rip-intake-meeting`, `rip-intake-report`,
+  `rip-psu-organize`, `rip-psu-execution`, `rip-risk-file`, `rip-approval`
+  (reusable at both approval gateways)
+- 3 document templates: `rip-intake-report.document` (column 2),
+  `rip-psu-report.document` (column 3), `rip-pdp.document` (column 4)
+- Bundle deployed to `examples/organizations/flevoland/rip-phase1/`
+
+**Files:** `examples/organizations/flevoland/rip-phase1/`
+
+#### eDOCS Integration
+
+New backend service and external task worker for OpenText eDOCS document
+management.
+
+- `EdocsService` wraps the eDOCS REST API: `connect` (session token caching with
+  auto re-authentication on 401/403), `ensureWorkspace`, `uploadDocument`,
+  `getWorkspaceDocuments`, `healthCheck`
+- `ExternalTaskWorker` polls Operaton via `fetchAndLock` (long-polling, 20s
+  timeout) for two topics: `rip-edocs-workspace` (create/retrieve project
+  workspace, write `edocsWorkspaceId`) and `rip-edocs-document` (render and
+  upload document, write named output variable)
+- Stub mode (`EDOCS_STUB_MODE=true`, default) — all methods return realistic
+  fake responses; full process runs end-to-end without a live eDOCS server; no
+  code changes needed when switching to live
+- Worker started in `app.listen()` callback; stopped cleanly on
+  `SIGTERM`/`SIGINT`
+- 4 new REST endpoints: `GET /v1/edocs/status`, `POST
+  /v1/edocs/workspaces/ensure`, `POST /v1/edocs/documents`, `GET
+  /v1/edocs/workspaces/:id/documents`
+- New environment variables: `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`,
+  `EDOCS_PASSWORD`, `EDOCS_STUB_MODE`
+
+**Files:** `packages/backend/src/services/edocs.service.ts`,
+`packages/backend/src/services/externalTaskWorker.service.ts`,
+`packages/backend/src/routes/edocs.routes.ts`
+
+#### DMN Validator — Interaction Rules
+
+- **INT-005** scoped to DRDs only — no longer fires on standalone
+  single-decision DMNs; `<inputData>` elements on standalone models serve as
+  input contract declarations for CPSV publishing and do not require
+  `<informationRequirement>` wiring
+- **INT-007** (new) — warns when an `<inputExpression>` references a variable
+  name with no matching top-level `<inputData>` declaration; without this, the
+  CPSV Editor generates an empty request body on deploy
+
+**File:** `packages/backend/src/services/dmn-validation.service.ts`
+
+**v1.1.2 — Bug Fix (March 11, 2026)**
+
+#### Form Editor
+
+- **Save** now correctly persists the current schema. `saveSchema()` in form-js
+  1.20.x returns the schema object directly — not wrapped in `{ schema }`.
+  Destructuring assumption caused `undefined` to be written to `localStorage`,
+  making the active form disappear on the next render.
+- **Export .form** fixed for the same reason.
+- Vite `dedupe` config added for `preact` / `preact/hooks` / `preact/compat` to
+  prevent duplicate Preact instances after npm version round-trips involving
+  `@bpmn-io/*` packages; fixes `TypeError: Cannot read properties of undefined
+  (reading 'context')` on the form canvas.
+
+**Known issue:** Typing in a properties panel field (label, key, etc.) loses
+focus after the first character. Upstream form-js 1.20.x issue — Preact
+re-renders the properties panel internally on every change event. Will be
+resolved when an upstream fix is available.
+
+**File:** `packages/frontend/vite.config.ts`,
+`packages/frontend/src/components/FormEditor/FormCanvas.tsx`
+
+**v1.1.1 — Enhancement (March 10, 2026)**
+
+#### Import from file
+
+- **BPMN Modeler** — import `.bpmn` files via the Upload button in the process
+  list header; process name derived from the `name` attribute on the `<process>`
+  element, falling back to filename
+- **Form Editor** — import `.form` files; name derived from the schema `id`
+  field, falling back to filename
+- **Document Composer** — import `.document` files; receives a fresh `id` and
+  timestamps on import to avoid collisions with existing templates
+- All imported items open immediately in their respective editor and are
+  persisted to `localStorage`
+
+**Files:** `BpmnModeler/BpmnModeler.tsx`, `FormEditor/FormEditor.tsx`,
+`DocumentComposer/DocumentComposer.tsx`
+
+---
+
 ### v1.1.0 — Document Composer (March 2026)
 
-### v1.0.x — Form Editor & One-Click Deploy / Bug Fixes (March 2026)
+**v1.1.0 — New Feature (March 8, 2026)**
+
+#### Document Composer
+
+New **Document Composer** view for authoring formal government decision document
+templates (*beschikkingen*).
+
+- Three-panel layout matching BPMN Modeler and Chain Builder conventions:
+  document list (left), zone canvas (centre), Bindings panel (right)
+- Fixed-zone document structure: Letterhead, Contact Information, Reference,
+  Body, Closing, Sign-off, and optional Annex
+- Five draggable block types: rich text (TipTap with bold, italic, headings,
+  lists), variable placeholder, image (from TriplyDB), separator, horizontal
+  rule, and spacer
+- Blocks dragged from the Content library onto zones; reordering within and
+  across zones by drag
+- Image library tab fetches assets from the active TriplyDB dataset
+- Documents stored in `localStorage` under
+  `linkedDataExplorer_documentTemplates`; create, rename, delete, and **Save
+  as…** actions
+- Export document template as a `.document` JSON file
+- Read-only example document pre-loaded: **Kapvergunning Beschikking** (linked
+  to `AwbShellProcess`)
+
+**Files:** `DocumentComposer.tsx`, `DocumentCanvas.tsx`, `DocumentList.tsx`,
+`ZonePanel.tsx`, `TextBlockEditor.tsx`, `ImageBlock.tsx`, `VariableBlock.tsx`,
+`BindingPanel.tsx`, `document.types.ts`, `documentService.ts`
+
+#### Variable Bindings
+
+- Bindings panel maps `{{placeholder}}` tokens in rich-text blocks to Operaton
+  process variable keys
+- **Discover Variables** button queries `GET /v1/process/:key/variable-hints`
+  for all variables used by completed instances of a given process definition
+  key
+- Discovered variables shown as clickable chips labelled with type (`String`,
+  `Boolean`, `Double`, etc.)
+- Each binding records placeholder, variable key, source (`process` or
+  `dmn_output`), and optional label
+
+**File:** `BindingPanel.tsx`
+
+#### BPMN Modeler integration
+
+- **Link decision template** dropdown injected into the bpmn-js properties panel
+  for `UserTask` elements (not `StartEvent`)
+- Selecting a template writes `camunda:documentRef` to the BPMN XML
+- Purple badge (📄) rendered on the canvas below the element, below the existing
+  green form badge
+- Badge positioned at `bottom: -36` (vs. `bottom: -22` for the form badge) so
+  both badges are visible simultaneously
+- `DocumentTemplateSelector.tsx` follows the identical injection pattern as
+  `FormTemplateSelector.tsx`
+
+**Files:** `BpmnModeler/DocumentTemplateSelector.tsx`, `BpmnCanvas.tsx`
+
+---
+
+### v1.0.1 — Bug Fix & Internal (March 2026)
+
+**v1.0.1 — Bug Fix (March 7, 2026)**
+
+#### Bug fix
+
+Fixed `Task_Phase6_Notify` and `Task_RequestMissingInfo` appearing pre-claimed
+in the caseworker dashboard. `camunda:assignee="demo"` removed;
+`camunda:candidateGroups="caseworker"` added to both tasks so they are correctly
+visible in the task queue.
+
+#### Internal — example file migration and version registry
+
+- Example `.bpmn` and `.form` files moved to `public/examples/flevoland/` as the
+  single source of truth. Inline schemas removed from `bpmnTemplates.ts` and
+  `FormEditor.tsx`.
+- Added `exampleVersions.ts` with `EXAMPLE_VERSIONS` record (keyed by example
+  name, value is an integer version). The app compares stored versions in
+  `localStorage` key `linkedDataExplorer_exampleVersions` against
+  `EXAMPLE_VERSIONS` and re-fetches any example whose version has been
+  incremented.
+- **Developer workflow:** edit the file in `public/examples/`, mirror the change
+  to `examples/organizations/`, increment the version in `exampleVersions.ts`,
+  commit. Existing users receive the updated example without clearing
+  `localStorage`.
+
+**Files:** `exampleVersions.ts`, `bpmnTemplates.ts`, `FormEditor.tsx`,
+`public/examples/flevoland/`
+
+---
+
+### v1.0.0 — Form Editor & One-Click Deploy (March 2026)
+
+**v1.0.0 — Major Release**
+
+#### Form Editor
+
+New **Form Editor** view powered by `@bpmn-io/form-js` (schemaVersion 16, MIT
+licensed). Forms are authored as JSON schema, stored in `localStorage`, and
+available immediately to the BPMN Modeler.
+
+- Two-panel layout: form list (left) and `@bpmn-io/form-js` editor canvas
+  (right)
+- Create, rename, and delete WIP forms; three seed EXAMPLE forms are read-only
+- Three built-in examples: `kapvergunning-start` (citizen-facing),
+  `tree-felling-review` (caseworker review), `awb-notify-applicant` (caseworker
+  notification)
+- Export individual forms as `.form` JSON files compatible with Camunda Modeler
+  and Operaton
+- `FormService` localStorage CRUD shared with the BPMN Modeler — no sync step
+  required
+
+**Files:** `FormEditor.tsx`, `FormCanvas.tsx`, `FormList.tsx`, `formService.ts`
+
+#### BPMN Modeler — Form integration
+
+- **Link to Form** dropdown in the properties panel for `UserTask` and
+  `StartEvent` elements
+- Writes `camunda:formRef` and `camunda:formRefBinding="latest"` to the BPMN XML
+- `camunda:formRefBinding="latest"` means Operaton always resolves the most
+  recent deployment of that form ID — no version pinning needed
+- Green badge overlay on `UserTask` and `StartEvent` elements when a form is
+  linked
+- `DmnTemplateSelector` pre-selection bug fixed — dropdown now correctly
+  reflects an existing `camunda:decisionRef` when opening properties for an
+  already-linked element
+
+**Files:** `BpmnCanvas.tsx`, `FormTemplateSelector.tsx`
+
+#### BPMN Modeler — One-click deploy
+
+- **Deploy** button opens a modal listing all resources to be bundled: main
+  BPMN, subprocess BPMNs (resolved via `calledElement` attributes), and all
+  `.form` files referenced by `camunda:formRef`
+- All resources deployed in a single multipart `POST /api/dmns/process/deploy`
+  to Operaton — `camunda:formRef` resolves at runtime because BPMN and forms
+  share the same deployment ID
+- Configurable Operaton endpoint field pre-filled from `VITE_OPERATON_BASE_URL`
+- Optional HTTP Basic Auth credentials per deployment
+- Unmatched form references (in BPMN but not in localStorage) shown in modal
+  before deploying
+- Deploy button disabled after a successful deployment to prevent accidental
+  re-deploy
+
+**Files:** `BpmnCanvas.tsx` (frontend), `dmn.routes.ts` + `operaton.service.ts`
+(backend)
+
+---
 
 ### v0.9.x — DMN Syntactic Validation (February 2026)
 
+**v0.9.1 — Date Input Validation Fix**
+
+Fixed a false "Missing 1 required input(s)" error in the Chain Composer when a
+DMN contains an optional `Date` input whose test value is intentionally `null`
+(e.g. `overlijdensdatum` in `zorgtoeslag_resultaat`).
+
+The root cause was a two-part gap between how RDF stores test data and how the
+validator tracks input state. In TriplyDB, a `null` value cannot be represented
+as a `schema:value` triple, so optional date variables have no `testValue`
+property at all on the `DmnVariable` object returned by the backend. The Fill
+with test data button in `InputForm.tsx` only wrote a key into the `inputs`
+state object when `testValue` was defined — silently skipping `null`-default
+dates. The validator in `ChainBuilder.tsx` then checked `input.identifier in
+inputs`, found the key absent, and pushed the variable into `missingInputs`.
+
+Two fixes were applied:
+
+- **`InputForm.tsx`** — the Fill button now explicitly sets `Date` inputs to
+  `null` when `testValue` is `undefined`, ensuring the key is always registered
+  in state after filling.
+- **`ChainBuilder.tsx`** — the validator now exempts `Date` inputs from the
+  missing-input check when no value is present, consistent with the existing
+  exemption for `Boolean` inputs (which default to `false` without user action).
+  An unset date is a valid input state, not an authoring error.
+
+**v0.9.0 — DMN Validator**
+
+Added DMN Validator feature. The DMN Validator lets you validate one or more DMN
+files against the RONL DMN+ syntactic layers. It is accessible from the shield
+icon (🛡) in the sidebar. You can drop any number of .dmn or .xml files onto the
+validator at once, or add files incrementally — the drop zone remains visible at
+the top of the panel whenever files are loaded. Files are validated
+independently and displayed side-by-side for easy comparison.
+
+The validator runs on the shared backend at `POST /v1/dmns/validate` and is used
+both by this Linked Data Explorer's standalone DMN Validator view and by the
+CPSV Editor's inline validation in the [DMN
+tab](../../cpsv-editor/features/dmn-orchestration.md).
+
 ### v0.8.x — Governance & Vendor Integration (February 2026)
+
+**v0.8.4 — Vendor Services**
+
+Added vendor service discovery: `ronl:VendorService` resources are queried
+alongside DMN metadata, surfaced as blue count badges on DMN cards, and
+displayed in a detail modal with full provider information.
+
+**v0.8.3 — DMN Governance Badges**
+
+Three-state validation badge system using RONL Ontology v1.0 properties
+(`ronl:validationStatus`, `ronl:validatedBy`, `ronl:validatedAt`). Badges
+visible in both the DMN list and the Chain Composer. Organisation names resolved
+via `skos:prefLabel`.
+
+**v0.8.1 — BPMN DRD/DMN Selector**
+
+`DmnTemplateSelector` now loads both locally-saved DRD templates and regular
+DMNs from the backend, displayed in grouped options. Purple info card for DRDs
+shows chain composition. Auto-populates `camunda:decisionRef` with prefixed DRD
+entry-point identifier.
+
+---
 
 ### v0.7.x — BPMN Modeler & DRD Templates (February 2026)
 
+**v0.7.3 — DRD Template Linking (partial)**
+
+DMN template dropdown in BPMN properties panel implemented. Exact identifier
+auto-population working; variable compatibility validation planned for a future
+release.
+
+**v0.7.2 — DRD Template System**
+
+Users can save DRD-compatible chains as named templates stored in localStorage.
+Templates are endpoint-scoped. DRD templates load via the new "My Templates"
+panel.
+
+**v0.7.1 — Semantic Variable Matching Fix**
+
+Fixed `findEnhancedChainLinks` SPARQL query to correctly detect both exact and
+semantic matches. Heusdenpas chain now shows all 10 variable relationships
+across 3 DMNs.
+
+**v0.7.0 — BPMN Modeler Foundation**
+
+Full BPMN 2.0 editor using bpmn-js v18.12.0 with official Camunda/Operaton
+properties panel (`bpmn-js-properties-panel`). Three-panel layout: process list,
+canvas, properties. Tree Felling Permit example auto-loaded on first visit.
+localStorage persistence and `.bpmn` export.
+
+---
+
 ### v0.6.x — DRD Generation & Enhanced Validation (February 2026)
+
+**v0.6.2 — Semantic Analysis Tab**
+
+Semantic Analysis tab added to Chain Builder. Displays cross-agency variable
+equivalences and chain suggestions. Backend endpoints:
+`/api/dmns/semantic-equivalences`, `/api/dmns/enhanced-chain-links`,
+`/api/dmns/cycles`.
+
+**v0.6.1 — DRD Generation**
+
+Save DRD-compatible chains as single executable DRD files deployed to Operaton.
+Automatic `<informationRequirement>` wiring, entry-point detection, and
+deployment ID tracking.
+
+**v0.6.0 — Enhanced Validation**
+
+Validation engine distinguishes DRD-compatible chains (all exact matches) from
+sequential chains (semantic matches present). Clear UI states: green (DRD),
+amber (sequential), red (invalid). Separate save paths.
+
+---
 
 ### v0.5.x — Multi-Endpoint & Test Data (January 2026)
 
+**v0.5.5 — SPARQL & Export Improvements**
+
+Added "Service Rules Metadata" query (`cprmv:Rule → eli:LegalResource →
+cpsv:PublicService`). CSV export with timestamped filenames and proper escaping.
+RDF URI collision fix for `cprmv:Rule` instances.
+
+**v0.5.4 — Multi-Endpoint Chain Execution**
+
+Chain execution now correctly uses the selected endpoint throughout the full
+execution flow. Automatic test data population from `schema:value` in TriplyDB
+TTL files. Fallback to `testData.json` for legacy DMNs.
+
+**v0.5.3 — Dynamic Endpoint Selection**
+
+Switch between TriplyDB datasets in real time without page reload. Backend
+caches DMN metadata per endpoint (5-minute TTL). Connection indicator shows
+direct vs proxied connection status.
+
+---
+
 ### v0.4.x — API Versioning & Export (January 2026)
+
+**v0.4.0 — Backend API v1**
+
+Migrated all endpoints to `/v1/*` following Dutch Government API Design Rules.
+Legacy `/api/*` endpoints retained with `Deprecation` headers. `API-Version`
+header in all responses. Chain export as JSON or BPMN 2.0 diagram.
+
+---
 
 ### v0.3.x — Chain Builder UI (January 2026)
 
+**v0.3.1 — Bug Fixes**
+
+Enhanced error messages for Operaton failures. Synchronized test data between
+preset and manual chain. Fixed execution progress visibility on first run.
+
+**v0.3.0 — Chain Builder UI**
+
+Visual drag-and-drop chain builder. Real-time validation with input
+requirements. Dynamic form generation for DMN inputs. Chain execution with
+step-by-step progress tracking. In-app tutorial (accessible via ? icon).
+Deployment metadata display.
+
+---
+
 ### v0.2.0 — DMN Discovery & Orchestration View (January 2026)
 
+SPARQL-based DMN discovery using CPRMV vocabulary. Three-panel orchestration
+view: DMN list, chain composer placeholder, details panel. Real-time search and
+filter. Input/output variable inspection. Automatic chain detection by variable
+matching. SPARQL result parsing for multiple query response formats.
+
+---
+
 ### v0.1.0 — Initial Release (January 2026)
+
+React-based SPARQL visualisation and query tool. Interactive D3.js
+force-directed graph. Multiple endpoint support. Query editor with sample
+library and CORS proxy fallback. SELECT query results table. TypeScript
+interfaces and Vite build tooling.
 
 ---
 
 ## Notable backend bug fixes
 
-### Notable backend bug fixes
+These fixes are documented here because they involve non-obvious root causes
+that are likely to recur.
+
+### TriplyDB health check returning HTTP 400
+
+**Root cause:** The health check was calling `axios.get(triplydbEndpoint)`
+without a query parameter. SPARQL endpoints reject bare GET requests — they
+require either a POST with a query body or a GET with a `?query=` parameter.
+
+**Fix:** Updated `health.routes.ts` to call `sparqlService.healthCheck()`, which
+executes a minimal `SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 1` query.
+
+**File:** `packages/backend/src/routes/health.routes.ts`
+
+---
 
 ### `/v1/*` endpoints returning 404 after Azure deployment
 
+**Root cause:** The GitHub Actions deployment step used `cp -r dist/* deploy/`,
+which flattened the compiled output. The `package.json` start script references
+`dist/index.js`, and `health.routes.js` inside `dist/routes/` uses
+`require('../../package.json')` — both paths broke when the `dist/` folder was
+removed.
+
+**Fix:** Changed the deployment step to `cp -r dist deploy/`, preserving the
+directory structure.
+
+```yaml
+# Before (broken)
+cp -r dist/* deploy/
+
+# After (correct)
+cp -r dist deploy/
+```
+
+**Files:** `.github/workflows/azure-backend-acc.yml`,
+`.github/workflows/azure-backend-production.yml`
+
+---
+
 ### Root endpoint referencing deprecated `/api/*` paths
+
+**Root cause:** The `GET /` root response had not been updated when API
+versioning was introduced, so it still advertised `/api/health` and `/api/` as
+the documentation and health URLs.
+
+**Fix:** Updated `index.ts` to reference `/v1/*` endpoints in the root response
+and added a `legacy` block explicitly marking the old paths as deprecated.
+
+**File:** `packages/backend/src/index.ts`
 
 ---
 
@@ -55,4 +973,69 @@
 
 ### Frontend — Phase 2
 
-### Backend API - versioning roadmap
+The following items are planned but not yet scheduled. Phase 1 features
+(v0.1–v0.8) are complete.
+
+**Database migration**
+
+Move chain templates and BPMN processes from `localStorage` to a server-side
+database. Enables user authentication and ownership, process versioning with
+history, and public sharing with access control. PostgreSQL is the planned
+backend, consistent with the RONL Business API stack.
+
+**Collaborative editing**
+
+Multiple users editing shared process definitions. Real-time or
+optimistic-update model TBD.
+
+**Advanced BPMN properties panel**
+
+Full editing of all BPMN element properties: form fields, execution listeners,
+input/output mappings, conditional expressions, timers. Currently only name and
+DMN reference are editable.
+
+**DRD export and versioning**
+
+Export generated DRD XML for versioning and sharing. Track DRD version history
+alongside template evolution.
+
+**Certification registry**
+
+A queryable view of all `ronl:VendorService` resources with
+`ronl:certificationStatus "certified"`, enabling cross-service comparison of
+certified vendor implementations.
+
+**Multi-hop semantic chains**
+
+The current semantic validation checks only adjacent DMN pairs. Phase 2 will
+extend this to multi-hop: `DMN1 → DMN2 → DMN3` where the connection between DMN1
+and DMN3 is bridged semantically through DMN2.
+
+**Semantic concept browser**
+
+UI to explore the `skos:exactMatch` network: graph view of all concepts and
+their relationships, filterable by DMN or variable type, with search by concept
+URI.
+
+---
+
+### Backend API — versioning roadmap
+
+**v0.5.0 (planned)**
+
+OpenAPI 3.0 specification served at `/v1/openapi.json`. Request/response
+validation against the spec. Rate limiting. Per-endpoint response caching layer.
+
+**v1.0.0 (planned)**
+
+Full Dutch Government API Design Rules compliance (API-16, API-51, API-02,
+API-10). Production-grade monitoring and alerting. Performance target: <800ms
+for any chain execution. Comprehensive structured error handling across all
+services.
+
+**v2.0.0 (future)**
+
+Remove all legacy `/api/*` endpoints. Evaluate Dutch naming for business
+resources (`/v2/besluitmodellen` etc.) per API-04. Enhanced orchestration:
+parallel chain execution where dependency graph allows. Batch execution support
+for multiple input sets.
