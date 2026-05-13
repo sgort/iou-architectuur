@@ -2,11 +2,35 @@
 
 ---
 
-# Changelog & Roadmap
+## Changelog
+
+### v1.6.1 — Norms publish endpoint (May 2026)
+
+**v1.6.1 — Patch (May 12, 2026)**
+
+#### `/v1/norms` — new
+
+New backend route `GET /v1/norms` exposing all `cprmv:Rule` paths and norms from TriplyDB in the publish format consumed by the SPARQL editor's norm publisher. The response mirrors the `cprmv-example.json` shape exactly: fully-qualified RDF/CPRMV keys for `type`, `id`, `definition`, and `contains`; short keys for `situatie`, `norm`, `per`, `rulesetid`, `applicable_date`, and `rule_id_path`.
+
+- Parent rules and their `cprmv:contains` children are aggregated into a single nested object per parent; key insertion order is preserved across runs (matching the example file)
+- Optional `?endpoint=` query parameter overrides the default TriplyDB endpoint, matching the pattern already used by `/v1/dmns`
+- Response wrapped in the standard `ApiResponse` envelope with `data.rules` (array) and `data.total` (filtered count)
+
+#### Filtering by ruleset identifier and applicable date
+
+- New `applicable_date` attribute derived from the `_YYYY-MM-DD_` segment embedded in `rule_id_path` (e.g. `"BWBR0015703_2026-01-01_0, Artikel 20, ..."` yields `"2026-01-01"`); `null` when the path carries no parseable date
+- Optional `?rulesetid=` filter (exact-match on `cprmv:rulesetId`, e.g. `BWBR0015703`); validated against `/^[A-Za-z0-9_-]+$/`
+- Optional `?applicable_date=` filter (matches paths containing `_<date>_`); validated against `/^\d{4}-\d{2}-\d{2}$/`
+- Filters can be combined; invalid values return `400 INVALID_PARAM` before any SPARQL fires
+- Validated filter values are applied as SPARQL `FILTER` clauses server-side (exact-match on `?rulesetId`, `CONTAINS` on `?ruleIdPath`); regex validation is the injection-prevention contract
+
+#### Maintenance
+
+- `tsconfig.json` cleanup: removed `"ignoreDeprecations": "6.0"` which only became valid in TypeScript 6.0 and broke CI on TypeScript 5.x. Editor-side deprecation warnings are addressed via local `.vscode/settings.json` pointing at the workspace TypeScript instead. Full migration to `moduleResolution: "nodenext"` deferred until ESM-on-Node maturity warrants the per-file `.js` extension changes.
+
+**Files:** `packages/backend/src/services/norms.service.ts` (new), `packages/backend/src/routes/norms.routes.ts` (new), `packages/backend/src/routes/index.ts`, `packages/backend/tsconfig.json`
 
 ---
-
-## Changelog
 
 ### v1.6.0 — Multilingualism & pending-until-Save editing (April 2026)
 

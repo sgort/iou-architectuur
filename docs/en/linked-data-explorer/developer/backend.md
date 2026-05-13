@@ -134,6 +134,106 @@ Request body:
 
 Proxies a SPARQL query to any TriplyDB endpoint, bypassing CORS restrictions. Used by the frontend Query Editor for dynamic endpoint support.
 
+### Norms
+
+```
+GET /v1/norms?endpoint={url}&rulesetid={ruleset}&applicable_date={YYYY-MM-DD}
+```
+
+Returns all `cprmv:Rule` paths and norms from the configured TriplyDB endpoint in the publish format consumed by the SPARQL editor's norm publisher. Each rule object mirrors the `cprmv-example.json` shape exactly: fully-qualified RDF/CPRMV keys for `type`, `id`, `definition`, and `contains`; short keys for `situatie`, `norm`, `per`, `rulesetid`, `applicable_date`, and `rule_id_path`.
+
+Parent rules and their `cprmv:contains` children are aggregated into a single nested object per parent. Key insertion order is preserved across runs:
+
+```
+type, id, definition, contains?, situatie?, norm?, per?, rulesetid, applicable_date, rule_id_path
+```
+
+The `applicable_date` attribute is derived from the `_YYYY-MM-DD_` segment embedded in `rule_id_path` (e.g. `"BWBR0015703_2026-01-01_0, Artikel 20, ..."` yields `"2026-01-01"`). It is `null` when the path carries no parseable date.
+
+**Query parameters** (all optional, may be combined):
+
+| Parameter         | Description                                                                                                                                                          |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `endpoint`        | SPARQL endpoint URL. Defaults to `config.triplydb.endpoint` (`TRIPLYDB_ENDPOINT`) when omitted, matching the pattern used by `/v1/dmns`.                             |
+| `rulesetid`       | Exact-match filter on `cprmv:rulesetId` (e.g. `BWBR0015703`). Must match `/^[A-Za-z0-9_-]+$/` or the request is rejected with `400 INVALID_PARAM`.                   |
+| `applicable_date` | Filter on the dated segment of `cprmv:ruleIdPath` (e.g. `2026-01-01` matches paths containing `_2026-01-01_`). Must match `/^\d{4}-\d{2}-\d{2}$/` or `400`.          |
+
+Validated filter values are applied as SPARQL `FILTER` clauses server-side: exact-match on `?rulesetId` and `CONTAINS(STR(?ruleIdPath), "_<date>_")`. Filters are interpolated only after passing the regex gate, making SPARQL injection impossible.
+
+**Example response — flat rule** (most common; no `contains` key):
+
+```json
+{
+  "success": true,
+  "data": {
+    "total": 1,
+    "rules": [
+      {
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": "https://cprmv.open-regels.nl/0.3.0/Rule",
+        "https://cprmv.open-regels.nl/0.3.0/id": "onderdeel a.",
+        "https://cprmv.open-regels.nl/0.3.0/definition": "een alleenstaande van 18, 19 of 20 jaar: € 337,98;",
+        "situatie": "een alleenstaande van 18, 19 of 20 jaar",
+        "norm": "337,98",
+        "rulesetid": "BWBR0015703",
+        "applicable_date": "2025-07-01",
+        "rule_id_path": "BWBR0015703_2025-07-01_0, Artikel 20, lid 1, onderdeel a."
+      }
+    ]
+  },
+  "timestamp": "2026-05-12T14:00:00.000Z"
+}
+```
+
+**Example response — rule with nested children** (conditional `contains` map; emitted only when the parent has `cprmv:contains` links to sub-rules):
+
+```json
+{
+  "success": true,
+  "data": {
+    "total": 1,
+    "rules": [
+      {
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": "https://cprmv.open-regels.nl/0.3.0/Rule",
+        "https://cprmv.open-regels.nl/0.3.0/id": "onderdeel r.",
+        "https://cprmv.open-regels.nl/0.3.0/definition": "inkomsten uit arbeid van een alleenstaande ouder ...",
+        "https://cprmv.open-regels.nl/0.3.0/contains": {
+          "onderdeel 1°.": {
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": "https://cprmv.open-regels.nl/0.3.0/Rule",
+            "https://cprmv.open-regels.nl/0.3.0/id": "onderdeel 1°.",
+            "https://cprmv.open-regels.nl/0.3.0/definition": "hij de volledige zorg heeft voor een tot zijn last komend kind tot 12 jaar,"
+          },
+          "onderdeel 2°.": {
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": "https://cprmv.open-regels.nl/0.3.0/Rule",
+            "https://cprmv.open-regels.nl/0.3.0/id": "onderdeel 2°.",
+            "https://cprmv.open-regels.nl/0.3.0/definition": "de periode van zes maanden, bedoeld in onderdeel n, is verstreken, en"
+          }
+        },
+        "situatie": "inkomsten uit arbeid van een alleenstaande ouder ...",
+        "norm": "173,87",
+        "per": "maand, gedurende een aaneengesloten periode van maximaal 30 maanden, ...",
+        "rulesetid": "BWBR0015703",
+        "applicable_date": "2025-07-01",
+        "rule_id_path": "BWBR0015703_2025-07-01_0, Artikel 31, lid 2, onderdeel r."
+      }
+    ]
+  },
+  "timestamp": "2026-05-12T14:00:00.000Z"
+}
+```
+
+!!! note
+    The nested-children shape above is the format the endpoint will produce *when* `cprmv:contains` triples are present in TriplyDB. The current acceptance dataset has none, so every response is currently flat. End-to-end validation of the nested case is still pending: upload a dataset containing `cprmv:contains` links and verify that `/v1/norms` materialises them correctly into the publish format.
+
+**Example requests:**
+
+```
+GET /v1/norms
+GET /v1/norms?rulesetid=BWBR0015703
+GET /v1/norms?applicable_date=2026-01-01
+GET /v1/norms?rulesetid=BWBR0015703&applicable_date=2026-01-01
+GET /v1/norms?endpoint=https://api.open-regels.triply.cc/datasets/stevengort/RONL/services/RONL/sparql
+```
+
 ---
 
 ### Asset storage
@@ -182,6 +282,8 @@ findSemanticEquivalences(endpoint: string): Promise<SemanticEquivalence[]>
 ```
 
 The `findEnhancedChainLinks` query uses a `BIND(IF(...))` pattern to categorise each link as `exact`, `semantic`, or `both`, then expands `both` entries into two separate records post-query. This is the mechanism described in [Enhanced Validation](enhanced-validation.md).
+
+A separate `norms.service.ts` handles the `cprmv:Rule` publish-format query backing `/v1/norms`. It builds the query dynamically — filter clauses (rulesetid exact-match, applicable date `CONTAINS`) are injected only after upstream regex validation — then aggregates parent/child rows into nested objects with deterministic key ordering matching `cprmv-example.json`.
 
 ---
 
