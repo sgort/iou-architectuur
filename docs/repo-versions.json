@@ -22,11 +22,11 @@
     {
       "name": "Linked Data Explorer",
       "icon": "🔍",
-      "version": "v1.6.0",
+      "version": "v1.6.1",
       "environment": "acc",
-      "commit": "771b942...",
-      "commit_date": "2026-04-27",
-      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/771b9429d433e379fb2bc5344b9234b45f44bee3"
+      "commit": "23d1434...",
+      "commit_date": "2026-05-12",
+      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/23d1434d54050446a1989ce4f6b6994b26f615d5"
     },
     {
       "name": "CPRMV",

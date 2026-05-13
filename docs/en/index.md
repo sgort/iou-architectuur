@@ -28,13 +28,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.6.0** · *April 2026*
+-   **🔍 Linked Data Explorer — v1.6.1** · *May 2026*
 
     ---
 
-    **Multilingualism & pending-until-Save editing**
+    **Norms publish endpoint with ruleset and date filtering**
 
-    BPMN processes, Camunda forms, and document templates now carry an optional [language and organization](linked-data-explorer/features/multilingualism.md) — set via the editor footer panel, persisted to PostgreSQL and (for BPMN) to `ronl:language` / `ronl:organization` in the XML. List panels gain a search box, a language filter, and collapsible organization groups. The deploy modal warns inline when a bundle mixes languages. Footer edits across all three editors now use a pending-until-Save model with shell → subprocess atomic propagation. Ships with the Dutch HR-capacity reference bundle (1 BPMN, 8 forms, 2 documents) demonstrating stable English DMN keys with translated labels.
+    New backend route `GET /v1/norms` exposing all `cprmv:Rule` paths and norms from TriplyDB in the publish format consumed by the SPARQL editor's norm publisher. Parent rules with their `cprmv:contains` children are aggregated into nested objects matching the `cprmv-example.json` shape exactly, with deterministic key ordering preserved across runs. Optional `?rulesetid=` and `?applicable_date=` query parameters filter results server-side via SPARQL `FILTER` clauses, with regex validation upstream to guarantee safe interpolation. The new `applicable_date` attribute is derived from the dated segment embedded in each `rule_id_path`.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
