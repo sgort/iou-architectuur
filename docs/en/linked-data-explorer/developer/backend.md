@@ -145,10 +145,28 @@ Returns all `cprmv:Rule` paths and norms from the configured TriplyDB endpoint i
 Parent rules and their `cprmv:contains` children are aggregated into a single nested object per parent. Key insertion order is preserved across runs:
 
 ```
-type, id, definition, contains?, situatie?, norm?, per?, rulesetid, applicable_date, rule_id_path
+type, id, definition, contains?, situatie?, norm?, per?, rulesetid, applicable_date, rulesetid_index, rule_id_path, rule_id_path_key
 ```
 
-The `applicable_date` attribute is derived from the `_YYYY-MM-DD_` segment embedded in `rule_id_path` (e.g. `"BWBR0015703_2026-01-01_0, Artikel 20, ..."` yields `"2026-01-01"`). It is `null` when the path carries no parseable date.
+Three fields are derived from `rule_id_path` and emit JSON `null` when the path does not match the canonical `<rulesetid>_<YYYY-MM-DD>_<index>[, <rest>]` shape:
+
+| Field              | Source from `rule_id_path`                                 | Example                              |
+| ------------------ | ---------------------------------------------------------- | ------------------------------------ |
+| `applicable_date`  | The `_YYYY-MM-DD_` segment                                 | `"2025-07-01"`                       |
+| `rulesetid_index`  | The integer after the date                                 | `0`                                  |
+| `rule_id_path_key` | Path with date and index removed; stable across versions   | `"BWBR0002471, Artikel 2, lid 6"`   |
+
+The response envelope also carries an `aggregations` block alongside `rules`:
+
+```
+data: {
+  total: <number>,
+  aggregations: { norms_per_rulesetid: { "<rulesetid>": <count>, ... } },
+  rules: [...]
+}
+```
+
+Counts are over the filtered result set, so `total` equals the sum of all `norms_per_rulesetid` values. Use this to render ruleset-level summaries without re-counting on the client.
 
 **Query parameters** (all optional, may be combined):
 
@@ -167,6 +185,11 @@ Validated filter values are applied as SPARQL `FILTER` clauses server-side: exac
   "success": true,
   "data": {
     "total": 1,
+    "aggregations": {
+      "norms_per_rulesetid": {
+        "BWBR0015703": 1
+      }
+    },
     "rules": [
       {
         "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": "https://cprmv.open-regels.nl/0.3.0/Rule",
@@ -176,11 +199,13 @@ Validated filter values are applied as SPARQL `FILTER` clauses server-side: exac
         "norm": "337,98",
         "rulesetid": "BWBR0015703",
         "applicable_date": "2025-07-01",
-        "rule_id_path": "BWBR0015703_2025-07-01_0, Artikel 20, lid 1, onderdeel a."
+        "rulesetid_index": 0,
+        "rule_id_path": "BWBR0015703_2025-07-01_0, Artikel 20, lid 1, onderdeel a.",
+        "rule_id_path_key": "BWBR0015703, Artikel 20, lid 1, onderdeel a."
       }
     ]
   },
-  "timestamp": "2026-05-12T14:00:00.000Z"
+  "timestamp": "2026-05-14T14:00:00.000Z"
 }
 ```
 
@@ -191,6 +216,11 @@ Validated filter values are applied as SPARQL `FILTER` clauses server-side: exac
   "success": true,
   "data": {
     "total": 1,
+    "aggregations": {
+      "norms_per_rulesetid": {
+        "BWBR0015703": 1
+      }
+    },
     "rules": [
       {
         "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": "https://cprmv.open-regels.nl/0.3.0/Rule",
@@ -213,11 +243,13 @@ Validated filter values are applied as SPARQL `FILTER` clauses server-side: exac
         "per": "maand, gedurende een aaneengesloten periode van maximaal 30 maanden, ...",
         "rulesetid": "BWBR0015703",
         "applicable_date": "2025-07-01",
-        "rule_id_path": "BWBR0015703_2025-07-01_0, Artikel 31, lid 2, onderdeel r."
+        "rulesetid_index": 0,
+        "rule_id_path": "BWBR0015703_2025-07-01_0, Artikel 31, lid 2, onderdeel r.",
+        "rule_id_path_key": "BWBR0015703, Artikel 31, lid 2, onderdeel r."
       }
     ]
   },
-  "timestamp": "2026-05-12T14:00:00.000Z"
+  "timestamp": "2026-05-14T14:00:00.000Z"
 }
 ```
 

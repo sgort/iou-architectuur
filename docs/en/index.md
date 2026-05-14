@@ -28,13 +28,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.6.1** · *May 2026*
+-   **🔍 Linked Data Explorer — v1.6.3** · *May 2026*
 
     ---
 
-    **Norms publish endpoint with ruleset and date filtering**
+    **Stable keys and per-ruleset aggregation for norms publishing**
 
-    New backend route `GET /v1/norms` exposing all `cprmv:Rule` paths and norms from TriplyDB in the publish format consumed by the SPARQL editor's norm publisher. Parent rules with their `cprmv:contains` children are aggregated into nested objects matching the `cprmv-example.json` shape exactly, with deterministic key ordering preserved across runs. Optional `?rulesetid=` and `?applicable_date=` query parameters filter results server-side via SPARQL `FILTER` clauses, with regex validation upstream to guarantee safe interpolation. The new `applicable_date` attribute is derived from the dated segment embedded in each `rule_id_path`.
+    The `/v1/norms` endpoint introduced in v1.6.1 — exposing `cprmv:Rule` paths and norms from TriplyDB in the publish format consumed by the SPARQL editor — gains a stable `rule_id_path_key` (the path with date and version-index segments stripped; suitable as a deduplication key across versions of the same ruleset), a `rulesetid_index` field surfacing the integer version segment after the date, and an `aggregations.norms_per_rulesetid` map in the response envelope so clients can render ruleset-level summaries without re-counting. All three derivations emit `null` on non-conforming `rule_id_path` values.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
