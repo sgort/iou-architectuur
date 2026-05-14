@@ -28,13 +28,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.6.3** · *May 2026*
+-   **🔍 Linked Data Explorer — v1.7.0** · *May 2026*
 
     ---
 
-    **Stable keys and per-ruleset aggregation for norms publishing**
+    **Per-rulesetid dataset versioning and HTTP cache headers on /v1/norms**
 
-    The `/v1/norms` endpoint introduced in v1.6.1 — exposing `cprmv:Rule` paths and norms from TriplyDB in the publish format consumed by the SPARQL editor — gains a stable `rule_id_path_key` (the path with date and version-index segments stripped; suitable as a deduplication key across versions of the same ruleset), a `rulesetid_index` field surfacing the integer version segment after the date, and an `aggregations.norms_per_rulesetid` map in the response envelope so clients can render ruleset-level summaries without re-counting. All three derivations emit `null` on non-conforming `rule_id_path` values.
+    Each BWB ruleset is now published as its own `cprmv:Dataset` resource in TriplyDB, each on its own publication cadence. The response envelope carries a `dataset_versions` map keyed by `cprmv:rulesetId` so G2G consumers can see which version of each ruleset they're reading. When every rulesetid in a response has dataset metadata, the backend emits strong `ETag` and `Last-Modified` headers with `Cache-Control: public, max-age=3600` — consumers using conditional requests get a `304 Not Modified` short-circuit that skips the expensive SPARQL query entirely. Partial coverage degrades safely to `no-cache` so unversioned rulesets can't be served stale. Ships with an [API stability contract](linked-data-explorer/reference/api-stability.md) documenting the four versioning layers, the immutable primary-key promise, and the 24-month deprecation policy for the eventual `/v2/norms`.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

@@ -4,6 +4,106 @@
 
 ## Changelog
 
+### v1.7.0 — Per-rulesetid dataset versioning & HTTP cache headers (May 2026)
+
+**v1.7.0 — Minor (May 14, 2026)**
+
+#### Per-rulesetid dataset versioning on `/v1/norms`
+
+Each BWB ruleset (BWBR0002471, BWBR0004044, …) is now published as a distinct `cprmv:Dataset` resource in TriplyDB, each on its own publication cadence. The response envelope carries a `dataset_versions` map keyed by `cprmv:rulesetId` so G2G consumers can see exactly which version of each ruleset they're reading.
+
+```json
+"dataset_versions": {
+  "BWBR0002471": { "version": "2025.1.0", "published_at": "2025-01-15T00:00:00Z" },
+  "BWBR0015703": { "version": "2026.1.0", "published_at": "2026-01-15T00:00:00Z" }
+}
+```
+
+- New envelope field `dataset_versions` — only contains entries for rulesetids that have a `cprmv:Dataset` record; rulesetids without one are silently absent (transitional state during rollout)
+- New envelope field `cprmv_version` — backend constant extracted from the CPRMV namespace URI, describes which vocabulary the backend speaks independently of which data is published
+- Backend picks the latest `cprmv:Dataset` per rulesetid via a `FILTER NOT EXISTS` SPARQL subpattern — historical versions remain queryable in TriplyDB but consumers see only the latest
+- Versions follow CalVer per ruleset: `<year>.<cycle>.<patch>` (e.g. `2026.1.0` for the first publication of 2026, `2026.1.1` for a correction)
+- Internal 60-second cache on the dataset metadata SPARQL query keeps the metadata lookup off the hot path
+
+#### HTTP cache headers for G2G consumers
+
+When **every** rulesetid in the response has dataset metadata, the response carries strong cache headers:
+
+```
+ETag: "a3f99c1d"
+Last-Modified: Thu, 15 Jan 2026 00:00:00 GMT
+Cache-Control: public, max-age=3600
+```
+
+- `ETag` is an opaque 8-hex hash over the sorted `dataset_versions` map plus all filter parameters that affect the response shape
+- `Last-Modified` is `max(published_at)` across the response's datasets in RFC 7231 format — `If-Modified-Since` returns `304` only when nothing in the consumer's query has been republished
+- For single-rulesetid queries (`?rulesetid=<id>`), the `304 Not Modified` short-circuit happens **before** the expensive rules SPARQL query — only the cheap cached metadata lookup runs
+- Safe-by-default partial-coverage policy: if any rulesetid in the response lacks dataset metadata, all three cache headers degrade to `Cache-Control: no-cache` so consumers can't be misled into serving stale data for an unversioned ruleset
+
+#### API stability contract published
+
+New IOU documentation page at [`/linked-data-explorer/reference/api-stability`](../reference/api-stability.md) — the binding contract for G2G consumers covering:
+
+- The four versioning layers (API contract, dataset versions, CPRMV vocabulary, backend service)
+- The immutable primary-key promise: `(rulesetid, applicable_date, rulesetid_index)` is the eternal PK; consumers can cache permanently and never invalidate
+- The `rule_id_path_key` field as the logical identifier for querying "the current value of this rule" across its lifetime
+- Per-rulesetid publication detection mechanics and partial-coverage behaviour
+- Breaking-change criteria warranting `/v2/norms` and the 24-month deprecation policy
+
+**Files:** `packages/backend/src/utils/etag.ts` (new), `packages/backend/src/services/norms.service.ts`, `packages/backend/src/routes/norms.routes.ts`, `docs/iou-architectuur/linked-data-explorer/architecture/backend.md`, `docs/iou-architectuur/linked-data-explorer/reference/api-stability.md` (new)
+
+---
+
+### v1.6.3 — Stable keys and per-ruleset aggregation (May 2026)
+
+**v1.6.3 — Patch (May 14, 2026)**
+
+#### Stable keys and version indices on `/v1/norms`
+
+- New `rule_id_path_key` field: `rule_id_path` with the date and index segments removed, e.g. `"BWBR0002471_2025-01-01_0, Artikel 2, lid 6"` → `"BWBR0002471, Artikel 2, lid 6"`; stable across versions of the same ruleset, suitable as a deduplication key when aggregating norms across `applicable_date` values
+- New `rulesetid_index` field: the integer index segment after the date in `rule_id_path` (e.g. the `_0` in `BWBR..._2025-01-01_0`); distinguishes multiple versions published on the same date
+- Both new fields, together with `applicable_date`, are derived from a single regex pass over `rule_id_path`; all three emit JSON `null` when the path does not match the canonical `<rulesetid>_<YYYY-MM-DD>_<index>[, <rest>]` shape
+- Key insertion order extended: `rulesetid`, `applicable_date`, `rulesetid_index`, `rule_id_path`, `rule_id_path_key` — identifier metadata grouped first, then the path and its derived stable key together
+
+#### Per-rulesetid aggregation
+
+- Response envelope now carries an `aggregations.norms_per_rulesetid` map alongside `rules`, listing the count of top-level rules per `cprmv:rulesetId` in the filtered result set
+- Counts are keyed by the authoritative `cprmv:rulesetId` value (not parsed from the path), so non-conforming `rule_id_path` values still aggregate correctly
+- Sum of values equals `data.total`, letting clients render ruleset-level summaries without a second pass over `rules`
+- Additive change — existing readers of `data.rules` and `data.total` see no breaking change
+
+**Files:** `packages/backend/src/services/norms.service.ts`, `packages/backend/src/routes/norms.routes.ts`, `docs/iou-architectuur/linked-data-explorer/architecture/backend.md`
+
+---
+
+### v1.6.2 — Shared route registry & content-negotiated root page (May 2026)
+
+**v1.6.2 — Patch (May 13, 2026)**
+
+#### Single source of truth for v1 routes
+
+- New backend module `packages/backend/src/routes/registry.ts`: every v1 route's mount path, router, summary, and category lives in one array. Adding a route is a one-line entry that both registration and the root page pick up automatically.
+- Refactored `packages/backend/src/routes/index.ts` to iterate the registry for v1 mounting; legacy `/api/*` deprecation aliases stay hand-mounted (deprecated routes are intentionally excluded from the registry to steer consumers towards `/v1/*`)
+- Mount-order semantics preserved: more specific paths still precede their parents (`/v1/chains/templates` before `/v1/chains`) so Express route precedence behaves exactly as before
+
+#### Content-negotiated root page
+
+- `GET /` now serves HTML when `Accept` includes `text/html` (browsers) and JSON otherwise (curl, fetch with default `Accept`, programmatic pollers); both views are derived from the shared route registry so they cannot drift
+- HTML view groups endpoints by category (Health & monitoring, Discovery, Execution, Assets, Integrations) and badges public-CORS endpoints; styling is inline with no external dependencies
+- JSON payload preserves backwards compatibility: same top-level keys as before (`name`, `version`, `environment`, `status`, `documentation`, `health`, `endpoints`, `legacy`); existing programmatic clients see no breaking change
+- Closes the drift gap that was missing `/v1/dso`, `/v1/norms`, `/v1/assets/*`, `/v1/cache`, `/v1/edocs`, `/v1/ropa`, `/v1/process` and `/v1/chains/templates` from the previous hand-coded listing
+
+#### Deployment tier display label
+
+- New `DEPLOYMENT_ENV` environment variable distinguishes ACC from PROD when `NODE_ENV` is `'production'` for both; falls back to `NODE_ENV` when unset so local development needs no change
+- Added `config.displayEnv` (string) and `config.deploymentEnv` (raw value) to `packages/backend/src/utils/config.ts` with mappings: `prod`/`production` → `PROD`, `acc`/`acceptance`/`staging` → `ACC`, `dev`/`development`/`local` → `development`, `test` → `test`, unknown values pass through
+- Used consistently by the HTML root page and the `/v1/health` response so the displayed environment stays in sync across surfaces
+- Configuration is per Azure App Service: `az webapp config appsettings set ... --settings DEPLOYMENT_ENV=acc` (or `prod`)
+
+**Files:** `packages/backend/src/routes/registry.ts` (new), `packages/backend/src/utils/rootView.ts` (new), `packages/backend/src/routes/index.ts`, `packages/backend/src/index.ts`, `packages/backend/src/utils/config.ts`, `packages/backend/.env.example`, `packages/backend/src/routes/health.routes.ts`
+
+---
+
 ### v1.6.1 — Norms publish endpoint (May 2026)
 
 **v1.6.1 — Patch (May 12, 2026)**
