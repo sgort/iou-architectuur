@@ -170,41 +170,62 @@ Counts are over the filtered result set, so `total` equals the sum of all `norms
 
 **Dataset versioning and HTTP cache headers**
 
-Each BWB ruleset (BWBR0002471, BWBR0015703, …) is published as a separate `cprmv:Dataset` resource in TriplyDB. A single `/v1/norms` response can span multiple BWB rulesets, each with its own version and publication date; the envelope therefore carries a `dataset_versions` map keyed by `cprmv:rulesetId`:
+Each BWB ruleset (BWBR0002471, BWBR0015703, …) is published as a separate `cprmv:Dataset` resource in TriplyDB by the CPSV editor (see [CPRMV Dataset Generation](../../cpsv-editor/developer/cprmv-dataset-generation.md)). A single ruleset can have multiple Dataset records — different applicable periods of the same law (e.g. BWBR0015703 at `2025-01-01` and `2026-01-01`) are **concurrent and equally authoritative**, not competing versions. A single `/v1/norms` response can span multiple rulesets, each carrying multiple records; the envelope therefore carries a `dataset_versions` map keyed by `cprmv:rulesetId`, where each value is a **list** of records:
 
 ```json
 "dataset_versions": {
-  "BWBR0002471": { "version": "2025.1.0", "published_at": "2025-01-15T00:00:00Z" },
-  "BWBR0015703": { "version": "2026.1.0", "published_at": "2026-01-15T00:00:00Z" }
+  "BWBR0015703": [
+    {
+      "version": "2026-01-01",
+      "published_at": "2026-05-15T06:57:21Z",
+      "title": "Participatiewet"
+    },
+    {
+      "version": "2025-01-01",
+      "published_at": "2026-05-15T07:45:36Z",
+      "title": "Participatiewet"
+    }
+  ],
+  "BWBR0044894": [
+    { "version": null, "published_at": "2026-05-15T07:45:36Z", "title": null }
+  ]
 }
 ```
 
-The map contains entries only for rulesetids that have a `cprmv:Dataset` record. Rulesetids without one are silently absent (transitional state during rollout). Versions follow CalVer per ruleset: `<year>.<cycle>.<patch>`, with each BWB on its own publication cycle.
+The list is pre-sorted: **`version` descending with nulls at the end, ties broken by `published_at` descending**. Element `[0]` is the most-recent applicable version of that ruleset. Non-primary rulesets (no `dcat:version` in TriplyDB) fall through to pure `published_at` desc ordering.
+
+Three per-entry fields, with two of them nullable:
+
+| Field          | Source       | Always present? |
+| -------------- | ------------ | --------------- |
+| `version`      | `dcat:version` | Primary ruleset only — the editor only knows the version of the service's `legalResource.bwbId`. `null` for non-primary rulesets. |
+| `published_at` | `dct:issued`   | Yes. The timestamp of this `cprmv:Dataset` record's publication — the meaningful signal for cache validity. |
+| `title`        | `dct:title`    | Primary ruleset only. `null` for non-primary rulesets. |
 
 `cprmv_version` is a single string surfacing the CPRMV vocabulary version the backend speaks — independent of which datasets have been published.
 
-When **every** rulesetid in the response has a `dataset_versions` entry, the response carries strong HTTP cache headers:
+When **every** rulesetid in the response has at least one `dataset_versions` entry, the response carries strong HTTP cache headers:
 
 ```
-ETag: "a3f99c1d"
-Last-Modified: Thu, 15 Jan 2026 00:00:00 GMT
+ETag: "3c899856"
+Last-Modified: Fri, 15 May 2026 07:45:36 GMT
 Cache-Control: public, max-age=3600
 ```
 
-The `ETag` is an opaque 8-hex hash over the sorted `dataset_versions` map plus all request parameters that affect the response shape. `Last-Modified` is the maximum `published_at` across the response's datasets — a consumer's `If-Modified-Since` returns `304 Not Modified` only when nothing in their query has been republished since their last fetch.
+The `ETag` is an opaque 8-hex hash over every `(version, published_at)` pair in `dataset_versions` plus all request parameters that affect the response shape. `title` is deliberately excluded — informational only, and a title-only update would arrive as a new `dct:issued` anyway. `Last-Modified` is the maximum `published_at` across *all* records in the response (not just the first per ruleset), so a consumer's `If-Modified-Since` returns `304 Not Modified` only when nothing in their query has been republished.
 
 Conditional requests are honoured via Express's `req.fresh`:
 
 ```http
 GET /v1/norms HTTP/1.1
-If-None-Match: "a3f99c1d"
+If-None-Match: "3c899856"
 ```
 
 For single-rulesetid queries (`?rulesetid=<id>`), the 304 check happens **before** the expensive rules SPARQL query — only the cheap (cached) metadata query runs for a 304 response. For multi-rulesetid queries the rules query must run first to know which rulesetids appear in the response.
 
-When **any** rulesetid in the response lacks dataset metadata, `Cache-Control: no-cache` is set and `ETag` / `Last-Modified` are omitted. Safe-by-default: consumers must always refetch until every BWB they query has been published with a `cprmv:Dataset` record. During the rollout-from-scratch period this means caching kicks in progressively as Datasets are published.
+When **any** rulesetid in the response lacks `cprmv:Dataset` records, `Cache-Control: no-cache` is set and `ETag` / `Last-Modified` are omitted. Safe-by-default: consumers must always refetch until every BWB they query has been published with at least one `cprmv:Dataset` record. During the rollout-from-scratch period this means caching kicks in progressively as Datasets are published.
 
-Dataset metadata is cached in-memory for 60 seconds per endpoint URL. Biannual publication tolerates this happily; the cache keeps the metadata SPARQL lookup off the hot path.
+Dataset metadata is cached in-memory for 60 seconds per endpoint URL.
 
 **Query parameters** (all optional, may be combined):
 
@@ -224,7 +245,18 @@ Validated filter values are applied as SPARQL `FILTER` clauses server-side: exac
   "data": {
     "total": 1,
     "dataset_versions": {
-      "BWBR0015703": { "version": "2026.1.0", "published_at": "2026-01-15T00:00:00Z" }
+      "BWBR0015703": [
+        {
+          "version": "2026-01-01",
+          "published_at": "2026-05-15T06:57:21Z",
+          "title": "Participatiewet"
+        },
+        {
+          "version": "2025-01-01",
+          "published_at": "2026-05-15T07:45:36Z",
+          "title": "Participatiewet"
+        }
+      ]
     },
     "cprmv_version": "0.3.0",
     "aggregations": {
@@ -259,7 +291,18 @@ Validated filter values are applied as SPARQL `FILTER` clauses server-side: exac
   "data": {
     "total": 1,
     "dataset_versions": {
-      "BWBR0015703": { "version": "2026.1.0", "published_at": "2026-01-15T00:00:00Z" }
+      "BWBR0015703": [
+        {
+          "version": "2026-01-01",
+          "published_at": "2026-05-15T06:57:21Z",
+          "title": "Participatiewet"
+        },
+        {
+          "version": "2025-01-01",
+          "published_at": "2026-05-15T07:45:36Z",
+          "title": "Participatiewet"
+        }
+      ]
     },
     "cprmv_version": "0.3.0",
     "aggregations": {

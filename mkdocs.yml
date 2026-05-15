@@ -171,6 +171,7 @@ nav:
       - Visual Architecture: cpsv-editor/developer/visual-architecture.md
       - Local Development: cpsv-editor/developer/local-development.md
       - Project Structure: cpsv-editor/developer/project-structure.md
+      - CPRMV Dataset Generation: cpsv-editor/developer/cprmv-dataset-generation.md
       - Deployment: cpsv-editor/developer/deployment.md
       - DMN Implementation: cpsv-editor/developer/dmn-implementation.md
       - TriplyDB Publish Implementation: cpsv-editor/developer/triplydb-publish-implementation.md
