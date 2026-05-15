@@ -18,23 +18,23 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
--   **✏️ CPSV Editor — v1.9.3** · *February 2026*
+-   **✏️ CPSV Editor — v1.9.4** · *May 2026*
 
     ---
 
-    **DMN Syntactic Validation**
+    **cprmv:Dataset Generation**
 
-    Inline [DMN validation](linked-data-explorer/reference/dmn-validation-reference.md) immediately after upload: five-layer syntactic checks with severity-coded results (error / warning / info), element references, and line numbers — directly in the DMN file card.
+    DCAT-aligned [`cprmv:Dataset`](cpsv-editor/developer/cprmv-dataset-generation.md) blocks emitted on TTL export — one per legal source, dual-typed `cprmv:Dataset` / `dcat:Dataset`, carrying `dcat:version`, `dct:issued`, `dcat:landingPage`, and `cprmv:implements` — powering the new `/v1/norms` endpoint in the Linked Data Explorer.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.7.0** · *May 2026*
+-   **🔍 Linked Data Explorer — v1.8.0** · *May 2026*
 
     ---
 
-    **Per-rulesetid dataset versioning and HTTP cache headers on /v1/norms**
+    **Concurrent applicable periods and HTTP cache headers on /v1/norms**
 
-    Each BWB ruleset is now published as its own `cprmv:Dataset` resource in TriplyDB, each on its own publication cadence. The response envelope carries a `dataset_versions` map keyed by `cprmv:rulesetId` so G2G consumers can see which version of each ruleset they're reading. When every rulesetid in a response has dataset metadata, the backend emits strong `ETag` and `Last-Modified` headers with `Cache-Control: public, max-age=3600` — consumers using conditional requests get a `304 Not Modified` short-circuit that skips the expensive SPARQL query entirely. Partial coverage degrades safely to `no-cache` so unversioned rulesets can't be served stale. Ships with an [API stability contract](linked-data-explorer/reference/api-stability.md) documenting the four versioning layers, the immutable primary-key promise, and the 24-month deprecation policy for the eventual `/v2/norms`.
+    Each BWB ruleset is published as its own `cprmv:Dataset` resource in TriplyDB, and a single ruleset can carry multiple records — different applicable periods of the same law (e.g. the `2025-01-01` and `2026-01-01` editions of the Participatiewet) are concurrent and equally authoritative, not competing versions. The `dataset_versions` envelope field is a per-rulesetid map of lists, sorted with the most-recent applicable version first, so G2G consumers can match each rule's `applicable_date` to the Dataset record that backs it. Ships with an [API stability contract](linked-data-explorer/reference/api-stability.md) documenting the four versioning layers, the immutable primary-key promise, and the 24-month deprecation policy for the eventual `/v2/norms`.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

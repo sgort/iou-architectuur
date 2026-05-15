@@ -13,20 +13,20 @@
     {
       "name": "CPSV Editor",
       "icon": "✏️",
-      "version": "v1.9.3",
-      "environment": "prod",
-      "commit": "0931fd6...",
-      "commit_date": "2026-02-25",
-      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/0931fd6d32404dfc0bd579f78e633b9fe1ca10fc"
+      "version": "v1.9.4",
+      "environment": "acc",
+      "commit": "4b5cda6...",
+      "commit_date": "2026-05-15",
+      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/4b5cda686710fbacde4619ac387c4053dc61a579"
     },
     {
       "name": "Linked Data Explorer",
       "icon": "🔍",
-      "version": "v1.7.0",
+      "version": "v1.8.0",
       "environment": "acc",
-      "commit": "810ee6a...",
-      "commit_date": "2026-05-14",
-      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/810ee6a85b64e1a08cfddd5ee008b8394e3168b4"
+      "commit": "92e42c8...",
+      "commit_date": "2026-05-15",
+      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/92e42c89a0bbb857f771d6f4520847b6cd095aec"
     },
     {
       "name": "CPRMV",

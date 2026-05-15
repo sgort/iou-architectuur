@@ -55,41 +55,62 @@ The `cprmv_version` envelope field surfaces which CPRMV vocabulary the response 
 
 ## Per-rulesetid dataset versioning
 
-Each BWB ruleset (BWBR0002471, BWBR0004044, …) is published as a distinct `cprmv:Dataset` resource in TriplyDB. A single `/v1/norms` response can aggregate rules across N rulesets, each on its own publication cadence.
+Each BWB ruleset (BWBR0002471, BWBR0004044, …) is published as a distinct `cprmv:Dataset` resource in TriplyDB by the CPSV editor. **A single ruleset can have multiple Dataset records** — different applicable periods of the same law (e.g. the `2025-01-01` and `2026-01-01` editions of the Participatiewet) are *concurrent and equally authoritative*, not competing versions of each other. Both back rules that consumers may legitimately ask for. A single `/v1/norms` response can aggregate rules across N rulesets, each carrying M records.
 
 ### The `dataset_versions` map
 
-The `data.dataset_versions` envelope field is keyed by `cprmv:rulesetId`:
+The `data.dataset_versions` envelope field is keyed by `cprmv:rulesetId`; each value is a **list** of records:
 
 ```json
 "dataset_versions": {
-  "BWBR0002471": { "version": "2025.1.0", "published_at": "2025-01-15T00:00:00Z" },
-  "BWBR0015703": { "version": "2026.1.0", "published_at": "2026-01-15T00:00:00Z" }
+  "BWBR0015703": [
+    {
+      "version": "2026-01-01",
+      "published_at": "2026-05-15T06:57:21Z",
+      "title": "Participatiewet"
+    },
+    {
+      "version": "2025-01-01",
+      "published_at": "2026-05-15T07:45:36Z",
+      "title": "Participatiewet"
+    }
+  ],
+  "BWBR0044894": [
+    { "version": null, "published_at": "2026-05-15T07:45:36Z", "title": null }
+  ]
 }
 ```
 
-Each entry carries the **latest** publication of that ruleset. Historical Dataset resources may exist in TriplyDB for the same `cprmv:rulesetId`; consumers see only the latest. The map contains entries only for rulesetids that have a `cprmv:Dataset` record — rulesetids without one are silently absent (transitional state during rollout).
+The list is **pre-sorted**: `version` descending with nulls at the end, ties broken by `published_at` descending. Element `[0]` is the most-recent applicable version of that ruleset. Non-primary rulesets (where the editor doesn't know `dcat:version`) fall through to pure `published_at` desc ordering.
 
-### CalVer per ruleset
+The map contains entries only for rulesetids that have at least one `cprmv:Dataset` record. Rulesetids without one are silently absent (transitional state during rollout).
 
-`dataset_versions[*].version` follows CalVer:
+Three per-entry fields, with two of them nullable:
 
-- `2026.1.0` — first publication of 2026 for this ruleset
-- `2026.1.1` — correction within the 2026.1 cycle (rare)
-- `2026.2.0` — second publication of 2026 (around July, if applicable)
+| Field          | Source         | Always present?                                                                                              |
+| -------------- | -------------- | ------------------------------------------------------------------------------------------------------------ |
+| `version`      | `dcat:version` | **Primary ruleset only.** The CPSV editor only knows the version of the service's `legalResource.bwbId` — the law explicitly entered in the Legal tab. For other rulesets that enter the service via `cprmv:Rule` references, the version is unknown and emitted as `null`. |
+| `published_at` | `dct:issued`   | **Always present.** Timestamp of when this `cprmv:Dataset` record was published. This is the meaningful signal for change detection — it updates on every (re-)publication regardless of whether the BWB's own version is known. |
+| `title`        | `dct:title`    | **Primary ruleset only.** `null` for non-primary rulesets, for the same reason as `version`. |
 
-Each BWB ruleset is on its own cycle. Most align with the standard Dutch legislative dates (January 1 and July 1), but cadence is per-ruleset, not global.
+### Matching rules to Dataset records
+
+A rule with `applicable_date: "2025-07-01"` is backed by the Dataset record whose `version` covers that period. The mapping is convention-based, not enforced by the API: the editor publishes Dataset records for the same applicable periods as the rules it generates. Consumers wanting "the Dataset record that backs this rule" can:
+
+1. Look up `dataset_versions[<rule.rulesetid>]`
+2. Find the entry whose `version` matches `<rule.applicable_date>` (when version is known)
+3. Fall through to the latest entry by `published_at` when version is null
 
 ### Detecting publications
 
 #### HTTP cache headers
 
-When **every** rulesetid in the response has a `dataset_versions` entry, the response carries:
+When **every** rulesetid in the response has at least one `dataset_versions` entry, the response carries:
 
 | Header | Example | Meaning |
 |--------|---------|---------|
-| `ETag` | `"a3f99c1d"` | Opaque strong validator over (dataset_versions map, filter params) |
-| `Last-Modified` | `Thu, 15 Jan 2026 00:00:00 GMT` | Maximum `published_at` across the response |
+| `ETag` | `"3c899856"` | Opaque strong validator over every `(version, published_at)` pair plus filter params. `title` is intentionally excluded — informational only. |
+| `Last-Modified` | `Fri, 15 May 2026 07:45:36 GMT` | Maximum `published_at` across **all records** in the response |
 | `Cache-Control` | `public, max-age=3600` | Biannual data tolerates generous caching |
 
 Consumers should use conditional requests for efficiency:
@@ -97,10 +118,14 @@ Consumers should use conditional requests for efficiency:
 ```http
 GET /v1/norms HTTP/1.1
 Host: backend.linkeddata.open-regels.nl
-If-None-Match: "a3f99c1d"
+If-None-Match: "3c899856"
 ```
 
 The server returns `304 Not Modified` with no body when nothing in the response has been republished since the last fetch. For single-rulesetid queries (`?rulesetid=<id>`), the 304 check happens before the expensive rules SPARQL query — only the cheap (cached) metadata lookup runs.
+
+#### Why `published_at` (not `version`) drives cache validity
+
+A null `version` field doesn't mean the data is uncacheable — it just means the BWB's own version label is unknown. The actual change signal is `published_at` (`dct:issued`), which is always present and updates on every publication event. ETag and Last-Modified rely on `published_at`; the `version` field is informational metadata for human and UI consumption.
 
 #### Partial-coverage behaviour
 
@@ -137,6 +162,9 @@ When `/v2/norms` is eventually introduced:
 | How do I detect new publications efficiently? | Use `If-None-Match` with the previous `ETag` — `304` means nothing changed |
 | What if a rulesetid is missing from `dataset_versions`? | That ruleset has no `cprmv:Dataset` record yet; do not cache |
 | What does `Cache-Control: no-cache` mean here? | At least one rulesetid in your query is unversioned — refetch every time |
+| What does `version: null` mean? | The BWB's own version is unknown (this ruleset isn't the primary law of any service that publishes it). `published_at` is still authoritative for change detection. |
+| Why does a single rulesetid have multiple Dataset records? | Different applicable periods of the same law are concurrent and equally authoritative. The `2025-01-01` and `2026-01-01` editions of Participatiewet both back current rules; both are listed. |
+| How do I find which Dataset record backs a specific rule? | Look up `dataset_versions[<rule.rulesetid>]`, find the entry whose `version` matches `<rule.applicable_date>`; fall through to the latest by `published_at` when `version` is null. |
 | How do I find the current value of a rule? | Filter by `rule_id_path_key`, sort by `applicable_date` desc then `rulesetid_index` desc, take first |
 | Will new fields appear in responses? | Yes — additively, never as a breaking change. Ignore unknown fields |
-| Are all BWB rulesets on the same publication cycle? | No — each ruleset has its own cadence; check `dataset_versions[<id>].published_at` individually |
+| Are all BWB rulesets on the same publication cycle? | No — each ruleset has its own cadence; check `dataset_versions[<id>][0].published_at` individually |

@@ -4,6 +4,54 @@
 
 ## Changelog
 
+### v1.8.0 — Concurrent applicable periods per ruleset (May 2026)
+
+**v1.8.0 — Minor (May 15, 2026)**
+
+#### `dataset_versions` becomes a list per rulesetid
+
+A single BWB ruleset can have multiple `cprmv:Dataset` records — different applicable periods of the same law (e.g. the `2025-01-01` and `2026-01-01` editions of the Participatiewet) are **concurrent and equally authoritative**, not competing versions. The v1.7.0 design treated them as competing and used `FILTER NOT EXISTS` to surface only the latest, hiding any earlier applicable period. v1.8.0 surfaces them all.
+
+- `dataset_versions[<rulesetid>]` is now a **list** of `{ version, published_at, title }` records, not a single record. Replaces the v1.7.x object shape.
+- List is pre-sorted: `version` descending with nulls at the end, ties broken by `published_at` descending. Element `[0]` is the most-recent applicable version of that ruleset.
+- SPARQL query simplified: dropped the `FILTER NOT EXISTS` subpattern and now fetches all `cprmv:Dataset` records. Grouping and sort live in the service layer.
+
+```json
+"dataset_versions": {
+  "BWBR0015703": [
+    {
+      "version": "2026-01-01",
+      "published_at": "2026-05-15T06:57:21Z",
+      "title": "Participatiewet"
+    },
+    {
+      "version": "2025-01-01",
+      "published_at": "2026-05-15T07:45:36Z",
+      "title": "Participatiewet"
+    }
+  ]
+}
+```
+
+#### Cache headers preserved across the shape change
+
+- `ETag` now hashes every `(version, published_at)` pair in `dataset_versions` — a new applicable period being added to any ruleset changes the ETag
+- `Last-Modified` is `max(published_at)` across **all records** in the response (not just the first per ruleset)
+- `Cache-Control` semantics unchanged: full headers when every rulesetid has metadata; `no-cache` otherwise
+
+#### Breaking change
+
+Replaces v1.7.1 (which was never used by external G2G consumers — the API stability contract hadn't been promised yet at that release). The shape change from object to list is detected at integration time, not silent runtime breakage. Anyone consuming v1.7.0/v1.7.1 needs to wrap `dataset_versions[<id>]` access in array indexing or iteration.
+
+#### Documentation
+
+- API stability contract updated with the list-shape, the multi-applicable-period rationale, and how consumers can match a rule's `applicable_date` to a specific Dataset record
+- Quick-reference table gains two new rows (multi-record explanation and rule→Dataset lookup recipe)
+
+**Files:** `packages/backend/src/utils/etag.ts`, `packages/backend/src/services/norms.service.ts`, `packages/backend/src/routes/norms.routes.ts`, `docs/iou-architectuur/linked-data-explorer/architecture/backend.md`, `docs/iou-architectuur/linked-data-explorer/reference/api-stability.md`
+
+---
+
 ### v1.7.0 — Per-rulesetid dataset versioning & HTTP cache headers (May 2026)
 
 **v1.7.0 — Minor (May 14, 2026)**
