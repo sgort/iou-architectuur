@@ -15,7 +15,8 @@ copyright: Copyright &copy; 2026 Provincie Flevoland & RONL Initiative
 # Theme configuration
 theme:
   name: material
-  language: en  # Default language
+  custom_dir: overrides
+  language: en
   
   # Colors matching NL Design System
   palette:
