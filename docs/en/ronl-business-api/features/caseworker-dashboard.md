@@ -1,6 +1,9 @@
 # Caseworker Dashboard
 
-The MijnOmgeving caseworker dashboard is the primary interface for municipality staff. It is a shell-based single-page application that loads at `/dashboard/caseworker` and remains publicly accessible — authentication is handled inside the component rather than at the route level, allowing unauthenticated visitors to browse public content before logging in.
+The MijnOmgeving caseworker dashboard is the primary interface for municipality staff. It loads at `/dashboard/caseworker` and remains publicly accessible — authentication is handled inside the component rather than at the route level, allowing unauthenticated visitors to browse public content before logging in.
+
+!!! note "V2 shell (from v3.0.0)"
+    From v3.0.0 this route is served by the V2 shell — a three-mode information architecture (Werk · Zoeken · Beheer) with a ⌘K command palette and a toggleable assistant dock. The V1 three-zone shell described below is retired. The section-ID and tenant-vs-platform scoping rules on this page still apply (the section components are re-used unchanged), but the navigation chrome is described in [Caseworker Dashboard (V2)](caseworker-dashboard-v2.md). Read that page first; this page remains the reference for the section catalogue.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: Caseworker Dashboard — authenticated shell](../../../assets/screenshots/ronl-caseworker-dashboard-shell.png)

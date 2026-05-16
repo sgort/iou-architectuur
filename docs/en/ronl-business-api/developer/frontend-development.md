@@ -113,9 +113,9 @@ if (authenticated) {
 
 `onLoad: 'check-sso'` returns `true` if a Keycloak SSO session cookie already exists in the browser, allowing the caseworker to skip the login screen entirely on subsequent visits within the session window. If no session exists, `keycloak.login({ loginHint: '__medewerker__' })` redirects to Keycloak and passes `__medewerker__` as the `login_hint` parameter. The `login.ftl` template detects this sentinel and renders the caseworker context banner (see [Keycloak Deployment — Caseworker banner](./deployment/keycloak.md#caseworker-context-banner)).
 
-**3. Caseworker dashboard (`/dashboard/caseworker` — `CaseworkerDashboard.tsx`)**
+**3. Caseworker dashboard (`/dashboard/caseworker` — V2 shell)**
 
-The caseworker portal. This route is **not wrapped in `ProtectedRoute`** — authentication is handled inside the component so public content (Nieuws, Berichten, Regelcatalogus) can render without a login. The component checks `keycloak.authenticated` on mount:
+The caseworker portal. From v3.0.0 this route renders the V2 shell (`pages/CaseworkerDashboardV2.tsx`, with the "V2" suffix dropped after the Phase 3 file rename). The V1 page shell is retired; `/dashboard/caseworker/v2` redirects to the canonical route for one release. This route is **not wrapped in `ProtectedRoute`** — authentication is handled inside the component so public content (Nieuws, Berichten, Regelcatalogus, Procesbibliotheek) can render without a login. The component observes `keycloak.authenticated` on mount. The shell owns auth state, tenant theme, navigation state, and layout only; `SectionRouter` dispatches every section. See [Caseworker Dashboard (V2)](../features/caseworker-dashboard-v2.md).
 ```typescript
 const [isAuthenticated] = useState(() => !!keycloak.authenticated);
 ```

@@ -576,7 +576,9 @@ JSON with the appropriate HTTP status code before the stream is opened.
 | `done`     | Loop completed                                |
 | `error`    | Timeout, tool failure, or Anthropic API error |
 
-**Timeout:** 240 seconds. **Not recorded in the audit log.**
+**Timeout:** 480 seconds. **Not recorded in the audit log.**
+
+`POST /v1/mcp/chat` additionally requires a `modelId` string in the body (the LLM model to use, from `GET /v1/mcp/models`). A missing or empty `message` or `modelId` returns `400 INVALID_REQUEST` before the stream is opened.
 
 ---
  
@@ -791,4 +793,5 @@ Link: </v1/health>; rel="successor-version"
 | `NO_FILE` | 400 | `POST /v1/public/upload-file` called without a file |
 | `MCP_DISABLED` | 503 | `MCP_ENABLED=false` — MCP endpoints are inactive |
 | `MCP_NOT_CONNECTED` | 503 | No connected MCP providers match the requested `sources` |
+| `INVALID_REQUEST` | 400 | `POST /v1/mcp/chat` called without a `message` or `modelId` |
 | `DB_ERROR` | 500 | PostgreSQL query failed in admin/audit endpoint |

@@ -94,6 +94,22 @@ from origin 'http://localhost:5173' has been blocked by CORS policy
 
 If the error persists, verify `CORS_ORIGIN` in `packages/backend/.env` matches `http://localhost:5173` exactly (no trailing slash).
 
+### Procesbibliotheek CORS error
+
+**Symptom:** The Procesbibliotheek section is empty and the browser console shows a CORS policy error for a request to `https://backend.linkeddata.open-regels.nl/v1/bundles/public` from origin `https://mijn.open-regels.nl`.
+
+**Cause:** Procesbibliotheek calls the standalone LDE backend directly from the browser (`VITE_LDE_API_URL/bundles/public`), not via the business API. The LDE backend is a separate deployment with its own ACC/PROD environment split and its own CORS allowlist. A new frontend origin is not automatically allowed.
+
+**Fix:** Add the frontend origin (e.g. `https://mijn.open-regels.nl`) to the LDE backend's CORS allowlist — wherever that backend configures it (env var or its own `cors()` config) — then restart it. Confirm with:
+
+```bash
+curl -s -i -X OPTIONS https://backend.linkeddata.open-regels.nl/v1/bundles/public \
+  -H "Origin: https://mijn.open-regels.nl" \
+  -H "Access-Control-Request-Method: GET" | grep -i 'access-control'
+```
+
+The response must include `Access-Control-Allow-Origin: https://mijn.open-regels.nl`. The rest of the dashboard is unaffected by this — only Procesbibliotheek degrades.
+
 ---
 
 ## Backend API errors

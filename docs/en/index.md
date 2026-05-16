@@ -8,13 +8,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.9.7** · *April 2026*
+-   **⚙️ RONL Business API — v3.0.7** · *May 2026*
 
     ---
 
-    **AI Assistant — MCP providers & multi-model LLM registry**
+    **V2 caseworker dashboard live in production**
 
-    AI Assistant extended with three independent MCP providers — CPRMV legislation (Dutch & EU law), LDE Process Library (deployed BPMN bundles, forms, document templates), and a multi-model LLM registry supporting both Claude and GPT-4o. New Procesbibliotheek section on the Home tab lets caseworkers browse deployed processes without login. IOU tab for Flevoland: use-case submission with file attachments, feedback with screenshot upload, and read-only GitLab issue lists.
+    The redesigned [V2 caseworker dashboard](ronl-business-api/features/caseworker-dashboard-v2.md) is now the available at `/dashboard/caseworker/v2`; the V1 shell will be retired. A three-mode information architecture (Werk · Zoeken · Beheer) replaces the flat 25-item nav, with a ⌘K command palette and a toggleable AI assistant dock. Production brought to full parity with acceptance.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

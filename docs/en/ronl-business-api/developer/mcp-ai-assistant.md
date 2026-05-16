@@ -1,6 +1,6 @@
 # MCP AI Assistant
 
-The AI Assistant is a streaming chat interface embedded in the Gereedschap tab of the caseworker dashboard. It connects a configurable LLM to a registry of data sources via the [Model Context Protocol](https://modelcontextprotocol.io/) (MCP), allowing caseworkers to query process definitions, running instances, tasks, decisions, deployments, legislation, knowledge graph data, and deployed process bundles in natural language.
+The AI Assistant is a streaming chat interface in the caseworker dashboard. From v3.0.0 it is hosted in the assistant dock — a toggleable right-side panel in the V2 shell (`components/CaseworkerDashboardV2/AssistantDock.tsx`), which re-uses the `McpChatSection` component verbatim and persists the conversation to `sessionStorage`. It is not a rail item and has no left-panel entry. It connects a configurable LLM to a registry of data sources via the [Model Context Protocol](https://modelcontextprotocol.io/) (MCP), allowing caseworkers to query process definitions, running instances, tasks, decisions, deployments, legislation, knowledge graph data, and deployed process bundles in natural language.
 
 Sources and models are selected per session. See [LLM Provider Architecture](llm-provider-architecture.md) for how providers and models are registered and extended.
 

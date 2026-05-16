@@ -15,7 +15,8 @@ copyright: Copyright &copy; 2026 Provincie Flevoland & RONL Initiative
 # Theme configuration
 theme:
   name: material
-  language: en  # Default language
+  custom_dir: overrides
+  language: en
   
   # Colors matching NL Design System
   palette:
@@ -100,6 +101,7 @@ nav:
       - Regelcatalogus: ronl-business-api/features/regelcatalogus.md
       - Procesbibliotheek: ronl-business-api/features/procesbibliotheek.md
       - Caseworker Dashboard: ronl-business-api/features/caseworker-dashboard.md
+      - Caseworker Dashboard (V2): en/ronl-business-api/features/caseworker-dashboard-v2.md
       - Commercial Organisation Integration: en/ronl-business-api/features/commercial-org-integration.md
       - Timeline Navigation: ronl-business-api/features/timeline-navigation.md
       - Security & Compliance: ronl-business-api/features/security-compliance.md
