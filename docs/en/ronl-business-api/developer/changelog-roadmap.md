@@ -4,6 +4,49 @@
 
 ## Changelog
 
+## v3.0.7 — Production Cutover (May 2026)
+
+### Production brought to parity with ACC
+
+PROD (previously v2.9.2) brought up to the ACC line. Operationally notable:
+
+- **PROD backend workflow fix.** `.github/workflows/azure-backend-prod.yml` corrected to delete the `@ronl/shared` workspace dependency from the deploy `package.json` before `npm install --production` (`npm pkg delete dependencies.@ronl/shared`) and to copy `shared/dist` into `node_modules/@ronl/shared/` with the correct nesting — matching the ACC workflow. The previous PROD workflow produced a non-functional zip.
+- **New PROD App Service settings.** `ANTHROPIC_API_KEY` (required — the backend aborts at startup without it), plus the MCP/TriplyDB/CPRMV/LDE, GitLab, eDOCS, and `REDIS_URL` settings. See [Environment Variables](../references/environment-variables.md).
+- **PROD Keycloak realm sync.** The nine Management Capacity Claim roles and associated clients/mappers imported into the PROD realm.
+- **Frontend env.** `.env.production` / `.env.acceptance` are force-tracked in the repo and travel with the merge; `VITE_LDE_API_URL` points at the standalone LDE backend, not the business API.
+
+!!! warning "LDE backend is a separate deployment"
+    The Procesbibliotheek section calls the standalone LDE backend (`backend.linkeddata.open-regels.nl`) directly from the browser, not via the business API. That backend has its own ACC/PROD environment split and its own CORS allowlist. Each new frontend origin (e.g. `https://mijn.open-regels.nl`) must be added to the LDE backend's allowlist or the Procesbibliotheek section fails with a CORS error while the rest of the dashboard works. See [Troubleshooting — Procesbibliotheek CORS](troubleshooting.md#procesbibliotheek-cors-error).
+
+## v3.0.0–v3.0.6 — V2 Caseworker Dashboard cutover (April–May 2026)
+
+### V2 caseworker dashboard becomes the default
+
+`/dashboard/caseworker/v2` now serves the V2 shell. The V1 three-zone shell will be retired; `/dashboard/caseworker/v2` will redirect to the canonical route for one release to catch stale bookmarks. New surface:
+
+- 3-mode information architecture (Werk · Zoeken · Beheer) replacing the flat ~25-item left panel — `pages/caseworker-v2/modes.config.ts`
+- ⌘K command palette (`CommandPalette.tsx`) — any section in two keystrokes, filtered by the same visibility gate as the rail
+- Right-side assistant dock (`AssistantDock.tsx`) — replaces the full-screen chat tab; conversation persisted to `sessionStorage`
+- Single `isRailItemVisible(item, ctx)` predicate used by both rail and palette; `requiredRoles` / `requiredOrgTypes` capability on `RailItem`
+- Defence-in-depth gate in `SectionRouter` via `findGateFor()` + `<NoAccessPanel>` — gated sections cannot leak via deep-link or palette
+- `SectionErrorBoundary` — a render error in one section no longer takes down the shell
+
+See [Caseworker Dashboard (V2)](../features/caseworker-dashboard-v2.md).
+
+### DvTP consent flow (v3.0.1)
+
+`DvtpStartSection` / `DvtpTakenSection` added under Werk → DVTP, gated to `municipality` org types. Starts the `DvtpToestemmingGevenProcess` BPMN via `ProcessStartFormViewer`. `dvtp` feature flag added to `tenants.json`. See [DvTP Consent Flow](../features/dvtp-consent-flow.md).
+
+### Management Capacity Claim (v3.0.2)
+
+`ManagementCapacityClaimProcess` BPMN + `/v1/hr-capacity/*` routes (`capacity.routes.ts`). `CapacityClaimSection` (manager-gated), `CapacityClaimArchiefSection`, inline `CapacityClaimDocumentsViewer`. Nine new realm roles. Role-based `candidateGroups` task queue filtering. See [Management Capacity Claim](../features/management-capacity-claim.md).
+
+### Nieuws RSS feed migration → revert
+
+`nieuws.service.ts` was migrated to the Rijksoverheid `/api/rss?query=` JSON API and then reverted to the legacy `feeds.rijksoverheid.nl/nieuws.rss` subdomain due to upstream technical issues. Cold-cache failure handling hardened: a 200 with zero parsed items is now treated as a failure rather than caching an empty list.
+
+---
+
 ## v2.9.7 — Feature Release (April 3, 2026)
 
 ### AI Assistant — CPRMV Legislation Provider
@@ -681,6 +724,16 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 | LDE Process Library Provider                             | v2.9.7  |
 | LLM Provider Architecture (LlmRegistry, OpenAI support)  | v2.9.7  |
 | Procesbibliotheek section                                | v2.9.7  |
+| V2 caseworker dashboard (3-mode shell, ⌘K, dock)         | v3.0.0  |
+| Section gating (`requiredRoles`/`requiredOrgTypes`)      | v3.0.0  |
+| `SectionErrorBoundary` per-section crash isolation       | v3.0.0  |
+| DvTP consent flow (`DvtpToestemmingGevenProcess`)        | v3.0.1  |
+| `dvtp` tenant feature flag                               | v3.0.1  |
+| Management Capacity Claim process + 9 realm roles        | v3.0.2  |
+| `/v1/hr-capacity/*` route group                          | v3.0.2  |
+| Nieuws RSS feed migration → revert                       | v3.0.x  |
+| V1 dashboard retired; V2 is the default route            | v3.0.x  |
+| PROD brought to ACC parity (cutover)                     | v3.0.7  |
 
 ---
 
