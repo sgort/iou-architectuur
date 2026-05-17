@@ -1,10 +1,8 @@
 # CPSV Editor — Product & Architecture Overview
 
 **Repository:** `ttl-editor` (public, GitLab — mirrored to GitHub)
-
 **Purpose:** A browser-based editor for creating, importing, and exporting Dutch government service descriptions as RDF/Turtle files, compliant with the EU CPSV-AP 3.2.0 standard.
-
-**Part of:** The RONL (regels.overheid.nl) initiative — tooling for machine-readable government regulation metadata.
+**Part of:** The RONL (Regels Open Nederland) initiative — tooling for machine-readable government regulation metadata.
 
 ---
 
@@ -116,10 +114,39 @@ The DMN content is embedded in the TTL output as `cprmv:DecisionModel` triples, 
 
 - **No automated tests for TTL output.** The test file (`App.test.js`) is a CRA stub. The real validation happens manually via example files. A test suite comparing generated TTL against the reference examples would be high-value.
 
-- **localStorage for config.** TriplyDB credentials are stored in localStorage. Fine for a prototype, but for a production tool used across teams, does need a proper secrets/config management approach.
+- **localStorage for config.** TriplyDB credentials are stored in localStorage. Fine for a prototype, but for a production tool used across teams, consider a proper secrets/config management approach.
 
 - **Shared backend.** The Express backend is owned by the Linked Data Explorer repo. The CPSV Editor depends on it for three things: CORS-proxied SPARQL queries (RONL vocabulary), TriplyDB service re-indexing, and DMN syntactic validation (the five-layer validator uses libxmljs2, which requires a Node.js runtime). Any changes to the backend affect the CPSV Editor. Clarify ownership, versioning (API v1 header is already in place), and deployment coupling.
 
 - **Separation opportunity.** The four domains (editor, vendor, publishing, DMN) are loosely coupled via the shared editor state. A modular architecture — whether as separate routes/lazy-loaded modules within the SPA, or as independent micro-frontends sharing a TTL data contract — would improve maintainability and allow independent release cycles.
 
 - **Create React App.** The React team officially deprecated CRA on February 14, 2025. It continues to work in maintenance mode (a final version was published with React 19 support), but it will not receive new features, performance improvements, or active security updates. The React team recommends migrating to a framework (Next.js, React Router) or a modern build tool (Vite, Parcel, Rsbuild). Since the Linked Data Explorer already uses Vite, migrating the CPSV Editor to Vite would align the tooling across the RONL ecosystem and remove the dependency on an unmaintained build tool.
+
+---
+
+## Authentication & Authorization for Production Publishing
+
+The prototype has no user authentication. A user publishing a government service description to the production TriplyDB instance acts on behalf of a competent authority — that is a formal mandate that must be verifiable. The current codebase handles credentials as follows:
+
+| Integration point | Current auth mechanism |
+|---|---|
+| TriplyDB publishing | Personal API token, entered by the user, stored in browser localStorage |
+| Operaton deployment & testing | Hardcoded Basic Auth (`demo:demo`) |
+| Shared Express backend (LDE) | No authentication — endpoints are open |
+| Azure Static Web Apps | Deployment tokens in GitHub Secrets (CI/CD only, no user auth) |
+
+None of these mechanisms establish who the user is, which organization they represent, or whether they are authorized to publish on behalf of that organization. For a production environment this is a prerequisite, not an enhancement.
+
+**What needs to change.** The production publishing flow must authenticate the user through the IAM infrastructure that already exists for Dutch government organizations and civil servants. The typical approach is to integrate an OpenID Connect (OIDC) identity provider — either the organization's own IdP (e.g. Microsoft Entra ID / Azure AD, which most government organizations already operate) or a federated government IdP. The authentication should yield a verifiable identity claim (who is this person, which organization do they belong to) that the backend can use to authorize the publish action.
+
+**Advice for the DevOps team:**
+
+- **Backend-mediated publishing.** In production, the publish action should not go directly from the browser to TriplyDB with a user-supplied API token. Instead, the authenticated user should request publication through the backend, which holds the TriplyDB service credentials and can enforce authorization rules (does this user have the right to publish for this organization, to this dataset/graph?). This also eliminates the localStorage token storage issue.
+
+- **Operaton credentials.** The hardcoded `demo:demo` Basic Auth must be replaced. In production, the backend should proxy Operaton calls with proper service credentials, similar to how it already proxies SPARQL queries to TriplyDB.
+
+- **Backend authentication.** The shared Express backend currently has no authentication middleware. Adding an OIDC token verification middleware (validating JWT access tokens from the organization's IdP) would protect all three backend functions (SPARQL proxy, TriplyDB publishing, DMN validation) in one layer.
+
+- **Audit trail.** When a publication carries the weight of a mandate from a competent authority, an audit log recording who published what, when, and on whose behalf becomes essential. The backend is the natural place for this.
+
+- **Scope.** This applies specifically to the production environment. The development and acceptance environments can continue to operate with the current prototype-level credentials for rapid iteration.
