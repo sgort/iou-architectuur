@@ -123,3 +123,32 @@ De DMN-inhoud wordt ingebed in de TTL-output als `cprmv:DecisionModel`-triples, 
 - **Separatiemogelijkheid.** De vier domeinen (editor, leverancier, publicatie, DMN) zijn losjes gekoppeld via de gedeelde editor-state. Een modulaire architectuur — of als aparte routes/lazy-loaded modules binnen de SPA (Single Page Application), of als onafhankelijke micro-frontends die een TTL-datacontract delen — zou de onderhoudbaarheid verbeteren en onafhankelijke release-cycli mogelijk maken.
 
 - **Create React App.** Het React-team heeft CRA officieel als verouderd aangemerkt op 14 februari 2025. Het blijft werken in onderhoudsmodus (een definitieve versie is gepubliceerd met React 19-ondersteuning), maar het zal geen nieuwe functies, prestatieverbeteringen of actieve beveiligingsupdates ontvangen. Het React-team beveelt migratie aan naar een framework (Next.js, React Router) of een moderne build-tool (Vite, Parcel, Rsbuild). Aangezien de Linked Data Explorer reeds Vite gebruikt, zou migratie van de CPSV Editor naar Vite de tooling binnen het RONL-ecosysteem gelijktrekken en de afhankelijkheid van een niet meer onderhouden build-tool wegnemen.
+
+---
+
+## Authenticatie & Autorisatie voor Productiepublicatie
+
+Het prototype heeft geen gebruikersauthenticatie. Een gebruiker die een overheidsdienst­beschrijving publiceert naar de productie-TriplyDB-instantie handelt namens een bevoegd gezag — dat is een formeel mandaat dat verifieerbaar moet zijn. De huidige codebase behandelt credentials als volgt:
+
+| Integratiepunt | Huidig authenticatiemechanisme |
+|---|---|
+| TriplyDB-publicatie | Persoonlijk API-token, ingevoerd door de gebruiker, opgeslagen in browser-localStorage |
+| Operaton-deployment & testen | Hardcoded Basic Auth (`demo:demo`) |
+| Gedeelde Express-backend (LDE) | Geen authenticatie — endpoints zijn open |
+| Azure Static Web Apps | Deployment-tokens in GitHub Secrets (alleen CI/CD, geen gebruikersauth) |
+
+Geen van deze mechanismen stelt vast wie de gebruiker is, welke organisatie zij vertegenwoordigen, of zij geautoriseerd zijn om namens die organisatie te publiceren. Voor een productieomgeving is dit een vereiste, geen verbetering.
+
+**Wat er moet veranderen.** De productiepublicatie­flow moet de gebruiker authenticeren via de IAM-infrastructuur die reeds bestaat voor Nederlandse overheidsorganisaties en ambtenaren. De gebruikelijke aanpak is integratie van een OpenID Connect (OIDC) identity provider — ofwel de eigen IdP van de organisatie (bijv. Microsoft Entra ID / Azure AD, waar de meeste overheidsorganisaties reeds over beschikken) ofwel een gefedereerde overheids-IdP. De authenticatie moet een verifieerbare identiteitsclaim opleveren (wie is deze persoon, bij welke organisatie hoort deze) die de backend kan gebruiken om de publicatieactie te autoriseren.
+
+**Advies voor het DevOps-team:**
+
+- **Backend-gemedieerde publicatie.** In productie mag de publicatieactie niet rechtstreeks vanuit de browser naar TriplyDB gaan met een door de gebruiker opgegeven API-token. In plaats daarvan moet de geauthenticeerde gebruiker publicatie aanvragen via de backend, die de TriplyDB-servicecredentials beheert en autorisatieregels kan afdwingen (heeft deze gebruiker het recht om namens deze organisatie te publiceren, naar deze dataset/graph?). Dit elimineert tevens het localStorage-tokenopslagprobleem.
+
+- **Operaton-credentials.** De hardcoded `demo:demo` Basic Auth moet worden vervangen. In productie moet de backend Operaton-aanroepen proxyen met juiste servicecredentials, vergelijkbaar met hoe het reeds SPARQL-queries naar TriplyDB proxyt.
+
+- **Backend-authenticatie.** De gedeelde Express-backend heeft momenteel geen authenticatie-middleware. Het toevoegen van een OIDC-tokenverificatie-middleware (die JWT-access-tokens van de IdP van de organisatie valideert) zou alle drie de backendfuncties (SPARQL-proxy, TriplyDB-publicatie, DMN-validatie) in één laag beschermen.
+
+- **Audittrail.** Wanneer een publicatie het gewicht draagt van een mandaat van een bevoegd gezag, wordt een auditlog die vastlegt wie wat heeft gepubliceerd, wanneer en namens wie, essentieel. De backend is de natuurlijke plek hiervoor.
+
+- **Scope.** Dit geldt specifiek voor de productieomgeving. De ontwikkel- en acceptatieomgevingen kunnen blijven werken met de huidige prototype-credentials ten behoeve van snelle iteratie.
