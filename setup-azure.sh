@@ -46,7 +46,7 @@ az staticwebapp create \
   --resource-group "$RESOURCE_GROUP" \
   --location "$LOCATION" \
   --sku "$SKU" \
-  --source "https://git.open-regels.nl/your-group/iou-architectuur" \
+  --source "https://git.open-regels.nl/showcases/iou-architectuur" \
   --branch "main" \
   --app-location "/" \
   --output-location "site" \
@@ -71,7 +71,7 @@ echo "   Value: $DEPLOYMENT_TOKEN"
 echo "   Protected: Yes"
 echo "   Masked: Yes"
 echo ""
-echo "   Go to: https://git.open-regels.nl/your-group/iou-architectuur/-/settings/ci_cd"
+echo "   Go to: https://git.open-regels.nl/showcases/iou-architectuur/-/settings/ci_cd"
 echo ""
 
 # Step 5: Get the default hostname
