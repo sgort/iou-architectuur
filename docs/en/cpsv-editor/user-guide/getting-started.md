@@ -16,7 +16,7 @@
 ## Local installation
 
 ```bash
-git clone https://github.com/your-org/cpsv-editor.git
+git clone https://github.com/sgort/cpsv-editor.git
 cd cpsv-editor
 npm install
 npm start

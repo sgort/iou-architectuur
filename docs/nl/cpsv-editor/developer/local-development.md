@@ -45,6 +45,6 @@
 
 # 3. Monitor the GitHub Actions workflow
 
-# https://github.com/your-org/cpsv-editor/actions
+# https://github.com/sgort/cpsv-editor/actions
 
 # 4. Verify the ACC deployment
