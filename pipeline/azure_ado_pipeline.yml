@@ -3,12 +3,12 @@ name: Azure Static Web Apps CI/CD
 trigger:
   branches:
     include:
-      - main
+      - acc
 
 pr:
   branches:
     include:
-      - main
+      - acc
 
 pool:
   vmImage: ubuntu-latest
