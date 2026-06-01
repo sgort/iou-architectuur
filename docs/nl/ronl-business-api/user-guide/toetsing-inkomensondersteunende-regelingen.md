@@ -43,7 +43,19 @@ flowchart TB
     M3["6c · Correctie<br/>persoonsgegevens<br/><i>terugwerkende kracht</i>"]:::ch6c -.->|trigger| PG
 ```
 
-[➔ Interactieve versie met voorbeeldketen AOW → AIO → Bijzondere bijstand → Huurtoeslag → Heusdenpas](toetsing-inkomensondersteunende-regelingen.html)
+---
+
+## Interactieve versie
+
+<figure style="width:100%; margin:0;">
+  <iframe src="../toetsing-inkomensondersteunende-regelingen.html"
+          width="100%"
+          height="900px"
+          frameborder="0"
+          style="border-radius:12px; display:block;">
+  </iframe>
+  <figcaption>Interactieve versie met voorbeeldketen AOW → AIO → Bijzondere bijstand → Huurtoeslag → Heusdenpas.</figcaption>
+</figure>
 
 ---
 
@@ -77,4 +89,3 @@ Wijzigingen activeren altijd dezelfde lus, maar via verschillende ingangen.
 | **6b · Wijziging regelgeving** | Regels (CPRMV) | Alleen de betreffende regeling en de regelingen die *downstream* van haar resultaat afhangen, worden opnieuw getoetst. Bovenstroomse regelingen blijven ongewijzigd. |
 | **6c · Correctie persoonsgegevens** | Persoonsgegevens | Als 6a, maar met **terugwerkende kracht**. Eerdere beschikkingen worden retrospectief herbeoordeeld; nabetaling of terugvordering kan volgen. |
 
-> Het temporele model &mdash; *valid time* versus *transaction time* &mdash; is in dit overzicht bewust niet uitgewerkt. Voor de architectuurprincipes is "elke wijziging triggert hervaststelling" voldoende; de bitemporele uitwerking hoort op een eigen pagina.
