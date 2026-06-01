@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Toetsing van inkomensondersteunende regelingen — IOU Architecture</title>
+<title>Assessing income support schemes — IOU Architecture</title>
 <style>
   :root {
     --bg: #ffffff;
@@ -214,17 +214,17 @@
 </head>
 <body>
 <main>
-  <h1>Toetsing van inkomensondersteunende regelingen</h1>
-  <p class="subtitle">Persoonsgegevens, regels en de hervaststellingslus &mdash; met drie wijzigingsstromen.</p>
+  <h1>Assessing income support schemes</h1>
+  <p class="subtitle">Personal data, rules and the re-assessment loop &mdash; with three change pathways.</p>
 
   <p class="intro">
-    Voorbeeldketen: <strong>AOW → AIO → Bijzondere bijstand → Huurtoeslag → Heusdenpas</strong>. De uitkomst van iedere regeling is invoer voor de volgende, daarom draait de toetsing in een lus tot de uitkomst stabiel is. Klik een wijzigingsknop om te zien hoe elke wijzigingssoort de lus opnieuw activeert.
+    Example chain: <strong>AOW → AIO → Bijzondere bijstand → Huurtoeslag → Heusdenpas</strong>. Each scheme's outcome is input to the next, so assessment runs as a loop until the outcome is stable. Click a change button to see how each kind of change re-activates the loop.
   </p>
 
   <div class="stage">
     <svg viewBox="0 0 680 360" role="img" aria-labelledby="diagram-title diagram-desc">
-      <title id="diagram-title">Architectuur van toetsing aan inkomensondersteunende regelingen</title>
-      <desc id="diagram-desc">Diagram toont persoonsgegevens links, een verticale keten van vijf regelingen in het midden en regels rechts. Pijlen tussen de regelingen tonen de wisselwerking. Drie knoppen eronder activeren elk een wijzigingsstroom.</desc>
+      <title id="diagram-title">Architecture of assessment against income support schemes</title>
+      <desc id="diagram-desc">Diagram shows personal data on the left, a vertical chain of five schemes in the centre, and rules on the right. Arrows between the schemes show cross-scheme interaction. Three buttons below activate each change pathway.</desc>
 
       <defs>
         <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -232,33 +232,33 @@
         </marker>
       </defs>
 
-      <!-- Persoonsgegevens block -->
+      <!-- Personal data block -->
       <rect id="block-pg" class="block-pg-rect" x="20" y="40" width="180" height="280" rx="8"/>
-      <text class="label-pg" x="110" y="62" text-anchor="middle" font-size="14" font-weight="500">Persoonsgegevens</text>
+      <text class="label-pg" x="110" y="62" text-anchor="middle" font-size="14" font-weight="500">Personal data</text>
       <text class="label-pg" x="36" y="92"  font-size="12">BRP</text>
-      <text class="sub-pg"   x="36" y="108" font-size="12" opacity="0.75">leeftijd, huishouden</text>
+      <text class="sub-pg"   x="36" y="108" font-size="12" opacity="0.75">age, household</text>
       <text class="label-pg" x="36" y="134" font-size="12">SUWI · UWV</text>
-      <text class="sub-pg"   x="36" y="150" font-size="12" opacity="0.75">inkomen, uitkering</text>
+      <text class="sub-pg"   x="36" y="150" font-size="12" opacity="0.75">income, benefits</text>
       <text class="label-pg" x="36" y="176" font-size="12">Belastingdienst</text>
-      <text class="sub-pg"   x="36" y="192" font-size="12" opacity="0.75">inkomensgegevens</text>
-      <text class="label-pg" x="36" y="218" font-size="12">Woningregister</text>
-      <text class="sub-pg"   x="36" y="234" font-size="12" opacity="0.75">huur, WOZ-waarde</text>
-      <text class="label-pg" x="36" y="260" font-size="12">Gemeente-administratie</text>
-      <text class="sub-pg"   x="36" y="276" font-size="12" opacity="0.75">aanvragen, beschikkingen</text>
+      <text class="sub-pg"   x="36" y="192" font-size="12" opacity="0.75">income data</text>
+      <text class="label-pg" x="36" y="218" font-size="12">Housing register</text>
+      <text class="sub-pg"   x="36" y="234" font-size="12" opacity="0.75">rent, property value</text>
+      <text class="label-pg" x="36" y="260" font-size="12">Municipal records</text>
+      <text class="sub-pg"   x="36" y="276" font-size="12" opacity="0.75">applications, decisions</text>
 
-      <!-- Regels block -->
+      <!-- Rules block -->
       <rect id="block-rg" class="block-rg-rect" x="480" y="40" width="180" height="280" rx="8"/>
-      <text class="label-rg" x="570" y="62" text-anchor="middle" font-size="14" font-weight="500">Regels (CPRMV)</text>
+      <text class="label-rg" x="570" y="62" text-anchor="middle" font-size="14" font-weight="500">Rules (CPRMV)</text>
       <text class="label-rg" x="496" y="92"  font-size="12">AOW</text>
-      <text class="sub-rg"   x="496" y="108" font-size="12" opacity="0.75">Algemene Ouderdomswet</text>
+      <text class="sub-rg"   x="496" y="108" font-size="12" opacity="0.75">state pension act</text>
       <text class="label-rg" x="496" y="134" font-size="12">AIO</text>
-      <text class="sub-rg"   x="496" y="150" font-size="12" opacity="0.75">Participatiewet</text>
+      <text class="sub-rg"   x="496" y="150" font-size="12" opacity="0.75">Participation Act</text>
       <text class="label-rg" x="496" y="176" font-size="12">Bijzondere bijstand</text>
-      <text class="sub-rg"   x="496" y="192" font-size="12" opacity="0.75">gem. verordening</text>
+      <text class="sub-rg"   x="496" y="192" font-size="12" opacity="0.75">municipal regulation</text>
       <text class="label-rg" x="496" y="218" font-size="12">Huurtoeslag</text>
-      <text class="sub-rg"   x="496" y="234" font-size="12" opacity="0.75">Wet op de huurtoeslag</text>
+      <text class="sub-rg"   x="496" y="234" font-size="12" opacity="0.75">Rent Allowance Act</text>
       <text class="label-rg" x="496" y="260" font-size="12">Heusdenpas</text>
-      <text class="sub-rg"   x="496" y="276" font-size="12" opacity="0.75">gem. verordening</text>
+      <text class="sub-rg"   x="496" y="276" font-size="12" opacity="0.75">municipal regulation</text>
 
       <!-- Schemes column -->
       <rect id="s-aow" class="scheme-rect" x="230" y="60"  width="220" height="40" rx="6"/>
@@ -266,13 +266,13 @@
       <rect id="s-bb"  class="scheme-rect" x="230" y="164" width="220" height="40" rx="6"/>
       <rect id="s-ht"  class="scheme-rect" x="230" y="216" width="220" height="40" rx="6"/>
       <rect id="s-hp"  class="scheme-rect" x="230" y="268" width="220" height="40" rx="6"/>
-      <text class="label-scheme" x="340" y="80"  text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500">AOW (ouderdomspensioen)</text>
-      <text class="label-scheme" x="340" y="132" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500">AIO (aanvulling AOW)</text>
+      <text class="label-scheme" x="340" y="80"  text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500">AOW (state pension)</text>
+      <text class="label-scheme" x="340" y="132" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500">AIO (supplement to AOW)</text>
       <text class="label-scheme" x="340" y="184" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500">Bijzondere bijstand</text>
-      <text class="label-scheme" x="340" y="236" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500">Huurtoeslag</text>
-      <text class="label-scheme" x="340" y="288" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500">Heusdenpas (gemeentepas)</text>
+      <text class="label-scheme" x="340" y="236" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500">Huurtoeslag (rent allowance)</text>
+      <text class="label-scheme" x="340" y="288" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500">Heusdenpas (municipal pass)</text>
 
-      <!-- Wisselwerking arrows between schemes -->
+      <!-- Cross-scheme interaction arrows -->
       <line x1="340" y1="100" x2="340" y2="112" class="arrow-line" marker-end="url(#arrow)"/>
       <line x1="340" y1="152" x2="340" y2="164" class="arrow-line" marker-end="url(#arrow)"/>
       <line x1="340" y1="204" x2="340" y2="216" class="arrow-line" marker-end="url(#arrow)"/>
@@ -280,31 +280,31 @@
 
       <!-- Data → schemes -->
       <line x1="200" y1="184" x2="228" y2="184" class="arrow-line" marker-end="url(#arrow)"/>
-      <text class="label-arrow" x="214" y="178" text-anchor="middle" font-size="11">gegevens</text>
+      <text class="label-arrow" x="214" y="178" text-anchor="middle" font-size="11">data</text>
 
       <!-- Rules → schemes -->
       <line x1="480" y1="184" x2="452" y2="184" class="arrow-line" marker-end="url(#arrow)"/>
-      <text class="label-arrow" x="466" y="178" text-anchor="middle" font-size="11">regels</text>
+      <text class="label-arrow" x="466" y="178" text-anchor="middle" font-size="11">rules</text>
 
       <!-- Loop indicator -->
-      <text class="label-loop" x="340" y="336" text-anchor="middle" font-size="12">↻ Hervaststelling tot stabiele uitkomst</text>
+      <text class="label-loop" x="340" y="336" text-anchor="middle" font-size="12">↻ Re-assessment until stable outcome</text>
     </svg>
 
     <div class="legend">
-      <span><span class="legend-dot" style="background: var(--c6a)"></span>6a · data&shy;mutatie</span>
-      <span><span class="legend-dot" style="background: var(--c6b)"></span>6b · regel&shy;wijziging</span>
-      <span><span class="legend-dot" style="background: var(--c6c)"></span>6c · correctie met terugwerkende kracht</span>
+      <span><span class="legend-dot" style="background: var(--c6a)"></span>6a · data change</span>
+      <span><span class="legend-dot" style="background: var(--c6b)"></span>6b · rule change</span>
+      <span><span class="legend-dot" style="background: var(--c6c)"></span>6c · retroactive correction</span>
     </div>
   </div>
 
   <div class="ctrl-row">
-    <button class="ctrl-btn b6a" onclick="trigger6a()">6a · Wijziging persoonsgegevens</button>
-    <button class="ctrl-btn b6b" onclick="trigger6b()">6b · Wijziging regelgeving</button>
-    <button class="ctrl-btn b6c" onclick="trigger6c()">6c · Correctie persoonsgegevens</button>
+    <button class="ctrl-btn b6a" onclick="trigger6a()">6a · Personal data change</button>
+    <button class="ctrl-btn b6b" onclick="trigger6b()">6b · Rule change</button>
+    <button class="ctrl-btn b6c" onclick="trigger6c()">6c · Personal data correction</button>
     <button class="ctrl-btn reset" onclick="resetSim()">Reset</button>
   </div>
 
-  <div class="status" id="status">Klik een wijzigingsknop om te zien hoe de hervaststellingslus opnieuw wordt doorlopen.</div>
+  <div class="status" id="status">Click a change button to see how the re-assessment loop is triggered again.</div>
 
 </main>
 
@@ -351,12 +351,12 @@
     if (busy) return;
     setBusy(true); clearAll();
     status.classList.add('active-6a');
-    status.textContent = '6a · Persoonsgegevens gewijzigd — alle regelingen die de gewijzigde gegevens als invoer hebben worden opnieuw getoetst. Een inkomenswijziging raakt in beginsel elke inkomensafhankelijke regeling.';
+    status.textContent = '6a · Personal data has changed — every scheme that uses the changed data as input is re-assessed. An income change in principle affects every income-dependent scheme.';
     await pulseOnce(blockPG, 'pulse-6a');
     await cascade(schemes, 'pulse-6a', 240);
     clearAll();
     status.classList.add('active-6a');
-    status.textContent = 'Hervaststelling afgerond. Nieuwe stabiele uitkomst bepaald op basis van gewijzigde persoonsgegevens.';
+    status.textContent = 'Re-assessment complete. A new stable outcome has been determined on the basis of the changed personal data.';
     setBusy(false);
   }
 
@@ -364,12 +364,12 @@
     if (busy) return;
     setBusy(true); clearAll();
     status.classList.add('active-6b');
-    status.textContent = '6b · Regelgeving voor bijzondere bijstand gewijzigd — alleen die regeling én de downstream regelingen die er via wisselwerking van afhangen worden opnieuw getoetst. Bovenstroomse regelingen (AOW, AIO) blijven ongewijzigd.';
+    status.textContent = '6b · Rules for Bijzondere bijstand have changed — only that scheme and the downstream schemes that depend on its outcome are re-assessed. Upstream schemes (AOW, AIO) remain unaffected.';
     await pulseOnce(blockRG, 'pulse-6b');
     await cascade(['s-bb', 's-ht', 's-hp'], 'pulse-6b', 240);
     clearAll();
     status.classList.add('active-6b');
-    status.textContent = 'Hervaststelling afgerond. Nieuwe uitkomst voor bijzondere bijstand en afhankelijke regelingen; AOW en AIO ongewijzigd.';
+    status.textContent = 'Re-assessment complete. A new outcome for Bijzondere bijstand and dependent schemes; AOW and AIO are unchanged.';
     setBusy(false);
   }
 
@@ -377,19 +377,19 @@
     if (busy) return;
     setBusy(true); clearAll();
     status.classList.add('active-6c');
-    status.textContent = '6c · Persoonsgegevens met terugwerkende kracht gecorrigeerd — alle eerdere toetsingen worden retrospectief herbeoordeeld; beschikkingen kunnen worden herzien.';
+    status.textContent = '6c · Personal data has been corrected retroactively — all earlier assessments are re-evaluated retrospectively; decisions may be revised.';
     await pulseOnce(blockPG, 'pulse-6c');
     await cascade(schemes, 'pulse-6c', 240);
     clearAll();
     status.classList.add('active-6c');
-    status.textContent = 'Retrospectieve herbeoordeling afgerond. Eerdere uitkomsten worden zo nodig gecorrigeerd; nabetaling of terugvordering kan volgen.';
+    status.textContent = 'Retrospective re-evaluation complete. Earlier outcomes are corrected where needed; back-payments or recoveries may follow.';
     setBusy(false);
   }
 
   function resetSim() {
     if (busy) return;
     clearAll();
-    status.textContent = 'Klik een wijzigingsknop om te zien hoe de hervaststellingslus opnieuw wordt doorlopen.';
+    status.textContent = 'Click a change button to see how the re-assessment loop is triggered again.';
   }
 
   // Expose for inline handlers
