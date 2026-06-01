@@ -118,7 +118,7 @@ When an unauthenticated visitor lands on the dashboard and navigates to a top-na
   <figcaption>Clicking a private section while unauthenticated shows the login prompt inline without leaving the page</figcaption>
 </figure>
 
-Clicking **Inloggen als medewerker** in the prompt stores `medewerker` in `sessionStorage` and navigates to `/auth`, following the same caseworker login path described in [Logging In](../user-guide/login-flow.md#caseworker-path).
+Clicking **Inloggen als medewerker** in the prompt stores `medewerker` in `sessionStorage` and navigates to `/auth`, following the same caseworker login path described in [Logging In](../user-guide/login-flow.md#caseworker-login).
 
 ---
 

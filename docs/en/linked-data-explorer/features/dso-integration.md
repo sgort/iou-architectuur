@@ -127,4 +127,3 @@ The integration is delivered in phases. The detailed plan, current status, confi
 - [DSO Explorer user guide](../user-guide/dso-explorer.md) — step-by-step search and link workflow
 - [DSO Integration Phase Plan](dso-integration-phase-plan.md) — phase status, test anchors, implementation order
 - [BPMN Modeler — DSO activiteit linkage](bpmn-modeler.md#dso-activiteit-linkage)
-- [Backend API reference — DSO routes](../reference/api-reference.md#dso-routes)

@@ -128,7 +128,7 @@ See [API Endpoints](../references/api-endpoints.md) for full details and error c
 - [LDE Form Editor](../../../linked-data-explorer/features/form-editor.md) — authoring Camunda Forms
 - [LDE Document Composer](../../../linked-data-explorer/features/document-composer.md) — authoring DocumentTemplates
 - [LDE BPMN Modeler — Form linking](../../../linked-data-explorer/features/bpmn-modeler.md#form-linking) — linking forms to BPMN elements
-- [LDE BPMN Modeler — Document linking](../../../linked-data-explorer/features/bpmn-modeler.md#document-linking) — linking document templates to BPMN elements
+- [LDE BPMN Modeler — Document linking](../../../linked-data-explorer/features/bpmn-modeler.md#document-template-linking) — linking document templates to BPMN elements
 - [Submitting an Application](../user-guide/submitting-application.md) — citizen perspective
 - [Caseworker Workflow](../user-guide/caseworker-workflow.md) — caseworker perspective
-- [Frontend Development — Camunda Forms](../developer/frontend-development.md#camunda-forms----bpmn-ioform-js) — component reference
+- [Frontend Development — Camunda Forms](../developer/frontend-development.md#camunda-forms-bpmn-ioform-js) — component reference

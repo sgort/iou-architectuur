@@ -51,7 +51,7 @@ For component-specific development setup, refer to each component's Developer Do
 
 ## How to Contribute for Users
 
- [Submit a use case →](/use-case-form.html){ .md-button .md-button--primary }
+ [Submit a use case →](../../use-case-form.html){ .md-button .md-button--primary }
 
 ## How to Contribute for Developers
 

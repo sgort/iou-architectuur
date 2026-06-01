@@ -57,6 +57,42 @@
 
 ---
 
+## eDOCS
+
+### `GET /v1/edocs/status`
+
+### `POST /v1/edocs/workspaces/ensure`
+
+### `POST /v1/edocs/documents`
+
+### `GET /v1/edocs/workspaces/:workspaceId/documents`
+
+---
+
+## Asset Storage
+
+### `GET /v1/assets/bpmn`
+
+### `POST /v1/assets/bpmn`
+
+### `DELETE /v1/assets/bpmn/:id`
+
+### `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId`
+
+### `GET /v1/assets/forms`
+
+### `POST /v1/assets/forms`
+
+### `DELETE /v1/assets/forms/:id`
+
+### `GET /v1/assets/documents`
+
+### `POST /v1/assets/documents`
+
+### `DELETE /v1/assets/documents/:id`
+
+---
+
 ## Error responses
 
 ---
