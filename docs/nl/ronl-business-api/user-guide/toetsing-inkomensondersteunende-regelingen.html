@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toetsing van inkomensondersteunende regelingen — IOU Architecture</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #f7f6f3;
+    --text: #1d1d1b;
+    --text-soft: #5f5e5a;
+    --text-faint: #888780;
+    --border: rgba(29,29,27,0.12);
+    --border-soft: rgba(29,29,27,0.08);
+    --shadow: 0 1px 2px rgba(0,0,0,0.04);
+
+    --c6a: #D85A30;      /* coral — data mutation */
+    --c6a-soft: #FAECE7;
+    --c6a-mid: #F0997B;
+    --c6a-dark: #993C1D;
+
+    --c6b: #BA7517;      /* amber — rule change */
+    --c6b-soft: #FAEEDA;
+    --c6b-mid: #EF9F27;
+    --c6b-dark: #854F0B;
+
+    --c6c: #7F77DD;      /* purple — retroactive correction */
+    --c6c-soft: #EEEDFE;
+    --c6c-mid: #AFA9EC;
+    --c6c-dark: #3C3489;
+
+    --data:   #185FA5;   --data-soft: #E6F1FB;   --data-dark: #0C447C;
+    --rules:  #854F0B;   --rules-soft: #FAEEDA;  --rules-dark: #412402;
+    --assess: #0F6E56;   --assess-soft: #E1F5EE; --assess-dark: #04342C;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a18;
+      --bg-soft: #232320;
+      --text: #e9e8e3;
+      --text-soft: #b5b3aa;
+      --text-faint: #888780;
+      --border: rgba(233,232,227,0.14);
+      --border-soft: rgba(233,232,227,0.08);
+      --shadow: 0 1px 2px rgba(0,0,0,0.3);
+
+      --data-soft: rgba(24, 95, 165, 0.18);    --data-dark: #B5D4F4;
+      --rules-soft: rgba(186, 117, 23, 0.16);  --rules-dark: #FAC775;
+      --assess-soft: rgba(15, 110, 86, 0.18);  --assess-dark: #9FE1CB;
+
+      --c6a-soft: rgba(216, 90, 48, 0.18);
+      --c6b-soft: rgba(186, 117, 23, 0.18);
+      --c6c-soft: rgba(127, 119, 221, 0.20);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .subtitle {
+    color: var(--text-soft);
+    margin: 0 0 28px;
+    font-size: 14px;
+  }
+  .intro {
+    color: var(--text-soft);
+    font-size: 14px;
+    margin: 0 0 24px;
+    padding: 14px 16px;
+    background: var(--bg-soft);
+    border-radius: 8px;
+    border-left: 3px solid var(--border);
+  }
+  .stage {
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    background: var(--bg);
+    box-shadow: var(--shadow);
+  }
+  svg { display: block; width: 100%; height: auto; }
+  .scheme-box { transition: filter 0.2s ease; }
+  .legend {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--text-soft);
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 0.5px solid var(--border-soft);
+  }
+  .legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: -1px;
+  }
+  .ctrl-row {
+    display: flex;
+    gap: 8px;
+    margin: 20px 0 12px;
+    flex-wrap: wrap;
+  }
+  .ctrl-btn {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-left-width: 3px;
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 400;
+    cursor: pointer;
+    color: var(--text);
+    font-family: inherit;
+    transition: background 0.15s, transform 0.05s;
+  }
+  .ctrl-btn:hover:not(:disabled) { background: var(--bg-soft); }
+  .ctrl-btn:active:not(:disabled) { transform: scale(0.99); }
+  .ctrl-btn:disabled { opacity: 0.5; cursor: wait; }
+  .ctrl-btn:focus-visible { outline: 2px solid var(--text-soft); outline-offset: 2px; }
+  .ctrl-btn.b6a { border-left-color: var(--c6a); }
+  .ctrl-btn.b6b { border-left-color: var(--c6b); }
+  .ctrl-btn.b6c { border-left-color: var(--c6c); }
+  .ctrl-btn.reset { border-left-width: 0.5px; border-left-color: var(--border); color: var(--text-soft); }
+  .status {
+    font-size: 13.5px;
+    color: var(--text);
+    padding: 14px 16px;
+    background: var(--bg-soft);
+    border-radius: 8px;
+    min-height: 22px;
+    line-height: 1.55;
+    border-left: 3px solid var(--border);
+    transition: border-left-color 0.3s;
+  }
+  .status.active-6a { border-left-color: var(--c6a); }
+  .status.active-6b { border-left-color: var(--c6b); }
+  .status.active-6c { border-left-color: var(--c6c); }
+
+  /* SVG block fills (theme-aware) */
+  .block-pg-rect  { fill: var(--data-soft);   stroke: var(--data);   stroke-width: 0.5; transition: all 0.3s; }
+  .block-rg-rect  { fill: var(--rules-soft);  stroke: var(--rules);  stroke-width: 0.5; transition: all 0.3s; }
+  .scheme-rect    { fill: var(--assess-soft); stroke: var(--assess); stroke-width: 0.5; transition: all 0.3s; }
+  .label-pg, .sub-pg     { fill: var(--data-dark); }
+  .label-rg, .sub-rg     { fill: var(--rules-dark); }
+  .label-scheme          { fill: var(--assess-dark); }
+  .label-loop, .label-arrow { fill: var(--text-soft); }
+  .arrow-line { stroke: var(--text-soft); stroke-width: 1; fill: none; }
+
+  @keyframes pulse6a {
+    0%, 100% { fill: var(--start-fill); stroke: var(--start-stroke); stroke-width: 0.5; }
+    50%      { fill: var(--c6a-mid); stroke: var(--c6a-dark); stroke-width: 2.5; }
+  }
+  @keyframes pulse6b {
+    0%, 100% { fill: var(--start-fill); stroke: var(--start-stroke); stroke-width: 0.5; }
+    50%      { fill: var(--c6b-mid); stroke: var(--c6b-dark); stroke-width: 2.5; }
+  }
+  @keyframes pulse6c {
+    0%, 100% { fill: var(--start-fill); stroke: var(--start-stroke); stroke-width: 0.5; }
+    50%      { fill: var(--c6c-mid); stroke: var(--c6c-dark); stroke-width: 2.5; }
+  }
+  .block-pg-rect { --start-fill: var(--data-soft);   --start-stroke: var(--data); }
+  .block-rg-rect { --start-fill: var(--rules-soft);  --start-stroke: var(--rules); }
+  .scheme-rect   { --start-fill: var(--assess-soft); --start-stroke: var(--assess); }
+  .pulse-6a { animation: pulse6a 0.95s ease; }
+  .pulse-6b { animation: pulse6b 0.95s ease; }
+  .pulse-6c { animation: pulse6c 0.95s ease; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pulse-6a, .pulse-6b, .pulse-6c {
+      animation: none;
+    }
+    .pulse-6a { fill: var(--c6a-mid); stroke: var(--c6a-dark); stroke-width: 2.5; }
+    .pulse-6b { fill: var(--c6b-mid); stroke: var(--c6b-dark); stroke-width: 2.5; }
+    .pulse-6c { fill: var(--c6c-mid); stroke: var(--c6c-dark); stroke-width: 2.5; }
+  }
+
+  footer {
+    margin-top: 32px;
+    font-size: 12px;
+    color: var(--text-faint);
+    text-align: center;
+  }
+  footer a { color: var(--text-soft); text-decoration: none; border-bottom: 0.5px solid var(--border); }
+  footer a:hover { color: var(--text); }
+
+  @media (max-width: 520px) {
+    main { padding: 20px 16px 40px; }
+    .ctrl-btn { font-size: 12.5px; padding: 8px 12px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Toetsing van inkomensondersteunende regelingen</h1>
+  <p class="subtitle">Persoonsgegevens, regels en de hervaststellingslus &mdash; met drie wijzigingsstromen.</p>
+
+  <p class="intro">
+    Voorbeeldketen: <strong>AOW → AIO → Bijzondere bijstand → Huurtoeslag → Heusdenpas</strong>. De uitkomst van iedere regeling is invoer voor de volgende, daarom draait de toetsing in een lus tot de uitkomst stabiel is. Klik een wijzigingsknop om te zien hoe elke wijzigingssoort de lus opnieuw activeert.
+  </p>
+
+  <div class="stage">
+    <svg viewBox="0 0 680 360" role="img" aria-labelledby="diagram-title diagram-desc">
+      <title id="diagram-title">Architectuur van toetsing aan inkomensondersteunende regelingen</title>
+      <desc id="diagram-desc">Diagram toont persoonsgegevens links, een verticale keten van vijf regelingen in het midden en regels rechts. Pijlen tussen de regelingen tonen de wisselwerking. Drie knoppen eronder activeren elk een wijzigingsstroom.</desc>
+
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <!-- Persoonsgegevens block -->
+      <rect id="block-pg" class="block-pg-rect" x="20" y="40" width="180" height="280" rx="8"/>
+      <text class="label-pg" x="110" y="62" text-anchor="middle" font-size="14" font-weight="500">Persoonsgegevens</text>
+      <text class="label-pg" x="36" y="92"  font-size="12">BRP</text>
+      <text class="sub-pg"   x="36" y="108" font-size="12" opacity="0.75">leeftijd, huishouden</text>
+      <text class="label-pg" x="36" y="134" font-size="12">SUWI · UWV</text>
+      <text class="sub-pg"   x="36" y="150" font-size="12" opacity="0.75">inkomen, uitkering</text>
+      <text class="label-pg" x="36" y="176" font-size="12">Belastingdienst</text>
+      <text class="sub-pg"   x="36" y="192" font-size="12" opacity="0.75">inkomensgegevens</text>
+      <text class="label-pg" x="36" y="218" font-size="12">Woningregister</text>
+      <text class="sub-pg"   x="36" y="234" font-size="12" opacity="0.75">huur, WOZ-waarde</text>
+      <text class="label-pg" x="36" y="260" font-size="12">Gemeente-administratie</text>
+      <text class="sub-pg"   x="36" y="276" font-size="12" opacity="0.75">aanvragen, beschikkingen</text>
+
+      <!-- Regels block -->
+      <rect id="block-rg" class="block-rg-rect" x="480" y="40" width="180" height="280" rx="8"/>
+      <text class="label-rg" x="570" y="62" text-anchor="middle" font-size="14" font-weight="500">Regels (CPRMV)</text>
+      <text class="label-rg" x="496" y="92"  font-size="12">AOW</text>
+      <text class="sub-rg"   x="496" y="108" font-size="12" opacity="0.75">Algemene Ouderdomswet</text>
+      <text class="label-rg" x="496" y="134" font-size="12">AIO</text>
+      <text class="sub-rg"   x="496" y="150" font-size="12" opacity="0.75">Participatiewet</text>
+      <text class="label-rg" x="496" y="176" font-size="12">Bijzondere bijstand</text>
+      <text class="sub-rg"   x="496" y="192" font-size="12" opacity="0.75">gem. verordening</text>
+      <text class="label-rg" x="496" y="218" font-size="12">Huurtoeslag</text>
+      <text class="sub-rg"   x="496" y="234" font-size="12" opacity="0.75">Wet op de huurtoeslag</text>
+      <text class="label-rg" x="496" y="260" font-size="12">Heusdenpas</text>
+      <text class="sub-rg"   x="496" y="276" font-size="12" opacity="0.75">gem. verordening</text>
+
+      <!-- Schemes column -->
+      <rect id="s-aow" class="scheme-rect" x="230" y="60"  width="220" height="40" rx="6"/>
+      <rect id="s-aio" class="scheme-rect" x="230" y="112" width="220" height="40" rx="6"/>
+      <rect id="s-bb"  class="scheme-rect" x="230" y="164" width="220" height="40" rx="6"/>
+      <rect id="s-ht"  class="scheme-rect" x="230" y="216" width="220" height="40" rx="6"/>
+      <rect id="s-hp"  class="scheme-rect" x="230" y="268" width="220" height="40" rx="6"/>
+      <text class="label-scheme" x="340" y="80"  text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500">AOW (ouderdomspensioen)</text>
+      <text class="label-scheme" x="340" y="132" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500">AIO (aanvulling AOW)</text>
+      <text class="label-scheme" x="340" y="184" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500">Bijzondere bijstand</text>
+      <text class="label-scheme" x="340" y="236" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500">Huurtoeslag</text>
+      <text class="label-scheme" x="340" y="288" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500">Heusdenpas (gemeentepas)</text>
+
+      <!-- Wisselwerking arrows between schemes -->
+      <line x1="340" y1="100" x2="340" y2="112" class="arrow-line" marker-end="url(#arrow)"/>
+      <line x1="340" y1="152" x2="340" y2="164" class="arrow-line" marker-end="url(#arrow)"/>
+      <line x1="340" y1="204" x2="340" y2="216" class="arrow-line" marker-end="url(#arrow)"/>
+      <line x1="340" y1="256" x2="340" y2="268" class="arrow-line" marker-end="url(#arrow)"/>
+
+      <!-- Data → schemes -->
+      <line x1="200" y1="184" x2="228" y2="184" class="arrow-line" marker-end="url(#arrow)"/>
+      <text class="label-arrow" x="214" y="178" text-anchor="middle" font-size="11">gegevens</text>
+
+      <!-- Rules → schemes -->
+      <line x1="480" y1="184" x2="452" y2="184" class="arrow-line" marker-end="url(#arrow)"/>
+      <text class="label-arrow" x="466" y="178" text-anchor="middle" font-size="11">regels</text>
+
+      <!-- Loop indicator -->
+      <text class="label-loop" x="340" y="336" text-anchor="middle" font-size="12">↻ Hervaststelling tot stabiele uitkomst</text>
+    </svg>
+
+    <div class="legend">
+      <span><span class="legend-dot" style="background: var(--c6a)"></span>6a · data&shy;mutatie</span>
+      <span><span class="legend-dot" style="background: var(--c6b)"></span>6b · regel&shy;wijziging</span>
+      <span><span class="legend-dot" style="background: var(--c6c)"></span>6c · correctie met terugwerkende kracht</span>
+    </div>
+  </div>
+
+  <div class="ctrl-row">
+    <button class="ctrl-btn b6a" onclick="trigger6a()">6a · Wijziging persoonsgegevens</button>
+    <button class="ctrl-btn b6b" onclick="trigger6b()">6b · Wijziging regelgeving</button>
+    <button class="ctrl-btn b6c" onclick="trigger6c()">6c · Correctie persoonsgegevens</button>
+    <button class="ctrl-btn reset" onclick="resetSim()">Reset</button>
+  </div>
+
+  <div class="status" id="status">Klik een wijzigingsknop om te zien hoe de hervaststellingslus opnieuw wordt doorlopen.</div>
+
+  <footer>
+    Onderdeel van de <a href="../">IOU Architecture Documentation</a>.
+  </footer>
+</main>
+
+<script>
+(function() {
+  const status = document.getElementById('status');
+  const buttons = document.querySelectorAll('.ctrl-btn');
+  const schemes = ['s-aow', 's-aio', 's-bb', 's-ht', 's-hp'];
+  const blockPG = document.getElementById('block-pg');
+  const blockRG = document.getElementById('block-rg');
+  let busy = false;
+
+  function setBusy(b) {
+    busy = b;
+    buttons.forEach(btn => btn.disabled = b);
+  }
+
+  function clearAll() {
+    document.querySelectorAll('.pulse-6a, .pulse-6b, .pulse-6c').forEach(el => {
+      el.classList.remove('pulse-6a', 'pulse-6b', 'pulse-6c');
+    });
+    status.classList.remove('active-6a', 'active-6b', 'active-6c');
+  }
+
+  function pulseOnce(el, cls) {
+    return new Promise(resolve => {
+      el.classList.add(cls);
+      const handler = () => { el.removeEventListener('animationend', handler); resolve(); };
+      el.addEventListener('animationend', handler);
+      // Fallback for reduced-motion (no animationend fires)
+      setTimeout(resolve, 1000);
+    });
+  }
+
+  async function cascade(ids, cls, gap) {
+    for (const id of ids) {
+      document.getElementById(id).classList.add(cls);
+      await new Promise(r => setTimeout(r, gap));
+    }
+    await new Promise(r => setTimeout(r, 700));
+  }
+
+  async function trigger6a() {
+    if (busy) return;
+    setBusy(true); clearAll();
+    status.classList.add('active-6a');
+    status.textContent = '6a · Persoonsgegevens gewijzigd — alle regelingen die de gewijzigde gegevens als invoer hebben worden opnieuw getoetst. Een inkomenswijziging raakt in beginsel elke inkomensafhankelijke regeling.';
+    await pulseOnce(blockPG, 'pulse-6a');
+    await cascade(schemes, 'pulse-6a', 240);
+    clearAll();
+    status.classList.add('active-6a');
+    status.textContent = 'Hervaststelling afgerond. Nieuwe stabiele uitkomst bepaald op basis van gewijzigde persoonsgegevens.';
+    setBusy(false);
+  }
+
+  async function trigger6b() {
+    if (busy) return;
+    setBusy(true); clearAll();
+    status.classList.add('active-6b');
+    status.textContent = '6b · Regelgeving voor bijzondere bijstand gewijzigd — alleen die regeling én de downstream regelingen die er via wisselwerking van afhangen worden opnieuw getoetst. Bovenstroomse regelingen (AOW, AIO) blijven ongewijzigd.';
+    await pulseOnce(blockRG, 'pulse-6b');
+    await cascade(['s-bb', 's-ht', 's-hp'], 'pulse-6b', 240);
+    clearAll();
+    status.classList.add('active-6b');
+    status.textContent = 'Hervaststelling afgerond. Nieuwe uitkomst voor bijzondere bijstand en afhankelijke regelingen; AOW en AIO ongewijzigd.';
+    setBusy(false);
+  }
+
+  async function trigger6c() {
+    if (busy) return;
+    setBusy(true); clearAll();
+    status.classList.add('active-6c');
+    status.textContent = '6c · Persoonsgegevens met terugwerkende kracht gecorrigeerd — alle eerdere toetsingen worden retrospectief herbeoordeeld; beschikkingen kunnen worden herzien.';
+    await pulseOnce(blockPG, 'pulse-6c');
+    await cascade(schemes, 'pulse-6c', 240);
+    clearAll();
+    status.classList.add('active-6c');
+    status.textContent = 'Retrospectieve herbeoordeling afgerond. Eerdere uitkomsten worden zo nodig gecorrigeerd; nabetaling of terugvordering kan volgen.';
+    setBusy(false);
+  }
+
+  function resetSim() {
+    if (busy) return;
+    clearAll();
+    status.textContent = 'Klik een wijzigingsknop om te zien hoe de hervaststellingslus opnieuw wordt doorlopen.';
+  }
+
+  // Expose for inline handlers
+  window.trigger6a = trigger6a;
+  window.trigger6b = trigger6b;
+  window.trigger6c = trigger6c;
+  window.resetSim = resetSim;
+})();
+</script>
+</body>
+</html>
