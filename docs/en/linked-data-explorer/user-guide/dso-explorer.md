@@ -7,7 +7,7 @@ A step-by-step walkthrough for searching the Digitaal Stelsel Omgevingswet from 
 ## Before you start
 
 - Open LDE and navigate to the **DSO Explorer** view in the sidebar (the globe icon).
-- Decide which DSO environment you need. Most authority data is published in pre-production first; production carries the authoritative live ruleset. Test anchors per environment are listed in [DSO Integration Phase Plan](../features/dso-integration-phase-plan.md#current-state--v153).
+- Decide which DSO environment you need. Most authority data is published in pre-production first; production carries the authoritative live ruleset. Test anchors per environment are listed in [DSO Integration Phase Plan](../features/dso-integration-phase-plan.md).
 - Confirm the environment in **Settings → DSO environment**. The header badge turns amber for pre-production, green for production.
 
 <figure markdown style="width:100%; margin:0;">

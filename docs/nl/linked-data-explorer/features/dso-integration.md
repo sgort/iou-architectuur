@@ -1,9 +1,8 @@
 # DSO-integratie
 
 !!! info "Documentatie in ontwikkeling"
-    Deze pagina is nog niet vertaald. Raadpleeg voorlopig de [Engelse versie](../../features/dso-integration.md) voor de volledige inhoud.
-
-    **Status:** Engelse versie compleet — Nederlandse vertaling staat gepland.
+    De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
+    Raadpleeg de <a href="/linked-data-explorer/features/dso-integration/">Engelse versie</a> voor de huidige inhoud.
 
 ## Overzicht
 

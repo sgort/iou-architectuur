@@ -115,7 +115,7 @@ nav:
       - HR Onboarding: ronl-business-api/user-guide/hr-onboarding.md
       - RIP Phase 1 Workflow: ronl-business-api/user-guide/rip-phase1-workflow.md
       - Adding a Municipality: ronl-business-api/user-guide/adding-municipality.md
-      - Multiple interacting rules example: ronl-business-api/user-guide/toetsing-inkomensondersteunende-regelingen.md
+      - Multiple interacting rules example: ronl-business-api/user-guide/assessing-income-support-schemes.md
     - Developer Docs:
       - Local Development Setup: ronl-business-api/developer/local-development.md
       - Backend Development: ronl-business-api/developer/backend-development.md

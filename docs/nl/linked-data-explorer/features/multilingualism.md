@@ -1,9 +1,8 @@
 # Meertaligheid
 
 !!! info "Documentatie in ontwikkeling"
-    Deze pagina is nog niet vertaald. Raadpleeg voorlopig de [Engelse versie](../../features/multilingualism.md) voor de volledige inhoud.
-
-    **Status:** Engelse versie compleet — Nederlandse vertaling staat gepland.
+    De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
+    Raadpleeg de <a href="/linked-data-explorer/features/multilingualism/">Engelse versie</a> voor de huidige inhoud.
 
 ## Overzicht
 
@@ -48,6 +47,6 @@ De form-js properties-panel verliest focus bij een korte pauze tijdens typen —
 ## Verwante pagina's
 
 - [Meertaligheid-gebruikershandleiding](../user-guide/multilingualism.md)
-- [BPMN Modeler — taal en organisatie](bpmn-modeler.md#taal-en-organisatie)
-- [Form Editor — taal en organisatie](form-editor.md#taal-en-organisatie)
-- [Document Composer — taal en organisatie](document-composer.md#taal-en-organisatie)
+- [BPMN Modeler — taal en organisatie](bpmn-modeler.md)
+- [Form Editor — taal en organisatie](form-editor.md)
+- [Document Composer — taal en organisatie](document-composer.md)

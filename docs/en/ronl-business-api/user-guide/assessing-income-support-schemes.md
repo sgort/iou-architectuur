@@ -46,7 +46,7 @@ flowchart TB
 ## Interactive walkthrough
 
 <figure style="width:100%; margin:0;">
-  <iframe src="../toetsing-inkomensondersteunende-regelingen.html"
+  <iframe src="../assessing-income-support-schemes.html"
           width="100%"
           height="900px"
           frameborder="0"

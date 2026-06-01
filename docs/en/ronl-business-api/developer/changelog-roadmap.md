@@ -35,11 +35,11 @@ See [Caseworker Dashboard (V2)](../features/caseworker-dashboard-v2.md).
 
 ### DvTP consent flow (v3.0.1)
 
-`DvtpStartSection` / `DvtpTakenSection` added under Werk → DVTP, gated to `municipality` org types. Starts the `DvtpToestemmingGevenProcess` BPMN via `ProcessStartFormViewer`. `dvtp` feature flag added to `tenants.json`. See [DvTP Consent Flow](../features/dvtp-consent-flow.md).
+`DvtpStartSection` / `DvtpTakenSection` added under Werk → DVTP, gated to `municipality` org types. Starts the `DvtpToestemmingGevenProcess` BPMN via `ProcessStartFormViewer`. `dvtp` feature flag added to `tenants.json`.
 
 ### Management Capacity Claim (v3.0.2)
 
-`ManagementCapacityClaimProcess` BPMN + `/v1/hr-capacity/*` routes (`capacity.routes.ts`). `CapacityClaimSection` (manager-gated), `CapacityClaimArchiefSection`, inline `CapacityClaimDocumentsViewer`. Nine new realm roles. Role-based `candidateGroups` task queue filtering. See [Management Capacity Claim](../features/management-capacity-claim.md).
+`ManagementCapacityClaimProcess` BPMN + `/v1/hr-capacity/*` routes (`capacity.routes.ts`). `CapacityClaimSection` (manager-gated), `CapacityClaimArchiefSection`, inline `CapacityClaimDocumentsViewer`. Nine new realm roles. Role-based `candidateGroups` task queue filtering.
 
 ### Nieuws RSS feed migration → revert
 
