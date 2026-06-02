@@ -18,13 +18,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
--   **✏️ CPSV Editor — v1.9.4** · *May 2026*
+-   **✏️ CPSV Editor — v1.9.5** · *May 2026*
 
     ---
 
-    **cprmv:Dataset Generation**
+    **DMN Workflow Polish**
 
-    DCAT-aligned [`cprmv:Dataset`](cpsv-editor/developer/cprmv-dataset-generation.md) blocks emitted on TTL export — one per legal source, dual-typed `cprmv:Dataset` / `dcat:Dataset`, carrying `dcat:version`, `dct:issued`, `dcat:landingPage`, and `cprmv:implements` — powering the new `/v1/norms` endpoint in the Linked Data Explorer.
+    Starter request bodies now populate from [`<inputValues>` constraints](cpsv-editor/developer/dmn-implementation.md#request-body-generation) on decisionTable input columns — constrained string inputs get a runnable value out of the box instead of an empty string that would fail at evaluate time. Validation backend unreachability surfaces as a distinct amber *"Syntax validation result not available"* state, no more silent failures when the LDE backend can't be reached.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
