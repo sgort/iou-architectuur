@@ -11,6 +11,15 @@
       "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/53a4c0a0c05c8d3a2e0f20c0b5a0fed335bb298e"
     },
     {
+      "name": "Norm Editor",
+      "icon": "🖍️",
+      "version": "v0.0.1",
+      "environment": "acc",
+      "commit": "7a8c164...",
+      "commit_date": "2026-06-02",
+      "repo_url": "https://git.open-regels.nl/regels/editor/-/commit/7a8c16497b676ad38eac235ae00818a513850be5"
+    },
+    {
       "name": "CPSV Editor",
       "icon": "✏️",
       "version": "v1.9.5",

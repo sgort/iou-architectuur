@@ -18,6 +18,16 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
+-   **🖍️ Norm Editor — v0.0.1** · *June 2026*
+
+    ---
+
+    **Joins the documentation site**
+
+    The Norm Editor (Regeleditor) is now documented: a guided workflow for interpreting legal sources into FLINT Fact, Act, and Claim-duty frames, with source annotation, AND/OR/NOT preconditions, optional BERTje-based NLP suggestions for act constituents, and a lossless round trip to RDF in TriplyDB. Features, User Guide, Developer Docs, and Reference are all available.
+
+    [:octicons-arrow-right-24: Documentation](norm-editor/index.md)
+    
 -   **✏️ CPSV Editor — v1.9.5** · *June 2026*
 
     ---
@@ -104,6 +114,12 @@ The core business API layer that provides secure authentication and process orch
 **Live App**: [mijn.open-regels.nl](https://mijn.open-regels.nl)
 
 [View Documentation →](ronl-business-api/index.md){ .md-button }
+
+### 🖍️ Norm Editor
+
+Vue/Quasar application for creating FLINT interpretations of legal sources: load a normative text, annotate fragments, and build Fact, Act, and Claim-duty frames that export to RDF in TriplyDB. Backed by NLP, unwrap, and wrap-up services.
+
+[View Documentation →](norm-editor/index.md){ .md-button }
 
 ### ✏️ CPSV Editor
 
