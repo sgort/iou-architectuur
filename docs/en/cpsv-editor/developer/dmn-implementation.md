@@ -90,8 +90,20 @@ const runBackendValidation = async (content) => {
       // Auto-expand the panel when errors are present
       setValidationExpanded(data.data.summary.errors > 0);
     }
-  } catch (err) {
-    // Validation failure is non-blocking — DMN workflow continues
+} catch (err) {
+    // Backend unreachable — surface a neutral "unavailable" state rather than
+    // failing silently. DMN workflow remains fully functional; only the
+    // syntactic pre-check is skipped.
+    setValidationResult({
+      valid: false,
+      unavailable: true,
+      parseError:
+        'Syntax validation result not available — the validation backend ' +
+        `could not be reached (${err.message}). DMN deployment and testing ` +
+        'still work; only syntax pre-checks are skipped.',
+      layers: { base: { issues: [] }, business: { issues: [] }, execution: { issues: [] }, interaction: { issues: [] }, content: { issues: [] } },
+      summary: { errors: 0, warnings: 0, infos: 0 },
+    });
   } finally {
     setIsValidating(false);
   }
@@ -104,15 +116,16 @@ The call is made:
 - After `loadExampleDMN` — on successful fetch
 - Cleared in `handleClearFile` — `setValidationResult(null); setIsValidating(false);`
 
-### Validation is non-blocking
+### Backend unreachability handling
 
-A validation failure (network error or backend unavailable) does not prevent the DMN workflow from continuing. The panel simply does not appear. This ensures the editor remains functional in environments where the backend is unreachable.
+A network failure or unavailable backend does not block the DMN workflow — deployment, single evaluate, intermediate tests, and the test-cases runner all continue to function. From v1.9.5 onward the validation panel renders a distinct amber *"Syntax validation result not available"* state to make the situation visible, kept visually separate from the red *"Syntax issues found"* state that indicates an actual DMN problem. The amber state is signalled by `validationResult.unavailable === true`; the per-layer issue arrays and the error/warning/info counts are empty in that case.
 
 ### Response shape
 
 ```typescript
 interface ValidationResult {
   valid: boolean;
+  unavailable?: boolean;  // v1.9.5+ — true when the backend was unreachable; layers and summary are empty
   parseError: string | null;
   layers: {
     base:        { label: string; issues: Issue[] };
@@ -201,6 +214,20 @@ Console log on extraction:
 ```
 [DMN] Extracted primary decision key: "zorgtoeslag_resultaat" (skipped 8 p_* constant(s))
 ```
+
+---
+
+---
+
+## Request body generation
+
+When a DMN file is loaded, `generateRequestBodyFromDMN` walks the top-level `<inputData>` elements and builds a starter request body. For each input it picks a starter value using three sources, in priority order:
+
+1. **`<inputValues>` constraint (v1.9.5+).** If the inputData name matches the `<inputExpression>` text of a decisionTable input column that carries an `<inputValues>` FEEL allowed-values list, the first allowed value is used. Quoted strings are unwrapped; booleans and numbers are coerced from their FEEL literal forms.
+2. **`typeRef` from the inputData `<variable>` child.** When no `<inputValues>` constraint applies, the type drives a switch: `boolean` → `false`, `integer`/`long` → `0`, `number`/`double`/`decimal` → `0`, `date` → today's date in `YYYY-MM-DD`, `string` → empty.
+3. **Name-based heuristics.** `string`-typed inputs whose name contains `datum`/`date`/`dag` default to today's date; `geboorte` defaults to a random adult birth date; `aantal`/`bedrag`/`inkomen` default to `0`. Heuristics run only when steps 1 and 2 leave the value empty.
+
+The resulting body is editable in the DMN tab's request-body panel before each evaluate call. Authors who want a richer starter body without writing custom code can simply add `<inputValues>` constraints to the relevant decisionTable input columns — this also documents intent in the DMN itself, which downstream tooling (validators, decision-table editors) can consume.
 
 ---
 
