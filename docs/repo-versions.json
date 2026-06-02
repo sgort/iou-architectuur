@@ -13,11 +13,11 @@
     {
       "name": "CPSV Editor",
       "icon": "✏️",
-      "version": "v1.9.4",
+      "version": "v1.9.5",
       "environment": "acc",
-      "commit": "4b5cda6...",
-      "commit_date": "2026-05-15",
-      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/4b5cda686710fbacde4619ac387c4053dc61a579"
+      "commit": "9e5c26f...",
+      "commit_date": "2026-06-02",
+      "repo_url": "https://git.open-regels.nl/showcases/iou-architectuur/-/commit/9e5c26fc5c80fb3fb53f6ae302d77f83158adb3e"
     },
     {
       "name": "Linked Data Explorer",

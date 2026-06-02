@@ -18,7 +18,7 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
--   **✏️ CPSV Editor — v1.9.5** · *May 2026*
+-   **✏️ CPSV Editor — v1.9.5** · *June 2026*
 
     ---
 
