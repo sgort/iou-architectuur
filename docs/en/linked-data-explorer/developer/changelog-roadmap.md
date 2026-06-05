@@ -4,6 +4,58 @@
 
 ## Changelog
 
+### v1.9.0–v1.9.1 — SHACL Validator (June 2026)
+
+**v1.9.0 — Minor (June 4, 2026) · v1.9.1 — Patch (June 5, 2026)**
+
+A new **SHACL Validator** view validates CPSV-AP Turtle against the canonical CPSV-AP 3.2.0 shapes and RONL-authored shapes before publishing to TriplyDB.
+
+- New backend endpoints `POST /v1/shacl/validate` (file-local) and `POST /v1/shacl/validate-merged` (unions the file with the already-published graph via a read-only SPARQL `CONSTRUCT` before validating).
+- Two result layers: **CPSV-AP 3.2.0** (the SEMIC shapes vendored verbatim — 32 shapes) and **RONL Custom** (at most one `foaf:homepage`/`dct:identifier`/`cv:spatial` per organisation; one `dct:title`/`dct:description` per language on a rule).
+- v1.9.1 vendored the canonical CPSV-AP file and collapsed the earlier Core/Vocabularies split into a single CPSV-AP layer, added the **Not loaded vs OK** distinction, capped offending values at 60 characters, and added a conformant example plus deterministic merge-simulated test coverage.
+
+**Files:** `packages/backend/src/services/shacl-validation.service.ts`, `packages/backend/src/routes/shacl.routes.ts`, `packages/backend/src/types/shacl-rdf.d.ts`, `packages/backend/shapes/**`, `packages/frontend/src/components/ShaclValidator.tsx`
+
+---
+
+### v1.8.2 — DMN XML download (May 2026)
+
+**v1.8.2 — Patch (May 20, 2026)**
+
+- New endpoint `GET /v1/dmns/:identifier/xml` streams the deployed DMN XML from Operaton as `<identifier>.dmn` with the correct `Content-Type` and `Content-Disposition` headers.
+- DMN list and detail responses now include an `xmlUrl` field pointing to the download endpoint, making it self-discoverable.
+- Backward compatible: the legacy `GET /api/dmns/:definitionKey/xml` route remains available.
+
+**Files:** `packages/backend/src/routes/dmn.routes.ts`, `packages/frontend/src/types` (`DmnModel`)
+
+---
+
+### v1.8.1 — DMN validator: INT-007 false positives eliminated (May 2026)
+
+**v1.8.1 — Patch (May 19, 2026)**
+
+The Interaction Rules layer no longer flags valid intra-DRD references, and now parses FEEL expressions instead of matching the whole `<inputExpression>` text.
+
+#### `requiredDecision` targets resolved
+
+An `<inputExpression>` may legitimately reference a value produced by another decision wired in via `<informationRequirement><requiredDecision>` — that name is the producing decision's `<variable name>` or `<decisionTable>` `<output name>`, never an `<inputData>`. INT-007 now resolves `requiredDecision` targets and treats their output variables as satisfied, mirroring the `requiredInput` → `inputData` resolution INT-001 already performs.
+
+#### FEEL expressions parsed, not whole-text matched
+
+Previously the entire `<inputExpression><text>` was treated as one variable name, so `date and time(aanvraagDatum)` demanded an `<inputData name="date and time(aanvraagDatum)">` and any operator expression false-fired. A new shared `extractFeelIdentifiers()` helper strips string literals, unwraps built-in calls (`date(...)`, `date and time(...)`, `number(...)`, `string(...)`, `not(...)`, …), drops FEEL keywords/operators and qualified-name segments after a dot, and checks each referenced identifier individually.
+
+#### Decision outputs excluded from the input-contract check
+
+Output variable names (decision `<variable>` and decision-table `<output name>`) are, by construction, never external inputs and are no longer subject to the must-have-matching-`inputData` requirement. Genuine gaps still raise INT-007 — now naming the specific identifier rather than the raw expression string.
+
+#### No API change
+
+`POST /v1/dmns/validate` is unchanged; only the interaction-layer issue set for affected files differs (fewer false-positive warnings). Verified against real DMNs that deploy and evaluate on Operaton: `RONL_Heusden_Heusdenpas.dmn`, `RONL_SVB_Leeftijden.dmn`, `EmployeeRoleAssignment.dmn`, `tree-felling-decision.dmn`, and `replacement-tree-decision.dmn` all validate clean; backend `tsc --noEmit` passes.
+
+**Files:** `packages/backend/src/services/dmn-validation.service.ts`
+
+---
+
 ### v1.8.0 — Concurrent applicable periods per ruleset (May 2026)
 
 **v1.8.0 — Minor (May 15, 2026)**
