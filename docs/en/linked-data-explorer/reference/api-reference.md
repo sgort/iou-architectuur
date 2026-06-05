@@ -111,6 +111,7 @@ Query TriplyDB for all published DMN decision models at the given endpoint.
         "id": "https://regels.overheid.nl/services/aow-leeftijd/dmn",
         "identifier": "SVB_LeeftijdsInformatie",
         "title": "AOW Leeftijdsberekening",
+        "xmlUrl": "/v1/dmns/SVB_LeeftijdsInformatie/xml",
         "inputs": [
           {
             "identifier": "geboortedatum",
@@ -154,7 +155,21 @@ Returns full metadata for a single DMN by its identifier.
 
 **Query parameters:** `endpoint` (required)
 
-**Response:** Same shape as a single entry in the `GET /v1/dmns` response array.
+**Response:** Same shape as a single entry in the `GET /v1/dmns` response array. The response also includes an `xmlUrl` field pointing to the XML download endpoint below.
+
+---
+
+### `GET /v1/dmns/:identifier/xml`
+
+Streams the deployed DMN XML for a single DMN, fetched from Operaton. The file is returned as `<identifier>.dmn` with `Content-Type: application/xml` and a `Content-Disposition: attachment` header, so browsers save it directly.
+
+**Path parameters:**
+
+| Parameter    | Description                           |
+| ------------ | ------------------------------------- |
+| `identifier` | The `dct:identifier` value of the DMN |
+
+**Response:** The raw DMN XML document (not the JSON envelope).
 
 ---
 
@@ -546,6 +561,7 @@ These endpoints persist and retrieve BPMN processes, form schemas, and document 
 Returns all non-readonly BPMN processes stored in the database.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -578,6 +594,7 @@ Deletes a BPMN process by its LDE `id`.
 Looks up a process by its BPMN `<process id="...">` value. Used by the deploy bundle assembler to resolve `calledElement` subprocess references.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -615,6 +632,47 @@ Deletes a document template.
 
 ---
 
+## SHACL validation
+
+### `POST /v1/shacl/validate`
+
+Validates a CPSV-AP Turtle document against the CPSV-AP 3.2.0 and RONL SHACL shape layers (file-local).
+
+**Request body:** `{ "content": "<turtle>" }`
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "valid": false,
+    "parseError": null,
+    "layers": {
+      "cpsv-ap":     { "label": "CPSV-AP 3.2.0", "loaded": true, "issues": [] },
+      "ronl-custom": { "label": "RONL Custom",   "loaded": true, "issues": [] }
+    },
+    "summary": { "errors": 0, "warnings": 0, "infos": 0 }
+  }
+}
+```
+
+Each issue has the shape `{ severity, code, message, location? }`. See the [SHACL Validation Reference](shacl-validation-reference.md) for codes and shapes.
+
+---
+
+### `POST /v1/shacl/validate-merged`
+
+As above, but first fetches the already-published triples for the document's subjects via a read-only SPARQL `CONSTRUCT` and unions them with the document before validating — catching collisions that only appear once the file is merged into the store.
+
+**Request body:** `{ "content": "<turtle>", "endpoint": "https://…/sparql" }`
+
+`endpoint` is optional; the configured default TriplyDB endpoint is used when omitted.
+
+**Response:** Identical shape to `POST /v1/shacl/validate`.
+
+---
+
 ## Error responses
 
 All error responses follow a standard envelope:
@@ -645,7 +703,7 @@ All error responses follow a standard envelope:
 ## Legacy endpoints and deprecation
 
 !!! note
-    Asset storage endpoints (`/v1/assets/*`) have no legacy `/api/` equivalents. They were introduced in v1.3.0 as v1-only routes.
+Asset storage endpoints (`/v1/assets/*`) have no legacy `/api/` equivalents. They were introduced in v1.3.0 as v1-only routes.
 
 All `/api/*` endpoints are deprecated and will be removed in v2.0.0. They return identical responses to their `/v1/*` counterparts plus the following headers:
 
@@ -663,6 +721,7 @@ Link: </v1/health>; rel="successor-version"
 | `GET /api/health`                         | `GET /v1/health`                         |
 | `GET /api/dmns`                           | `GET /v1/dmns`                           |
 | `GET /api/dmns/:identifier`               | `GET /v1/dmns/:identifier`               |
+| `GET /api/dmns/:definitionKey/xml`        | `GET /v1/dmns/:identifier/xml`           |
 | `GET /api/chains`                         | `GET /v1/chains`                         |
 | `POST /api/chains/execute`                | `POST /v1/chains/execute`                |
 | `POST /api/chains/execute/heusdenpas`     | `POST /v1/chains/execute/heusdenpas`     |

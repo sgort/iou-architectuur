@@ -38,15 +38,15 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.8.0** · *May 2026*
+-   **🔍 Linked Data Explorer — v1.9.1** · *June 2026*
 
     ---
 
-    **Concurrent applicable periods and HTTP cache headers on /v1/norms**
+    **SHACL validation against CPSV-AP 3.2.0 and RONL shapes before publishing**
 
-    Each BWB ruleset is published as its own `cprmv:Dataset` resource in TriplyDB, and a single ruleset can carry multiple records — different applicable periods of the same law (e.g. the `2025-01-01` and `2026-01-01` editions of the Participatiewet) are concurrent and equally authoritative, not competing versions. The `dataset_versions` envelope field is a per-rulesetid map of lists, sorted with the most-recent applicable version first, so G2G consumers can match each rule's `applicable_date` to the Dataset record that backs it. Ships with an [API stability contract](linked-data-explorer/reference/api-stability.md) documenting the four versioning layers, the immutable primary-key promise, and the 24-month deprecation policy for the eventual `/v2/norms`.
+    A new SHACL Validator view validates CPSV-AP Turtle against two layers — the canonical CPSV-AP 3.2.0 shapes (vendored verbatim from SEMIC, 32 shapes) and RONL-authored uniqueness shapes — before records are published to TriplyDB. Validate a file on its own, or in **merge-simulated** mode, which first unions it with the already-published graph via a read-only SPARQL `CONSTRUCT` — catching collisions that only emerge at publication time, such as an organisation whose `foaf:homepage` diverges between publications, or several `cpsv:Rule` blocks sharing one subject URI. Backed by `POST /v1/shacl/validate` and `/validate-merged`, with per-layer results and offending-value listing.
 
-    [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
+    [:octicons-arrow-right-24: SHACL Validator](linked-data-explorer/features/shacl-validator.md)
 
 -   **📜 CPRMV API — v0.4.0** · *February 2026*
 
