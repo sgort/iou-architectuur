@@ -18,13 +18,23 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
--   **✏️ CPSV Editor — v1.9.4** · *May 2026*
+-   **🖍️ Norm Editor — v0.0.1** · *June 2026*
 
     ---
 
-    **cprmv:Dataset Generation**
+    **Joins the documentation site**
 
-    DCAT-aligned [`cprmv:Dataset`](cpsv-editor/developer/cprmv-dataset-generation.md) blocks emitted on TTL export — one per legal source, dual-typed `cprmv:Dataset` / `dcat:Dataset`, carrying `dcat:version`, `dct:issued`, `dcat:landingPage`, and `cprmv:implements` — powering the new `/v1/norms` endpoint in the Linked Data Explorer.
+    The Norm Editor (Regeleditor) is now documented: a guided workflow for interpreting legal sources into FLINT Fact, Act, and Claim-duty frames, with source annotation, AND/OR/NOT preconditions, optional BERTje-based NLP suggestions for act constituents, and a lossless round trip to RDF in TriplyDB. Features, User Guide, Developer Docs, and Reference are all available.
+
+    [:octicons-arrow-right-24: Documentation](norm-editor/index.md)
+    
+-   **✏️ CPSV Editor — v1.9.5** · *June 2026*
+
+    ---
+
+    **DMN Workflow Polish**
+
+    Starter request bodies now populate from [`<inputValues>` constraints](cpsv-editor/developer/dmn-implementation.md#request-body-generation) on decisionTable input columns — constrained string inputs get a runnable value out of the box instead of an empty string that would fail at evaluate time. Validation backend unreachability surfaces as a distinct amber *"Syntax validation result not available"* state, no more silent failures when the LDE backend can't be reached.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
@@ -104,6 +114,12 @@ The core business API layer that provides secure authentication and process orch
 **Live App**: [mijn.open-regels.nl](https://mijn.open-regels.nl)
 
 [View Documentation →](ronl-business-api/index.md){ .md-button }
+
+### 🖍️ Norm Editor
+
+Vue/Quasar application for creating FLINT interpretations of legal sources: load a normative text, annotate fragments, and build Fact, Act, and Claim-duty frames that export to RDF in TriplyDB. Backed by NLP, unwrap, and wrap-up services.
+
+[View Documentation →](norm-editor/index.md){ .md-button }
 
 ### ✏️ CPSV Editor
 

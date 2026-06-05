@@ -115,6 +115,7 @@ nav:
       - HR Onboarding: ronl-business-api/user-guide/hr-onboarding.md
       - RIP Phase 1 Workflow: ronl-business-api/user-guide/rip-phase1-workflow.md
       - Adding a Municipality: ronl-business-api/user-guide/adding-municipality.md
+      - Multiple interacting rules example: ronl-business-api/user-guide/assessing-income-support-schemes.md
     - Developer Docs:
       - Local Development Setup: ronl-business-api/developer/local-development.md
       - Backend Development: ronl-business-api/developer/backend-development.md
@@ -152,6 +153,36 @@ nav:
       - BRP Timeline Integration: ronl-business-api/references/brp-timeline-integration.md
       - Standards & Compliance: ronl-business-api/references/standards-compliance.md
   
+  - 🖍️ Norm Editor:
+    - Overview: norm-editor/index.md
+    - Features:
+      - Overview: norm-editor/features/overview.md
+      - FLINT Frame Model: norm-editor/features/flint-frame-model.md
+      - Source Annotation: norm-editor/features/source-annotation.md
+      - Boolean Constructs: norm-editor/features/boolean-constructs.md
+      - NLP Assistance: norm-editor/features/nlp-assistance.md
+      - Frame Visualisation: norm-editor/features/visualisation.md
+      - TriplyDB Integration & Formats: norm-editor/features/triplydb-and-formats.md
+    - User Guides:
+      - Getting Started: norm-editor/user-guide/getting-started.md
+      - Defining a Task: norm-editor/user-guide/defining-a-task.md
+      - Collecting Sources: norm-editor/user-guide/collecting-sources.md
+      - Interpreting Sources: norm-editor/user-guide/interpreting-sources.md
+      - Using NLP Suggestions: norm-editor/user-guide/using-nlp-suggestions.md
+      - Saving & Loading: norm-editor/user-guide/saving-and-loading.md
+    - Developer Docs:
+      - Architecture: norm-editor/developer/architecture.md
+      - Local Development: norm-editor/developer/local-development.md
+      - Frontend: norm-editor/developer/frontend.md
+      - Backend & API Services: norm-editor/developer/backend-and-apis.md
+      - Deployment: norm-editor/developer/deployment.md
+    - References:
+      - Interpretation JSON Format: norm-editor/reference/interpretation-json-format.md
+      - API Endpoints: norm-editor/reference/api-endpoints.md
+      - Frame Types & Roles: norm-editor/reference/frame-types-and-roles.md
+      - Environment Variables: norm-editor/reference/environment-variables.md
+      - FLINT Ontology: norm-editor/reference/flint-ontology.md
+
   - ✏️ CPSV Editor:
     - Overview: cpsv-editor/index.md
     - Features:

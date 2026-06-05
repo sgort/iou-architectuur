@@ -1,5 +1,5 @@
 {
-  "docs_built": "2026-05-16",
+  "docs_built": "2026-06-02",
   "repositories": [
     {
       "name": "RONL Business API",
@@ -11,13 +11,22 @@
       "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/53a4c0a0c05c8d3a2e0f20c0b5a0fed335bb298e"
     },
     {
+      "name": "Norm Editor",
+      "icon": "🖍️",
+      "version": "v0.0.1",
+      "environment": "acc",
+      "commit": "7a8c164...",
+      "commit_date": "2026-06-02",
+      "repo_url": "https://git.open-regels.nl/regels/editor/-/commit/7a8c16497b676ad38eac235ae00818a513850be5"
+    },
+    {
       "name": "CPSV Editor",
       "icon": "✏️",
-      "version": "v1.9.4",
+      "version": "v1.9.5",
       "environment": "acc",
-      "commit": "4b5cda6...",
-      "commit_date": "2026-05-15",
-      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/4b5cda686710fbacde4619ac387c4053dc61a579"
+      "commit": "9e5c26f...",
+      "commit_date": "2026-06-02",
+      "repo_url": "https://git.open-regels.nl/showcases/iou-architectuur/-/commit/9e5c26fc5c80fb3fb53f6ae302d77f83158adb3e"
     },
     {
       "name": "Linked Data Explorer",

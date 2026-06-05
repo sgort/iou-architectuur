@@ -151,7 +151,7 @@ The backend queries the Operaton history API for all variables present in comple
 
 ## DocumentTemplateSelector — BPMN integration
 
-`DocumentTemplateSelector` (`BpmnModeler/DocumentTemplateSelector.tsx`) is injected into the bpmn-js properties panel alongside `FormTemplateSelector` whenever a `UserTask` is selected. It follows the identical injection pattern (see [BPMN Modeler developer docs](bpmn-modeler.md#formtemplateselector--form-linking-for-usertask-and-startevent)):
+`DocumentTemplateSelector` (`BpmnModeler/DocumentTemplateSelector.tsx`) is injected into the bpmn-js properties panel alongside `FormTemplateSelector` whenever a `UserTask` is selected. It follows the identical injection pattern (see [BPMN Modeler developer docs](bpmn-modeler.md#formtemplateselector-form-linking-for-usertask-and-startevent)):
 
 ```typescript
 // BpmnCanvas.tsx — inside selectionChanged, after FormTemplateSelector injection
@@ -205,5 +205,5 @@ Clicking **Export .document** serialises the `DocumentTemplate` object to JSON a
 
 - [Document Composer features](../features/document-composer.md)
 - [Document Composer user guide](../user-guide/document-composer.md)
-- [BPMN Modeler developer docs — FormTemplateSelector](bpmn-modeler.md#formtemplateselector--form-linking-for-usertask-and-startevent)
+- [BPMN Modeler developer docs — FormTemplateSelector](bpmn-modeler.md#formtemplateselector-form-linking-for-usertask-and-startevent)
 - [Frontend Architecture](frontend.md) — ViewMode enum, localStorage key conventions

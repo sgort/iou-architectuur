@@ -534,6 +534,7 @@ Lists all documents stored in an eDOCS workspace.
   }
 }
 ```
+
 ---
 
 ## Asset Storage
