@@ -24,6 +24,10 @@ Werkzaamheden zoeken via de Zoekinterface, met autocomplete en versiegeschiedeni
 
 RTR-activiteiten doorbladeren, gefilterd via OIN-presets (Lelystad, Flevoland) en datum.
 
+## Toepasbare regels → LDE-assets (Fase 4)
+
+De toepasbare regels van een activiteit exporteren naar LDE-assets — een deploy-klare DMN of een form-js-scaffold — of doorgeven aan de CPSV Editor om te publiceren (v1.9.3–v1.9.5).
+
 ## BPMN-subproces koppelen aan een DSO-activiteit
 
 Het footerpaneel van de BPMN Modeler bevat een DSO Activity-selector waarmee een URN wordt geverifieerd tegen de live DSO RTR en wordt opgeslagen als `ronl:dsoActiviteitUrn` op het BPMN-procesetlement.

@@ -33,7 +33,7 @@ Use this when you know the public name of the task (the term a citizen would use
   <figcaption>Werkzaamheid detail panel with version history</figcaption>
 </figure>
 
-The `functioneleStructuurRef` URI on each result is the pivot to the STTR file used in the upcoming Phase 4 import. Copy it now if you'll be linking it to a BPMN subprocess later.
+The `functioneleStructuurRef` URI on each result is the pivot to the STTR file used by the Phase 4 rule extraction (see Workflow 4 below). Copy it now if you'll be linking it to a BPMN subprocess later.
 
 ---
 
@@ -84,9 +84,21 @@ If you switch DSO environments after verifying, re-verify — a URN that resolve
 
 ---
 
+## Workflow 4 — Extract an activity's rules into LDE (Phase 4)
+
+Use this to turn a DSO activity's *toepasbare regels* into LDE assets. Open the activity's detail panel (Workflow 2 or 3) and find the **Applicable Rules** section, which lists the rules grouped by type (Conclusie / Indieningsvereisten) with validity date and STTR version.
+
+- **↓ STTR** — download the raw STTR XML for any rule type.
+- **↓ Extract DMN** (Conclusie) — download the embedded decision table as a standalone, deploy-ready `.dmn` (normalized to DMN 1.3 with FEEL-safe names, output `typeRef`s and `camunda:historyTimeToLive`, so it deploys and evaluates on Operaton as-is).
+- **↓ Form scaffold** (Indieningsvereisten) — download a form-js JSON scaffold generated from the questionnaire.
+- **↓ Import into LDE** (Indieningsvereisten) — save that scaffold straight into the Form Editor as a draft, tagged with the authority name and a green **DSO** badge — no manual download/import.
+- **Publish via CPSV Editor** (Conclusie) — open the CPSV Editor with a deep-link to publish the extracted DMN to TriplyDB, where the LDE DMN picker (Chain Builder) can consume it.
+
+---
+
 ## Common situations
 
-**An activity card has only Indieningsvereisten — no Conclusie.** That activity has questionnaire logic but no full decision model. You can still link it to a BPMN subprocess, but Phase 4 will only generate a form scaffold, not a DMN.
+**An activity card has only Indieningsvereisten — no Conclusie.** That activity has questionnaire logic but no full decision model. You can still link it to a BPMN subprocess and generate a form scaffold from it, but there is no DMN to extract.
 
 **The detail panel shows "not available in this environment".** The URN was queried with the wrong DSO environment toggle. Switch in Settings and try again.
 

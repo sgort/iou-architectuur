@@ -29,6 +29,9 @@ The Linked Data Explorer models government service workflows as two-layer BPMN c
 
 Shell processes are top-level entries. Their subprocesses are indented beneath them with a tree connector. Standalone processes — those with no parent-child relationship — appear as top-level entries without indentation.
 
+!!! note "Automatic shell/subprocess linking (v1.9.2)"
+    Uploaded BPMN processes that form a shell/subprocess pair are now linked automatically: a process containing Call Activity elements is classified as a **shell**, and any process whose BPMN process ID is targeted by a shell's call-activity becomes its **subprocess**. Classification runs both on fresh imports and retroactively on startup, so processes uploaded as standalone before this release are reclassified without needing a re-upload.
+
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: BPMN Modeler process list showing AWB Generic Process with Tree Felling Permit indented below it as a subprocess, and AWB Zorgtoeslag with its two subprocesses indented below it](../../assets/screenshots/linked-data-explorer-bpmn-process-hierarchy.png)
   <figcaption>Process list showing shell/subprocess hierarchy: AWB shells with their subprocesses indented</figcaption>

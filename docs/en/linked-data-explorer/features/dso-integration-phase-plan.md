@@ -1,5 +1,14 @@
 # DSO Integration — Phase Plan & Test Guidance
 
+!!! info "Status update (v1.9.3–v1.9.5)"
+    Phase 2a/2d and Phase 4 have since shipped: the Activity Detail panel now lists
+    **Applicable Rules** with one-click **↓ STTR**, **↓ Extract DMN**, **↓ Form scaffold**,
+    **↓ Import into LDE** and **Publish via CPSV Editor** actions, backed by the
+    `GET /v1/dso/toepasbare-regels/*` routes; extracted DMNs are normalized to deploy and
+    evaluate on Operaton. See [DSO Integration → Applicable rules → LDE assets](dso-integration.md#applicable-rules-lde-assets-phase-4).
+    The "next development cycle" notes below describe the original plan and are kept for
+    historical context.
+
 ## End goal
 
 A **DSO-driven AWB process bundle**: given a location and a werkzaamheid, LDE produces a deployable Operaton package — BPMN subprocess + DMN + form schema + document template — all seeded from authoritative DSO source data rather than authored by hand.

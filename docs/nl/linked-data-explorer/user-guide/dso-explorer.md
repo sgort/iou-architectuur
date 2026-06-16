@@ -20,6 +20,10 @@ Open het Activities-tabblad, kies een authority-preset (Lelystad of Flevoland), 
 
 Plak de URN in het footerpaneel van de BPMN Modeler en klik Verify. Bij succes verschijnt een teal infoblok met omschrijving en bevoegd gezag.
 
+## Werkwijze 4 — Regels van een activiteit naar LDE exporteren (Fase 4)
+
+Via de sectie 'Applicable Rules' in het detailpaneel: ↓ STTR, ↓ Extract DMN (Conclusie), ↓ Form scaffold / ↓ Import into LDE (Indieningsvereisten), en Publish via CPSV Editor (Conclusie).
+
 ## Veelvoorkomende situaties
 
 Bij een 404 — controleer eerst de DSO-omgevingsschakelaar; een URN kan alleen in productie of alleen in pre-productie bestaan.

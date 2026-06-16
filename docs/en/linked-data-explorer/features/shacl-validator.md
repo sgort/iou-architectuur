@@ -1,6 +1,6 @@
 # SHACL Validator
 
-The SHACL Validator lets you validate one or more CPSV-AP Turtle files against the canonical **CPSV-AP 3.2.0** shapes and the **RONL Custom** shapes before publishing them to TriplyDB. It is accessible from the badge-check icon in the sidebar.
+The SHACL Validator lets you validate one or more CPSV-AP Turtle files against the canonical **CPSV-AP 3.2.0** shapes, the **CPRMV 0.4.1** shapes, and the **RONL Custom** shapes before publishing them to TriplyDB. It is accessible from the badge-check icon in the sidebar.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: SHACL Validator with three files loaded side-by-side — a conformant file (all green) and two collision fixtures showing per-layer errors](../../assets/screenshots/linked-data-explorer-shacl-validator.png)
@@ -37,16 +37,20 @@ A **Clear all** button in the header removes every file and resets the panel. Na
 
 ## Validation layers
 
-Results are grouped into two layers. Each layer can be expanded to see individual issues. Issues carry a severity, a typed code, and a human-readable message; cardinality and uniqueness issues also list the offending values.
+Results are grouped into three layers (v1.9.5 added the CPRMV layer). Each layer can be expanded to see individual issues. Issues carry a severity, a typed code, and a human-readable message; cardinality and uniqueness issues also list the offending values.
 
 | Layer | Source | Covers |
 |---|---|---|
 | CPSV-AP 3.2.0 | Canonical SEMIC shapes, vendored | The full CPSV-AP model — `PublicService`, `Rule`, `PublicOrganisation`, `ContactPoint`, `Channel`, `Address`, and related classes (32 shapes). Enforces required properties, datatypes, and class constraints. |
+| CPRMV 0.4.1 | CPRMV SHACL shapes (`shapes/cprmv/0.4.1/cprmv.shacl.ttl`) | The CPRMV rule-management model — `RuleSet`, `Rule`, `RuleMethod` and their required properties. Added in v1.9.5. |
 | RONL Custom | RONL-authored shapes | RONL publishing invariants on top of CPSV-AP — at most one `foaf:homepage` / `dct:identifier` / `cv:spatial` per organisation, and at most one `dct:title` / `dct:description` per language on a rule. |
 
 A file is **valid** when no layer produces an error. Warnings and informational messages are advisory.
 
 A layer is shown as **Not loaded** (rather than OK) when no shape files are present for it — so an unvendored layer never displays a misleading green check. For the complete specification of the shapes and codes, see the [SHACL Validation Reference](../reference/shacl-validation-reference.md).
+
+!!! note "Full issue text (v1.9.7)"
+    Long issue messages and focus-node locations are no longer truncated with an ellipsis — they wrap in full and the complete text is also available on hover (title tooltip). The backend's earlier 60-character cap on the offending values reported for cardinality (`maxCount` / `uniqueLang`) violations has been removed, so the full value appears in the message.
 
 ---
 

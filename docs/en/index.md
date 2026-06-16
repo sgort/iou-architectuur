@@ -38,15 +38,15 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.9.1** · *June 2026*
+-   **🔍 Linked Data Explorer — v1.9.7** · *June 2026*
 
     ---
 
-    **SHACL validation against CPSV-AP 3.2.0 and RONL shapes before publishing**
+    **DSO rule extraction & three-layer SHACL validation**
 
-    A new SHACL Validator view validates CPSV-AP Turtle against two layers — the canonical CPSV-AP 3.2.0 shapes (vendored verbatim from SEMIC, 32 shapes) and RONL-authored uniqueness shapes — before records are published to TriplyDB. Validate a file on its own, or in **merge-simulated** mode, which first unions it with the already-published graph via a read-only SPARQL `CONSTRUCT` — catching collisions that only emerge at publication time, such as an organisation whose `foaf:homepage` diverges between publications, or several `cpsv:Rule` blocks sharing one subject URI. Backed by `POST /v1/shacl/validate` and `/validate-merged`, with per-layer results and offending-value listing.
+    The DSO Explorer now extracts an activity's *toepasbare regels* into deploy-ready LDE assets — a normalized DMN (deploys & evaluates on Operaton) or a form-js scaffold imported straight into the Form Editor — and can hand a DMN off to the CPSV Editor for publishing. The SHACL Validator gained a third **CPRMV 0.4.1** layer alongside CPSV-AP 3.2.0 and RONL Custom, and the ChainBuilder/`/v1/dmns` now discover DMNs under both the 0.3.0 and 0.4.1 CPRMV namespaces.
 
-    [:octicons-arrow-right-24: SHACL Validator](linked-data-explorer/features/shacl-validator.md)
+    [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
 -   **📜 CPRMV API — v0.4.1** · *June 2026*
 
