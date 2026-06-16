@@ -48,13 +48,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: SHACL Validator](linked-data-explorer/features/shacl-validator.md)
 
--   **📜 CPRMV API — v0.4.0** · *February 2026*
+-   **📜 CPRMV API — v0.4.1** · *June 2026*
 
     ---
 
-    **On-the-fly Rule Retrieval**
+    **CPRMV 0.4.1 conformance & reference resolution**
 
-    Live retrieval and CPRMV transformation of Dutch and EU legislation from BWB, CVDR, and EU CELLAR repositories. Automatic latest-version resolution, seven output formats, definition extraction with parse patterns, and Juriconnect reference resolution.
+    RuleSets are now FRBR Works (`frbroo:F1_Work`); `/ref` auto-detects Juriconnect, ELI (to EU CELLAR), and CPRMV-API references; new `/cellar-by-celex` and `/cellar-by-eli` redirects; `unformat` works across all output formats; and the API now exposes a basic [MCP server](cprmv-api/reference/api-endpoints.md) at `/mcp`.
 
     [:octicons-arrow-right-24: Full changelog](cprmv-api/developer/changelog-roadmap.md)
 

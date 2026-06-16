@@ -17,6 +17,8 @@
 
 ## Changelog
 
+### v0.4.1 (June 2026)
+
 ### v0.4.0 — Initial Release (February 2026)
 
 ---
@@ -27,5 +29,5 @@
 
 ### Planned
 
-### v0.4.x — Features & ReSpec documentation
+### v0.4.x — Features & documentation
 

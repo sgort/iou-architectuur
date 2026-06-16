@@ -28,8 +28,8 @@ This matches a definition like `Huur: € 1.200,—` and extracts:
     "norm": "1.200,—",
     "rulesetid": "BWBR0015703_2025-07-01_0",
     "rule_id_path": "BWBR0015703_2025-07-01_0, Artikel 20, lid 1, onderdeel a.",
-    "https://standaarden.open-regels.nl/standards/cprmv/0.4.0/#id": "onderdeel a.",
-    "https://standaarden.open-regels.nl/standards/cprmv/0.4.0/#definition": "Huur: € 1.200,—"
+    "https://standaarden.open-regels.nl/standards/cprmv/0.4.1#id": "onderdeel a.",
+    "https://standaarden.open-regels.nl/standards/cprmv/0.4.1#definition": "Huur: € 1.200,—"
 }
 ```
 
@@ -72,6 +72,9 @@ FastAPI's Swagger UI handles encoding automatically.
 
 ---
 
-## Format override
+## Works with any output format (v0.4.1)
 
-When `unformat` is specified, the `format` parameter is ignored and the response is always `cprmv-json`. The `unformat` mechanism operates on the rule's definition literal, which is only available in the cprmv-json structure.
+Up to v0.4.0, `unformat` only had an effect when `format=cprmv-json`. As of **v0.4.1** it works with any format: the values extracted from the definition are added as additional triples on the selected rule, so they appear in the RDF serialisations too (e.g. `turtle`, `n3`, `json-ld`). Combine `unformat` with `format=turtle` to get the extracted `situatie`/`norm` values as triples in the Turtle output.
+
+!!! note
+    The interactive Swagger description of the `unformat` parameter still states that it implies `cprmv-json`; that text is stale — the cross-format behaviour above is what the API actually does in v0.4.1.

@@ -31,5 +31,5 @@
 
 ---
 
-## Format override
+## Works with any output format (v0.4.1)
 

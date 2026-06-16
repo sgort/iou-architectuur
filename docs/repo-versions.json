@@ -40,11 +40,11 @@
     {
       "name": "CPRMV",
       "icon": "📜",
-      "version": "v0.4.0",
-      "environment": "acc",
-      "commit": "42f1771...",
-      "commit_date": "2026-02-24",
-      "repo_url": "https://git.open-regels.nl/standards/cprmv/-/commit/42f17711a470527890cb55b44b027f957324d6bc"
+      "version": "v0.4.1",
+      "environment": "prod",
+      "commit": "d614539...",
+      "commit_date": "2026-06-13",
+      "repo_url": "https://git.open-regels.nl/standards/cprmv/-/commit/d61453970000e505b778ed95a36fbdf9ff85f555"
     }
   ]
 }
