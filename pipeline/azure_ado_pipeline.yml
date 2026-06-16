@@ -1,0 +1,47 @@
+name: Azure Static Web Apps CI/CD
+
+trigger:
+  branches:
+    include:
+      - acc
+
+pr:
+  branches:
+    include:
+      - acc
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  pythonVersion: '3.11'
+
+steps:
+- checkout: self
+  submodules: true
+  lfs: false
+
+- task: UsePythonVersion@0
+  displayName: Set up Python
+  inputs:
+    versionSpec: '$(pythonVersion)'
+    addToPath: true
+
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: Install dependencies
+
+- script: |
+    mkdocs build --verbose
+  displayName: Build MkDocs site
+
+- task: AzureStaticWebApp@0
+  displayName: Build & Deploy (SWA)
+  inputs:
+    azure_static_web_apps_api_token: $(AZURE_STATIC_WEB_APPS_API_TOKEN)
+    skip_app_build: true
+    app_location: 'site'          # bij skip_app_build=true is dit je build output map [1](https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/azure-static-web-app-v0?view=azure-pipelines)
+    output_location: ''           # leeg laten bij deploy-only [1](https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/azure-static-web-app-v0?view=azure-pipelines)
+    api_location: ''
+    production_branch: 'main'
