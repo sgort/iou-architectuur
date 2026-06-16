@@ -2,9 +2,9 @@
 
 The CPRMV vocabulary is defined in `rdf/cprmv.ttl` and published as the CPRMV specification at [acc.cprmv.open-regels.nl/respec/](https://acc.cprmv.open-regels.nl/respec/). This page provides a compact reference of the classes and properties relevant to the API's output.
 
-**Vocabulary namespace:** `https://standaarden.open-regels.nl/standards/cprmv/0.4.0/#`  
+**Vocabulary namespace:** `https://standaarden.open-regels.nl/standards/cprmv/0.4.1#`  
 **Prefix:** `cprmv:`  
-**Version:** 0.4.0 (published 2026-02-09)  
+**Version:** 0.4.1  
 
 ---
 
@@ -12,7 +12,7 @@ The CPRMV vocabulary is defined in `rdf/cprmv.ttl` and published as the CPRMV sp
 
 | Class                       | Subclass of                      | Description                                          |
 | --------------------------- | -------------------------------- | ---------------------------------------------------- |
-| `cprmv:RuleSet`             | `eli:LegalResource`, `cv:Output` | A versioned set of rules, output of a public service |
+| `cprmv:RuleSet`             | `frbroo:F1_Work`, `cv:Output`    | A versioned set of rules, output of a public service. As of v0.4.1 a RuleSet is a FRBR Work, **not** an `eli:LegalResource` — a formalisation (e.g. business rules) is not in itself a legal resource (`eli:LegalResource` is itself a subclass of FRBR Work). |
 | `cprmv:Analysis`            | `cprmv:RuleSet`                  | Rule set produced by an analysis method              |
 | `cprmv:DecisionModel`       | `cprmv:RuleSet`                  | Rule set produced by a formalisation method          |
 | `cprmv:Rule`                | —                                | An individual rule within a rule set                 |
@@ -42,7 +42,7 @@ The CPRMV vocabulary is defined in `rdf/cprmv.ttl` and published as the CPRMV sp
 | ----------------- | --------------------------------------------------- | ------------------------------ | --------------------------------------------------------- |
 | `cprmv:id`        | `cprmv:Rule` ∪ `cprmv:RuleSet` ∪ `cprmv:RuleMethod` | literal                        | Unique identifier (lang-tagged, used for path navigation) |
 | `cprmv:hasPart`   | `cprmv:RuleSet` ∪ `cprmv:Rule`                      | RDF list                       | Ordered list of contained rules or rule sets              |
-| `cprmv:isBasedOn` | `cprmv:RuleSet` ∪ `cprmv:Rule`                      | `cprmv:RuleSet` ∪ `cprmv:Rule` | Subproperty of `eli:based_on` and `prov:wasDerivedFrom`   |
+| `cprmv:isBasedOn` | `cprmv:RuleSet` ∪ `cprmv:Rule`                      | `cprmv:RuleSet` ∪ `cprmv:Rule` | Subproperty of `frbroo:R2_is_derivative_of` and `prov:wasDerivedFrom` (as of v0.4.1 — was `eli:based_on`) |
 | `cprmv:comment`   | —                                                   | `xsd:string`                   |                                                           |
 
 ### On cprmv:RuleSet only
@@ -75,8 +75,8 @@ The CPRMV vocabulary is defined in `rdf/cprmv.ttl` and published as the CPRMV sp
 
 | CPRMV class/property | Aligned standard                                         |
 | -------------------- | -------------------------------------------------------- |
-| `cprmv:RuleSet`      | `eli:LegalResource`, `cv:Output`, `dcat:Dataset` member  |
-| `cprmv:isBasedOn`    | `eli:based_on`, `prov:wasDerivedFrom`                    |
+| `cprmv:RuleSet`      | `frbroo:F1_Work`, `cv:Output`, `dcat:Dataset` member (`cprmv:is_part_of`) |
+| `cprmv:isBasedOn`    | `frbroo:R2_is_derivative_of`, `prov:wasDerivedFrom`     |
 | `cprmv:isOutputOf`   | inverse of `schema:serviceOutput`, `prov:wasGeneratedBy` |
 
 The full alignment table and rationale are in the [CPRMV specification](https://acc.cprmv.open-regels.nl/respec/).

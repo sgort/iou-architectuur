@@ -16,7 +16,7 @@
 ## Local installation
 
 ```bash
-git clone https://github.com/your-org/cpsv-editor.git
+git clone https://github.com/sgort/cpsv-editor.git
 cd cpsv-editor
 npm install
 npm start
@@ -40,7 +40,7 @@ The typical workflow for a new service definition follows these steps:
 
 1. **Fill in Service Details** — Enter the service identifier, official name, description, and sector. The identifier becomes the base for all RDF URIs in the output, so choose something stable and descriptive (e.g. `aow-leeftijdsbepaling`).
 
-2. **Add Organisation** — Enter the competent authority. The geographic jurisdiction (`cv:spatial`) is mandatory.
+2. **Add Organisation** — Enter the competent authority. The geographic jurisdiction (`dct:spatial`) is mandatory.
 
 3. **Link Legal Resource** — Enter the BWB ID of the governing legislation (e.g. `BWBR0002221`). The editor validates the format and constructs the ELI URI.
 

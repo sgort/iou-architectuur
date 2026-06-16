@@ -85,6 +85,23 @@ See [Asset Storage](../developer/asset-storage.md) for the full architecture.
 
 ---
 
+## Language and organization
+
+The Document Composer footer panel mirrors the Form Editor's:
+
+- **Language** — ISO 639-1 dropdown. Persisted as the `language` column on `document_templates`.
+- **Organization** — free-text input with autocomplete. Persisted as the `organization` column.
+
+Both live on the `DocumentTemplate` wrapper, not inside the `zones` object.
+
+The list panel toolbar offers search and language filtering; documents are grouped under collapsible organization headers, identical to the BPMN and Form list patterns.
+
+Pending-until-Save: typing language or organization updates the editor's draft but does not regroup the document until **Save** is clicked. A load-window guard suppresses synthetic `onTemplateChange` events fired by child editors (TipTap) during document load, so opening a document no longer flips `hasChanges` spuriously.
+
+See [Multilingualism](multilingualism.md) for the architectural overview.
+
+---
+
 ## BPMN Modeler integration
 
 A **Link decision template** selector is injected into the BPMN properties panel for every `UserTask` element. Selecting a document template writes `camunda:documentRef` to the BPMN XML. A purple badge appears below the element on the canvas, distinct from the green form badge (📝) and the amber DMN badge.

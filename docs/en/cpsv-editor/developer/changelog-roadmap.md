@@ -4,6 +4,88 @@
 
 ## Changelog
 
+### v1.10.2 — Conformance Round-trip Fixes (June 2026)
+
+**Imported DMNs SHACL-conformant.** Imported DMN blocks are preserved verbatim, so their Decision Rules previously bypassed the v1.10.0 CPSV-AP fixes. `generateDmnSection` now runs a `normalizeImportedDmnBlocks` pass: each `cpsv:Rule` gets `dct:title`/`dct:description` injected when absent, and a `cpsv:implements` pointing at a `/services/` URI is repointed to the `eli:LegalResource` (or dropped when none exists). Edits are additive/repointing only and idempotent.
+
+**Valid, readable IRIs for NL-SBB concept URIs.** A shared `sanitizeIri` helper replaces whitespace with underscores and percent-encodes IRI-illegal characters, applied to the concept URI, `dct:subject` and `skos:exactMatch`. The Concepts tab "Variable Name (used in URI)" input now enforces URI-safe names. Existing `skos:exactMatch` values under the `…/concepts/` namespace have hyphens converted to underscores to match the underscore-style concept URIs.
+
+**Populate the Concepts tab from test cases.** Running uploaded test cases now fills the Concepts tab even without a manual evaluate — input concepts are derived from the union of every uploaded case's request-body variables; output concepts still come from the last successful result.
+
+**Round-trip `dct:spatial` on import.** Import now reads the organisation's spatial value from both `dct:spatial` (current output) and `cv:spatial` (legacy), so downloaded files re-import and re-validate cleanly.
+
+---
+
+### v1.10.1 — SHACL Scope Clarification (June 2026)
+
+The PublishDialog pre-publish SHACL panel now explains that it checks the Turtle that will actually be published — the editor's current (regenerated) output — which can differ from an originally-imported file, since import normalises legacy CPRMV/CPSV-AP terms to CPRMV 0.4.1 / CPSV-AP 3.2.0. An imported file that fails validation on its own may still publish as conformant.
+
+---
+
+### v1.10.0 — CPRMV 0.4.1 & CPSV-AP 3.2.0 Conformance (June 2026)
+
+**CPRMV 0.4.1 conformance.** The `cprmv:` namespace was bumped to the canonical `https://standaarden.open-regels.nl/standards/cprmv/0.4.1#`, and a `prov:` prefix added. `ttlGenerator` now emits a 0.4.1-conformant `cprmv:RuleSet` per `rulesetId` — replacing the old `cprmv:Dataset` — carrying `cprmv:id`, `cprmv:validFrom`^^`xsd:date`, `cprmv:isOutputOf` → the service, `cprmv:hasMethod` → a dual-typed `cprmv:RuleMethod`/`cprmv:CodificationMethod`, an ordered `cprmv:hasPart` RDF list of its rules, and `prov:wasDerivedFrom`. Every `cprmv:Rule` now always emits `cprmv:id`; `cprmv:extends` was renamed to `cprmv:isBasedOn`.
+
+**Import the CPRMV 0.4.1 API output.** New `src/utils/cprmvImport.js` `flattenCprmvRules` walks the CPRMV Rules API shape (array of `cprmv:RuleSet` objects with nested `…#hasPart` maps), recursing and flattening sub-rules into the editor's flat model (nested rules inherit their parent's `rulesetId`). Tolerates legacy 0.4.1-slash, 0.3.0, and flat-array exports. Used by both `handleImportJSON` and the CPRMV tab's **Load Example**; the bundled `cprmv-example.json` is now the conformant API output.
+
+**CPSV-AP 3.2.0 conformance.** `dct:language`/`cv:sector`/`cv:thematicArea` references are typed in-graph (`dct:LinguisticSystem`/`skos:Concept`); the organisation emits `dct:spatial` (was the non-conformant `cv:spatial`) pointing at a `dct:Location`-typed node; `cpsv:Rule` nodes (temporal + DMN decision rules) always emit `dct:identifier`/`dct:title@nl`/`dct:description@nl`, and `cpsv:implements` points at the `eli:LegalResource` (or is omitted when none). A full editor-generated TTL validates clean against both the CPSV-AP 3.2.0 and CPRMV 0.4.1 SHACL shapes.
+
+**Pre-publish SHACL validation (advisory).** New `src/utils/shaclHelper.js` `validateTtl` POSTs the generated Turtle to `REACT_APP_BACKEND_URL/v1/shacl/validate` and returns a layered result; it never throws (an unreachable backend yields a neutral `{ unavailable: true }` shape). PublishDialog runs validation on open and via a **Validate now** button, rendering a layered CPRMV / CPSV-AP / RONL panel. It is purely advisory and never blocks publishing.
+
+---
+
+### v1.9.6 — DSO → DMN Handoff (June 2026)
+
+**Consume the DSO → DMN handoff from the Linked Data Explorer.** New `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes the deep-link contract `/?dsoImport=dmn&dmnId=…&env=…&activityName=…&authority=…&activityUrn=…&fsRef=…` — on mount it fetches the standalone DMN XML from the shared backend (`GET REACT_APP_BACKEND_URL/v1/dso/toepasbare-regels/{dmnId}/dmn`, with `?env=prod` only when `env=prod`) and prefills the DMN/Service/Organization tabs. The DMN tab stays fully interactive (`isImported` stays false), so deploy/test/publish run through the existing flow. After consuming the link the import params are stripped via `history.replaceState`, and a `consumedRef` guard prevents a StrictMode double-invoke.
+
+**Shared decision-key extraction + external-content hydration.** `extractPrimaryDecisionKey` was lifted out of `DMNTab.jsx` into `src/utils/dmnHelpers.js` and exported, so the import hook and the DMN tab share one implementation. `DMNTab` now hydrates its internal uploaded-file/decision-key/test-body/parsed-decisions/validation state from `dmnData.content` whenever content arrives from outside the tab and no local file was uploaded.
+
+---
+
+### v1.9.5 — DMN Workflow Polish (May 2026)
+
+**Request Body Generation Reads `<inputValues>` Constraints**
+
+`generateRequestBodyFromDMN` in `DMNTab.jsx` now consults every decisionTable input column for an `<inputValues>` FEEL allowed-values list and uses the first allowed value as the starter for the corresponding inputData. DMNs that constrain string inputs (e.g., normbedragen descriptions, status codes, enum-style domain values) no longer produce empty strings that would fail at Operaton evaluate time — the generated starter body is runnable as-is.
+
+Two helper closures added: `parseFirstFeelListItem` (unwraps quoted strings, coerces booleans, parses numbers from a comma-separated FEEL list) and `findInputValuesExample` (scans `decisionTable > input` elements for a constraint whose `inputExpression` matches the given inputData name). When no constraint exists, the inputData falls through to the existing `typeRef` switch and name-based heuristics unchanged — every existing project DMN keeps generating the same starter body as before.
+
+**Validation Backend Unreachability Surfaced**
+
+`runBackendValidation` no longer fails silently when the Linked Data Explorer backend at `REACT_APP_BACKEND_URL` cannot be reached. The validation panel renders a third, distinct visual state — amber *"Syntax validation result not available"* — with a short explanation that DMN deployment and testing still work; only the syntactic pre-check is skipped. The amber state is kept visually separate from the existing red *"Syntax issues found"* state so a network failure cannot be mistaken for an actual DMN problem. A new `validationResult.unavailable` flag drives the third branch in the validation pill header; the `parseError` bubble switches between amber and red styling to match the meaning of the message.
+
+**DMN Modelling Reference Updates**
+
+Patterns surfaced while building the Den Haag *Beslissing Levensonderhoud (ALO)* and SZW *normbedragen* deployable DMNs have been folded back as standing guidance: every `<inputData>` element requires a `<variable>` child with `name` and `typeRef` so sub-decision evaluation by key can resolve `requiredInput` references; the primary decision must be listed first in the file because Operaton selects the first `<decision>` as the primary key; and decisions that aggregate output from required decisions should declare passthrough output columns (e.g., `redenAfwijzing`, `informatiebehoefte`) so the response from a primary-decision evaluate call carries the full verdict shape rather than just the headline output.
+
+---
+
+### v1.9.4 — Dataset Catalog & Stable Graph Publishing (May 2026)
+
+**Legal Resource URI Cleanup**
+
+Parser normalises `legalResource.bwbId` to its canonical un-versioned form on import — trailing `/YYYY-MM-DD` and `/YYYY-MM-DD/<index>` segments are stripped so the version is captured exclusively in `legalResource.version`. The `generateLegalResourceSection` emitter refactored to route both the subject URI and `eli:is_realized_by` through `buildLegalUriForRulesetId`, producing a clean un-versioned `eli:LegalResource` subject (e.g., `https://wetten.overheid.nl/BWBR0015703`) and a single-versioned manifestation URI (`.../BWBR0015703/2026-01-01`), regardless of whether `bwbId` arrived clean or in a legacy already-versioned form. `cv:hasLegalResource` in the Service section automatically points to the same un-versioned URI as the LegalResource block, closing the loop between Service, LegalResource, and versioned manifestation. Resolves the doubled-version URIs (e.g., `.../BWBR0015703/2026-01-01/0/2026-01-01`) that previously appeared in `eli:is_realized_by` and propagated through to `cprmv:implements` on rules.
+
+**cprmv:Dataset Generation**
+
+TTL export now emits a `cprmv:Dataset` block per unique `cprmv:rulesetId` across the CPRMV Rules collection — one Dataset per legal source, dual-typed `cprmv:Dataset` and `dcat:Dataset` for DCAT catalogue interoperability. Dataset properties include `dct:identifier`, optional `dct:title` (primary ruleset only), `cprmv:rulesetId`, `cprmv:implements` pointing to the legal manifestation URI, optional `dcat:version`, `dct:issued`, and `dcat:landingPage`.
+
+CPRMV Rule emitter updated so `cprmv:implements` uses each rule's own `rulesetId` rather than the service's primary legal resource — accurate rule-level claims in multi-BWB services, and identical loose (`cprmv:rulesetId`) and tight (`cprmv:implements`) SPARQL join results. New `buildLegalUriForRulesetId()` helper handles BWB, CVDR, and full-URI inputs; defensively strips already-versioned suffixes before appending the version. `cprmvDataset` entity type registered in `vocabularies.config.js`; `dcat` namespace already present in `TTL_NAMESPACES`. Supports the new `/v1/norms` endpoint in the Linked Data Explorer.
+
+**Deterministic Graph IRI on Publish**
+
+Publishes now land in a per-service graph at `https://regels.overheid.nl/graphs/{org-local}/{service-id}` (e.g., `.../graphs/Sociale_Verzekeringsbank/aow-leeftijd`) instead of the auto-numbered `graph:default-N` series. Republishing the same service overwrites its previous graph rather than creating an incremented copy — each service now corresponds to a single, stable graph IRI in TriplyDB. New `buildGraphIRI()` helper derives the IRI from `organization.identifier` and `service.identifier`, threaded through `publishToTriplyDB` and `publishToTriplyDB_SPARQL` as a `graphIRI` parameter (default fallback: `graphs/default`).
+
+The graph IRI is forwarded to the Linked Data Explorer backend's `/v1/triplydb/update-service` endpoint as `graphName`, logged on the backend as `triggeredByGraph` for end-to-end traceability across multi-publish flows.
+
+**Vendor Tab Polish**
+
+Vendor tab data — selected vendor, contact details, technical fields, certification, service notes — now survives navigation between tabs; the local `selectedVendor` state in `VendorTab.jsx` replaced with a derived alias over lifted `vendorService.selectedVendor`, eliminating the data loss that previously occurred on tab re-entry. RONL concept fetch (analysis, method, and vendor concepts from TriplyDB) lifted from `LegalTab` and `VendorTab` into `useEditorState` — concepts are fetched once on App mount and shared across both tabs, eliminating per-mount network calls and dropdown flicker.
+
+TTL import now restores vendor data: `selectedVendor`, provider organisation name, `contactPoint` (name, email, telephone), `foaf:homepage`, `schema:url`, `schema:license`, `ronl:accessType`, `dct:description`, and `schema:image`. `vendorService` threaded through `parseTTL()` and `applyImportedData()`; `setVendorService` added to the setters object handed to `handleTTLImport`. Round-trip verified against the SVB AOW-leeftijd Vendor example.
+
+---
+
 ### v1.9.x — DMN Testing Suite & Vendor Services (February 2026)
 
 **v1.9.3 — DMN Syntactic Validation**
@@ -132,6 +214,11 @@ Initial release. React + Tailwind CSS web application. Five-tab interface: Servi
 | Full modularisation (−66% code) | v1.5.1 |
 | RPP architecture visualisation | v1.5.1 |
 | TriplyDB direct publishing | v1.6.0 |
+| NL-SBB concept layer | v1.8.1 |
+| DMN syntactic validation (5-layer) | v1.9.3 |
+| CPRMV 0.4.1 + CPSV-AP 3.2.0 SHACL conformance | v1.10.0 |
+| Pre-publish SHACL validation (advisory) | v1.10.0 |
+| DSO → DMN deep-link import | v1.9.6 |
 
 ---
 
@@ -151,7 +238,7 @@ Multi-language support beyond Dutch with language-specific fields and translatio
 
 **Phase 4 — Technical Enhancements (2026 Q4)**
 
-SHACL-based validation with field-level error messages and real-time compliance checking. Additional export formats: JSON-LD, RDF/XML, N-Triples, YAML. Git integration for service versioning and diff viewing.
+Advisory pre-publish SHACL validation shipped in v1.10.0; next up is field-level error messages and real-time in-form compliance checking. Additional export formats: JSON-LD, RDF/XML, N-Triples, YAML. Git integration for service versioning and diff viewing.
 
 **Phase 5 — Advanced Features (2027 Q1)**
 

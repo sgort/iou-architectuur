@@ -17,7 +17,7 @@
 ## Clone and install
 
 ```bash
-git clone https://github.com/your-org/ronl-business-api.git
+git clone https://github.com/sgort/ronl-business-api.git
 cd ronl-business-api
 npm install          # installs all workspace packages
 ```

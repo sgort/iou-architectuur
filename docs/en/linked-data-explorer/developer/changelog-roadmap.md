@@ -4,6 +4,443 @@
 
 ## Changelog
 
+### v1.9.7 — SHACL display fixes (June 2026)
+
+**v1.9.7 — Patch (June 15, 2026)**
+
+- SHACL Validator: long issue messages and focus-node locations were truncated with a single-line CSS ellipsis and could not be read. They now wrap in full (`break-words` / `break-all`) and expose the complete text on hover (title tooltip).
+- SHACL backend: removed the 60-character cap on the offending values reported for cardinality (`maxCount` / `uniqueLang`) violations, so the full value appears in the message.
+
+**Files:** `packages/frontend/src/components/ShaclValidator.tsx`, `packages/backend/src/services/shacl-validation.service.ts`
+
+---
+
+### v1.9.6 — CPRMV 0.4.1 DMN discovery + chain fixes (June 2026)
+
+**v1.9.6 — Patch (June 13, 2026)**
+
+- DMNs published under the new CPRMV 0.4.1 namespace (e.g. `vast_bedrag_op_vestiging`) were missing from `/v1/dmns` and the ChainBuilder DMN picker — `getAllDmns` and the chain-link queries only matched `cprmv:DecisionModel` under the old 0.3.0 namespace. Both namespaces are now matched side by side until existing 0.3.0 data is migrated.
+- Fixed "Fill with test data" in the ChainBuilder input form not visibly filling Integer/Double fields when the RDF-sourced test value is `0` (the input rendered empty because `0 || '' === ''`).
+
+**Files:** `packages/backend/src/services/sparql.service.ts`, `packages/frontend/src/components` (ChainBuilder)
+
+---
+
+### v1.9.5 — DSO deploy-ready DMN + SHACL CPRMV layer (June 2026)
+
+**v1.9.5 — Minor (June 11, 2026)**
+
+- **DSO Integration:** extracted DSO DMNs now carry `camunda:historyTimeToLive`, so they deploy to Operaton exactly as handed off — the consumer no longer has to patch the DMN first. LDE now produces a fully deploy-ready and evaluatable DMN (DMN 1.3, input ids, FEEL-safe variable names, output `typeRef`s, history TTL). Forms imported from DSO show a green **DSO** badge in the Form Editor list instead of the generic yellow WIP badge.
+- **SHACL Validator:** a third **CPRMV 0.4.1** shape layer now validates uploaded Turtle alongside CPSV-AP 3.2.0 and RONL Custom; the results panel renders it automatically. Added valid/invalid test fixtures for every layer (CPRMV, CPSV-AP, RONL) plus a malformed-Turtle case.
+
+**Files:** `packages/backend/src/services/shacl-validation.service.ts`, `packages/backend/shapes/cprmv/**`, `packages/backend/src/services/dso.service.ts`, `packages/frontend/src/components/DsoExplorer.tsx`, `packages/frontend/src/components/FormEditor.tsx`
+
+---
+
+### v1.9.4 — DSO Phase 2d + DMN publish handoff (June 2026)
+
+**v1.9.4 — Minor (June 10, 2026)**
+
+- **Activities tab name search:** fixing a location (Lelystad / Flevoland) loads that authority's full activity set in one call and reveals a search box that live-filters by name.
+- **↓ Import into LDE** (Indieningsvereisten) saves the generated form-js scaffold straight into the Form Editor as a draft, named after the activity and tagged with the readable authority name (falling back to the RTR code).
+- **Publish via CPSV Editor** (Conclusie) opens the CPSV Editor with a deep-link to publish the extracted DMN to TriplyDB, where the LDE DMN picker can consume it — no local DMN store needed.
+- Extracted DMNs are normalized to deploy and evaluate on Operaton (DMN 1.2 → 1.3, missing input ids added, FEEL-safe variable names, explicit output `typeRef`). Verified end-to-end: the normalized `HoutopstandVellen` decision deploys (all 7 decisions) and the root decision evaluates without the previous FEEL error.
+
+**Files:** `packages/backend/src/routes/dso.routes.ts`, `packages/backend/src/services/dso.service.ts`, `packages/frontend/src/components/DsoExplorer.tsx`
+
+---
+
+### v1.9.3 — DSO Phase 2a + 4 (June 2026)
+
+**v1.9.3 — Minor (June 9, 2026)**
+
+- Activity Detail panel now shows an **Applicable Rules** section listing *toepasbare regels* fetched live from the DSO Uitvoeren Gegevens API, grouped by rule type (Conclusie / Indieningsvereisten) with validity date and STTR version.
+- **↓ STTR** downloads the raw STTR XML for any rule type; **↓ Extract DMN** (Conclusie) extracts the embedded DMN decision table as a standalone `.dmn`; **↓ Form scaffold** (Indieningsvereisten) generates a form-js JSON scaffold from the STTR questionnaire (boolean → checkbox, list → select, number → number field, attachment → labelled textfield).
+- Added `ronl:dsoActiviteitUrn` on `TreeFellingPermitSubProcess` linking it to `nl.imow-gm0995.activiteit.HoutopstandVellen` (Gemeente Lelystad).
+
+**Files:** `packages/backend/src/routes/dso.routes.ts` (`/toepasbare-regels`, `/toepasbare-regels/:id/sttr`, `/toepasbare-regels/:id/dmn`, `/toepasbare-regels/:id/form-scaffold`), `packages/backend/src/services/dso.service.ts`, `packages/frontend/src/components/DsoExplorer.tsx`
+
+---
+
+### v1.9.2 — BPMN shell/subprocess auto-linking (June 2026)
+
+**v1.9.2 — Patch (June 9, 2026)**
+
+- Uploaded BPMN processes that form a shell/subprocess pair are now automatically linked: a process with call-activity elements is classified as a *shell*, and any process whose BPMN process ID is targeted by a shell's call-activity becomes its *subprocess*. The relationship is detected both on fresh imports and retroactively on startup, so previously uploaded standalone processes are reclassified without a re-upload.
+- Removed two unused TypeScript imports (`DsoWerkzaamheid`, `zoekActiviteiten`) in `DsoExplorer`.
+
+**Files:** `packages/frontend/src/components/BpmnModeler` (process classification), `packages/frontend/src/components/DsoExplorer.tsx`
+
+---
+
+### v1.9.0–v1.9.1 — SHACL Validator (June 2026)
+
+**v1.9.0 — Minor (June 4, 2026) · v1.9.1 — Patch (June 5, 2026)**
+
+A new **SHACL Validator** view validates CPSV-AP Turtle against the canonical CPSV-AP 3.2.0 shapes and RONL-authored shapes before publishing to TriplyDB.
+
+- New backend endpoints `POST /v1/shacl/validate` (file-local) and `POST /v1/shacl/validate-merged` (unions the file with the already-published graph via a read-only SPARQL `CONSTRUCT` before validating).
+- Two result layers: **CPSV-AP 3.2.0** (the SEMIC shapes vendored verbatim — 32 shapes) and **RONL Custom** (at most one `foaf:homepage`/`dct:identifier`/`cv:spatial` per organisation; one `dct:title`/`dct:description` per language on a rule).
+- v1.9.1 vendored the canonical CPSV-AP file and collapsed the earlier Core/Vocabularies split into a single CPSV-AP layer, added the **Not loaded vs OK** distinction, capped offending values at 60 characters, and added a conformant example plus deterministic merge-simulated test coverage.
+
+**Files:** `packages/backend/src/services/shacl-validation.service.ts`, `packages/backend/src/routes/shacl.routes.ts`, `packages/backend/src/types/shacl-rdf.d.ts`, `packages/backend/shapes/**`, `packages/frontend/src/components/ShaclValidator.tsx`
+
+---
+
+### v1.8.2 — DMN XML download (May 2026)
+
+**v1.8.2 — Patch (May 20, 2026)**
+
+- New endpoint `GET /v1/dmns/:identifier/xml` streams the deployed DMN XML from Operaton as `<identifier>.dmn` with the correct `Content-Type` and `Content-Disposition` headers.
+- DMN list and detail responses now include an `xmlUrl` field pointing to the download endpoint, making it self-discoverable.
+- Backward compatible: the legacy `GET /api/dmns/:definitionKey/xml` route remains available.
+
+**Files:** `packages/backend/src/routes/dmn.routes.ts`, `packages/frontend/src/types` (`DmnModel`)
+
+---
+
+### v1.8.1 — DMN validator: INT-007 false positives eliminated (May 2026)
+
+**v1.8.1 — Patch (May 19, 2026)**
+
+The Interaction Rules layer no longer flags valid intra-DRD references, and now parses FEEL expressions instead of matching the whole `<inputExpression>` text.
+
+#### `requiredDecision` targets resolved
+
+An `<inputExpression>` may legitimately reference a value produced by another decision wired in via `<informationRequirement><requiredDecision>` — that name is the producing decision's `<variable name>` or `<decisionTable>` `<output name>`, never an `<inputData>`. INT-007 now resolves `requiredDecision` targets and treats their output variables as satisfied, mirroring the `requiredInput` → `inputData` resolution INT-001 already performs.
+
+#### FEEL expressions parsed, not whole-text matched
+
+Previously the entire `<inputExpression><text>` was treated as one variable name, so `date and time(aanvraagDatum)` demanded an `<inputData name="date and time(aanvraagDatum)">` and any operator expression false-fired. A new shared `extractFeelIdentifiers()` helper strips string literals, unwraps built-in calls (`date(...)`, `date and time(...)`, `number(...)`, `string(...)`, `not(...)`, …), drops FEEL keywords/operators and qualified-name segments after a dot, and checks each referenced identifier individually.
+
+#### Decision outputs excluded from the input-contract check
+
+Output variable names (decision `<variable>` and decision-table `<output name>`) are, by construction, never external inputs and are no longer subject to the must-have-matching-`inputData` requirement. Genuine gaps still raise INT-007 — now naming the specific identifier rather than the raw expression string.
+
+#### No API change
+
+`POST /v1/dmns/validate` is unchanged; only the interaction-layer issue set for affected files differs (fewer false-positive warnings). Verified against real DMNs that deploy and evaluate on Operaton: `RONL_Heusden_Heusdenpas.dmn`, `RONL_SVB_Leeftijden.dmn`, `EmployeeRoleAssignment.dmn`, `tree-felling-decision.dmn`, and `replacement-tree-decision.dmn` all validate clean; backend `tsc --noEmit` passes.
+
+**Files:** `packages/backend/src/services/dmn-validation.service.ts`
+
+---
+
+### v1.8.0 — Concurrent applicable periods per ruleset (May 2026)
+
+**v1.8.0 — Minor (May 15, 2026)**
+
+#### `dataset_versions` becomes a list per rulesetid
+
+A single BWB ruleset can have multiple `cprmv:Dataset` records — different applicable periods of the same law (e.g. the `2025-01-01` and `2026-01-01` editions of the Participatiewet) are **concurrent and equally authoritative**, not competing versions. The v1.7.0 design treated them as competing and used `FILTER NOT EXISTS` to surface only the latest, hiding any earlier applicable period. v1.8.0 surfaces them all.
+
+- `dataset_versions[<rulesetid>]` is now a **list** of `{ version, published_at, title }` records, not a single record. Replaces the v1.7.x object shape.
+- List is pre-sorted: `version` descending with nulls at the end, ties broken by `published_at` descending. Element `[0]` is the most-recent applicable version of that ruleset.
+- SPARQL query simplified: dropped the `FILTER NOT EXISTS` subpattern and now fetches all `cprmv:Dataset` records. Grouping and sort live in the service layer.
+
+```json
+"dataset_versions": {
+  "BWBR0015703": [
+    {
+      "version": "2026-01-01",
+      "published_at": "2026-05-15T06:57:21Z",
+      "title": "Participatiewet"
+    },
+    {
+      "version": "2025-01-01",
+      "published_at": "2026-05-15T07:45:36Z",
+      "title": "Participatiewet"
+    }
+  ]
+}
+```
+
+#### Cache headers preserved across the shape change
+
+- `ETag` now hashes every `(version, published_at)` pair in `dataset_versions` — a new applicable period being added to any ruleset changes the ETag
+- `Last-Modified` is `max(published_at)` across **all records** in the response (not just the first per ruleset)
+- `Cache-Control` semantics unchanged: full headers when every rulesetid has metadata; `no-cache` otherwise
+
+#### Breaking change
+
+Replaces v1.7.1 (which was never used by external G2G consumers — the API stability contract hadn't been promised yet at that release). The shape change from object to list is detected at integration time, not silent runtime breakage. Anyone consuming v1.7.0/v1.7.1 needs to wrap `dataset_versions[<id>]` access in array indexing or iteration.
+
+#### Documentation
+
+- API stability contract updated with the list-shape, the multi-applicable-period rationale, and how consumers can match a rule's `applicable_date` to a specific Dataset record
+- Quick-reference table gains two new rows (multi-record explanation and rule→Dataset lookup recipe)
+
+**Files:** `packages/backend/src/utils/etag.ts`, `packages/backend/src/services/norms.service.ts`, `packages/backend/src/routes/norms.routes.ts`, `docs/iou-architectuur/linked-data-explorer/architecture/backend.md`, `docs/iou-architectuur/linked-data-explorer/reference/api-stability.md`
+
+---
+
+### v1.7.0 — Per-rulesetid dataset versioning & HTTP cache headers (May 2026)
+
+**v1.7.0 — Minor (May 14, 2026)**
+
+#### Per-rulesetid dataset versioning on `/v1/norms`
+
+Each BWB ruleset (BWBR0002471, BWBR0004044, …) is now published as a distinct `cprmv:Dataset` resource in TriplyDB, each on its own publication cadence. The response envelope carries a `dataset_versions` map keyed by `cprmv:rulesetId` so G2G consumers can see exactly which version of each ruleset they're reading.
+
+```json
+"dataset_versions": {
+  "BWBR0002471": { "version": "2025.1.0", "published_at": "2025-01-15T00:00:00Z" },
+  "BWBR0015703": { "version": "2026.1.0", "published_at": "2026-01-15T00:00:00Z" }
+}
+```
+
+- New envelope field `dataset_versions` — only contains entries for rulesetids that have a `cprmv:Dataset` record; rulesetids without one are silently absent (transitional state during rollout)
+- New envelope field `cprmv_version` — backend constant extracted from the CPRMV namespace URI, describes which vocabulary the backend speaks independently of which data is published
+- Backend picks the latest `cprmv:Dataset` per rulesetid via a `FILTER NOT EXISTS` SPARQL subpattern — historical versions remain queryable in TriplyDB but consumers see only the latest
+- Versions follow CalVer per ruleset: `<year>.<cycle>.<patch>` (e.g. `2026.1.0` for the first publication of 2026, `2026.1.1` for a correction)
+- Internal 60-second cache on the dataset metadata SPARQL query keeps the metadata lookup off the hot path
+
+#### HTTP cache headers for G2G consumers
+
+When **every** rulesetid in the response has dataset metadata, the response carries strong cache headers:
+
+```
+ETag: "a3f99c1d"
+Last-Modified: Thu, 15 Jan 2026 00:00:00 GMT
+Cache-Control: public, max-age=3600
+```
+
+- `ETag` is an opaque 8-hex hash over the sorted `dataset_versions` map plus all filter parameters that affect the response shape
+- `Last-Modified` is `max(published_at)` across the response's datasets in RFC 7231 format — `If-Modified-Since` returns `304` only when nothing in the consumer's query has been republished
+- For single-rulesetid queries (`?rulesetid=<id>`), the `304 Not Modified` short-circuit happens **before** the expensive rules SPARQL query — only the cheap cached metadata lookup runs
+- Safe-by-default partial-coverage policy: if any rulesetid in the response lacks dataset metadata, all three cache headers degrade to `Cache-Control: no-cache` so consumers can't be misled into serving stale data for an unversioned ruleset
+
+#### API stability contract published
+
+New IOU documentation page at [`/linked-data-explorer/reference/api-stability`](../reference/api-stability.md) — the binding contract for G2G consumers covering:
+
+- The four versioning layers (API contract, dataset versions, CPRMV vocabulary, backend service)
+- The immutable primary-key promise: `(rulesetid, applicable_date, rulesetid_index)` is the eternal PK; consumers can cache permanently and never invalidate
+- The `rule_id_path_key` field as the logical identifier for querying "the current value of this rule" across its lifetime
+- Per-rulesetid publication detection mechanics and partial-coverage behaviour
+- Breaking-change criteria warranting `/v2/norms` and the 24-month deprecation policy
+
+**Files:** `packages/backend/src/utils/etag.ts` (new), `packages/backend/src/services/norms.service.ts`, `packages/backend/src/routes/norms.routes.ts`, `docs/iou-architectuur/linked-data-explorer/architecture/backend.md`, `docs/iou-architectuur/linked-data-explorer/reference/api-stability.md` (new)
+
+---
+
+### v1.6.3 — Stable keys and per-ruleset aggregation (May 2026)
+
+**v1.6.3 — Patch (May 14, 2026)**
+
+#### Stable keys and version indices on `/v1/norms`
+
+- New `rule_id_path_key` field: `rule_id_path` with the date and index segments removed, e.g. `"BWBR0002471_2025-01-01_0, Artikel 2, lid 6"` → `"BWBR0002471, Artikel 2, lid 6"`; stable across versions of the same ruleset, suitable as a deduplication key when aggregating norms across `applicable_date` values
+- New `rulesetid_index` field: the integer index segment after the date in `rule_id_path` (e.g. the `_0` in `BWBR..._2025-01-01_0`); distinguishes multiple versions published on the same date
+- Both new fields, together with `applicable_date`, are derived from a single regex pass over `rule_id_path`; all three emit JSON `null` when the path does not match the canonical `<rulesetid>_<YYYY-MM-DD>_<index>[, <rest>]` shape
+- Key insertion order extended: `rulesetid`, `applicable_date`, `rulesetid_index`, `rule_id_path`, `rule_id_path_key` — identifier metadata grouped first, then the path and its derived stable key together
+
+#### Per-rulesetid aggregation
+
+- Response envelope now carries an `aggregations.norms_per_rulesetid` map alongside `rules`, listing the count of top-level rules per `cprmv:rulesetId` in the filtered result set
+- Counts are keyed by the authoritative `cprmv:rulesetId` value (not parsed from the path), so non-conforming `rule_id_path` values still aggregate correctly
+- Sum of values equals `data.total`, letting clients render ruleset-level summaries without a second pass over `rules`
+- Additive change — existing readers of `data.rules` and `data.total` see no breaking change
+
+**Files:** `packages/backend/src/services/norms.service.ts`, `packages/backend/src/routes/norms.routes.ts`, `docs/iou-architectuur/linked-data-explorer/architecture/backend.md`
+
+---
+
+### v1.6.2 — Shared route registry & content-negotiated root page (May 2026)
+
+**v1.6.2 — Patch (May 13, 2026)**
+
+#### Single source of truth for v1 routes
+
+- New backend module `packages/backend/src/routes/registry.ts`: every v1 route's mount path, router, summary, and category lives in one array. Adding a route is a one-line entry that both registration and the root page pick up automatically.
+- Refactored `packages/backend/src/routes/index.ts` to iterate the registry for v1 mounting; legacy `/api/*` deprecation aliases stay hand-mounted (deprecated routes are intentionally excluded from the registry to steer consumers towards `/v1/*`)
+- Mount-order semantics preserved: more specific paths still precede their parents (`/v1/chains/templates` before `/v1/chains`) so Express route precedence behaves exactly as before
+
+#### Content-negotiated root page
+
+- `GET /` now serves HTML when `Accept` includes `text/html` (browsers) and JSON otherwise (curl, fetch with default `Accept`, programmatic pollers); both views are derived from the shared route registry so they cannot drift
+- HTML view groups endpoints by category (Health & monitoring, Discovery, Execution, Assets, Integrations) and badges public-CORS endpoints; styling is inline with no external dependencies
+- JSON payload preserves backwards compatibility: same top-level keys as before (`name`, `version`, `environment`, `status`, `documentation`, `health`, `endpoints`, `legacy`); existing programmatic clients see no breaking change
+- Closes the drift gap that was missing `/v1/dso`, `/v1/norms`, `/v1/assets/*`, `/v1/cache`, `/v1/edocs`, `/v1/ropa`, `/v1/process` and `/v1/chains/templates` from the previous hand-coded listing
+
+#### Deployment tier display label
+
+- New `DEPLOYMENT_ENV` environment variable distinguishes ACC from PROD when `NODE_ENV` is `'production'` for both; falls back to `NODE_ENV` when unset so local development needs no change
+- Added `config.displayEnv` (string) and `config.deploymentEnv` (raw value) to `packages/backend/src/utils/config.ts` with mappings: `prod`/`production` → `PROD`, `acc`/`acceptance`/`staging` → `ACC`, `dev`/`development`/`local` → `development`, `test` → `test`, unknown values pass through
+- Used consistently by the HTML root page and the `/v1/health` response so the displayed environment stays in sync across surfaces
+- Configuration is per Azure App Service: `az webapp config appsettings set ... --settings DEPLOYMENT_ENV=acc` (or `prod`)
+
+**Files:** `packages/backend/src/routes/registry.ts` (new), `packages/backend/src/utils/rootView.ts` (new), `packages/backend/src/routes/index.ts`, `packages/backend/src/index.ts`, `packages/backend/src/utils/config.ts`, `packages/backend/.env.example`, `packages/backend/src/routes/health.routes.ts`
+
+---
+
+### v1.6.1 — Norms publish endpoint (May 2026)
+
+**v1.6.1 — Patch (May 12, 2026)**
+
+#### `/v1/norms` — new
+
+New backend route `GET /v1/norms` exposing all `cprmv:Rule` paths and norms from TriplyDB in the publish format consumed by the SPARQL editor's norm publisher. The response mirrors the `cprmv-example.json` shape exactly: fully-qualified RDF/CPRMV keys for `type`, `id`, `definition`, and `contains`; short keys for `situatie`, `norm`, `per`, `rulesetid`, `applicable_date`, and `rule_id_path`.
+
+- Parent rules and their `cprmv:contains` children are aggregated into a single nested object per parent; key insertion order is preserved across runs (matching the example file)
+- Optional `?endpoint=` query parameter overrides the default TriplyDB endpoint, matching the pattern already used by `/v1/dmns`
+- Response wrapped in the standard `ApiResponse` envelope with `data.rules` (array) and `data.total` (filtered count)
+
+#### Filtering by ruleset identifier and applicable date
+
+- New `applicable_date` attribute derived from the `_YYYY-MM-DD_` segment embedded in `rule_id_path` (e.g. `"BWBR0015703_2026-01-01_0, Artikel 20, ..."` yields `"2026-01-01"`); `null` when the path carries no parseable date
+- Optional `?rulesetid=` filter (exact-match on `cprmv:rulesetId`, e.g. `BWBR0015703`); validated against `/^[A-Za-z0-9_-]+$/`
+- Optional `?applicable_date=` filter (matches paths containing `_<date>_`); validated against `/^\d{4}-\d{2}-\d{2}$/`
+- Filters can be combined; invalid values return `400 INVALID_PARAM` before any SPARQL fires
+- Validated filter values are applied as SPARQL `FILTER` clauses server-side (exact-match on `?rulesetId`, `CONTAINS` on `?ruleIdPath`); regex validation is the injection-prevention contract
+
+#### Maintenance
+
+- `tsconfig.json` cleanup: removed `"ignoreDeprecations": "6.0"` which only became valid in TypeScript 6.0 and broke CI on TypeScript 5.x. Editor-side deprecation warnings are addressed via local `.vscode/settings.json` pointing at the workspace TypeScript instead. Full migration to `moduleResolution: "nodenext"` deferred until ESM-on-Node maturity warrants the per-file `.js` extension changes.
+
+**Files:** `packages/backend/src/services/norms.service.ts` (new), `packages/backend/src/routes/norms.routes.ts` (new), `packages/backend/src/routes/index.ts`, `packages/backend/tsconfig.json`
+
+---
+
+### v1.6.0 — Multilingualism & pending-until-Save editing (April 2026)
+
+**v1.6.0 — New Feature (April 27, 2026)**
+
+#### Multilingualism — language and organization metadata
+
+BPMN processes, Camunda forms, and document templates now carry an optional ISO 639-1 language code (`en`, `nl`, `de`) and an open-ended organization key. The model is sibling-artefact i18n: each artefact exists once per language, with the LDE deploy modal warning on mixed-language bundles. DMNs stay language-agnostic — variable keys remain stable English so a single DMN serves both English and Dutch sibling BPMNs.
+
+- **Database** — `language VARCHAR(2)` and `organization VARCHAR(100)` columns added to `process_definitions`, `form_schemas`, and `document_templates` with partial indexes; nullable, existing rows coexist as `NULL`
+- **BPMN moddle descriptor** — `LanguageMixin` and `OrganizationMixin` extending `bpmn:Process` in `ronlModdleDescriptor.json`; survive `saveXML` round-trip via the existing `ronl` namespace registration
+- **List panels** — new `ArtefactListToolbar` (search + language filter + match counter) shared by Process, Form, and Document lists; collapsible organization groups; subprocesses follow their shell's organization regardless of their own tag
+- **Editor footer panel** — uniform pattern across all three editors: `LanguageSelector` and `OrganizationSelector` (with autocomplete from existing organization keys); BPMN footer additionally retains RoPA and DSO selectors
+- **Filename-based language inference on import** — `.bpmn`, `.form`, `.document` files with a `<id>.<lang>.<ext>` suffix are auto-tagged on import; precedence: in-file value → filename → untagged
+- **Form export** — `Export .form` now wraps the form-js schema with top-level `language` and `organization` keys and uses a language-suffixed filename; round-trip integrity for all three artefact types
+- **Deploy-time language consistency check** — amber warning surfaces inline in the deploy modal when a bundle mixes languages, listing the offending codes; mirrors the existing RoPA-missing warning UX
+
+**Files:** `packages/backend/src/db/migrate.ts`, `packages/backend/src/db/types.ts`, `packages/backend/src/db/mappers.ts`, `packages/backend/src/domain/types.ts`, `packages/backend/src/services/assets.service.ts`, `packages/frontend/src/types/index.ts`, `packages/frontend/src/types/document.types.ts`, `packages/frontend/src/components/BpmnModeler/ronlModdleDescriptor.json`, `packages/frontend/src/components/common/LanguageSelector.tsx`, `packages/frontend/src/components/common/OrganizationSelector.tsx`, `packages/frontend/src/components/common/ArtefactListToolbar.tsx`, `packages/frontend/src/components/BpmnModeler/BpmnModeler.tsx`, `packages/frontend/src/components/BpmnModeler/BpmnCanvas.tsx`, `packages/frontend/src/components/BpmnModeler/ProcessList.tsx`, `packages/frontend/src/components/FormEditor/FormEditor.tsx`, `packages/frontend/src/components/FormEditor/FormCanvas.tsx`, `packages/frontend/src/components/FormEditor/FormList.tsx`, `packages/frontend/src/components/DocumentComposer/DocumentComposer.tsx`, `packages/frontend/src/components/DocumentComposer/DocumentList.tsx`, `packages/frontend/src/services/bpmnService.ts`, `packages/frontend/src/services/formService.ts`
+
+#### Pending-until-Save editing model
+
+Footer edits across BPMN, Form, and Document editors no longer persist immediately. They accumulate in a draft state on the editor parent and flush atomically when Save is clicked. Navigation guards confirm before discarding unsaved changes.
+
+- **Editor architecture** — footer state lifted to the editor parent (`BpmnModeler`, `FormEditor`, `DocumentComposer`); children receive effective values via props and report changes via callbacks; Save is the single point of persistence
+- **Shell → subprocess atomic save** — saving a BPMN shell propagates `language` and `organization` to all linked subprocesses in one write; idempotent (skips subprocesses already aligned); shell wins unconditionally; example subprocesses (`readonly: true`) are skipped
+- **Save button dirty tracking fixed** — Form Save button was always-enabled (regression); now starts disabled, enables on first edit, disables after Save
+- **Document load window** — `DocumentComposer` no longer flips `hasChanges` spuriously on document load; TipTap's mount-time `onUpdate` events are suppressed for the macrotask following load via `isLoadingRef`
+
+#### HR-capacity Dutch reference bundle
+
+The first multi-language reference bundle: 1 BPMN, 8 forms, 2 documents under `examples/organizations/flevoland/HR-capacity/nl/`, all tagged `language=nl`, `organization=flevoland`. Same `CapacityClaimRouting` DMN serves both the English and Dutch siblings.
+
+#### Bug fixes
+
+- BPMN persistence: `language` and `organization` now included in the `BpmnService.saveProcess` POST payload (previously dropped silently, causing values to vanish on hydration)
+- `OrganizationSelector` is now controlled (`value`/`onChange`) rather than uncontrolled (`defaultValue`/`onBlur`); switching artefacts refreshes the input correctly
+- `BpmnCanvas` no longer resets on parent re-renders — `handleElementSelect` stabilised via a ref, modeler-init effect deps narrowed to `xml`
+
+#### Known limitation
+
+The form-js properties panel loses input focus when typing pauses (Field label, Description, Key). Upstream form-js issue #86, marked wontfix by bpmn-io. Not LDE-caused, not fixable from React without forking form-js. Workaround: edit `.form` JSON in a code editor and re-import — filename-based language inference handles the language tag automatically.
+
+---
+
+### v1.5.3 — DSO Works tab & OIN preset fix (April 2026)
+
+**v1.5.3 — Patch (April 2026)**
+
+#### Works tab — new
+
+New **Works** tab in the DSO Explorer (between Concepts and Activities) backed by the Zoekinterface API.
+
+- Search werkzaamheden by user intent (e.g. "boom kappen") with autocomplete suggestions after 2 characters; selecting a suggestion immediately fires the search
+- Each result shows the human-readable `omschrijving`, the `functioneleStructuurRef` (full concept URI — the Phase 4 pivot to STTR files), and the short werkzaamheid URN
+- Selecting a result opens a detail panel showing the current version's `omschrijving`, validity period, and full version history with start/end dates and a "current" badge
+- Autocomplete uses `POST /werkzaamheden/_suggereer` with 300ms debounce
+- Reloads on DSO environment switch with the same clean-slate behaviour as the other tabs
+
+#### Activities tab — OIN preset fix
+
+The Lelystad and Flevoland presets now use `POST /activiteiten/_zoek` with `bestuursorgaan.oin` filter instead of `_wijzigingen` — returning activities valid on a given date rather than a delta sync of changed activities.
+
+- Activities now appear in the list with their full `omschrijving` visible immediately, without requiring parallel detail fetches
+- Date field defaults to today for OIN presets (yesterday offset removed — no longer needed with `_zoek`)
+- Pagination works correctly in OIN mode — Load button reloads the authority list for the selected date
+- Empty state distinguishes between no activities found in general vs no activities found for the selected authority on the selected date
+
+#### Bug fixes
+
+- Activity Detail panel always using pre-production DSO when opened from the Activities list — `env` was missing from the `getActiviteitDetail` call, causing 404 for production-only activities
+- Activity Detail panel not re-fetching when DSO environment is switched while a URN is already selected — `env` added to the `useEffect` dependency array
+- Activity Detail panel showing stale date context in OIN preset mode — `activeDatum` now set correctly by `loadByOin` alongside the result
+
+#### Backend — DSO service
+
+- `zoekinterfaceBaseUrl` and `opvragenWerkzaamhedenBaseUrl` added to both `dso` and `dsoProd` config blocks — defaults baked in, no new env vars required
+- `POST /v1/dso/werkzaamheden/zoek` — proxies Zoekinterface `/werkzaamheden/_zoek`
+- `POST /v1/dso/werkzaamheden/suggereer` — proxies Zoekinterface `/werkzaamheden/_suggereer`
+- `GET /v1/dso/werkzaamheden/:urn` — proxies Opvragen Werkzaamheden `/werkzaamheden/{urn}` (version history, without expand — `_expandScope` enum value not yet resolved)
+- `POST /v1/dso/activiteiten/oin` now uses `/activiteiten/_zoek` with `bestuursorgaan.oin` body field and `datum` instead of `_wijzigingen` with `datumVanaf`
+
+---
+
+### v1.5.2 — DSO Explorer enhancements (April 2026)
+
+**v1.5.2 — Patch (April 2026)**
+
+- DSO environment selector added to the Settings panel (gear icon): switch between pre-production and production DSO independently of the LDE environment, persisted across sessions in localStorage
+- Environment badge in the DSO Explorer header updates to reflect the active DSO environment (amber for pre-production, green for production)
+- Both DSO environments use separate API keys configured via `DSO_API_KEY` and `DSO_API_KEY_PROD` environment variables
+- Location presets (Lelystad, Flevoland) initially filter by authority OIN — replaced with `_zoek` in v1.5.3
+- Child activities in the detail panel now show human-readable names fetched in parallel after the parent detail loads
+- Graceful 404 handling in the detail panel: activities not available in the active DSO environment show a clear message instead of a raw error
+
+---
+
+### v1.5.1 — Dev infrastructure (April 2026)
+
+**v1.5.1 — Infrastructure (April 2026)**
+
+#### Docker readiness check
+
+New `packages/backend/scripts/check-docker.sh` verifies the `ronl-postgres` container is up and healthy before nodemon starts the backend.
+
+- Coloured terminal output: green for ready, yellow for unhealthy, red for missing or stopped
+- Suggests the exact `docker start` or `docker run` command if the container is missing
+- Backend `dev` script now runs the check first; `dev:full` and `dev:backend` scripts added to root `package.json` for one-command monorepo startup
+
+**Files:** `packages/backend/scripts/check-docker.sh`, `packages/backend/package.json`, `package.json`
+
+---
+
+### v1.5.0 — DSO Integration Phase 1 (March 2026)
+
+**v1.5.0 — New Feature (March 2026)**
+
+#### DSO Explorer
+
+New top-level view for browsing the Digitaal Stelsel Omgevingswet from inside LDE.
+
+- **Concepts tab** — full-text search across the Stelselcatalogus
+- **Activities tab** — RTR `activiteiten` list with date filtering and a detail panel showing `bestuursorgaan`, validity, parent and child activities, and which rule types (`Conclusie`, `Indieningsvereisten`, `Maatregelen`) are present
+
+#### BPMN — DSO activiteit linkage
+
+- New `ronl:dsoActiviteitUrn` mixin on `bpmn:Process` in `ronlModdleDescriptor.json`
+- New `DsoActiviteitSelector` component pinned to the BPMN Modeler footer (sibling of `RopaSelector`)
+- Live URN verification against DSO RTR; on success shows the omschrijving, authority block, and a direct link to the public RTR viewer
+- URN survives `saveXML` round-trips and shows up in process exports
+
+#### Backend — DSO service
+
+- New `src/services/dso.service.ts` covering Stelselcatalogus and RTR endpoints
+- New `src/routes/dso.routes.ts` at `/v1/dso/...`
+- Pre-production and production base URLs configurable via env; API keys per environment
+- Path-aware DSO environment selection via `X-Dso-Env` header
+
+**Files:** `packages/frontend/src/components/BpmnModeler/DsoActiviteitSelector.tsx`, `packages/frontend/src/services/dsoService.ts`, `packages/backend/src/services/dso.service.ts`, `packages/backend/src/routes/dso.routes.ts`
+
+---
+
 ### v1.4.0 — RoPA Records & GDPR Article 30 Compliance (March 2026)
 
 **v1.4.0 — New Feature (March 28, 2026)**

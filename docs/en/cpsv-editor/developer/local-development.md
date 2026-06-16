@@ -59,7 +59,7 @@ External services do not need to be running locally. They are always accessed re
 ### Frontend (CPSV Editor)
 
 ```bash
-git clone https://github.com/your-org/cpsv-editor.git
+git clone https://github.com/sgort/cpsv-editor.git
 cd cpsv-editor
 npm install
 npm start
@@ -70,7 +70,7 @@ Opens at `http://localhost:3000`.
 ### Shared backend
 
 ```bash
-git clone https://github.com/your-org/linked-data-explorer.git
+git clone https://github.com/sgort/linked-data-explorer.git
 cd linked-data-explorer
 npm install
 npm run dev:backend
@@ -114,7 +114,7 @@ git commit -m "feat: your change description"
 git push origin acc
 
 # 3. Monitor the GitHub Actions workflow
-# https://github.com/your-org/cpsv-editor/actions
+# https://github.com/sgort/cpsv-editor/actions
 
 # 4. Verify the ACC deployment
 curl https://acc.cpsv-editor.open-regels.nl

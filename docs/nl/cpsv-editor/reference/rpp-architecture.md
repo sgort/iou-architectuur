@@ -25,7 +25,7 @@
 
 # Policy rule — linked to legislation
 
-# Temporal rule — links to policy via ronl:extends
+# Temporal rule — links to legislation via cprmv:isBasedOn
 
 # Parameter — used by the rule
 

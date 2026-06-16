@@ -23,11 +23,11 @@
 
 ---
 
-## Rules tab — `cpsv:Rule, ronl:TemporalRule`
+## Rules tab — `cpsv:Rule, cprmv:TemporalRule`
 
 ---
 
-## Parameters tab — `ronl:ParameterWaarde`
+## Parameters tab — `cprmv:ParameterWaarde`
 
 ---
 

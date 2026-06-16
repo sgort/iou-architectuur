@@ -202,6 +202,31 @@ No changes needed for standard local development.
 
 Open three terminal windows.
 
+### Docker readiness check (v1.5.1+)
+
+Before starting the backend, the `npm run dev` script in `packages/backend` runs `scripts/check-docker.sh`. The script verifies the `ronl-postgres` container is up and healthy, fails fast with a clear remediation message if not, and prevents nodemon from starting against a broken database.
+
+Coloured output:
+
+- **Green** — container is running and healthy → dev server starts
+- **Yellow** — container is running but not yet healthy (still initialising) → wait briefly and retry
+- **Red** — container is missing, stopped, or Docker daemon not running → script prints the exact `docker start` or `docker run` command for the missing container and exits non-zero
+
+If you bypass the check (e.g. running `nodemon` directly), the backend will still try to migrate against `DATABASE_URL` and you'll get a connection error at startup. Just run `npm run dev` instead.
+
+### Convenience scripts at the repo root
+
+Two scripts at the monorepo root let you start everything with one command:
+
+```bash
+npm run dev:full       # backend (with check-docker.sh) and frontend in parallel
+npm run dev:backend    # backend only, with the Docker check
+```
+
+Both chain through to the per-workspace `npm run dev` so the docker check still runs for the backend.
+
+### Per-terminal startup
+
 **Terminal 1 — Backend:**
 
 ```bash

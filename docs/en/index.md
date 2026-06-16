@@ -8,43 +8,53 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2.9.7** · *April 2026*
+-   **⚙️ RONL Business API — v3.0.7** · *May 2026*
 
     ---
 
-    **AI Assistant — MCP providers & multi-model LLM registry**
+    **V2 caseworker dashboard live in production**
 
-    AI Assistant extended with three independent MCP providers — CPRMV legislation (Dutch & EU law), LDE Process Library (deployed BPMN bundles, forms, document templates), and a multi-model LLM registry supporting both Claude and GPT-4o. New Procesbibliotheek section on the Home tab lets caseworkers browse deployed processes without login. IOU tab for Flevoland: use-case submission with file attachments, feedback with screenshot upload, and read-only GitLab issue lists.
+    The redesigned [V2 caseworker dashboard](ronl-business-api/features/caseworker-dashboard-v2.md) is now the available at `/dashboard/caseworker/v2`; the V1 shell will be retired. A three-mode information architecture (Werk · Zoeken · Beheer) replaces the flat 25-item nav, with a ⌘K command palette and a toggleable AI assistant dock. Production brought to full parity with acceptance.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
--   **✏️ CPSV Editor — v1.9.3** · *February 2026*
+-   **🖍️ Norm Editor — v0.0.1** · *June 2026*
 
     ---
 
-    **DMN Syntactic Validation**
+    **Joins the documentation site**
 
-    Inline [DMN validation](linked-data-explorer/reference/dmn-validation-reference.md) immediately after upload: five-layer syntactic checks with severity-coded results (error / warning / info), element references, and line numbers — directly in the DMN file card.
+    The Norm Editor (Regeleditor) is now documented: a guided workflow for interpreting legal sources into FLINT Fact, Act, and Claim-duty frames, with source annotation, AND/OR/NOT preconditions, optional BERTje-based NLP suggestions for act constituents, and a lossless round trip to RDF in TriplyDB. Features, User Guide, Developer Docs, and Reference are all available.
+
+    [:octicons-arrow-right-24: Documentation](norm-editor/index.md)
+    
+-   **✏️ CPSV Editor — v1.10.2** · *June 2026*
+
+    ---
+
+    **CPRMV 0.4.1 & CPSV-AP 3.2.0 conformance**
+
+    Editor-generated Turtle now validates clean against the [CPRMV 0.4.1](cpsv-editor/reference/namespace-property-reference.md) and CPSV-AP 3.2.0 SHACL shapes — `cprmv:RuleSet`/`cprmv:RuleMethod` grouping, `dct:spatial` organisations, and an [advisory pre-publish SHACL check](cpsv-editor/features/triplydb-publishing.md). Decision models can also be handed off straight from the Linked Data Explorer via the new [DSO → DMN deep-link import](cpsv-editor/features/dso-import.md).
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.4.0** · *March 2026*
+-   **🔍 Linked Data Explorer — v1.9.7** · *June 2026*
 
     ---
 
-    **RoPA Records — GDPR Article 30 Compliance**
+    **DSO rule extraction & three-layer SHACL validation**
 
-    v1.4.0 introduces a full Record of Processing Activities (RoPA) framework. The LDE RoPA Editor lets Product Owners author GDPR Art. 30 records per process bundle — with a legal basis SPARQL lookup, form-hydrated personal data field classification, and a BPMN link written as `ronl:ropaRef` on the process element. Active records are served from a CORS-open public endpoint and rendered on a dedicated static site (`ropa.open-regels.nl`) deployed separately from the LDE stack.
+    The DSO Explorer now extracts an activity's *toepasbare regels* into deploy-ready LDE assets — a normalized DMN (deploys & evaluates on Operaton) or a form-js scaffold imported straight into the Form Editor — and can hand a DMN off to the CPSV Editor for publishing. The SHACL Validator gained a third **CPRMV 0.4.1** layer alongside CPSV-AP 3.2.0 and RONL Custom, and the ChainBuilder/`/v1/dmns` now discover DMNs under both the 0.3.0 and 0.4.1 CPRMV namespaces.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
--   **📜 CPRMV API — v0.4.0** · *February 2026*
+-   **📜 CPRMV API — v0.4.1** · *June 2026*
 
     ---
 
-    **On-the-fly Rule Retrieval**
+    **CPRMV 0.4.1 conformance & reference resolution**
 
-    Live retrieval and CPRMV transformation of Dutch and EU legislation from BWB, CVDR, and EU CELLAR repositories. Automatic latest-version resolution, seven output formats, definition extraction with parse patterns, and Juriconnect reference resolution.
+    RuleSets are now FRBR Works (`frbroo:F1_Work`); `/ref` auto-detects Juriconnect, ELI (to EU CELLAR), and CPRMV-API references; new `/cellar-by-celex` and `/cellar-by-eli` redirects; `unformat` works across all output formats; and the API now exposes a basic [MCP server](cprmv-api/reference/api-endpoints.md) at `/mcp`.
 
     [:octicons-arrow-right-24: Full changelog](cprmv-api/developer/changelog-roadmap.md)
 
@@ -104,6 +114,12 @@ The core business API layer that provides secure authentication and process orch
 **Live App**: [mijn.open-regels.nl](https://mijn.open-regels.nl)
 
 [View Documentation →](ronl-business-api/index.md){ .md-button }
+
+### 🖍️ Norm Editor
+
+Vue/Quasar application for creating FLINT interpretations of legal sources: load a normative text, annotate fragments, and build Fact, Act, and Claim-duty frames that export to RDF in TriplyDB. Backed by NLP, unwrap, and wrap-up services.
+
+[View Documentation →](norm-editor/index.md){ .md-button }
 
 ### ✏️ CPSV Editor
 

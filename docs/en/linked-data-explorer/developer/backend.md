@@ -134,6 +134,227 @@ Request body:
 
 Proxies a SPARQL query to any TriplyDB endpoint, bypassing CORS restrictions. Used by the frontend Query Editor for dynamic endpoint support.
 
+### Norms
+
+```
+GET /v1/norms?endpoint={url}&rulesetid={ruleset}&applicable_date={YYYY-MM-DD}
+```
+
+Returns all `cprmv:Rule` paths and norms from the configured TriplyDB endpoint in the publish format consumed by the SPARQL editor's norm publisher. Each rule object mirrors the `cprmv-example.json` shape exactly: fully-qualified RDF/CPRMV keys for `type`, `id`, `definition`, and `contains`; short keys for `situatie`, `norm`, `per`, `rulesetid`, `applicable_date`, and `rule_id_path`.
+
+Parent rules and their `cprmv:contains` children are aggregated into a single nested object per parent. Key insertion order is preserved across runs:
+
+```
+type, id, definition, contains?, situatie?, norm?, per?, rulesetid, applicable_date, rulesetid_index, rule_id_path, rule_id_path_key
+```
+
+Three fields are derived from `rule_id_path` and emit JSON `null` when the path does not match the canonical `<rulesetid>_<YYYY-MM-DD>_<index>[, <rest>]` shape:
+
+| Field              | Source from `rule_id_path`                                 | Example                              |
+| ------------------ | ---------------------------------------------------------- | ------------------------------------ |
+| `applicable_date`  | The `_YYYY-MM-DD_` segment                                 | `"2025-07-01"`                       |
+| `rulesetid_index`  | The integer after the date                                 | `0`                                  |
+| `rule_id_path_key` | Path with date and index removed; stable across versions   | `"BWBR0002471, Artikel 2, lid 6"`   |
+
+The response envelope also carries an `aggregations` block alongside `rules`:
+
+```
+data: {
+  total: <number>,
+  aggregations: { norms_per_rulesetid: { "<rulesetid>": <count>, ... } },
+  rules: [...]
+}
+```
+
+Counts are over the filtered result set, so `total` equals the sum of all `norms_per_rulesetid` values. Use this to render ruleset-level summaries without re-counting on the client.
+
+**Dataset versioning and HTTP cache headers**
+
+Each BWB ruleset (BWBR0002471, BWBR0015703, …) is published as a separate `cprmv:Dataset` resource in TriplyDB by the CPSV editor (see [CPRMV Dataset Generation](../../cpsv-editor/developer/cprmv-dataset-generation.md)). A single ruleset can have multiple Dataset records — different applicable periods of the same law (e.g. BWBR0015703 at `2025-01-01` and `2026-01-01`) are **concurrent and equally authoritative**, not competing versions. A single `/v1/norms` response can span multiple rulesets, each carrying multiple records; the envelope therefore carries a `dataset_versions` map keyed by `cprmv:rulesetId`, where each value is a **list** of records:
+
+```json
+"dataset_versions": {
+  "BWBR0015703": [
+    {
+      "version": "2026-01-01",
+      "published_at": "2026-05-15T06:57:21Z",
+      "title": "Participatiewet"
+    },
+    {
+      "version": "2025-01-01",
+      "published_at": "2026-05-15T07:45:36Z",
+      "title": "Participatiewet"
+    }
+  ],
+  "BWBR0044894": [
+    { "version": null, "published_at": "2026-05-15T07:45:36Z", "title": null }
+  ]
+}
+```
+
+The list is pre-sorted: **`version` descending with nulls at the end, ties broken by `published_at` descending**. Element `[0]` is the most-recent applicable version of that ruleset. Non-primary rulesets (no `dcat:version` in TriplyDB) fall through to pure `published_at` desc ordering.
+
+Three per-entry fields, with two of them nullable:
+
+| Field          | Source       | Always present? |
+| -------------- | ------------ | --------------- |
+| `version`      | `dcat:version` | Primary ruleset only — the editor only knows the version of the service's `legalResource.bwbId`. `null` for non-primary rulesets. |
+| `published_at` | `dct:issued`   | Yes. The timestamp of this `cprmv:Dataset` record's publication — the meaningful signal for cache validity. |
+| `title`        | `dct:title`    | Primary ruleset only. `null` for non-primary rulesets. |
+
+`cprmv_version` is a single string surfacing the CPRMV vocabulary version the backend speaks — independent of which datasets have been published.
+
+When **every** rulesetid in the response has at least one `dataset_versions` entry, the response carries strong HTTP cache headers:
+
+```
+ETag: "3c899856"
+Last-Modified: Fri, 15 May 2026 07:45:36 GMT
+Cache-Control: public, max-age=3600
+```
+
+The `ETag` is an opaque 8-hex hash over every `(version, published_at)` pair in `dataset_versions` plus all request parameters that affect the response shape. `title` is deliberately excluded — informational only, and a title-only update would arrive as a new `dct:issued` anyway. `Last-Modified` is the maximum `published_at` across *all* records in the response (not just the first per ruleset), so a consumer's `If-Modified-Since` returns `304 Not Modified` only when nothing in their query has been republished.
+
+Conditional requests are honoured via Express's `req.fresh`:
+
+```http
+GET /v1/norms HTTP/1.1
+If-None-Match: "3c899856"
+```
+
+For single-rulesetid queries (`?rulesetid=<id>`), the 304 check happens **before** the expensive rules SPARQL query — only the cheap (cached) metadata query runs for a 304 response. For multi-rulesetid queries the rules query must run first to know which rulesetids appear in the response.
+
+When **any** rulesetid in the response lacks `cprmv:Dataset` records, `Cache-Control: no-cache` is set and `ETag` / `Last-Modified` are omitted. Safe-by-default: consumers must always refetch until every BWB they query has been published with at least one `cprmv:Dataset` record. During the rollout-from-scratch period this means caching kicks in progressively as Datasets are published.
+
+Dataset metadata is cached in-memory for 60 seconds per endpoint URL.
+
+**Query parameters** (all optional, may be combined):
+
+| Parameter         | Description                                                                                                                                                          |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `endpoint`        | SPARQL endpoint URL. Defaults to `config.triplydb.endpoint` (`TRIPLYDB_ENDPOINT`) when omitted, matching the pattern used by `/v1/dmns`.                             |
+| `rulesetid`       | Exact-match filter on `cprmv:rulesetId` (e.g. `BWBR0015703`). Must match `/^[A-Za-z0-9_-]+$/` or the request is rejected with `400 INVALID_PARAM`.                   |
+| `applicable_date` | Filter on the dated segment of `cprmv:ruleIdPath` (e.g. `2026-01-01` matches paths containing `_2026-01-01_`). Must match `/^\d{4}-\d{2}-\d{2}$/` or `400`.          |
+
+Validated filter values are applied as SPARQL `FILTER` clauses server-side: exact-match on `?rulesetId` and `CONTAINS(STR(?ruleIdPath), "_<date>_")`. Filters are interpolated only after passing the regex gate, making SPARQL injection impossible.
+
+**Example response — flat rule** (most common; no `contains` key):
+
+```json
+{
+  "success": true,
+  "data": {
+    "total": 1,
+    "dataset_versions": {
+      "BWBR0015703": [
+        {
+          "version": "2026-01-01",
+          "published_at": "2026-05-15T06:57:21Z",
+          "title": "Participatiewet"
+        },
+        {
+          "version": "2025-01-01",
+          "published_at": "2026-05-15T07:45:36Z",
+          "title": "Participatiewet"
+        }
+      ]
+    },
+    "cprmv_version": "0.3.0",
+    "aggregations": {
+      "norms_per_rulesetid": {
+        "BWBR0015703": 1
+      }
+    },
+    "rules": [
+      {
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": "https://cprmv.open-regels.nl/0.3.0/Rule",
+        "https://cprmv.open-regels.nl/0.3.0/id": "onderdeel a.",
+        "https://cprmv.open-regels.nl/0.3.0/definition": "een alleenstaande van 18, 19 of 20 jaar: € 337,98;",
+        "situatie": "een alleenstaande van 18, 19 of 20 jaar",
+        "norm": "337,98",
+        "rulesetid": "BWBR0015703",
+        "applicable_date": "2025-07-01",
+        "rulesetid_index": 0,
+        "rule_id_path": "BWBR0015703_2025-07-01_0, Artikel 20, lid 1, onderdeel a.",
+        "rule_id_path_key": "BWBR0015703, Artikel 20, lid 1, onderdeel a."
+      }
+    ]
+  },
+  "timestamp": "2026-05-14T14:00:00.000Z"
+}
+```
+
+**Example response — rule with nested children** (conditional `contains` map; emitted only when the parent has `cprmv:contains` links to sub-rules):
+
+```json
+{
+  "success": true,
+  "data": {
+    "total": 1,
+    "dataset_versions": {
+      "BWBR0015703": [
+        {
+          "version": "2026-01-01",
+          "published_at": "2026-05-15T06:57:21Z",
+          "title": "Participatiewet"
+        },
+        {
+          "version": "2025-01-01",
+          "published_at": "2026-05-15T07:45:36Z",
+          "title": "Participatiewet"
+        }
+      ]
+    },
+    "cprmv_version": "0.3.0",
+    "aggregations": {
+      "norms_per_rulesetid": {
+        "BWBR0015703": 1
+      }
+    },
+    "rules": [
+      {
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": "https://cprmv.open-regels.nl/0.3.0/Rule",
+        "https://cprmv.open-regels.nl/0.3.0/id": "onderdeel r.",
+        "https://cprmv.open-regels.nl/0.3.0/definition": "inkomsten uit arbeid van een alleenstaande ouder ...",
+        "https://cprmv.open-regels.nl/0.3.0/contains": {
+          "onderdeel 1°.": {
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": "https://cprmv.open-regels.nl/0.3.0/Rule",
+            "https://cprmv.open-regels.nl/0.3.0/id": "onderdeel 1°.",
+            "https://cprmv.open-regels.nl/0.3.0/definition": "hij de volledige zorg heeft voor een tot zijn last komend kind tot 12 jaar,"
+          },
+          "onderdeel 2°.": {
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": "https://cprmv.open-regels.nl/0.3.0/Rule",
+            "https://cprmv.open-regels.nl/0.3.0/id": "onderdeel 2°.",
+            "https://cprmv.open-regels.nl/0.3.0/definition": "de periode van zes maanden, bedoeld in onderdeel n, is verstreken, en"
+          }
+        },
+        "situatie": "inkomsten uit arbeid van een alleenstaande ouder ...",
+        "norm": "173,87",
+        "per": "maand, gedurende een aaneengesloten periode van maximaal 30 maanden, ...",
+        "rulesetid": "BWBR0015703",
+        "applicable_date": "2025-07-01",
+        "rulesetid_index": 0,
+        "rule_id_path": "BWBR0015703_2025-07-01_0, Artikel 31, lid 2, onderdeel r.",
+        "rule_id_path_key": "BWBR0015703, Artikel 31, lid 2, onderdeel r."
+      }
+    ]
+  },
+  "timestamp": "2026-05-14T14:00:00.000Z"
+}
+```
+
+!!! note
+    The nested-children shape above is the format the endpoint will produce *when* `cprmv:contains` triples are present in TriplyDB. The current acceptance dataset has none, so every response is currently flat. End-to-end validation of the nested case is still pending: upload a dataset containing `cprmv:contains` links and verify that `/v1/norms` materialises them correctly into the publish format.
+
+**Example requests:**
+
+```
+GET /v1/norms
+GET /v1/norms?rulesetid=BWBR0015703
+GET /v1/norms?applicable_date=2026-01-01
+GET /v1/norms?rulesetid=BWBR0015703&applicable_date=2026-01-01
+GET /v1/norms?endpoint=https://api.open-regels.triply.cc/datasets/stevengort/RONL/services/RONL/sparql
+```
+
 ---
 
 ### Asset storage
@@ -182,6 +403,8 @@ findSemanticEquivalences(endpoint: string): Promise<SemanticEquivalence[]>
 ```
 
 The `findEnhancedChainLinks` query uses a `BIND(IF(...))` pattern to categorise each link as `exact`, `semantic`, or `both`, then expands `both` entries into two separate records post-query. This is the mechanism described in [Enhanced Validation](enhanced-validation.md).
+
+A separate `norms.service.ts` handles the `cprmv:Rule` publish-format query backing `/v1/norms`. It builds the query dynamically — filter clauses (rulesetid exact-match, applicable date `CONTAINS`) are injected only after upstream regex validation — then aggregates parent/child rows into nested objects with deterministic key ordering matching `cprmv-example.json`.
 
 ---
 

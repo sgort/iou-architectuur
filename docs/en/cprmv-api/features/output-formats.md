@@ -10,13 +10,13 @@ A custom recursive JSON format produced directly from rdflib's graph traversal, 
 
 ```json
 {
-    "https://standaarden.open-regels.nl/standards/cprmv/0.4.0/#id": "Artikel 20",
-    "https://standaarden.open-regels.nl/standards/cprmv/0.4.0/#definition": "...",
-    "https://standaarden.open-regels.nl/standards/cprmv/0.4.0/#hasPart": {
+    "https://standaarden.open-regels.nl/standards/cprmv/0.4.1#id": "Artikel 20",
+    "https://standaarden.open-regels.nl/standards/cprmv/0.4.1#definition": "...",
+    "https://standaarden.open-regels.nl/standards/cprmv/0.4.1#hasPart": {
         "lid 1": {
-            "https://standaarden.open-regels.nl/standards/cprmv/0.4.0/#id": "lid 1",
-            "https://standaarden.open-regels.nl/standards/cprmv/0.4.0/#definition": "...",
-            "https://standaarden.open-regels.nl/standards/cprmv/0.4.0/#hasPart": {
+            "https://standaarden.open-regels.nl/standards/cprmv/0.4.1#id": "lid 1",
+            "https://standaarden.open-regels.nl/standards/cprmv/0.4.1#definition": "...",
+            "https://standaarden.open-regels.nl/standards/cprmv/0.4.1#hasPart": {
                 "onderdeel a": { ... }
             }
         }
@@ -27,7 +27,7 @@ A custom recursive JSON format produced directly from rdflib's graph traversal, 
 All sub-rules contained via `cprmv:hasPart` RDF lists are recursively included. Predicate URIs are used as keys.
 
 !!! note
-    When `unformat` is also provided, the format is forced to `cprmv-json` regardless of the `format` value. The named fields extracted by the `parse` pattern are merged into the top-level JSON object.
+    As of v0.4.1, `unformat` works with **any** output format, not only `cprmv-json`. The values extracted by the `parse` pattern are added as additional triples on the selected rule, so they also appear in the RDF serialisations (`turtle`, `n3`, `json-ld`, …). In `cprmv-json` the extracted fields are merged into the rule object.
 
 ---
 

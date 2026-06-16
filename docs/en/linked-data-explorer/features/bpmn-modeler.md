@@ -29,6 +29,9 @@ The Linked Data Explorer models government service workflows as two-layer BPMN c
 
 Shell processes are top-level entries. Their subprocesses are indented beneath them with a tree connector. Standalone processes — those with no parent-child relationship — appear as top-level entries without indentation.
 
+!!! note "Automatic shell/subprocess linking (v1.9.2)"
+    Uploaded BPMN processes that form a shell/subprocess pair are now linked automatically: a process containing Call Activity elements is classified as a **shell**, and any process whose BPMN process ID is targeted by a shell's call-activity becomes its **subprocess**. Classification runs both on fresh imports and retroactively on startup, so processes uploaded as standalone before this release are reclassified without needing a re-upload.
+
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: BPMN Modeler process list showing AWB Generic Process with Tree Felling Permit indented below it as a subprocess, and AWB Zorgtoeslag with its two subprocesses indented below it](../../assets/screenshots/linked-data-explorer-bpmn-process-hierarchy.png)
   <figcaption>Process list showing shell/subprocess hierarchy: AWB shells with their subprocesses indented</figcaption>
@@ -181,6 +184,37 @@ Both mechanisms produce identical results. The attribute is registered in `ronlM
 The deploy modal checks for the presence of `ronl:ropaRef` on the process element. If absent, an amber warning appears between the resource list and the resource count line. The warning is non-blocking — the bundle can still be deployed — but is intended to prevent deploying to production without a linked RoPA record.
 
 See [RoPA Records](ropa-records.md) for the full feature description.
+
+---
+
+## DSO activiteit linkage
+
+The BPMN Modeler footer panel includes a **DSO Activity** selector for linking a process to a DSO activiteit URN. Pasting a URN and clicking **Verify** queries the live DSO RTR; on success the panel shows the activity's omschrijving, authority block, and a link to the public RTR viewer. The URN is persisted on `<bpmn:process>` as the `ronl:dsoActiviteitUrn` attribute and survives `saveXML` round-trips.
+
+See [DSO Integration](dso-integration.md) for the full integration overview and [DSO Explorer user guide](../user-guide/dso-explorer.md) for the verification workflow.
+
+---
+
+## Language and organization
+
+The footer panel includes **Language** and **Organization** selectors:
+
+- **Language** — ISO 639-1 dropdown (Language-agnostic / English / Dutch / German). Persisted as `ronl:language` on `<bpmn:process>` and as the `process_definitions.language` DB column.
+- **Organization** — free-text input with autocomplete from existing organization keys. Persisted as `ronl:organization` and as the DB column.
+
+Both fields are pending-until-Save: typing in them updates the editor's draft state but does not regroup the artefact in the list panel until **Save** is clicked. Saving a shell process atomically propagates `language` and `organization` to all linked subprocesses.
+
+The list panel toolbar offers a language filter and a search box; cards are grouped under collapsible organization headers. Subprocesses follow their shell's organization regardless of their own tag.
+
+See [Multilingualism](multilingualism.md) for the full feature description and [Multilingualism user guide](../user-guide/multilingualism.md) for the tagging workflow.
+
+---
+
+## Deploy modal — language consistency check
+
+When the deploy modal opens, LDE walks the bundle resources (shell BPMN + subprocess BPMNs + linked forms + linked documents) and collects all distinct language tags. If more than one is present, an amber warning surfaces inline in the modal listing the offending codes. The warning is non-blocking — Deploy stays enabled. DMNs are excluded from the check (language-agnostic by design).
+
+The check sits alongside the existing RoPA-missing warning, both rendered between the resource list and the resource count.
 
 ---
 

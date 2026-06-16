@@ -9,11 +9,11 @@ The **Rules–Policy–Parameters (RPP)** pattern is the architectural framework
 ```
 LAW (legislation)
   ↓
-POLICY — Normative values extracted from the law (cprmv:Rule)
+POLICY — Normative values extracted from the law (cprmv:Rule, grouped in cprmv:RuleSet)
   ↓  implements
-RULES — Executable decision logic that operationalises policy (cpsv:Rule, ronl:TemporalRule)
+RULES — Executable decision logic that operationalises policy (cpsv:Rule, cprmv:TemporalRule)
   ↓  configured by
-PARAMETERS — Tunable constants that adjust rule behaviour (ronl:ParameterWaarde)
+PARAMETERS — Tunable constants that adjust rule behaviour (cprmv:ParameterWaarde)
   ↓
 DECISION — Computed outcome for a citizen or case
 ```
@@ -26,13 +26,13 @@ Examples: the legal definition of "eligible for zorgtoeslag", the statutory AOW 
 
 ### Rules layer
 
-Rules capture **how** policy is implemented computationally — the executable decision logic. Expressed as `cpsv:Rule, ronl:TemporalRule`, rules are time-bounded and link back to their policy source via `ronl:extends`. Rules are owned by business analysts and are versioned independently of the underlying policy.
+Rules capture **how** policy is implemented computationally — the executable decision logic. Expressed as `cpsv:Rule, cprmv:TemporalRule`, rules are time-bounded and link back to their policy source via `cprmv:isBasedOn`. Rules are owned by business analysts and are versioned independently of the underlying policy.
 
 Examples: an eligibility check function, a benefit calculation algorithm.
 
 ### Parameters layer
 
-Parameters are **configurable constants** that tune rule behaviour without requiring rule changes. Expressed as `ronl:ParameterWaarde`, parameters carry a machine-readable notation, a value, a unit, and temporal validity. They are owned by operational teams who can update them within authorised ranges.
+Parameters are **configurable constants** that tune rule behaviour without requiring rule changes. Expressed as `cprmv:ParameterWaarde`, parameters carry a machine-readable notation, a value, a unit, and temporal validity. They are owned by operational teams who can update them within authorised ranges.
 
 Examples: an income threshold, a regional pilot adjustment factor, a standard premium amount.
 
@@ -48,16 +48,17 @@ The RPP layers are connected through explicit RDF properties:
     a cprmv:Rule ;
     cprmv:implements <https://wetten.overheid.nl/BWBR0002221> .
 
-# Temporal rule — links to policy via ronl:extends
+# Temporal rule — links to legislation via cprmv:isBasedOn, implements the eli:LegalResource
 <.../rules/aow-leeftijd-2024>
-    a cpsv:Rule, ronl:TemporalRule ;
-    ronl:extends <https://wetten.overheid.nl/BWBR0002221/2024-01-01/0/artikel/7a> ;
-    ronl:validFrom "2024-01-01"^^xsd:date ;
-    ronl:validUntil "2024-12-31"^^xsd:date .
+    a cpsv:Rule, cprmv:TemporalRule ;
+    cpsv:implements <https://wetten.overheid.nl/BWBR0002221> ;
+    cprmv:isBasedOn <https://wetten.overheid.nl/BWBR0002221/2024-01-01/0/artikel/7a> ;
+    cprmv:validFrom "2024-01-01"^^xsd:date ;
+    cprmv:validUntil "2024-12-31"^^xsd:date .
 
 # Parameter — used by the rule
 <.../parameters/aow-standaard-leeftijd>
-    a ronl:ParameterWaarde ;
+    a cprmv:ParameterWaarde ;
     skos:notation "AOW_LEEFTIJD_STANDAARD" ;
     schema:value "67" ;
     schema:unitCode "ANN" .
@@ -67,7 +68,7 @@ The RPP layers are connected through explicit RDF properties:
 
 ## Governance benefits
 
-**Legal traceability.** Every decision can be traced from output back to the specific legal article that mandates it. When a SPARQL query links `cprmv:DecisionRule → cprmv:extends → eli:LegalResource`, the chain from decision to law is explicit and machine-verifiable.
+**Legal traceability.** Every decision can be traced from output back to the specific legal article that mandates it. When a SPARQL query links `cprmv:DecisionRule → cprmv:isBasedOn → eli:LegalResource`, the chain from decision to law is explicit and machine-verifiable.
 
 **Organisational agility.** Parameters can be updated by operational teams within their authorised scope, without touching rules (which require analyst approval) or policy (which requires legal approval). This reduces the cost and risk of routine maintenance.
 

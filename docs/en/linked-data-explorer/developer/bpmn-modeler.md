@@ -406,18 +406,30 @@ The backend additionally exposes `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId`
 
 ### ronlModdleDescriptor.json
 
-`ronlModdleDescriptor.json` contains two type entries. The first extends `bpmn:UserTask` with `documentRef`. The second, added in v1.4.0, extends `bpmn:Process` with `ropaRef`:
+`ronlModdleDescriptor.json` registers all custom `ronl:` extensions against bpmn-js so the attributes survive `saveXML()` serialisation. Without registration, bpmn-js silently strips unknown namespaced attributes on every save.
+
+The descriptor currently declares five type entries:
+
+| Type | Extends | Attribute | Added in |
+|---|---|---|---|
+| `DocumentRefMixin` | `bpmn:UserTask` | `documentRef` | v1.1.0 |
+| `RopaRefMixin` | `bpmn:Process` | `ropaRef` | v1.4.0 |
+| `DsoActiviteitMixin` | `bpmn:Process` | `dsoActiviteitUrn` | v1.5.0 |
+| `LanguageMixin` | `bpmn:Process` | `language` | v1.6.0 |
+| `OrganizationMixin` | `bpmn:Process` | `organization` | v1.6.0 |
+
+Each entry has the same shape, e.g. for `LanguageMixin`:
 ```json
 {
-  "name": "RopaRefMixin",
+  "name": "LanguageMixin",
   "extends": ["bpmn:Process"],
   "properties": [
-    { "name": "ropaRef", "isAttr": true, "type": "String" }
+    { "name": "language", "isAttr": true, "type": "String" }
   ]
 }
 ```
 
-Without this registration, `ronl:ropaRef` is silently stripped by bpmn-js on every `saveXML()` call — matching the behaviour documented for `ronl:documentRef` on UserTask elements.
+When adding a new attribute on `bpmn:Process` or `bpmn:UserTask`, append a new mixin entry rather than altering existing ones — each entry is self-contained.
 
 ### RopaSelector placement
 
@@ -465,6 +477,61 @@ The current example processes and their roles:
 | `wip_asylum_migration` | `standalone` | `Process_Migratie_en_Asiel` | — |
 
 After the seed effect, a separate hydration effect runs `BpmnService.hydrateFromServer()` to merge any user-authored processes stored in PostgreSQL into the local list.
+
+---
+
+## Pending-until-Save editing model
+
+Footer edits — `language`, `organization`, `ropaRef`, `dsoActiviteitUrn` — accumulate in a draft on `BpmnModeler.tsx` rather than persisting immediately. The pattern:
+
+```typescript
+type FooterDraft = {
+  language?: BpmnProcess['language'];
+  organization?: string;
+  ropaRef?: string;
+  dsoActiviteitUrn?: string;
+};
+
+const [draft, setDraft] = useState<FooterDraft>({});
+const [hasFooterChanges, setHasFooterChanges] = useState(false);
+const [hasCanvasChanges, setHasCanvasChanges] = useState(false);
+```
+
+Footer handlers update only the draft:
+
+```typescript
+const handleLanguageChange = (language: string | undefined) => {
+  if (!activeProcessId) return;
+  setDraft((d) => ({ ...d, language: language as BpmnProcess['language'] }));
+  setHasFooterChanges(true);
+};
+```
+
+`handleSaveProcess` flushes the draft into both the in-memory `BpmnProcess` object and the BPMN XML's `ronl:` attributes, then resets the draft. Distinguishing "user touched the field" from "user explicitly cleared it" matters — the `'language' in draft` idiom preserves the difference between *unset* and *cleared*:
+
+```typescript
+language: 'language' in draft ? draft.language : process.language,
+```
+
+The list panel reads from committed `processes` state so visible grouping doesn't shift while the user is typing in the footer. The footer reads its display value via a `readEffective()` helper: draft wins when the field has been touched, else the committed `BpmnProcess` field, else the `ronl:` attribute extracted from the XML.
+
+Navigation guards (`handleCreateProcess`, `handleLoadProcess`, `handleCloseProcess`) check the combined `hasUnsavedChanges = hasCanvasChanges || hasFooterChanges` and prompt the user to confirm before discarding. `BpmnCanvas` exposes its own dirty state via `onDirtyChange?: (dirty: boolean) => void` so the parent can combine canvas content edits with footer edits into a single guard.
+
+### `applyRonlAttr` helper
+
+A single helper consolidates the four duplicated XML-mutation snippets that previously lived in each footer handler. It ensures the `xmlns:ronl=` namespace is declared on `<definitions>`, then either rewrites an existing `ronl:<attr>=` value, injects a new attribute on the `<bpmn:process>` opening tag, or strips the attribute when the value is `undefined`:
+
+```typescript
+function applyRonlAttr(xml: string, attr: string, value: string | undefined): string;
+```
+
+`handleSaveProcess` calls it once per draft field present (`language`, `organization`, `ropaRef`, `dsoActiviteitUrn`).
+
+### Shell → subprocess atomic save
+
+After saving a shell, `handleSaveProcess` walks `processes` for subprocesses where `processRole === 'subprocess'` and `calledElement === shell.bpmnProcessId`. For each match, the shell's `language` and `organization` are applied to the subprocess XML (via `applyRonlAttr`) and to the in-memory `BpmnProcess` fields, then persisted via `BpmnService.saveProcess` in sequence. The propagation triggers on every shell save when the shell has either field set, regardless of whether the user touched the footer in this session — the architectural rule "shell wins" must hold across editing sessions.
+
+Idempotent: subprocesses already aligned on both fields are skipped (no `updatedAt` bump, no backend write). Example subprocesses (`readonly: true`) are skipped. RoPA and DSO are NOT propagated — each subprocess has its own RoPA record and DSO context.
 
 ---
 

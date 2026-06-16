@@ -15,7 +15,8 @@ copyright: Copyright &copy; 2026 Provincie Flevoland & RONL Initiative
 # Theme configuration
 theme:
   name: material
-  language: en  # Default language
+  custom_dir: overrides
+  language: en
   
   # Colors matching NL Design System
   palette:
@@ -100,6 +101,7 @@ nav:
       - Regelcatalogus: ronl-business-api/features/regelcatalogus.md
       - Procesbibliotheek: ronl-business-api/features/procesbibliotheek.md
       - Caseworker Dashboard: ronl-business-api/features/caseworker-dashboard.md
+      - Caseworker Dashboard (V2): en/ronl-business-api/features/caseworker-dashboard-v2.md
       - Commercial Organisation Integration: en/ronl-business-api/features/commercial-org-integration.md
       - Timeline Navigation: ronl-business-api/features/timeline-navigation.md
       - Security & Compliance: ronl-business-api/features/security-compliance.md
@@ -113,6 +115,7 @@ nav:
       - HR Onboarding: ronl-business-api/user-guide/hr-onboarding.md
       - RIP Phase 1 Workflow: ronl-business-api/user-guide/rip-phase1-workflow.md
       - Adding a Municipality: ronl-business-api/user-guide/adding-municipality.md
+      - Multiple interacting rules example: ronl-business-api/user-guide/assessing-income-support-schemes.md
     - Developer Docs:
       - Local Development Setup: ronl-business-api/developer/local-development.md
       - Backend Development: ronl-business-api/developer/backend-development.md
@@ -150,12 +153,43 @@ nav:
       - BRP Timeline Integration: ronl-business-api/references/brp-timeline-integration.md
       - Standards & Compliance: ronl-business-api/references/standards-compliance.md
   
+  - 🖍️ Norm Editor:
+    - Overview: norm-editor/index.md
+    - Features:
+      - Overview: norm-editor/features/overview.md
+      - FLINT Frame Model: norm-editor/features/flint-frame-model.md
+      - Source Annotation: norm-editor/features/source-annotation.md
+      - Boolean Constructs: norm-editor/features/boolean-constructs.md
+      - NLP Assistance: norm-editor/features/nlp-assistance.md
+      - Frame Visualisation: norm-editor/features/visualisation.md
+      - TriplyDB Integration & Formats: norm-editor/features/triplydb-and-formats.md
+    - User Guides:
+      - Getting Started: norm-editor/user-guide/getting-started.md
+      - Defining a Task: norm-editor/user-guide/defining-a-task.md
+      - Collecting Sources: norm-editor/user-guide/collecting-sources.md
+      - Interpreting Sources: norm-editor/user-guide/interpreting-sources.md
+      - Using NLP Suggestions: norm-editor/user-guide/using-nlp-suggestions.md
+      - Saving & Loading: norm-editor/user-guide/saving-and-loading.md
+    - Developer Docs:
+      - Architecture: norm-editor/developer/architecture.md
+      - Local Development: norm-editor/developer/local-development.md
+      - Frontend: norm-editor/developer/frontend.md
+      - Backend & API Services: norm-editor/developer/backend-and-apis.md
+      - Deployment: norm-editor/developer/deployment.md
+    - References:
+      - Interpretation JSON Format: norm-editor/reference/interpretation-json-format.md
+      - API Endpoints: norm-editor/reference/api-endpoints.md
+      - Frame Types & Roles: norm-editor/reference/frame-types-and-roles.md
+      - Environment Variables: norm-editor/reference/environment-variables.md
+      - FLINT Ontology: norm-editor/reference/flint-ontology.md
+
   - ✏️ CPSV Editor:
     - Overview: cpsv-editor/index.md
     - Features:
       - Service, Organisation & Legal: cpsv-editor/features/service-organisation-legal.md
       - Rules, Policy & Parameters: cpsv-editor/features/rules-policy-parameters.md
       - DMN Orchestration: cpsv-editor/features/dmn-orchestration.md
+      - DSO → DMN Import: cpsv-editor/features/dso-import.md
       - TriplyDB Publishing: cpsv-editor/features/triplydb-publishing.md
       - Vendor Integration: cpsv-editor/features/vendor-integration.md
       - Import, Export & Preview: cpsv-editor/features/import-export.md
@@ -165,12 +199,15 @@ nav:
       - Import & Export TTL: cpsv-editor/user-guide/import-export-ttl.md
       - DMN Workflow: cpsv-editor/user-guide/dmn-workflow.md
       - DMN Testing: cpsv-editor/user-guide/dmn-testing.md
+      - DSO → DMN Import: cpsv-editor/user-guide/dso-import.md
       - Publishing to TriplyDB: cpsv-editor/user-guide/publishing-to-triplydb.md
       - Vendor Integration: cpsv-editor/user-guide/vendor-integration.md
     - Developer Docs:
+      - Due Diligence: cpsv-editor/developer/due-diligence.md
       - Visual Architecture: cpsv-editor/developer/visual-architecture.md
       - Local Development: cpsv-editor/developer/local-development.md
       - Project Structure: cpsv-editor/developer/project-structure.md
+      - CPRMV RuleSet Generation: cpsv-editor/developer/cprmv-dataset-generation.md
       - Deployment: cpsv-editor/developer/deployment.md
       - DMN Implementation: cpsv-editor/developer/dmn-implementation.md
       - TriplyDB Publish Implementation: cpsv-editor/developer/triplydb-publish-implementation.md
@@ -193,13 +230,16 @@ nav:
         - DMN Discovery & Chain Building: linked-data-explorer/features/dmn-chain-building.md
         - DRD Generation: linked-data-explorer/features/drd-generation.md
         - DMN Validator: linked-data-explorer/features/dmn-validator.md
+        - SHACL Validator: linked-data-explorer/features/shacl-validator.md
         - RIP Phase 1 Bundle: en/linked-data-explorer/features/rip-phase1-bundle.md
         - Semantic Analysis: linked-data-explorer/features/semantic-analysis.md
         - BPMN Modeler: linked-data-explorer/features/bpmn-modeler.md
         - Form Editor: linked-data-explorer/features/form-editor.md
         - Document Composer: linked-data-explorer/features/document-composer.md
         - RoPA Records: linked-data-explorer/features/ropa-records.md
-        - DSO Viewer & Integration: linked-data-explorer/features/dso-integration-phase-plan.md
+        - Multilingualism: linked-data-explorer/features/multilingualism.md
+        - DSO Viewer & Integration: linked-data-explorer/features/dso-integration.md
+        - DSO (WIP): linked-data-explorer/features/dso-integration-phase-plan.md
         - Governance & Validation: linked-data-explorer/features/governance-validation.md
         - Vendor Services: linked-data-explorer/features/vendor-services.md
     - User Guides:
@@ -208,11 +248,14 @@ nav:
         - Building DMN Chains: linked-data-explorer/user-guide/chain-building.md
         - Saving & Executing DRDs: linked-data-explorer/user-guide/drd-generation.md
         - DMN Validator: linked-data-explorer/user-guide/dmn-validator.md
+        - SHACL Validator: linked-data-explorer/user-guide/shacl-validator.md
         - Semantic Analysis: linked-data-explorer/user-guide/semantic-analysis.md
         - BPMN Modeler: linked-data-explorer/user-guide/bpmn-modeler.md
         - Form Editor: linked-data-explorer/user-guide/form-editor.md
         - Document Composer: linked-data-explorer/user-guide/document-composer.md
         - RoPA Records: linked-data-explorer/user-guide/ropa-records.md
+        - Multilingualism: linked-data-explorer/user-guide/multilingualism.md
+        - DSO Explorer: linked-data-explorer/user-guide/dso-explorer.md
         - Governance Badges: linked-data-explorer/user-guide/governance-badges.md
         - Vendor Services: linked-data-explorer/user-guide/vendor-services.md
     - Developer Docs:
@@ -227,6 +270,7 @@ nav:
         - Chain Export: linked-data-explorer/developer/chain-export.md
         - DRD Generation: linked-data-explorer/developer/drd-generation.md
         - DMN Validator Implementation: linked-data-explorer/developer/dmn-validator-implementation.md
+        - SHACL Validator Implementation: linked-data-explorer/developer/shacl-validator-implementation.md
         - BPMN Modeler: linked-data-explorer/developer/bpmn-modeler.md
         - Form Editor: linked-data-explorer/developer/form-editor.md
         - Document Composer: linked-data-explorer/developer/document-composer.md
@@ -240,7 +284,9 @@ nav:
     - References:
         - Operaton DMN Compatibility: linked-data-explorer/reference/operaton-dmn-compatibility.md
         - DMN Validation Reference: linked-data-explorer/reference/dmn-validation-reference.md
+        - SHACL Validation Reference: linked-data-explorer/reference/shacl-validation-reference.md
         - API Reference: linked-data-explorer/reference/api-reference.md
+        - API Stability: linked-data-explorer/reference/api-stability.md
         - RONL Ontology: linked-data-explorer/reference/ronl-ontology.md
 
   - 📜 CPRMV API:

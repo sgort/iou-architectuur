@@ -7,7 +7,7 @@ The CPRMV API produces and consumes data conforming to the CPRMV OWL vocabulary 
 ## Namespace
 
 ```
-https://standaarden.open-regels.nl/standards/cprmv/0.4.0/#
+https://standaarden.open-regels.nl/standards/cprmv/0.4.1#
 ```
 
 Prefix: `cprmv:`
@@ -18,7 +18,7 @@ Prefix: `cprmv:`
 
 ### cprmv:RuleSet
 
-A set of rules that is the output of a public service. Subclass of `eli:LegalResource` and `cv:Output`.
+A set of rules that is the output of a public service. Subclass of `frbroo:F1_Work` and `cv:Output` (as of v0.4.1 — a formalisation is a FRBR Work, no longer an `eli:LegalResource`). A RuleSet, being a `cv:Output`, is `cprmv:is_part_of` a `dcat:Dataset`.
 
 | Property | Type | Cardinality | Notes |
 |---|---|---|---|
@@ -29,8 +29,15 @@ A set of rules that is the output of a public service. Subclass of `eli:LegalRes
 | `cprmv:isOutputOf` | `cpsv:PublicService` | 1..1 | Links to the service that produced this rule set |
 | `cprmv:hasMethod` | `cprmv:RuleMethod` | 1..* | |
 | `cprmv:hasPart` | RDF list of `cprmv:Rule`/`cprmv:RuleSet` | 1..1 | |
-| `cprmv:isBasedOn` | `cprmv:RuleSet` or `cprmv:Rule` | 0..* | |
+| `cprmv:isBasedOn` | `cprmv:RuleSet` or `cprmv:Rule` | 0..* | Subproperty of `frbroo:R2_is_derivative_of` and `prov:wasDerivedFrom` |
 | `cprmv:comment` | `xsd:string` | 0..1 | |
+
+!!! note "Source provenance (v0.4.1)"
+    When the `/rules` endpoint transforms a publication, the generated `cprmv:RuleSet`
+    carries a `prov:wasDerivedFrom` triple pointing at the original source publication URL
+    (the BWB/CVDR repository document, the EU CELLAR item, or the Operaton DMN resource).
+    The RuleSet subject itself now lives in the `cprmv.open-regels.nl` /
+    `operaton.open-regels.nl` namespace (was `opencatalogi.open-regels.nl` before v0.4.1).
 
 ### cprmv:Analysis
 
@@ -89,7 +96,7 @@ Subclass of `cprmv:Rule`. A rule that represents a parameter value (e.g. income 
 ## Methods namespace
 
 ```
-https://cprmv.open-regels.nl/0.4.0/serve-api/
+https://cprmv.open-regels.nl/0.4.1/serve-api/
 ```
 
 Prefix: `cprmv-serve:`

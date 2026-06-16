@@ -23,6 +23,8 @@
 
 ### ⚙️ RONL Business API
 
+### 🖍️ Norm Editor
+
 ### ✏️ CPSV Editor
 
 ### 🔍 Linked Data Explorer

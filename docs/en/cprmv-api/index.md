@@ -58,6 +58,7 @@ graph LR
 | Component | Technology | Version |
 |---|---|---|
 | API framework | FastAPI | 0.116.1 |
+| MCP server | fastapi-mcp | 0.4.0 |
 | RDF library | rdflib | 7.1.4 |
 | XML/XSLT processing | lxml | 6.0.0 |
 | Pattern matching | parse | 1.20.2 |

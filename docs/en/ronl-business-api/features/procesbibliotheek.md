@@ -40,6 +40,9 @@ Expanding a card reveals:
 
 Data is fetched on mount from `VITE_LDE_API_URL/bundles/public`. This is the same public endpoint used by the LDE frontend and requires no authentication. A dedicated `ldeApi` Axios instance in `services/api.ts` is used to avoid attaching the Keycloak `Authorization` header to LDE requests.
 
+!!! warning "Cross-origin prerequisite"
+    `VITE_LDE_API_URL` points at the standalone LDE backend (`backend.linkeddata.open-regels.nl`), a separate deployment from the business API. The browser calls it directly, so that backend's CORS allowlist must include the frontend origin (`https://mijn.open-regels.nl` for PROD, `https://acc.mijn.open-regels.nl` for ACC). If a new environment is added, its origin must be added there too. See [Troubleshooting — Procesbibliotheek CORS](../developer/troubleshooting.md#procesbibliotheek-cors-error).
+
 ---
 
 ## AI Assistant integration

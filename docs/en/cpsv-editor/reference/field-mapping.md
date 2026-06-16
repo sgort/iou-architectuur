@@ -30,7 +30,7 @@ This page maps each UI field in the editor to its corresponding RDF property and
 |---|---|---|---|---|
 | Organisation identifier | `organization.identifier` | `dct:identifier` | `dct:identifier` | ⭐ |
 | Organisation name | `organization.name` | `skos:prefLabel` | `skos:prefLabel` | ✅ |
-| Geographic jurisdiction | `organization.spatial` | `cv:spatial` | `cv:spatial` | 🎯 Mandatory |
+| Geographic jurisdiction | `organization.spatial` | `dct:spatial` | `dct:spatial` | 🎯 Mandatory (v1.10.0; was `cv:spatial`) |
 | Homepage | `organization.homepage` | `foaf:homepage` | `foaf:homepage` | ✅ |
 | Logo | `organization.logo` | `foaf:logo`, `schema:image` | — | ℹ️ |
 
@@ -47,21 +47,23 @@ This page maps each UI field in the editor to its corresponding RDF property and
 
 ---
 
-## Rules tab — `cpsv:Rule, ronl:TemporalRule`
+## Rules tab — `cpsv:Rule, cprmv:TemporalRule`
 
 | UI field | State property | TTL property | CPSV-AP 3.2.0 | Status |
 |---|---|---|---|---|
 | Rule identifier | `rule.identifier` | `dct:identifier` | `dct:identifier` | 🎯 Mandatory |
 | Rule title | `rule.title` | `dct:title` | `dct:title` | 🎯 Mandatory |
+| (auto) description | `rule.description` | `dct:description` | `dct:description` | 🎯 Mandatory (falls back to title) |
 | Rule URI | `rule.uri` | Subject URI | — | ℹ️ |
-| Extends | `rule.extends` | `ronl:extends` | — | ℹ️ |
-| Valid from | `rule.validFrom` | `ronl:validFrom` | — | ℹ️ |
-| Valid until | `rule.validUntil` | `ronl:validUntil` | — | ℹ️ |
-| Confidence level | `rule.confidenceLevel` | `ronl:confidenceLevel` | — | ℹ️ |
+| (auto) implements | — | `cpsv:implements` → `eli:LegalResource` | `cpsv:implements` | ℹ️ Emitted only when a legal resource exists |
+| Extends | `rule.extends` | `cprmv:isBasedOn` | — | ℹ️ v1.10.0 (was `ronl:extends`) |
+| Valid from | `rule.validFrom` | `cprmv:validFrom` | — | ℹ️ v2.0.0 (was `ronl:validFrom`) |
+| Valid until | `rule.validUntil` | `cprmv:validUntil` | — | ℹ️ v2.0.0 (was `ronl:validUntil`) |
+| Confidence level | `rule.confidenceLevel` | `cprmv:confidenceLevel` | — | ℹ️ v2.0.0 (was `ronl:confidenceLevel`) |
 
 ---
 
-## Parameters tab — `ronl:ParameterWaarde`
+## Parameters tab — `cprmv:ParameterWaarde`
 
 | UI field | State property | TTL property | Notes |
 |---|---|---|---|
@@ -69,8 +71,8 @@ This page maps each UI field in the editor to its corresponding RDF property and
 | Label | `parameter.label` | `skos:prefLabel` | Human-readable name |
 | Value | `parameter.value` | `schema:value` | |
 | Unit | `parameter.unit` | `schema:unitCode` | |
-| Valid from | `parameter.validFrom` | `ronl:validFrom` | |
-| Valid until | `parameter.validUntil` | `ronl:validUntil` | |
+| Valid from | `parameter.validFrom` | `cprmv:validFrom` | v2.0.0 (was `ronl:validFrom`) |
+| Valid until | `parameter.validUntil` | `cprmv:validUntil` | v2.0.0 (was `ronl:validUntil`) |
 
 ---
 
@@ -78,13 +80,17 @@ This page maps each UI field in the editor to its corresponding RDF property and
 
 | UI field | State property | TTL property | Status |
 |---|---|---|---|
-| Identifier | `cprmvRule.identifier` | `dct:identifier` | ✅ Mandatory |
-| Title | `cprmvRule.title` | `dct:title` | ✅ Mandatory |
-| Definition | `cprmvRule.definition` | `cprmv:definition` | ✅ Mandatory |
-| Situation | `cprmvRule.situation` | `cprmv:situatie` | ✅ Mandatory |
+| Rule ID | `cprmvRule.ruleId` | `cprmv:id` | ✅ Mandatory (RuleShape) |
+| Ruleset ID | `cprmvRule.rulesetId` | `cprmv:rulesetId` | ✅ Mandatory |
+| Definition | `cprmvRule.definition` | `cprmv:definition` (`@nl`) | ✅ Mandatory |
+| Situation | `cprmvRule.situatie` | `cprmv:situatie` (`@nl`) | ✅ Mandatory |
 | Norm | `cprmvRule.norm` | `cprmv:norm` | ✅ Mandatory |
 | Rule ID path | `cprmvRule.ruleIdPath` | `cprmv:ruleIdPath` | ✅ Mandatory |
-| Implements | auto-linked | `cprmv:implements` | ⭐ v1.9.0 auto-linked |
+| Implements | auto-linked | `cprmv:implements` | ⭐ v1.9.0 auto-linked (uses the rule's own `rulesetId`) |
+
+Each unique `rulesetId` also produces a `cprmv:RuleSet` (with a `cprmv:RuleMethod`)
+that lists its rules via an ordered `cprmv:hasPart` — see
+[CPRMV RuleSet Generation](../developer/cprmv-dataset-generation.md).
 
 ---
 
@@ -92,13 +98,14 @@ This page maps each UI field in the editor to its corresponding RDF property and
 
 | UI field | State property | TTL property | Notes |
 |---|---|---|---|
-| DMN filename | `dmnData.fileName` | `dct:source` | |
+| DMN filename | `dmnData.fileName` | `dct:title` | `dct:source` is a placeholder file URI |
 | Decision key | `dmnData.decisionKey` | `dct:identifier` | |
 | Deployment ID | `dmnData.deploymentId` | `cprmv:deploymentId` | |
-| Deployed at | `dmnData.deployedAt` | `dct:issued` | |
-| API endpoint | `dmnData.apiEndpoint` | `schema:url` | |
+| Deployed at | `dmnData.deployedAt` | `cprmv:deployedAt` (`xsd:dateTime`) | |
+| API endpoint | `dmnData.apiEndpoint` | `cprmv:implementedBy` | |
 | Input variables | extracted | `cpsv:Input` entities | One per `<inputData>` |
-| Decision rules | extracted | `cprmv:DecisionRule` entities | One per `<decision>` |
+| Output variables | extracted | `cpsv:Output` entities | One per output (v1.5.2+) |
+| Decision rules | extracted | `cpsv:Rule, cprmv:DecisionRule` entities | With `dct:title`/`dct:description`, `cprmv:isBasedOn` |
 
 ---
 

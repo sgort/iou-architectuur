@@ -25,7 +25,7 @@ The **Cost** and **Output** sections within the Service tab implement `cv:Cost` 
 
 The Organisation tab models the competent authority responsible for the service as `cv:PublicOrganisation` (CPSV-AP 3.2.0 compliant — formerly `org:Organization`).
 
-The geographic jurisdiction field (`cv:spatial`) is mandatory under CPSV-AP 3.2.0. The editor enforces this and displays a validation error if it is omitted.
+The geographic jurisdiction field (`dct:spatial`) is mandatory under CPSV-AP 3.2.0. The editor enforces this and displays a validation error if it is omitted. The value is emitted as `dct:spatial` pointing at a `dct:Location`-typed node so the `PublicOrganisationShape` SHACL check passes without entailment (v1.10.0 — replaces the non-conformant `cv:spatial`). On import the editor reads both `dct:spatial` and the legacy `cv:spatial`, so older files round-trip without losing the value.
 
 Organisation logos can be uploaded directly in this tab. Uploaded images are resized to 256×256px, encoded as base64, and — when publishing to TriplyDB — uploaded as a named asset. The generated Turtle includes both `foaf:logo` and `schema:image` properties. This creates a full semantic traversal path from a DMN decision model to the organisation's logo: `DMN → Service → Organisation → Logo`.
 

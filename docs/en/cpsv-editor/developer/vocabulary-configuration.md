@@ -8,14 +8,19 @@ The `src/config/vocabularies_config.js` file is the central configuration for al
 
 ```javascript
 export const VOCABULARY_CONFIG = {
-  version: '1.0.0',
-  lastUpdated: '2025-10-27',
+  version: '2.1.0',
+  lastUpdated: '2026-06-11',
 
   namespaces: { /* URI → prefix mappings */ },
   entityTypes: { /* RDF type → editor section mappings */ },
   propertyAliases: { /* alternative property → canonical property */ },
 };
 ```
+
+!!! note "v2.0.0 vocabulary migration"
+    Rule properties moved from `ronl:` to `cprmv:`; `ronl:` is now used exclusively for
+    validation/certification governance. Backward compatibility is provided via a
+    `ronl-legacy` import-only alias. The CPRMV namespace is `…/cprmv/0.4.1#`.
 
 ---
 
@@ -27,18 +32,20 @@ Maps namespace URIs to the prefix(es) accepted in Turtle files.
 
 ```javascript
 namespaces: {
-  'http://purl.org/vocab/cpsv#':               ['cpsv'],
-  'http://data.europa.eu/m8g/':                ['cv', 'cpsv-ap'],
-  'http://www.w3.org/ns/org#':                 ['org'],
-  'http://xmlns.com/foaf/0.1/':                ['foaf'],
-  'http://data.europa.eu/eli/ontology#':       ['eli'],
-  'https://regels.overheid.nl/termen/':        ['ronl'],
-  'https://cprmv.open-regels.nl/0.3.0/':       ['cprmv'],
-  'http://purl.org/dc/terms/':                 ['dct'],
-  'http://www.w3.org/ns/dcat#':                ['dcat'],
-  'http://www.w3.org/2004/02/skos/core#':      ['skos'],
-  'http://www.w3.org/2001/XMLSchema#':         ['xsd'],
-  'http://schema.org/':                        ['schema'],
+  'http://purl.org/vocab/cpsv#':                              ['cpsv'],
+  'http://data.europa.eu/m8g/':                               ['cv', 'cpsv-ap'],
+  'http://www.w3.org/ns/org#':                                ['org'],
+  'http://xmlns.com/foaf/0.1/':                               ['foaf'],
+  'http://data.europa.eu/eli/ontology#':                      ['eli'],
+  'https://regels.overheid.nl/ontology#':                     ['ronl'],          // governance only
+  'https://regels.overheid.nl/termen/':                       ['ronl-legacy'],   // import-only, never exported
+  'https://standaarden.open-regels.nl/standards/cprmv/0.4.1#':['cprmv'],
+  'http://www.w3.org/ns/prov#':                               ['prov'],
+  'http://purl.org/dc/terms/':                                ['dct'],
+  'http://www.w3.org/ns/dcat#':                               ['dcat'],
+  'http://www.w3.org/2004/02/skos/core#':                     ['skos'],
+  'http://www.w3.org/2001/XMLSchema#':                        ['xsd'],
+  'http://schema.org/':                                       ['schema'],
 }
 ```
 
@@ -66,21 +73,25 @@ entityTypes: {
     canonicalType: 'cpsv:PublicService'
   },
   organization: {
-    acceptedTypes: ['org:Organization', 'foaf:Organization'],
-    canonicalType: 'org:Organization'
+    acceptedTypes: ['cv:PublicOrganisation'],
+    canonicalType: 'cv:PublicOrganisation'
   },
-  legalResource: {
-    acceptedTypes: ['eli:LegalResource'],
-    canonicalType: 'eli:LegalResource'
-  },
+  concept:       { acceptedTypes: ['skos:Concept'], canonicalType: 'skos:Concept' },
+  cost:          { acceptedTypes: ['cv:Cost'],      canonicalType: 'cv:Cost' },
+  output:        { acceptedTypes: ['cv:Output'],    canonicalType: 'cv:Output' },
+  legalResource: { acceptedTypes: ['eli:LegalResource'], canonicalType: 'eli:LegalResource' },
   temporalRule: {
-    acceptedTypes: ['ronl:TemporalRule'],
-    canonicalType: 'ronl:TemporalRule'
+    acceptedTypes: ['cprmv:TemporalRule', 'cpsv:Rule', 'ronl:TemporalRule'], // ronl = legacy
+    canonicalType: 'cprmv:TemporalRule'
   },
   parameter: {
-    acceptedTypes: ['skos:Concept', 'ronl:ParameterWaarde'],
-    canonicalType: 'skos:Concept'
-  }
+    acceptedTypes: ['cprmv:ParameterWaarde', 'skos:Concept', 'ronl:ParameterWaarde'],
+    canonicalType: 'cprmv:ParameterWaarde'
+  },
+  ruleSet:    { acceptedTypes: ['cprmv:RuleSet'],    canonicalType: 'cprmv:RuleSet' },
+  ruleMethod: { acceptedTypes: ['cprmv:RuleMethod'], canonicalType: 'cprmv:RuleMethod' },
+  cprmvRule:  { acceptedTypes: ['cprmv:Rule'],       canonicalType: 'cprmv:Rule' },
+  vendorService: { acceptedTypes: ['ronl:VendorService'], canonicalType: 'ronl:VendorService' },
 }
 ```
 
@@ -89,15 +100,22 @@ entityTypes: {
 ```javascript
 parameter: {
   acceptedTypes: [
+    'cprmv:ParameterWaarde',
     'skos:Concept',
-    'ronl:ParameterWaarde',
+    'ronl:ParameterWaarde',  // legacy
     'custom:Parameter'       // ← add here, never remove existing
   ],
-  canonicalType: 'skos:Concept'
+  canonicalType: 'cprmv:ParameterWaarde'
 }
 ```
 
 Always add new types alongside existing ones. Removing an accepted type breaks import of files that use it.
+
+!!! warning "Detection order matters"
+    `detectEntityType()` checks DMN entities first, then `cprmv:RuleSet` / `cprmv:RuleMethod`
+    **before** `cprmv:Rule` — because `a cprmv:Rule` is a substring of `a cprmv:RuleSet` /
+    `a cprmv:RuleMethod` and would otherwise match first. `skos:Concept` detection excludes
+    `skos:ConceptScheme`.
 
 ---
 
@@ -123,12 +141,20 @@ propertyAliases: {
   'cpsv-ap:hasOutput':             'cv:hasOutput',
   'cpsv-ap:hasLegalResource':      'cv:hasLegalResource',
 
-  // CPRMV to RONL property mapping
-  'cprmv:validFrom':       'ronl:validFrom',
-  'cprmv:validUntil':      'ronl:validUntil',
-  'cprmv:confidence':      'ronl:confidenceLevel',
-  'cprmv:confidenceLevel': 'ronl:confidenceLevel',
-  'cprmv:extends':         'ronl:extends'
+  // v2.0.0: legacy ronl:* (import-only) → current cprmv:* equivalents
+  'ronl-legacy:hasAnalysis':     'cprmv:hasAnalysis',
+  'ronl-legacy:hasMethod':       'cprmv:hasMethod',
+  'ronl-legacy:implements':      'cprmv:implements',
+  'ronl-legacy:implementedBy':   'cprmv:implementedBy',
+  'ronl-legacy:confidenceLevel': 'cprmv:confidenceLevel',
+  'ronl-legacy:validFrom':       'cprmv:validFrom',
+  'ronl-legacy:validUntil':      'cprmv:validUntil',
+  'ronl-legacy:extends':         'cprmv:extends',
+
+  // CPRMV self-aliases (normalise confidence variants)
+  'cprmv:confidence':      'cprmv:confidenceLevel',
+  'cprmv:confidenceLevel': 'cprmv:confidenceLevel',
+  'cprmv:extends':         'cprmv:extends'
 }
 ```
 
@@ -138,11 +164,11 @@ propertyAliases: {
 
 The config file exports several utility functions used by the parser:
 
-**`isKnownPrefix(prefix)`** — Returns true if the prefix is registered in `namespaces`.
+**`detectEntityType(line)`** — Returns the editor section name for a `a <type>` line (DMN and RuleSet/RuleMethod checked first), or `null`.
 
-**`resolveNamespace(prefix)`** — Returns the full URI for a prefix, or null.
+**`normalizeProperty(property)`** — Maps an alias (e.g. `ronl-legacy:validFrom`) to its canonical form, or returns the property unchanged.
 
-**`getCanonicalType(sectionName)`** — Returns the canonical RDF type for a given editor section.
+**`getCanonicalType(entityName)`** — Returns the canonical RDF type for a given editor section.
 
 **`extractPrefixMap(ttlContent)`** — Parses all `@prefix` declarations from a Turtle string and returns a `{ prefix: uri }` map.
 

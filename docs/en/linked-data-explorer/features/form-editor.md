@@ -13,7 +13,7 @@ The Form Editor lets you create and edit **Camunda Forms** (schemaVersion 16) di
 
 The Form Editor uses a two-panel layout:
 
-- **Left panel** — Form list. Shows all forms stored in `localStorage` with create, rename, and delete actions. An **EXAMPLE** badge marks the three read-only seed forms; user-created forms carry a **WIP** badge.
+- **Left panel** — Form list. Shows all forms stored in `localStorage` with create, rename, and delete actions. An **EXAMPLE** badge marks the three read-only seed forms; user-created forms carry a **WIP** badge; forms imported from a DSO activity carry a green **DSO** badge (v1.9.5).
 - **Right panel** — Form canvas. Hosts the `@bpmn-io/form-js` graphical editor for the selected form, with a toolbar for saving and exporting.
 
 ---
@@ -26,6 +26,7 @@ The list panel shows every form in storage. Each entry displays the form name, i
 |---|---|
 | **EXAMPLE** | Read-only seed form — cannot be renamed or deleted |
 | **WIP** | User-created form — fully editable |
+| **DSO** (green) | Form scaffold imported from a DSO activity's Indieningsvereisten (v1.9.4–v1.9.5) |
 
 Actions available on each form:
 
@@ -83,6 +84,41 @@ See [Asset Storage](../developer/asset-storage.md) for the full architecture.
 The Form Editor and BPMN Modeler share the same `FormService` storage layer. A form saved in the Form Editor appears instantly in the **Link to Form** dropdown when a `UserTask` or `StartEvent` is selected in the BPMN Modeler. No page reload or manual sync step is required.
 
 See [BPMN Modeler — Form linking](bpmn-modeler.md#form-linking) and the [Form Editor user guide](../user-guide/form-editor.md) for step-by-step instructions.
+
+---
+
+## Language and organization
+
+The Form Editor footer panel mirrors the BPMN Modeler footer:
+
+- **Language** — ISO 639-1 dropdown (Language-agnostic / English / Dutch / German). Persisted as the `language` column on `form_schemas`.
+- **Organization** — free-text input with autocomplete from existing organization keys. Persisted as the `organization` column.
+
+Both live on the LDE `FormSchema` wrapper, not inside the form-js `schema` object — the form-js spec stays unmodified.
+
+The list panel toolbar offers free-text search and language filtering; forms are grouped under collapsible organization headers.
+
+### Filename-based language inference on import
+
+A file named `<form-id>.<lang>.form` (e.g. `capacity-claim-intake.nl.form`) is auto-tagged on import. Precedence:
+
+1. Top-level `language` key in the file's JSON (set by **Export .form**)
+2. Filename suffix `.<lang>.form`
+3. Untagged
+
+### Form export round-trip
+
+Clicking **Export .form** wraps the form-js schema with the active `language` and `organization` at the top of the exported JSON and uses a language-suffixed filename. Re-importing populates both fields automatically — round-trip integrity preserved without extending the form-js schema spec. The wrapper keys are stripped on import before the schema reaches form-js.
+
+### Save button dirty tracking
+
+Pending-until-Save: the **Save** button starts disabled, enables on the first canvas or footer edit, and disables again after a successful save. Typing in the footer dropdowns does not regroup the form in the list until you click Save.
+
+See [Multilingualism](multilingualism.md) for the architectural overview.
+
+### Known limitation — form-js properties panel focus loss
+
+The form-js properties panel loses input focus when typing pauses (Field label, Description, Key). Upstream form-js issue #86, marked wontfix by bpmn-io. Not LDE-caused, not fixable from React without forking form-js. Workaround: edit the `.form` JSON in a code editor and re-import.
 
 ---
 

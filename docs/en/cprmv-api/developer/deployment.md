@@ -94,7 +94,7 @@ The `IMAGE_TAG` environment variable can pin to a specific commit SHA from the C
 
 ## Health check
 
-The container's built-in health check polls `http://localhost:8000/` every 30 seconds with a 30-second timeout, 3 retries, and a 5-second start period. The `/` endpoint returns `{"CPRMV Rules Serve API": "0.4.0"}`.
+The container's built-in health check polls `http://localhost:8000/` every 30 seconds with a 30-second timeout, 3 retries, and a 5-second start period. The `/` endpoint returns `{"CPRMV Rules Serve API": "0.4.1"}`.
 
 External monitoring can poll:
 

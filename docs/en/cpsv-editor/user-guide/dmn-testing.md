@@ -108,7 +108,7 @@ Results appear progressively:
      Expected: eligible=false, amountYear=0
 ```
 
-After a successful run, NL-SBB concepts are generated from the last successful result for semantic linking via the Linked Data Explorer.
+Running test cases also populates the **Concepts** tab. Input concepts are derived from the union of every uploaded case's request-body variables — so all inputs are covered even without a successful evaluate — and output concepts are added from the last successful result when there is one (v1.10.2). These NL-SBB concepts are used for semantic linking via the Linked Data Explorer.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: Test Cases section showing the pass/fail counter at the top (3/3 passed) and four test case rows each with a ✅ badge and the expected outcome text](../../assets/screenshots/cpsv-editor-test-cases.png)
