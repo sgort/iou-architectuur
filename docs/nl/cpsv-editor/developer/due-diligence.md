@@ -27,8 +27,8 @@ Formuliergebaseerde authoring van CPSV-AP 3.2.0-conforme dienstbeschrijvingen. T
 | Dienst | Identificatie, naam, beschrijving, sector, thematisch gebied, trefwoorden | CPSV-AP, DCAT |
 | Organisatie | Bevoegd gezag, homepage, geografische jurisdictie, logo | CV, FOAF, ORG |
 | Juridisch | BWB/CVDR-wetgevingsreferentie, versie, RONL-analyse- & methodeconcepten | ELI, SKOS, RONL-vocabulaire |
-| Regels | Temporele bedrijfsregels met geldigheidsperioden en betrouwbaarheidsniveaus | CPRMV 0.3.0 |
-| CPRMV (Beleid) | Normatieve regels met ruleId, rulesetId, situatie, norm, definitie | CPRMV 0.3.0 |
+| Regels | Temporele bedrijfsregels met geldigheidsperioden en betrouwbaarheidsniveaus | CPRMV 0.4.1 |
+| CPRMV (Beleid) | Normatieve regels met ruleId, rulesetId, situatie, norm, definitie; gegroepeerd in `cprmv:RuleSet`s | CPRMV 0.4.1 |
 | Parameters | Benoemde parameterwaarden (bedragen, percentages, looptijden) met temporele geldigheid | CPRMV, SKOS |
 | Concepten | NL-SBB-conforme SKOS-concepten met labels, definities, notaties | SKOS, NL-SBB |
 | Kosten / Output | Dienstkosten en outputbeschrijvingen (ingebed in het tabblad Dienst) | CV |
@@ -52,6 +52,8 @@ Beide integraties bevinden zich binnen hetzelfde tabblad Leverancier, wat het pa
 
 Een PublishDialog-component verzorgt het uploaden van de gegenereerde TTL-inhoud naar een TriplyDB-triplestore. Twee uploadmethoden zijn geïmplementeerd: FormData-gebaseerde bestandsupload (`publishToTriplyDB`) en SPARQL UPDATE-insertie (`publishToTriplyDB_SPARQL`). De publicatieworkflow is een meerstapsproces met voortgangs­registratie: valideren → TTL genereren → uploaden naar TriplyDB → logo's uploaden (organisatie + leverancier) → SPARQL-service bijwerken → bevestigen. Ondersteunt configureerbaar account/dataset/token (opgeslagen in localStorage), verbindingstesten, graph-IRI-generatie op basis van organisatie- + dienst-identifiers, en SPARQL-service-herindexering (via de gedeelde Express-backend om CORS te vermijden).
 
+Bij het openen van de dialoog draait ook een **adviserende pre-publicatie SHACL-validatie** (`shaclHelper.js` → `POST /v1/shacl/validate`), met een gelaagd CPRMV 0.4.1 / CPSV-AP 3.2.0 / RONL-resultaat. Deze blokkeert publiceren nooit en valt terug op een neutrale amberstatus wanneer de backend onbereikbaar is. De validatie controleert de *opnieuw gegenereerde* output van de editor, die kan afwijken van een geïmporteerd bronbestand omdat import naar de 0.4.1-vocabulaire normaliseert.
+
 **Koppeling met kerneditor:** Laag. Gebruikt uitsluitend de gegenereerde TTL-string en dienst-/organisatie-identifiers voor graph-naamgeving. De Express-backend (`REACT_APP_BACKEND_URL`) wordt gedeeld met de Linked Data Explorer.
 
 ### 4 — DMN-integratie & Operaton-deployment
@@ -68,7 +70,7 @@ Het DMN-tabblad (`DMNTab.jsx`, ~1520 regels) behandelt de volledige levenscyclus
 | 4 — Interactieregels | DRD-bedrading, informationRequirement-integriteit, verweesde inputData, zelfreferenties | INT-001 t/m INT-007 |
 | 5 — Inhoud | Metadatakwaliteit — lege beschrijvingen, ontbrekende typeRefs, lege tekstannotaties | CON-001 t/m CON-005 |
 
-Validatieresultaten (fouten, waarschuwingen, info per laag) worden inline weergegeven met inklapbaar detail per laag. Dit is dezelfde validatie-engine die wordt gebruikt door de drag-and-drop DMN-validator van de Linked Data Explorer voor meerdere bestanden. Als de backend onbereikbaar is, faalt de validatie stil — het blokkeert de DMN-workflow niet.
+Validatieresultaten (fouten, waarschuwingen, info per laag) worden inline weergegeven met inklapbaar detail per laag. Dit is dezelfde validatie-engine die wordt gebruikt door de drag-and-drop DMN-validator van de Linked Data Explorer voor meerdere bestanden. Als de backend onbereikbaar is, toont het paneel een aparte amberkleurige *"Syntax validation result not available"*-status (v1.9.5) in plaats van stil te falen — deployen en testen blijven werken; alleen de syntactische voorcontrole wordt overgeslagen.
 
 **Deployen.** Eenkliksdeploy naar de Operaton-regelengine (`operaton.open-regels.nl/engine-rest/deployment/create`) via multipart-formulierupload. Slaat het deployment-ID en tijdstempel op in de editor-state.
 
@@ -80,11 +82,17 @@ Validatieresultaten (fouten, waarschuwingen, info per laag) worden inline weerge
 | Tussenliggende beslissingstests | Voor DRD's met meerdere beslissingen: evalueert elke deelbeslissing individueel met dezelfde request-body. Toont progressieve resultaten (ok / fout / onverwacht) per beslissing. Constante-parameterbeslissingen (`p_*`) worden automatisch gefilterd. |
 | Testcases | Upload een `test-cases.json`-bestand (ondersteunt twee formaten: Toeslagen `{name, expected, requestBody}` en DUO `{testName, testResult, variables}`). Voert alle cases sequentieel uit tegen de primaire beslissing. Toont slaag/faal per case met uitklapbaar detail. |
 
-**Conceptgeneratie.** Na elke geslaagde test genereert het tabblad automatisch NL-SBB-conforme SKOS-concepten uit de DMN-invoer-/uitvoervariabelen — inclusief URI, prefLabel, definitie, notatie en `skos:exactMatch` — en pusht deze naar het tabblad Concepten. Testcase-runs genereren concepten uit de laatst geslaagde case.
+**Conceptgeneratie.** Na elke geslaagde test genereert het tabblad automatisch NL-SBB-conforme SKOS-concepten uit de DMN-invoer-/uitvoervariabelen — inclusief URI, prefLabel, definitie, notatie en `skos:exactMatch` — en pusht deze naar het tabblad Concepten. Testcase-runs leiden invoerconcepten af uit de vereniging van de request-bodyvariabelen van álle geüploade cases (zodat alle invoer wordt gedekt, ook zonder geslaagde evaluatie) en voegen uitvoerconcepten toe uit de laatst geslaagde case (v1.10.2). Gegenereerde concept-URI's, `dct:subject` en `skos:exactMatch` worden IRI-veilig gemaakt (witruimte → `_`, ongeldige tekens percent-gecodeerd) zodat de export door een strikte SHACL-parser komt en schoon herimporteert.
 
 De DMN-inhoud wordt ingebed in de TTL-output als `cprmv:DecisionModel`-triples, en het tabblad Organisatie ondersteunt validatiestatustracking (niet-gevalideerd / in-review / gevalideerd / afgewezen) met metadata over wie heeft gevalideerd en wanneer.
 
 **Koppeling met kerneditor:** Gemiddeld. DMN-metadata (deploystatus, testresultaten, validatie) is onderdeel van de editor-state. De automatisch gegenereerde concepten voeden het tabblad Concepten. De TTL-export bevat DMN-blokken. De syntactische validatie is afhankelijk van het gedeelde LDE-backend (`POST /v1/dmns/validate`). De Operaton REST API-interactie en DMN XML-parsing (`dmnHelpers.js`) zijn echter op zichzelf staande utilities.
+
+### 5 — DSO → DMN deep-link import
+
+De `useDsoImport`-hook (`src/hooks/useDsoImport.js`, v1.9.6) verwerkt een deep-link-overdracht vanuit de Linked Data Explorer: `/?dsoImport=dmn&dmnId=…&env=…&activityName=…&authority=…&activityUrn=…&fsRef=…`. Bij mount haalt hij de standalone DMN-XML op van de gedeelde backend (`GET /v1/dso/toepasbare-regels/{dmnId}/dmn`, met `?env=prod` alleen wanneer `env=prod`) en vult de DMN-tab (interactief — *niet* de bewaard-geïmporteerde modus), de Service-tab (vanuit de DSO-activiteit) en de Organisatie-tab (vanuit de opgeloste autoriteit) voor. Daarna worden de importparameters via `history.replaceState` verwijderd, en een `consumedRef`-guard voorkomt een dubbele aanroep onder StrictMode. Deployen/testen/publiceren verlopen via de bestaande DMNTab + PublishDialog-flow.
+
+**Koppeling met kerneditor:** Laag. De hook roept alleen de bestaande `setDmnData`/`setService`/`setOrganization`-setters en de gedeelde berichtenbanner aan.
 
 ---
 

@@ -21,9 +21,9 @@ The tab handles the complete lifecycle of a Decision Model and Notation (DMN 1.3
 
 **Live decision evaluation.** Test the deployed model with configurable input variables using a Postman-style interface. The request body is auto-generated but fully editable. Responses are displayed inline.
 
-**Metadata documentation.** The exported Turtle includes the full DMN metadata: the decision model URI, deployment ID, API endpoint, all input variables as `cpsv:Input` entities, and extracted decision rules with their legal article references as `cprmv:DecisionRule` entities.
+**Metadata documentation.** The exported Turtle includes the full DMN metadata: the decision model URI, deployment ID (`cprmv:deploymentId`), API endpoint (`cprmv:implementedBy`), all input variables as `cpsv:Input` entities and outputs as `cpsv:Output` entities, and extracted decision rules with their legal article references as `cpsv:Rule, cprmv:DecisionRule` entities (each carrying `dct:title`/`dct:description` and, when a legal resource is set, `cpsv:implements` → the `eli:LegalResource`).
 
-**Import preservation.** When a Turtle file containing DMN data is imported, the DMN blocks are preserved exactly as-is across the import/export cycle. The tab displays a clear notice indicating that the DMN is in imported state, and provides the option to clear and recreate it.
+**Import preservation.** When a Turtle file containing DMN data is imported, the DMN blocks are preserved verbatim across the import/export cycle. The tab displays a clear notice indicating that the DMN is in imported state, and provides the option to clear and recreate it. On export, a `normalizeImportedDmnBlocks` pass makes only additive/repointing edits to the preserved Decision Rules so they remain CPSV-AP 3.2.0 conformant (v1.10.2): missing `dct:title`/`dct:description` are injected, and a `cpsv:implements` that still points at the `cpsv:PublicService` is repointed to the `eli:LegalResource` (or dropped when none exists). The edits never remove preserved triples and are idempotent, so re-importing an already-conformant export is a no-op.
 
 ---
 
@@ -57,7 +57,7 @@ Beyond single-evaluation testing, the DMN tab includes two advanced testing mode
 
 **Test cases** run multiple predefined scenarios from an uploaded JSON file against the primary decision key. Results are displayed progressively — pass/fail counters update in real time as each case executes. Two JSON formats are supported (Toeslagen and DUO format), with automatic normalisation.
 
-A successful test case run also generates NL-SBB concepts for semantic linking via the Linked Data Explorer.
+Running uploaded test cases also populates the Concepts tab: input concepts are derived from the union of every uploaded case's request-body variables (so all inputs across all cases are covered, with no successful evaluate required), and output concepts are added from the last successful result when there is one (v1.10.2).
 
 ---
 

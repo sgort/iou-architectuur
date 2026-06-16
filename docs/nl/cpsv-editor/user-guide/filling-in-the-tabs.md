@@ -39,4 +39,8 @@
 
 ---
 
+## Concepts tab
+
+---
+
 ## Vendor tab

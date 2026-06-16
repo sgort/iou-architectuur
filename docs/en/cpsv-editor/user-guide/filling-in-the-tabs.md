@@ -36,7 +36,7 @@ The Organisation tab models `cv:PublicOrganisation`.
 
 **Organisation name** (`skos:prefLabel`) — The official name.
 
-**Geographic jurisdiction** (`cv:spatial`) — Mandatory. The geographic area the organisation is responsible for, as a URI.
+**Geographic jurisdiction** (`dct:spatial`) — Mandatory. The geographic area the organisation is responsible for, as a URI. Emitted as `dct:spatial` pointing at a `dct:Location`-typed node (was `cv:spatial` before v1.10.0; both are still read on import).
 
 **Homepage** (`foaf:homepage`) — The organisation's official website URI.
 
@@ -63,7 +63,7 @@ The Legal tab models `eli:LegalResource`.
 
 ## Rules tab (RPP: Rules)
 
-Each rule models `cpsv:Rule, ronl:TemporalRule`.
+Each rule models `cpsv:Rule, cprmv:TemporalRule`.
 
 **Rule identifier** (`dct:identifier`) — Mandatory. Unique identifier for this rule.
 
@@ -71,11 +71,13 @@ Each rule models `cpsv:Rule, ronl:TemporalRule`.
 
 **Rule URI** — Full URI for the rule, or leave blank to auto-generate from the service identifier.
 
-**Extends** (`ronl:extends`) — URI of the legal article or version this rule implements.
+**Extends** (`cprmv:isBasedOn`) — URI of the legal article or version this rule implements. (Was `ronl:extends` before v1.10.0.)
 
-**Valid from / until** (`ronl:validFrom`, `ronl:validUntil`) — Temporal validity window as ISO dates.
+**Valid from / until** (`cprmv:validFrom`, `cprmv:validUntil`) — Temporal validity window as ISO dates.
 
-**Confidence level** (`ronl:confidenceLevel`) — The certainty with which this rule implements the policy.
+**Confidence level** (`cprmv:confidenceLevel`) — The certainty with which this rule implements the policy.
+
+When a legal resource is set in the Legal tab, each rule's `cpsv:implements` automatically points at the `eli:LegalResource` (CPSV-AP 3.2.0 RuleShape), and a `dct:description` is emitted (falling back to the title).
 
 Multiple rules can be added with the **Add Rule** button. Each rule appears as an expandable card.
 
@@ -83,7 +85,7 @@ Multiple rules can be added with the **Add Rule** button. Each rule appears as a
 
 ## Parameters tab (RPP: Parameters)
 
-Each parameter models `ronl:ParameterWaarde`.
+Each parameter models `cprmv:ParameterWaarde`.
 
 **Notation** (`skos:notation`) — Machine-readable identifier for the parameter (e.g. `AOW_LEEFTIJD_STANDAARD`).
 
@@ -101,21 +103,40 @@ Each parameter models `ronl:ParameterWaarde`.
 
 Each entry models `cprmv:Rule`. All six fields are mandatory.
 
-**Identifier** (`dct:identifier`), **Title** (`dct:title`), **Definition** (`cprmv:definition`) — Standard metadata.
+**Rule ID** (`cprmv:id`) — Identifier of the rule (e.g. `onderdeel a.`).
+
+**Ruleset ID** (`cprmv:rulesetId`) — The legal source (BWB/CVDR) the rule belongs to. Drives the `cprmv:RuleSet` grouping and the rule's `cprmv:implements` link.
+
+**Definition** (`cprmv:definition`) — The full legal text.
 
 **Situation** (`cprmv:situatie`) — The contextual situation to which the rule applies.
 
 **Norm** (`cprmv:norm`) — The normative value mandated by the rule.
 
-**Rule ID path** (`cprmv:ruleIdPath`) — The legislative path to the source article.
+**Rule ID path** (`cprmv:ruleIdPath`) — The full legislative path to the source article (used to build a unique rule URI).
 
-CPRMV rules can be entered individually or imported in bulk via the **Import JSON** button, which accepts normenbrief-format JSON.
+CPRMV rules can be entered individually or imported in bulk via the **Import JSON** button, which accepts the CPRMV 0.4.1 Rules API output (an array of `cprmv:RuleSet` objects with nested `hasPart` maps) as well as legacy flat-array exports. **Load Example** loads the bundled conformant 0.4.1 sample.
 
 ---
 
 ## DMN tab
 
 See the [DMN Workflow](dmn-workflow.md) and [DMN Testing](dmn-testing.md) user guides.
+
+---
+
+## Concepts tab
+
+The Concepts tab holds NL-SBB concept definitions (`skos:Concept`) for the DMN's input and output variables. Concepts are populated automatically once a DMN is loaded and its inputs/outputs are known — by running a single evaluate, by running uploaded test cases (the union of all uploaded cases' request-body variables is used, so no successful evaluate is required), or restored on import. A badge on the tab shows the concept count, or "Needs DMN" when none exist yet.
+
+Each concept exposes editable **Preferred Label** (`skos:prefLabel`), **Notation** (`skos:notation`), **Definition** (`skos:definition`), an optional **Exact Match URI** (`skos:exactMatch`) for cross-DMN semantic linking, and a **Variable Name** that forms the concept URI. The Variable Name input is URI-safe — spaces are converted to underscores and IRI-illegal characters are stripped (v1.10.2), so generated Turtle always parses.
+
+Concepts can be added or removed manually with **Add Input Concept** / **Add Output Concept**. They are written to the export as a `skos:ConceptScheme` plus the input and output concepts, each linked to its DMN variable via `dct:subject`.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Concepts tab showing the green "N concepts" summary, the Concept Scheme info box, and an Input Concepts section with an editable concept card (Preferred Label, Notation, Definition, Exact Match URI, Variable Name fields)](../../assets/screenshots/cpsv-editor-concepts-tab.png)
+  <figcaption>Concepts tab with auto-generated NL-SBB concepts and their editable semantic properties</figcaption>
+</figure>
 
 ---
 

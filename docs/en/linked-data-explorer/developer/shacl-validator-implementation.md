@@ -44,11 +44,12 @@ interface ShaclEntry {
 type ValidationMode = 'file' | 'merged';
 ```
 
-`ValidationResult.layers` is typed with exactly two keys:
+`ValidationResult.layers` is typed with three keys (the `cprmv` layer was added in v1.9.5):
 
 ```typescript
 layers: {
   'cpsv-ap': LayerResult;
+  'cprmv': LayerResult;
   'ronl-custom': LayerResult;
 };
 ```
@@ -77,7 +78,7 @@ ShaclValidator
             ├── Validation spinner / error / placeholder
             └── Result
                 ├── Summary badge (valid/invalid + E/W/I counts)
-                └── LayerSection × 2  (cpsv-ap, ronl-custom)
+                └── LayerSection × 3  (cpsv-ap, cprmv, ronl-custom)
                     └── IssueRow × n
 ```
 
@@ -141,6 +142,7 @@ Shapes are read once and cached for the life of the process (a deploy restarts i
 ```typescript
 const LAYER_SPECS: LayerSpec[] = [
   { key: 'cpsv-ap',     label: 'CPSV-AP 3.2.0', files: ['cpsv-ap/3.2.0/cpsv-ap-SHACL.ttl'] },
+  { key: 'cprmv',       label: 'CPRMV 0.4.1',   files: ['cprmv/0.4.1/cprmv.shacl.ttl'] }, // v1.9.5
   { key: 'ronl-custom', label: 'RONL Custom',   dir: 'ronl' },
 ];
 ```
@@ -164,7 +166,7 @@ Each SHACL result's `sh:resultSeverity` maps to the issue severity, and the code
 
 ### Merge mode
 
-`validateMerged(content, endpoint?)` parses the file, extracts its distinct subjects, builds a SPARQL `CONSTRUCT` scoped to those subjects, fetches the published graph as Turtle, unions it with the file, and runs the same two layers. The fetch is injectable:
+`validateMerged(content, endpoint?)` parses the file, extracts its distinct subjects, builds a SPARQL `CONSTRUCT` scoped to those subjects, fetches the published graph as Turtle, unions it with the file, and runs the same three layers. The fetch is injectable:
 
 ```typescript
 type GraphFetcher = (endpoint: string, query: string) => Promise<string>;

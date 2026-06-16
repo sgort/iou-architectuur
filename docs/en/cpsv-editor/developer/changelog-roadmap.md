@@ -4,6 +4,44 @@
 
 ## Changelog
 
+### v1.10.2 — Conformance Round-trip Fixes (June 2026)
+
+**Imported DMNs SHACL-conformant.** Imported DMN blocks are preserved verbatim, so their Decision Rules previously bypassed the v1.10.0 CPSV-AP fixes. `generateDmnSection` now runs a `normalizeImportedDmnBlocks` pass: each `cpsv:Rule` gets `dct:title`/`dct:description` injected when absent, and a `cpsv:implements` pointing at a `/services/` URI is repointed to the `eli:LegalResource` (or dropped when none exists). Edits are additive/repointing only and idempotent.
+
+**Valid, readable IRIs for NL-SBB concept URIs.** A shared `sanitizeIri` helper replaces whitespace with underscores and percent-encodes IRI-illegal characters, applied to the concept URI, `dct:subject` and `skos:exactMatch`. The Concepts tab "Variable Name (used in URI)" input now enforces URI-safe names. Existing `skos:exactMatch` values under the `…/concepts/` namespace have hyphens converted to underscores to match the underscore-style concept URIs.
+
+**Populate the Concepts tab from test cases.** Running uploaded test cases now fills the Concepts tab even without a manual evaluate — input concepts are derived from the union of every uploaded case's request-body variables; output concepts still come from the last successful result.
+
+**Round-trip `dct:spatial` on import.** Import now reads the organisation's spatial value from both `dct:spatial` (current output) and `cv:spatial` (legacy), so downloaded files re-import and re-validate cleanly.
+
+---
+
+### v1.10.1 — SHACL Scope Clarification (June 2026)
+
+The PublishDialog pre-publish SHACL panel now explains that it checks the Turtle that will actually be published — the editor's current (regenerated) output — which can differ from an originally-imported file, since import normalises legacy CPRMV/CPSV-AP terms to CPRMV 0.4.1 / CPSV-AP 3.2.0. An imported file that fails validation on its own may still publish as conformant.
+
+---
+
+### v1.10.0 — CPRMV 0.4.1 & CPSV-AP 3.2.0 Conformance (June 2026)
+
+**CPRMV 0.4.1 conformance.** The `cprmv:` namespace was bumped to the canonical `https://standaarden.open-regels.nl/standards/cprmv/0.4.1#`, and a `prov:` prefix added. `ttlGenerator` now emits a 0.4.1-conformant `cprmv:RuleSet` per `rulesetId` — replacing the old `cprmv:Dataset` — carrying `cprmv:id`, `cprmv:validFrom`^^`xsd:date`, `cprmv:isOutputOf` → the service, `cprmv:hasMethod` → a dual-typed `cprmv:RuleMethod`/`cprmv:CodificationMethod`, an ordered `cprmv:hasPart` RDF list of its rules, and `prov:wasDerivedFrom`. Every `cprmv:Rule` now always emits `cprmv:id`; `cprmv:extends` was renamed to `cprmv:isBasedOn`.
+
+**Import the CPRMV 0.4.1 API output.** New `src/utils/cprmvImport.js` `flattenCprmvRules` walks the CPRMV Rules API shape (array of `cprmv:RuleSet` objects with nested `…#hasPart` maps), recursing and flattening sub-rules into the editor's flat model (nested rules inherit their parent's `rulesetId`). Tolerates legacy 0.4.1-slash, 0.3.0, and flat-array exports. Used by both `handleImportJSON` and the CPRMV tab's **Load Example**; the bundled `cprmv-example.json` is now the conformant API output.
+
+**CPSV-AP 3.2.0 conformance.** `dct:language`/`cv:sector`/`cv:thematicArea` references are typed in-graph (`dct:LinguisticSystem`/`skos:Concept`); the organisation emits `dct:spatial` (was the non-conformant `cv:spatial`) pointing at a `dct:Location`-typed node; `cpsv:Rule` nodes (temporal + DMN decision rules) always emit `dct:identifier`/`dct:title@nl`/`dct:description@nl`, and `cpsv:implements` points at the `eli:LegalResource` (or is omitted when none). A full editor-generated TTL validates clean against both the CPSV-AP 3.2.0 and CPRMV 0.4.1 SHACL shapes.
+
+**Pre-publish SHACL validation (advisory).** New `src/utils/shaclHelper.js` `validateTtl` POSTs the generated Turtle to `REACT_APP_BACKEND_URL/v1/shacl/validate` and returns a layered result; it never throws (an unreachable backend yields a neutral `{ unavailable: true }` shape). PublishDialog runs validation on open and via a **Validate now** button, rendering a layered CPRMV / CPSV-AP / RONL panel. It is purely advisory and never blocks publishing.
+
+---
+
+### v1.9.6 — DSO → DMN Handoff (June 2026)
+
+**Consume the DSO → DMN handoff from the Linked Data Explorer.** New `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes the deep-link contract `/?dsoImport=dmn&dmnId=…&env=…&activityName=…&authority=…&activityUrn=…&fsRef=…` — on mount it fetches the standalone DMN XML from the shared backend (`GET REACT_APP_BACKEND_URL/v1/dso/toepasbare-regels/{dmnId}/dmn`, with `?env=prod` only when `env=prod`) and prefills the DMN/Service/Organization tabs. The DMN tab stays fully interactive (`isImported` stays false), so deploy/test/publish run through the existing flow. After consuming the link the import params are stripped via `history.replaceState`, and a `consumedRef` guard prevents a StrictMode double-invoke.
+
+**Shared decision-key extraction + external-content hydration.** `extractPrimaryDecisionKey` was lifted out of `DMNTab.jsx` into `src/utils/dmnHelpers.js` and exported, so the import hook and the DMN tab share one implementation. `DMNTab` now hydrates its internal uploaded-file/decision-key/test-body/parsed-decisions/validation state from `dmnData.content` whenever content arrives from outside the tab and no local file was uploaded.
+
+---
+
 ### v1.9.5 — DMN Workflow Polish (May 2026)
 
 **Request Body Generation Reads `<inputValues>` Constraints**
@@ -176,6 +214,11 @@ Initial release. React + Tailwind CSS web application. Five-tab interface: Servi
 | Full modularisation (−66% code) | v1.5.1 |
 | RPP architecture visualisation | v1.5.1 |
 | TriplyDB direct publishing | v1.6.0 |
+| NL-SBB concept layer | v1.8.1 |
+| DMN syntactic validation (5-layer) | v1.9.3 |
+| CPRMV 0.4.1 + CPSV-AP 3.2.0 SHACL conformance | v1.10.0 |
+| Pre-publish SHACL validation (advisory) | v1.10.0 |
+| DSO → DMN deep-link import | v1.9.6 |
 
 ---
 
@@ -195,7 +238,7 @@ Multi-language support beyond Dutch with language-specific fields and translatio
 
 **Phase 4 — Technical Enhancements (2026 Q4)**
 
-SHACL-based validation with field-level error messages and real-time compliance checking. Additional export formats: JSON-LD, RDF/XML, N-Triples, YAML. Git integration for service versioning and diff viewing.
+Advisory pre-publish SHACL validation shipped in v1.10.0; next up is field-level error messages and real-time in-form compliance checking. Additional export formats: JSON-LD, RDF/XML, N-Triples, YAML. Git integration for service versioning and diff viewing.
 
 **Phase 5 — Advanced Features (2027 Q1)**
 

@@ -60,11 +60,15 @@ App.js
   ├── ParametersTab      ← Configuration values  [RPP: Parameters]
   ├── CPRMVTab           ← Normative rules  [RPP: Policy]
   ├── DMNTab             ← Decision model deployment & testing
-  ├── VendorTab          ← Vendor implementation metadata
-  ├── IKnowMappingTab    ← iKnow XML import
+  ├── ConceptsTab        ← NL-SBB concept definitions for DMN variables
+  ├── VendorTab          ← Vendor implementation metadata (hosts the iKnow mapping/import UI)
   ├── ChangelogTab       ← Version history
   └── PreviewPanel       ← Live TTL preview (side panel)
 ```
+
+The editor exposes ten tabs in this order: Service, Organization, Legal, Rules,
+Parameters, Policy (CPRMV), DMN, Concepts, Vendor, Changelog. The iKnow XML
+import/mapping UI is rendered inside the Vendor tab rather than as a separate tab.
 
 ### Data flow
 
@@ -95,7 +99,7 @@ The editor generates Turtle files compliant with the following vocabularies:
 | Vocabulary | Version | Purpose |
 |---|---|---|
 | CPSV-AP | 3.2.0 | EU Core Public Service Vocabulary |
-| CPRMV | 0.3.0 | Core Public Rule Management Vocabulary (Dutch) |
+| CPRMV | 0.4.1 | Core Public Rule Management Vocabulary (Dutch) |
 | RONL | — | Regels Overheid Nederland governance vocabulary |
 | ELI | — | European Legislation Identifier |
 | Dublin Core | — | Metadata terms (title, description, identifier) |
@@ -103,6 +107,12 @@ The editor generates Turtle files compliant with the following vocabularies:
 | Schema.org | — | Value and unit definitions |
 | FOAF | — | Organization homepages |
 | ORG | — | Organization ontology |
+| DCAT | — | Data Catalog Vocabulary |
+| PROV-O | — | Provenance (`prov:wasDerivedFrom`) |
+
+The canonical CPRMV namespace is `https://standaarden.open-regels.nl/standards/cprmv/0.4.1#`.
+Files that use the older `https://cprmv.open-regels.nl/0.3.0/` namespace are still
+accepted on import and silently normalised to 0.4.1 on export.
 
 ---
 

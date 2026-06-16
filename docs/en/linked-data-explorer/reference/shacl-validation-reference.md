@@ -6,11 +6,11 @@ This reference documents the shape layers used by the SHACL Validator, the const
 
 ## How to read this reference
 
-Issues are grouped into two layers. Each issue carries a severity, a typed code, the focus node and property path it applies to, and — for cardinality and uniqueness constraints — the offending values.
+Issues are grouped into three layers (the CPRMV 0.4.1 layer was added in v1.9.5). Each issue carries a severity, a typed code, the focus node and property path it applies to, and — for cardinality and uniqueness constraints — the offending values (no longer truncated as of v1.9.7).
 
 | Field | Meaning |
 |---|---|
-| **Layer** | `CPSV-AP 3.2.0` (canonical, vendored) or `RONL Custom` (RONL-authored) |
+| **Layer** | `CPSV-AP 3.2.0` (canonical, vendored), `CPRMV 0.4.1` (CPRMV shapes), or `RONL Custom` (RONL-authored) |
 | **Code** | Derived from the SHACL `sh:sourceConstraintComponent` local name (e.g. `SHACL-MAXCOUNT`) |
 | **Severity** | `error` (`sh:Violation`), `warning` (`sh:Warning`), `info` (`sh:Info`) |
 | **Focus node** | The subject the constraint was evaluated against |
@@ -81,6 +81,12 @@ These shapes prefer `sh:uniqueLang true` over `sh:maxCount 1` for human-readable
 | `dct:description` | `sh:uniqueLang true` | `SHACL-UNIQUELANG` |
 
 **Rationale.** Publishing several distinct rules under one subject URI is a common authoring error: the subject accumulates several same-language titles and descriptions. `sh:uniqueLang` detects this while still allowing a single rule to carry one title/description per language. The fix is to give each rule its own subject URI.
+
+---
+
+## Layer 3 — CPRMV 0.4.1
+
+Added in v1.9.5. The CPRMV SHACL shapes, vendored into `packages/backend/shapes/cprmv/0.4.1/cprmv.shacl.ttl`, validate the CPRMV rule-management model — `cprmv:RuleSet`, `cprmv:Rule`, and `cprmv:RuleMethod` and their required properties. This is the same shape set the CPRMV API and CPSV Editor validate against, so a file that passes here is conformant for the rule-management vocabulary independently of its CPSV-AP service metadata. A layer with no shape files present reports **Not loaded** rather than a green check.
 
 ---
 
@@ -158,6 +164,7 @@ Both endpoints accept a JSON body and return the standard envelope.
     "parseError": null,
     "layers": {
       "cpsv-ap":     { "label": "CPSV-AP 3.2.0", "loaded": true, "issues": [ ... ] },
+      "cprmv":       { "label": "CPRMV 0.4.1",   "loaded": true, "issues": [ ... ] },
       "ronl-custom": { "label": "RONL Custom",   "loaded": true, "issues": [ ... ] }
     },
     "summary": { "errors": 2, "warnings": 0, "infos": 0 }

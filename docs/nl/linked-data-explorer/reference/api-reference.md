@@ -93,6 +93,42 @@
 
 ---
 
+## SHACL validation
+
+### `POST /v1/shacl/validate`
+
+### `POST /v1/shacl/validate-merged`
+
+---
+
+## DSO Integration
+
+### `GET /v1/dso/begrippen`
+
+### `GET /v1/dso/activiteiten`
+
+### `GET /v1/dso/activiteiten/:urn`
+
+### `POST /v1/dso/activiteiten/oin`
+
+### `POST /v1/dso/activiteiten/zoek`
+
+### `POST /v1/dso/werkzaamheden/zoek`
+
+### `POST /v1/dso/werkzaamheden/suggereer`
+
+### `GET /v1/dso/werkzaamheden/:urn`
+
+### `GET /v1/dso/toepasbare-regels`
+
+### `GET /v1/dso/toepasbare-regels/:id/sttr`
+
+### `GET /v1/dso/toepasbare-regels/:id/dmn`
+
+### `GET /v1/dso/toepasbare-regels/:id/form-scaffold`
+
+---
+
 ## Error responses
 
 ---

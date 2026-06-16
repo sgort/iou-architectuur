@@ -1,7 +1,7 @@
 # Project Structure
 
-**Version:** 1.9.x (fully modularised)  
-**Framework:** React 18.3.1
+**Version:** 1.10.x (fully modularised)  
+**Framework:** React 19
 
 ---
 
@@ -27,44 +27,52 @@ cpsv-editor/
 │   │
 │   ├── components/
 │   │   ├── PreviewPanel.jsx        # Live TTL preview side panel
-│   │   ├── PublishDialog.jsx       # TriplyDB publish dialog
+│   │   ├── PublishDialog.jsx       # TriplyDB publish dialog + pre-publish SHACL panel
 │   │   └── tabs/
 │   │       ├── index.js            # Barrel export
 │   │       ├── ServiceTab.jsx
+│   │       ├── CostSection.jsx     # Embedded in ServiceTab
+│   │       ├── OutputSection.jsx   # Embedded in ServiceTab
 │   │       ├── OrganizationTab.jsx
 │   │       ├── LegalTab.jsx
 │   │       ├── RulesTab.jsx        # RPP: Rules
 │   │       ├── ParametersTab.jsx   # RPP: Parameters
 │   │       ├── CPRMVTab.jsx        # RPP: Policy
 │   │       ├── DMNTab.jsx          # DMN upload, deploy, test
-│   │       ├── VendorTab.jsx       # Vendor integration
-│   │       ├── IKnowMappingTab.jsx # iKnow import
+│   │       ├── ConceptsTab.jsx     # NL-SBB concept definitions
+│   │       ├── VendorTab.jsx       # Vendor integration (hosts the iKnow UI)
+│   │       ├── IKnowMappingTab.jsx # iKnow mapping config (rendered inside VendorTab)
+│   │       ├── IKnowImportTab.jsx  # iKnow import (rendered inside VendorTab)
 │   │       └── ChangelogTab.jsx
 │   │
 │   ├── hooks/
 │   │   ├── useEditorState.js       # Centralised state management
-│   │   └── useArrayHandlers.js     # DRY CRUD for array-based fields
+│   │   ├── useArrayHandlers.js     # DRY CRUD for array-based fields
+│   │   └── useDsoImport.js         # DSO → DMN deep-link import (v1.9.6)
 │   │
 │   ├── utils/
 │   │   ├── index.js                # Barrel export
-│   │   ├── constants.js            # Shared constants, dropdown options
+│   │   ├── constants.js            # Shared constants, TTL_NAMESPACES, dropdown options
 │   │   ├── ttlGenerator.js         # TTL generation class
+│   │   ├── ttlHelpers.js           # TTL string/IRI helpers (escapeTTLString, sanitizeIri, …)
 │   │   ├── importHandler.js        # Import logic
+│   │   ├── cprmvImport.js          # CPRMV 0.4.1 Rules API → flat model (v1.10.0)
+│   │   ├── shaclHelper.js          # Pre-publish SHACL validation (v1.10.0)
 │   │   ├── dmnHelpers.js           # DMN-specific utilities
 │   │   ├── validators.js           # Form validation
 │   │   ├── parseTTL.enhanced.js    # TTL parser with DMN preservation
-│   │   ├── triplydbHelper.js       # TriplyDB API integration
+│   │   ├── triplydbHelper.js       # TriplyDB API integration, buildGraphIRI
 │   │   ├── ronlHelper.js           # RONL vocabulary SPARQL queries
 │   │   └── iknowParser.js          # iKnow XML parser
 │   │
 │   ├── data/
 │   │   ├── changelog.json          # Powers ChangelogTab
 │   │   ├── roadmap.json            # Planned features for ChangelogTab
-│   │   └── cprmv-example.json      # Example data for CPRMV "Load Example"
+│   │   └── cprmv-example.json      # Conformant 0.4.1 example for CPRMV "Load Example"
 │   │
 │   └── config/
-│       ├── vocabularies_config.js  # RDF vocabulary mappings for parser
-│       └── iknow-mappings.js       # iKnow default field mapping templates
+│       ├── vocabularies.config.js  # RDF vocabulary mappings for parser
+│       └── iknow-mappings/         # iKnow default field mapping templates
 │
 ├── .github/
 │   └── workflows/
@@ -81,7 +89,8 @@ cpsv-editor/
 
 Centralises all editor state into a single custom hook, providing:
 
-- State slices for every tab (service, organization, legalResource, temporalRules, parameters, cprmvRules, cost, output, dmnData, iknowMappingConfig)
+- State slices for every tab (service, organization, legalResource, ronlAnalysis, ronlMethod, temporalRules, parameters, cprmvRules, concepts, cost, output, dmnData, vendorService, iknowMappingConfig, triplyDBConfig)
+- Shared RONL vocabulary concepts (analysis/method/vendor), fetched once on mount and shared across the Legal and Vendor tabs
 - A `clearAllData()` action that resets the entire editor
 
 This replaces dozens of individual `useState` calls that were previously spread across `App.js`.
@@ -111,9 +120,9 @@ Class-based TTL generation. Each tab section has a corresponding generate method
 
 Full TTL parser. Handles vocabulary detection, multi-line values, namespace resolution, date parsing, array extraction (keywords), and DMN block capture and preservation. Returns a data structure matching the editor state shape for direct use in `useEditorState`.
 
-### `src/config/vocabularies_config.js`
+### `src/config/vocabularies.config.js`
 
-Configuration-driven vocabulary management. Defines namespace-to-prefix mappings, RDF type-to-editor-section mappings, and property aliases. See [Vocabulary Configuration](vocabulary-configuration.md) for how to extend it.
+Configuration-driven vocabulary management. Defines namespace-to-prefix mappings, RDF type-to-editor-section mappings, and property aliases, plus the `detectEntityType()` helper. See [Vocabulary Configuration](vocabulary-configuration.md) for how to extend it.
 
 ---
 

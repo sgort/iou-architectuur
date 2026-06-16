@@ -21,7 +21,7 @@ The exported file contains:
 3. The editor parses the file and populates all tabs.
 4. A green confirmation message appears under the page title.
 
-The import handles vocabulary variants gracefully — properties expressed with alternative prefixes or legacy aliases are normalised to the canonical form the editor uses.
+The import handles vocabulary variants gracefully — properties expressed with alternative prefixes or legacy aliases are normalised to the canonical form the editor uses. This includes the older `cprmv/0.3.0/` namespace, legacy `ronl:TemporalRule`/`ronl:ParameterWaarde` types, and the organisation's legacy `cv:spatial` (read alongside the current `dct:spatial`). Because import normalises to CPRMV 0.4.1 / CPSV-AP 3.2.0, the regenerated output can differ from a legacy source file — an older file that does not validate on its own may re-export as conformant.
 
 ---
 
@@ -40,7 +40,7 @@ If the imported Turtle file contains DMN entities (`cprmv:DecisionModel`, `cpsv:
   <figcaption>MN tab showing the blue "DMN data imported" notice with the preserved block summary and the "Clear Imported DMN Data" button</figcaption>
 </figure>
 
-The DMN tab displays a preservation notice showing what was found. The preserved blocks are appended unchanged to every subsequent export — they are not editable through the form interface. This protects deployed decision model metadata from accidental modification during collaborative editing.
+The DMN tab displays a preservation notice showing what was found. The preserved blocks are appended to every subsequent export — they are not editable through the form interface. On export a conformance-only pass (v1.10.2) makes additive/repointing edits to the Decision Rules (injecting missing `dct:title`/`dct:description`, repointing a `cpsv:implements` that targets the service to the legal resource); no preserved triples are removed, so deployed decision-model metadata is protected from accidental modification during collaborative editing.
 
 **To clear the preserved DMN data and start fresh:**
 

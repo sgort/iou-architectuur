@@ -636,7 +636,7 @@ Deletes a document template.
 
 ### `POST /v1/shacl/validate`
 
-Validates a CPSV-AP Turtle document against the CPSV-AP 3.2.0 and RONL SHACL shape layers (file-local).
+Validates a CPSV-AP Turtle document against the CPSV-AP 3.2.0, CPRMV 0.4.1, and RONL SHACL shape layers (file-local). The CPRMV layer was added in v1.9.5.
 
 **Request body:** `{ "content": "<turtle>" }`
 
@@ -650,6 +650,7 @@ Validates a CPSV-AP Turtle document against the CPSV-AP 3.2.0 and RONL SHACL sha
     "parseError": null,
     "layers": {
       "cpsv-ap":     { "label": "CPSV-AP 3.2.0", "loaded": true, "issues": [] },
+      "cprmv":       { "label": "CPRMV 0.4.1",   "loaded": true, "issues": [] },
       "ronl-custom": { "label": "RONL Custom",   "loaded": true, "issues": [] }
     },
     "summary": { "errors": 0, "warnings": 0, "infos": 0 }
@@ -670,6 +671,101 @@ As above, but first fetches the already-published triples for the document's sub
 `endpoint` is optional; the configured default TriplyDB endpoint is used when omitted.
 
 **Response:** Identical shape to `POST /v1/shacl/validate`.
+
+---
+
+## DSO Integration
+
+Server-side proxy for the **Digitaal Stelsel Omgevingswet (DSO)** APIs — the Stelselcatalogus (concepts), the Zoekinterface (werkzaamheden), the RTR (activiteiten), and the Uitvoeren Gegevens API (toepasbare regels). Proxying server-side keeps the DSO API key off the client and avoids browser CORS.
+
+**Environment selection.** Every DSO endpoint targets the **pre-production** DSO by default. To target **production**, send the header `X-Dso-Env: prod` (used by the frontend) or append `?env=prod`. Each environment uses its own base URLs and API key (`DSO_API_KEY` / `DSO_API_KEY_PROD`).
+
+Unless noted, responses are the DSO payload wrapped in LDE's standard `{ success, data }` envelope. On failure the DSO routes return `{ "success": false, "error": "<message>" }` (a plain string, not the `{ code, message }` error object used elsewhere): `400` for missing required parameters, `404` for an unknown URN/resource, `422` when a Conclusie STTR has no DMN to extract, and `502` for upstream DSO failures.
+
+### Concepts (Stelselcatalogus)
+
+#### `GET /v1/dso/begrippen`
+
+Full-text search over the Stelselcatalogus concepts.
+
+| Parameter | In | Required | Description |
+|---|---|---|---|
+| `zoekTerm` | query | No | Free-text search term |
+| `geldigOp` | query | No | Validity date `YYYY-MM-DD` (defaults to current) |
+| `page` | query | No | Page number (default 1) |
+| `pageSize` | query | No | `10` \| `20` \| `40` \| `100` (default 10) |
+
+### Activities (RTR)
+
+#### `GET /v1/dso/activiteiten`
+
+All legal activities valid on a given date.
+
+| Parameter | In | Required | Description |
+|---|---|---|---|
+| `datum` | query | No | Date `dd-MM-yyyy` (defaults to today) |
+| `page` | query | No | Page number (default 1) |
+| `pageSize` | query | No | `10` \| `20` \| `40` \| `100` (default 10) |
+
+#### `GET /v1/dso/activiteiten/:urn`
+
+Fetch a single activity by URN. `datum` query param (`dd-MM-yyyy`, optional, defaults to today). Returns `404` when the URN does not exist in the active DSO environment.
+
+#### `POST /v1/dso/activiteiten/oin`
+
+All activities registered by one authority (OIN) — backs the Lelystad / Flevoland presets.
+
+**Request body:** `{ "oin": "<OIN>", "datum"?: "dd-MM-yyyy" }` — `oin` is required (`400` otherwise).
+
+#### `POST /v1/dso/activiteiten/zoek`
+
+Search activities by date and optional point geometry.
+
+**Request body:** `{ "datum"?: "dd-MM-yyyy", "lat"?: number, "lon"?: number, "page"?: number, "pageSize"?: number }`
+
+### Werkzaamheden (Zoekinterface)
+
+#### `POST /v1/dso/werkzaamheden/zoek`
+
+Search werkzaamheden. **Request body:** `{ "zoekterm"?: string, "page"?: number, "pageSize"?: number }`
+
+#### `POST /v1/dso/werkzaamheden/suggereer`
+
+Autocomplete suggestions. **Request body:** `{ "zoekterm": string }` — required (`400` otherwise).
+
+#### `GET /v1/dso/werkzaamheden/:urn`
+
+Versioned detail (version history) for a single werkzaamheid.
+
+### Toepasbare regels (Uitvoeren Gegevens API)
+
+The Phase 4 extraction endpoints (v1.9.3+). They resolve an activity's *toepasbare regels* and turn STTR files into deploy-ready LDE assets.
+
+#### `GET /v1/dso/toepasbare-regels`
+
+Metadata for the toepasbare regels of an activity, grouped by rule type (Conclusie / Indieningsvereisten) with validity date and STTR version.
+
+| Parameter | In | Required | Description |
+|---|---|---|---|
+| `functioneleStructuurRef` | query | Yes | Full concept URI of the activity (`400` when omitted) |
+
+#### `GET /v1/dso/toepasbare-regels/:id/sttr`
+
+Streams the raw STTR XML as `sttr-<id>.xml` (`Content-Type: application/xml`, `Content-Disposition: attachment`). Returns the XML document, not the JSON envelope.
+
+#### `GET /v1/dso/toepasbare-regels/:id/dmn`
+
+Extracts the embedded DMN `<definitions>` from a **Conclusie** STTR and streams it as a standalone, deploy-ready `decision-<id>.dmn` (normalized to DMN 1.3 — input ids, FEEL-safe variable names, output `typeRef`s, `camunda:historyTimeToLive`). Returns `422` when the STTR contains no DMN. This is the endpoint the CPSV Editor's [DSO → DMN import](../../cpsv-editor/features/dso-import.md) consumes (`…/toepasbare-regels/{dmnId}/dmn`).
+
+#### `GET /v1/dso/toepasbare-regels/:id/form-scaffold`
+
+Generates a form-js field scaffold from an **Indieningsvereisten** STTR questionnaire (boolean → checkbox, list → select, number → number field, attachment → labelled textfield).
+
+| Parameter | In | Required | Description |
+|---|---|---|---|
+| `formId` | query | No | Desired form-js schema id (defaults to the toepasbare-regel `:id`) |
+
+**Response:** the form-js JSON scaffold wrapped in the standard envelope.
 
 ---
 

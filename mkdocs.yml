@@ -189,6 +189,7 @@ nav:
       - Service, Organisation & Legal: cpsv-editor/features/service-organisation-legal.md
       - Rules, Policy & Parameters: cpsv-editor/features/rules-policy-parameters.md
       - DMN Orchestration: cpsv-editor/features/dmn-orchestration.md
+      - DSO → DMN Import: cpsv-editor/features/dso-import.md
       - TriplyDB Publishing: cpsv-editor/features/triplydb-publishing.md
       - Vendor Integration: cpsv-editor/features/vendor-integration.md
       - Import, Export & Preview: cpsv-editor/features/import-export.md
@@ -198,6 +199,7 @@ nav:
       - Import & Export TTL: cpsv-editor/user-guide/import-export-ttl.md
       - DMN Workflow: cpsv-editor/user-guide/dmn-workflow.md
       - DMN Testing: cpsv-editor/user-guide/dmn-testing.md
+      - DSO → DMN Import: cpsv-editor/user-guide/dso-import.md
       - Publishing to TriplyDB: cpsv-editor/user-guide/publishing-to-triplydb.md
       - Vendor Integration: cpsv-editor/user-guide/vendor-integration.md
     - Developer Docs:
@@ -205,7 +207,7 @@ nav:
       - Visual Architecture: cpsv-editor/developer/visual-architecture.md
       - Local Development: cpsv-editor/developer/local-development.md
       - Project Structure: cpsv-editor/developer/project-structure.md
-      - CPRMV Dataset Generation: cpsv-editor/developer/cprmv-dataset-generation.md
+      - CPRMV RuleSet Generation: cpsv-editor/developer/cprmv-dataset-generation.md
       - Deployment: cpsv-editor/developer/deployment.md
       - DMN Implementation: cpsv-editor/developer/dmn-implementation.md
       - TriplyDB Publish Implementation: cpsv-editor/developer/triplydb-publish-implementation.md

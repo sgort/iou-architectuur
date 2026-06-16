@@ -23,7 +23,19 @@
 
 ---
 
-## GET /ref/{referencemethod}/{reference}
+## GET /ref
+
+---
+
+## GET /cellar-by-celex/{celexid}
+
+---
+
+## GET /cellar-by-eli/{elipath}/{language}/{format}
+
+---
+
+## /mcp
 
 ---
 

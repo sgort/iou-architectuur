@@ -13,7 +13,7 @@ The Form Editor lets you create and edit **Camunda Forms** (schemaVersion 16) di
 
 The Form Editor uses a two-panel layout:
 
-- **Left panel** — Form list. Shows all forms stored in `localStorage` with create, rename, and delete actions. An **EXAMPLE** badge marks the three read-only seed forms; user-created forms carry a **WIP** badge.
+- **Left panel** — Form list. Shows all forms stored in `localStorage` with create, rename, and delete actions. An **EXAMPLE** badge marks the three read-only seed forms; user-created forms carry a **WIP** badge; forms imported from a DSO activity carry a green **DSO** badge (v1.9.5).
 - **Right panel** — Form canvas. Hosts the `@bpmn-io/form-js` graphical editor for the selected form, with a toolbar for saving and exporting.
 
 ---
@@ -26,6 +26,7 @@ The list panel shows every form in storage. Each entry displays the form name, i
 |---|---|
 | **EXAMPLE** | Read-only seed form — cannot be renamed or deleted |
 | **WIP** | User-created form — fully editable |
+| **DSO** (green) | Form scaffold imported from a DSO activity's Indieningsvereisten (v1.9.4–v1.9.5) |
 
 Actions available on each form:
 

@@ -25,8 +25,8 @@ Form-based authoring of CPSV-AP 3.2.0 compliant service descriptions. Ten tabs c
 | Service | Identifier, name, description, sector, thematic area, keywords | CPSV-AP, DCAT |
 | Organization | Competent authority, homepage, geographic jurisdiction, logo | CV, FOAF, ORG |
 | Legal | BWB/CVDR legislation reference, version, RONL analysis & method concepts | ELI, SKOS, RONL vocabulary |
-| Rules | Temporal business rules with validity periods and confidence levels | CPRMV 0.3.0 |
-| CPRMV (Policy) | Normative rules with ruleId, rulesetId, situatie, norm, definition | CPRMV 0.3.0 |
+| Rules | Temporal business rules with validity periods and confidence levels | CPRMV 0.4.1 |
+| CPRMV (Policy) | Normative rules with ruleId, rulesetId, situatie, norm, definition; grouped into `cprmv:RuleSet`s | CPRMV 0.4.1 |
 | Parameters | Named parameter values (amounts, percentages, durations) with temporal validity | CPRMV, SKOS |
 | Concepts | NL-SBB compliant SKOS concepts with labels, definitions, notations | SKOS, NL-SBB |
 | Cost / Output | Service cost and output descriptions (embedded in Service tab) | CV |
@@ -50,6 +50,8 @@ Both integrations live within the same Vendor tab, demonstrating the pattern for
 
 A PublishDialog component handles uploading the generated TTL content to a TriplyDB triple store. Two upload methods are implemented: FormData-based file upload (`publishToTriplyDB`) and SPARQL UPDATE insertion (`publishToTriplyDB_SPARQL`). The publish workflow is a multi-step process with progress tracking: validate → generate TTL → upload to TriplyDB → upload logos (organization + vendor) → update SPARQL service → confirm. Supports configurable account/dataset/token (persisted in localStorage), connection testing, graph IRI generation based on organization + service identifiers, and SPARQL service re-indexing (via the shared Express backend to avoid CORS).
 
+When the dialog opens it also runs an **advisory pre-publish SHACL validation** (`shaclHelper.js` → `POST /v1/shacl/validate`), rendering a layered CPRMV 0.4.1 / CPSV-AP 3.2.0 / RONL result. It never blocks publishing and degrades to a neutral amber state when the backend is unreachable. It validates the editor's *regenerated* output, which can differ from an imported source file because import normalises legacy terms to the 0.4.1 vocabulary.
+
 **Coupling to core editor:** Low. Consumes only the generated TTL string and service/organization identifiers for graph naming. The Express backend (`REACT_APP_BACKEND_URL`) is shared with the Linked Data Explorer.
 
 ### 4 — DMN Integration & Operaton Deployment
@@ -66,7 +68,7 @@ The DMN Tab (`DMNTab.jsx`, ~1520 lines) handles the full lifecycle of decision m
 | 4 — Interaction Rules | DRD wiring, informationRequirement integrity, orphaned inputData, self-references | INT-001 through INT-007 |
 | 5 — Content | Metadata quality — empty descriptions, missing typeRefs, empty text annotations | CON-001 through CON-005 |
 
-Validation results (errors, warnings, infos per layer) are displayed inline with collapsible detail per layer. This is the same validation engine used by the Linked Data Explorer's multi-file drag-and-drop DMN validator. If the backend is unreachable, validation fails silently — it does not block the DMN workflow.
+Validation results (errors, warnings, infos per layer) are displayed inline with collapsible detail per layer. This is the same validation engine used by the Linked Data Explorer's multi-file drag-and-drop DMN validator. If the backend is unreachable, the panel renders a distinct amber *"Syntax validation result not available"* state (v1.9.5) rather than failing silently — deployment and testing still work; only the syntactic pre-check is skipped.
 
 **Deploy.** One-click deployment to the Operaton rule engine (`operaton.open-regels.nl/engine-rest/deployment/create`) via multipart form upload. Stores the deployment ID and timestamp in editor state.
 
@@ -78,11 +80,17 @@ Validation results (errors, warnings, infos per layer) are displayed inline with
 | Intermediate Decision Tests | For DRDs with multiple decisions: evaluates each sub-decision individually using the same request body. Shows progressive results (ok / error / unexpected) per decision. Constant parameter decisions (`p_*`) are automatically filtered. |
 | Test Cases | Upload a `test-cases.json` file (supports two formats: Toeslagen `{name, expected, requestBody}` and DUO `{testName, testResult, variables}`). Runs all cases sequentially against the primary decision. Shows pass/fail per case with expandable detail. |
 
-**Concept generation.** After any successful test, the tab auto-generates NL-SBB compliant SKOS concepts from the DMN input/output variables — including URI, prefLabel, definition, notation, and `skos:exactMatch` — and pushes them to the Concepts tab. Test case runs generate concepts from the last successful case.
+**Concept generation.** After any successful test, the tab auto-generates NL-SBB compliant SKOS concepts from the DMN input/output variables — including URI, prefLabel, definition, notation, and `skos:exactMatch` — and pushes them to the Concepts tab. Test case runs derive input concepts from the union of every uploaded case's request-body variables (so all inputs are covered even without a successful evaluate) and add output concepts from the last successful case (v1.10.2). Generated concept URIs, `dct:subject` and `skos:exactMatch` values are IRI-sanitised (whitespace → `_`, illegal chars percent-encoded) so the export parses under a strict SHACL parser and re-imports cleanly.
 
 The DMN content is embedded in the TTL output as `cprmv:DecisionModel` triples, and the Organization tab supports validation status tracking (not-validated / in-review / validated / rejected) with metadata about who validated and when.
 
 **Coupling to core editor:** Medium. DMN metadata (deployment status, test results, validation) is part of the editor state. The auto-generated concepts feed into the Concepts tab. The TTL export includes DMN blocks. The syntactic validation depends on the shared LDE backend (`POST /v1/dmns/validate`). However, the Operaton REST API interaction and DMN XML parsing (`dmnHelpers.js`) are self-contained utilities.
+
+### 5 — DSO → DMN deep-link import
+
+The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link handoff from the Linked Data Explorer: `/?dsoImport=dmn&dmnId=…&env=…&activityName=…&authority=…&activityUrn=…&fsRef=…`. On mount it fetches the standalone DMN XML from the shared backend (`GET /v1/dso/toepasbare-regels/{dmnId}/dmn`, with `?env=prod` only when `env=prod`) and prefills the DMN tab (keeping it interactive — *not* the imported-preserved mode), the Service tab (from the DSO activity) and the Organization tab (from the resolved authority). The import params are then stripped via `history.replaceState`, and a `consumedRef` guard prevents a StrictMode double-invoke. Deploy/test/publish proceed through the normal DMNTab + PublishDialog flow.
+
+**Coupling to core editor:** Low. The hook only calls the existing `setDmnData`/`setService`/`setOrganization` setters and the shared message banner.
 
 ---
 

@@ -4,6 +4,75 @@
 
 ## Changelog
 
+### v1.9.7 — SHACL display fixes (June 2026)
+
+**v1.9.7 — Patch (June 15, 2026)**
+
+- SHACL Validator: long issue messages and focus-node locations were truncated with a single-line CSS ellipsis and could not be read. They now wrap in full (`break-words` / `break-all`) and expose the complete text on hover (title tooltip).
+- SHACL backend: removed the 60-character cap on the offending values reported for cardinality (`maxCount` / `uniqueLang`) violations, so the full value appears in the message.
+
+**Files:** `packages/frontend/src/components/ShaclValidator.tsx`, `packages/backend/src/services/shacl-validation.service.ts`
+
+---
+
+### v1.9.6 — CPRMV 0.4.1 DMN discovery + chain fixes (June 2026)
+
+**v1.9.6 — Patch (June 13, 2026)**
+
+- DMNs published under the new CPRMV 0.4.1 namespace (e.g. `vast_bedrag_op_vestiging`) were missing from `/v1/dmns` and the ChainBuilder DMN picker — `getAllDmns` and the chain-link queries only matched `cprmv:DecisionModel` under the old 0.3.0 namespace. Both namespaces are now matched side by side until existing 0.3.0 data is migrated.
+- Fixed "Fill with test data" in the ChainBuilder input form not visibly filling Integer/Double fields when the RDF-sourced test value is `0` (the input rendered empty because `0 || '' === ''`).
+
+**Files:** `packages/backend/src/services/sparql.service.ts`, `packages/frontend/src/components` (ChainBuilder)
+
+---
+
+### v1.9.5 — DSO deploy-ready DMN + SHACL CPRMV layer (June 2026)
+
+**v1.9.5 — Minor (June 11, 2026)**
+
+- **DSO Integration:** extracted DSO DMNs now carry `camunda:historyTimeToLive`, so they deploy to Operaton exactly as handed off — the consumer no longer has to patch the DMN first. LDE now produces a fully deploy-ready and evaluatable DMN (DMN 1.3, input ids, FEEL-safe variable names, output `typeRef`s, history TTL). Forms imported from DSO show a green **DSO** badge in the Form Editor list instead of the generic yellow WIP badge.
+- **SHACL Validator:** a third **CPRMV 0.4.1** shape layer now validates uploaded Turtle alongside CPSV-AP 3.2.0 and RONL Custom; the results panel renders it automatically. Added valid/invalid test fixtures for every layer (CPRMV, CPSV-AP, RONL) plus a malformed-Turtle case.
+
+**Files:** `packages/backend/src/services/shacl-validation.service.ts`, `packages/backend/shapes/cprmv/**`, `packages/backend/src/services/dso.service.ts`, `packages/frontend/src/components/DsoExplorer.tsx`, `packages/frontend/src/components/FormEditor.tsx`
+
+---
+
+### v1.9.4 — DSO Phase 2d + DMN publish handoff (June 2026)
+
+**v1.9.4 — Minor (June 10, 2026)**
+
+- **Activities tab name search:** fixing a location (Lelystad / Flevoland) loads that authority's full activity set in one call and reveals a search box that live-filters by name.
+- **↓ Import into LDE** (Indieningsvereisten) saves the generated form-js scaffold straight into the Form Editor as a draft, named after the activity and tagged with the readable authority name (falling back to the RTR code).
+- **Publish via CPSV Editor** (Conclusie) opens the CPSV Editor with a deep-link to publish the extracted DMN to TriplyDB, where the LDE DMN picker can consume it — no local DMN store needed.
+- Extracted DMNs are normalized to deploy and evaluate on Operaton (DMN 1.2 → 1.3, missing input ids added, FEEL-safe variable names, explicit output `typeRef`). Verified end-to-end: the normalized `HoutopstandVellen` decision deploys (all 7 decisions) and the root decision evaluates without the previous FEEL error.
+
+**Files:** `packages/backend/src/routes/dso.routes.ts`, `packages/backend/src/services/dso.service.ts`, `packages/frontend/src/components/DsoExplorer.tsx`
+
+---
+
+### v1.9.3 — DSO Phase 2a + 4 (June 2026)
+
+**v1.9.3 — Minor (June 9, 2026)**
+
+- Activity Detail panel now shows an **Applicable Rules** section listing *toepasbare regels* fetched live from the DSO Uitvoeren Gegevens API, grouped by rule type (Conclusie / Indieningsvereisten) with validity date and STTR version.
+- **↓ STTR** downloads the raw STTR XML for any rule type; **↓ Extract DMN** (Conclusie) extracts the embedded DMN decision table as a standalone `.dmn`; **↓ Form scaffold** (Indieningsvereisten) generates a form-js JSON scaffold from the STTR questionnaire (boolean → checkbox, list → select, number → number field, attachment → labelled textfield).
+- Added `ronl:dsoActiviteitUrn` on `TreeFellingPermitSubProcess` linking it to `nl.imow-gm0995.activiteit.HoutopstandVellen` (Gemeente Lelystad).
+
+**Files:** `packages/backend/src/routes/dso.routes.ts` (`/toepasbare-regels`, `/toepasbare-regels/:id/sttr`, `/toepasbare-regels/:id/dmn`, `/toepasbare-regels/:id/form-scaffold`), `packages/backend/src/services/dso.service.ts`, `packages/frontend/src/components/DsoExplorer.tsx`
+
+---
+
+### v1.9.2 — BPMN shell/subprocess auto-linking (June 2026)
+
+**v1.9.2 — Patch (June 9, 2026)**
+
+- Uploaded BPMN processes that form a shell/subprocess pair are now automatically linked: a process with call-activity elements is classified as a *shell*, and any process whose BPMN process ID is targeted by a shell's call-activity becomes its *subprocess*. The relationship is detected both on fresh imports and retroactively on startup, so previously uploaded standalone processes are reclassified without a re-upload.
+- Removed two unused TypeScript imports (`DsoWerkzaamheid`, `zoekActiviteiten`) in `DsoExplorer`.
+
+**Files:** `packages/frontend/src/components/BpmnModeler` (process classification), `packages/frontend/src/components/DsoExplorer.tsx`
+
+---
+
 ### v1.9.0–v1.9.1 — SHACL Validator (June 2026)
 
 **v1.9.0 — Minor (June 4, 2026) · v1.9.1 — Patch (June 5, 2026)**

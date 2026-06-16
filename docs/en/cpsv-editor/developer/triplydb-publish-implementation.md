@@ -9,6 +9,8 @@ User clicks Publish
         ↓
 PublishDialog.jsx opens
         ↓
+On open: validateTtl(ttlContent) → POST /v1/shacl/validate   (advisory, non-blocking)
+        ↓
 User enters credentials → optional Test Connection
         ↓
 handlePublish() in App.js:
@@ -37,11 +39,27 @@ updateTriplyDBService() in triplydbHelper.js:
 src/
 ├── App.js                      # handlePublish() with progress state management
 ├── components/
-│   └── PublishDialog.jsx       # Dialog UI: form, progress, success/error states
+│   └── PublishDialog.jsx       # Dialog UI: form, progress, success/error, SHACL panel
 └── utils/
     ├── triplydbHelper.js       # TriplyDB API integration, buildGraphIRI
+    ├── shaclHelper.js          # validateTtl — advisory pre-publish SHACL validation
     └── dmnHelpers.js           # sanitizeServiceIdentifier (used by buildGraphIRI)
 ```
+
+---
+
+## Pre-publish SHACL validation
+
+When the dialog opens (and via a **Validate now** button), `PublishDialog` calls
+`validateTtl(ttlContent)` from `src/utils/shaclHelper.js`, which POSTs the generated Turtle
+to `REACT_APP_BACKEND_URL/v1/shacl/validate` and returns a layered result
+(`{ valid, parseError, layers: { cprmv, 'cpsv-ap', 'ronl-custom' }, summary, unavailable? }`).
+
+It mirrors `DMNTab.runBackendValidation`: it **never throws**. An unreachable backend yields a
+neutral `{ unavailable: true }` shape and the panel shows a distinct amber state. The check is
+**advisory only** — it never blocks `handlePublish`. Because it validates the editor's
+*regenerated* output, an imported legacy file that fails on its own may pass here (import
+normalises to CPRMV 0.4.1 / CPSV-AP 3.2.0).
 
 ---
 

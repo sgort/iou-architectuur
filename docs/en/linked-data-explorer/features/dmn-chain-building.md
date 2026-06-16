@@ -13,6 +13,9 @@ The Chain Builder is the central feature of the Linked Data Explorer. It queries
 
 When you open the Chain Builder, it queries TriplyDB using the CPRMV vocabulary to find all published `cprmv:DecisionModel` resources. Each model appears as a card in the **Available DMNs** panel showing its title, identifier, variable counts, and publishing organisation. A real-time search field filters the list by title or identifier.
 
+!!! note "CPRMV namespace coverage (v1.9.6)"
+    The DMN picker (and the `/v1/dmns` endpoint) match `cprmv:DecisionModel` under **both** the legacy `0.3.0` namespace and the current `0.4.1` namespace (`https://standaarden.open-regels.nl/standards/cprmv/0.4.1#`). DMNs published by the CPSV Editor under 0.4.1 (e.g. `vast_bedrag_op_vestiging`) therefore appear in the picker alongside older 0.3.0 data until the 0.3.0 data is migrated.
+
 Expanding a card reveals its full variable list: input variables in blue, output variables in green, each with its name, identifier, and datatype (`Integer`, `String`, `Boolean`, `Date`).
 
 ---
