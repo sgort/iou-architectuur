@@ -76,9 +76,9 @@ For multi-table DMNs, expand the **Intermediate Decision Tests** section and cli
 
 Click **Download TTL**. The exported file includes:
 
-- The `cprmv:DecisionModel` entity with deployment ID and API endpoint
-- All input variables as `cpsv:Input` entities
-- All extracted decision rules as `cprmv:DecisionRule` entities, each linked to the relevant legal article via `cprmv:extends`
+- The `cprmv:DecisionModel` entity with deployment ID (`cprmv:deploymentId`) and API endpoint (`cprmv:implementedBy`)
+- All input variables as `cpsv:Input` entities and output variables as `cpsv:Output` entities
+- All extracted decision rules as `cpsv:Rule, cprmv:DecisionRule` entities (with `dct:title`/`dct:description`), each linked to the relevant legal article via `cprmv:isBasedOn` and, when a legal resource is set, to the `eli:LegalResource` via `cpsv:implements`
 
 The DMN section is appended after the core service metadata.
 

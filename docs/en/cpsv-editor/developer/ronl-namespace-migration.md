@@ -11,7 +11,7 @@ The original RONL namespace (`https://regels.overheid.nl/termen/`) was used for 
 | Namespace | Prefix | Purpose |
 |---|---|---|
 | `https://regels.overheid.nl/ontology#` | `ronl:` | Organisational governance (validation, certification, vendor) |
-| `https://cprmv.open-regels.nl/0.3.0/` | `cprmv:` | Rule management (decision models, rules, parameters) |
+| `https://standaarden.open-regels.nl/standards/cprmv/0.4.1#` | `cprmv:` | Rule management (rulesets, rules, parameters, decision models) |
 
 The old namespace is deprecated but still accepted by the parser for backward compatibility.
 
@@ -34,13 +34,17 @@ The old namespace is deprecated but still accepted by the parser for backward co
 
 ```turtle
 @prefix ronl:  <https://regels.overheid.nl/ontology#> .
-@prefix cprmv: <https://cprmv.open-regels.nl/0.3.0/> .
+@prefix cprmv: <https://standaarden.open-regels.nl/standards/cprmv/0.4.1#> .
 
 <something>
     cprmv:hasAnalysis <...> ;
     cprmv:hasMethod <...> ;
     cprmv:implements <...> .
 ```
+
+The CPRMV namespace itself was also bumped from `…/cprmv/0.3.0/` to the canonical
+`…/standards/cprmv/0.4.1#` in v1.10.0; the parser still accepts the 0.3.0 namespace on
+import (see `cprmvImport.js` and the `STD_NS` fallback list).
 
 ---
 
@@ -51,9 +55,9 @@ The parser registers both namespaces:
 ```javascript
 // src/config/vocabularies.config.js
 namespaces: {
-  'https://regels.overheid.nl/ontology#':  ['ronl'],
-  'https://cprmv.open-regels.nl/0.3.0/':  ['cprmv'],
-  'https://regels.overheid.nl/termen/':   ['ronl-legacy'],  // never exported
+  'https://regels.overheid.nl/ontology#':                      ['ronl'],
+  'https://standaarden.open-regels.nl/standards/cprmv/0.4.1#': ['cprmv'],
+  'https://regels.overheid.nl/termen/':                        ['ronl-legacy'],  // never exported
 }
 ```
 
@@ -66,9 +70,9 @@ propertyAliases: {
   'ronl-legacy:implements':      'cprmv:implements',
   'ronl-legacy:implementedBy':   'cprmv:implementedBy',
   'ronl-legacy:confidenceLevel': 'cprmv:confidenceLevel',
-  'ronl-legacy:validFrom':       'ronl:validFrom',
-  'ronl-legacy:validUntil':      'ronl:validUntil',
-  'ronl-legacy:extends':         'ronl:extends',
+  'ronl-legacy:validFrom':       'cprmv:validFrom',
+  'ronl-legacy:validUntil':      'cprmv:validUntil',
+  'ronl-legacy:extends':         'cprmv:extends',
 }
 ```
 
@@ -81,7 +85,7 @@ The `ronl-legacy` prefix is an internal alias only — it never appears in expor
 When querying across both old and new data, use `OPTIONAL` to handle both namespaces:
 
 ```sparql
-PREFIX cprmv: <https://cprmv.open-regels.nl/0.3.0/>
+PREFIX cprmv: <https://standaarden.open-regels.nl/standards/cprmv/0.4.1#>
 PREFIX ronl-old: <https://regels.overheid.nl/termen/>
 
 SELECT ?service ?analysis WHERE {

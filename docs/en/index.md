@@ -28,13 +28,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Documentation](norm-editor/index.md)
     
--   **✏️ CPSV Editor — v1.9.5** · *June 2026*
+-   **✏️ CPSV Editor — v1.10.2** · *June 2026*
 
     ---
 
-    **DMN Workflow Polish**
+    **CPRMV 0.4.1 & CPSV-AP 3.2.0 conformance**
 
-    Starter request bodies now populate from [`<inputValues>` constraints](cpsv-editor/developer/dmn-implementation.md#request-body-generation) on decisionTable input columns — constrained string inputs get a runnable value out of the box instead of an empty string that would fail at evaluate time. Validation backend unreachability surfaces as a distinct amber *"Syntax validation result not available"* state, no more silent failures when the LDE backend can't be reached.
+    Editor-generated Turtle now validates clean against the [CPRMV 0.4.1](cpsv-editor/reference/namespace-property-reference.md) and CPSV-AP 3.2.0 SHACL shapes — `cprmv:RuleSet`/`cprmv:RuleMethod` grouping, `dct:spatial` organisations, and an [advisory pre-publish SHACL check](cpsv-editor/features/triplydb-publishing.md). Decision models can also be handed off straight from the Linked Data Explorer via the new [DSO → DMN deep-link import](cpsv-editor/features/dso-import.md).
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 

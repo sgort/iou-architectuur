@@ -11,9 +11,24 @@ The editor can publish service metadata directly to a TriplyDB knowledge graph w
 
 ## What publishing does
 
-When you publish, the editor generates the complete Turtle output for the current service definition and uploads it to the specified TriplyDB dataset via the TriplyDB API. A backend proxy then ensures the data is accessible via a cumulative SPARQL endpoint — so each published service accumulates in the dataset rather than overwriting previous entries.
+When you publish, the editor generates the complete Turtle output for the current service definition and uploads it to the specified TriplyDB dataset via the TriplyDB API. Each service is written to its own deterministic, per-service named graph at `https://regels.overheid.nl/graphs/{org-local}/{service-id}` (v1.9.4), derived by `buildGraphIRI()` from the organisation and service identifiers. Republishing the same service overwrites that graph rather than creating an auto-numbered copy, so each service corresponds to a single, stable graph IRI; different services accumulate side by side in the dataset.
 
-Organisation logos, when present, are uploaded as named assets alongside the Turtle data, making them available as linked resources in the knowledge graph.
+Organisation logos (and vendor logos), when present, are uploaded as named assets alongside the Turtle data, making them available as linked resources in the knowledge graph.
+
+---
+
+## Pre-publish SHACL validation (advisory)
+
+When the publish dialog opens it runs the generated Turtle through the shared backend's SHACL validator (`POST /v1/shacl/validate`, `src/utils/shaclHelper.js`) and shows a layered **CPRMV 0.4.1 / CPSV-AP 3.2.0 / RONL Custom** result panel with per-layer issues. A **Validate now** button re-runs the check.
+
+The check is **purely advisory and never blocks publishing**. It validates the Turtle that will *actually* be published — the editor's current, regenerated output — which can differ from an originally-imported file, because import normalises legacy CPRMV/CPSV-AP terms to the CPRMV 0.4.1 / CPSV-AP 3.2.0 vocabulary. An imported file that fails validation on its own may therefore still publish as conformant here (v1.10.0–v1.10.1).
+
+If the validation backend is unreachable, the panel shows a distinct amber "result not available" state and publishing continues unaffected.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: The publish dialog's "Pre-publish SHACL validation" panel showing a green "Conformant — 0 violations" result with the CPRMV/CPSV-AP/RONL layers, the "Validate now" button, and the explanatory note about regenerated output](../../assets/screenshots/cpsv-editor-publish-shacl-validation.png)
+  <figcaption>The advisory pre-publish SHACL validation panel in the publish dialog</figcaption>
+</figure>
 
 ---
 
@@ -38,6 +53,6 @@ An optional **Test Connection** button verifies credentials before publishing, w
 
 ---
 
-## Cumulative data storage
+## Per-service graphs
 
-TriplyDB's default behaviour creates auto-numbered graphs on each upload. The backend proxy addresses this by querying across all graphs and presenting a unified view, so the dataset always appears to contain all published services regardless of how many upload operations have been performed.
+TriplyDB's default behaviour creates auto-numbered graphs on each upload. The editor avoids this by writing each service to a deterministic, per-service named graph (`buildGraphIRI()` → `…/graphs/{org-local}/{service-id}`). Republishing a service overwrites its own graph, so it always has exactly one current version, while distinct services coexist in the dataset. The graph IRI is also forwarded to the backend's `/v1/triplydb/update-service` endpoint (as `graphName`) so the cumulative SPARQL service stays in sync across multi-publish flows.

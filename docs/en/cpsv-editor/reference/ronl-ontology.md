@@ -67,7 +67,7 @@ If a subject has `ronl:certifiedBy`, it must also have `ronl:basedOn` (certified
 
 ```turtle
 @prefix ronl:  <https://regels.overheid.nl/ontology#> .
-@prefix cprmv: <https://cprmv.open-regels.nl/0.3.0/> .
+@prefix cprmv: <https://standaarden.open-regels.nl/standards/cprmv/0.4.1#> .
 @prefix dct:   <http://purl.org/dc/terms/> .
 
 <https://regels.overheid.nl/services/aow-leeftijd/dmn>

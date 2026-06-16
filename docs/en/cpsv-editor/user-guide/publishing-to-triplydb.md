@@ -11,7 +11,7 @@ Ensure:
 - You have a TriplyDB API token with write access to the target dataset
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Publish modal](../../assets/screenshots/cpsv-editor-publish-modal.png)
+  ![Screenshot: Publish modal](../../assets/screenshots/cpsv-editor-publish-dialog.png)
   <figcaption>The TriplyDB publish dialog</figcaption>
 </figure>
 
@@ -25,8 +25,9 @@ Ensure:
    - **Account:** your TriplyDB account or organisation name
    - **Dataset:** the target dataset name
    - **API Token:** create one in TriplyDB → User Settings → API Tokens
-3. Optionally click **Test Connection** to verify the credentials without uploading.
-4. Click **Publish to TriplyDB**.
+3. Review the **Pre-publish SHACL validation** panel at the top of the dialog. It validates the Turtle that will actually be published against the CPRMV 0.4.1 / CPSV-AP 3.2.0 / RONL shapes. This is advisory — a non-conformant result (or an unreachable validation backend, shown in amber) does **not** stop you from publishing. Click **Validate now** to re-run it.
+4. Optionally click **Test Connection** to verify the credentials without uploading.
+5. Click **Publish to TriplyDB**.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: Publish dialog in "publishing" state showing the progress bar, four step indicators (Validating, Generating TTL, Uploading, Updating service) with the first three showing ✓ and the fourth showing a spinner](../../assets/screenshots/cpsv-editor-publish-progress.png)
@@ -65,6 +66,6 @@ Best practices:
 
 ---
 
-## Cumulative publishing
+## Per-service graphs
 
-Each time you publish, the service data is added to the dataset. The backend proxy provides a unified SPARQL endpoint that queries across all uploads, so the dataset always reflects the complete current state of all published services. Publishing the same service again after edits results in the updated version being available alongside the previous one in TriplyDB, with the unified endpoint showing the most recent data.
+Each service is published to its own stable named graph (`…/graphs/{org-local}/{service-id}`). Republishing the same service **overwrites** that graph, so it always holds the latest version — no auto-numbered duplicates accumulate. Different services live in separate graphs within the same dataset, and the backend's unified SPARQL endpoint reflects the current state across all of them.

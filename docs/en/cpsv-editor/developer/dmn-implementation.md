@@ -196,7 +196,7 @@ if (parsed.hasDmnData && dmnLines.length > 0) {
 
 ### Export
 
-`ttlGenerator.js` appends preserved blocks unchanged at the end of the generated output — after all form-based sections.
+`ttlGenerator.js` appends preserved blocks at the end of the generated output — after all form-based sections. Before appending, `generateDmnSection` runs `normalizeImportedDmnBlocks` (v1.10.2): a CPSV-AP conformance pass over the preserved `cpsv:Rule` (Decision Rule) blocks that injects missing `dct:title`/`dct:description` and repoints a `cpsv:implements` that targets the `cpsv:PublicService` to the `eli:LegalResource` (or drops it when no legal resource exists). The edits are additive/repointing only — no preserved triples are removed — and idempotent, so re-importing an already-conformant export is a no-op.
 
 ---
 
@@ -209,6 +209,10 @@ The `extractPrimaryDecisionKey()` helper skips constant parameters automatically
 // Returns the last non-constant decision (typically the output decision)
 // Falls back to first decision if all are constants
 ```
+
+As of v1.9.6 this helper lives in `src/utils/dmnHelpers.js` and is exported, so both
+`DMNTab.jsx` and the DSO import hook share one implementation instead of duplicating the
+parser.
 
 Console log on extraction:
 ```
@@ -228,6 +232,30 @@ When a DMN file is loaded, `generateRequestBodyFromDMN` walks the top-level `<in
 3. **Name-based heuristics.** `string`-typed inputs whose name contains `datum`/`date`/`dag` default to today's date; `geboorte` defaults to a random adult birth date; `aantal`/`bedrag`/`inkomen` default to `0`. Heuristics run only when steps 1 and 2 leave the value empty.
 
 The resulting body is editable in the DMN tab's request-body panel before each evaluate call. Authors who want a richer starter body without writing custom code can simply add `<inputValues>` constraints to the relevant decisionTable input columns — this also documents intent in the DMN itself, which downstream tooling (validators, decision-table editors) can consume.
+
+---
+
+## DSO → DMN deep-link import
+
+The `useDsoImport` hook (`src/hooks/useDsoImport.js`, v1.9.6) lets the Linked Data Explorer
+hand a toepasbare-regel DMN straight into the editor via a deep-link:
+
+```
+/?dsoImport=dmn&dmnId=<id>&env=<pre|prod>&activityName=<…>
+  &authority=<…>&activityUrn=<…>&fsRef=<…>
+```
+
+On mount (guarded by a `consumedRef` against StrictMode double-invoke) the hook:
+
+1. fetches the standalone DMN XML — `GET REACT_APP_BACKEND_URL/v1/dso/toepasbare-regels/{dmnId}/dmn` (`?env=prod` only when `env=prod`);
+2. prefills `dmnData` with `fileName: decision-{dmnId}.dmn`, the fetched XML, and the primary decision key — keeping the tab **interactive** (`isImported: false`, *not* the preserved mode);
+3. prefills the Service tab (title/identifier/description from the DSO activity) and Organization tab (from the resolved authority);
+4. strips the import params via `history.replaceState` so a refresh can't re-import.
+
+Deploy + test + publish then run through the existing `DMNTab` / `PublishDialog` flow.
+`DMNTab` hydrates its internal uploaded-file/decision-key/test-body/validation state from
+`dmnData.content` whenever content arrives from outside the tab and no local file was
+uploaded — without this, deploy/test stayed gated on the internal `uploadedFile` state.
 
 ---
 

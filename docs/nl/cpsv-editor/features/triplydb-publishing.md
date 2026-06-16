@@ -15,6 +15,10 @@
 
 ---
 
+## Pre-publish SHACL validation (advisory)
+
+---
+
 ## Progress tracking
 
 ---
@@ -23,4 +27,4 @@
 
 ---
 
-## Cumulative data storage
+## Per-service graphs
