@@ -4,7 +4,7 @@ This page maps each UI field in the editor to its corresponding RDF property and
 
 **Legend:** ✅ Implemented and compliant · 🎯 Phase 1 (v1.4.0) · ⭐ New in v1.5.0/v1.9.0 · 📋 Phase 2 planned · ℹ️ RONL/CPRMV extension
 
-The **SHACL constraint** column references the shape that validates each field during pre-publish validation (`req` = minCount ≥ 1, `opt` = no minCount; `(new)` = shape added in LDE v1.9.7).
+The **SHACL constraint** column references the shape that validates each field during pre-publish validation (`req` = minCount ≥ 1, `opt` = no minCount; `(new)` = shape added in LDE v1.9.8).
 
 ---
 
@@ -81,7 +81,7 @@ The **SHACL constraint** column references the shape that validates each field d
 | Valid from | `parameter.validFrom` | `cprmv:validFrom` | v2.0.0 (was `ronl:validFrom`) | `ParameterWaardeShape` · opt `xsd:date` (new) |
 | Valid until | `parameter.validUntil` | `cprmv:validUntil` | v2.0.0 (was `ronl:validUntil`) | `ParameterWaardeShape` · opt `xsd:date` (new) |
 
-> `ParameterWaardeShape` is a new shape added in LDE v1.9.7. The shape makes `skos:notation` and `skos:prefLabel` mandatory; the client-side validator in the CPSV Editor was updated in the same release to enforce both fields unconditionally.
+> `ParameterWaardeShape` is a new shape added in LDE v1.9.8. The shape makes `skos:notation` and `skos:prefLabel` mandatory; the client-side validator in the CPSV Editor was updated in the same release to enforce both fields unconditionally.
 
 ---
 
