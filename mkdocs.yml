@@ -222,6 +222,7 @@ nav:
       - RPP Architecture: cpsv-editor/reference/rpp-architecture.md
       - Semantic Mediation Architecture: cpsv-editor/reference/semantic-mediation-architecture.md
       - External Standards: cpsv-editor/reference/external-standards.md
+      - SHACL Shape Diagrams: cpsv-editor/reference/data-model-diagrams.md
   
   - 🔍 Linked Data Explorer:
     - Overview: linked-data-explorer/index.md
