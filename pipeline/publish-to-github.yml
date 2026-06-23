@@ -1,11 +1,16 @@
 name: Publish to GitHub — IOU Architectuur
 
-trigger: none  # Alleen handmatig uitvoeren
+trigger:
+  tags:
+    include:
+      - pub/v*   # bijv. pub/v1.0.0 → triggert publish naar GitHub
+                 # gewone v1.0.0 tags triggeren niets
 
 parameters:
   - name: releaseTag
-    displayName: 'Release tag (bijv. v1.0.0)'
+    displayName: 'Release tag (bijv. pub/v1.0.0) — leeg laten bij tag-trigger'
     type: string
+    default: ''
 
 pool:
   vmImage: ubuntu-latest
@@ -23,7 +28,14 @@ steps:
 - script: |
     set -e
 
+    # Gebruik parameter bij handmatige run, anders de trigger-tag
     TAG="${{ parameters.releaseTag }}"
+    if [ -z "$TAG" ]; then
+      TAG="$(Build.SourceBranchName)"
+    fi
+
+    # Strip pub/ prefix voor de GitHub tag (pub/v1.0.0 → v1.0.0)
+    GITHUB_TAG="${TAG#pub/}"
 
     # Verifieer dat de tag bestaat
     git tag | grep -q "^${TAG}$" || { echo "Tag ${TAG} niet gevonden"; exit 1; }
@@ -56,7 +68,7 @@ steps:
 
     echo "Snapshot klaar in: ${SNAPSHOT}"
     echo "##vso[task.setvariable variable=SNAPSHOT_DIR]${SNAPSHOT}"
-    echo "##vso[task.setvariable variable=RELEASE_TAG]${TAG}"
+    echo "##vso[task.setvariable variable=RELEASE_TAG]${GITHUB_TAG}"
   displayName: 'Exporteer en sanitize snapshot'
 
 - script: |
