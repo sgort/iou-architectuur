@@ -31,7 +31,9 @@ steps:
     # Gebruik parameter bij handmatige run, anders de trigger-tag
     TAG="${{ parameters.releaseTag }}"
     if [ -z "$TAG" ]; then
-      TAG="$(Build.SourceBranchName)"
+      # Build.SourceBranch geeft refs/tags/pub/v1.0.0 — strip het refs/tags/ prefix
+      TAG="$(Build.SourceBranch)"
+      TAG="${TAG#refs/tags/}"
     fi
 
     # Strip pub/ prefix voor de GitHub tag (pub/v1.0.0 → v1.0.0)
