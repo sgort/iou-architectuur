@@ -1,0 +1,81 @@
+name: Publish to GitHub — IOU Architectuur
+
+trigger: none  # Alleen handmatig uitvoeren
+
+parameters:
+  - name: releaseTag
+    displayName: 'Release tag (bijv. v1.0.0)'
+    type: string
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: GitHub-Publish-Secrets
+  - name: GITHUB_REPO
+    value: 'https://x-access-token:$(GITHUB_PAT)@github.com/ProvincieFlevoland/IOU-architectuur.git'
+
+steps:
+- checkout: self
+  fetchDepth: 0
+  persistCredentials: false
+
+- script: |
+    set -e
+
+    TAG="${{ parameters.releaseTag }}"
+
+    # Verifieer dat de tag bestaat
+    git tag | grep -q "^${TAG}$" || { echo "Tag ${TAG} niet gevonden"; exit 1; }
+
+    echo "Exporteren van tag: ${TAG}"
+    SNAPSHOT=$(mktemp -d)
+
+    # Exporteer alleen de whitelisted bestanden via git archive
+    # .gitattributes export-ignore regels worden automatisch toegepast
+    git archive "${TAG}" | tar -x -C "${SNAPSHOT}"
+
+    # Verwijder .claudesync als git archive het toch meeneemt
+    rm -rf "${SNAPSHOT}/docs/en/.claudesync"
+
+    # Sanitize mkdocs.yml — vervang interne GitLab URL door GitHub
+    sed -i \
+      -e 's|repo_url:.*|repo_url: https://github.com/ProvincieFlevoland/IOU-architectuur|' \
+      -e 's|edit_uri:.*|edit_uri: edit/main/docs/|' \
+      -e 's|icon: fontawesome/brands/gitlab|icon: fontawesome/brands/github|' \
+      "${SNAPSHOT}/mkdocs.yml"
+
+    # Secretscan — breek af als er gevoelige patronen gevonden worden
+    if grep -rE '(password|secret|token|api_key|private_key)\s*[:=]\s*[^$\(\{]' \
+        "${SNAPSHOT}" \
+        --include="*.yml" --include="*.yaml" --include="*.env" --include="*.tf" \
+        --include="*.sh" -l 2>/dev/null; then
+      echo "##[error] Mogelijk gevoelige data gevonden — publish afgebroken"
+      exit 1
+    fi
+
+    echo "Snapshot klaar in: ${SNAPSHOT}"
+    echo "##vso[task.setvariable variable=SNAPSHOT_DIR]${SNAPSHOT}"
+    echo "##vso[task.setvariable variable=RELEASE_TAG]${TAG}"
+  displayName: 'Exporteer en sanitize snapshot'
+
+- script: |
+    set -e
+
+    cd "${SNAPSHOT_DIR}"
+
+    git init
+    git config user.email "ado-pipeline@provincie-flevoland.nl"
+    git config user.name  "ADO Publish Bot"
+
+    git remote add origin "${GITHUB_REPO}"
+
+    git add .
+    git commit -m "Release ${RELEASE_TAG}"
+    git tag "${RELEASE_TAG}"
+
+    git push origin HEAD:main --tags --force
+  displayName: 'Push naar GitHub'
+  env:
+    GITHUB_REPO: $(GITHUB_REPO)
+    GITHUB_PAT: $(GITHUB_PAT)
