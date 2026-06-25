@@ -81,27 +81,29 @@ stages:
         FILE_LIST=$(find "${SNAPSHOT}" -type f | sed "s|${SNAPSHOT}/||" | sort)
         MANIFEST_FILE="$(Agent.TempDirectory)/publish-manifest.md"
 
-        cat > "${MANIFEST_FILE}" << EOF
+        cat > "${MANIFEST_FILE}" << 'MANIFEST'
 ## Publish Manifest
+MANIFEST
 
-| | |
-|---|---|
-| **Tag (ADO)** | \`${TAG}\` |
-| **Tag (GitHub)** | \`${GITHUB_TAG}\` |
-| **Bestanden** | ${FILE_COUNT} |
-
-### Bestanden in snapshot
-\`\`\`
-${FILE_LIST}
-\`\`\`
-
-### Sanitize
-- \`repo_url\` → \`https://github.com/ProvincieFlevoland/IOU-architectuur\`
-- \`edit_uri\` → \`edit/main/docs/\`
-- \`icon\` → \`fontawesome/brands/github\`
-
-### Secretscan
-EOF
+        {
+          echo "| | |"
+          echo "|---|---|"
+          echo "| **Tag (ADO)** | \`${TAG}\` |"
+          echo "| **Tag (GitHub)** | \`${GITHUB_TAG}\` |"
+          echo "| **Bestanden** | ${FILE_COUNT} |"
+          echo ""
+          echo "### Bestanden in snapshot"
+          echo '```'
+          echo "${FILE_LIST}"
+          echo '```'
+          echo ""
+          echo "### Sanitize"
+          echo "- \`repo_url\` → \`https://github.com/ProvincieFlevoland/IOU-architectuur\`"
+          echo "- \`edit_uri\` → \`edit/main/docs/\`"
+          echo "- \`icon\` → \`fontawesome/brands/github\`"
+          echo ""
+          echo "### Secretscan"
+        } >> "${MANIFEST_FILE}"
 
         if [ -n "${SCAN_HITS}" ]; then
           echo "❌ Mogelijk gevoelige data gevonden in:" >> "${MANIFEST_FILE}"
