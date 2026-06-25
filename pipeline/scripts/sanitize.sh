@@ -26,10 +26,17 @@ git archive "${TAG}" | tar -x -C "${SNAPSHOT}"
 # Verwijder .claudesync als git archive het toch meeneemt
 rm -rf "${SNAPSHOT}/docs/en/.claudesync"
 
+# Lees originele waarden voor de sanitize (voor rapportage)
+ORIG_REPO_URL=$(grep 'repo_url:' "${SNAPSHOT}/mkdocs.yml" | head -1 | sed 's/repo_url:\s*//')
+ORIG_EDIT_URI=$(grep 'edit_uri:' "${SNAPSHOT}/mkdocs.yml" | head -1 | sed 's/edit_uri:\s*//')
+ORIG_ICON=$(grep 'repo: fontawesome' "${SNAPSHOT}/mkdocs.yml" | head -1 | sed 's/.*repo:\s*//')
+ORIG_ICON2=$(grep 'icon: fontawesome' "${SNAPSHOT}/mkdocs.yml" | head -1 | sed 's/.*icon:\s*//')
+
 # Sanitize mkdocs.yml -- vervang interne GitLab URL door GitHub
 sed -i \
   -e 's|repo_url:.*|repo_url: https://github.com/ProvincieFlevoland/IOU-architectuur|' \
   -e 's|edit_uri:.*|edit_uri: edit/main/docs/|' \
+  -e 's|repo: fontawesome/brands/gitlab|repo: fontawesome/brands/github|' \
   -e 's|icon: fontawesome/brands/gitlab|icon: fontawesome/brands/github|' \
   "${SNAPSHOT}/mkdocs.yml"
 
@@ -52,9 +59,10 @@ echo "  Bestanden in snapshot:"
 echo "${FILE_LIST}" | sed 's/^/    /'
 echo ""
 echo "  Gesaniteerd in mkdocs.yml:"
-echo "    repo_url  -> https://github.com/ProvincieFlevoland/IOU-architectuur"
-echo "    edit_uri  -> edit/main/docs/"
-echo "    icon      -> fontawesome/brands/github"
+echo "    repo_url:  ${ORIG_REPO_URL} -> https://github.com/ProvincieFlevoland/IOU-architectuur"
+echo "    edit_uri:  ${ORIG_EDIT_URI} -> edit/main/docs/"
+echo "    repo icon: ${ORIG_ICON} -> fontawesome/brands/github"
+echo "    icon:      ${ORIG_ICON2} -> fontawesome/brands/github"
 echo ""
 if [ -n "${SCAN_HITS}" ]; then
   echo "  Secretscan: GEFAALD"
@@ -84,9 +92,10 @@ MANIFEST_FILE="${AGENT_TEMPDIRECTORY}/publish-manifest.md"
   echo "\`\`\`"
   echo ""
   echo "### Sanitize"
-  echo "- repo_url -> https://github.com/ProvincieFlevoland/IOU-architectuur"
-  echo "- edit_uri -> edit/main/docs/"
-  echo "- icon     -> fontawesome/brands/github"
+  echo "- repo_url:  ${ORIG_REPO_URL} -> https://github.com/ProvincieFlevoland/IOU-architectuur"
+  echo "- edit_uri:  ${ORIG_EDIT_URI} -> edit/main/docs/"
+  echo "- repo icon: ${ORIG_ICON} -> fontawesome/brands/github"
+  echo "- icon:      ${ORIG_ICON2} -> fontawesome/brands/github"
   echo ""
   echo "### Secretscan"
   echo "OK -- geen gevoelige data gevonden in ${FILE_COUNT} bestanden"
