@@ -71,13 +71,73 @@ stages:
           "${SNAPSHOT}/mkdocs.yml"
 
         # Secretscan — breek af als er gevoelige patronen gevonden worden
-        if grep -rE '(password|secret|token|api_key|private_key)\s*[:=]\s*[^$\(\{]' \
+        SCAN_HITS=$(grep -rEl '(password|secret|token|api_key|private_key)\s*[:=]\s*[^$\(\{]' \
             "${SNAPSHOT}" \
             --include="*.yml" --include="*.yaml" --include="*.env" --include="*.tf" \
-            --include="*.sh" -l 2>/dev/null; then
+            --include="*.sh" 2>/dev/null || true)
+
+        # Publiceer manifest als Extensions tab in ADO
+        FILE_COUNT=$(find "${SNAPSHOT}" -type f | wc -l)
+        FILE_LIST=$(find "${SNAPSHOT}" -type f | sed "s|${SNAPSHOT}/||" | sort)
+        MANIFEST_FILE="$(Agent.TempDirectory)/publish-manifest.md"
+
+        cat > "${MANIFEST_FILE}" << EOF
+## Publish Manifest
+
+| | |
+|---|---|
+| **Tag (ADO)** | \`${TAG}\` |
+| **Tag (GitHub)** | \`${GITHUB_TAG}\` |
+| **Bestanden** | ${FILE_COUNT} |
+
+### Bestanden in snapshot
+\`\`\`
+${FILE_LIST}
+\`\`\`
+
+### Sanitize
+- \`repo_url\` → \`https://github.com/ProvincieFlevoland/IOU-architectuur\`
+- \`edit_uri\` → \`edit/main/docs/\`
+- \`icon\` → \`fontawesome/brands/github\`
+
+### Secretscan
+EOF
+
+        if [ -n "${SCAN_HITS}" ]; then
+          echo "❌ Mogelijk gevoelige data gevonden in:" >> "${MANIFEST_FILE}"
+          echo '```' >> "${MANIFEST_FILE}"
+          echo "${SCAN_HITS}" >> "${MANIFEST_FILE}"
+          echo '```' >> "${MANIFEST_FILE}"
+          echo "##vso[task.uploadsummary]${MANIFEST_FILE}"
           echo "##[error] Mogelijk gevoelige data gevonden — publish afgebroken"
           exit 1
+        else
+          echo "✅ OK — geen gevoelige data gevonden in ${FILE_COUNT} bestanden" >> "${MANIFEST_FILE}"
         fi
+
+        echo "##vso[task.uploadsummary]${MANIFEST_FILE}"
+
+        # Toon manifest ook in de pipeline log als inklapbare sectie
+        echo "##[group]PUBLISH MANIFEST"
+        echo "  Tag (ADO):    ${TAG}"
+        echo "  Tag (GitHub): ${GITHUB_TAG}"
+        echo "  Bestanden:    ${FILE_COUNT}"
+        echo ""
+        echo "  Bestanden in snapshot:"
+        echo "${FILE_LIST}" | sed 's/^/    /'
+        echo ""
+        echo "  Gesaniteerd in mkdocs.yml:"
+        echo "    repo_url  → https://github.com/ProvincieFlevoland/IOU-architectuur"
+        echo "    edit_uri  → edit/main/docs/"
+        echo "    icon      → fontawesome/brands/github"
+        echo ""
+        if [ -n "${SCAN_HITS}" ]; then
+          echo "  Secretscan: GEFAALD"
+          echo "${SCAN_HITS}" | sed 's/^/    /'
+        else
+          echo "  Secretscan: OK (${FILE_COUNT} bestanden gescand)"
+        fi
+        echo "##[endgroup]"
 
         echo "##vso[task.setvariable variable=GITHUB_TAG;isOutput=true]${GITHUB_TAG}"
       displayName: 'Exporteer en sanitize'
