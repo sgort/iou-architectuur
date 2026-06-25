@@ -46,6 +46,8 @@ Check [github.com/ProvincieFlevoland/IOU-architectuur](https://github.com/Provin
 - No internal files (pipelines, Azure config) are included
 - The tag is visible under **Releases**
 
+**flowchart**
+
 ```mermaid
 flowchart TD
     A([Developer]) -->|git tag pub/vX.Y.Z| B[Push tag naar ADO]
