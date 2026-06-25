@@ -46,6 +46,36 @@ Check [github.com/ProvincieFlevoland/IOU-architectuur](https://github.com/Provin
 - No internal files (pipelines, Azure config) are included
 - The tag is visible under **Releases**
 
+```mermaid
+flowchart TD
+    A([Developer]) -->|git tag pub/vX.Y.Z| B[Push tag naar ADO]
+    B --> C{Tag matcht pub/v* ?}
+    C -->|Nee| D([Geen trigger])
+    C -->|Ja| E
+
+    subgraph Stage1["Stage 1 - Sanitize automatisch"]
+        E[git archive snapshot van tag]
+        E --> F[Verwijder .claudesync]
+        F --> G[Sanitize mkdocs.yml<br/>repo_url / edit_uri / icon]
+        G --> H[Secretscan]
+        H --> I{Secrets gevonden?}
+        I -->|Ja| J([Pipeline afgebroken<br/>manifest zichtbaar in log])
+        I -->|Nee| K[Publiceer manifest<br/>in log + Extensions tab]
+        K --> L[Sla snapshot op<br/>als pipeline artifact]
+    end
+
+    L --> M{Approval vereist}
+
+    subgraph Stage2["Stage 2 - Publish handmatige approval"]
+        M -->|Afgewezen| N([Pipeline geannuleerd])
+        M -->|Goedgekeurd| O[Download artifact]
+        O --> P[git init + remote GitHub]
+        P --> Q[git push naar<br/>ProvincieFlevoland/IOU-architectuur]
+        Q --> R[Tag vX.Y.Z gezet op GitHub<br/>pub/ prefix verwijderd]
+    end
+
+    R --> S([Controleer GitHub repo])
+```
 ## What gets published
 
 | Path | Published |
