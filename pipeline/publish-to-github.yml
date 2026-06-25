@@ -1,6 +1,9 @@
 name: Publish to GitHub — IOU Architectuur
 
 trigger:
+  branches:
+    exclude:
+      - '*'      # geen branch-triggers, alleen tags
   tags:
     include:
       - pub/v*   # bijv. pub/v1.0.0 → triggert publish naar GitHub
@@ -12,84 +15,114 @@ parameters:
     type: string
     default: ''
 
-pool:
-  vmImage: ubuntu-latest
-
 variables:
   - group: GitHub-Publish-Secrets
   - name: GITHUB_REPO
     value: 'https://x-access-token:$(GITHUB_PAT)@github.com/ProvincieFlevoland/IOU-architectuur.git'
 
-steps:
-- checkout: self
-  fetchDepth: 0
-  persistCredentials: false
+stages:
 
-- script: |
-    set -e
-
-    # Gebruik parameter bij handmatige run, anders de trigger-tag
-    TAG="${{ parameters.releaseTag }}"
-    if [ -z "$TAG" ]; then
-      # Build.SourceBranch geeft refs/tags/pub/v1.0.0 — strip het refs/tags/ prefix
-      TAG="$(Build.SourceBranch)"
-      TAG="${TAG#refs/tags/}"
-    fi
-
-    # Strip pub/ prefix voor de GitHub tag (pub/v1.0.0 → v1.0.0)
-    GITHUB_TAG="${TAG#pub/}"
-
-    # Verifieer dat de tag bestaat
-    git tag | grep -q "^${TAG}$" || { echo "Tag ${TAG} niet gevonden"; exit 1; }
-
-    echo "Exporteren van tag: ${TAG}"
-    SNAPSHOT=$(mktemp -d)
-
-    # Exporteer alleen de whitelisted bestanden via git archive
-    # .gitattributes export-ignore regels worden automatisch toegepast
-    git archive "${TAG}" | tar -x -C "${SNAPSHOT}"
-
-    # Verwijder .claudesync als git archive het toch meeneemt
-    rm -rf "${SNAPSHOT}/docs/en/.claudesync"
-
-    # Sanitize mkdocs.yml — vervang interne GitLab URL door GitHub
-    sed -i \
-      -e 's|repo_url:.*|repo_url: https://github.com/ProvincieFlevoland/IOU-architectuur|' \
-      -e 's|edit_uri:.*|edit_uri: edit/main/docs/|' \
-      -e 's|icon: fontawesome/brands/gitlab|icon: fontawesome/brands/github|' \
-      "${SNAPSHOT}/mkdocs.yml"
-
-    # Secretscan — breek af als er gevoelige patronen gevonden worden
-    if grep -rE '(password|secret|token|api_key|private_key)\s*[:=]\s*[^$\(\{]' \
-        "${SNAPSHOT}" \
-        --include="*.yml" --include="*.yaml" --include="*.env" --include="*.tf" \
-        --include="*.sh" -l 2>/dev/null; then
-      echo "##[error] Mogelijk gevoelige data gevonden — publish afgebroken"
-      exit 1
-    fi
-
-    echo "Snapshot klaar in: ${SNAPSHOT}"
-    echo "##vso[task.setvariable variable=SNAPSHOT_DIR]${SNAPSHOT}"
-    echo "##vso[task.setvariable variable=RELEASE_TAG]${GITHUB_TAG}"
+# ── STAGE 1: Exporteer en sanitize ──────────────────────────────────────────
+- stage: Sanitize
   displayName: 'Exporteer en sanitize snapshot'
+  jobs:
+  - job: export
+    displayName: 'Git archive + sanitize'
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - checkout: self
+      fetchDepth: 0
+      persistCredentials: false
 
-- script: |
-    set -e
+    - script: |
+        set -e
 
-    cd "${SNAPSHOT_DIR}"
+        # Gebruik parameter bij handmatige run, anders de trigger-tag
+        TAG="${{ parameters.releaseTag }}"
+        if [ -z "$TAG" ]; then
+          # Build.SourceBranch geeft refs/tags/pub/v1.0.0 — strip het refs/tags/ prefix
+          TAG="$(Build.SourceBranch)"
+          TAG="${TAG#refs/tags/}"
+        fi
 
-    git init
-    git config user.email "ado-pipeline@provincie-flevoland.nl"
-    git config user.name  "ADO Publish Bot"
+        # Strip pub/ prefix voor de GitHub tag (pub/v1.0.0 → v1.0.0)
+        GITHUB_TAG="${TAG#pub/}"
 
-    git remote add origin "${GITHUB_REPO}"
+        # Verifieer dat de tag bestaat
+        git tag | grep -q "^${TAG}$" || { echo "Tag ${TAG} niet gevonden"; exit 1; }
 
-    git add .
-    git commit -m "Release ${RELEASE_TAG}"
-    git tag "${RELEASE_TAG}"
+        echo "Exporteren van tag: ${TAG}"
+        SNAPSHOT=$(Agent.TempDirectory)/snapshot
+        mkdir -p "${SNAPSHOT}"
 
-    git push origin HEAD:main --tags --force
-  displayName: 'Push naar GitHub'
-  env:
-    GITHUB_REPO: $(GITHUB_REPO)
-    GITHUB_PAT: $(GITHUB_PAT)
+        # Exporteer alleen de whitelisted bestanden via git archive
+        # .gitattributes export-ignore regels worden automatisch toegepast
+        git archive "${TAG}" | tar -x -C "${SNAPSHOT}"
+
+        # Verwijder .claudesync als git archive het toch meeneemt
+        rm -rf "${SNAPSHOT}/docs/en/.claudesync"
+
+        # Sanitize mkdocs.yml — vervang interne GitLab URL door GitHub
+        sed -i \
+          -e 's|repo_url:.*|repo_url: https://github.com/ProvincieFlevoland/IOU-architectuur|' \
+          -e 's|edit_uri:.*|edit_uri: edit/main/docs/|' \
+          -e 's|icon: fontawesome/brands/gitlab|icon: fontawesome/brands/github|' \
+          "${SNAPSHOT}/mkdocs.yml"
+
+        # Secretscan — breek af als er gevoelige patronen gevonden worden
+        if grep -rE '(password|secret|token|api_key|private_key)\s*[:=]\s*[^$\(\{]' \
+            "${SNAPSHOT}" \
+            --include="*.yml" --include="*.yaml" --include="*.env" --include="*.tf" \
+            --include="*.sh" -l 2>/dev/null; then
+          echo "##[error] Mogelijk gevoelige data gevonden — publish afgebroken"
+          exit 1
+        fi
+
+        echo "##vso[task.setvariable variable=GITHUB_TAG;isOutput=true]${GITHUB_TAG}"
+      displayName: 'Exporteer en sanitize'
+      name: sanitize
+
+    - publish: $(Agent.TempDirectory)/snapshot
+      artifact: PublishSnapshot
+      displayName: 'Sla snapshot op als artifact'
+
+# ── STAGE 2: Publish naar GitHub (met approval gate) ────────────────────────
+- stage: Publish
+  displayName: 'Publish naar GitHub'
+  dependsOn: Sanitize
+  variables:
+    GITHUB_TAG: $[ stageDependencies.Sanitize.export.outputs['sanitize.GITHUB_TAG'] ]
+  jobs:
+  - deployment: PushToGitHub
+    displayName: 'Push snapshot naar GitHub'
+    pool:
+      vmImage: ubuntu-latest
+    environment: GitHub-Public      # ← ADO environment met approval gate
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: PublishSnapshot
+
+          - script: |
+              set -e
+
+              cd $(Pipeline.Workspace)/PublishSnapshot
+
+              git init
+              git config user.email "ado-pipeline@provincie-flevoland.nl"
+              git config user.name  "ADO Publish Bot"
+
+              git remote add origin "${GITHUB_REPO}"
+
+              git add .
+              git commit -m "Release $(GITHUB_TAG)"
+              git tag "$(GITHUB_TAG)"
+
+              git push origin HEAD:main --tags --force
+            displayName: 'Push naar GitHub'
+            env:
+              GITHUB_REPO: $(GITHUB_REPO)
+              GITHUB_PAT: $(GITHUB_PAT)

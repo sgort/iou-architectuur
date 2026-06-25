@@ -1,15 +1,20 @@
 # Publishing to Public GitHub
 
-This documentation site is maintained in Azure DevOps (ADO) as the primary source of truth. Selected releases are published to the public GitHub repository [ProvincieFlevoland/IOU-architectuur](https://github.com/ProvincieFlevoland/IOU-architectuur) using a controlled pipeline.
+This documentation site is maintained in Azure DevOps (ADO) as the primary source of truth. Selected releases are published to the public GitHub repository [ProvincieFlevoland/IOU-architectuur](https://github.com/ProvincieFlevoland/IOU-architectuur) using a controlled two-stage pipeline.
 
 ## How it works
 
-Only tagged releases with the `pub/` prefix are published. The pipeline automatically:
+Only tagged releases with the `pub/` prefix are published. The pipeline has two stages:
 
+**Stage 1 — Sanitize (automatic)**
 - Exports a clean snapshot of the tag (no git history, no internal files)
 - Strips internal configuration (GitLab URLs, pipeline files, Azure config)
-- Scans for secrets before pushing
-- Pushes to GitHub with the `pub/` prefix removed from the tag name
+- Scans for secrets — aborts if anything is found
+- Saves the snapshot as a pipeline artifact
+
+**Stage 2 — Publish (requires approval)**
+- Waits for manual approval in the ADO environment `GitHub-Public`
+- After approval: pushes the snapshot to GitHub with the `pub/` prefix removed from the tag name
 
 ## Publishing a release
 
@@ -21,15 +26,19 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-**Step 3 — Create the publish tag to trigger the GitHub pipeline:**
+**Step 3 — Create the publish tag to trigger the pipeline:**
 ```bash
 git tag pub/v1.0.0
 git push origin pub/v1.0.0
 ```
 
-The pipeline triggers automatically. The public GitHub repository receives tag `v1.0.0` (without the `pub/` prefix).
+The pipeline triggers automatically. Stage 1 runs immediately. Stage 2 waits for approval.
 
-**Step 4 — Verify the result on GitHub:**
+**Step 4 — Approve the publish in ADO:**
+
+ADO → Pipelines → **Publish-to-GitHub-IOU-architectuur** → open the running pipeline → approve Stage 2.
+
+**Step 5 — Verify the result on GitHub:**
 
 Check [github.com/ProvincieFlevoland/IOU-architectuur](https://github.com/ProvincieFlevoland/IOU-architectuur) that:
 
