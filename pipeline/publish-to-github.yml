@@ -36,114 +36,13 @@ stages:
       persistCredentials: false
 
     - script: |
-        set -e
-
-        # Gebruik parameter bij handmatige run, anders de trigger-tag
-        TAG="${{ parameters.releaseTag }}"
-        if [ -z "$TAG" ]; then
-          # Build.SourceBranch geeft refs/tags/pub/v1.0.0 — strip het refs/tags/ prefix
-          TAG="$(Build.SourceBranch)"
-          TAG="${TAG#refs/tags/}"
-        fi
-
-        # Strip pub/ prefix voor de GitHub tag (pub/v1.0.0 → v1.0.0)
-        GITHUB_TAG="${TAG#pub/}"
-
-        # Verifieer dat de tag bestaat
-        git tag | grep -q "^${TAG}$" || { echo "Tag ${TAG} niet gevonden"; exit 1; }
-
-        echo "Exporteren van tag: ${TAG}"
-        SNAPSHOT=$(Agent.TempDirectory)/snapshot
-        mkdir -p "${SNAPSHOT}"
-
-        # Exporteer alleen de whitelisted bestanden via git archive
-        # .gitattributes export-ignore regels worden automatisch toegepast
-        git archive "${TAG}" | tar -x -C "${SNAPSHOT}"
-
-        # Verwijder .claudesync als git archive het toch meeneemt
-        rm -rf "${SNAPSHOT}/docs/en/.claudesync"
-
-        # Sanitize mkdocs.yml — vervang interne GitLab URL door GitHub
-        sed -i \
-          -e 's|repo_url:.*|repo_url: https://github.com/ProvincieFlevoland/IOU-architectuur|' \
-          -e 's|edit_uri:.*|edit_uri: edit/main/docs/|' \
-          -e 's|icon: fontawesome/brands/gitlab|icon: fontawesome/brands/github|' \
-          "${SNAPSHOT}/mkdocs.yml"
-
-        # Secretscan — breek af als er gevoelige patronen gevonden worden
-        SCAN_HITS=$(grep -rEl '(password|secret|token|api_key|private_key)\s*[:=]\s*[^$\(\{]' \
-            "${SNAPSHOT}" \
-            --include="*.yml" --include="*.yaml" --include="*.env" --include="*.tf" \
-            --include="*.sh" 2>/dev/null || true)
-
-        # Publiceer manifest als Extensions tab in ADO
-        FILE_COUNT=$(find "${SNAPSHOT}" -type f | wc -l)
-        FILE_LIST=$(find "${SNAPSHOT}" -type f | sed "s|${SNAPSHOT}/||" | sort)
-        MANIFEST_FILE="$(Agent.TempDirectory)/publish-manifest.md"
-
-        cat > "${MANIFEST_FILE}" << 'MANIFEST'
-## Publish Manifest
-MANIFEST
-
-        {
-          echo "| | |"
-          echo "|---|---|"
-          echo "| **Tag (ADO)** | \`${TAG}\` |"
-          echo "| **Tag (GitHub)** | \`${GITHUB_TAG}\` |"
-          echo "| **Bestanden** | ${FILE_COUNT} |"
-          echo ""
-          echo "### Bestanden in snapshot"
-          echo '```'
-          echo "${FILE_LIST}"
-          echo '```'
-          echo ""
-          echo "### Sanitize"
-          echo "- \`repo_url\` → \`https://github.com/ProvincieFlevoland/IOU-architectuur\`"
-          echo "- \`edit_uri\` → \`edit/main/docs/\`"
-          echo "- \`icon\` → \`fontawesome/brands/github\`"
-          echo ""
-          echo "### Secretscan"
-        } >> "${MANIFEST_FILE}"
-
-        if [ -n "${SCAN_HITS}" ]; then
-          echo "❌ Mogelijk gevoelige data gevonden in:" >> "${MANIFEST_FILE}"
-          echo '```' >> "${MANIFEST_FILE}"
-          echo "${SCAN_HITS}" >> "${MANIFEST_FILE}"
-          echo '```' >> "${MANIFEST_FILE}"
-          echo "##vso[task.uploadsummary]${MANIFEST_FILE}"
-          echo "##[error] Mogelijk gevoelige data gevonden — publish afgebroken"
-          exit 1
-        else
-          echo "✅ OK — geen gevoelige data gevonden in ${FILE_COUNT} bestanden" >> "${MANIFEST_FILE}"
-        fi
-
-        echo "##vso[task.uploadsummary]${MANIFEST_FILE}"
-
-        # Toon manifest ook in de pipeline log als inklapbare sectie
-        echo "##[group]PUBLISH MANIFEST"
-        echo "  Tag (ADO):    ${TAG}"
-        echo "  Tag (GitHub): ${GITHUB_TAG}"
-        echo "  Bestanden:    ${FILE_COUNT}"
-        echo ""
-        echo "  Bestanden in snapshot:"
-        echo "${FILE_LIST}" | sed 's/^/    /'
-        echo ""
-        echo "  Gesaniteerd in mkdocs.yml:"
-        echo "    repo_url  → https://github.com/ProvincieFlevoland/IOU-architectuur"
-        echo "    edit_uri  → edit/main/docs/"
-        echo "    icon      → fontawesome/brands/github"
-        echo ""
-        if [ -n "${SCAN_HITS}" ]; then
-          echo "  Secretscan: GEFAALD"
-          echo "${SCAN_HITS}" | sed 's/^/    /'
-        else
-          echo "  Secretscan: OK (${FILE_COUNT} bestanden gescand)"
-        fi
-        echo "##[endgroup]"
-
-        echo "##vso[task.setvariable variable=GITHUB_TAG;isOutput=true]${GITHUB_TAG}"
+        chmod +x pipeline/scripts/sanitize.sh
+        pipeline/scripts/sanitize.sh
       displayName: 'Exporteer en sanitize'
       name: sanitize
+      env:
+        RELEASE_TAG_PARAM: ${{ parameters.releaseTag }}
+        BUILD_SOURCE_BRANCH: $(Build.SourceBranch)
 
     - publish: $(Agent.TempDirectory)/snapshot
       artifact: PublishSnapshot
