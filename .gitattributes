@@ -1,0 +1,8 @@
+# Git export-ignore — bestanden die niet mee gaan bij git archive (publish naar GitHub)
+.github/                              export-ignore
+.gitlab-ci.yml                        export-ignore
+pipeline/                             export-ignore
+azure-static-web-apps-pipeline.yml    export-ignore
+staticwebapp.config.json              export-ignore
+setup-azure.sh                        export-ignore
+docs/en/.claudesync/                  export-ignore

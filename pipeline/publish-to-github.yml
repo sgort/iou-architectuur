@@ -1,0 +1,89 @@
+name: Publish to GitHub — IOU Architectuur
+
+trigger:
+  branches:
+    exclude:
+      - '*'      # geen branch-triggers, alleen tags
+  tags:
+    include:
+      - pub/v*   # bijv. pub/v1.0.0 → triggert publish naar GitHub
+                 # gewone v1.0.0 tags triggeren niets
+
+parameters:
+  - name: releaseTag
+    displayName: 'Release tag (bijv. pub/v1.0.0) — leeg laten bij tag-trigger'
+    type: string
+    default: ''
+
+variables:
+  - group: GitHub-Publish-Secrets
+  - name: GITHUB_REPO
+    value: 'https://x-access-token:$(GITHUB_PAT)@github.com/ProvincieFlevoland/IOU-architectuur.git'
+
+stages:
+
+# ── STAGE 1: Exporteer en sanitize ──────────────────────────────────────────
+- stage: Sanitize
+  displayName: 'Exporteer en sanitize snapshot'
+  jobs:
+  - job: export
+    displayName: 'Git archive + sanitize'
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - checkout: self
+      fetchDepth: 0
+      persistCredentials: false
+
+    - script: |
+        chmod +x pipeline/scripts/sanitize.sh
+        pipeline/scripts/sanitize.sh
+      displayName: 'Exporteer en sanitize'
+      name: sanitize
+      env:
+        RELEASE_TAG_PARAM: ${{ parameters.releaseTag }}
+        BUILD_SOURCE_BRANCH: $(Build.SourceBranch)
+
+    - publish: $(Agent.TempDirectory)/snapshot
+      artifact: PublishSnapshot
+      displayName: 'Sla snapshot op als artifact'
+
+# ── STAGE 2: Publish naar GitHub (met approval gate) ────────────────────────
+- stage: Publish
+  displayName: 'Publish naar GitHub'
+  dependsOn: Sanitize
+  variables:
+    GITHUB_TAG: $[ stageDependencies.Sanitize.export.outputs['sanitize.GITHUB_TAG'] ]
+  jobs:
+  - deployment: PushToGitHub
+    displayName: 'Push snapshot naar GitHub'
+    pool:
+      vmImage: ubuntu-latest
+    environment: GitHub-Public      # ← ADO environment met approval gate
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: PublishSnapshot
+
+          - script: |
+              set -e
+
+              cd $(Pipeline.Workspace)/PublishSnapshot
+
+              git init
+              git config user.email "ado-pipeline@provincie-flevoland.nl"
+              git config user.name  "ADO Publish Bot"
+
+              git remote add origin "${GITHUB_REPO}"
+
+              git add .
+              git commit -m "Release $(GITHUB_TAG)"
+              git tag "$(GITHUB_TAG)"
+
+              git push origin HEAD:main --tags --force
+            displayName: 'Push naar GitHub'
+            env:
+              GITHUB_REPO: $(GITHUB_REPO)
+              GITHUB_PAT: $(GITHUB_PAT)
