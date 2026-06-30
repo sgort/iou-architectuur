@@ -322,3 +322,28 @@ exactly the count `/v1/norms?cprmv_version=0.4.1` returns (the 9 sub-clauses fol
     **not** emit `cprmv:contains` / nested child rules. The LDE `/v1/norms` query still has an
     `OPTIONAL { ?rule cprmv:contains … }` for backward compatibility, but current editor
     output never populates it.
+
+---
+
+## Known limitations & planned changes
+
+These follow from the v1.10.5 changes and mainly affect downstream consumers — notably the
+Linked Data Explorer `/v1/norms` endpoint and its
+[API stability contract](../../linked-data-explorer/reference/api-stability.md):
+
+- **0.4.1 RuleSets carry no publication timestamp.** A `cprmv:RuleSet` has `cprmv:validFrom`
+  (the applicable date) but no `dct:issued`. `/v1/norms` therefore uses `validFrom` as the
+  `published_at` / cache signal for the 0.4.1 target, so a re-publish that keeps the same
+  `validFrom` but corrects rule values does **not** invalidate consumers' HTTP caches (up to
+  `max-age`, 1 h). **Planned:** emit a publication timestamp (`dct:issued` or
+  `prov:generatedAtTime`) on the RuleSet so 0.4.1 caching is correction-accurate, matching the
+  0.3.x `cprmv:Dataset` behaviour.
+- **`cprmv:contains` is vestigial downstream.** Sub-clauses fold into the parent
+  `cprmv:definition`, so the editor never emits `cprmv:contains` child rules. The `/v1/norms`
+  query keeps an `OPTIONAL { ?rule cprmv:contains … }` branch and a "nested children" example
+  purely for legacy compatibility; both are candidates for removal once no legacy data relies
+  on them.
+- **`dataset_versions[].version: null` is now legacy-only.** Because every ruleset is dated
+  from its own rules, non-primary rulesets are versioned too; a `null` version only appears for
+  data published before v1.10.5. The "version unknown for non-primary rulesets" handling in
+  consumers and in the contract doc can be pruned once such data is gone.
