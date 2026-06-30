@@ -4,6 +4,15 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 ---
 
+!!! abstract "📌 Documentation update · 30 June 2026 — CPRMV version selector & `/v1/norms?cprmv_version=`"
+    Today's feature deployment is documented on **three pages**. The rest of the
+    documentation (and the **Documentation Status** table below) is **not yet** updated to
+    this version.
+
+    - [CPRMV RuleSet / Dataset Generation](cpsv-editor/developer/cprmv-dataset-generation.md) — the CPSV editor's **0.3.2 / 0.4.1** target selector, per-ruleset date derivation, duplicate-path URIs, the SHACL fix, and sub-clause folding.
+    - [Linked Data Explorer — `/v1/norms`](linked-data-explorer/developer/backend.md#norms) — the **`?cprmv_version=`** parameter (`0.3.0` / `0.3.2` / `0.4.1`) and the `cprmv:Dataset`-vs-`cprmv:RuleSet` metadata model.
+    - [API Stability Contract](linked-data-explorer/reference/api-stability.md) — what's contract-stable (default `0.3.0`) vs. **experimental** (`0.3.2` / `0.4.1`).
+
 ## 🆕 What's New
 
 <div class="grid cards whats-new-cards" markdown>
