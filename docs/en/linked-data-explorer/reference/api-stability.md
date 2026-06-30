@@ -63,7 +63,16 @@ The `cprmv_version` envelope field echoes the version requested via `?cprmv_vers
 - `0.3.0` / `0.3.2` → `https://cprmv.open-regels.nl/<version>/…`
 - `0.4.1` → `https://standaarden.open-regels.nl/standards/cprmv/0.4.1#…`
 
-Stability within v1: **the default (`0.3.0`) response shape and its predicate URIs do not change.** Requesting a different `cprmv_version` is an explicit opt-in to that namespace — not a breaking change to the default contract. A consumer that never sends the parameter is unaffected by new versions being added to the supported set. A future change that altered the *default* version, or the predicate URIs of an already-supported version, would be released as `/v2/norms`.
+Stability within v1: **the default (`0.3.0`) response shape and its predicate URIs do not change.** Requesting a different `cprmv_version` is an explicit opt-in to that namespace — not a breaking change to the default contract. A consumer that never sends the parameter is unaffected by new versions being added to the supported set. A future change that altered the **default** version, or the predicate URIs of the **default** version, would be released as `/v2/norms`.
+
+!!! warning "Experimental versions — `0.3.2` and `0.4.1` are not part of the v1 guarantee"
+    Only the default **`0.3.0`** is covered by this stability contract. **`0.3.2` and `0.4.1`
+    are experimental / preview:** their response shape, predicate URIs, `dataset_versions`
+    semantics (e.g. the 0.4.1 `cprmv:RuleSet`/`validFrom` model and its
+    [cache caveat](#detecting-publications)) and even their availability may change — or be
+    withdrawn — **without** a `/v2/norms` and outside the additive-evolution promise above.
+    Build long-term G2G integrations against the default; treat `?cprmv_version=0.3.2` /
+    `0.4.1` as opt-in until a version is explicitly promoted into this contract.
 
 ## Per-rulesetid dataset versioning
 
@@ -181,7 +190,7 @@ When `/v2/norms` is eventually introduced:
 |----------|--------|
 | Can I cache a rule's values indefinitely? | Yes, keyed by `(rulesetid, applicable_date, rulesetid_index)` |
 | How do I detect new publications efficiently? | Use `If-None-Match` with the previous `ETag` — `304` means nothing changed |
-| Which `cprmv_version` should I request? | Omit it for the stable default (`0.3.0`). Send `?cprmv_version=0.3.2` or `0.4.1` only if you specifically want that namespace. The default's shape and predicate URIs are contract-stable within v1. |
+| Which `cprmv_version` should I request? | Omit it for the stable default (`0.3.0`). Send `?cprmv_version=0.3.2` or `0.4.1` only if you specifically want that namespace — these are **experimental** and **not** covered by the v1 guarantee (may change/withdraw without `/v2/`). Only the default's shape and predicate URIs are contract-stable within v1. |
 | What if a rulesetid is missing from `dataset_versions`? | That ruleset has no version record yet (a `cprmv:Dataset` for 0.3.x / a `cprmv:RuleSet` for 0.4.1); do not cache |
 | What does `Cache-Control: no-cache` mean here? | At least one rulesetid in your query is unversioned — refetch every time |
 | What does `version: null` mean? | Legacy data published before CPSV editor v1.10.5 — its non-primary version was unknown. Current data versions **every** ruleset, so `null` is rare. `published_at` remains authoritative for change detection (with the [0.4.1 caveat](#detecting-publications)). |

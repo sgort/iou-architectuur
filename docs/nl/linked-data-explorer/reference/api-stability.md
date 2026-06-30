@@ -63,7 +63,17 @@ Het envelopveld `cprmv_version` echoot de versie die via `?cprmv_version=` is ge
 - `0.3.0` / `0.3.2` → `https://cprmv.open-regels.nl/<versie>/…`
 - `0.4.1` → `https://standaarden.open-regels.nl/standards/cprmv/0.4.1#…`
 
-Stabiliteit binnen v1: **de default-respons (`0.3.0`) en zijn predicate-URI's veranderen niet.** Een andere `cprmv_version` opvragen is een expliciete opt-in voor die namespace — geen breaking change aan het default-contract. Een afnemer die de parameter nooit meestuurt, wordt niet geraakt door nieuwe versies in de ondersteunde set. Een toekomstige wijziging die de *default*-versie verandert, of de predicate-URI's van een reeds ondersteunde versie, zou worden uitgebracht als `/v2/norms`.
+Stabiliteit binnen v1: **de default-respons (`0.3.0`) en zijn predicate-URI's veranderen niet.** Een andere `cprmv_version` opvragen is een expliciete opt-in voor die namespace — geen breaking change aan het default-contract. Een afnemer die de parameter nooit meestuurt, wordt niet geraakt door nieuwe versies in de ondersteunde set. Een toekomstige wijziging die de **default**-versie verandert, of de predicate-URI's van de **default**-versie, zou worden uitgebracht als `/v2/norms`.
+
+!!! warning "Experimentele versies — `0.3.2` en `0.4.1` vallen niet onder de v1-garantie"
+    Alleen de default **`0.3.0`** valt onder dit stabiliteitscontract. **`0.3.2` en `0.4.1` zijn
+    experimenteel / preview:** hun responsvorm, predicate-URI's, `dataset_versions`-semantiek
+    (bijv. het 0.4.1-`cprmv:RuleSet`/`validFrom`-model en de
+    [cachekanttekening](#publicaties-detecteren)) en zelfs hun beschikbaarheid kunnen wijzigen —
+    of worden ingetrokken — **zonder** een `/v2/norms` en buiten de additieve-evolutiebelofte
+    hierboven. Bouw langetermijn-G2G-integraties tegen de default; behandel
+    `?cprmv_version=0.3.2` / `0.4.1` als opt-in totdat een versie expliciet in dit contract wordt
+    opgenomen.
 
 ## Datasetversiebeheer per rulesetid
 
@@ -181,7 +191,7 @@ Wanneer `/v2/norms` uiteindelijk wordt geïntroduceerd:
 |-------|----------|
 | Mag ik de waarden van een regel onbeperkt cachen? | Ja, gekeyd op `(rulesetid, applicable_date, rulesetid_index)` |
 | Hoe detecteer ik nieuwe publicaties efficiënt? | Gebruik `If-None-Match` met de vorige `ETag` — `304` betekent dat er niets is gewijzigd |
-| Welke `cprmv_version` moet ik opvragen? | Laat hem weg voor de stabiele default (`0.3.0`). Stuur `?cprmv_version=0.3.2` of `0.4.1` alleen als u die namespace specifiek wilt. De vorm en predicate-URI's van de default zijn contractstabiel binnen v1. |
+| Welke `cprmv_version` moet ik opvragen? | Laat hem weg voor de stabiele default (`0.3.0`). Stuur `?cprmv_version=0.3.2` of `0.4.1` alleen als u die namespace specifiek wilt — deze zijn **experimenteel** en vallen **niet** onder de v1-garantie (kunnen wijzigen/ingetrokken worden zonder `/v2/`). Alleen de vorm en predicate-URI's van de default zijn contractstabiel binnen v1. |
 | Wat als een rulesetid ontbreekt in `dataset_versions`? | Die regelset heeft nog geen versierecord (een `cprmv:Dataset` voor 0.3.x / een `cprmv:RuleSet` voor 0.4.1); niet cachen |
 | Wat betekent `Cache-Control: no-cache` hier? | Ten minste één rulesetid in uw query is niet versie-gebonden — telkens opnieuw ophalen |
 | Wat betekent `version: null`? | Legacy-data gepubliceerd vóór CPSV editor v1.10.5 — de niet-primaire versie was onbekend. Actuele data versioneert **elke** regelset, dus `null` is zeldzaam. `published_at` blijft gezaghebbend voor wijzigingsdetectie (met de [0.4.1-kanttekening](#publicaties-detecteren)). |
