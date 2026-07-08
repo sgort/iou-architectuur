@@ -206,13 +206,24 @@ The `extractPrimaryDecisionKey()` helper skips constant parameters automatically
 
 ```javascript
 // Filters decisions with p_* prefix (constants)
-// Returns the last non-constant decision (typically the output decision)
-// Falls back to first decision if all are constants
+// Prefers a *root* decision — one no other decision requires via
+//   informationRequirement/requiredDecision (v1.10.3)
+// Document order breaks ties between multiple independent roots
+// Falls back to the first decision if all are constants
 ```
 
 As of v1.9.6 this helper lives in `src/utils/dmnHelpers.js` and is exported, so both
 `DMNTab.jsx` and the DSO import hook share one implementation instead of duplicating the
 parser.
+
+**Root-decision preference (v1.10.3).** The helper previously returned the *last*
+non-constant decision, which broke models whose intended output decision is authored
+earlier or in a non-obvious position. It now prefers a decision that no other decision
+requires (a DRD root). When several independent roots exist (e.g. a combined
+Recht-én-Hoogte model) document order still decides, and a console warning points to the
+**Decision Key** dropdown. That dropdown renders on the DMN File card whenever a file
+has more than one testable decision, listing each as `Name (id)`; selecting one updates
+the decision key and the evaluation URL everywhere.
 
 Console log on extraction:
 ```
@@ -232,6 +243,35 @@ When a DMN file is loaded, `generateRequestBodyFromDMN` walks the top-level `<in
 3. **Name-based heuristics.** `string`-typed inputs whose name contains `datum`/`date`/`dag` default to today's date; `geboorte` defaults to a random adult birth date; `aantal`/`bedrag`/`inkomen` default to `0`. Heuristics run only when steps 1 and 2 leave the value empty.
 
 The resulting body is editable in the DMN tab's request-body panel before each evaluate call. Authors who want a richer starter body without writing custom code can simply add `<inputValues>` constraints to the relevant decisionTable input columns — this also documents intent in the DMN itself, which downstream tooling (validators, decision-table editors) can consume.
+
+---
+
+## Test-case verification
+
+`evaluateTestCaseExpectation` (v1.10.3) compares each uploaded test case's expected
+outputs against the engine's actual outputs and returns a verdict, so a case only passes
+when it is functionally correct — not merely because the HTTP call returned 200. It reads
+the expectation from the readable `key=value, reden="…"` string, a structured `expected`
+object, or the special empty-result case, and yields one of:
+
+| Verdict | Condition |
+|---|---|
+| `PASS` | expected outputs match actual |
+| `FAIL` | mismatch — an Expected-vs-Actual table is rendered per output |
+| `ERROR` | the evaluate call itself failed |
+| `OK-unchecked` | no expectation could be parsed (amber; never a silent pass) |
+
+Summary and header counts are verdict-based. Run All Test Cases routes each case to its
+own decision — a case's optional `decision` field is the evaluation key, falling back to
+the selected Decision Key (v1.10.4).
+
+**Empty-result expectations (v1.10.6).** The empty-result branch originally matched only
+the descriptive strings `empty result` / `no matching rule`, so a literal `[]` (or `{}`)
+expectation fell through to the `key=value` parser, found no pairs, and was judged
+`OK-unchecked` even though an empty engine response was exactly correct. The check now
+also matches a literal empty array or object, so `[]` is treated as *expect an empty
+result set* (e.g. Thuisbatterij `jaarGebondenBudget` years 2025/2028 outside the modelled
+range now pass). A non-empty response against an `[]` expectation still fails.
 
 ---
 

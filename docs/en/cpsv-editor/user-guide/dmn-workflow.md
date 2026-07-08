@@ -68,7 +68,9 @@ Review the auto-generated request body in the test panel. Edit variable values t
 
 Click **Evaluate Decision** to call `POST /engine-rest/decision-definition/key/{decisionKey}/evaluate`. The response is displayed inline.
 
-For multi-table DMNs, expand the **Intermediate Decision Tests** section and click **Run Intermediate Tests** to evaluate each sub-decision individually — useful for isolating which part of a complex DRD is producing an unexpected result.
+If the file contains more than one testable decision, use the **Decision Key** dropdown on the DMN File card to choose which decision to evaluate — the editor defaults to the root decision (one no other decision requires), but you can point it at any of them, and the evaluation URL updates to match (v1.10.3).
+
+For multi-table DMNs, expand the **Intermediate Decision Tests** section and click **Run Intermediate Tests** to evaluate each sub-decision individually — useful for isolating which part of a complex DRD is producing an unexpected result. For batch, *verified* scenario testing, see [DMN Testing](dmn-testing.md).
 
 ---
 

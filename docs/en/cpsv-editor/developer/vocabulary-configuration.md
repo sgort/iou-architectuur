@@ -49,6 +49,13 @@ namespaces: {
 }
 ```
 
+!!! note "Selectable CPRMV export namespace (v1.10.5)"
+    The `cprmv` entry above is the default `0.4.1` export namespace. The toolbar
+    **CPRMV version selector** can instead bind `cprmv:` to the `0.3.2` versioned path
+    `https://cprmv.open-regels.nl/0.3.2/` for the generated Turtle (preview, download and
+    publish), which also switches the ruleset grouping from `cprmv:RuleSet` to a
+    `cprmv:Dataset` per ruleset. Both namespaces remain accepted on import.
+
 **Adding a namespace:**
 
 ```javascript

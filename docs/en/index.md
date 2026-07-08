@@ -4,15 +4,6 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 ---
 
-!!! abstract "📌 Documentation update · 30 June 2026 — CPRMV version selector & `/v1/norms?cprmv_version=`"
-    Today's feature deployment is documented on **three pages**. The rest of the
-    documentation (and the **Documentation Status** table below) is **not yet** updated to
-    this version.
-
-    - [CPRMV RuleSet / Dataset Generation](cpsv-editor/developer/cprmv-dataset-generation.md) — the CPSV editor's **0.3.2 / 0.4.1** target selector, per-ruleset date derivation, duplicate-path URIs, the SHACL fix, and sub-clause folding.
-    - [Linked Data Explorer — `/v1/norms`](linked-data-explorer/developer/backend.md#norms) — the **`?cprmv_version=`** parameter (`0.3.0` / `0.3.2` / `0.4.1`) and the `cprmv:Dataset`-vs-`cprmv:RuleSet` metadata model.
-    - [API Stability Contract](linked-data-explorer/reference/api-stability.md) — what's contract-stable (default `0.3.0`) vs. **experimental** (`0.3.2` / `0.4.1`).
-
 ## 🆕 What's New
 
 <div class="grid cards whats-new-cards" markdown>
@@ -37,13 +28,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Documentation](norm-editor/index.md)
     
--   **✏️ CPSV Editor — v1.10.2** · *June 2026*
+-   **✏️ CPSV Editor — v1.10.6** · *July 2026*
 
     ---
 
-    **CPRMV 0.4.1 & CPSV-AP 3.2.0 conformance**
+    **CPRMV version selector & verified DMN test cases**
 
-    Editor-generated Turtle now validates clean against the [CPRMV 0.4.1](cpsv-editor/reference/namespace-property-reference.md) and CPSV-AP 3.2.0 SHACL shapes — `cprmv:RuleSet`/`cprmv:RuleMethod` grouping, `dct:spatial` organisations, and an [advisory pre-publish SHACL check](cpsv-editor/features/triplydb-publishing.md). Decision models can also be handed off straight from the Linked Data Explorer via the new [DSO → DMN deep-link import](cpsv-editor/features/dso-import.md).
+    Preview, export and publish now target a [selectable CPRMV vocabulary version](cpsv-editor/features/import-export.md#cprmv-vocabulary-version-041-032) — `0.4.1` (`cprmv:RuleSet`) or `0.3.2` (`cprmv:Dataset`) — with consolidation dates derived from the rules and collision-free rule URIs. DMN [test cases are now functionally verified](cpsv-editor/user-guide/dmn-testing.md): PASS/FAIL/ERROR/OK-unchecked verdicts with Expected-vs-Actual diffs, per-decision routing, and empty-result checks.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
