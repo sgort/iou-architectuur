@@ -414,6 +414,8 @@ src/db/
 └── migrate.ts    — idempotent DDL: process_definitions, form_schemas, document_templates
 ```
 
+As of v1.9.9, `process_definitions` carries a `board_owner` column that records the owning board chosen (or auto-derived from candidate groups) at deploy time. It is set from the deployed BPMN's process-level `camunda:property boardOwner` and surfaced through `/bundles/public`, so downstream consumers (the ronl-business-api Procesbibliotheek and archive split) can group processes by board.
+
 See [PostgreSQL Deployment](deployment-postgresql.md) for Azure provisioning.
 
 ---

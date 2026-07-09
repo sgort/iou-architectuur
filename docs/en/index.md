@@ -38,13 +38,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.9.7** · *June 2026*
+-   **🔍 Linked Data Explorer — v1.9.11** · *July 2026*
 
     ---
 
-    **DSO rule extraction & three-layer SHACL validation**
+    **Board-owner deploys & a negotiable `/v1/norms` CPRMV version**
 
-    The DSO Explorer now extracts an activity's *toepasbare regels* into deploy-ready LDE assets — a normalized DMN (deploys & evaluates on Operaton) or a form-js scaffold imported straight into the Form Editor — and can hand a DMN off to the CPSV Editor for publishing. The SHACL Validator gained a third **CPRMV 0.4.1** layer alongside CPSV-AP 3.2.0 and RONL Custom, and the ChainBuilder/`/v1/dmns` now discover DMNs under both the 0.3.0 and 0.4.1 CPRMV namespaces.
+    The BPMN deploy modal now requires a [board owner](linked-data-explorer/user-guide/bpmn-modeler.md#deploying-to-operaton) — auto-detected from candidate groups, stamped as `camunda:property boardOwner`, and exposed via `/bundles/public`. The [`/v1/norms`](linked-data-explorer/developer/backend.md#norms) endpoint gained a `?cprmv_version=` selector (`0.3.0` default, `0.3.2`/`0.4.1` experimental) matching the CPSV Editor's export targets, and the CPRMV SHACL layer added the `ParameterWaarde`/`TemporalRule` shapes.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

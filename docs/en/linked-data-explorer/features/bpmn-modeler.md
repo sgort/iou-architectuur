@@ -160,12 +160,16 @@ All resources are sent in a single multipart `POST` to Operaton. Because the BPM
 
 The modal provides:
 
+- **Board ownership** *(required, v1.9.9)* — the owning board, auto-detected from the process's candidate groups (infra/rip → Infra-board, caseworker/hr → Caseworker) and overridable. The choice is stamped onto the deployed BPMN as a process-level `camunda:property boardOwner`, persisted on the `process_definitions` record (`board_owner` column), and exposed via `/bundles/public` for downstream consumers (ronl-business-api Procesbibliotheek and archive split)
 - **Operaton endpoint** — pre-filled from `VITE_OPERATON_BASE_URL`, editable per deployment
 - **Username / Password** — optional HTTP Basic Auth for instances that require it
 - **Resource list** — shows exactly what will be included before you commit
 - **Deploy button** — disabled after a successful deployment to prevent accidental re-deploy
 
 If a `camunda:formRef` references a form ID that is not found in `localStorage`, it is listed as an unmatched reference. The deployment still proceeds, but that form will not resolve at runtime.
+
+!!! note "Board-owner injection preserves BPMN schema order (v1.9.11)"
+    When a `<bpmn:process>` already carries a `<bpmn:documentation>` child, the `boardOwner` property is inserted **after** it — `injectBoardOwner` skips past any leading `<documentation>` element(s) before locating or creating `extensionElements`, so the resulting XML stays schema-valid (documentation must precede extensionElements). Deploy failures also now surface Operaton's actual response body rather than a generic Axios message.
 
 ---
 

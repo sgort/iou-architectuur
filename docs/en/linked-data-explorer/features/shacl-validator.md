@@ -42,7 +42,7 @@ Results are grouped into three layers (v1.9.5 added the CPRMV layer). Each layer
 | Layer | Source | Covers |
 |---|---|---|
 | CPSV-AP 3.2.0 | Canonical SEMIC shapes, vendored | The full CPSV-AP model — `PublicService`, `Rule`, `PublicOrganisation`, `ContactPoint`, `Channel`, `Address`, and related classes (32 shapes). Enforces required properties, datatypes, and class constraints. |
-| CPRMV 0.4.1 | CPRMV SHACL shapes (`shapes/cprmv/0.4.1/cprmv.shacl.ttl`) | The CPRMV rule-management model — `RuleSet`, `Rule`, `RuleMethod` and their required properties. Added in v1.9.5. |
+| CPRMV 0.4.1 | CPRMV SHACL shapes (`shapes/cprmv/0.4.1/cprmv.shacl.ttl`) | The CPRMV rule-management model — `RuleSet`, `Rule`, `RuleMethod` and their required properties. Added in v1.9.5; v1.9.8 added `ParameterWaardeShape` (mandatory `skos:notation`/`skos:prefLabel`) and `TemporalRuleShape`. See the [SHACL Validation Reference](../reference/shacl-validation-reference.md#parameter-and-temporal-rule-shapes-v198). |
 | RONL Custom | RONL-authored shapes | RONL publishing invariants on top of CPSV-AP — at most one `foaf:homepage` / `dct:identifier` / `cv:spatial` per organisation, and at most one `dct:title` / `dct:description` per language on a rule. |
 
 A file is **valid** when no layer produces an error. Warnings and informational messages are advisory.
