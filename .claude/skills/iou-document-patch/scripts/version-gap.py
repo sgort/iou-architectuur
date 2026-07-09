@@ -70,20 +70,29 @@ def documented_version(docs_root, component):
     raise ValueError(f"Component '{component}' not found in {rv_path}")
 
 
-def roadmap_top_version(docs_root):
-    """Best-effort: read the newest ### vX.Y.Z heading in changelog-roadmap.md."""
+def component_slug(component):
+    """'CPSV Editor' -> 'cpsv-editor', 'Linked Data Explorer' -> 'linked-data-explorer'."""
+    return re.sub(r"[^a-z0-9]+", "-", component.strip().lower()).strip("-")
+
+
+def roadmap_top_version(docs_root, component, roadmap_override=None):
+    """Best-effort: read the newest ### vX.Y.Z heading in the component's
+    developer changelog-roadmap.md. The path is derived from the component name
+    (docs/en/<slug>/developer/changelog-roadmap.md) unless overridden."""
     rm = (
-        Path(docs_root)
+        Path(roadmap_override)
+        if roadmap_override
+        else Path(docs_root)
         / "docs"
         / "en"
-        / "cpsv-editor"
+        / component_slug(component)
         / "developer"
         / "changelog-roadmap.md"
     )
     if not rm.exists():
         return None
     for line in rm.read_text(encoding="utf-8").splitlines():
-        m = re.match(r"^###\s+v(\d+\.\d+\.\d+)", line.strip())
+        m = re.match(r"^###\s+v?(\d+\.\d+\.\d+)", line.strip())
         if m:
             return m.group(1)
     return None
@@ -94,6 +103,12 @@ def main(argv=None):
     ap.add_argument("--docs-root", default=".")
     ap.add_argument("--changelog", default=None)
     ap.add_argument("--component", default="CPSV Editor")
+    ap.add_argument(
+        "--roadmap",
+        default=None,
+        help="Path to the component's changelog-roadmap.md "
+        "(default: docs/en/<component-slug>/developer/changelog-roadmap.md)",
+    )
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
 
@@ -107,7 +122,7 @@ def main(argv=None):
     versions = load_changelog_versions(changelog_path)
     latest = versions[0].get("version", "").strip()
     doc_ver, rv_path = documented_version(docs_root, args.component)
-    roadmap_ver = roadmap_top_version(docs_root)
+    roadmap_ver = roadmap_top_version(docs_root, args.component, args.roadmap)
 
     doc_key = parse_semver(doc_ver)
     gap = [

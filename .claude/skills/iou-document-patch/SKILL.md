@@ -152,10 +152,17 @@ Check which referenced files actually exist:
 ls docs/assets/screenshots/
 ```
 
-Write the manifest to **`docs/cpsv-editor-screenshots-todo.md`** (committed) with
-one row per screenshot: status (NEW/REPLACE), filename, embedding page(s),
-caption, and the reason/version that triggered it. This is a deliverable in its
-own right — the user captures these separately.
+Write the manifest to **`screenshot-manifest/<component-slug>-screenshots-todo.md`**
+(committed) with one row per screenshot: status (NEW/REPLACE), filename, embedding
+page(s), caption, and the reason/version that triggered it. This is a deliverable
+in its own right — the user captures these separately.
+
+!!! important "Keep manifests out of `docs/`"
+    The manifest is an operational artifact, **not** documentation content. Write
+    it under the root `screenshot-manifest/` folder, never under `docs/` — any
+    loose `.md` in the MkDocs source tree that isn't in the `nav` produces a
+    "not included in the nav configuration" warning on `mkdocs serve`/`build`.
+    The screenshots themselves still go in `docs/assets/screenshots/`.
 
 !!! invariant "Every manifest entry must map to a real `<figure>`"
     A screenshot only belongs in the manifest if a page **embeds** it. So:
@@ -214,7 +221,8 @@ Work in this order so a failure leaves the docs in an obvious half-state:
 5. **NL pages** — for real translations (`due-diligence.md`) apply the
    corresponding edit; for placeholders, only sync mirrored section headers if
    the EN page structure changed.
-6. **`docs/cpsv-editor-screenshots-todo.md`** — write the manifest.
+6. **`screenshot-manifest/<component-slug>-screenshots-todo.md`** — write the
+   manifest (root folder, **not** under `docs/`).
 7. **`repo-versions.json`** — set the CPSV Editor `version`/`commit`/
    `commit_date`/`environment`/`repo_url` and the top-level `docs_built` to the
    user-confirmed values.
