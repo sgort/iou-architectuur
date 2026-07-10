@@ -4,6 +4,48 @@
 
 ## Changelog
 
+### v1.10.6 — Empty-result Test Verification (July 2026)
+
+**Test cases that expect an empty result set are now auto-verified.** A DMN test case whose expected value is the literal empty collection `[]` (or `{}`) — meaning no rule matches and the engine correctly returns an empty result — was previously reported as *"OK (unchecked)"* because the empty-result branch in `evaluateTestCaseExpectation` only recognised the descriptive strings *"empty result"* / *"no matching rule"*. A literal `[]` fell through to the `key=value` parser, found no pairs, and was judged unverified even though the response was exactly correct. The empty-result check now also matches a literal empty array or object, so an expected value of `[]` is treated as *"expect an empty result set"*. Boundary cases such as the Thuisbatterij `jaarGebondenBudget` years outside the modelled range (2025, 2028) now pass automatically. A non-empty response against an `[]` expectation still fails, and structured/descriptive expectations are unaffected.
+
+---
+
+### v1.10.5 — CPRMV Version Selector & Rules-derived Dates (June 2026)
+
+> Full deep-dive: [CPRMV RuleSet / Dataset Generation](cprmv-dataset-generation.md).
+
+**Choose which CPRMV vocabulary version to preview, export and publish.** A CPRMV version selector (`0.4.1` / `0.3.2`) next to the preview/export controls now drives the generated TTL. The editor previously always emitted the `0.4.1` namespace (`https://standaarden.open-regels.nl/standards/cprmv/0.4.1#`), so data published for a `0.3.x` consumer was invisible to it. Selecting `0.3.2` binds `cprmv:` to `https://cprmv.open-regels.nl/0.3.2/` — the versioned-path namespace the Linked Data Explorer `/v1/norms?cprmv_version=0.3.2` query reads. The two targets differ in shape, not just prefix: `0.4.1` wraps the rules in a `cprmv:RuleSet` (+ `cprmv:hasPart`); `0.3.2` instead emits a `cprmv:Dataset` per ruleset — the unit `/v1/norms` reports under `dataset_versions`. The flat `cprmv:Rule` resources are emitted for both targets. The selection applies consistently to the live preview, the TTL download, and the publish-to-TriplyDB action.
+
+**Consolidation date is derived from the rules, not entered by hand.** The published consolidation date — the `eli:is_realized_by` version on the LegalResource and every `cprmv:RuleSet`'s `cprmv:validFrom` and versioned `cprmv:id` — is now derived per ruleset from the BWB in-force date the rules themselves carry in their `ruleIdPath` (e.g. `BWBR0015703_2026-04-03_0` → `2026-04-03`), rather than the manually-entered *"Version or consolidation date"* field, which had let an operator pick a date that disagreed with the rules. Each ruleset is dated from its own rules, so non-primary rulesets (entering via `cprmv:Rule` references, e.g. BWBR0044894 and BWBR0015711) are now versioned correctly too — previously they were emitted version-less. The manual field remains a fallback when no rule carries a dated `ruleIdPath`, with today's date as a last resort.
+
+**Rules sharing a legal path no longer collapse on publish.** A `cprmv:Rule`'s subject URI was built only from its `ruleIdPath`, so two rules on the same legal path — a range's bounds or multiple maxima (*"per maand"* / *"per kalenderjaar"*) — resolved to the same RDF subject and silently merged on publish (a 69-rule import surfaced as only 66 norms). Each rule now gets a unique subject URI: the first occurrence of a path keeps the path-derived URI, and each subsequent duplicate gets an `_N` suffix (`_2`, `_3`, …) in document order. Both the flat `cprmv:Rule` resources and the `0.4.1` `cprmv:RuleSet` `hasPart` list use the same assignment (69 in, 69 out). The duplicates still share a `rule_id_path_key`, which the LDE treats as the dedup key.
+
+**`0.3.2` datasets pass CPSV-AP 3.2.0 validation.** The `0.3.2` `cprmv:Dataset` records were co-typed `dcat:Dataset`, which triggered the CPSV-AP 3.2.0 `DatasetShape` and raised an error per dataset for missing `dct:title`/`dct:description`/`dct:publisher` plus an untyped `dcat:landingPage`. They are now typed only `cprmv:Dataset` — the class the LDE `dataset_versions` query reads, and one that no shape targets — so pre-publish validation passes (4 errors per dataset → 0) while the data stays fully consumable.
+
+**Nested sub-clauses fold into their parent rule on import.** Importing a CPRMV Rules API payload no longer creates standalone, norm-less rules for nested enumeration sub-clauses (e.g. the *onderdeel 1°./2°./3°.* under *Artikel 31, lid 2, onderdeel r.*). Those `hasPart` members carry no `rule_id_path`, so they are folded — in order, recursively — into the parent rule's `cprmv:definition`, which keeps the complete legal text. Nested members that are rules in their own right (carry a `rule_id_path`) are still imported separately. For the 1 juli 2026 `0.4.1` normenbrief this turns 81 imported entries into 72 — exactly the norms `/v1/norms` returns.
+
+**Toolbar polish and a runnable generator test suite.** The CPRMV version selector is styled as a toolbar control matching the action buttons, and the Import / Show Preview / Clear All buttons no longer wrap to two lines. Generator tests are runnable with `npm run test:generator` (one-shot), `test:generator:watch` and `test:ci`; they cover the version selector (namespace + shape), the rules-derived dates, and the duplicate-path URI handling, and live in `src/utils/ttlGenerator.*.test.js`.
+
+---
+
+### v1.10.4 — Test Routing, Concept Coverage & Parameter Validation (June 2026)
+
+**Parameter notation and label are now unconditionally required.** `validateParameter` previously only required `skos:notation` when `schema:value` was also present, and never validated `skos:prefLabel` at all. A new `cprmv:ParameterWaardeShape` (added in LDE v1.9.8) makes both properties mandatory `[1,n]`, so the client-side check now mirrors the SHACL constraint: both fields are required regardless of whether a numeric value is set. The pre-publish validation panel and the inline Parameters-tab error now surface missing notation and label immediately, rather than letting the file through to the back-end SHACL check.
+
+**Run test cases per decision, and gather concepts across the whole DMN.** Run All Test Cases now routes each case to its own decision: a case's optional `decision` field is used as the evaluation key, falling back to the selected Decision Key when absent. One test file can therefore exercise every decision of a deployed DMN, and each result shows the decision it ran against. NL-SBB concept generation now unions both inputs and outputs across every case (deduped by name), where it previously took outputs from a single result; each variable records the decision(s) it appears in.
+
+**Per-decision concept badges and persistent DMN tab.** The Concepts tab shows a decision badge next to each variable, colour-matched to its kind: blue beside Input #x, green beside Output #x. Output concepts are clustered so variables from the same decision sit together. The DMN tab now keeps its state when switching tabs — an uploaded DMN, deployment status, and the full test-case run results survive a hop to the Concepts tab and back, instead of being reset each time the tab unmounted.
+
+---
+
+### v1.10.3 — Decision Selection & Functional Test Verification (June 2026)
+
+**Pick which decision to evaluate in multi-decision DMNs.** `extractPrimaryDecisionKey` now prefers a *root* decision — one that no other decision requires via `informationRequirement`/`requiredDecision` — instead of blindly taking the first `<decision>` element in document order, fixing models where the intended output decision is authored later in the file. When a DMN has several independent roots, document order breaks the tie and a console warning points to the picker. The DMN File card shows a Decision Key dropdown whenever a file contains more than one testable decision, listing each as *"Name (id)"*; selecting one updates the Decision Key and the evaluation URL everywhere.
+
+**Test cases now verify functional correctness, not just a 200.** Previously a test case went green whenever the HTTP call succeeded, regardless of the returned values. A new `evaluateTestCaseExpectation` compares each case's expected outputs against the engine's actual outputs and returns PASS, FAIL, or unverified. It parses the readable `key=value, reden="…"` expected strings, accepts a structured expected object, and special-cases the *"empty result set"* expectation. Results render **PASS** (green), **FAIL** (red, with an Expected-vs-Actual mismatch table per output), **ERROR** (red, when the call itself fails) and **OK-unchecked** (amber, when no expectation could be parsed — never a silent green). Summary and header counts are now verdict-based, so *"N/N passed"* means functionally correct results.
+
+---
+
 ### v1.10.2 — Conformance Round-trip Fixes (June 2026)
 
 **Imported DMNs SHACL-conformant.** Imported DMN blocks are preserved verbatim, so their Decision Rules previously bypassed the v1.10.0 CPSV-AP fixes. `generateDmnSection` now runs a `normalizeImportedDmnBlocks` pass: each `cpsv:Rule` gets `dct:title`/`dct:description` injected when absent, and a `cpsv:implements` pointing at a `/services/` URI is repointed to the `eli:LegalResource` (or dropped when none exists). Edits are additive/repointing only and idempotent.
@@ -219,6 +261,11 @@ Initial release. React + Tailwind CSS web application. Five-tab interface: Servi
 | CPRMV 0.4.1 + CPSV-AP 3.2.0 SHACL conformance | v1.10.0 |
 | Pre-publish SHACL validation (advisory) | v1.10.0 |
 | DSO → DMN deep-link import | v1.9.6 |
+| Functional test-case verification (PASS/FAIL/ERROR) | v1.10.3 |
+| Root-decision selection in multi-decision DMNs | v1.10.3 |
+| Per-decision test routing & DMN-wide concept coverage | v1.10.4 |
+| CPRMV version selector (0.4.1 / 0.3.2 export) | v1.10.5 |
+| Rules-derived consolidation dates & unique rule URIs | v1.10.5 |
 
 ---
 

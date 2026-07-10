@@ -117,6 +117,7 @@ nav:
       - Adding a Municipality: ronl-business-api/user-guide/adding-municipality.md
       - Multiple interacting rules example: ronl-business-api/user-guide/assessing-income-support-schemes.md
       - PA-Cockpit Testen: ronl-business-api/user-guide/pa-cockpit-gebruikershandleiding.md
+      - Dossierbeheer Testhandleiding: ronl-business-api/user-guide/dossierbeheer-testhandleiding.md
     - Developer Docs:
       - Local Development Setup: ronl-business-api/developer/local-development.md
       - Backend Development: ronl-business-api/developer/backend-development.md
@@ -177,6 +178,7 @@ nav:
       - Frontend: norm-editor/developer/frontend.md
       - Backend & API Services: norm-editor/developer/backend-and-apis.md
       - Deployment: norm-editor/developer/deployment.md
+      - Changelog & Roadmap: norm-editor/developer/changelog-roadmap.md
     - References:
       - Interpretation JSON Format: norm-editor/reference/interpretation-json-format.md
       - API Endpoints: norm-editor/reference/api-endpoints.md

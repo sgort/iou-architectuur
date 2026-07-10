@@ -15,6 +15,8 @@ When you publish, the editor generates the complete Turtle output for the curren
 
 Organisation logos (and vendor logos), when present, are uploaded as named assets alongside the Turtle data, making them available as linked resources in the knowledge graph.
 
+The published Turtle honours the **CPRMV version selector** (`0.4.1` / `0.3.2`) — the same selection that drives the live preview and **Download TTL** — so you can publish data shaped for a `0.3.x` consumer as well as the default `0.4.1`. See [CPRMV vocabulary version](import-export.md#cprmv-vocabulary-version-041-032) for how the two targets differ (v1.10.5).
+
 ---
 
 ## Pre-publish SHACL validation (advisory)

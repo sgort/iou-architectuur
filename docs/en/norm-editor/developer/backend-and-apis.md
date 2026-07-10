@@ -31,7 +31,7 @@ See [API Endpoints](../reference/api-endpoints.md#backend) for full request/resp
 
 ---
 
-## nlp-api (Python / Flask)
+## nlp-api (Python / Flask) { #nlp-api }
 
 The NLP service wraps a fine-tuned **BERTje** model for **token classification**, exposing it
 over HTTP. It uses Flask with CORS enabled and serves a Swagger UI at `/swagger`.

@@ -8,6 +8,7 @@ Ensure:
 
 - The service identifier is filled in (it is used to construct the dataset URL)
 - The **Validate** button shows no errors
+- The **CPRMV version selector** (`0.4.1` / `0.3.2`) is set to the version your consumer expects — it drives the published Turtle just as it drives the preview and download (v1.10.5). See [CPRMV vocabulary version](../features/import-export.md#cprmv-vocabulary-version-041-032).
 - You have a TriplyDB API token with write access to the target dataset
 
 <figure markdown style="width:100%; margin:0;">

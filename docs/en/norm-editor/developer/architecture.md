@@ -12,7 +12,7 @@ communicate, and the request routing that ties them together. For the production
 graph TB
     Browser([Browser])
     NGINX[nginx]
-    WEB[web · Quasar SSR]
+    WEB[web · Vue 3 SPA]
     BACKEND[backend · Node/Express]
     NLP[nlp-api · Flask]
     UNWRAP[unwrap-api · Flask]
@@ -38,7 +38,7 @@ graph TB
 | Service | Stack | Role |
 |---|---|---|
 | `nginx` | nginx | Single entry point; all routing lives here |
-| `web` | Vue 3 + Quasar (SSR), Pinia, D3 | The editor UI |
+| `web` | Vue 3 + Quasar (SPA), Pinia, D3 | The editor UI |
 | `backend` | Node.js, Express, `@triply/triplydb`, N3, SuperAgent | TriplyDB gateway: list/read/write sources and tasks |
 | `nlp-api` | Python, Flask, HuggingFace Transformers, PyTorch | BERTje token classification for act frames |
 | `unwrap-api` | Python, Flask, RDFLib | FLINT RDF → editor JSON |
@@ -70,7 +70,7 @@ nginx is the only component exposed to the browser. It routes by path prefix:
 | `/api/predict` | nlp-api |
 | `/api/process_and_save` | wrap-up-api |
 | `/api/*` | backend |
-| `/*` | web (Quasar SSR) |
+| `/*` | web (Vue 3 SPA) |
 
 Routing is defined in two files that must be kept in sync:
 

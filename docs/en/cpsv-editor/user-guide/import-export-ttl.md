@@ -12,6 +12,9 @@ The exported file contains:
 - The `cpsv:PublicService` entity and all its linked entities
 - Any preserved DMN blocks (if a file with DMN data was imported)
 
+!!! tip "Choose the CPRMV vocabulary version"
+    A **CPRMV version selector** (`0.4.1` / `0.3.2`) next to the preview/export controls sets which CPRMV vocabulary version the download targets — the same selection also drives the live preview and publishing. Use `0.4.1` (default, a `cprmv:RuleSet` per ruleset) unless you are publishing for a `0.3.x` consumer, which needs the `0.3.2` shape (a `cprmv:Dataset` per ruleset under the `https://cprmv.open-regels.nl/0.3.2/` namespace). See [CPRMV vocabulary version](../features/import-export.md#cprmv-vocabulary-version-041-032) for the full comparison (v1.10.5).
+
 ---
 
 ## Importing an existing Turtle file
