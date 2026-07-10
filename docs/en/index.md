@@ -18,15 +18,15 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
--   **🖍️ Norm Editor — v0.0.1** · *June 2026*
+-   **🖍️ Norm Editor — v2026.07.0** · *July 2026*
 
     ---
 
-    **Joins the documentation site**
+    **First tagged release: SSR removed, SPA routing**
 
-    The Norm Editor (Regeleditor) is now documented: a guided workflow for interpreting legal sources into FLINT Fact, Act, and Claim-duty frames, with source annotation, AND/OR/NOT preconditions, optional BERTje-based NLP suggestions for act constituents, and a lossless round trip to RDF in TriplyDB. Features, User Guide, Developer Docs, and Reference are all available.
+    The Norm Editor now cuts version-tagged releases with a generated changelog. This first tag removes the Quasar SSR server in favour of a plain SPA with client-side routing across six pages, restyles the in-app changelog viewer, and backports graph-processing internals, `wrap-up-api` updates, and UI styling from the TNO mirror.
 
-    [:octicons-arrow-right-24: Documentation](norm-editor/index.md)
+    [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
 -   **✏️ CPSV Editor — v1.10.6** · *July 2026*
 

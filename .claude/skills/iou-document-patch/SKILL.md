@@ -30,6 +30,12 @@ adapt the paths — the same staging applies.
 | Home "What's New" card | `docs/en/index.md` (and `docs/nl/index.md`) — CPSV Editor grid card |
 | Screenshots referenced by docs | `../../assets/screenshots/cpsv-editor-*.png` → real files in `docs/assets/screenshots/` (language-neutral, served at site root) |
 
+### Known components beyond CPSV Editor
+
+| Component | Source repo | Changelog | Notes |
+|---|---|---|---|
+| **Norm Editor** | not a sibling repo — ask the user for its path (seen at `/home/steven/Development/editor`) | `gui/public/changelog.json`, schema **`{versions: {<service>: <semver>, ...}, releases: [{version, date, changes: {<conventional-commit-type>: [commit, ...]}, commits: [...]}]}`** — git-log-derived, not curated. `version-gap.py` auto-detects this shape (a `releases` array) vs. the curated `versions` array and normalizes both to the same `sections`/`items` shape; it also drops the synthetic `"Unreleased"` pseudo-version. Pass `--changelog <path> --component "Norm Editor"` explicitly. | No `developer/changelog-roadmap.md` existed before the 2026.07.0 sync (create it + add the mkdocs.yml nav entry — don't assume the page is there). Docs currently have **zero** screenshots — don't force a manifest entry for that reason alone. `docs/nl/index.md` is a placeholder with no "What's New" section to mirror at all — check before assuming both `docs/en/index.md` and `docs/nl/index.md` need the card edit. Because the first tag can land long after the code it covers, don't backfill version numbers onto pre-existing features you can't date — only claim what genuinely changed inside the tagged commit range. |
+
 ### i18n rule (do not violate)
 
 The site uses `mkdocs-static-i18n` with `docs_structure: folder`. EN is the
@@ -214,10 +220,12 @@ Work in this order so a failure leaves the docs in an obvious half-state:
    documented / status table not yet updated" admonition on `docs/en/index.md`
    and `docs/nl/index.md` that this sync makes untrue (see Stage 2). Keep the
    deep pages they linked to.
-4. **What's New card** — update the CPSV Editor grid card in `docs/en/index.md`
-   (version token in the `**✏️ CPSV Editor — vX.Y.Z** · *Month Year*` heading, the
-   date, the headline `**...**`, the summary paragraph, and links) and mirror the
-   version/date/headline in `docs/nl/index.md`.
+4. **What's New card** — update the component's grid card in `docs/en/index.md`
+   (version token in the `**<icon> <Name> — vX.Y.Z** · *Month Year*` heading, the
+   date, the headline `**...**`, the summary paragraph, and links). Before touching
+   `docs/nl/index.md` too, check it actually has a mirrored "What's New" section —
+   a fully-placeholder NL home page may not carry that section at all, in which case
+   there is nothing to sync there.
 5. **NL pages** — for real translations (`due-diligence.md`) apply the
    corresponding edit; for placeholders, only sync mirrored section headers if
    the EN page structure changed.

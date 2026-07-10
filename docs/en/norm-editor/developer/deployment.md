@@ -26,7 +26,7 @@ graph TB
             APPGW
         end
         subgraph aca["aca-subnet 10.0.2.0/23 — internal"]
-            WEBAPP["web Container App<br/>nginx :80 + Quasar SSR :8080"]
+            WEBAPP["web Container App<br/>nginx :80 + Vue 3 SPA :8080"]
             BACKEND[backend]
             NLP[nlp-api]
             UNWRAP[unwrap-api]
@@ -50,7 +50,7 @@ Key properties of the production topology:
 - The **Container Apps Environment is internal-only**. None of the services are reachable from
   the internet directly.
 - The **only** app with external ACA ingress is `web`, which runs an **nginx sidecar** in
-  front of the Quasar SSR server. The backend, nlp-api, unwrap-api, and wrap-up-api are
+  front of the static SPA build. The backend, nlp-api, unwrap-api, and wrap-up-api are
   internal only.
 - The **Application Gateway** holds the public IP, listens on port 80, and forwards to the
   ACA internal load balancer, setting the `Host` header to the `web` app's FQDN.
@@ -74,7 +74,7 @@ Running `./deploy.sh` provisions or updates, via Bicep (`infra/main.bicep` →
 | Application Gateway (Standard_v2) | Public entry point |
 | Public IP | Static IP on the gateway |
 | Container Apps Environment | Internal-only |
-| Container App `web` | nginx + Quasar SSR — the only externally-reachable app |
+| Container App `web` | nginx + Vue 3 SPA — the only externally-reachable app |
 | Container Apps `backend`, `nlp-api`, `unwrap-api`, `wrap-up-api` | Internal only |
 | Azure Container Registry | Stores all images |
 | Key Vault | Registry credentials |

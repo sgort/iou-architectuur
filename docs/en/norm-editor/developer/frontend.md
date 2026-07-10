@@ -1,7 +1,9 @@
 # Frontend
 
-The frontend (`regel-gui`) is a **Vue 3** application built with the **Quasar** framework in
-**SSR** mode. State is held in a single **Pinia** store, the domain is modelled as plain
+The frontend (`regel-gui`) is a **Vue 3** application built with the **Quasar** framework as a
+plain **SPA** — `src-ssr/` was removed in v2026.07.0 (see
+[Changelog & Roadmap](changelog-roadmap.md)). State is held mainly in a **Pinia** `regel`
+store (plus a small `layout` store for UI-only state), the domain is modelled as plain
 JavaScript classes, and the network view is drawn with **D3**.
 
 ---
@@ -10,23 +12,33 @@ JavaScript classes, and the network view is drawn with **D3**.
 
 ```
 gui/src/
-├── pages/IndexPage.vue          # The stepper — entry point
-├── views/                       # One per workflow step + the two interpretation panes
+├── router/routes.js             # task, sources, interpretation, visualization,
+│                                 # executable, execute — client-side routes
+├── pages/                       # Thin <q-page> wrappers, one per route, each
+│   ├── TaskDefinitionPage.vue    # rendering the matching view below
+│   ├── SourceCollectionPage.vue
+│   ├── InterpretationPage.vue
+│   ├── VisualizationPage.vue
+│   ├── ExecutablePage.vue       # "Coming soon" — see Roadmap
+│   ├── ExecutePage.vue          # "Coming soon" — see Roadmap
+│   └── ErrorNotFound.vue
+├── views/                       # The actual step UIs; unaffected by the routing rework
 │   ├── TaskDefinitionView.vue
 │   ├── SourceCollectionView.vue
 │   ├── InterpretationView.vue
-│   ├── SourceView.vue
-│   └── FramesView.vue
+│   ├── SourceView.vue           # interpretation pane
+│   ├── FramesView.vue           # interpretation pane
+│   └── visualization/           # VisualizationView.vue, VisualizationPanel.vue
 ├── components/                  # Editor panels, forms, lists, network, dialogs
 ├── model/                       # Domain classes (see below)
-├── stores/regel.js              # The single Pinia store
+├── stores/                      # regel.js (domain state), layout.js (UI state)
 ├── services/ApiServices.js      # All calls to the backend / Python services
 ├── helpers/                     # annotating, underlining, importExport, config, ...
-└── src-ssr/                     # SSR server and (no-op) API middleware
+└── i18n/                        # vue-i18n message catalogue (en-US)
 ```
 
-`src-ssr/middlewares/api.js` is intentionally a no-op: **all API routing is handled by
-nginx**, not by the SSR server.
+Routing replaced a single `IndexPage.vue` stepper that swapped views by client-side step
+state; the same `views/*.vue` step UIs are now reached through the router instead.
 
 ---
 

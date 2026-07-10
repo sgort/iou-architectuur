@@ -53,11 +53,67 @@ def parse_semver(v):
     return tuple(nums[:3])
 
 
+# Conventional-commit type -> (icon, section title), for components whose
+# changelog is git-log-derived (a top-level "releases" array of {version, date,
+# changes: {type: [commit, ...]}, commits: [...]}) rather than hand-curated
+# release notes (a top-level "versions" array of {version, date, sections: [...]})
+CONVENTIONAL_TYPE_META = {
+    "feat": ("✨", "Features"),
+    "fix": ("🐛", "Fixes"),
+    "docs": ("📚", "Documentation"),
+    "chore": ("🧹", "Chores"),
+    "refactor": ("♻️", "Refactoring"),
+    "perf": ("⚡", "Performance"),
+    "test": ("✅", "Tests"),
+    "style": ("💅", "Style"),
+    "build": ("🏗️", "Build"),
+    "ci": ("🤖", "CI"),
+    "other": ("🔧", "Other"),
+}
+
+
+def normalize_conventional_release(release):
+    """Reshape a git-log-derived release ({version, date, changes: {type:
+    [commit,...]}}) into the {version, date, status, sections: [{title, icon,
+    items}]} shape the rest of this script (and the human-readable report)
+    expects from a curated changelog."""
+    changes = release.get("changes", {}) or {}
+    sections = []
+    for type_key, commits in changes.items():
+        icon, title = CONVENTIONAL_TYPE_META.get(type_key, ("•", type_key.capitalize()))
+        items = [c.get("description") or c.get("subject", "") for c in commits]
+        sections.append({"title": title, "icon": icon, "items": items, "type": type_key})
+    date = release.get("date", "") or ""
+    return {
+        "version": release.get("version", "").strip(),
+        "date": date.split("T")[0] if "T" in date else date,
+        "status": "",
+        "sections": sections,
+    }
+
+
 def load_changelog_versions(path):
     data = json.loads(Path(path).read_text(encoding="utf-8"))
+
+    releases = data.get("releases")
+    if isinstance(releases, list) and releases:
+        # git-log-derived changelog (see scripts/generate-changelog.mjs in the
+        # component repo). "Unreleased" is not a real version — drop it.
+        tagged = [
+            r for r in releases if r.get("version", "").strip().lower() != "unreleased"
+        ]
+        return [normalize_conventional_release(r) for r in tagged]
+
     versions = data.get("versions", [])
     if not versions:
-        raise ValueError(f"No 'versions' array in {path}")
+        raise ValueError(f"No 'versions' or 'releases' array found in {path}")
+    if not isinstance(versions, list):
+        raise ValueError(
+            f"'versions' in {path} is a {type(versions).__name__}, not a list of "
+            "releases — this looks like a per-service version map (e.g. "
+            '{"gui": "0.5.2", ...}), not a changelog. Check for a "releases" '
+            "array in the same file instead."
+        )
     return versions
 
 

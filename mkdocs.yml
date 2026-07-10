@@ -178,6 +178,7 @@ nav:
       - Frontend: norm-editor/developer/frontend.md
       - Backend & API Services: norm-editor/developer/backend-and-apis.md
       - Deployment: norm-editor/developer/deployment.md
+      - Changelog & Roadmap: norm-editor/developer/changelog-roadmap.md
     - References:
       - Interpretation JSON Format: norm-editor/reference/interpretation-json-format.md
       - API Endpoints: norm-editor/reference/api-endpoints.md
