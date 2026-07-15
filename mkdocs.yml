@@ -116,6 +116,9 @@ nav:
       - RIP Phase 1 Workflow: ronl-business-api/user-guide/rip-phase1-workflow.md
       - Adding a Municipality: ronl-business-api/user-guide/adding-municipality.md
       - Multiple interacting rules example: ronl-business-api/user-guide/assessing-income-support-schemes.md
+      - PA-Cockpit Testen: ronl-business-api/user-guide/pa-cockpit-gebruikershandleiding.md
+      - Dossierbeheer Testhandleiding: ronl-business-api/user-guide/dossierbeheer-testhandleiding.md
+      - Capaciteitsclaim Testhandleiding: ronl-business-api/user-guide/capaciteitsclaim-testhandleiding.md
     - Developer Docs:
       - Local Development Setup: ronl-business-api/developer/local-development.md
       - Backend Development: ronl-business-api/developer/backend-development.md
@@ -176,6 +179,7 @@ nav:
       - Frontend: norm-editor/developer/frontend.md
       - Backend & API Services: norm-editor/developer/backend-and-apis.md
       - Deployment: norm-editor/developer/deployment.md
+      - Changelog & Roadmap: norm-editor/developer/changelog-roadmap.md
     - References:
       - Interpretation JSON Format: norm-editor/reference/interpretation-json-format.md
       - API Endpoints: norm-editor/reference/api-endpoints.md
@@ -222,6 +226,7 @@ nav:
       - RPP Architecture: cpsv-editor/reference/rpp-architecture.md
       - Semantic Mediation Architecture: cpsv-editor/reference/semantic-mediation-architecture.md
       - External Standards: cpsv-editor/reference/external-standards.md
+      - SHACL Shape Diagrams: cpsv-editor/reference/data-model-diagrams.md
   
   - 🔍 Linked Data Explorer:
     - Overview: linked-data-explorer/index.md

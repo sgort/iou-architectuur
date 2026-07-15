@@ -1,0 +1,1327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns:graphml="http://graphml.graphdrawing.org/xmlns"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:sh="http://www.w3.org/ns/shacl#"
+         xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:y="http://www.yworks.com/xml/graphml">
+   <key attr.name="url" attr.type="string" for="node" id="d3"/>
+   <key attr.name="statement-url" attr.type="string" for="edge" id="d7"/>
+   <key attr.name="url" attr.type="string" for="edge" id="d8"/>
+   <key for="node" id="d6" yfiles.type="nodegraphics"/>
+   <key for="edge" id="d10" yfiles.type="edgegraphics"/>
+   <graph id="G" edgedefault="directed">
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Case">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Case</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:Case</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">
+                  <y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleSetShape">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleSetShape</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:RuleSet</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">cprmv:comment (string) [0,1]
+cprmv:id [1,n]
+cprmv:isOutputOf → PublicService [1,n]
+cprmv:publishedOn (date) [0,1]
+cprmv:validFrom (date) [1,1]
+cprmv:validUntil (date) [0,1]
+<y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Decision">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Decision</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:Decision</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">
+                  <y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleMethodShape">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleMethodShape</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:RuleMethod</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">cprmv:comment (string) [0,1]
+cprmv:id [1,n]
+<y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#TestMethod">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#TestMethod</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:TestMethod</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">
+                  <y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#PublicationMethod">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#PublicationMethod</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:PublicationMethod</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">
+                  <y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Explanation">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Explanation</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:Explanation</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">
+                  <y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#ExecutionMethod">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#ExecutionMethod</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:ExecutionMethod</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">
+                  <y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#hasPartListShape">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#hasPartListShape</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">hasPartListShape</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">
+                  <y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleShape">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleShape</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:Rule</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">cprmv:comment (string) [0,1]
+cprmv:definition [0,1]
+cprmv:id [1,n]
+cprmv:postDefinition [0,1]
+cprmv:sourceQuote (string) [0,1]
+<y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#TestCase">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#TestCase</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:TestCase</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">
+                  <y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#TestSet">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#TestSet</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:TestSet</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">
+                  <y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#FormalisationMethod">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#FormalisationMethod</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:FormalisationMethod</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">
+                  <y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#ExplanationMethod">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#ExplanationMethod</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:ExplanationMethod</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">
+                  <y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#AnalysisMethod">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#AnalysisMethod</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:AnalysisMethod</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">
+                  <y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#ReferenceMethod">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#ReferenceMethod</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:ReferenceMethod</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">
+                  <y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#CodificationMethod">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#CodificationMethod</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:CodificationMethod</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">
+                  <y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <node id="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#DecisionModelShape">
+         <data key="d3">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#DecisionModelShape</data>
+         <data key="d6">
+            <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+               <y:Geometry height="90.0" width="80.0" x="637.0" y="277.0"/>
+               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+               <y:BorderStyle color="#000000" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="content"
+                            backgroundColor="#B7C9E3"
+                            configuration="com.yworks.entityRelationship.label.name"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            height="18.1328125"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            verticalTextPosition="bottom"
+                            visible="true"
+                            width="44.25390625"
+                            x="17.873046875"
+                            y="4.0">cprmv:DecisionModel</y:NodeLabel>
+               <y:NodeLabel alignment="left"
+                            autoSizePolicy="content"
+                            configuration="com.yworks.entityRelationship.label.attributes"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasBackgroundColor="false"
+                            hasLineColor="false"
+                            height="46.3984375"
+                            horizontalTextPosition="center"
+                            iconTextGap="4"
+                            modelName="custom"
+                            textColor="#000000"
+                            verticalTextPosition="top"
+                            visible="true"
+                            width="65.541015625"
+                            x="2.0"
+                            y="30.1328125">cprmv:hasAnalysis → Analysis [0,n]
+<y:LabelModel>
+                     <y:ErdAttributesNodeLabelModel/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:ErdAttributesNodeLabelModelParameter/>
+                  </y:ModelParameter>
+               </y:NodeLabel>
+            </y:GenericNode>
+         </data>
+      </node>
+      <edge source="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleSetShape"
+            target="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleSetShape">
+         <data key="d7">urn:md5:https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleSetShapehttps://standaarden.open-regels.nl/standards/cprmv/0.4.1#isBasedOnhttps://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleSetShape</data>
+         <data key="d8">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#isBasedOn</data>
+         <data key="d10">
+            <y:PolyLineEdge>
+               <y:LineStyle color="#000000" type="line" width="1.0"/>
+               <y:Arrows source="none" target="standard"/>
+               <y:EdgeLabel alignment="center"
+                            backgroundColor="#FFFFFF"
+                            configuration="AutoFlippingLabel"
+                            distance="2.0"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            modelName="custom"
+                            preferredPlacement="anywhere"
+                            ratio="0.5"
+                            textColor="#000000"
+                            visible="true">cprmv:isBasedOn [0,n]<y:LabelModel>
+                     <y:SmartEdgeLabelModel autoRotationEnabled="false"
+                                            defaultAngle="0.0"
+                                            defaultDistance="10.0"/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:SmartEdgeLabelModelParameter angle="0.0"
+                                                     distance="30.0"
+                                                     distanceToCenter="true"
+                                                     position="center"
+                                                     ratio="0.5"
+                                                     segment="0"/>
+                  </y:ModelParameter>
+                  <y:PreferredPlacementDescriptor angle="0.0"
+                                                  angleOffsetOnRightSide="0"
+                                                  angleReference="absolute"
+                                                  angleRotationOnRightSide="co"
+                                                  distance="-1.0"
+                                                  frozen="true"
+                                                  placement="anywhere"
+                                                  side="anywhere"
+                                                  sideReference="relative_to_edge_flow"/>
+               </y:EdgeLabel>
+               <y:BendStyle smoothed="false"/>
+            </y:PolyLineEdge>
+         </data>
+      </edge>
+      <edge source="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleSetShape"
+            target="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleMethodShape">
+         <data key="d7">urn:md5:https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleSetShapehttps://standaarden.open-regels.nl/standards/cprmv/0.4.1#hasMethodhttps://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleMethodShape</data>
+         <data key="d8">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#hasMethod</data>
+         <data key="d10">
+            <y:PolyLineEdge>
+               <y:LineStyle color="#000000" type="line" width="1.0"/>
+               <y:Arrows source="none" target="standard"/>
+               <y:EdgeLabel alignment="center"
+                            backgroundColor="#FFFFFF"
+                            configuration="AutoFlippingLabel"
+                            distance="2.0"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            modelName="custom"
+                            preferredPlacement="anywhere"
+                            ratio="0.5"
+                            textColor="#000000"
+                            visible="true">cprmv:hasMethod [1,n]<y:LabelModel>
+                     <y:SmartEdgeLabelModel autoRotationEnabled="false"
+                                            defaultAngle="0.0"
+                                            defaultDistance="10.0"/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:SmartEdgeLabelModelParameter angle="0.0"
+                                                     distance="30.0"
+                                                     distanceToCenter="true"
+                                                     position="center"
+                                                     ratio="0.5"
+                                                     segment="0"/>
+                  </y:ModelParameter>
+                  <y:PreferredPlacementDescriptor angle="0.0"
+                                                  angleOffsetOnRightSide="0"
+                                                  angleReference="absolute"
+                                                  angleRotationOnRightSide="co"
+                                                  distance="-1.0"
+                                                  frozen="true"
+                                                  placement="anywhere"
+                                                  side="anywhere"
+                                                  sideReference="relative_to_edge_flow"/>
+               </y:EdgeLabel>
+               <y:BendStyle smoothed="false"/>
+            </y:PolyLineEdge>
+         </data>
+      </edge>
+      <edge source="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleSetShape"
+            target="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#hasPartListShape">
+         <data key="d7">urn:md5:https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleSetShapehttps://standaarden.open-regels.nl/standards/cprmv/0.4.1#hasParthttps://standaarden.open-regels.nl/standards/cprmv/0.4.1#hasPartListShape</data>
+         <data key="d8">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#hasPart</data>
+         <data key="d10">
+            <y:PolyLineEdge>
+               <y:LineStyle color="#000000" type="line" width="1.0"/>
+               <y:Arrows source="none" target="standard"/>
+               <y:EdgeLabel alignment="center"
+                            backgroundColor="#FFFFFF"
+                            configuration="AutoFlippingLabel"
+                            distance="2.0"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            modelName="custom"
+                            preferredPlacement="anywhere"
+                            ratio="0.5"
+                            textColor="#000000"
+                            visible="true">cprmv:hasPart [1,1]<y:LabelModel>
+                     <y:SmartEdgeLabelModel autoRotationEnabled="false"
+                                            defaultAngle="0.0"
+                                            defaultDistance="10.0"/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:SmartEdgeLabelModelParameter angle="0.0"
+                                                     distance="30.0"
+                                                     distanceToCenter="true"
+                                                     position="center"
+                                                     ratio="0.5"
+                                                     segment="0"/>
+                  </y:ModelParameter>
+                  <y:PreferredPlacementDescriptor angle="0.0"
+                                                  angleOffsetOnRightSide="0"
+                                                  angleReference="absolute"
+                                                  angleRotationOnRightSide="co"
+                                                  distance="-1.0"
+                                                  frozen="true"
+                                                  placement="anywhere"
+                                                  side="anywhere"
+                                                  sideReference="relative_to_edge_flow"/>
+               </y:EdgeLabel>
+               <y:BendStyle smoothed="false"/>
+            </y:PolyLineEdge>
+         </data>
+      </edge>
+      <edge source="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleShape"
+            target="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#hasPartListShape">
+         <data key="d7">urn:md5:https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleShapehttps://standaarden.open-regels.nl/standards/cprmv/0.4.1#hasParthttps://standaarden.open-regels.nl/standards/cprmv/0.4.1#hasPartListShape</data>
+         <data key="d8">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#hasPart</data>
+         <data key="d10">
+            <y:PolyLineEdge>
+               <y:LineStyle color="#000000" type="line" width="1.0"/>
+               <y:Arrows source="none" target="standard"/>
+               <y:EdgeLabel alignment="center"
+                            backgroundColor="#FFFFFF"
+                            configuration="AutoFlippingLabel"
+                            distance="2.0"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            modelName="custom"
+                            preferredPlacement="anywhere"
+                            ratio="0.5"
+                            textColor="#000000"
+                            visible="true">cprmv:hasPart [0,1]<y:LabelModel>
+                     <y:SmartEdgeLabelModel autoRotationEnabled="false"
+                                            defaultAngle="0.0"
+                                            defaultDistance="10.0"/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:SmartEdgeLabelModelParameter angle="0.0"
+                                                     distance="30.0"
+                                                     distanceToCenter="true"
+                                                     position="center"
+                                                     ratio="0.5"
+                                                     segment="0"/>
+                  </y:ModelParameter>
+                  <y:PreferredPlacementDescriptor angle="0.0"
+                                                  angleOffsetOnRightSide="0"
+                                                  angleReference="absolute"
+                                                  angleRotationOnRightSide="co"
+                                                  distance="-1.0"
+                                                  frozen="true"
+                                                  placement="anywhere"
+                                                  side="anywhere"
+                                                  sideReference="relative_to_edge_flow"/>
+               </y:EdgeLabel>
+               <y:BendStyle smoothed="false"/>
+            </y:PolyLineEdge>
+         </data>
+      </edge>
+      <edge source="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleShape"
+            target="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleShape">
+         <data key="d7">urn:md5:https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleShapehttps://standaarden.open-regels.nl/standards/cprmv/0.4.1#isBasedOnhttps://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleShape</data>
+         <data key="d8">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#isBasedOn</data>
+         <data key="d10">
+            <y:PolyLineEdge>
+               <y:LineStyle color="#000000" type="line" width="1.0"/>
+               <y:Arrows source="none" target="standard"/>
+               <y:EdgeLabel alignment="center"
+                            backgroundColor="#FFFFFF"
+                            configuration="AutoFlippingLabel"
+                            distance="2.0"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            modelName="custom"
+                            preferredPlacement="anywhere"
+                            ratio="0.5"
+                            textColor="#000000"
+                            visible="true">cprmv:isBasedOn [0,n]<y:LabelModel>
+                     <y:SmartEdgeLabelModel autoRotationEnabled="false"
+                                            defaultAngle="0.0"
+                                            defaultDistance="10.0"/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:SmartEdgeLabelModelParameter angle="0.0"
+                                                     distance="30.0"
+                                                     distanceToCenter="true"
+                                                     position="center"
+                                                     ratio="0.5"
+                                                     segment="0"/>
+                  </y:ModelParameter>
+                  <y:PreferredPlacementDescriptor angle="0.0"
+                                                  angleOffsetOnRightSide="0"
+                                                  angleReference="absolute"
+                                                  angleRotationOnRightSide="co"
+                                                  distance="-1.0"
+                                                  frozen="true"
+                                                  placement="anywhere"
+                                                  side="anywhere"
+                                                  sideReference="relative_to_edge_flow"/>
+               </y:EdgeLabel>
+               <y:BendStyle smoothed="false"/>
+            </y:PolyLineEdge>
+         </data>
+      </edge>
+      <node id="urn:md5:https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Explanationna33bf21a57d24b50a5a05d1c06e8410fb26or">
+         <data key="d3">urn:md5:https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Explanationna33bf21a57d24b50a5a05d1c06e8410fb26or</data>
+         <data key="d6">
+            <y:ShapeNode>
+               <y:Geometry height="30.0" width="40.0" x="376.0" y="185.0"/>
+               <y:Fill color="#FFFFFF" transparent="false"/>
+               <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
+               <y:NodeLabel alignment="center"
+                            autoSizePolicy="node_width"
+                            configuration="CroppingLabel"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            modelName="internal"
+                            modelPosition="t"
+                            textColor="#000000"
+                            visible="true"
+                            hasBackgroundColor="false">or</y:NodeLabel>
+               <y:Shape type="ellipse"/>
+            </y:ShapeNode>
+         </data>
+      </node>
+      <edge source="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Explanation"
+            target="urn:md5:https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Explanationna33bf21a57d24b50a5a05d1c06e8410fb26or">
+         <data key="d7">urn:md5:https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Explanationhttps://standaarden.open-regels.nl/standards/cprmv/0.4.1#explainsurn:md5:https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Explanationna33bf21a57d24b50a5a05d1c06e8410fb26or</data>
+         <data key="d8">https://standaarden.open-regels.nl/standards/cprmv/0.4.1#explains</data>
+         <data key="d10">
+            <y:PolyLineEdge>
+               <y:LineStyle color="#000000" type="line" width="1.0"/>
+               <y:Arrows source="none" target="standard"/>
+               <y:EdgeLabel alignment="center"
+                            backgroundColor="#FFFFFF"
+                            configuration="AutoFlippingLabel"
+                            distance="2.0"
+                            fontFamily="Dialog"
+                            fontSize="12"
+                            fontStyle="plain"
+                            hasLineColor="false"
+                            modelName="custom"
+                            preferredPlacement="anywhere"
+                            ratio="0.5"
+                            textColor="#000000"
+                            visible="true">cprmv:explains [1,1]<y:LabelModel>
+                     <y:SmartEdgeLabelModel autoRotationEnabled="false"
+                                            defaultAngle="0.0"
+                                            defaultDistance="10.0"/>
+                  </y:LabelModel>
+                  <y:ModelParameter>
+                     <y:SmartEdgeLabelModelParameter angle="0.0"
+                                                     distance="30.0"
+                                                     distanceToCenter="true"
+                                                     position="center"
+                                                     ratio="0.5"
+                                                     segment="0"/>
+                  </y:ModelParameter>
+                  <y:PreferredPlacementDescriptor angle="0.0"
+                                                  angleOffsetOnRightSide="0"
+                                                  angleReference="absolute"
+                                                  angleRotationOnRightSide="co"
+                                                  distance="-1.0"
+                                                  frozen="true"
+                                                  placement="anywhere"
+                                                  side="anywhere"
+                                                  sideReference="relative_to_edge_flow"/>
+               </y:EdgeLabel>
+               <y:BendStyle smoothed="false"/>
+            </y:PolyLineEdge>
+         </data>
+      </edge>
+      <edge source="urn:md5:https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Explanationna33bf21a57d24b50a5a05d1c06e8410fb26or"
+            target="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleShape">
+         <data key="d7">urn:md5:urn:md5:https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Explanationna33bf21a57d24b50a5a05d1c06e8410fb26orLOGIChttps://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleShape</data>
+         <data key="d8">LOGIC</data>
+         <data key="d10">
+            <y:PolyLineEdge>
+               <y:LineStyle color="#000000" type="line" width="1.0"/>
+               <y:Arrows source="none" target="standard"/>
+               <y:BendStyle smoothed="false"/>
+            </y:PolyLineEdge>
+         </data>
+      </edge>
+      <edge source="urn:md5:https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Explanationna33bf21a57d24b50a5a05d1c06e8410fb26or"
+            target="https://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleSetShape">
+         <data key="d7">urn:md5:urn:md5:https://standaarden.open-regels.nl/standards/cprmv/0.4.1#Explanationna33bf21a57d24b50a5a05d1c06e8410fb26orLOGIChttps://standaarden.open-regels.nl/standards/cprmv/0.4.1#RuleSetShape</data>
+         <data key="d8">LOGIC</data>
+         <data key="d10">
+            <y:PolyLineEdge>
+               <y:LineStyle color="#000000" type="line" width="1.0"/>
+               <y:Arrows source="none" target="standard"/>
+               <y:BendStyle smoothed="false"/>
+            </y:PolyLineEdge>
+         </data>
+      </edge>
+   </graph>
+</graphml>

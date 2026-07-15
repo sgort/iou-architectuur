@@ -18,33 +18,33 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
--   **🖍️ Norm Editor — v0.0.1** · *June 2026*
+-   **🖍️ Norm Editor — v2026.07.0** · *July 2026*
 
     ---
 
-    **Joins the documentation site**
+    **First tagged release: SSR removed, SPA routing**
 
-    The Norm Editor (Regeleditor) is now documented: a guided workflow for interpreting legal sources into FLINT Fact, Act, and Claim-duty frames, with source annotation, AND/OR/NOT preconditions, optional BERTje-based NLP suggestions for act constituents, and a lossless round trip to RDF in TriplyDB. Features, User Guide, Developer Docs, and Reference are all available.
+    The Norm Editor now cuts version-tagged releases with a generated changelog. This first tag removes the Quasar SSR server in favour of a plain SPA with client-side routing across six pages, restyles the in-app changelog viewer, and backports graph-processing internals, `wrap-up-api` updates, and UI styling from the TNO mirror.
 
-    [:octicons-arrow-right-24: Documentation](norm-editor/index.md)
+    [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v1.10.2** · *June 2026*
+-   **✏️ CPSV Editor — v1.10.6** · *July 2026*
 
     ---
 
-    **CPRMV 0.4.1 & CPSV-AP 3.2.0 conformance**
+    **CPRMV version selector & verified DMN test cases**
 
-    Editor-generated Turtle now validates clean against the [CPRMV 0.4.1](cpsv-editor/reference/namespace-property-reference.md) and CPSV-AP 3.2.0 SHACL shapes — `cprmv:RuleSet`/`cprmv:RuleMethod` grouping, `dct:spatial` organisations, and an [advisory pre-publish SHACL check](cpsv-editor/features/triplydb-publishing.md). Decision models can also be handed off straight from the Linked Data Explorer via the new [DSO → DMN deep-link import](cpsv-editor/features/dso-import.md).
+    Preview, export and publish now target a [selectable CPRMV vocabulary version](cpsv-editor/features/import-export.md#cprmv-vocabulary-version-041-032) — `0.4.1` (`cprmv:RuleSet`) or `0.3.2` (`cprmv:Dataset`) — with consolidation dates derived from the rules and collision-free rule URIs. DMN [test cases are now functionally verified](cpsv-editor/user-guide/dmn-testing.md): PASS/FAIL/ERROR/OK-unchecked verdicts with Expected-vs-Actual diffs, per-decision routing, and empty-result checks.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.9.7** · *June 2026*
+-   **🔍 Linked Data Explorer — v1.9.11** · *July 2026*
 
     ---
 
-    **DSO rule extraction & three-layer SHACL validation**
+    **Board-owner deploys & a negotiable `/v1/norms` CPRMV version**
 
-    The DSO Explorer now extracts an activity's *toepasbare regels* into deploy-ready LDE assets — a normalized DMN (deploys & evaluates on Operaton) or a form-js scaffold imported straight into the Form Editor — and can hand a DMN off to the CPSV Editor for publishing. The SHACL Validator gained a third **CPRMV 0.4.1** layer alongside CPSV-AP 3.2.0 and RONL Custom, and the ChainBuilder/`/v1/dmns` now discover DMNs under both the 0.3.0 and 0.4.1 CPRMV namespaces.
+    The BPMN deploy modal now requires a [board owner](linked-data-explorer/user-guide/bpmn-modeler.md#deploying-to-operaton) — auto-detected from candidate groups, stamped as `camunda:property boardOwner`, and exposed via `/bundles/public`. The [`/v1/norms`](linked-data-explorer/developer/backend.md#norms) endpoint gained a `?cprmv_version=` selector (`0.3.0` default, `0.3.2`/`0.4.1` experimental) matching the CPSV Editor's export targets, and the CPRMV SHACL layer added the `ParameterWaarde`/`TemporalRule` shapes.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

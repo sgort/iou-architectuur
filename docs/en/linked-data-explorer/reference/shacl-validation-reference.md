@@ -88,6 +88,17 @@ These shapes prefer `sh:uniqueLang true` over `sh:maxCount 1` for human-readable
 
 Added in v1.9.5. The CPRMV SHACL shapes, vendored into `packages/backend/shapes/cprmv/0.4.1/cprmv.shacl.ttl`, validate the CPRMV rule-management model — `cprmv:RuleSet`, `cprmv:Rule`, and `cprmv:RuleMethod` and their required properties. This is the same shape set the CPRMV API and CPSV Editor validate against, so a file that passes here is conformant for the rule-management vocabulary independently of its CPSV-AP service metadata. A layer with no shape files present reports **Not loaded** rather than a green check.
 
+### Parameter and temporal-rule shapes (v1.9.8)
+
+Two shapes were added to the CPRMV layer, extending validation beyond the ruleset model:
+
+| Shape | Target class | Constraints |
+|---|---|---|
+| `cprmv:ParameterWaardeShape` | `cprmv:ParameterWaarde` | **Required:** `skos:notation` [1,1] `xsd:string`, `skos:prefLabel` [1,n] `rdf:langString`. **Optional:** `schema:value` [0,1] `xsd:decimal`, `schema:unitCode` [0,1] `xsd:string`, `dct:description` [0,1] `rdf:langString`, `cprmv:validFrom`/`cprmv:validUntil` [0,1] `xsd:date`. |
+| `cprmv:TemporalRuleShape` | `cprmv:TemporalRule` | **All optional:** `cprmv:validFrom` [0,1] `xsd:date`, `cprmv:validUntil` [0,1] `xsd:date`, `cprmv:confidenceLevel` [0,1] `xsd:string`, `cprmv:isBasedOn` [0,n] `sh:class cpsv:Rule`. |
+
+The change also adds the `skos:`, `schema:`, and `dct:` prefix declarations these shapes require; existing shapes are unchanged. The mandatory `skos:notation`/`skos:prefLabel` on `ParameterWaarde` is the same constraint the [CPSV Editor enforces client-side](../../cpsv-editor/reference/namespace-property-reference.md#parameter-validation-v1104) (from its v1.10.4), so a parameter that passes in the editor also passes here.
+
 ---
 
 ## Constraint codes

@@ -137,10 +137,10 @@ Proxyt een SPARQL-query naar een willekeurig TriplyDB-endpoint, om CORS-restrict
 ### Normen
 
 ```
-GET /v1/norms?endpoint={url}&rulesetid={ruleset}&applicable_date={YYYY-MM-DD}
+GET /v1/norms?endpoint={url}&rulesetid={ruleset}&applicable_date={YYYY-MM-DD}&cprmv_version={0.3.0|0.3.2|0.4.1}
 ```
 
-Retourneert alle `cprmv:Rule`-paden en normen vanuit het geconfigureerde TriplyDB-endpoint in het publicatieformaat dat de normenpublisher van de SPARQL-editor consumeert. Elk regelobject spiegelt exact de vorm van `cprmv-example.json`: volledig-gekwalificeerde RDF/CPRMV-sleutels voor `type`, `id`, `definition` en `contains`; korte sleutels voor `situatie`, `norm`, `per`, `rulesetid`, `applicable_date` en `rule_id_path`.
+Retourneert alle `cprmv:Rule`-paden en normen vanuit het geconfigureerde TriplyDB-endpoint in het publicatieformaat dat de normenpublisher van de SPARQL-editor consumeert. Elk regelobject spiegelt exact de vorm van `cprmv-example.json`: volledig-gekwalificeerde RDF/CPRMV-sleutels voor `type`, `id`, `definition` en `contains`; korte sleutels voor `situatie`, `norm`, `per`, `rulesetid`, `applicable_date` en `rule_id_path`. De volledig-gekwalificeerde sleutels dragen de namespace van de **geselecteerde `cprmv_version`** (zie hieronder).
 
 Bovenliggende regels en hun `cprmv:contains`-kinderen worden geaggregeerd tot één geneste object per ouder. De invoegvolgorde van sleutels blijft consistent tussen runs:
 
@@ -170,7 +170,7 @@ Tellingen gelden over de gefilterde resultatenset, dus `total` is gelijk aan de 
 
 **Datasetversiebeheer en HTTP-cacheheaders**
 
-Elke BWB-regelset (BWBR0002471, BWBR0015703, …) wordt door de CPSV editor gepubliceerd als een afzonderlijke `cprmv:Dataset`-resource in TriplyDB (zie [CPRMV-datasetgeneratie](../../cpsv-editor/developer/cprmv-dataset-generation.md)). Eén regelset kan meerdere Dataset-records hebben — verschillende toepasselijke perioden van dezelfde wet (bijv. BWBR0015703 op `2025-01-01` en `2026-01-01`) zijn **gelijktijdig en even gezaghebbend**, geen concurrerende versies. Eén `/v1/norms`-respons kan meerdere regelsets bestrijken, elk met meerdere records; de envelop draagt daarom een `dataset_versions`-map gekeyd op `cprmv:rulesetId`, waarbij elke waarde een **lijst** met records is:
+Elke BWB-regelset (BWBR0002471, BWBR0015703, …) draagt versiemetadata per regelset, gepubliceerd door de CPSV editor (zie [CPRMV RuleSet / Dataset-generatie](../../cpsv-editor/developer/cprmv-dataset-generation.md)). **Waar die metadata staat hangt af van `cprmv_version`:** voor `0.3.0`/`0.3.2` is het een `cprmv:Dataset`-resource (met `dct:issued` + `dcat:version`); voor `0.4.1` is er geen `cprmv:Dataset` en wordt het uit de `cprmv:RuleSet` gelezen (`cprmv:validFrom`, dat tevens als `published_at` dient — zie de tabel hieronder). Eén regelset kan meerdere records hebben — verschillende toepasselijke perioden van dezelfde wet (bijv. BWBR0015703 op `2025-01-01` en `2026-01-01`) zijn **gelijktijdig en even gezaghebbend**, geen concurrerende versies. Eén `/v1/norms`-respons kan meerdere regelsets bestrijken, elk met meerdere records; de envelop draagt daarom een `dataset_versions`-map gekeyd op `cprmv:rulesetId`, waarbij elke waarde een **lijst** met records is:
 
 ```json
 "dataset_versions": {
@@ -192,17 +192,33 @@ Elke BWB-regelset (BWBR0002471, BWBR0015703, …) wordt door de CPSV editor gepu
 }
 ```
 
-De lijst is vooraf gesorteerd: **`version` aflopend met nulls achteraan, gelijke waarden gebroken door `published_at` aflopend**. Element `[0]` is de meest recente toepasselijke versie van die regelset. Niet-primaire regelsets (geen `dcat:version` in TriplyDB) vallen terug op pure `published_at` desc-volgorde.
+De lijst is vooraf gesorteerd: **`version` aflopend met nulls achteraan, gelijke waarden gebroken door `published_at` aflopend**. Element `[0]` is de meest recente toepasselijke versie van die regelset.
 
-Drie velden per entry, waarvan twee nullable:
+Drie velden per entry:
 
-| Veld           | Bron           | Altijd aanwezig? |
-| -------------- | -------------- | ---------------- |
-| `version`      | `dcat:version` | Alleen primaire regelset — de editor kent alleen de versie van het `legalResource.bwbId` van de dienst. `null` voor niet-primaire regelsets. |
-| `published_at` | `dct:issued`   | Ja. Het tijdstempel van de publicatie van dit `cprmv:Dataset`-record — het betekenisvolle signaal voor cachegeldigheid. |
-| `title`        | `dct:title`    | Alleen primaire regelset. `null` voor niet-primaire regelsets. |
+| Veld           | Bron (0.3.x / 0.4.1)              | Opmerkingen |
+| -------------- | --------------------------------- | ----------- |
+| `version`      | `dcat:version` / `cprmv:validFrom` | **Nu voor elke regelset aanwezig.** Sinds v1.10.5 leidt de editor de versie van elke regelset af uit de BWB-datum die de eigen regels dragen (hun `ruleIdPath`), zodat ook niet-primaire regelsets zijn geversioneerd. (`null` blijft alleen over voor legacy-data die vóór die wijziging is gepubliceerd.) |
+| `published_at` | `dct:issued` / `cprmv:validFrom`   | **0.3.x:** het publicatietijdstempel van het `cprmv:Dataset`-record — verandert bij elke (her)publicatie, het primaire signaal voor cachegeldigheid. **0.4.1:** er is geen `dct:issued`, dus `cprmv:validFrom` dient als `published_at` (zie de waarschuwing hieronder). |
+| `title`        | `dct:title`                       | Alleen primaire regelset — de editor kent alleen de menselijke titel van het `legalResource` van de dienst. `null` voor niet-primaire regelsets. |
 
-`cprmv_version` is een enkele string die de versie van het CPRMV-vocabulaire naar buiten brengt die de backend spreekt — onafhankelijk van welke datasets zijn gepubliceerd.
+!!! warning "0.4.1-cachekanttekening"
+    Voor `cprmv_version=0.4.1` is `published_at` gelijk aan `cprmv:validFrom` (de toepasselijke datum), niet aan een publicatietijdstempel. Een herpublicatie van een RuleSet **met dezelfde `validFrom`** maar gewijzigde regelwaarden verandert de ETag/`Last-Modified` **niet**, dus een gecachete 0.4.1-respons kan tot `max-age` (1 u) na een correctie op dezelfde datum worden geserveerd. `0.3.x` heeft deze kanttekening niet (`dct:issued` loopt op bij elke publicatie). Een toekomstige fix is het emitteren van `dct:issued`/`prov:generatedAtTime` op de 0.4.1-RuleSet.
+
+**CPRMV-versieselectie (`?cprmv_version=`)**
+
+De optionele queryparameter `cprmv_version` selecteert welke CPRMV-vocabulaireversie het endpoint **bevraagt en uitlevert** — een van `0.3.0`, `0.3.2` of `0.4.1` (anders → `400 INVALID_PARAM`). Default is `0.3.0`, wat het historische gedrag behoudt. De gekozen waarde wordt teruggegeven in het envelopveld `cprmv_version`, en de volledig-gekwalificeerde regelsleutels (`type`, `id`, `definition`, `contains`) dragen de namespace van die versie:
+
+| `cprmv_version` | Namespace gebonden aan `cprmv:` | Bron van metadata per regelset |
+| --------------- | ------------------------------- | ------------------------------ |
+| `0.3.0` (default) | `https://cprmv.open-regels.nl/0.3.0/` | `cprmv:Dataset` |
+| `0.3.2` | `https://cprmv.open-regels.nl/0.3.2/` | `cprmv:Dataset` |
+| `0.4.1` | `https://standaarden.open-regels.nl/standards/cprmv/0.4.1#` | `cprmv:RuleSet` |
+
+Alle drie de versies dragen **platte `cprmv:Rule`-resources met identieke predicaten** (`id`, `definition`, `rulesetId`, `ruleIdPath`, `situatie`, `norm`), dus de regels-query is één vorm met een verwisselde namespace. De gekozen versie wordt doorgegeven aan de regels-query, de dataset-metadata-query (cache gekeyd op endpoint **+ versie**), de uitvoersleutels, het `cprmv_version`-veld en de ETag-signature — zodat verschillende versies nooit een cache-entry delen.
+
+!!! warning "Gewijzigde semantiek"
+    `cprmv_version` beschreef voorheen "het vocabulaire dat de backend spreekt, onafhankelijk van de data". Het weerspiegelt nu de **gevraagde** versie en daarmee de namespace van de geretourneerde data. Afnemers die op `0.3.0` vastzaten merken geen verschil (het is de default).
 
 Wanneer **elke** rulesetid in de respons ten minste één `dataset_versions`-entry heeft, draagt de respons strong HTTP-cacheheaders:
 
@@ -223,9 +239,9 @@ If-None-Match: "3c899856"
 
 Voor queries op een enkele rulesetid (`?rulesetid=<id>`) vindt de 304-check **vóór** de dure rules-SPARQL-query plaats — alleen de goedkope (gecachete) metadata-query draait voor een 304-respons. Voor multi-rulesetid-queries moet de rules-query eerst draaien om te weten welke rulesetid's in de respons verschijnen.
 
-Wanneer **enige** rulesetid in de respons `cprmv:Dataset`-records mist, wordt `Cache-Control: no-cache` gezet en worden `ETag` / `Last-Modified` weggelaten. Veilig-by-default: afnemers moeten altijd opnieuw ophalen totdat elke BWB die zij bevragen is gepubliceerd met ten minste één `cprmv:Dataset`-record. Tijdens de periode van uitrol-vanaf-nul betekent dit dat caching geleidelijk in werking treedt naarmate Datasets worden gepubliceerd.
+Wanneer **enige** rulesetid in de respons een versierecord mist (een `cprmv:Dataset` voor 0.3.x, een `cprmv:RuleSet` voor 0.4.1), wordt `Cache-Control: no-cache` gezet en worden `ETag` / `Last-Modified` weggelaten. Veilig-by-default: afnemers moeten altijd opnieuw ophalen totdat elke BWB die zij bevragen met ten minste één versierecord is gepubliceerd. Tijdens de periode van uitrol-vanaf-nul betekent dit dat caching geleidelijk in werking treedt naarmate er metadata wordt gepubliceerd.
 
-Dataset-metadata wordt 60 seconden in-memory gecached per endpoint-URL.
+Dataset-metadata wordt 60 seconden in-memory gecached, gekeyd op endpoint-URL **en `cprmv_version`** (zodat de `cprmv:Dataset`- en `cprmv:RuleSet`-metadata-queries nooit een cache-entry delen).
 
 **Queryparameters** (alle optioneel, mogen worden gecombineerd):
 
@@ -234,6 +250,7 @@ Dataset-metadata wordt 60 seconden in-memory gecached per endpoint-URL.
 | `endpoint`        | SPARQL-endpoint-URL. Default `config.triplydb.endpoint` (`TRIPLYDB_ENDPOINT`) wanneer weggelaten, conform het patroon dat `/v1/dmns` gebruikt.                        |
 | `rulesetid`       | Filter op exact-match van `cprmv:rulesetId` (bijv. `BWBR0015703`). Moet voldoen aan `/^[A-Za-z0-9_-]+$/`, anders wordt de request afgewezen met `400 INVALID_PARAM`.  |
 | `applicable_date` | Filter op het gedateerde segment van `cprmv:ruleIdPath` (bijv. `2026-01-01` matcht paden die `_2026-01-01_` bevatten). Moet voldoen aan `/^\d{4}-\d{2}-\d{2}$/` of `400`. |
+| `cprmv_version`   | CPRMV-vocabulaireversie om te bevragen en uit te leveren: een van `0.3.0`, `0.3.2`, `0.4.1` (anders `400 INVALID_PARAM`). Default `0.3.0`. Selecteert de `cprmv:`-namespace en het metadatamodel (`cprmv:Dataset` vs `cprmv:RuleSet`) — zie de subsectie **CPRMV-versieselectie** hierboven. |
 
 Gevalideerde filterwaarden worden server-side toegepast als SPARQL `FILTER`-clauses: exact-match op `?rulesetId` en `CONTAINS(STR(?ruleIdPath), "_<date>_")`. Filters worden pas geïnterpoleerd na het passeren van de regex-poort, waardoor SPARQL-injectie onmogelijk is.
 
@@ -342,8 +359,16 @@ Gevalideerde filterwaarden worden server-side toegepast als SPARQL `FILTER`-clau
 }
 ```
 
-!!! note
-    De vorm met geneste kinderen hierboven is het formaat dat het endpoint zal produceren *wanneer* `cprmv:contains`-triples aanwezig zijn in TriplyDB. De huidige acceptance-dataset bevat er geen, dus elke respons is momenteel plat. End-to-end-validatie van het geneste geval is nog uitstaand: upload een dataset met `cprmv:contains`-koppelingen en verifieer dat `/v1/norms` deze correct materialiseert in het publicatieformaat.
+!!! note "`contains` wordt door de huidige editor niet geproduceerd"
+    De vorm met geneste kinderen hierboven wordt *alleen* gematerialiseerd wanneer er
+    `cprmv:contains`-triples in TriplyDB aanwezig zijn. Sinds CPSV editor v1.10.5 worden die
+    **niet** meer geëmit: geneste subclausules (opsommingsitems zoals *"onderdeel 1°./2°./3°."*)
+    worden bij het importeren **in de `cprmv:definition` van de bovenliggende regel gevouwen**
+    in plaats van als `cprmv:contains`-kinderen gepubliceerd. Het endpoint behoudt de
+    `OPTIONAL { ?rule cprmv:contains … }`-tak voor achterwaartse compatibiliteit met eventuele
+    legacy-data, maar de huidige acceptance/productie-responses zijn plat (de bovenliggende
+    definitie draagt de volledige wettekst). Het veld `per` wordt eveneens alleen gevuld
+    wanneer een `cprmv:per`-triple bestaat.
 
 **Voorbeeldrequests:**
 
@@ -352,6 +377,8 @@ GET /v1/norms
 GET /v1/norms?rulesetid=BWBR0015703
 GET /v1/norms?applicable_date=2026-01-01
 GET /v1/norms?rulesetid=BWBR0015703&applicable_date=2026-01-01
+GET /v1/norms?cprmv_version=0.4.1
+GET /v1/norms?cprmv_version=0.3.2&rulesetid=BWBR0015703
 GET /v1/norms?endpoint=https://api.open-regels.triply.cc/datasets/stevengort/RONL/services/RONL/sparql
 ```
 

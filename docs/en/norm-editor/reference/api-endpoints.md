@@ -13,7 +13,7 @@ below. This page lists every endpoint the editor relies on.
 | `/api/process_graph` | unwrap-api |
 | `/api/process_and_save` | wrap-up-api |
 | `/api/*` (everything else) | backend |
-| `/*` | web (Quasar SSR) |
+| `/*` | web (Vue 3 SPA) |
 
 ---
 

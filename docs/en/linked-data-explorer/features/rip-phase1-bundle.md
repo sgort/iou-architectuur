@@ -105,6 +105,8 @@ The process is designed to be started from the Human Tasks interface in MijnOmge
 !!! note
     `candidateGroups` is set to `infra-projectteam` for all tasks by the DMN. Any user with this group membership can claim tasks.
 
+As of v1.9.9, the Map-role outputs script also sets a `leadRole` process variable, derived from the intake `projectType` (`contractbeheer` → `manager-pb`, otherwise `projectleider`). `leadRole` is distinct from the task `candidateGroups`: it names who owns the project in the portfolio, not who can claim its tasks.
+
 ---
 
 ## eDOCS integration

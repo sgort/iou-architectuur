@@ -48,7 +48,7 @@ graph TB
     NGINX[nginx<br/>reverse proxy]
 
     subgraph "Application services"
-        WEB[web<br/>Quasar SSR frontend]
+        WEB[web<br/>Vue 3 SPA frontend]
         BACKEND[backend<br/>Node / Express + TriplyDB client]
         NLP[nlp-api<br/>BERTje token classifier]
         UNWRAP[unwrap-api<br/>RDF &rarr; JSON]
@@ -78,7 +78,7 @@ graph TB
 | Service | Technology | Responsibility | Local port |
 |---|---|---|---|
 | `nginx` | nginx | Reverse proxy / single entry point | 80 |
-| `web` | Vue 3 + Quasar (SSR) | The editor user interface | 8080 (internal) |
+| `web` | Vue 3 + Quasar (SPA) | The editor user interface | 8080 (internal) |
 | `backend` | Node.js + Express + `@triply/triplydb` | Reads and writes sources and tasks in TriplyDB | 3000 |
 | `nlp-api` | Python + Flask + Transformers | Predicts act-frame entities from Dutch text | 8081 |
 | `unwrap-api` | Python + Flask + RDFLib | Converts FLINT RDF into editor JSON | 5001 |

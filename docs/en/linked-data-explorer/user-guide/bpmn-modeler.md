@@ -81,20 +81,23 @@ Click the **Deploy** button in the canvas toolbar. The deploy modal opens and li
   - Any subprocess BPMNs it calls via `calledElement` (resolved from your saved processes)
   - All `.form` files whose IDs match `camunda:formRef` references in the bundle
   - All `.document` files whose IDs match `ronl:documentRef` references in the bundle
- 
+
+The modal also has a required **Board ownership** section (v1.9.9). It auto-detects the owning board from the process's candidate groups — infra/rip groups → **Infra-board**, caseworker/hr groups → **Caseworker** — and lets you override the choice. The selected board is stamped onto the deployed BPMN as a process-level `camunda:property boardOwner`, persisted with the process, and exposed via `/bundles/public` so downstream consumers (the ronl-business-api Procesbibliotheek and archive split) can read which board owns the process.
+
 !!! note "DMNs are not part of the deploy bundle"
     Decision models referenced via `camunda:decisionRef` on `BusinessRuleTask` elements are **not** included in this deployment. DMNs reach Operaton through a separate path: they are published to TriplyDB by the [CPSV Editor](../../cpsv-editor/index.md) and deployed to Operaton from there. The BPMN process resolves `camunda:decisionRef` at runtime against whatever is already deployed — as long as the DMN key matches, no additional action is needed here.
  
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Deploy modal showing three sections — BPMN file, subprocess BPMNs, and form files — with the Operaton endpoint field pre-filled and a Deploy button at the bottom](../../assets/screenshots/linked-data-explorer-bpmn-deploy-modal.png)
-  <figcaption>Deploy modal showing the complete bundle before committing to Operaton</figcaption>
+  ![Screenshot: Deploy modal showing the bundle sections — BPMN file, subprocess BPMNs, form files — plus the required Board ownership section with the auto-detected board and an override control, the Operaton endpoint field pre-filled and a Deploy button at the bottom](../../assets/screenshots/linked-data-explorer-bpmn-deploy-modal.png)
+  <figcaption>Deploy modal showing the complete bundle and the Board ownership section before committing to Operaton</figcaption>
 </figure>
 
 1. Review the resource list. If a referenced form ID is shown as unmatched, open the Form Editor and save a form with that ID before deploying.
-2. Confirm or edit the **Operaton endpoint** URL. It is pre-filled from the environment configuration.
-3. If your Operaton instance requires authentication, enter the **Username** and **Password**.
-4. Click **Deploy**. All resources are sent in one multipart request.
-5. On success, a deployment ID is shown and the Deploy button is disabled to prevent accidental re-deploy.
+2. Check the **Board ownership** section — accept the auto-detected board or override it. A board owner is required to deploy.
+3. Confirm or edit the **Operaton endpoint** URL. It is pre-filled from the environment configuration.
+4. If your Operaton instance requires authentication, enter the **Username** and **Password**.
+5. Click **Deploy**. All resources are sent in one multipart request.
+6. On success, a deployment ID is shown and the Deploy button is disabled to prevent accidental re-deploy.
 
 Because the BPMN and all its forms land in the same Operaton deployment, `camunda:formRef` resolves correctly at runtime with no additional steps.
 

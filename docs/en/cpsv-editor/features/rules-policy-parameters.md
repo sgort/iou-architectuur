@@ -59,7 +59,7 @@ An informational banner in the CPRMV tab shows the currently linked legal resour
 
 ## Parameters layer
 
-Parameters are configurable constants that tune rule behaviour without changing the rules themselves — for example, income thresholds, age limits, or regional rates. Modelled as `cprmv:ParameterWaarde` (was `ronl:ParameterWaarde` before v2.0.0), each parameter carries a machine-readable notation (`skos:notation`), a numeric value and unit (`schema:value`, `schema:unitCode`), and optional temporal validity (`cprmv:validFrom`, `cprmv:validUntil`).
+Parameters are configurable constants that tune rule behaviour without changing the rules themselves — for example, income thresholds, age limits, or regional rates. Modelled as `cprmv:ParameterWaarde` (was `ronl:ParameterWaarde` before v2.0.0), each parameter carries a machine-readable notation (`skos:notation`), a numeric value and unit (`schema:value`, `schema:unitCode`), and optional temporal validity (`cprmv:validFrom`, `cprmv:validUntil`). Both the notation and the human-readable label (`skos:prefLabel`) are **mandatory** — the editor enforces them client-side to mirror the `cprmv:ParameterWaardeShape` SHACL constraint, regardless of whether a value is set (v1.10.4).
 
 ---
 

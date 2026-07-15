@@ -137,10 +137,10 @@ Proxies a SPARQL query to any TriplyDB endpoint, bypassing CORS restrictions. Us
 ### Norms
 
 ```
-GET /v1/norms?endpoint={url}&rulesetid={ruleset}&applicable_date={YYYY-MM-DD}
+GET /v1/norms?endpoint={url}&rulesetid={ruleset}&applicable_date={YYYY-MM-DD}&cprmv_version={0.3.0|0.3.2|0.4.1}
 ```
 
-Returns all `cprmv:Rule` paths and norms from the configured TriplyDB endpoint in the publish format consumed by the SPARQL editor's norm publisher. Each rule object mirrors the `cprmv-example.json` shape exactly: fully-qualified RDF/CPRMV keys for `type`, `id`, `definition`, and `contains`; short keys for `situatie`, `norm`, `per`, `rulesetid`, `applicable_date`, and `rule_id_path`.
+Returns all `cprmv:Rule` paths and norms from the configured TriplyDB endpoint in the publish format consumed by the SPARQL editor's norm publisher. Each rule object mirrors the `cprmv-example.json` shape exactly: fully-qualified RDF/CPRMV keys for `type`, `id`, `definition`, and `contains`; short keys for `situatie`, `norm`, `per`, `rulesetid`, `applicable_date`, and `rule_id_path`. The fully-qualified keys carry the namespace of the **selected `cprmv_version`** (see below).
 
 Parent rules and their `cprmv:contains` children are aggregated into a single nested object per parent. Key insertion order is preserved across runs:
 
@@ -170,7 +170,7 @@ Counts are over the filtered result set, so `total` equals the sum of all `norms
 
 **Dataset versioning and HTTP cache headers**
 
-Each BWB ruleset (BWBR0002471, BWBR0015703, …) is published as a separate `cprmv:Dataset` resource in TriplyDB by the CPSV editor (see [CPRMV Dataset Generation](../../cpsv-editor/developer/cprmv-dataset-generation.md)). A single ruleset can have multiple Dataset records — different applicable periods of the same law (e.g. BWBR0015703 at `2025-01-01` and `2026-01-01`) are **concurrent and equally authoritative**, not competing versions. A single `/v1/norms` response can span multiple rulesets, each carrying multiple records; the envelope therefore carries a `dataset_versions` map keyed by `cprmv:rulesetId`, where each value is a **list** of records:
+Each BWB ruleset (BWBR0002471, BWBR0015703, …) carries per-ruleset version metadata, published by the CPSV editor (see [CPRMV RuleSet / Dataset Generation](../../cpsv-editor/developer/cprmv-dataset-generation.md)). **Where that metadata lives depends on `cprmv_version`:** for `0.3.0`/`0.3.2` it is a `cprmv:Dataset` resource (with `dct:issued` + `dcat:version`); for `0.4.1` there is no `cprmv:Dataset` and it is read from the `cprmv:RuleSet` instead (`cprmv:validFrom`, which also serves as `published_at` — see the table below). A single ruleset can have multiple records — different applicable periods of the same law (e.g. BWBR0015703 at `2025-01-01` and `2026-01-01`) are **concurrent and equally authoritative**, not competing versions. A single `/v1/norms` response can span multiple rulesets, each carrying multiple records; the envelope therefore carries a `dataset_versions` map keyed by `cprmv:rulesetId`, where each value is a **list** of records:
 
 ```json
 "dataset_versions": {
@@ -192,17 +192,33 @@ Each BWB ruleset (BWBR0002471, BWBR0015703, …) is published as a separate `cpr
 }
 ```
 
-The list is pre-sorted: **`version` descending with nulls at the end, ties broken by `published_at` descending**. Element `[0]` is the most-recent applicable version of that ruleset. Non-primary rulesets (no `dcat:version` in TriplyDB) fall through to pure `published_at` desc ordering.
+The list is pre-sorted: **`version` descending with nulls at the end, ties broken by `published_at` descending**. Element `[0]` is the most-recent applicable version of that ruleset.
 
-Three per-entry fields, with two of them nullable:
+Three per-entry fields:
 
-| Field          | Source       | Always present? |
-| -------------- | ------------ | --------------- |
-| `version`      | `dcat:version` | Primary ruleset only — the editor only knows the version of the service's `legalResource.bwbId`. `null` for non-primary rulesets. |
-| `published_at` | `dct:issued`   | Yes. The timestamp of this `cprmv:Dataset` record's publication — the meaningful signal for cache validity. |
-| `title`        | `dct:title`    | Primary ruleset only. `null` for non-primary rulesets. |
+| Field          | Source (0.3.x / 0.4.1)        | Notes |
+| -------------- | ----------------------------- | ----- |
+| `version`      | `dcat:version` / `cprmv:validFrom` | **Now present for every ruleset.** Since v1.10.5 the editor derives each ruleset's version from the BWB date its own rules carry (their `ruleIdPath`), so non-primary rulesets are versioned too. (`null` only survives for legacy data published before that change.) |
+| `published_at` | `dct:issued` / `cprmv:validFrom` | **0.3.x:** the `cprmv:Dataset` publication timestamp — changes on every (re-)publication, the primary cache-validity signal. **0.4.1:** there is no `dct:issued`, so `cprmv:validFrom` doubles as `published_at` (see caveat below). |
+| `title`        | `dct:title`                   | Primary ruleset only — the editor only knows the human title of the service's `legalResource`. `null` for non-primary rulesets. |
 
-`cprmv_version` is a single string surfacing the CPRMV vocabulary version the backend speaks — independent of which datasets have been published.
+!!! warning "0.4.1 cache caveat"
+    For `cprmv_version=0.4.1`, `published_at` equals `cprmv:validFrom` (the applicable date), not a publication timestamp. Re-publishing a RuleSet **with the same `validFrom`** but changed rule values does **not** change the ETag/`Last-Modified`, so a cached `0.4.1` response can be served for up to `max-age` (1 h) after a same-date correction. `0.3.x` does not have this caveat (`dct:issued` advances on every publish). A future fix is to emit `dct:issued`/`prov:generatedAtTime` on the 0.4.1 RuleSet.
+
+**CPRMV version selection (`?cprmv_version=`)**
+
+The optional `cprmv_version` query parameter selects which CPRMV vocabulary version the endpoint **queries and emits** — one of `0.3.0`, `0.3.2`, or `0.4.1` (anything else → `400 INVALID_PARAM`). It defaults to `0.3.0`, preserving the historical behaviour. The chosen value is echoed back in the `cprmv_version` envelope field, and the fully-qualified rule keys (`type`, `id`, `definition`, `contains`) carry that version's namespace:
+
+| `cprmv_version` | Namespace bound to `cprmv:` | Per-ruleset metadata source |
+| --------------- | --------------------------- | --------------------------- |
+| `0.3.0` (default) | `https://cprmv.open-regels.nl/0.3.0/` | `cprmv:Dataset` |
+| `0.3.2` | `https://cprmv.open-regels.nl/0.3.2/` | `cprmv:Dataset` |
+| `0.4.1` | `https://standaarden.open-regels.nl/standards/cprmv/0.4.1#` | `cprmv:RuleSet` |
+
+All three versions carry **flat `cprmv:Rule` resources with identical predicates** (`id`, `definition`, `rulesetId`, `ruleIdPath`, `situatie`, `norm`), so the rules query is one shape with the namespace swapped. The selected version is threaded through the rules query, the dataset-metadata query (cache keyed by endpoint **+ version**), the output keys, the `cprmv_version` field, and the ETag signature — so different versions never share a cache entry.
+
+!!! warning "Changed semantics"
+    `cprmv_version` previously described "the vocabulary the backend speaks, independent of the data". It now reflects the **requested** version and therefore the namespace of the data returned. Callers that pinned to `0.3.0` see no change (it is the default).
 
 When **every** rulesetid in the response has at least one `dataset_versions` entry, the response carries strong HTTP cache headers:
 
@@ -225,7 +241,7 @@ For single-rulesetid queries (`?rulesetid=<id>`), the 304 check happens **before
 
 When **any** rulesetid in the response lacks `cprmv:Dataset` records, `Cache-Control: no-cache` is set and `ETag` / `Last-Modified` are omitted. Safe-by-default: consumers must always refetch until every BWB they query has been published with at least one `cprmv:Dataset` record. During the rollout-from-scratch period this means caching kicks in progressively as Datasets are published.
 
-Dataset metadata is cached in-memory for 60 seconds per endpoint URL.
+Dataset metadata is cached in-memory for 60 seconds, keyed by endpoint URL **and `cprmv_version`** (so the `cprmv:Dataset` and `cprmv:RuleSet` metadata queries never share a cache entry).
 
 **Query parameters** (all optional, may be combined):
 
@@ -234,8 +250,9 @@ Dataset metadata is cached in-memory for 60 seconds per endpoint URL.
 | `endpoint`        | SPARQL endpoint URL. Defaults to `config.triplydb.endpoint` (`TRIPLYDB_ENDPOINT`) when omitted, matching the pattern used by `/v1/dmns`.                             |
 | `rulesetid`       | Exact-match filter on `cprmv:rulesetId` (e.g. `BWBR0015703`). Must match `/^[A-Za-z0-9_-]+$/` or the request is rejected with `400 INVALID_PARAM`.                   |
 | `applicable_date` | Filter on the dated segment of `cprmv:ruleIdPath` (e.g. `2026-01-01` matches paths containing `_2026-01-01_`). Must match `/^\d{4}-\d{2}-\d{2}$/` or `400`.          |
+| `cprmv_version`   | CPRMV vocabulary version to query and emit: one of `0.3.0`, `0.3.2`, `0.4.1` (else `400 INVALID_PARAM`). Defaults to `0.3.0`. Selects the `cprmv:` namespace and the metadata model (`cprmv:Dataset` vs `cprmv:RuleSet`) — see the **CPRMV version selection** subsection above. |
 
-Validated filter values are applied as SPARQL `FILTER` clauses server-side: exact-match on `?rulesetId` and `CONTAINS(STR(?ruleIdPath), "_<date>_")`. Filters are interpolated only after passing the regex gate, making SPARQL injection impossible.
+Validated filter values are applied as SPARQL `FILTER` clauses server-side: exact-match on `?rulesetId` and `CONTAINS(STR(?ruleIdPath), "_<date>_")`. Filters are interpolated only after passing the regex gate, making SPARQL injection impossible. `cprmv_version` selects a namespace rather than a filter, so it is validated against the supported set rather than a character-class regex.
 
 **Example response — flat rule** (most common; no `contains` key):
 
@@ -342,8 +359,15 @@ Validated filter values are applied as SPARQL `FILTER` clauses server-side: exac
 }
 ```
 
-!!! note
-    The nested-children shape above is the format the endpoint will produce *when* `cprmv:contains` triples are present in TriplyDB. The current acceptance dataset has none, so every response is currently flat. End-to-end validation of the nested case is still pending: upload a dataset containing `cprmv:contains` links and verify that `/v1/norms` materialises them correctly into the publish format.
+!!! note "`contains` is not produced by the current editor"
+    The nested-children shape above is materialised *only when* `cprmv:contains` triples are
+    present in TriplyDB. Since CPSV editor v1.10.5 those are **not** emitted: nested
+    sub-clauses (enumeration items such as *"onderdeel 1°./2°./3°."*) are **folded into the
+    parent rule's `cprmv:definition`** on import rather than published as `cprmv:contains`
+    children. The endpoint keeps the `OPTIONAL { ?rule cprmv:contains … }` branch for
+    backward compatibility with any legacy data, but current acceptance/production responses
+    are flat (the parent definition carries the full legal text). The `per` field is likewise
+    only populated when a `cprmv:per` triple exists.
 
 **Example requests:**
 
@@ -352,6 +376,8 @@ GET /v1/norms
 GET /v1/norms?rulesetid=BWBR0015703
 GET /v1/norms?applicable_date=2026-01-01
 GET /v1/norms?rulesetid=BWBR0015703&applicable_date=2026-01-01
+GET /v1/norms?cprmv_version=0.4.1
+GET /v1/norms?cprmv_version=0.3.2&rulesetid=BWBR0015703
 GET /v1/norms?endpoint=https://api.open-regels.triply.cc/datasets/stevengort/RONL/services/RONL/sparql
 ```
 
@@ -387,6 +413,8 @@ src/db/
 ├── pool.ts       — pg.Pool initialisation, error listener, null-if-unconfigured guard
 └── migrate.ts    — idempotent DDL: process_definitions, form_schemas, document_templates
 ```
+
+As of v1.9.9, `process_definitions` carries a `board_owner` column that records the owning board chosen (or auto-derived from candidate groups) at deploy time. It is set from the deployed BPMN's process-level `camunda:property boardOwner` and surfaced through `/bundles/public`, so downstream consumers (the ronl-business-api Procesbibliotheek and archive split) can group processes by board.
 
 See [PostgreSQL Deployment](deployment-postgresql.md) for Azure provisioning.
 

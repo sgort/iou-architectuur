@@ -1,4 +1,4 @@
-# CPRMV RuleSet-generatie
+# CPRMV RuleSet / Dataset-generatie
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
@@ -40,3 +40,7 @@
 ---
 
 ## Importing the CPRMV 0.4.1 Rules API
+
+---
+
+## Known limitations & planned changes

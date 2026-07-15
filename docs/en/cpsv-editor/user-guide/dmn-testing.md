@@ -77,6 +77,8 @@ Create a JSON file containing an array of test cases. Two formats are supported:
 
 Both formats are automatically detected and normalised — you do not need to specify which one you are using.
 
+Each case may also carry an optional `decision` field naming the decision it should be evaluated against. When present it is used as the evaluation key; when absent the case falls back to the selected Decision Key. This lets a single file exercise every decision of a multi-decision DMN (see [Routing each case to its decision](#running-test-cases) below).
+
 ### Variable types
 
 | DMN typeRef | JSON type | Example |
@@ -96,23 +98,38 @@ Both formats are automatically detected and normalised — you do not need to sp
 2. Click **Upload test-cases.json** and select your file. A badge shows the filename and case count.
 3. Click **Run All Test Cases**.
 
-Results appear progressively:
+Results appear progressively, and each case is **verified** — its expected outcome is compared against the engine's actual outputs, not just the HTTP status:
 
 ```
-4/4 passed  •  0/4 failed
+3/4 passed  •  1/4 failed
 
-✅ 1  TC1_Eligible_NL_insured_moderate_income
-     Expected: eligible=true, amountYear>0
+✅ PASS  1  TC1_Eligible_NL_insured_moderate_income
+         Expected: eligible=true, amountYear>0
 
-✅ 2  TC2_Not_eligible_detained
-     Expected: eligible=false, amountYear=0
+❌ FAIL  2  TC2_Not_eligible_detained
+         Expected: eligible=false  ·  Actual: eligible=true
 ```
 
-Running test cases also populates the **Concepts** tab. Input concepts are derived from the union of every uploaded case's request-body variables — so all inputs are covered even without a successful evaluate — and output concepts are added from the last successful result when there is one (v1.10.2). These NL-SBB concepts are used for semantic linking via the Linked Data Explorer.
+Each case resolves to one of four verdicts (v1.10.3):
+
+| Verdict | Meaning |
+|---|---|
+| **PASS** (green) | Expected outputs match the engine's actual outputs. |
+| **FAIL** (red) | A mismatch — an Expected-vs-Actual table is shown per output. |
+| **ERROR** (red) | The evaluate call itself failed (deployment, network, or request error). |
+| **OK-unchecked** (amber) | The call succeeded but no expectation could be parsed, so correctness could not be confirmed — never counted as a silent pass. |
+
+The expected outcome is read from the readable `key=value, reden="…"` string, a structured `expected` object, or the special *"empty result set"* case (see below). The summary and header counts are verdict-based, so *"N/N passed"* means functionally correct results.
+
+**Routing each case to its decision.** Run All Test Cases sends each case to its own decision: a case's optional `decision` field is used as the evaluation key, falling back to the selected Decision Key when absent. One test file can therefore exercise every decision of a deployed DMN, and each result shows the decision it ran against (v1.10.4).
+
+**Expecting an empty result.** A case whose expected value is the literal empty collection `[]` (or `{}`) — meaning no rule matches and the engine correctly returns an empty result — is verified automatically as an empty-result expectation, alongside the descriptive strings *"empty result"* / *"no matching rule"*. A non-empty response against an `[]` expectation still fails (v1.10.6).
+
+Running test cases also populates the **Concepts** tab. Input *and* output concepts are unioned across every uploaded case (deduped by name), and each variable records the decision(s) it appears in — so every input and output is attributed to its decision(s), even without a successful evaluate (v1.10.4). These NL-SBB concepts are used for semantic linking via the Linked Data Explorer.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Test Cases section showing the pass/fail counter at the top (3/3 passed) and four test case rows each with a ✅ badge and the expected outcome text](../../assets/screenshots/cpsv-editor-test-cases.png)
-  <figcaption>Test Cases section showing the pass/fail counter at the top (3/3 passed) and four test case rows each with a ✅ badge and the expected outcome text</figcaption>
+  ![Screenshot: Test Cases section showing the verdict-based pass/fail counter at the top (3/4 passed, 1/4 failed) with PASS, FAIL and OK-unchecked badges on the case rows and an Expected-vs-Actual mismatch table under the failed case](../../assets/screenshots/cpsv-editor-test-cases.png)
+  <figcaption>Test Cases section with verdict-based results — PASS/FAIL/ERROR/OK-unchecked badges and an Expected-vs-Actual mismatch table under a failed case</figcaption>
 </figure>
 
 ---

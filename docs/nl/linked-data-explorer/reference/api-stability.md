@@ -14,10 +14,17 @@ Dit contract richt zich op **G2G-afnemers** — andere Nederlandse overheidsdien
 |------|---------|-------------------|------------------------|
 | **API-contract** | URL-pad `/v1/` | Het schema en de vorm waar afnemers tegen aan coderen | Uitsluitend breaking changes (rechtvaardigt `/v2/`) |
 | **Dataset-versies** | `data.dataset_versions`-envelopmap | Publicatie-snapshots per rulesetid | Elke BWB-regelset met eigen cadans; de map bevat de meest recente versie per rulesetid in het antwoord |
-| **CPRMV-vocabulaire** | `data.cprmv_version`-envelopveld | Welk vocabulaire de data gebruikt | Versie-updates van het vocabulaire (meestal additief) |
+| **CPRMV-vocabulaire** | `?cprmv_version=`-requestparameter ↔ `data.cprmv_version`-envelopveld | In welke CPRMV-vocabulaireversie de respons wordt gevraagd en uitgeleverd | **Door de afnemer gekozen** per request (`0.3.0` default, `0.3.2`, `0.4.1`); de namespace van de data volgt de keuze |
 | **Backend-service** | `API-Version` HTTP-header | De uitgerolde backendcode | Bij elke backendrelease (operationeel, geen contractsignaal) |
 
 Alleen de eerste drie maken deel uit van het afnemerscontract. De `API-Version`-header is informatief — bruikbaar voor supporttickets, niet voor cache-invalidatie of schema-onderscheid.
+
+!!! note "`cprmv_version` is nu een request-input"
+    Sinds backend v1.9.10 is `cprmv_version` een **onderhandelbare** laag: afnemers kiezen de
+    vocabulaireversie via de optionele parameter `?cprmv_version=` (default `0.3.0`), en het
+    envelopveld `cprmv_version` echoot de keuze. Voorheen gaf het alleen "wat de backend spreekt"
+    weer. De parameter weglaten behoudt exact het eerdere gedrag, dus dit is een additieve
+    wijziging binnen v1.
 
 ## Stabiliteitsbelofte binnen v1
 
@@ -51,11 +58,26 @@ Binnen v1 zijn alle wijzigingen additief:
 
 ### CPRMV-vocabulaireversie
 
-Het envelopveld `cprmv_version` geeft aan welk CPRMV-vocabulaire de responsdata gebruikt (momenteel `"0.3.0"`). Een bump binnen de `0.x`-lijn wordt behandeld als additieve groei van het vocabulaire (nieuwe predicates, nieuwe optionele velden). Een major bump die de predicate-URI's verandert die de afnemer ziet, zou worden uitgebracht als `/v2/norms`.
+Het envelopveld `cprmv_version` echoot de versie die via `?cprmv_version=` is gevraagd (een van `0.3.0`, `0.3.2`, `0.4.1`; default `0.3.0`). De **volledig-gekwalificeerde regelsleutels** (`type`, `id`, `definition`, `contains`) dragen de namespace van die versie, dus de predicate-URI's die een afnemer ziet zijn een functie van de versie die hij *opvraagt*:
+
+- `0.3.0` / `0.3.2` → `https://cprmv.open-regels.nl/<versie>/…`
+- `0.4.1` → `https://standaarden.open-regels.nl/standards/cprmv/0.4.1#…`
+
+Stabiliteit binnen v1: **de default-respons (`0.3.0`) en zijn predicate-URI's veranderen niet.** Een andere `cprmv_version` opvragen is een expliciete opt-in voor die namespace — geen breaking change aan het default-contract. Een afnemer die de parameter nooit meestuurt, wordt niet geraakt door nieuwe versies in de ondersteunde set. Een toekomstige wijziging die de **default**-versie verandert, of de predicate-URI's van de **default**-versie, zou worden uitgebracht als `/v2/norms`.
+
+!!! warning "Experimentele versies — `0.3.2` en `0.4.1` vallen niet onder de v1-garantie"
+    Alleen de default **`0.3.0`** valt onder dit stabiliteitscontract. **`0.3.2` en `0.4.1` zijn
+    experimenteel / preview:** hun responsvorm, predicate-URI's, `dataset_versions`-semantiek
+    (bijv. het 0.4.1-`cprmv:RuleSet`/`validFrom`-model en de
+    [cachekanttekening](#publicaties-detecteren)) en zelfs hun beschikbaarheid kunnen wijzigen —
+    of worden ingetrokken — **zonder** een `/v2/norms` en buiten de additieve-evolutiebelofte
+    hierboven. Bouw langetermijn-G2G-integraties tegen de default; behandel
+    `?cprmv_version=0.3.2` / `0.4.1` als opt-in totdat een versie expliciet in dit contract wordt
+    opgenomen.
 
 ## Datasetversiebeheer per rulesetid
 
-Elke BWB-regelset (BWBR0002471, BWBR0004044, …) wordt door de CPSV editor gepubliceerd als een afzonderlijke `cprmv:Dataset`-resource in TriplyDB. **Eén regelset kan meerdere Dataset-records hebben** — verschillende toepasselijke perioden van dezelfde wet (bijv. de edities `2025-01-01` en `2026-01-01` van de Participatiewet) zijn *gelijktijdig en even gezaghebbend*, geen concurrerende versies van elkaar. Beide ondersteunen regels die afnemers legitiem kunnen opvragen. Eén `/v1/norms`-respons kan regels over N regelsets aggregeren, elk met M records.
+Elke BWB-regelset (BWBR0002471, BWBR0004044, …) draagt versiemetadata per regelset, gepubliceerd door de CPSV editor. **Waar die metadata staat hangt af van de gevraagde `cprmv_version`:** `0.3.0`/`0.3.2` gebruiken een afzonderlijke `cprmv:Dataset`-resource per regelset; `0.4.1` heeft geen `cprmv:Dataset` en de metadata wordt uit de `cprmv:RuleSet` gelezen (`cprmv:validFrom`). Hoe dan ook is de envelopvorm hieronder identiek. **Eén regelset kan meerdere records hebben** — verschillende toepasselijke perioden van dezelfde wet (bijv. de edities `2025-01-01` en `2026-01-01` van de Participatiewet) zijn *gelijktijdig en even gezaghebbend*, geen concurrerende versies van elkaar. Beide ondersteunen regels die afnemers legitiem kunnen opvragen. Eén `/v1/norms`-respons kan regels over N regelsets aggregeren, elk met M records.
 
 ### De `dataset_versions`-map
 
@@ -81,17 +103,17 @@ Het envelopveld `data.dataset_versions` is gekeyd op `cprmv:rulesetId`; elke waa
 }
 ```
 
-De lijst is **vooraf gesorteerd**: `version` aflopend met nulls achteraan, gelijke waarden gebroken door `published_at` aflopend. Element `[0]` is de meest recente toepasselijke versie van die regelset. Niet-primaire regelsets (waar de editor `dcat:version` niet kent) vallen terug op pure `published_at` desc-volgorde.
+De lijst is **vooraf gesorteerd**: `version` aflopend met nulls achteraan, gelijke waarden gebroken door `published_at` aflopend. Element `[0]` is de meest recente toepasselijke versie van die regelset.
 
-De map bevat alleen entries voor rulesetid's die ten minste één `cprmv:Dataset`-record hebben. Rulesetid's zonder zo'n record zijn stilzwijgend afwezig (overgangsstaat tijdens de uitrol).
+De map bevat alleen entries voor rulesetid's die ten minste één versierecord hebben (een `cprmv:Dataset` voor 0.3.x, een `cprmv:RuleSet` voor 0.4.1). Rulesetid's zonder zo'n record zijn stilzwijgend afwezig (een overgangsstaat voor legacy 0.3.x-data; 0.4.1 heeft altijd een RuleSet per regelset).
 
-Drie velden per entry, waarvan twee nullable:
+Drie velden per entry:
 
-| Veld           | Bron           | Altijd aanwezig?                                                                                              |
-| -------------- | -------------- | ------------------------------------------------------------------------------------------------------------- |
-| `version`      | `dcat:version` | **Alleen primaire regelset.** De CPSV editor kent alleen de versie van het `legalResource.bwbId` van de dienst — de wet die expliciet is ingevoerd op het tabblad Legal. Voor andere regelsets die via `cprmv:Rule`-referenties in de dienst voorkomen is de versie onbekend en wordt deze als `null` uitgezonden. |
-| `published_at` | `dct:issued`   | **Altijd aanwezig.** Tijdstempel van wanneer dit `cprmv:Dataset`-record is gepubliceerd. Dit is het betekenisvolle signaal voor wijzigingsdetectie — het wordt bij elke (her)publicatie bijgewerkt, ongeacht of de eigen versie van de BWB bekend is. |
-| `title`        | `dct:title`    | **Alleen primaire regelset.** `null` voor niet-primaire regelsets, om dezelfde reden als `version`. |
+| Veld           | Bron (0.3.x / 0.4.1)              | Opmerkingen |
+| -------------- | --------------------------------- | ----------- |
+| `version`      | `dcat:version` / `cprmv:validFrom` | **Aanwezig voor elke regelset sinds CPSV editor v1.10.5** — de editor leidt de versie van elke regelset af uit de BWB-datum die de eigen regels dragen (hun `ruleIdPath`), zodat ook niet-primaire regelsets zijn geversioneerd. `null` blijft alleen over voor legacy-data van vóór die wijziging; afnemers moeten dit nog steeds tolereren. |
+| `published_at` | `dct:issued` / `cprmv:validFrom`   | **0.3.x:** het publicatietijdstempel — wordt bij elke (her)publicatie bijgewerkt, het signaal voor wijzigingsdetectie. **0.4.1:** er is geen `dct:issued`, dus `cprmv:validFrom` dient als `published_at` (zie de [0.4.1-cachekanttekening](#publicaties-detecteren)). |
+| `title`        | `dct:title`                        | **Alleen primaire regelset.** De editor kent alleen de menselijke titel van het `legalResource.bwbId` van de dienst. `null` voor niet-primaire regelsets. |
 
 ### Regels koppelen aan Dataset-records
 
@@ -125,17 +147,26 @@ De server retourneert `304 Not Modified` zonder body wanneer er sinds de laatste
 
 #### Waarom `published_at` (niet `version`) de cachegeldigheid bepaalt
 
-Een null-waarde voor `version` betekent niet dat de data niet cachebaar is — het betekent enkel dat het eigen versielabel van de BWB onbekend is. Het werkelijke wijzigingssignaal is `published_at` (`dct:issued`), dat altijd aanwezig is en bij elke publicatiegebeurtenis wordt bijgewerkt. ETag en Last-Modified steunen op `published_at`; het veld `version` is informatieve metadata voor menselijke en UI-consumptie.
+ETag en `Last-Modified` worden berekend uit `published_at`, niet uit `version`; het veld `version` is informatieve metadata voor menselijke en UI-consumptie. Voor `0.3.0`/`0.3.2` is `published_at` gelijk aan `dct:issued`, dat bij elke publicatiegebeurtenis wordt bijgewerkt en daarmee een betrouwbaar wijzigingssignaal is (een legacy-`null` voor `version` maakt de data niet on-cachebaar).
+
+!!! warning "0.4.1-cachekanttekening"
+    Voor `cprmv_version=0.4.1` is `published_at` gelijk aan `cprmv:validFrom` (de toepasselijke
+    datum), omdat de 0.4.1-RuleSet geen `dct:issued` heeft. Een herpublicatie die **dezelfde
+    `validFrom` behoudt** maar regelwaarden corrigeert, verandert de ETag/`Last-Modified`
+    **niet**, dus een gecachete respons kan tot `max-age` (1 u) worden geserveerd. Afnemers die
+    op `0.4.1` correctie-actuele data nodig hebben, moeten binnen dat venster niet uitsluitend op
+    conditionele requests vertrouwen. `0.3.x` wordt niet geraakt (`dct:issued` loopt op bij elke
+    publicatie). Een geplande fix emit een publicatietijdstempel op de 0.4.1-RuleSet.
 
 #### Gedrag bij gedeeltelijke dekking
 
-Wanneer **een** rulesetid in de respons geen `cprmv:Dataset`-record heeft (een niet-versie-gebonden regelset), degradeert de respons als volgt:
+Wanneer **een** rulesetid in de respons een versierecord mist (een `cprmv:Dataset` voor 0.3.x, een `cprmv:RuleSet` voor 0.4.1), degradeert de respons als volgt:
 
 - De `dataset_versions`-map laat de niet-versie-gebonden rulesetid(s) weg
 - De headers `ETag` en `Last-Modified` worden niet gezet
 - `Cache-Control: no-cache`
 
-Rationale: we kunnen een wijziging in een niet-versie-gebonden regelset niet betrouwbaar detecteren. Een 304 retourneren in dat geval zou het risico van verouderde data opleveren, dus vertellen we afnemers altijd opnieuw op te halen. Naarmate meer BWB-regelsets worden gepubliceerd met `cprmv:Dataset`-metadata, treedt caching geleidelijk in werking voor queries die uitsluitend versie-gebonden regelsets bestrijken.
+Rationale: we kunnen een wijziging in een niet-versie-gebonden regelset niet betrouwbaar detecteren. Een 304 retourneren in dat geval zou het risico van verouderde data opleveren, dus vertellen we afnemers altijd opnieuw op te halen. Naarmate meer BWB-regelsets worden gepubliceerd met versiemetadata, treedt caching geleidelijk in werking voor queries die uitsluitend versie-gebonden regelsets bestrijken.
 
 ## Wat rechtvaardigt `/v2/norms`
 
@@ -160,9 +191,11 @@ Wanneer `/v2/norms` uiteindelijk wordt geïntroduceerd:
 |-------|----------|
 | Mag ik de waarden van een regel onbeperkt cachen? | Ja, gekeyd op `(rulesetid, applicable_date, rulesetid_index)` |
 | Hoe detecteer ik nieuwe publicaties efficiënt? | Gebruik `If-None-Match` met de vorige `ETag` — `304` betekent dat er niets is gewijzigd |
-| Wat als een rulesetid ontbreekt in `dataset_versions`? | Die regelset heeft nog geen `cprmv:Dataset`-record; niet cachen |
+| Welke `cprmv_version` moet ik opvragen? | Laat hem weg voor de stabiele default (`0.3.0`). Stuur `?cprmv_version=0.3.2` of `0.4.1` alleen als u die namespace specifiek wilt — deze zijn **experimenteel** en vallen **niet** onder de v1-garantie (kunnen wijzigen/ingetrokken worden zonder `/v2/`). Alleen de vorm en predicate-URI's van de default zijn contractstabiel binnen v1. |
+| Wat als een rulesetid ontbreekt in `dataset_versions`? | Die regelset heeft nog geen versierecord (een `cprmv:Dataset` voor 0.3.x / een `cprmv:RuleSet` voor 0.4.1); niet cachen |
 | Wat betekent `Cache-Control: no-cache` hier? | Ten minste één rulesetid in uw query is niet versie-gebonden — telkens opnieuw ophalen |
-| Wat betekent `version: null`? | De eigen versie van de BWB is onbekend (deze regelset is niet de primaire wet van een dienst die hem publiceert). `published_at` blijft gezaghebbend voor wijzigingsdetectie. |
+| Wat betekent `version: null`? | Legacy-data gepubliceerd vóór CPSV editor v1.10.5 — de niet-primaire versie was onbekend. Actuele data versioneert **elke** regelset, dus `null` is zeldzaam. `published_at` blijft gezaghebbend voor wijzigingsdetectie (met de [0.4.1-kanttekening](#publicaties-detecteren)). |
+| Is `published_at` altijd een publicatietijdstempel? | Voor `0.3.x` wel (`dct:issued`). Voor `0.4.1` is het `cprmv:validFrom` (de toepasselijke datum) — een herpublicatie op dezelfde datum verhoogt het niet; zie de 0.4.1-cachekanttekening. |
 | Waarom heeft één rulesetid meerdere Dataset-records? | Verschillende toepasselijke perioden van dezelfde wet zijn gelijktijdig en even gezaghebbend. De edities `2025-01-01` en `2026-01-01` van de Participatiewet ondersteunen beide actuele regels; beide worden vermeld. |
 | Hoe vind ik welk Dataset-record een specifieke regel ondersteunt? | Zoek op `dataset_versions[<rule.rulesetid>]`, vind de entry waarvan `version` overeenkomt met `<rule.applicable_date>`; val door naar de meest recente op `published_at` wanneer `version` null is. |
 | Hoe vind ik de huidige waarde van een regel? | Filter op `rule_id_path_key`, sorteer op `applicable_date` desc en vervolgens `rulesetid_index` desc, neem de eerste |

@@ -87,11 +87,19 @@ Multiple rules can be added with the **Add Rule** button. Each rule appears as a
 
 Each parameter models `cprmv:ParameterWaarde`.
 
-**Notation** (`skos:notation`) — Machine-readable identifier for the parameter (e.g. `AOW_LEEFTIJD_STANDAARD`).
+**Notation** (`skos:notation`) — Machine-readable identifier for the parameter (e.g. `AOW_LEEFTIJD_STANDAARD`). **Required.**
 
-**Label** (`skos:prefLabel`) — Human-readable name.
+**Label** (`skos:prefLabel`) — Human-readable name. **Required.**
 
 **Value** (`schema:value`) — The numeric or string value.
+
+!!! note "Notation and label are always required"
+    Both **Notation** and **Label** are mandatory for every parameter regardless of whether a value is set — the client-side check mirrors the `cprmv:ParameterWaardeShape` SHACL constraint, so a missing notation or label is flagged inline and in the pre-publish validation panel rather than only being caught by the back-end on publish (v1.10.4).
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Parameters tab with a parameter card whose empty Notation and Label fields show inline "required" validation errors, alongside the Value, Unit and Valid from/until fields](../../assets/screenshots/cpsv-editor-parameters-tab.png)
+  <figcaption>Parameters tab surfacing the now-mandatory Notation and Label validation inline (v1.10.4)</figcaption>
+</figure>
 
 **Unit** (`schema:unitCode`) — The unit of measurement (e.g. `ANN` for years, `EUR` for euros).
 
@@ -123,11 +131,15 @@ CPRMV rules can be entered individually or imported in bulk via the **Import JSO
 
 See the [DMN Workflow](dmn-workflow.md) and [DMN Testing](dmn-testing.md) user guides.
 
+The DMN tab retains its state when you switch tabs — an uploaded DMN, its deployment status, and the full test-case run results survive a hop to the Concepts tab and back, so you don't lose work by navigating away (v1.10.4).
+
 ---
 
 ## Concepts tab
 
-The Concepts tab holds NL-SBB concept definitions (`skos:Concept`) for the DMN's input and output variables. Concepts are populated automatically once a DMN is loaded and its inputs/outputs are known — by running a single evaluate, by running uploaded test cases (the union of all uploaded cases' request-body variables is used, so no successful evaluate is required), or restored on import. A badge on the tab shows the concept count, or "Needs DMN" when none exist yet.
+The Concepts tab holds NL-SBB concept definitions (`skos:Concept`) for the DMN's input and output variables. Concepts are populated automatically once a DMN is loaded and its inputs/outputs are known — by running a single evaluate, by running uploaded test cases (input *and* output concepts are unioned across every uploaded case, deduped by name, so no successful evaluate is required), or restored on import. A badge on the tab shows the concept count, or "Needs DMN" when none exist yet.
+
+Each variable also carries a **decision badge** showing which decision(s) it belongs to — blue beside inputs (which are DRD-level and may belong to several decisions) and green beside outputs, with output concepts clustered so variables from the same decision sit together (v1.10.4).
 
 Each concept exposes editable **Preferred Label** (`skos:prefLabel`), **Notation** (`skos:notation`), **Definition** (`skos:definition`), an optional **Exact Match URI** (`skos:exactMatch`) for cross-DMN semantic linking, and a **Variable Name** that forms the concept URI. The Variable Name input is URI-safe — spaces are converted to underscores and IRI-illegal characters are stripped (v1.10.2), so generated Turtle always parses.
 

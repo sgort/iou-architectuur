@@ -4,6 +4,52 @@
 
 ## Changelog
 
+### v1.9.11 — Board-owner deploy fix & Operaton error surfacing (July 2026)
+
+**v1.9.11 — Patch (July 2, 2026)**
+
+- Fixed `boardOwner` injection breaking BPMN deploys whose `<bpmn:process>` carries a `<bpmn:documentation>` child. `injectBoardOwner` now skips past any leading `<documentation>` element(s) before inserting or locating `extensionElements`, preserving valid BPMN schema order (documentation must precede extensionElements).
+- Deploy failures now surface Operaton's real error: the deployment service captures and logs the response body (`operatonResponse` / `operatonStatus`) instead of only the generic Axios message, and `getErrorDetails()` now checks `isAxiosError` **before** the generic `Error` branch — previously dead code, since `AxiosError extends Error` always matched the generic branch first and silently discarded `response.data`.
+
+**Files:** `packages/backend/src/services` (deployment / BPMN board-owner injection)
+
+---
+
+### v1.9.10 — `/v1/norms` CPRMV version selector (June 2026)
+
+**v1.9.10 — Feature (June 30, 2026)**
+
+- A new `?cprmv_version=` query parameter on `/v1/norms` selects which CPRMV vocabulary version to query and emit — one of `0.3.0`, `0.3.2`, or `0.4.1` (else `400 INVALID_PARAM`), defaulting to `0.3.0`. All three carry flat `cprmv:Rule` resources with identical predicates, so the rules query is one shape with the namespace swapped; `0.3.0`/`0.3.2` bind `cprmv:` to the `cprmv.open-regels` versioned-path IRI, `0.4.1` to the `standaarden.open-regels` `0.4.1#` IRI.
+- Per-ruleset metadata (`dataset_versions`) differs by version: `0.3.x` reads `cprmv:Dataset` (`dct:issued` + `dcat:version`); `0.4.1` has no `cprmv:Dataset` and reads `cprmv:RuleSet` (`cprmv:validFrom`, which doubles as the ETag / `Last-Modified` freshness signal since `0.4.1` has no `dct:issued`).
+- This is the LDE consumer side of the CPSV editor's [CPRMV version selector](../../cpsv-editor/features/import-export.md#cprmv-vocabulary-version-041-032). Full detail: [Backend — `/v1/norms`](backend.md#norms) and the [API Stability Contract](../reference/api-stability.md) (`0.3.2` / `0.4.1` are experimental, `0.3.0` is the stable default).
+
+**Files:** `packages/backend/src/services/sparql.service.ts`, `packages/backend/src/routes` (`/v1/norms`)
+
+---
+
+### v1.9.9 — Deploy-time board ownership & RIP leadRole (June 2026)
+
+**v1.9.9 — Feature (June 22, 2026)**
+
+- **Process board ownership.** The Deploy modal now requires a board owner: a new "Board ownership" section auto-detects the board from the process's candidate groups (infra/rip → Infra-board, caseworker/hr → Caseworker) and lets you override it. Deployed BPMN is stamped with a process-level `camunda:property boardOwner` (explicit choice or auto-derived). `boardOwner` is persisted on the `process_definitions` record (new `board_owner` column) and exposed via `/bundles/public`, so downstream consumers (ronl-business-api Procesbibliotheek and archive split) can read it.
+- **RIP Phase 1 leadRole.** The Map-role outputs script now sets a `leadRole` process variable, derived from the intake `projectType` (contractbeheer → `manager-pb`, otherwise `projectleider`). Distinct from the task `candidateGroups`: `leadRole` names who owns the project in the portfolio, not who can claim its tasks.
+
+**Files:** `packages/frontend/src/components` (Deploy modal), `packages/backend/src/services` (deployment, `process_definitions`, `/bundles/public`)
+
+---
+
+### v1.9.8 — CPRMV SHACL: ParameterWaarde & TemporalRule shapes (June 2026)
+
+**v1.9.8 — Feature (June 17, 2026)**
+
+- Added `cprmv:ParameterWaardeShape` targeting `cprmv:ParameterWaarde`: `skos:notation` [1,1] `xsd:string` and `skos:prefLabel` [1,n] `rdf:langString` are **mandatory**; `schema:value` [0,1] `xsd:decimal`, `schema:unitCode` [0,1] `xsd:string`, `dct:description` [0,1] `rdf:langString`, and `cprmv:validFrom`/`validUntil` [0,1] `xsd:date` are optional.
+- Added `cprmv:TemporalRuleShape` targeting `cprmv:TemporalRule`: `cprmv:validFrom` [0,1] `xsd:date`, `cprmv:validUntil` [0,1] `xsd:date`, `cprmv:confidenceLevel` [0,1] `xsd:string`, and `cprmv:isBasedOn` [0,n] `sh:class cpsv:Rule` — all optional.
+- Also adds the `skos:`, `schema:`, and `dct:` `@prefix` declarations the new shapes require; no changes to existing shapes. (The CPSV editor enforces the `ParameterWaardeShape` client-side as of its v1.10.4.)
+
+**Files:** CPRMV SHACL shapes (`cprmv` custom layer)
+
+---
+
 ### v1.9.7 — SHACL display fixes (June 2026)
 
 **v1.9.7 — Patch (June 15, 2026)**

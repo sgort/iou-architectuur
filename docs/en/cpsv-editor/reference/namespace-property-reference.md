@@ -33,6 +33,14 @@ in `src/utils/constants.js`).
     accepts the old namespace and the parser normalises it; only the 0.4.1 namespace
     is written on export.
 
+!!! note "Selectable export namespace (v1.10.5)"
+    A **CPRMV version selector** lets the editor emit the `0.3.2` versioned-path
+    namespace `https://cprmv.open-regels.nl/0.3.2/` instead of the default `0.4.1`
+    namespace above. This is the namespace the Linked Data Explorer
+    `/v1/norms?cprmv_version=0.3.2` query reads. The two targets also differ in
+    shape — see the [conformance changes (v1.10.5)](#cprmv-version-selector-changes-v1105)
+    below.
+
 ---
 
 ## CPSV-AP (`cpsv:`)
@@ -188,8 +196,8 @@ in `src/utils/constants.js`).
 
 | Property | Domain | Range | Cardinality | Notes |
 |---|---|---|---|---|
-| `skos:prefLabel` | Organisation, ParameterWaarde | Literal | 1..1 | |
-| `skos:notation` | ParameterWaarde | Literal | 0..1 | Machine-readable identifier |
+| `skos:prefLabel` | Organisation, ParameterWaarde | Literal | 1..1 | ParameterWaarde: required by `cprmv:ParameterWaardeShape` (v1.10.4) |
+| `skos:notation` | ParameterWaarde | Literal | 1..1 | Machine-readable identifier; required by `cprmv:ParameterWaardeShape` (v1.10.4) |
 
 ---
 
@@ -233,6 +241,40 @@ in `src/utils/constants.js`).
 
 All editor-generated TTL validates clean (0 violations) against both the CPSV-AP
 3.2.0 and CPRMV 0.4.1 SHACL shapes.
+
+---
+
+## Parameter validation (v1.10.4)
+
+The `cprmv:ParameterWaardeShape` (added in Linked Data Explorer v1.9.8) makes both
+`skos:notation` and `skos:prefLabel` mandatory `[1,n]` on every `cprmv:ParameterWaarde`.
+The editor's client-side `validateParameter` mirrors this: both fields are required
+regardless of whether a `schema:value` is set, and a missing one is surfaced in the
+Parameters-tab form and the pre-publish validation panel rather than only at back-end
+publish time.
+
+---
+
+## CPRMV version selector changes (v1.10.5)
+
+The editor can emit either of two CPRMV targets, selected in the toolbar. They differ
+in namespace **and** in shape:
+
+| | `0.4.1` (default) | `0.3.2` |
+|---|---|---|
+| `cprmv:` namespace | `…/standards/cprmv/0.4.1#` | `https://cprmv.open-regels.nl/0.3.2/` |
+| Ruleset grouping | `cprmv:RuleSet` (+ `cprmv:hasPart`) | `cprmv:Dataset` per ruleset |
+| Dataset node typing | — | `cprmv:Dataset` **only** (not co-typed `dcat:Dataset`, so the CPSV-AP `DatasetShape` is not triggered) |
+| Flat `cprmv:Rule` resources | emitted | emitted |
+| LDE query | `dataset_versions` via `cprmv:RuleSet` | `/v1/norms?cprmv_version=0.3.2` |
+
+Independent of the selected version:
+
+| Behaviour | Effect |
+|---|---|
+| Rules-derived consolidation date | `eli:is_realized_by` and each ruleset's `cprmv:validFrom`/versioned `cprmv:id` come from the BWB in-force date in the rules' `ruleIdPath`; the manual date field is a fallback only |
+| Unique rule subject URIs | Rules sharing a legal path get an `_N` suffix (`_2`, `_3`, …) instead of collapsing onto one subject; duplicates share a `rule_id_path_key` dedup key |
+| Nested sub-clause folding | Import folds `rule_id_path`-less nested members into the parent `cprmv:definition` rather than creating norm-less rules |
 
 ---
 

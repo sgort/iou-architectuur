@@ -13,7 +13,7 @@ The DMN tab enables the editor to go beyond metadata authoring and become an act
 
 The tab handles the complete lifecycle of a Decision Model and Notation (DMN 1.3) file within a service definition:
 
-**File management.** Upload a `.dmn` file, or load one of the provided examples. The editor parses the DMN XML, extracts all `<decision>` elements, identifies the primary decision key (automatically skipping constant parameters prefixed with `p_*`), and pre-populates the request body with the correct input variable names and types.
+**File management.** Upload a `.dmn` file, or load one of the provided examples. The editor parses the DMN XML, extracts all `<decision>` elements, identifies the primary decision key (automatically skipping constant parameters prefixed with `p_*`), and pre-populates the request body with the correct input variable names and types. The primary key is chosen by preferring a *root* decision — one that no other decision requires via `informationRequirement` — rather than the first `<decision>` in document order, so a model whose intended output decision is authored later is still resolved correctly. When a file contains more than one testable decision, a **Decision Key** dropdown lets you pick which one to evaluate; the selection updates the evaluation URL everywhere (v1.10.3).
 
 **Syntactic validation.** Immediately after upload, the editor runs the DMN file through the shared backend's five-layer syntactic validator. The result is shown inline in the file card — valid files display a green badge, files with issues display a collapsible panel grouped by layer. See [Syntactic Validation](#syntactic-validation) below.
 
@@ -55,9 +55,9 @@ Beyond single-evaluation testing, the DMN tab includes two advanced testing mode
 
 **Intermediate decision tests** evaluate each sub-decision in the Decision Requirements Diagram (DRD) individually. This is invaluable for debugging complex multi-table DMNs — rather than examining the final output, you can see exactly which sub-decision is producing an unexpected result. Constant parameters are automatically filtered out; only testable decisions are shown.
 
-**Test cases** run multiple predefined scenarios from an uploaded JSON file against the primary decision key. Results are displayed progressively — pass/fail counters update in real time as each case executes. Two JSON formats are supported (Toeslagen and DUO format), with automatic normalisation.
+**Test cases** run multiple predefined scenarios from an uploaded JSON file and *verify* each one — expected outputs are compared against the engine's actual outputs, so a case only passes when it is functionally correct rather than merely returning HTTP 200. Each case resolves to PASS, FAIL (with an Expected-vs-Actual mismatch table), ERROR, or OK-unchecked (amber, when no expectation could be parsed), and the counters are verdict-based (v1.10.3). A case's optional `decision` field routes it to its own decision, so one file can exercise every decision of a multi-decision DMN, each result showing the decision it ran against (v1.10.4). A literal empty-collection expectation (`[]` / `{}`) is verified as an empty-result case (v1.10.6). Two JSON formats are supported (Toeslagen and DUO format), with automatic normalisation.
 
-Running uploaded test cases also populates the Concepts tab: input concepts are derived from the union of every uploaded case's request-body variables (so all inputs across all cases are covered, with no successful evaluate required), and output concepts are added from the last successful result when there is one (v1.10.2).
+Running uploaded test cases also populates the Concepts tab: input *and* output concepts are unioned across every uploaded case (deduped by name), and each variable records the decision(s) it appears in — so all inputs and outputs are attributed to their decision(s) even without a successful evaluate (v1.10.4).
 
 ---
 
