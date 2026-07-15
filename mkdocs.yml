@@ -118,6 +118,7 @@ nav:
       - Multiple interacting rules example: ronl-business-api/user-guide/assessing-income-support-schemes.md
       - PA-Cockpit Testen: ronl-business-api/user-guide/pa-cockpit-gebruikershandleiding.md
       - Dossierbeheer Testhandleiding: ronl-business-api/user-guide/dossierbeheer-testhandleiding.md
+      - Capaciteitsclaim Testhandleiding: ronl-business-api/user-guide/capaciteitsclaim-testhandleiding.md
     - Developer Docs:
       - Local Development Setup: ronl-business-api/developer/local-development.md
       - Backend Development: ronl-business-api/developer/backend-development.md
