@@ -432,14 +432,20 @@ These endpoints require a valid JWT with the `caseworker` role. Tenant isolation
  
 All `/v1/edocs` endpoints require a Bearer JWT issued by Keycloak (`aud: ronl-business-api`). They are intended for machine-to-machine access — the primary consumer is Microsoft Copilot Studio via the `copilot-studio-edocs` Keycloak client, though they can be called by any authenticated client.
  
-When `EDOCS_STUB_MODE=true` (default on ACC), all endpoints return realistic fake responses. No live eDOCS server is contacted.
+When `EDOCS_STUB_MODE=true` (default on ACC), all endpoints return realistic fake responses. No live eDOCS server is contacted. For live-tested results and known issues per endpoint, see [eDOCS — Live Testing](../developer/testing/edocs-live-testing.md).
  
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| `GET` | `/v1/edocs/status` | Bearer JWT | Returns service health: `status` (`stub`, `up`, or `down`), `library`, `stubMode`, and optional `latencyMs` |
+| `GET` | `/v1/edocs/status` | Bearer JWT | Returns service health: `status` (`stub`, `up`, or `down`), `library`, `stubMode`, `reachable`, `authenticated`, and optional `latencyMs` |
+| `GET` | `/v1/edocs/workspaces` | Bearer JWT | Lists available workspaces |
 | `POST` | `/v1/edocs/workspaces/ensure` | Bearer JWT | Creates or retrieves a project workspace. Returns `workspaceId`, `workspaceName`, `created` |
-| `POST` | `/v1/edocs/documents` | Bearer JWT | Uploads a base64-encoded document to a workspace. Returns `documentId`, `documentNumber`, `workspaceId` |
-| `GET` | `/v1/edocs/workspaces/:workspaceId/documents` | Bearer JWT | Lists all documents in a workspace |
+| `POST` | `/v1/edocs/documents` | Bearer JWT | Uploads a base64-encoded document. `workspaceId` is **optional** — omit it for a standalone upload (the only path confirmed working live), pass one to use the workspace-ref path (confirmed broken, see live-testing page). Returns `documentId`, `documentNumber`, `workspaceId` |
+| `GET` | `/v1/edocs/workspaces/:workspaceId/documents` | Bearer JWT | Lists a workspace's content |
+| `GET` | `/v1/edocs/documents/:documentId/profile` | Bearer JWT | Returns the document's raw profile data |
+| `GET` | `/v1/edocs/documents/:documentId/versions` | Bearer JWT | Lists the document's versions |
+| `GET` | `/v1/edocs/documents/:documentId/versions/:version` | Bearer JWT | Downloads a version's content (base64). Live-tested: only the literal value `0` works, not a version id from the list above |
+| `DELETE` | `/v1/edocs/documents/:documentId` | Bearer JWT | Deletes a document |
+| `DELETE` | `/v1/edocs/workspaces/:workspaceId` | Bearer JWT | Deletes a workspace |
  
 **`GET /v1/edocs/status` response:**
  
@@ -449,7 +455,9 @@ When `EDOCS_STUB_MODE=true` (default on ACC), all endpoints return realistic fak
   "data": {
     "status": "stub",
     "library": "DOCUVITT",
-    "stubMode": true
+    "stubMode": true,
+    "reachable": true,
+    "authenticated": true
   },
   "timestamp": "2026-03-14T20:32:47.462Z"
 }
@@ -464,19 +472,22 @@ When `EDOCS_STUB_MODE=true` (default on ACC), all endpoints return realistic fak
 }
 ```
  
-**`POST /v1/edocs/documents` request body:**
+**`POST /v1/edocs/documents` request body (standalone — recommended):**
  
 ```json
 {
-  "workspaceId": "2993896",
   "filename": "rip-intake-report-FL-INF-2025-042.txt",
   "contentBase64": "<base64-encoded content>",
   "metadata": {
     "docName": "FL-INF-2025-042 — Intake Report — N308 Reconstructie",
-    "appId": "INFRA"
+    "department": "IVR",
+    "appId": "DEFAULT"
   }
 }
 ```
+ 
+`metadata.department` (eDOCS `UV_AFD_NAAM`) is required — the DM server
+rejects uploads without it. `appId` defaults to `"DEFAULT"` if omitted.
  
 **`GET /v1/edocs/workspaces/:workspaceId/documents` response:**
  
@@ -497,7 +508,7 @@ When `EDOCS_STUB_MODE=true` (default on ACC), all endpoints return realistic fak
 }
 ```
  
-For OAuth setup and curl verification, see [Copilot Studio — eDOCS OAuth Integration](../developer/copilot-studio-edocs.md).
+For OAuth setup and curl verification, see [Copilot Studio — eDOCS OAuth Integration](../developer/copilot-studio-edocs.md). For live-tested endpoint results and known issues, see [eDOCS — Live Testing](../developer/testing/edocs-live-testing.md).
 
 ---
 

@@ -1,4 +1,4 @@
-# CI/CD
+# Copilot Studio — eDOCS OAuth Integration
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
@@ -35,7 +35,7 @@
 
 ---
 
-## eDOCS REST API specification notes
+## eDOCS REST API — spec vs. reality
 
 ---
 
