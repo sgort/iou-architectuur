@@ -131,7 +131,10 @@ nav:
       - Frontend Development: ronl-business-api/developer/frontend-development.md
       - Shared Package: ronl-business-api/developer/shared-package.md
       - Timeline Implementation: ronl-business-api/developer/implementing-timeline.md
-      - Testing: ronl-business-api/developer/testing.md
+      - Testing:
+        - Overview: ronl-business-api/developer/testing/overview.md
+        - eDOCS — Live Testing: ronl-business-api/developer/testing/edocs-live-testing.md
+        - Doccle — Live Testing: ronl-business-api/developer/testing/doccle-live-testing.md
       - CI/CD: ronl-business-api/developer/cicd.md
       - Troubleshooting: ronl-business-api/developer/troubleshooting.md
       - Changelog & Roadmap: ronl-business-api/developer/changelog-roadmap.md

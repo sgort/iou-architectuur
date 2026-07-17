@@ -11,26 +11,24 @@
 
 ---
 
-## Backend tests
+## Backend unit & integration tests
 
-### Unit tests
+---
 
-### Integration tests
+## Live smoke suite
 
-### What to test
+### test-smoke-live.sh
+
+### test-edocs-live.sh
+
+### test-doccle-live.sh
+
+### test-m2m-routes.sh
 
 ---
 
 ## Health check verification
 
-# Local
-
-# ACC
-
 ---
 
-## Pre-commit and pre-push hooks
-
----
-
-## CI test run
+## Pre-commit / pre-push hooks and CI
