@@ -4,17 +4,20 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 ---
 
+!!! note "RONL Business API: only the Developer docs are current to v3.9.1"
+    A recent pass through the 28-version documentation gap (v3.0.8 → v3.9.1) reconciled only the [Developer](ronl-business-api/developer/changelog-roadmap.md) perspective. Of those 28 versions, just 8 carried developer-relevant content (architecture, backend/frontend internals, deployment, testing, MCP/AI-assistant config) — documented and cross-linked from the changelog. The other 20 shipped PA-Cockpit, Woo-dashboard, or Infra-board **feature** work with no developer-page target, and are **not yet reflected** in the Features, Reference, or User-guide sections for RONL Business API.
+
 ## 🆕 What's New
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v3.0.7** · *May 2026*
+-   **⚙️ RONL Business API — v3.9.1** · *July 2026*
 
     ---
 
-    **V2 caseworker dashboard live in production**
+    **eDOCS joins the AI Assistant as a fifth MCP source**
 
-    The redesigned [V2 caseworker dashboard](ronl-business-api/features/caseworker-dashboard-v2.md) is now the available at `/dashboard/caseworker/v2`; the V1 shell will be retired. A three-mode information architecture (Werk · Zoeken · Beheer) replaces the flat 25-item nav, with a ⌘K command palette and a toggleable AI assistant dock. Production brought to full parity with acceptance.
+    A new [`edocs` MCP source](ronl-business-api/developer/mcp-ai-assistant.md#edocs-tools-edocs) lets the AI Assistant browse OpenText eDOCS workspaces and documents. Unlike every other source, it calls this backend's own `/v1/edocs/*` HTTP surface rather than the DM server directly, authenticating via a dedicated `edocs-mcp-client` — live-verified end-to-end against real eDOCS data.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

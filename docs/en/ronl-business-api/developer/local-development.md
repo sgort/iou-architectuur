@@ -114,12 +114,15 @@ Keycloak is ready when you see: `Keycloak 23.x.x on ... started`
 npm run dev
 ```
 
-This starts both servers in parallel via `concurrently`:
+Before starting either server, `npm run dev` first runs a `deps:check` preflight (`scripts/check-deps.sh`), then a Docker check, then starts both servers in parallel via `concurrently`:
 
 - **Backend** — `http://localhost:3002` (tsx watch, hot-reloads on TypeScript changes)
 - **Frontend** — `http://localhost:5173` (Vite HMR, hot-reloads on React changes)
 
 Open `http://localhost:5173` in your browser. You will be redirected to Keycloak for login.
+
+!!! note "Dependency preflight"
+    `deps:check` compares `package-lock.json`'s modification time against the `node_modules/.package-lock.json` install marker npm writes after every `npm install`. If the lockfile is newer — e.g. after a `git pull` that changed dependencies — it fails fast with an explicit "run `npm install`" message instead of letting the servers start and crash mid-boot with a confusing `MODULE_NOT_FOUND`. It's advisory only; it never runs `npm install` on its own.
 
 ---
 

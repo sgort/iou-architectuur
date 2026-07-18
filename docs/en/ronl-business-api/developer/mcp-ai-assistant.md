@@ -25,16 +25,48 @@ The AI assistant connects to one or more **MCP providers** registered in `McpReg
   <figcaption>MCP chat source selector.</figcaption>
 </figure>
 
-Four providers are registered. Each is independently enabled via its env var and appears in `GET /v1/mcp/sources` only when connected.
+Five providers are registered. Each is independently enabled via its env var and appears in `GET /v1/mcp/sources` only when connected. `edocs` is registered first, so it renders leftmost in the source selector.
 
-| Source ID  | Display name        | Transport | Tools | Description |
-|------------|---------------------|-----------|-------|-------------|
-| `operaton` | Process Engine      | stdio     | 16    | Live Operaton data: process instances, tasks, deployments, decisions, incidents |
+| Source ID  | Display name        | Transport                  | Tools | Description |
+|------------|---------------------|-----------------------------|-------|-------------|
+| `edocs`    | eDOCS               | stdio (→ own backend HTTP) | 4     | OpenText eDOCS document management: workspaces, documents, versions — via this backend's own `/v1/edocs/*` routes |
+| `operaton` | Process Engine      | stdio                       | 16    | Live Operaton data: process instances, tasks, deployments, decisions, incidents |
 | `triplydb` | Knowledge Graph     | stdio     | 11    | RONL knowledge graph via SPARQL: DMN metadata, public services, organisations, rules, concepts |
 | `cprmv`    | Legislation (CPRMV) | HTTP      | 3     | Dutch and EU legislation: BWB national law, CVDR municipal regulations, EU CELLAR |
 | `lde`      | Process Library     | stdio     | 6     | LDE asset store: deployed BPMN bundles, form schemas, document templates |
 
 The `sources` array in the `POST /v1/mcp/chat` request body controls which providers are active for a given turn. An empty array activates all connected providers.
+
+### eDOCS tools (`edocs`)
+
+The `EdocsMcpProvider` spawns the bundled `src/mcp-servers/edocs/index.ts` (compiled to `dist/mcp-servers/edocs/index.js` in production) and exposes 4 read-only tools, scoped strictly to routes proven live by `scripts/test-edocs-live.sh`:
+
+`workspace_list` — lists workspaces (folders) in the configured eDOCS library
+
+`workspace_documents` — lists the documents (and sub-items) inside a workspace, given its id
+
+`document_profile` — full metadata profile for a document, given its id
+
+`document_versions` — the version history for a document, given its id
+
+No tool was added on the basis of the OpenAPI spec alone — there is deliberately no `document_list` / browse-outside-a-workspace tool, since that has no live-tested backend route yet.
+
+#### Access pattern
+
+Unlike every other MCP source, the eDOCS subprocess does **not** talk to its upstream system (the OpenText eDOCS DM server) directly. Instead it calls this backend's own `/v1/edocs/*` HTTP surface — the same routes `EdocsService`/`edocs.routes.ts` already expose, live-tested end-to-end by `scripts/test-edocs-live.sh`. This keeps `EdocsService` the single place that knows eDOCS' auth/session/quirks (multipart upload shape, `HTTP 206` + `error_list` validation, flat-list response parsing, the `version="0"` download sentinel); the MCP layer never re-implements any of it.
+
+To call its own backend, the subprocess authenticates via a `client_credentials` flow against Keycloak using a **dedicated** `edocs-mcp-client` — not `copilot-studio-edocs`, which is kept separate since it has its own unrelated, unresolved custom-connector OAuth constraints. The subprocess caches its token, refreshes it 30 seconds before expiry, and retries once on a `401`.
+
+```typescript
+// mcp-servers/edocs/index.ts, on every tool call
+const token = await getToken();  // client_credentials against KEYCLOAK_URL/KEYCLOAK_REALM
+await backend.get(path, { headers: { Authorization: `Bearer ${token}` } });
+// backend baseURL defaults to http://localhost:<PORT>/v1/edocs — same App
+// Service instance, loopback, no TLS hop — override with EDOCS_MCP_BACKEND_URL
+```
+
+!!! note "Why this source is different"
+    The other four sources connect straight to their upstream system because none of them has a pre-existing backend service to reuse — `operaton-mcp` is an external package that cannot import this codebase, and TriplyDB/LDE have no `TriplyDbService`/`LdeService` class to wrap. eDOCS is the only source with both a proven, tested service class (`EdocsService`) *and* a proven HTTP contract, so it goes through that contract like an external consumer (Copilot Studio, the smoke test) would.
 
 ### Process Engine tools (`operaton`)
 
@@ -122,6 +154,7 @@ LLM (Claude, GPT-4o, …)
   │  tool_use blocks → MCP tool calls → McpRegistry.callTool()
   ▼
 McpRegistry  — routes each tool call to the owning provider
+  ├── EdocsMcpProvider      (stdio subprocess → edocs-mcp → this backend's own /v1/edocs/*)
   ├── OperatonMcpProvider   (stdio subprocess → operaton-mcp → engine-rest)
   ├── TriplyDbMcpProvider   (stdio subprocess → triplydb-mcp → SPARQL)
   ├── CprmvMcpProvider      (HTTP → acc.cprmv.open-regels.nl/mcp)
@@ -188,6 +221,7 @@ Each `McpProvider` maintains its own `ALLOWED_TOOLS` set as a curation gate. Onl
 
 | Provider              | Allowed tools                                                                                                              |
 |-----------------------|----------------------------------------------------------------------------------------------------------------------------|
+| `EdocsMcpProvider`    | `workspace_list`, `workspace_documents`, `document_profile`, `document_versions`                                          |
 | `OperatonMcpProvider` | `processDefinition_list/count/getByKey`, `processInstance_list/count/get`, `task_list/count/getById`, `decision_list/getByKey`, `deployment_list/count/getById`, `incident_list/count` |
 | `TriplyDbMcpProvider` | `dmn_list`, `dmn_get`, `dmn_chain_links`, `dmn_enhanced_chain_links`, `dmn_semantic_equivalences`, `organization_list`, `service_list`, `rule_list`, `concept_list`, `service_rules_metadata`, `sparql_query` |
 | `CprmvMcpProvider`    | `rules_rules__rule_id_path__get`, `ref_ref__referencemethod___reference__get`, `celex_cellar_by_celex__celexid___language___format__get` |
@@ -252,6 +286,9 @@ for await (const event of businessApi.mcp.chatStream(message, history, sources, 
 |--------------------------|--------------------------------------------------------------------------------|
 | `MCP_ENABLED=true`       | Backend env var; defaults to `false`                                           |
 | `ANTHROPIC_API_KEY`      | Required for Anthropic models; enables `AnthropicLlmProvider`                  |
+| `EDOCS_MCP_ENABLED`      | Set to `true` to register `EdocsMcpProvider`; defaults to `false`              |
+| `EDOCS_MCP_CLIENT_ID`    | Keycloak client id for the eDOCS MCP subprocess; defaults to `edocs-mcp-client`|
+| `EDOCS_MCP_CLIENT_SECRET`| Client secret for `EDOCS_MCP_CLIENT_ID` — a dedicated Keycloak service-account client, kept separate from `copilot-studio-edocs` |
 | `OPENAI_API_KEY`         | Optional; enables `OpenAILlmProvider` and its models in the selector           |
 | `OPERATON_USERNAME`      | Operaton credentials passed to the `OperatonMcpProvider` child process         |
 | `OPERATON_PASSWORD`      | —                                                                              |
@@ -277,6 +314,12 @@ for await (const event of businessApi.mcp.chatStream(message, history, sources, 
 MCP_ENABLED=true
 ANTHROPIC_API_KEY=sk-ant-...
 
+# eDOCS (optional) — calls this backend's own /v1/edocs/* routes, not the DM
+# server directly. KEYCLOAK_URL/KEYCLOAK_REALM are already set elsewhere.
+EDOCS_MCP_ENABLED=true
+EDOCS_MCP_CLIENT_ID=edocs-mcp-client
+EDOCS_MCP_CLIENT_SECRET=<secret-from-the-local-Keycloak-admin-console>
+
 # Process Engine (required)
 OPERATON_BASE_URL=https://operaton.open-regels.nl/engine-rest
 OPERATON_USERNAME=demo
@@ -298,10 +341,11 @@ LDE_DATABASE_URL=postgresql://lde_user:lde_password@localhost:5432/lde_assets
 
 Start the backend as normal. All enabled providers connect at startup. Check the logs for one line per provider:
 ```
-INFO  operaton-provider  Operaton MCP provider connected
-INFO  triplydb-provider  TriplyDB MCP provider connected
-INFO  cprmv-provider     CPRMV MCP provider connected
-INFO  lde-provider       LDE MCP provider connected
+INFO  edocs-mcp-provider  eDOCS MCP provider connected
+INFO  operaton-provider   Operaton MCP provider connected
+INFO  triplydb-provider   TriplyDB MCP provider connected
+INFO  cprmv-provider      CPRMV MCP provider connected
+INFO  lde-provider        LDE MCP provider connected
 ```
 
 If a provider fails to connect within 30 seconds the backend continues without it. Failed providers do not appear as connected in `GET /v1/mcp/sources`. The `/v1/mcp/chat` route returns `503 MCP_NOT_CONNECTED` only when **all** selected providers are unavailable.
@@ -316,6 +360,9 @@ az webapp config appsettings set \
   --settings \
     MCP_ENABLED=true \
     ANTHROPIC_API_KEY="sk-ant-..." \
+    EDOCS_MCP_ENABLED=true \
+    EDOCS_MCP_CLIENT_ID="edocs-mcp-client" \
+    EDOCS_MCP_CLIENT_SECRET="<secret-set-on-the-ACC-Keycloak-client>" \
     OPERATON_USERNAME="<user>" \
     OPERATON_PASSWORD="<pass>" \
     TRIPLYDB_MCP_ENABLED=true \
@@ -336,10 +383,11 @@ After deployment, verify all providers in the application logs:
 ```bash
 az webapp log tail --name ronl-business-api-acc --resource-group rg-ronl-acc
 # Look for one connected line per enabled provider:
-# operaton-provider  Operaton MCP provider connected
-# triplydb-provider  TriplyDB MCP provider connected
-# cprmv-provider     CPRMV MCP provider connected
-# lde-provider       LDE MCP provider connected
+# edocs-mcp-provider  eDOCS MCP provider connected
+# operaton-provider   Operaton MCP provider connected
+# triplydb-provider   TriplyDB MCP provider connected
+# cprmv-provider      CPRMV MCP provider connected
+# lde-provider        LDE MCP provider connected
 ```
 
 ---
@@ -347,6 +395,8 @@ az webapp log tail --name ronl-business-api-acc --resource-group rg-ronl-acc
 ## Troubleshooting
 
 **`503 MCP_NOT_CONNECTED`** — All providers selected for the request are unavailable. Individual provider failures are non-fatal — the backend continues without them. Check `GET /v1/mcp/sources` to see which providers are connected. For the Process Engine specifically: verify `MCP_ENABLED=true`, `OPERATON_BASE_URL`, `OPERATON_USERNAME`, and `OPERATON_PASSWORD` are correct, and that the App Service runtime is `NODE|22-lts` (the child process will silently fail on Node 20). For `LdeMcpProvider`: verify `LDE_DATABASE_URL` is reachable and uses `sslmode=verify-full` (not `sslmode=require`) to avoid a pg-connection-string SSL warning.
+
+**eDOCS source shows connected, but every tool call fails** — this is expected, not a bug, if the DM server itself is unreachable from the App Service. `EdocsMcpProvider.connect()` and its `ListTools` handler never touch Keycloak or the eDOCS DM server — they're a pure stdio MCP handshake and a static tool list — so the source will show up **active and selectable** in the source selector regardless of DM-server reachability. The Keycloak token fetch and the call to `/v1/edocs/*` only happen lazily, inside a tool call. If the DM server is unreachable, the failure surfaces as a `502 EDOCS_ERROR` tool-call error mid-conversation instead of a greyed-out "(offline)" button. Confirm the underlying issue with `GET /v1/edocs/status` (`reachable`/`authenticated` fields) or `az webapp log tail` — look for `"listWorkspaces failed"` and the raw error message, since a pure network error (no HTTP response at all, e.g. `ETIMEDOUT`/`ENOTFOUND`) never reaches `logUpstreamError`'s upstream-body logging.
 
 **`400 prompt is too long`** — A multi-round query accumulated too many tokens. This is handled automatically — each tool result is truncated to 12,000 characters. If it still occurs, the query is driving an unusual number of rounds with very large results; try a more specific question.
 

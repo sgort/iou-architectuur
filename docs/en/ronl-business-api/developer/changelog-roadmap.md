@@ -4,6 +4,58 @@
 
 ## Changelog
 
+## v3.9.1 — eDOCS AI Assistant MCP Source (July 2026)
+
+### `EdocsMcpProvider` — a fifth AI Assistant source
+
+`EdocsMcpProvider` added as a fifth AI Assistant source (`edocs`, displayed first — left of Process Engine). Unlike every other MCP source, its subprocess calls this backend's own `/v1/edocs/*` HTTP surface — the same routes `scripts/test-edocs-live.sh` already proves working — rather than the OpenText eDOCS DM server directly, so `EdocsService` stays the single place that knows eDOCS' auth and API quirks. It authenticates via a `client_credentials` flow against Keycloak using a new, dedicated `edocs-mcp-client`, kept separate from the existing `copilot-studio-edocs` client (which has its own unrelated, unresolved custom-connector OAuth constraints).
+
+Four tools exposed, scoped strictly to the routes proven live: `workspace_list`, `workspace_documents`, `document_profile`, `document_versions`. No tool was added on the basis of the OpenAPI spec alone — there is deliberately no `document_list` / browse-by-author tool, since browsing documents outside a workspace has no live-tested backend route yet. See [MCP AI Assistant — eDOCS tools](mcp-ai-assistant.md#edocs-tools-edocs) for the full architecture.
+
+Also: `GET /v1/edocs/status` now includes `baseUrl` alongside the existing `library`/`stubMode`/`reachable`/`authenticated` fields.
+
+!!! note "Also shipped in v3.9.1"
+    WatchBell &amp; Meldingen — per-user notifications for watched dossiers and searches. A PA-Cockpit feature with no developer-page surface in this section; see the Features changelog for v3.9.1.
+
+## v3.9.0 — Doccle Integration + eDOCS Live-Fixes (July 2026)
+
+`/v1/doccle` routes added, mirroring the eDOCS integration pattern (stub mode, JWT-gated, reachability-only health check). See [Doccle — Live Testing](testing/doccle-live-testing.md).
+
+Five live-verified eDOCS bugs fixed against a real DM server (multipart upload shape, `APP_ID` default, mandatory `UV_AFD_NAAM`, workspace-search parsing, the `getWorkspaceDocuments` endpoint) — full detail already tracked in [eDOCS — Live Testing](testing/edocs-live-testing.md).
+
+## v3.7.3 — Backend Test-Coverage Campaign (July 2026)
+
+A two-phase coverage campaign (~667 → 829 tests) brought every backend feature area under test for the first time, including the standalone MCP servers (`mcp-servers/lde`, `mcp-servers/triplydb`). See [Testing — Backend unit &amp; integration tests](testing/overview.md).
+
+## v3.5.5 — Dev Tooling: Dependency Preflight Check (July 2026)
+
+`npm run dev` now runs a `deps:check` preflight (`scripts/check-deps.sh`) before the Docker check — fails fast with a clear "run `npm install`" message instead of a `MODULE_NOT_FOUND` crash mid-boot when dependencies drift after a `git pull`. It compares `package-lock.json`'s mtime against the `node_modules/.package-lock.json` install marker npm writes after every install; advisory only, it never installs anything on its own. See [Local Development — Start development servers](local-development.md#start-development-servers).
+
+## v3.4.1 — AI Assistant: Model Retirement Fix (June 2026)
+
+Anthropic retired the dated `claude-sonnet-4-20250514` / `claude-opus-4-20250514` snapshots, which started returning a live `404 not_found_error` from the API on their retirement date. `AnthropicLlmProvider`'s model registry now uses non-expiring aliases (`claude-sonnet-4-6`, `claude-opus-4-8`) instead of dated snapshots. Provider errors (retired model, auth, rate limit, overload) are now translated to a clean, code-driven Dutch message instead of surfacing the raw Anthropic API payload. See [LLM Provider Architecture — Registered providers](llm-provider-architecture.md#registered-providers).
+
+## v3.1.0 — Caseworker Dashboard: V1 Retired (June 2026)
+
+Following the V2 shell's introduction (see v3.0.0–v3.0.6 below), `/dashboard/caseworker` now serves V2 exclusively — the V1 three-zone shell and its now-orphaned section components were deleted, and the temporary `/dashboard/caseworker/v2` redirect route was removed in favour of the canonical `/dashboard/caseworker` path.
+
+## v3.0.8 — Security Hardening: Public Write Endpoints (June 2026)
+
+### ALTCHA proof-of-work + upload/rate-limit hardening
+
+Following [work item #33](https://git.open-regels.nl/showcases/iou-architectuur/-/work_items/33) — public routes `/use-case`, `/upload-file`, and `/feedback` accepted requests with no auth, rate limiting, or CAPTCHA — the gaps were closed:
+
+- **ALTCHA proof-of-work** added to `POST /use-case` and `POST /feedback` — visitors must complete a SHA-256 PoW puzzle (`GET /v1/public/altcha/challenge`, max 50,000 iterations, 10-minute expiry, via `altcha-lib`) before a GitLab work item is created. `ALTCHA_HMAC_KEY` configures the HMAC secret; when unset, the check bypasses gracefully so development environments without the key are not blocked. `/upload-file` is intentionally excluded — it's a pre-upload step, not the final submission gate.
+- **Upload type whitelist** tightened on `POST /upload-file`: only images, PDF, plain text, Word/ODT, Excel, and XML are accepted, with MIME type and file extension checked independently to block extension spoofing.
+- **Rate limit** on public write endpoints reduced from the global 100 req/min to 10 req per 15 minutes per IP, with standardised `RateLimit-*` response headers.
+- **Build:** backend `tsconfig.json` upgraded from CommonJS/Node10 to `module: node16` / `moduleResolution: node16` — enables subpath-exports resolution and aligns TypeScript's module semantics with the Node.js runtime. See [TypeScript path aliases](backend-development.md#typescript-path-aliases).
+
+---
+
+*The following gap versions (v3.1.1–v3.1.2, v3.2.0–v3.2.1, v3.3.0–v3.4.0, v3.4.2, v3.5.0–v3.5.4, v3.6.0–v3.6.1, v3.7.0–v3.7.2, v3.8.0–v3.8.3) shipped PA-Cockpit, Woo-dashboard, or Infra-board feature work only, with no developer-perspective architecture change — see the Features changelog for those versions.*
+
+---
+
 ## v3.0.7 — Production Cutover (May 2026)
 
 ### Production brought to parity with ACC

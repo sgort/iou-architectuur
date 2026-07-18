@@ -58,9 +58,12 @@ Uses `@anthropic-ai/sdk`. Enabled when `ANTHROPIC_API_KEY` is set.
 
 | Model ID                    | Display name         |
 |-----------------------------|----------------------|
-| `claude-sonnet-4-20250514`  | Claude Sonnet 4      |
-| `claude-opus-4-20250514`    | Claude Opus 4        |
+| `claude-sonnet-4-6`         | Claude Sonnet 4.6    |
+| `claude-opus-4-8`           | Claude Opus 4.8      |
 | `claude-haiku-4-5-20251001` | Claude Haiku 4.5     |
+
+!!! note "Aliases, not dated snapshots"
+    `claude-sonnet-4-6` and `claude-opus-4-8` are non-expiring aliases, not dated model snapshots. Anthropic previously retired `claude-sonnet-4-20250514` / `claude-opus-4-20250514` (a live `404 not_found_error` from the API on the retirement date) — the registry switched to aliases in v3.4.1 specifically to avoid that failure mode recurring. `AnthropicLlmProvider.toLlmError()` also translates a retired-model 404 into a clean, code-driven Dutch message (`model_unavailable`) instead of surfacing the raw Anthropic payload.
 
 ### `OpenAILlmProvider`
 

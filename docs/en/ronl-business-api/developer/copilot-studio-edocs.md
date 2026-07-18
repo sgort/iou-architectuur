@@ -2,6 +2,24 @@
 
 This page documents how Microsoft Copilot Studio can connect to the eDOCS document management system using OAuth 2.0 via the RONL Business API and Keycloak.
 
+!!! danger "No working Copilot Studio connector yet — Client Credentials isn't supported the way this page assumes"
+    Copilot Studio / Power Platform custom connectors do not generally support arbitrary OAuth 2.0 **Client Credentials** grants for custom connectors the same way they support interactive OAuth. The built-in OAuth experience in Power Platform custom connectors is primarily designed for **delegated user authentication** — not a machine-to-machine `client_credentials` exchange like the one `copilot-studio-edocs` performs against Keycloak. In practice, the architecture below (Copilot Studio itself obtaining the Bearer token) has **not** been successfully wired up as a working custom connector.
+
+    **Recommended approach instead**: don't put OAuth in Copilot Studio at all. Have Copilot Studio call this backend with no OAuth (or a simple API key), and let the backend perform the `client_credentials` exchange with Keycloak itself before proxying to eDOCS:
+
+    ```
+    Copilot Studio
+          │
+          │  (no OAuth)
+          ▼
+    RONL Business API
+          │
+          ├── POST /token (client_credentials)
+          └── OpenText eDOCS
+    ```
+
+    This is the same shape already proven working for the [AI Assistant's own eDOCS MCP source](mcp-ai-assistant.md#edocs-tools-edocs) — it performs its own `client_credentials` exchange against a dedicated Keycloak client (`edocs-mcp-client`) internally, rather than expecting an external caller to hold OAuth credentials for this API at all. The rest of this page (Keycloak client setup, the `/v1/edocs` routes, stub mode, curl testing) still accurately describes the resource-server side and remains useful reference material — only the "Copilot Studio performs the `client_credentials` dance itself" framing in the diagram below is unproven as a working Power Platform custom connector configuration.
+
 ---
 
 ## Architecture

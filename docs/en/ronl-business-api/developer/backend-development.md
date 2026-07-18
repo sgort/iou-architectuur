@@ -175,6 +175,8 @@ The `tsconfig.json` configures path aliases for clean imports:
 
 `tsc-alias` resolves these aliases during the build step (`npm run build`).
 
+`tsconfig.json` uses `module: node16` / `moduleResolution: node16` (upgraded from CommonJS/Node10) — this enables subpath-exports resolution and aligns TypeScript's module semantics with the Node.js runtime actually executing the compiled output.
+
 ---
 
 ## Development commands
@@ -264,6 +266,14 @@ const authLimiter = rateLimit({
 app.use('/v1', apiLimiter);
 app.use('/v1/auth', authLimiter);
 ```
+
+### Public write-endpoint hardening
+
+`POST /v1/public/use-case`, `POST /v1/public/upload-file`, and `POST /v1/public/feedback` accept unauthenticated citizen submissions, so they carry extra hardening beyond the general rate limiter above:
+
+- **ALTCHA proof-of-work** — `use-case` and `feedback` require a solved PoW challenge before a GitLab work item is created. `GET /v1/public/altcha/challenge` issues a signed challenge (max 50,000 iterations, 10-minute expiry) via `altcha-lib`; `verifySolution()` checks it on submit. `ALTCHA_HMAC_KEY` configures the HMAC secret — when unset, the check bypasses gracefully so local dev isn't blocked. `upload-file` is intentionally excluded, since it's a pre-upload step rather than the final submission gate.
+- **Upload type whitelist** — `upload-file` checks both MIME type and file extension independently against `ALLOWED_UPLOAD_MIMETYPES`, blocking extension spoofing (a file claiming an allowed MIME type with a disallowed extension, or vice versa).
+- **Dedicated rate limit** — `publicWriteLimiter` caps these three routes at 10 requests per 15 minutes per IP (tighter than the general `apiLimiter` above), with standardised `RateLimit-*` response headers.
 
 ### CORS
 
