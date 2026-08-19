@@ -4,8 +4,31 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 ---
 
-!!! note "RONL Business API: only the Developer docs are current to v3.9.1"
-    A recent pass through the 28-version documentation gap (v3.0.8 → v3.9.1) reconciled only the [Developer](ronl-business-api/developer/changelog-roadmap.md) perspective. Of those 28 versions, just 8 carried developer-relevant content (architecture, backend/frontend internals, deployment, testing, MCP/AI-assistant config) — documented and cross-linked from the changelog. The other 20 shipped PA-Cockpit, Woo-dashboard, or Infra-board **feature** work with no developer-page target, and are **not yet reflected** in the Features, Reference, or User-guide sections for RONL Business API.
+## 📘 How this documentation is maintained
+
+Components differ in how fast they change, so they are documented to different depths.
+
+| Component | Cadence | User Guides |
+|---|---|---|
+| **RONL Business API** | Short-cycle, co-designed with users | Landing page and a brief page per board on ACC; full guides when a board reaches PROD |
+| **CPSV Editor** | Release-tagged | Full |
+| **Linked Data Explorer** | Release-tagged | Full |
+| **Norm Editor** | Release-tagged | Full |
+| **CPRMV API** | Spec-driven | Full |
+
+Features, Developer Docs and References follow the same pattern for every component.
+
+---
+
+## Documentation Status
+
+<div id="doc-status">
+  <div class="admonition info">
+    <p class="admonition-title">Loading documentation status…</p>
+  </div>
+</div>
+
+---
 
 ## 🆕 What's New
 
@@ -147,16 +170,6 @@ Python/FastAPI service that fetches individual rules from Dutch and European leg
 **Live App**: [cprmv.open-regels.nl/docs](https://cprmv.open-regels.nl/docs)  
 
 [View Documentation →](cprmv-api/index.md){ .md-button }
-
----
-
-## Documentation Status
-
-<div id="doc-status">
-  <div class="admonition info">
-    <p class="admonition-title">Loading documentation status…</p>
-  </div>
-</div>
 
 ---
 
