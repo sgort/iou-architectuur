@@ -100,6 +100,8 @@ nav:
     - Overview: ronl-business-api/index.md
     - Features:
       - Overview: ronl-business-api/features/overview.md
+      - Processes: ronl-business-api/features/processes.md
+      - Tasks: ronl-business-api/features/tasks.md
       - Authentication & IAM: ronl-business-api/features/authentication-iam.md
       - Business Rules Execution: ronl-business-api/features/business-rules-execution.md
       - Dynamic Forms: ronl-business-api/features/dynamic-forms.md

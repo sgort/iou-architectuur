@@ -11,22 +11,16 @@
 
 ---
 
-## The Business API Layer Pattern
-
-### The challenge
-
-### The integration pattern
-
-### Why not expose Operaton directly?
+## How this section relates to the User Guides
 
 ---
 
-## Core responsibilities
+## The surfaces
 
 ---
 
-## Example flow: zorgtoeslag calculation
+## Capabilities in this section
 
 ---
 
-## Open source components
+## Deployment
