@@ -114,6 +114,10 @@ nav:
       - API Design: ronl-business-api/features/api-design.md
     - User Guides:
       - Getting Started: ronl-business-api/user-guide/getting-started.md
+      - Caseworker: ronl-business-api/user-guide/caseworker.md
+      - PA-Cockpit: ronl-business-api/user-guide/pa-cockpit.md
+      - Infra-board: ronl-business-api/user-guide/infra-board.md
+      - Woo-dashboard: ronl-business-api/user-guide/woo-dashboard.md
       - Test guides:
         - PA-Cockpit Testen: ronl-business-api/user-guide/test-guides/pa-cockpit-gebruikershandleiding.md
         - Dossierbeheer Testhandleiding: ronl-business-api/user-guide/test-guides/dossierbeheer-testhandleiding.md
