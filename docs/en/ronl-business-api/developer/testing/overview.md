@@ -8,26 +8,37 @@ RONL Business API is an npm-workspaces monorepo with three tested packages:
 the Express/TypeScript backend on **Jest**, the caseworker portal
 (`packages/frontend`) on **Vitest** + React Testing Library, and the public
 search site (`packages/public-site`) on **Vitest** + jsdom. All three run
-with coverage by default. Each also has a Playwright **E2E** suite, described
-from source later on this page — see [E2E and live smoke suites](#e2e-and-live-smoke-suites-described-from-source-not-measured).
+with coverage by default. Each also has a Playwright **E2E** suite; the
+frontend and public-site E2E suites are measured below, run by the
+maintainer against a live dev stack — see
+[E2E and live smoke suites](#e2e-and-live-smoke-suites).
 
 !!! info "Figures on this page are measured, not estimated"
-    Every count, command and coverage percentage below was produced by
-    running the suites against **v2026.08.19** on **19 August 2026**. Rerun
+    Every count, command and coverage percentage below — including both
+    Playwright E2E suites — was produced by running the suites against
+    **v2026.08.19** on **19 August 2026**. The two E2E suites were run by
+    the maintainer, who owns the dev stack and local Operaton container
+    they need; their figures come from that Playwright JSON reporter
+    output (the reports themselves are not committed to this repo). Rerun
     the commands in [Running the tests](#running-the-tests) to reproduce
-    them.
+    the unit figures. The four live-smoke shell scripts remain described
+    from source only, not run for this page — see
+    [E2E and live smoke suites](#e2e-and-live-smoke-suites).
 
 **At a glance:**
 
 | Package | Runner | Files | Tests | Result | Wall time | Statements | Branches | Functions | Lines |
 |---|---|---:|---:|---|---:|---:|---:|---:|---:|
 | `packages/backend` | Jest + ts-jest | 71 | 1145 | all passing | ~40s | 94.28% | 73.54% | 94.13% | 95.69% |
-| `packages/frontend` | Vitest + RTL | 130 | 1065 | 1063 passing, 2 flaky¹ | ~60–100s | 85.18% | 76.63% | 80.21% | 86.55% |
+| `packages/frontend` | Vitest + RTL | 130 | 1065 | all passing | ~86s¹ | 85.18% | 76.63% | 80.21% | 86.55% |
 | `packages/public-site` | Vitest + jsdom | 28 | 134 | all passing | ~15s | 86.34% | 70.17% | 87.09% | 88.49% |
 
-¹ Two frontend tests are timing-sensitive and fail intermittently only under
-the CPU load of a full coverage run — see the note in
-[Running the tests](#running-the-tests). Both pass reliably in isolation.
+¹ Clean re-run, nothing else executing, 19 August 2026 against v2026.08.19:
+**130 files, 1065 tests, all passing, 85.71s.** An earlier measurement on a
+machine contended by a starting dev server reported 2 tests failing rather
+than flaky in the suite itself — see the note in
+[Running the tests](#running-the-tests) on why one of them is load-sensitive
+by design.
 
 ---
 
@@ -71,28 +82,29 @@ fourth, `@ronl/shared`, which has no `test` script at all (only `build`,
 `prepare`, `clean`, `type-check`). That's expected, not a gap: `shared` is a
 types-only package with nothing to unit test.
 
-!!! warning "Two frontend tests are flaky under a full coverage run"
-    `ChangelogPanel.test.tsx` (a 15s timeout that a CPU-contended full run can
-    exceed — `changelog-data.ts` renders 60+ real version entries) and
-    `simEngine.test.ts`'s performance assertion (`run(cfg)` must complete
-    under 250ms; measured **302ms, 837ms, and 1297ms** on this machine across
-    three consecutive full coverage runs, worsening each time as other work
-    competed for CPU) both failed in every full-suite coverage run taken for
-    this page. Both pass cleanly — 31/31 — when run alone
-    (`npx vitest run src/pages/ChangelogPanel.test.tsx
-    src/components/CaseworkerDashboardV2/regelsimulatie/simEngine.test.ts`).
-    This is a known, previously-documented trade-off (both tests carry source
-    comments explaining the budget/timeout), not a regression — but it means
-    a red `npm test --workspace=@ronl/frontend` on a busy machine does not by
-    itself mean something broke. Re-run the two files in isolation before
-    treating a frontend failure as real.
+!!! note "One frontend test carries a load-sensitive wall-clock budget"
+    `simEngine.test.ts`'s performance assertion requires `run(cfg)` to
+    complete under a **250ms budget**. On a clean, unloaded machine — the
+    conditions behind the 1065/1065 figure above — it passes comfortably;
+    but a wall-clock budget is inherently sensitive to CPU contention, and
+    on a machine contended by another process starting (e.g. a dev server)
+    it was observed degrading to **302ms, then 837ms, then 1297ms** across
+    three consecutive contended runs. That is a characteristic of asserting
+    on wall-clock time, not a defect in the test, and it is a plausible
+    source of intermittent CI failures on a busy runner.
+    `ChangelogPanel.test.tsx` carries a generous 15-second timeout for the
+    same reason — `changelog-data.ts` renders 60+ real version entries, so
+    the timeout is generous because the test is slow, not because it is
+    unreliable. Both tests carry source comments explaining the budget and
+    timeout.
 
 !!! note "Coverage report on failure"
     Vitest's default is to skip writing a coverage report when any test
     fails. The frontend figures on this page were captured with
-    `--coverage.reportOnFailure=true` so the two flaky tests above didn't
-    blank the report; a plain `npm test --workspace=@ronl/frontend` on a
-    contended machine may finish red with no `coverage/` output at all.
+    `--coverage.reportOnFailure=true` as a precaution against exactly the
+    kind of contended-run failure described above blanking the report; a
+    plain `npm test --workspace=@ronl/frontend` on a contended machine may
+    still finish red with no `coverage/` output at all.
 
 ---
 
@@ -317,22 +329,26 @@ oversight.
 
 ---
 
-## E2E and live smoke suites (described from source, not measured)
+## E2E and live smoke suites
 
-Everything in this section was **not run in this session** — the frontend
-suite needs a live dev stack (Keycloak, Postgres, Redis, the backend, and a
-sibling repo's LDE backend all running) and a local Operaton instance, and
-the live smoke shell scripts hit real running services. This section
-describes them from their configuration and specs only.
+The frontend and public-site Playwright suites below were **measured** on
+19 August 2026 against v2026.08.19 — run by the maintainer, who owns the
+dev stack and local Operaton container both suites need. Figures come from
+their Playwright JSON reporter output; the reports themselves are
+deliberately not committed to this repo, only the figures below. The four
+live-smoke shell scripts at the end of this section were **not run** and
+remain described from their configuration and specs only.
 
 ### Frontend Playwright suite
 
 `packages/frontend/e2e/`, its own `playwright.config.ts`
-(`npm run test:e2e --workspace=@ronl/frontend`). Per the source's own
-tracked tally: **12 tests across 6 spec files**, Chromium only, `workers: 1`
-(two specs race to claim an identically-named task for the same caseworker
-against the shared local Operaton engine, so the suite trades parallelism
-for correctness).
+(`npm run test:e2e --workspace=@ronl/frontend`). Chromium only,
+`workers: 1` (two specs race to claim an identically-named task for the
+same caseworker against the shared local Operaton engine, so the suite
+trades parallelism for correctness).
+
+**Measured 19 August 2026 against v2026.08.19: 12 tests, 12 passed, 0
+failed, 0 flaky, 0 skipped, 44.7s.**
 
 | Spec | Covers |
 |---|---|
@@ -342,6 +358,12 @@ for correctness).
 | `caseworker-journey.spec.ts` | Citizen submits a real Kapvergunning request via Operaton/DMN; caseworker claims and completes both resulting tasks; a genuinely finalized roundtrip |
 | `zorgtoeslag-journey.spec.ts` | Second deep journey — a commercial-org citizen submits a Zorgtoeslag claim, the `toeslagen` caseworker completes both steps |
 | `tenant-isolation.spec.ts` | A real cross-tenant fixture — confirms a wrong-tenant caseworker does **not** see a task, and the right one does |
+
+`tenant-isolation.spec.ts` is the empirical proof of the tenancy-scoping
+behaviour described in
+[Processes → Tenancy](../../features/processes.md#tenancy) and
+[Tasks → Visibility](../../features/tasks.md#visibility): a task raised
+under one tenant is visible only to that tenant's caseworker.
 
 Requires: `docker compose up -d` (Keycloak + Postgres + Redis) at the repo
 root, the backend and frontend dev servers running, and a sibling
@@ -353,11 +375,14 @@ it does not start anything itself.
 ### Public-site Playwright suite
 
 `packages/public-site/e2e/publiek.spec.ts`
-(`npm run test:e2e --workspace=@ronl/public-site`). Per source: **6 tests**
-against real `/v1/public/*` data (no mocks) — search→filter→detail→back URL
+(`npm run test:e2e --workspace=@ronl/public-site`) against real
+`/v1/public/*` data (no mocks) — search→filter→detail→back URL
 preservation, a deep link with pre-applied filters, keyboard-only
 navigation, plus three axe-core accessibility scans (home, results, a detail
 page) asserting no critical/serious violations.
+
+**Measured 19 August 2026 against v2026.08.19: 6 tests, 6 passed, 0 failed,
+0 flaky, 0 skipped, 8.9s.**
 
 Unlike the frontend suite, Playwright starts its own dev server for this
 package (`webServer` in `playwright.config.ts`) — only the backend needs to

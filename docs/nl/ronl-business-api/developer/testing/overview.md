@@ -23,7 +23,7 @@ component: RONL Business API
 
 ## Coverage
 
-## E2E and live smoke suites (described from source, not measured)
+## E2E and live smoke suites
 
 ## Adding tests
 
