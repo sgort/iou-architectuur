@@ -1,106 +1,57 @@
+---
+component: RONL Business API
+---
+
 # Security & Compliance
 
-RONL Business API is designed to meet Dutch government security requirements. The following standards inform the security architecture and audit requirements.
+Security is enforced at several layers: transport, request handling, identity, and — after a request completes — an audit record of what happened. None of these depend on which process, decision, or form a given request touches; they apply to every request the same way.
 
 ---
 
-## Applicable standards
+## Transport
 
-| Standard | Scope |
-|---|---|
-| **BIO** (Baseline Informatiebeveiliging Overheid) | Overall information security baseline for Dutch government |
-| **NEN 7510** | Information security in healthcare; applied here for sensitive citizen data |
-| **AVG / GDPR** | Data minimisation, audit trails, retention periods, right to access |
-| **DigiD Norm** | Authentication assurance levels for citizen-facing services |
-| **NCSC Guidelines** | Secure software development, dependency management |
+Traffic to the platform's own services is encrypted end to end. TLS certificates are provisioned and renewed automatically for the components behind the reverse proxy, and the managed hosting environment for the API itself handles its own certificate lifecycle.
 
 ---
 
-## Security controls
+## Request-level protections
 
-### HTTPS everywhere
+Every response carries a Content Security Policy restricting where scripts, styles, and images may be loaded from, and HTTP Strict Transport Security instructing browsers to only ever reach the platform over HTTPS.
 
-All traffic between components is encrypted. Caddy (the VM reverse proxy) handles TLS termination for Keycloak and Operaton using automatically-renewed Let's Encrypt certificates. Azure manages certificates for the Static Web App and App Service.
+Requests are rate-limited: a general limit applies across the authenticated API, keyed per caller IP (or per tenant and IP, where that stricter keying is enabled) so that one tenant's traffic cannot exhaust the limit for another. A separate, stricter limit applies to the public, unauthenticated endpoints that accept a write — submitting content without being signed in — and those endpoints additionally require passing a proof-of-work challenge before the write is accepted, which is what stands in for a login wall on a surface that deliberately has none.
 
-### Helmet middleware
+Only requests from explicitly configured origins are accepted; anything else is rejected before it reaches a route handler.
 
-The backend applies `helmet` with a strict Content Security Policy:
+---
 
-```
-defaultSrc: ["'self'"]
-styleSrc:   ["'self'", "'unsafe-inline'"]
-scriptSrc:  ["'self'"]
-imgSrc:     ["'self'", "data:", "https:"]
-```
+## Authentication and authorization
 
-HSTS is enabled with `maxAge: 31536000` and `includeSubDomains: true`.
+Every protected endpoint requires a valid, signature-verified token before any request data is processed — see [Authentication & IAM](authentication-iam.md) for the full validation chain, the role checks a caller's token is subject to, and the tenant boundary that keeps one caller from reaching another tenant's resources.
 
-### Rate limiting
+---
 
-Two rate limit policies are applied:
+## Secrets management
 
-- **General API** — 100 requests per 15 minutes per IP (or per tenant+IP if `RATE_LIMIT_PER_TENANT=true`)
-- **Authentication endpoints** — 5 requests per 15 minutes per IP
-
-Keycloak adds brute-force protection independently: 5 failed login attempts trigger a 15-minute lockout with exponential backoff.
-
-### CORS
-
-The backend only accepts requests from its configured `CORS_ORIGIN` values:
-
-```
-https://mijn.open-regels.nl          (production)
-https://acc.mijn.open-regels.nl      (acceptance)
-http://localhost:5173                 (local development)
-```
-
-All other origins receive HTTP 403. Keycloak client settings mirror these origins in `Web Origins` and `Valid Redirect URIs`.
-
-### JWT validation
-
-Every request to a protected endpoint passes through the JWT middleware:
-
-1. Signature verified against Keycloak JWKS (cached in Redis, TTL 300s)
-2. `exp` checked — 15-minute token lifetime enforced
-3. `iss` verified against the configured Keycloak realm URL
-4. `aud` verified to be `ronl-business-api`
-
-Tokens failing any check are rejected with HTTP 401. No request data is processed before successful validation.
-
-### Secrets management
-
-Secrets are stored as Azure App Settings (environment variables on App Service) and VM `.env` files (not committed to git). The repository contains only `.env.example` templates. The following are never in version control:
-
-- Keycloak client secrets
-- Database connection strings with passwords
-- Redis primary keys
-- Admin passwords
+Credentials — Keycloak client secrets, database connection strings, and the like — are held as environment configuration on the hosting platform, not committed to the repository. Only template files documenting which variables are expected are version-controlled.
 
 ---
 
 ## Audit logging
 
-Every API call that results in a process action is written to the PostgreSQL audit log with:
+A request that results in a process action is recorded once it completes, capturing who made it (the caller's identity and tenant), what it was (the HTTP method and endpoint, and the resource type and id it addressed where the path identifies one), when it happened, the caller's IP address where that is configured to be captured, and the outcome (success, failure, or error, derived from the response status). Audit logging can be disabled entirely by configuration, and IP capture can be disabled independently of the rest of the record. High-frequency, read-only traffic that would otherwise flood the log is deliberately excluded.
 
-| Field | Value |
-|---|---|
-| `user_id` | JWT `sub` claim |
-| `municipality` | JWT `municipality` claim |
-| `action` | HTTP method + endpoint |
-| `resource_id` | Process instance ID |
-| `timestamp` | UTC timestamp |
-| `ip_address` | Client IP (from trusted proxy headers) |
-| `result` | HTTP response code |
-
-Audit records have a configured retention of 2555 days (7 years) to satisfy BIO and AVG archiving requirements. The table schema is initialised by `config/postgres/init-databases.sql`.
+Audit records carry a configured retention target — long enough to satisfy a government archiving expectation measured in years rather than months — though retention is a configuration value the platform is set up to honour, not an automated purge the platform runs on a schedule.
 
 ---
 
-## Data minimisation
+## Data handling
 
-The Business API applies AVG data minimisation:
+Log output at debug verbosity is disabled outside development, so operational logs do not carry the level of request detail a developer would use while debugging. Error responses do not leak process variables or other request payload content beyond what the error itself needs to describe.
 
-- BSN (Citizen Service Number) is encrypted at rest and never logged in plaintext
-- The `userinfo_endpoint` is not exposed externally
-- Process variables containing personal data are not included in error responses
-- Log entries at DEBUG level are disabled in production (`LOG_LEVEL=info`)
+---
+
+## Related
+
+- [Authentication & IAM](authentication-iam.md) — the identity and tenancy checks this page's audit trail traces back to
+- [API Design](api-design.md) — the response conventions error handling follows
+- [Tasks](tasks.md) and [Processes](processes.md) — the actions an audit record most often describes

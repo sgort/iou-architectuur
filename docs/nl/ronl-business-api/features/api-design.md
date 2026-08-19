@@ -15,20 +15,20 @@
 
 ---
 
-## Naming conventions
+## Naming
 
 ---
 
-## Request / response format
+## The response envelope
 
 ---
 
-## Rate limiting headers
+## Error handling
 
 ---
 
-## OpenAPI documentation
+## Public versus authenticated surface
 
 ---
 
-## Route inventory
+## Related

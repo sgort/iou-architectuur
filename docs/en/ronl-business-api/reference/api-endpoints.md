@@ -719,7 +719,7 @@ This endpoint accepts an `application/json` request body and deploys all provide
 | `operatonUsername` | `string` | No | Override Operaton basic-auth username |
 | `operatonPassword` | `string` | No | Override Operaton basic-auth password |
 
-See [Dynamic Forms — Deployment](../features/dynamic-forms.md#deployment) for the full deploy workflow.
+See [Dynamic Forms — Authoring and deployment](../features/dynamic-forms.md#authoring-and-deployment) for the full deploy workflow.
 
 ---
 

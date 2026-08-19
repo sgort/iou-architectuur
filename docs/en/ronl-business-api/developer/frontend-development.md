@@ -465,7 +465,7 @@ On mount, fires two requests in parallel via `Promise.allSettled`:
 
 Caseworker-only fields are excluded from both rendering paths.
 
-See [Dynamic Forms — Decision Viewer](../features/dynamic-forms.md#decision-viewer-decisionviewer) for the feature description.
+See [Dynamic Forms — Document templates](../features/dynamic-forms.md#document-templates) for the feature description.
 
 ---
 
