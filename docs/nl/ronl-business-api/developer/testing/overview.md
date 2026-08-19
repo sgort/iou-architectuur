@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Testen
 
 !!! info "Documentatie in ontwikkeling"
@@ -11,24 +15,16 @@
 
 ---
 
-## Backend unit & integration tests
+## Running the tests
 
----
+## Linting, formatting, git hooks, and CI
 
-## Live smoke suite
+## Test inventory
 
-### test-smoke-live.sh
+## Coverage
 
-### test-edocs-live.sh
+## E2E and live smoke suites (described from source, not measured)
 
-### test-doccle-live.sh
+## Adding tests
 
-### test-m2m-routes.sh
-
----
-
-## Health check verification
-
----
-
-## Pre-commit / pre-push hooks and CI
+## Roadmap
