@@ -23,7 +23,7 @@
 
 ---
 
-## Live environments
+## Environments
 
 ---
 
