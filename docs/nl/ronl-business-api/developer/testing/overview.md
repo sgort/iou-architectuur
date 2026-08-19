@@ -2,12 +2,12 @@
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
-    Raadpleeg de <a href="/ronl-business-api/developer/testing/">Engelse versie</a> voor de huidige inhoud.
+    Raadpleeg de <a href="/ronl-business-api/developer/testing/overview/">Engelse versie</a> voor de huidige inhoud.
 
 ---
 
 **Status:** Concept  
-**Engelstalige bron:** `ronl-business-api/developer/testing.md`
+**Engelstalige bron:** `ronl-business-api/developer/testing/overview.md`
 
 ---
 

@@ -2,12 +2,12 @@
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
-    Raadpleeg de <a href="/ronl-business-api/technical/brp-timeline-integration/">Engelse versie</a> voor de huidige inhoud.
+    Raadpleeg de <a href="/ronl-business-api/reference/brp-timeline-integration/">Engelse versie</a> voor de huidige inhoud.
 
 ---
 
 **Status:** Concept  
-**Engelstalige bron:** `ronl-business-api/technical/brp-timeline-integration.md`
+**Engelstalige bron:** `ronl-business-api/reference/brp-timeline-integration.md`
 
 ---
 

@@ -2,7 +2,7 @@
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
-    Raadpleeg de <a href="/linked-data-explorer/features/dso-explorer/">Engelse versie</a> voor de huidige inhoud.
+    Raadpleeg de <a href="/linked-data-explorer/user-guide/dso-explorer/">Engelse versie</a> voor de huidige inhoud.
 
 ## Voorbereiding
 
