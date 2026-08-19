@@ -1,3 +1,12 @@
+---
+component: RONL Business API
+---
+
+!!! warning "Archived — not maintained"
+    This guide is kept for reference and is no longer updated. It describes the
+    application around **v2.9.1**; the current documented version is **v3.9.1**.
+    For current documentation see [Getting Started](../getting-started.md).
+
 # Caseworker Workflow
 
 Caseworkers (medewerkers) are municipal employees with elevated access to the RONL Business API portal. Unlike citizens, they authenticate via a dedicated Keycloak-native login path — not through DigiD, eHerkenning, or eIDAS.
@@ -10,7 +19,7 @@ The caseworker dashboard at `/dashboard/caseworker` uses a three-zone shell: a t
 
 The dashboard is accessible without login — public sections (Nieuws, Berichten, Regelcatalogus) under the Home tab are visible to anyone. Private sections show a login prompt when clicked unauthenticated; no page redirect occurs.
 
-See [Caseworker Dashboard](../features/caseworker-dashboard.md) for the full shell architecture.
+See [Caseworker Dashboard](../../features/caseworker-dashboard.md) for the full shell architecture.
 
 ---
 
@@ -19,7 +28,7 @@ See [Caseworker Dashboard](../features/caseworker-dashboard.md) for the full she
 Caseworkers use the **"Inloggen als Medewerker"** button on the MijnOmgeving landing page — a slate-coloured button visually separated from the three citizen identity provider options by a "MEDEWERKERS" section divider.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: MijnOmgeving Landing Page — Caseworker Button](../../../assets/screenshots/ronl-mijnomgeving-landing-caseworker.png)
+  ![Screenshot: MijnOmgeving Landing Page — Caseworker Button](../../../../assets/screenshots/ronl-mijnomgeving-landing-caseworker.png)
   <figcaption>MijnOmgeving landing page showing all four login options</figcaption>
 </figure>
 
@@ -32,7 +41,7 @@ The caseworker login flow differs from the citizen flow in three important ways:
 **Dedicated login screen.** If no SSO session exists, Keycloak is called with `loginHint: '__medewerker__'`. The custom `login.ftl` theme template detects this sentinel value and renders the Keycloak native login form with an indigo "Inloggen als gemeentemedewerker" context banner and "Medewerker portaal" as the page title, making the screen visually distinct from any citizen-facing Keycloak page.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Keycloak Login — Caseworker Banner](../../../assets/screenshots/ronl-keycloak-caseworker-login.png)
+  ![Screenshot: Keycloak Login — Caseworker Banner](../../../../assets/screenshots/ronl-keycloak-caseworker-login.png)
   <figcaption>Keycloak native login form with caseworker context banner</figcaption>
 </figure>
 
@@ -135,7 +144,7 @@ sequenceDiagram
 This task is created inside `TreeFellingPermitSubProcess` after both DMNs have been evaluated. It appears in the task queue as **Openstaand** with `taskDefinitionKey: Sub_CaseReview`.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: MijnOmgeving — Caseworker AWB Notify Claim](../../../assets/screenshots/ronl-mijnomgeving-caseworker-treefelling-review-task-claim.png)
+  ![Screenshot: MijnOmgeving — Caseworker AWB Notify Claim](../../../../assets/screenshots/ronl-mijnomgeving-caseworker-treefelling-review-task-claim.png)
   <figcaption>Sub_CaseReview task in the task queue — unclaimed (Openstaand)</figcaption>
 </figure>
 
@@ -152,7 +161,7 @@ The caseworker selects one of three actions:
 The `Sub_ResolveDecision` script task in the subprocess applies the override when `reviewAction = "change"`, then routes through the final gateway to `Sub_SetGranted` or `Sub_SetRejected`, which write `status`, `finalMessage`, `decisionType`, `replacementInfo`, `paymentRequired`, and `chainProcessRequired` back to the AWB shell.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: MijnOmgeving — Caseworker Dashboard](../../../assets/screenshots/ronl-mijnomgeving-caseworker-treefelling-review-task.png)
+  ![Screenshot: MijnOmgeving — Caseworker Dashboard](../../../../assets/screenshots/ronl-mijnomgeving-caseworker-treefelling-review-task.png)
   <figcaption>Sub_CaseReview task - Review</figcaption>
 </figure>
 
@@ -161,7 +170,7 @@ The `Sub_ResolveDecision` script task in the subprocess applies the override whe
 After `Sub_CaseReview` completes and the subprocess ends, the AWB shell creates `Task_Phase6_Notify`. This task also appears as **Openstaand** and requires a claim before it can be completed.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: MijnOmgeving — Caseworker AWB Notify Claim](../../../assets/screenshots/ronl-mijnomgeving-caseworker-awb-notify-claim.png)
+  ![Screenshot: MijnOmgeving — Caseworker AWB Notify Claim](../../../../assets/screenshots/ronl-mijnomgeving-caseworker-awb-notify-claim.png)
   <figcaption>Task_Phase6_Notify task - unclaimed (Openstaand)</figcaption>
 </figure>
 
@@ -176,7 +185,7 @@ The caseworker selects how the citizen was notified and confirms:
 | Bevestiging kennisgeving | `applicantNotified`  | Yes — must be checked                         |
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: MijnOmgeving — Caseworker AWB Notify Task](../../../assets/screenshots/ronl-mijnomgeving-caseworker-awb-notify-task.png)
+  ![Screenshot: MijnOmgeving — Caseworker AWB Notify Task](../../../../assets/screenshots/ronl-mijnomgeving-caseworker-awb-notify-task.png)
   <figcaption>Task_Phase6_Notify form — notification method and confirmation</figcaption>
 </figure>
 
@@ -220,7 +229,7 @@ Tasks are fetched from `GET /v1/task/history` and grouped by `processDefinitionK
 Expanding a task card loads its historic process variables via `GET /v1/process/:instanceId/historic-variables`. Variables are cached per `processInstanceId` — expanding a card a second time costs no additional API call.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard — Archief](../../../assets/screenshots/ronl-caseworker-archief.png)
+  ![Screenshot: Caseworker Dashboard — Archief](../../../../assets/screenshots/ronl-caseworker-archief.png)
   <figcaption>Archief — completed tasks grouped by process definition key. Expanded card shows historic process variables.</figcaption>
 </figure>
 

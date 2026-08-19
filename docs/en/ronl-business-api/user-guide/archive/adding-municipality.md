@@ -1,3 +1,12 @@
+---
+component: RONL Business API
+---
+
+!!! warning "Archived — not maintained"
+    This guide is kept for reference and is no longer updated. It describes the
+    application around **v2.9.1**; the current documented version is **v3.9.1**.
+    For current documentation see [Getting Started](../getting-started.md).
+
 # Adding a Municipality
 
 This guide is for system operators and developers onboarding a new Dutch municipality to RONL Business API. Three things need to be configured: the tenant configuration file, Keycloak users and groups, and (optionally) municipality-specific feature flags.
@@ -101,6 +110,6 @@ After making these changes:
 5. Verify that `GET /v1/health` still returns `healthy`
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: RONL Business API New Municipality Theme Comparison](../../../assets/screenshots/ronl-business-api-municipality-theme-comparison.png)
+  ![Screenshot: RONL Business API New Municipality Theme Comparison](../../../../assets/screenshots/ronl-business-api-municipality-theme-comparison.png)
   <figcaption>Example dashboard MijnOmgeving showing municipality theme</figcaption>
 </figure>

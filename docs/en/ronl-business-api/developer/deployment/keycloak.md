@@ -801,7 +801,7 @@ For PROD deployment:
 ## Related Documentation
 
 - [Authentication & IAM Features](../../features/authentication-iam.md) — Keycloak integration overview
-- [Login Flow User Guide](../../user-guide/login-flow.md) — End-user authentication experience
+- [Login Flow User Guide](../../user-guide/archive/login-flow.md) — End-user authentication experience
 - [Frontend Development](../frontend-development.md) — Keycloak JS adapter integration
 - [Deployment Overview](overview.md) — Full deployment architecture
 - [Caddy Reverse Proxy](caddy.md) — SSL termination and routing

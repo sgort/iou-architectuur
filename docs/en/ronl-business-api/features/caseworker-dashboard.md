@@ -118,7 +118,7 @@ When an unauthenticated visitor lands on the dashboard and navigates to a top-na
   <figcaption>Clicking a private section while unauthenticated shows the login prompt inline without leaving the page</figcaption>
 </figure>
 
-Clicking **Inloggen als medewerker** in the prompt stores `medewerker` in `sessionStorage` and navigates to `/auth`, following the same caseworker login path described in [Logging In](../user-guide/login-flow.md#caseworker-login).
+Clicking **Inloggen als medewerker** in the prompt stores `medewerker` in `sessionStorage` and navigates to `/auth`, following the same caseworker login path described in [Logging In](../user-guide/archive/login-flow.md#caseworker-login).
 
 ---
 
@@ -180,7 +180,7 @@ Displays the RONL knowledge graph via `GET /v1/public/regelcatalogus`. See [Rege
 
 ## Persoonlijke info tab
 
-The Persoonlijke info tab exposes four left-panel sections, all requiring authentication. See [HR Onboarding Workflow](../user-guide/hr-onboarding.md) for a full walkthrough of each section.
+The Persoonlijke info tab exposes four left-panel sections, all requiring authentication. See [HR Onboarding Workflow](../user-guide/archive/hr-onboarding.md) for a full walkthrough of each section.
 
 | Section                | Accessible to             |
 | ---------------------- | ------------------------- |
@@ -206,7 +206,7 @@ The Flevoland province tenant exposes the following sections:
 | Actieve zaken      | All caseworkers     | Placeholder                                               |
 | Archief            | All caseworkers     | Placeholder                                               |
 
-See [Caseworker Workflow](../user-guide/caseworker-workflow.md) for the task queue and [RIP Phase 1 Workflow](../user-guide/rip-phase1-workflow.md) for the full RIP process walkthrough.
+See [Caseworker Workflow](../user-guide/archive/caseworker-workflow.md) for the task queue and [RIP Phase 1 Workflow](../user-guide/archive/rip-phase1-workflow.md) for the full RIP process walkthrough.
 
 ---
 
@@ -331,9 +331,9 @@ The IOU tab depends on three environment variables that must be set on the backe
 
 ## Related documentation
 
-- [Caseworker Workflow](../user-guide/caseworker-workflow.md) — Task queue, claim, complete, AWB Kapvergunning, Archief
-- [HR Onboarding Workflow](../user-guide/hr-onboarding.md) — Persoonlijke info sections in detail
-- [RIP Phase 1 Workflow](../user-guide/rip-phase1-workflow.md) — Projecten tab RIP sections in detail
+- [Caseworker Workflow](../user-guide/archive/caseworker-workflow.md) — Task queue, claim, complete, AWB Kapvergunning, Archief
+- [HR Onboarding Workflow](../user-guide/archive/hr-onboarding.md) — Persoonlijke info sections in detail
+- [RIP Phase 1 Workflow](../user-guide/archive/rip-phase1-workflow.md) — Projecten tab RIP sections in detail
 - [Regelcatalogus](regelcatalogus.md) — Knowledge graph browser
 - [Multi-Tenant Municipality Portal](multi-tenant-portal.md) — Tenant theming and isolation
 - [Frontend Development](../developer/frontend-development.md) — CaseworkerDashboard.tsx architecture

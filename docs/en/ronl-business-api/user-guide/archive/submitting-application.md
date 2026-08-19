@@ -1,3 +1,12 @@
+---
+component: RONL Business API
+---
+
+!!! warning "Archived — not maintained"
+    This guide is kept for reference and is no longer updated. It describes the
+    application around **v2.9.1**; the current documented version is **v3.9.1**.
+    For current documentation see [Getting Started](../getting-started.md).
+
 # Submitting an Application
 
 This guide covers the **Kapvergunning** (tree felling permit) application — the AWB process currently available in the RONL Business API citizen portal. For the zorgtoeslag calculator and application, see [Applying for Zorgtoeslag via Unive](zorgtoeslag-cross-org-journey.md).
@@ -9,7 +18,7 @@ This guide covers the **Kapvergunning** (tree felling permit) application — th
 The tree felling permit is an **asynchronous, multi-actor process** implementing the Dutch Administrative Law Act (Awb). Unlike a simple calculation, the citizen submits an application and receives a dossier reference — the actual decision is made later by a caseworker and communicated separately.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: RONL Business API Kapvergunning Form](../../../assets/screenshots/ronl-business-api-kapvergunning-form.png)
+  ![Screenshot: RONL Business API Kapvergunning Form](../../../../assets/screenshots/ronl-business-api-kapvergunning-form.png)
   <figcaption>Example dashboard MijnOmgeving showing Kapvergunning application form</figcaption>
 </figure>
 
@@ -55,7 +64,7 @@ Content-Type: application/json
 The portal immediately shows your dossier reference:
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: RONL Business API Kapvergunning Confirmation](../../../assets/screenshots/ronl-business-api-kapvergunning-confirmation.png)
+  ![Screenshot: RONL Business API Kapvergunning Confirmation](../../../../assets/screenshots/ronl-business-api-kapvergunning-confirmation.png)
   <figcaption>Confirmation screen showing dossierReference after successful submission</figcaption>
 </figure>
 ```
@@ -67,7 +76,7 @@ Uiterste beslistermijn: 28 april 2026 (Awb 4:13, 8 weken)
 **No decision is returned at this point.** The process is now waiting for caseworker review. You can track the status under **Mijn aanvragen**.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: RONL Business API Kapvergunning Application list](../../../assets/screenshots/ronl-business-api-kapvergunning-application-list.png)
+  ![Screenshot: RONL Business API Kapvergunning Application list](../../../../assets/screenshots/ronl-business-api-kapvergunning-application-list.png)
   <figcaption>Mijn aanvragen screen showing the submitted Kapvergunning application</figcaption>
 </figure>
 
@@ -96,14 +105,14 @@ Once the caseworker completes both tasks and the process ends, a **Bekijk beslis
 From v2.3.0, the Decision Viewer renders the official **decision letter** authored in the [LDE Document Composer](../../../linked-data-explorer/features/document-composer.md) and bundled with the deployed process. The letter includes the municipality letterhead, contact information, dossier reference, the substantive decision text, and — if applicable — replacement tree requirements. Variable placeholders in the template are resolved from the final process variables automatically.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Decision Document Viewer citizen view](../../../assets/screenshots/ronl-decision-document-viewer.png)
+  ![Screenshot: Decision Document Viewer citizen view](../../../../assets/screenshots/ronl-decision-document-viewer.png)
   <figcaption>Mijn aanvragen — completed Kapvergunning application with Decision Document expanded</figcaption>
 </figure>
 
 For applications submitted before document templates were introduced, the viewer falls back to a compact readonly summary of the key decision fields.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Decision Viewer expanded](../../../assets/screenshots/ronl-mijnomgeving-citizen-decision-viewer-expanded.png)
+  ![Screenshot: Decision Viewer expanded](../../../../assets/screenshots/ronl-mijnomgeving-citizen-decision-viewer-expanded.png)
   <figcaption>Decision Viewer expanded — readonly decision fields</figcaption>
 </figure>
 
@@ -161,7 +170,7 @@ The Decision Viewer calls `GET /v1/process/:id/historic-variables` — variables
 Check that the API Health indicator in the portal header shows all services as UP. If Operaton shows "down", the business rules engine is temporarily unavailable.
 
 **500 error on submission**
-The most common cause is a double-wrapped variable format in the tenant middleware. Check the backend log for `Must provide 'null' or String value for value of SerializableValue type 'Json'`. See [Troubleshooting](../developer/troubleshooting.md).
+The most common cause is a double-wrapped variable format in the tenant middleware. Check the backend log for `Must provide 'null' or String value for value of SerializableValue type 'Json'`. See [Troubleshooting](../../developer/troubleshooting.md).
 
 **Error: FORBIDDEN / LOA_INSUFFICIENT**
 Your DigiD assurance level is too low for this service. Log out and log in again using DigiD with SMS code (midden) or the ID check app (hoog).

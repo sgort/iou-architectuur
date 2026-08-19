@@ -1,3 +1,12 @@
+---
+component: RONL Business API
+---
+
+!!! warning "Archived — not maintained"
+    This guide is kept for reference and is no longer updated. It describes the
+    application around **v2.9.1**; the current documented version is **v3.9.1**.
+    For current documentation see [Getting Started](../getting-started.md).
+
 # HR Onboarding Workflow
 
 From v2.4.0, the RONL Business API caseworker dashboard includes an **HR onboarding flow** that lets HR staff start, track, and complete a structured employee onboarding process entirely within MijnOmgeving. The process is backed by the `HrOnboardingProcess` BPMN and the `EmployeeRoleAssignment` DMN, using the same claim-first caseworker task queue as the AWB Kapvergunning.
@@ -37,7 +46,7 @@ The **Profiel** subsection shows a JWT identity card alongside onboarding data f
 - If the `employeeId` claim is absent (account not yet onboarded), a manual input fallback is shown so the caseworker can look up their own record by ID.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard — Profiel](../../../assets/screenshots/ronl-caseworker-persoonlijke-info-profiel.png)
+  ![Screenshot: Caseworker Dashboard — Profiel](../../../../assets/screenshots/ronl-caseworker-persoonlijke-info-profiel.png)
   <figcaption>Persoonlijke info → Profiel — JWT identity card with onboarding data</figcaption>
 </figure>
 
@@ -58,7 +67,7 @@ The **Rollen & rechten** subsection lists:
 | `admin` | Volledige toegang tot alle functionaliteiten |
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard — Rollen & rechten](../../../assets/screenshots/ronl-caseworker-persoonlijke-info-rollen.png)
+  ![Screenshot: Caseworker Dashboard — Rollen & rechten](../../../../assets/screenshots/ronl-caseworker-persoonlijke-info-rollen.png)
   <figcaption>Persoonlijke info → Rollen & rechten — role list and access level description</figcaption>
 </figure>
 
@@ -92,7 +101,7 @@ The **Medewerker onboarden** subsection (visible only to `hr-medewerker`) starts
 **Step 7** — The final task (`Task_NotifyEmployee`) completes the process. An IT handover document (`hr-it-handover.document`, linked via `ronl:documentRef`) becomes available via the Afgeronde onboardingen archive.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard — Medewerker onboarden](../../../assets/screenshots/ronl-caseworker-persoonlijke-info-hr-onboarden.png)
+  ![Screenshot: Caseworker Dashboard — Medewerker onboarden](../../../../assets/screenshots/ronl-caseworker-persoonlijke-info-hr-onboarden.png)
   <figcaption>Persoonlijke info → Medewerker onboarden — started and success state</figcaption>
 </figure>
 
@@ -117,7 +126,7 @@ The document includes:
 - **Keycloak account aanmaken** — step-by-step instructions for IT to create the Keycloak account
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard — Afgeronde onboardingen](../../../assets/screenshots/ronl-caseworker-persoonlijke-info-onboarding-archief.png)
+  ![Screenshot: Caseworker Dashboard — Afgeronde onboardingen](../../../../assets/screenshots/ronl-caseworker-persoonlijke-info-onboarding-archief.png)
   <figcaption>Persoonlijke info → Afgeronde onboardingen — expanded IT handover document</figcaption>
 </figure>
 
@@ -173,6 +182,6 @@ Password for all test accounts: `test123`
 ## Related documentation
 
 - [Caseworker Workflow](caseworker-workflow.md) — General task queue and claim-first workflow
-- [API Endpoints](../reference/api-endpoints.md) — HR endpoints
-- [Keycloak Realm Configuration](../reference/keycloak-realm.md) — `hr-medewerker` role, `employeeId` mapper
-- [BPMN Design Criteria](../reference/bpmn-design-criteria.md) — `candidateGroups` pattern
+- [API Endpoints](../../reference/api-endpoints.md) — HR endpoints
+- [Keycloak Realm Configuration](../../reference/keycloak-realm.md) — `hr-medewerker` role, `employeeId` mapper
+- [BPMN Design Criteria](../../reference/bpmn-design-criteria.md) — `candidateGroups` pattern

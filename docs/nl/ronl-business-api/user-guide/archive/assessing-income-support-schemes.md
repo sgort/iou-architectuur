@@ -1,6 +1,13 @@
 ---
+component: RONL Business API
 title: Toetsing van inkomensondersteunende regelingen
 ---
+
+!!! warning "Gearchiveerd — niet onderhouden"
+    Deze handleiding blijft beschikbaar ter referentie en wordt niet meer
+    bijgewerkt. Zij beschrijft de applicatie rond **v2.9.1**; de huidige
+    gedocumenteerde versie is **v3.9.1**. Zie
+    [Getting Started](../getting-started.md) voor actuele documentatie.
 
 # Toetsing van inkomensondersteunende regelingen
 

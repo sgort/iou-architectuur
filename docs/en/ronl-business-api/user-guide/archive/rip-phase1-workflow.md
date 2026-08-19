@@ -1,3 +1,12 @@
+---
+component: RONL Business API
+---
+
+!!! warning "Archived — not maintained"
+    This guide is kept for reference and is no longer updated. It describes the
+    application around **v2.9.1**; the current documented version is **v3.9.1**.
+    For current documentation see [Getting Started](../getting-started.md).
+
 # RIP Phase 1 Workflow
 
 From v2.6.0, the RONL Business API caseworker dashboard includes a **RIP Phase 1 flow** that lets infrastructure project team members start, track, and complete the two-phase project definition and preliminary design preparation process entirely within MijnOmgeving. The process is backed by the `RipPhase1Process` BPMN and the `RipProjectTypeAssignment` DMN, using the same claim-first caseworker task queue as the AWB Kapvergunning and HR onboarding.
@@ -42,7 +51,7 @@ The **RIP Fase 1 starten** section starts a new `RipPhase1Process` instance:
 **Step 3** — In the task queue, the first task **Complete intake form** appears with status **Openstaand**.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard — RIP Fase 1 starten](../../../assets/screenshots/ronl-caseworker-rip-fase1-starten.png)
+  ![Screenshot: Caseworker Dashboard — RIP Fase 1 starten](../../../../assets/screenshots/ronl-caseworker-rip-fase1-starten.png)
   <figcaption>Projecten → RIP Fase 1 starten — launch button and success state</figcaption>
 </figure>
 
@@ -102,7 +111,7 @@ Each task in the queue follows the standard claim-first pattern:
 5. The next task in the process appears in the queue
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard — RIP task queue](../../../assets/screenshots/ronl-caseworker-rip-task-queue.png)
+  ![Screenshot: Caseworker Dashboard — RIP task queue](../../../../assets/screenshots/ronl-caseworker-rip-task-queue.png)
   <figcaption>Projecten → Taken — RIP Phase 1 task queue with Procesgegevens panel</figcaption>
 </figure>
 
@@ -127,7 +136,7 @@ Clicking a project expands it to show the three document sections:
 Documents not yet produced show **Nog niet beschikbaar**. All three documents render using the same TipTap/ProseMirror zone renderer as the citizen DecisionViewer, with process variables substituted inline.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard — RIP Fase 1 WIP](../../../assets/screenshots/ronl-caseworker-rip-fase1-wip.png)
+  ![Screenshot: Caseworker Dashboard — RIP Fase 1 WIP](../../../../assets/screenshots/ronl-caseworker-rip-fase1-wip.png)
   <figcaption>Projecten → RIP Fase 1 WIP — active project with expanded Intakeverslag</figcaption>
 </figure>
 
@@ -138,7 +147,7 @@ Documents not yet produced show **Nog niet beschikbaar**. All three documents re
 The **RIP Fase 1 gereed** section lists all completed `RipPhase1Process` instances via `GET /v1/rip/phase1/completed`. The layout is identical to the WIP view, with completion date instead of start date. All three documents are rendered in the same collapsible sections.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard — RIP Fase 1 gereed](../../../assets/screenshots/ronl-caseworker-rip-fase1-gereed.png)
+  ![Screenshot: Caseworker Dashboard — RIP Fase 1 gereed](../../../../assets/screenshots/ronl-caseworker-rip-fase1-gereed.png)
   <figcaption>Projecten → RIP Fase 1 gereed — completed project archive with all three documents</figcaption>
 </figure>
 
@@ -216,10 +225,10 @@ The full RIP Phase 1 bundle lives in `examples/organizations/flevoland/rip-phase
 5. Verify the deployment in the Operaton Cockpit under `RipPhase1Process`
 
 !!! note "DMNs are not part of the deploy bundle"
-    Decision models referenced via `camunda:decisionRef` on `BusinessRuleTask` elements are **not** included in this deployment. DMNs reach Operaton through a separate path: they are published to TriplyDB by the [CPSV Editor](../../cpsv-editor/index.md) and deployed to Operaton from there. The BPMN process resolves `camunda:decisionRef` at runtime against whatever is already deployed — as long as the DMN key matches, no additional action is needed here.
+    Decision models referenced via `camunda:decisionRef` on `BusinessRuleTask` elements are **not** included in this deployment. DMNs reach Operaton through a separate path: they are published to TriplyDB by the [CPSV Editor](../../../cpsv-editor/index.md) and deployed to Operaton from there. The BPMN process resolves `camunda:decisionRef` at runtime against whatever is already deployed — as long as the DMN key matches, no additional action is needed here.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: LDE BPMN Canvas — RipPhase1Process](../../../assets/screenshots/ronl-lde-bpmn-rip-phase1-canvas.png)
+  ![Screenshot: LDE BPMN Canvas — RipPhase1Process](../../../../assets/screenshots/ronl-lde-bpmn-rip-phase1-canvas.png)
   <figcaption>LDE BPMN Canvas showing a small part of the RipPhase1Process with PDP steps and eDOCS ServiceTask</figcaption>
 </figure>
 
@@ -277,6 +286,6 @@ Password for all test accounts: `test123`
 
 - [Caseworker Workflow](caseworker-workflow.md) — General task queue and claim-first pattern
 - [HR Onboarding Workflow](hr-onboarding.md) — How `infra-projectteam` roles get assigned
-- [API Endpoints](../reference/api-endpoints.md) — RIP and eDOCS endpoints
-- [Keycloak Realm Configuration](../reference/keycloak-realm.md) — `infra-projectteam`, `infra-medewerker` roles and test users
-- [BPMN Design Criteria](../reference/bpmn-design-criteria.md) — `candidateGroups`, `ronl:documentRef` pattern
+- [API Endpoints](../../reference/api-endpoints.md) — RIP and eDOCS endpoints
+- [Keycloak Realm Configuration](../../reference/keycloak-realm.md) — `infra-projectteam`, `infra-medewerker` roles and test users
+- [BPMN Design Criteria](../../reference/bpmn-design-criteria.md) — `candidateGroups`, `ronl:documentRef` pattern

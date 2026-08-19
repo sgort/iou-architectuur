@@ -1,3 +1,12 @@
+---
+component: RONL Business API
+---
+
+!!! warning "Archived — not maintained"
+    This guide is kept for reference and is no longer updated. It describes the
+    application around **v2.9.1**; the current documented version is **v3.9.1**.
+    For current documentation see [Getting Started](../getting-started.md).
+
 ## What is Timeline Navigation?
 
 Timeline Navigation lets you view your personal data from the BRP (Basisregistratie Personen) at any point in time - past, present, or future. This helps you:
@@ -34,7 +43,7 @@ Timeline Navigation lets you view your personal data from the BRP (Basisregistra
 ## Using the Timeline
 
 <figure markdown style="width:100%; margin:0;">
-  ![Timeline showing Wessel Kooyman on marriage date](../../../assets/screenshots/ronl-timeline-getrouwd.png)
+  ![Timeline showing Wessel Kooyman on marriage date](../../../../assets/screenshots/ronl-timeline-getrouwd.png)
   <figcaption>Example dashboard MijnOmgeving Timeline showing Wessel Kooyman on marriage date</figcaption>
 </figure>
 
@@ -319,7 +328,7 @@ Planned features:
 ## Related Help Articles
 
 - [Login (DigiD Flow)](login-flow.md)
-- [Privacy & Security](../reference/standards-compliance.md)
+- [Privacy & Security](../../reference/standards-compliance.md)
 
 ---
 

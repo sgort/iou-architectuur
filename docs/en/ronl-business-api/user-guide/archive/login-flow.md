@@ -1,3 +1,12 @@
+---
+component: RONL Business API
+---
+
+!!! warning "Archived — not maintained"
+    This guide is kept for reference and is no longer updated. It describes the
+    application around **v2.9.1**; the current documented version is **v3.9.1**.
+    For current documentation see [Getting Started](../getting-started.md).
+
 # Logging In — Citizen & Caseworker
 
 This guide explains what happens when a citizen (burger) or caseworker (medewerker) logs into a municipality portal powered by RONL Business API. The two roles use different authentication paths, which are reflected in both the landing page and the Keycloak login experience.
@@ -9,7 +18,7 @@ This guide explains what happens when a citizen (burger) or caseworker (medewerk
 | Acceptance | `https://acc.mijn.open-regels.nl` |
 | Production | `https://mijn.open-regels.nl` |
 
-In the test environment, use the Keycloak test accounts listed in [Local Development Setup](../developer/local-development.md) instead of real DigiD or employee credentials.
+In the test environment, use the Keycloak test accounts listed in [Local Development Setup](../../developer/local-development.md) instead of real DigiD or employee credentials.
 
 ---
 
@@ -28,7 +37,7 @@ Citizens are Dutch residents, EU residents, or businesses accessing government s
 Open the municipality portal in your browser. You will see the **MijnOmgeving** landing page with four login options — three for citizens and one for caseworkers.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: MijnOmgeving Landing Page](../../../assets/screenshots/ronl-mijnomgeving-landing-idp-selection.png)
+  ![Screenshot: MijnOmgeving Landing Page](../../../../assets/screenshots/ronl-mijnomgeving-landing-idp-selection.png)
   <figcaption>MijnOmgeving landing page showing all four login options</figcaption>
 </figure>
 
@@ -60,7 +69,7 @@ keycloak.init({
 The `idpHint` tells Keycloak to skip its own login form and redirect immediately to the selected identity provider. In production, this takes you directly to DigiD, eHerkenning, or the eIDAS network. In the test environment (no real IdPs configured), Keycloak falls back to its native username/password form without a context banner.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Keycloak Native Login — Citizen (test)](../../../assets/screenshots/ronl-keycloak-digid-login.png)
+  ![Screenshot: Keycloak Native Login — Citizen (test)](../../../../assets/screenshots/ronl-keycloak-digid-login.png)
   <figcaption>Keycloak native login without caseworker banner</figcaption>
 </figure>
 
@@ -126,7 +135,7 @@ Password for all test accounts: `test123`
 On the MijnOmgeving landing page, scroll past the three citizen options. Below a "MEDEWERKERS" divider you will find the slate-coloured caseworker button.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: MijnOmgeving Landing Page — Caseworker Button](../../../assets/screenshots/ronl-mijnomgeving-landing-caseworker.png)
+  ![Screenshot: MijnOmgeving Landing Page — Caseworker Button](../../../../assets/screenshots/ronl-mijnomgeving-landing-caseworker.png)
   <figcaption>Caseworker login button, visually separated from citizen IdP options</figcaption>
 </figure>
 
@@ -161,7 +170,7 @@ This redirects to Keycloak and passes `__medewerker__` as the `login_hint` param
 - Suppresses the sentinel value from the username field (the field renders empty, so the caseworker types their own username)
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Keycloak Login — Caseworker](../../../assets/screenshots/ronl-keycloak-caseworker-login.png)
+  ![Screenshot: Keycloak Login — Caseworker](../../../../assets/screenshots/ronl-keycloak-caseworker-login.png)
   <figcaption>Keycloak native login with caseworker context banner</figcaption>
 </figure>
 
@@ -283,14 +292,14 @@ Web Origins: +
 
 **Cause:** The `__medewerker__` `login_hint` is not being passed, or the `login.ftl` template version on the server is outdated.
 
-**Fix:** Verify that `sessionStorage` contains `selected_idp = medewerker` before `/auth` loads (check DevTools → Application → Session Storage). If the theme file is outdated, redeploy the theme and restart the Keycloak container (see [Keycloak Deployment](../developer/deployment/keycloak.md)).
+**Fix:** Verify that `sessionStorage` contains `selected_idp = medewerker` before `/auth` loads (check DevTools → Application → Session Storage). If the theme file is outdated, redeploy the theme and restart the Keycloak container (see [Keycloak Deployment](../../developer/deployment/keycloak.md)).
 
 ---
 
 ## Related documentation
 
-- [Authentication & IAM](../features/authentication-iam.md) — Technical architecture of both authentication flows
+- [Authentication & IAM](../../features/authentication-iam.md) — Technical architecture of both authentication flows
 - [Caseworker Workflow](caseworker-workflow.md) — What caseworkers can do after login
-- [Frontend Development](../developer/frontend-development.md) — `LoginChoice.tsx` and `AuthCallback.tsx` implementation details
-- [Keycloak Deployment](../developer/deployment/keycloak.md) — Theme files, caseworker banner, container management
-- [JWT Claims Reference](../reference/jwt-claims.md) — Complete JWT token structure
+- [Frontend Development](../../developer/frontend-development.md) — `LoginChoice.tsx` and `AuthCallback.tsx` implementation details
+- [Keycloak Deployment](../../developer/deployment/keycloak.md) — Theme files, caseworker banner, container management
+- [JWT Claims Reference](../../reference/jwt-claims.md) — Complete JWT token structure

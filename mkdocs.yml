@@ -113,15 +113,16 @@ nav:
       - Security & Compliance: ronl-business-api/features/security-compliance.md
       - API Design: ronl-business-api/features/api-design.md
     - User Guides:
-      - Logging In — Citizen & Caseworker: ronl-business-api/user-guide/login-flow.md
-      - Submitting an Application: ronl-business-api/user-guide/submitting-application.md
-      - Zorgtoeslag via Commercial Org: en/ronl-business-api/user-guide/zorgtoeslag-cross-org-journey.md
-      - Using Timeline Navigation: ronl-business-api/user-guide/timeline-navigation.md
-      - Caseworker Workflow: ronl-business-api/user-guide/caseworker-workflow.md
-      - HR Onboarding: ronl-business-api/user-guide/hr-onboarding.md
-      - RIP Phase 1 Workflow: ronl-business-api/user-guide/rip-phase1-workflow.md
-      - Adding a Municipality: ronl-business-api/user-guide/adding-municipality.md
-      - Multiple interacting rules example: ronl-business-api/user-guide/assessing-income-support-schemes.md
+      - Archive:
+          - Logging In — Citizen & Caseworker: ronl-business-api/user-guide/archive/login-flow.md
+          - Submitting an Application: ronl-business-api/user-guide/archive/submitting-application.md
+          - Zorgtoeslag via Commercial Org: ronl-business-api/user-guide/archive/zorgtoeslag-cross-org-journey.md
+          - Using Timeline Navigation: ronl-business-api/user-guide/archive/timeline-navigation.md
+          - Caseworker Workflow: ronl-business-api/user-guide/archive/caseworker-workflow.md
+          - HR Onboarding: ronl-business-api/user-guide/archive/hr-onboarding.md
+          - RIP Phase 1 Workflow: ronl-business-api/user-guide/archive/rip-phase1-workflow.md
+          - Adding a Municipality: ronl-business-api/user-guide/archive/adding-municipality.md
+          - Multiple interacting rules example: ronl-business-api/user-guide/archive/assessing-income-support-schemes.md
       - PA-Cockpit Testen: ronl-business-api/user-guide/pa-cockpit-gebruikershandleiding.md
       - Dossierbeheer Testhandleiding: ronl-business-api/user-guide/dossierbeheer-testhandleiding.md
       - Capaciteitsclaim Testhandleiding: ronl-business-api/user-guide/capaciteitsclaim-testhandleiding.md

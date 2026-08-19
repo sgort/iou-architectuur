@@ -22,7 +22,7 @@ Six tenants are currently configured across three organisation types:
 | Provincie Flevoland | `province`         | `#0046ad` (blue)       | —                           |
 | UWV                 | `national`         | —                      | —                           |
 
-Adding a new tenant requires a `tenants.json` entry and a Keycloak user — see [Adding a Municipality](../user-guide/adding-municipality.md).
+Adding a new tenant requires a `tenants.json` entry and a Keycloak user — see [Adding a Municipality](../user-guide/archive/adding-municipality.md).
 
 ---
 

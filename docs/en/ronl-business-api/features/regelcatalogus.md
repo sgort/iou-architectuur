@@ -137,4 +137,4 @@ All current tenants include `"regelcatalogus"` in their `home` left panel sectio
 
 - [Environment Variables](../reference/environment-variables.md) — `RONL_SPARQL_ENDPOINT`
 - [API Endpoints](../reference/api-endpoints.md) — `GET /v1/public/regelcatalogus`
-- [Caseworker Workflow](../user-guide/caseworker-workflow.md) — Caseworker dashboard navigation
+- [Caseworker Workflow](../user-guide/archive/caseworker-workflow.md) — Caseworker dashboard navigation

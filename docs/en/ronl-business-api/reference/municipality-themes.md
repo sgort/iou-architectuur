@@ -106,4 +106,4 @@ Tailwind utility classes in the frontend use `var(--color-primary)` etc. as thei
 
 ## Adding a theme
 
-See [Adding a Municipality](../user-guide/adding-municipality.md) for the complete onboarding process.
+See [Adding a Municipality](../user-guide/archive/adding-municipality.md) for the complete onboarding process.
