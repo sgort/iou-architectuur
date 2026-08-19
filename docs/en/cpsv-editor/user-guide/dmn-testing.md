@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # DMN Testing
 
 The DMN tab provides two advanced testing modes in addition to single-request evaluation: intermediate decision tests and test cases. Both are available after a successful deployment and are shown as collapsible sections in the DMN tab.
@@ -83,14 +87,18 @@ Each case may also carry an optional `decision` field naming the decision it sho
 
 | DMN typeRef | JSON type | Example |
 |---|---|---|
-| `date` | `String` | `"2026-02-17"` |
+| `date` | `Date` | `"1990-03-17T00:00:00+01:00"` |
 | `boolean` | `Boolean` | `true` |
 | `integer` | `Integer` | `42` |
 | `double` | `Double` | `1234.56` |
 | `string` | `String` | `"text"` |
 
-!!! note "Date types"
-    Use `type: "String"` for date values in request bodies. Use `type: "Date"` only for null date values (e.g. `"overlijdensdatum": { "value": null, "type": "Date" }`).
+!!! warning "Date values need `type: "Date"` and a full ISO timestamp"
+    Dates must be sent as `{ "value": "1990-03-17T00:00:00+01:00", "type": "Date" }` — a full ISO timestamp with offset, not a bare `YYYY-MM-DD` string.
+
+    Sending a date as `type: "String"` appears to work for decisions that only compare it, which is why it went unnoticed for some time. It fails for any decision that does date arithmetic on the input — calling `.year` or `.years` on it — with `DMN-01005 Invalid value … for clause with type 'date'` in the Operaton log. Auto-generated request bodies use the correct form; if you hand-write or edit one, match it.
+
+    Null dates keep the same type: `{ "value": null, "type": "Date" }`.
 
 ### Running test cases
 
@@ -159,4 +167,8 @@ Watch the browser console for extraction logs:
 
 **Empty request body generated** — The DMN XML has no `<inputData>` elements or they are malformed. Use **Load Example** to see the expected structure, then compare to your DMN file.
 
-**Date conversion error** — Change `"type": "Date"` to `"type": "String"` for date value fields.
+**`DMN-01005 Invalid value ... for clause with type 'date'`** — A date input was sent as a plain string. Use a full ISO timestamp with `"type": "Date"` (see [Variable types](#variable-types)).
+
+**`FEEL/SCALA-01008`** — The DMN uses multi-word bare names in an input expression; Operaton's FEEL engine reads only the first word. The names must be flattened in the DMN itself — see the [authoring pitfalls](dmn-workflow.md#authoring-pitfalls).
+
+**Evaluation fails with a blank error and nothing in the log** — The decision's `<dmn:output>` declares a `label` but no `name`. Operaton needs `name` to serialise the result.

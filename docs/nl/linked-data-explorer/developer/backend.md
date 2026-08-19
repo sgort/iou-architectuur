@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Backend-architectuur
 
 De backend is een Node.js/Express TypeScript-API. Het staat tussen de React-frontend en twee externe services: TriplyDB (SPARQL-kennisgraaf) en Operaton (DMN-uitvoeringsengine). De functies zijn SPARQL-queries uitvoeren, DMN-keten-orkestratie, variabelenmapping tussen ketenstappen en het proxyen van dynamische TriplyDB-endpointaanroepen.
@@ -33,6 +37,34 @@ Retourneert servicehealth inclusief latency-checks van TriplyDB en Operaton. Geb
   }
 }
 ```
+
+### DMN deployen en evalueren (v2026.08.2)
+
+```
+POST /v1/dmns/deploy
+POST /v1/dmns/evaluate/:decisionKey
+```
+
+Twee routes toegevoegd voor de DMN-tab van de CPSV Editor, die Operaton
+voorheen rechtstreeks vanuit de browser aanriep — wat CORS blokkeert voor een
+lokale ontwikkel-origin. De browser post naar deze routes; de backend praat
+server-to-server met Operaton.
+
+`deploy` accepteert ruwe DMN-XML en vereist geen vooraf geregistreerde
+norm-identifier, zodat ook een geüpload of gegenereerd bestand zonder
+registratie-entry gedeployed kan worden. De route is een dunne wrapper om
+`operatonService.deployDrd()`.
+
+`evaluate/:decisionKey` is een **ruwe passthrough**: het antwoord van Operaton
+wordt byte-voor-byte en met dezelfde statuscode doorgegeven — de success-array of
+het exception-object — en dus *niet* in de gebruikelijke
+`{success, data, error}`-envelope, omdat de aanroepende tab de JSON van Operaton
+zelf leest. `evaluateRaw()` geeft ook de request-body ongewijzigd door en slaat
+de type-inferentie over die `evaluateDecision()` voor zijn eigen (andere)
+aanroepcontract toepast; de DMN-tab stelt de body al in Operaton-vorm samen, dus
+opnieuw inpakken zou die dubbel verpakken.
+
+Zie de [API Reference](../reference/api-reference.md) — de Engelstalige pagina bevat de volledige endpointbeschrijving.
 
 ### DMN-discovery
 

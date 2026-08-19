@@ -1,52 +1,34 @@
+---
+component: RONL Business API
+---
+
 # API Design
 
-RONL Business API follows the **Dutch Government API Design Rules** (Nederlandse API Strategie). The API is versioned, uses standard HTTP semantics, and provides machine-readable metadata via response headers.
+The HTTP surface is deliberately small and consistent: every route sits under a versioned prefix, almost every response follows the same envelope, and errors are reported the same way regardless of which endpoint produced them.
 
 ---
 
 ## Versioning
 
-All current endpoints are served under the `/v1/` prefix (rule API-20: major version in the URI path). A response header `API-Version` is added to every response (rule API-57):
-
-```http
-HTTP/1.1 200 OK
-API-Version: 1.0.0
-Content-Type: application/json
-```
-
-Legacy endpoints under `/api/*` continue to work but are deprecated. They return additional headers (rule API-51):
-
-```http
-Deprecation: true
-Link: </v1/health>; rel="successor-version"
-```
-
-Legacy support will be removed in v2.0.0.
+Every route is served under a `/v1/` prefix — the major version lives in the path, not in a header or a query parameter. Every response also carries an `API-Version` header reporting the deployed API's own version number, independent of the route version, so a caller can tell exactly which build answered a request.
 
 ---
 
-## Naming conventions
+## Naming
 
-| Rule | Applied as |
-|---|---|
-| API-05: use nouns | `process`, `decision`, `health` |
-| API-54: plural/singular | Collections use plural (`/v1/process`), single resource uses singular with ID |
-| API-48: no trailing slashes | Enforced in routing configuration |
-| API-53: hide implementation | No Operaton-internal identifiers exposed in responses |
-| API-04: language | Technical endpoints in English; business variable names follow Dutch source data |
+Resource paths use a singular noun for a resource type regardless of whether the request addresses the collection or a single member of it — `/v1/process`, `/v1/task`, `/v1/decision` — rather than pluralising collection endpoints. A resource's own identifier, not an internal Operaton identifier, is what appears in the path once a specific instance is addressed.
 
 ---
 
-## Request / response format
+## The response envelope
 
-All endpoints use `application/json`. Request bodies are validated using `express-validator`. Responses follow a consistent envelope:
+Almost every response — across both the authenticated API and the public, unauthenticated endpoints — follows the same shape:
 
 **Success:**
 ```json
 {
   "success": true,
-  "data": { ... },
-  "timestamp": "2026-02-20T10:00:00.000Z"
+  "data": { ... }
 }
 ```
 
@@ -56,26 +38,33 @@ All endpoints use `application/json`. Request bodies are validated using `expres
   "success": false,
   "error": {
     "code": "VALIDATION_ERROR",
-    "message": "income must be a positive number"
-  },
-  "timestamp": "2026-02-20T10:00:00.000Z"
+    "message": "..."
+  }
 }
 ```
 
----
+An error always carries a stable, machine-readable `code` alongside a human-readable `message`, so a caller can branch on the code without parsing the message text. Some endpoints add further fields alongside `data` — pagination details, or a generation timestamp — without changing the envelope's basic shape.
 
-## Rate limiting headers
-
-Rate limit state is communicated via standard headers (`RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`) when approaching the limit.
+**Where the envelope deliberately does not apply**: the service's own root endpoint, which reports the API's name, version, and a map of its mounted routes as a plain object, is not wrapped in the envelope — it identifies the service itself rather than the result of an API call, and is meant to be readable by a human landing on the base URL directly rather than parsed as API output.
 
 ---
 
-## OpenAPI documentation
+## Error handling
 
-An OpenAPI 3.0 specification is planned at `/v1/openapi.json` (rule API-16 / API-51). It is currently enabled only in non-production environments via `ENABLE_SWAGGER=true`.
+Every error response carries a `code` drawn from a small, consistent vocabulary — `UNAUTHORIZED` and `FORBIDDEN` for identity and authorization failures, `VALIDATION_ERROR` for a malformed request, resource-specific `*_NOT_FOUND` codes, and so on — alongside an HTTP status that matches the failure: `401` for a missing or invalid token, `403` for a role, tenant, or assurance-level check that failed, `404` for a resource that doesn't exist or isn't visible to the caller, `429` for a rate limit, `500` for anything unexpected. An unhandled error is caught centrally rather than crashing the request, and in production its message is replaced with a generic one so internal detail is not leaked to the caller.
 
 ---
 
-## Route inventory
+## Public versus authenticated surface
 
-The full list of registered routes, including legacy `/api/*` equivalents, is documented in [API Endpoints](../references/api-endpoints.md).
+Not every endpoint requires a token. A set of routes is deliberately public — reachable with no login — publishing read-only information for anyone to consult; see [Regelcatalogus](regelcatalogus.md) and [Procesbibliotheek](procesbibliotheek.md) for what that surface exposes. The public surface still follows the same response envelope and the same versioned prefix as the authenticated one, and the handful of public endpoints that accept a write are held to a stricter rate limit and a proof-of-work check rather than a login — see [Security & Compliance](security-compliance.md).
+
+Every other endpoint requires a valid token, checked as described in [Authentication & IAM](authentication-iam.md), before any request data is processed.
+
+---
+
+## Related
+
+- [Authentication & IAM](authentication-iam.md) — the validation every non-public request passes through
+- [Security & Compliance](security-compliance.md) — rate limiting and the audit trail this surface produces
+- [Tasks](tasks.md) and [Processes](processes.md) — the resources most of this surface addresses

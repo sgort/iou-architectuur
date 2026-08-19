@@ -1,34 +1,30 @@
+---
+component: RONL Business API
+---
+
 # Testen
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
-    Raadpleeg de <a href="/ronl-business-api/developer/testing/">Engelse versie</a> voor de huidige inhoud.
+    Raadpleeg de <a href="/ronl-business-api/developer/testing/overview/">Engelse versie</a> voor de huidige inhoud.
 
 ---
 
 **Status:** Concept  
-**Engelstalige bron:** `ronl-business-api/developer/testing.md`
+**Engelstalige bron:** `ronl-business-api/developer/testing/overview.md`
 
 ---
 
-## Backend unit & integration tests
+## Running the tests
 
----
+## Linting, formatting, git hooks, and CI
 
-## Live smoke suite
+## Test inventory
 
-### test-smoke-live.sh
+## Coverage
 
-### test-edocs-live.sh
+## E2E and live smoke suites
 
-### test-doccle-live.sh
+## Adding tests
 
-### test-m2m-routes.sh
-
----
-
-## Health check verification
-
----
-
-## Pre-commit / pre-push hooks and CI
+## Roadmap

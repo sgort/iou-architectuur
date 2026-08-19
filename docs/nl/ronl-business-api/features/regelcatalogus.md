@@ -11,24 +11,24 @@
 
 ---
 
-## Plaatsing en toegang
+## What an entry carries
 
 ---
 
-## De vier tabbladen
-
-### Organisaties
-
-### Diensten
-
-### Regels
-
-### Concepten
+## Where entries come from
 
 ---
 
-## Backend-eindpunt
+## Browsing and finding an entry
 
 ---
 
-## tenants.json-configuratie
+## Freshness and resilience
+
+---
+
+## Public and internal exposure
+
+---
+
+## Related

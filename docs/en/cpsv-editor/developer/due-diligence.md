@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # CPSV Editor — Product & Architecture Overview
 
 **Repository:** `ttl-editor` (public, GitLab — mirrored to GitHub)
@@ -70,9 +74,9 @@ The DMN Tab (`DMNTab.jsx`, ~1520 lines) handles the full lifecycle of decision m
 
 Validation results (errors, warnings, infos per layer) are displayed inline with collapsible detail per layer. This is the same validation engine used by the Linked Data Explorer's multi-file drag-and-drop DMN validator. If the backend is unreachable, the panel renders a distinct amber *"Syntax validation result not available"* state (v1.9.5) rather than failing silently — deployment and testing still work; only the syntactic pre-check is skipped.
 
-**Deploy.** One-click deployment to the Operaton rule engine (`operaton.open-regels.nl/engine-rest/deployment/create`) via multipart form upload. Stores the deployment ID and timestamp in editor state.
+**Deploy.** One-click deployment to the Operaton rule engine, routed through the shared LDE backend's `POST /v1/dmns/deploy` rather than the browser calling Operaton directly (v2026.08.0 — the direct call hit CORS in local development). Stores the deployment ID and timestamp in editor state.
 
-**Test.** Three levels of testing, all calling Operaton's `/engine-rest/decision-definition/key/{key}/evaluate` endpoint directly from the browser:
+**Test.** Three levels of testing, all routed through the shared LDE backend's `POST /v1/dmns/evaluate/{key}` (v2026.08.0), which calls Operaton server-to-server:
 
 | Test mode | What it does |
 |---|---|
@@ -84,7 +88,7 @@ Validation results (errors, warnings, infos per layer) are displayed inline with
 
 The DMN content is embedded in the TTL output as `cprmv:DecisionModel` triples, and the Organization tab supports validation status tracking (not-validated / in-review / validated / rejected) with metadata about who validated and when.
 
-**Coupling to core editor:** Medium. DMN metadata (deployment status, test results, validation) is part of the editor state. The auto-generated concepts feed into the Concepts tab. The TTL export includes DMN blocks. The syntactic validation depends on the shared LDE backend (`POST /v1/dmns/validate`). However, the Operaton REST API interaction and DMN XML parsing (`dmnHelpers.js`) are self-contained utilities.
+**Coupling to core editor:** Medium. DMN metadata (deployment status, test results, validation) is part of the editor state. The auto-generated concepts feed into the Concepts tab. The TTL export includes DMN blocks. The syntactic validation depends on the shared LDE backend (`POST /v1/dmns/validate`). Deploy and evaluate also go through that backend (`/v1/dmns/deploy`, `/v1/dmns/evaluate/{key}`), so the tab no longer talks to Operaton directly. DMN XML parsing (`dmnHelpers.js`) remains a self-contained utility.
 
 ### 5 — DSO → DMN deep-link import
 
@@ -101,6 +105,7 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 | Frontend | React 19, Create React App (deprecated — see below), Tailwind CSS, Lucide icons |
 | State management | React hooks (`useEditorState`, `useArrayHandlers`), no external state library |
 | Build & lint | CRA, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
+| Testing | Jest via `react-scripts test`, `@testing-library/react` — 257 tests, 16 suites ([Testing](testing.md)) |
 | TTL parsing | Custom hand-written parser (no RDF library dependency) |
 | DMN parsing | Browser DOMParser (XML) |
 | External APIs | TriplyDB REST + SPARQL, Operaton REST (Camunda-compatible), RONL SPARQL vocabulary |
@@ -120,7 +125,7 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 
 - **App.js orchestration.** The main `App.js` (1143 lines) has been partially modularized: data state lives in `useEditorState`, array CRUD operations in `useArrayHandlers`, TTL import logic in `importHandler.js`, and TTL generation in `ttlGenerator.js`. What remains in App.js is UI orchestration (tab rendering, message/status management), the publish workflow (~300 lines of step-by-step progress tracking), and glue code wiring state to child components. Further extraction targets: the publish handler could become a custom hook (`usePublishWorkflow`), and the tab navigation + message system could be separated from the data wiring.
 
-- **No automated tests for TTL output.** The test file (`App.test.js`) is a CRA stub. The real validation happens manually via example files. A test suite comparing generated TTL against the reference examples would be high-value.
+- **Automated tests — addressed, partially.** This was originally raised here as *"no automated tests for TTL output"*: the only test file was a CRA stub and validation happened manually against example files. A phased suite landed in v2026.07.0 and now stands at **257 tests across 16 suites**, including the high-value round-trip coverage suggested here — parse a real reference export, regenerate, re-parse, compare. It found two genuine defects immediately, one of which had been silently dropping data on re-import since a predicate rename. `ttlGenerator.js` and `parseTTL.enhanced.js` now sit around 80% statement coverage. What remains untested is the UI layer: `App.js` (14%), `DMNTab.jsx` (8%) and `importHandler.js` (10%), which is what phases P5–P6 target after the Vite migration. See [Testing](testing.md).
 
 - **localStorage for config.** TriplyDB credentials are stored in localStorage. Fine for a prototype, but for a production tool used across teams, consider a proper secrets/config management approach.
 
@@ -128,7 +133,7 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 
 - **Separation opportunity.** The four domains (editor, vendor, publishing, DMN) are loosely coupled via the shared editor state. A modular architecture — whether as separate routes/lazy-loaded modules within the SPA, or as independent micro-frontends sharing a TTL data contract — would improve maintainability and allow independent release cycles.
 
-- **Create React App.** The React team officially deprecated CRA on February 14, 2025. It continues to work in maintenance mode (a final version was published with React 19 support), but it will not receive new features, performance improvements, or active security updates. The React team recommends migrating to a framework (Next.js, React Router) or a modern build tool (Vite, Parcel, Rsbuild). Since the Linked Data Explorer already uses Vite, migrating the CPSV Editor to Vite would align the tooling across the RONL ecosystem and remove the dependency on an unmaintained build tool.
+- **Create React App.** The React team officially deprecated CRA on February 14, 2025. It continues to work in maintenance mode (a final version was published with React 19 support), but it will not receive new features, performance improvements, or active security updates. The React team recommends migrating to a framework (Next.js, React Router) or a modern build tool (Vite, Parcel, Rsbuild). Since the Linked Data Explorer already uses Vite, migrating the CPSV Editor to Vite would align the tooling across the RONL ecosystem and remove the dependency on an unmaintained build tool. The P0–P4 test phases were deliberately written first and are now green, so the migration has a regression net: re-running the existing suite under Vitest is the check that it changed nothing. See [Testing](testing.md) for the sequencing.
 
 ---
 

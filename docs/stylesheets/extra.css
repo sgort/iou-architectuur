@@ -380,3 +380,46 @@ button:focus {
   margin-left: 0.5em;
   vertical-align: middle;
 }
+/* =============================================================
+   Per-page metadata header
+   Rendered by overrides/partials/doc-meta.html directly below the
+   breadcrumbs on pages that declare a `component:` front-matter key.
+   Carries the git created/updated facts Material normally prints at
+   the bottom of the page, plus the documented component version.
+   ============================================================= */
+
+.doc-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 1.1rem;
+  margin: 0 0 1.2rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  color: var(--md-default-fg-color--light);
+  font-size: 0.7rem;
+}
+
+.doc-meta__fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.doc-meta__fact .md-icon svg {
+  width: 1em;
+  height: 1em;
+  fill: currentcolor;
+  vertical-align: middle;
+}
+
+/* The version fact is the point of the header — let it carry a little
+   more weight than the two date facts beside it. */
+.doc-meta__version {
+  font-weight: 600;
+  color: var(--md-default-fg-color);
+}
+
+.doc-meta__version code {
+  font-size: 0.9em;
+}

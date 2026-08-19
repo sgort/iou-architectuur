@@ -11,20 +11,24 @@
 
 ---
 
-## What Operaton handles
+## Deploying a decision table
 
 ---
 
-## Supported processes
+## Invoking a decision
 
 ---
 
-## Process execution flow
+## Inputs and outputs
 
 ---
 
-## API endpoints for business rules
+## Decisions shared across tenants
 
 ---
 
-## Operaton environment
+## Errors
+
+---
+
+## Related

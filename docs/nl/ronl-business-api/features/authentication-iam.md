@@ -11,44 +11,24 @@
 
 ---
 
-## Authentication flow
+## Authenticating
 
 ---
 
-## Keycloak as identity broker
+## Validating a token
 
 ---
 
-## JWT token structure
+## Claims carried in the token
 
 ---
 
-## OIDC discovery endpoints
+## Roles and authorization
 
 ---
 
-## Token validation in the backend
+## Tenancy
 
 ---
 
-## Security settings in the Keycloak realm
-
----
-
-## Connecting a real DigiD / eHerkenning / eIDAS provider
-
-### DigiD (SAML 2.0)
-
-### eHerkenning (SAML 2.0)
-
-### eIDAS (SAML 2.0)
-
-### Authentication flow
-
-### Assurance level (LoA) enforcement
-
-### Protocol mappers for IdP attributes
-
-### Token example (production)
-
-### Compliance notes
+## Related

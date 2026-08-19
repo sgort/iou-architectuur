@@ -11,40 +11,24 @@
 
 ---
 
-## Overzicht
+## What a timeline presents
 
 ---
 
-## Wat het doet
+## Selecting a point in time
 
 ---
 
-## Gebruikersflow
+## Event markers
 
 ---
 
-## "Wat als"-scenarioplanning (Visie)
+## What changes when the date changes
 
 ---
 
-## Gegevensbronnen
+## Access and privacy
 
 ---
 
-## Privacy en beveiliging
-
----
-
-## Technische opmerkingen
-
----
-
-## Huidige beperkingen
-
----
-
-## Schermafbeeldingen
-
----
-
-## Gerelateerde documentatie
+## Related

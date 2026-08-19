@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # Filling In the Tabs
 
 This page describes each tab's fields, what they map to in the generated Turtle, and what validation rules apply. For the full UI field ↔ RDF property mapping tables, see the [Field Mapping Reference](../reference/field-mapping.md).
@@ -138,6 +142,8 @@ The DMN tab retains its state when you switch tabs — an uploaded DMN, its depl
 ## Concepts tab
 
 The Concepts tab holds NL-SBB concept definitions (`skos:Concept`) for the DMN's input and output variables. Concepts are populated automatically once a DMN is loaded and its inputs/outputs are known — by running a single evaluate, by running uploaded test cases (input *and* output concepts are unioned across every uploaded case, deduped by name, so no successful evaluate is required), or restored on import. A badge on the tab shows the concept count, or "Needs DMN" when none exist yet.
+
+Output concepts appear even when an evaluation matches no rule. Some decisions — a DRD root with `hitPolicy="RULE ORDER"` and no catch-all rule, for instance — legitimately return an empty result against the default request body. Rather than losing the outputs in that case, the editor reads the decision's declared outputs straight from the DMN file, so they are still listed here and still published to the Turtle (v2026.08.0).
 
 Each variable also carries a **decision badge** showing which decision(s) it belongs to — blue beside inputs (which are DRD-level and may belong to several decisions) and green beside outputs, with output concepts clustered so variables from the same decision sit together (v1.10.4).
 

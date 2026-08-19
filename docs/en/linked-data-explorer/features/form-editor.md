@@ -126,4 +126,4 @@ The form-js properties panel loses input focus when typing pauses (Field label, 
 
 - [RONL Business API — Dynamic Forms](../../../ronl-business-api/features/dynamic-forms.md) — how the three AWB Kapvergunning forms are deployed and rendered at runtime in MijnOmgeving
 - [BPMN Modeler — One-click deploy](bpmn-modeler.md#one-click-deploy) — deploying BPMN and forms together to Operaton in one step
-- [RONL API Endpoints — Process definition deployment](../../../ronl-business-api/references/api-endpoints.md#process-definition-deployment) — the `POST /api/dmns/process/deploy` endpoint called by the deploy button
+- [RONL API Endpoints — Process definition deployment](../../../ronl-business-api/reference/api-endpoints.md#process-definition-deployment) — the `POST /api/dmns/process/deploy` endpoint called by the deploy button

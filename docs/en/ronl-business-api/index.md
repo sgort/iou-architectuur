@@ -1,9 +1,12 @@
+---
+component: RONL Business API
+---
+
 # RONL Business API
 
-**Serves as a reference for implementing a compliant, secure, and reliable BPMN service for Dutch municipalities using open-source components.**
+**Serves as a reference for implementing a compliant, secure, and reliable BPMN service using open-source components.**
 
-🌐 **Live application:** [mijn.open-regels.nl](https://mijn.open-regels.nl)  
-🧪 **Acceptance environment:** [acc.mijn.open-regels.nl](https://acc.mijn.open-regels.nl)
+🧪 **Current deployment:** [acc.mijn.open-regels.nl](https://acc.mijn.open-regels.nl) — Province of Flevoland, acceptance environment
 
 [![Deployed on Azure Web Apps](https://img.shields.io/badge/Azure-Web_Apps-blue?logo=microsoft-azure)](https://ronl.open-regels.nl)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?logo=typescript)](https://www.typescriptlang.org/)
@@ -23,7 +26,9 @@
 
 ## What is the RONL Business API?
 
-The **RONL Business API** is a secure, multi-tenant platform that enables Dutch municipalities to offer government digital services to residents. It implements the **Business API Layer** pattern: a security and business-logic layer that sits between a municipality's IAM system and the Operaton BPMN engine.
+The **RONL Business API** implements the **Business API Layer** pattern: a security and business-logic layer that sits between an IAM system and the Operaton BPMN engine, exposing scoped capabilities — processes, tasks, forms, decisions — rather than raw engine access.
+
+It is deployed for the **Province of Flevoland**, currently on the acceptance environment. Two surfaces put its capabilities to work: a signed-in **werkomgeving** where provincial staff work through role-scoped boards, and a public **knowledge base** reachable with no login. See [Getting Started](user-guide/getting-started.md) for how these surfaces are organised, and [Features](features/overview.md) for the capabilities themselves.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: RONL Business API Main UI](../../assets/screenshots/ronl-business-api-main-ui.png)
@@ -34,10 +39,10 @@ The **RONL Business API** is a secure, multi-tenant platform that enables Dutch 
 
 ## What it does
 
-Instead of exposing Operaton's REST API directly to municipality portals, RONL Business API provides:
+Instead of exposing Operaton's REST API directly to portal frontends, RONL Business API provides:
 
 - Secure OIDC/JWT token validation against Keycloak
-- Multi-tenant isolation per municipality (Utrecht, Amsterdam, Rotterdam, Den Haag)
+- Multi-tenant isolation as a platform mechanism — Operaton native tenant-ids and tenant-scoped queries keep each organisation's data apart, so the same deployment can serve more than one organisation without them seeing each other's data
 - Claims mapping from JWT to BPMN process variables
 - Role-based authorization (citizen, caseworker, admin)
 - Compliance-grade audit logging (BIO, NEN 7510, AVG/GDPR)
@@ -48,14 +53,16 @@ Instead of exposing Operaton's REST API directly to municipality portals, RONL B
 ## Architecture at a glance
 
 ```
-Resident → Municipality Portal → Keycloak IAM → Business API → Operaton BPMN Engine
+User → Portal → Keycloak IAM → Business API → Operaton BPMN Engine
 ```
 
 The system is hosted across two platforms. Azure hosts the stateless application layer (frontend, backend, PostgreSQL, Redis). A VM at `open-regels.nl` hosts the services requiring deep customisation or full control (Keycloak, Operaton, Caddy).
 
 ---
 
-## Live environments
+## Environments
+
+ACC is the environment of record for this documentation — the Province of Flevoland deployment currently runs there. A production environment is also configured in the codebase's deployment workflows:
 
 | Environment | Frontend | Backend | Keycloak |
 |---|---|---|---|
@@ -84,6 +91,6 @@ The system is hosted across two platforms. Azure hosts the stateless application
 ## Documentation sections
 
 - [**Features**](features/overview.md) — What RONL Business API does and why
-- [**User Guides**](user-guide/login-flow.md) — How residents, caseworkers, and operators use the system
+- [**User Guides**](user-guide/getting-started.md) — The werkomgeving's four boards and the public knowledge base
 - [**Developer Docs**](developer/local-development.md) — Local setup, backend, frontend, deployment
-- [**References**](references/api-endpoints.md) — API endpoints, environment variables, JWT claims, standards
+- [**References**](reference/api-endpoints.md) — API endpoints, environment variables, JWT claims, standards

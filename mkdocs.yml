@@ -39,7 +39,6 @@ theme:
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.sections
-    - navigation.expand
     - navigation.path
     - navigation.top
     - navigation.footer
@@ -86,6 +85,12 @@ plugins:
       enable_creation_date: true
       type: timeago
 
+# Loads docs/repo-versions.json into config.extra so the per-page metadata
+# header (overrides/partials/doc-meta.html) can render the documented
+# component version server-side.
+hooks:
+  - hooks/repo_versions.py
+
 # Navigation structure
 nav:
   - Home: index.md
@@ -94,31 +99,45 @@ nav:
     - Overview: ronl-business-api/index.md
     - Features:
       - Overview: ronl-business-api/features/overview.md
-      - Multi-Tenant Municipality Portal: ronl-business-api/features/multi-tenant-portal.md
+      - Processes: ronl-business-api/features/processes.md
+      - Tasks: ronl-business-api/features/tasks.md
       - Authentication & IAM: ronl-business-api/features/authentication-iam.md
       - Business Rules Execution: ronl-business-api/features/business-rules-execution.md
       - Dynamic Forms: ronl-business-api/features/dynamic-forms.md
+      - Documents: ronl-business-api/features/documents.md
       - Regelcatalogus: ronl-business-api/features/regelcatalogus.md
       - Procesbibliotheek: ronl-business-api/features/procesbibliotheek.md
-      - Caseworker Dashboard: ronl-business-api/features/caseworker-dashboard.md
-      - Caseworker Dashboard (V2): en/ronl-business-api/features/caseworker-dashboard-v2.md
-      - Commercial Organisation Integration: en/ronl-business-api/features/commercial-org-integration.md
+      - Public Publication: ronl-business-api/features/public-publication.md
       - Timeline Navigation: ronl-business-api/features/timeline-navigation.md
+      - Notifications & Watches: ronl-business-api/features/notifications-and-watches.md
       - Security & Compliance: ronl-business-api/features/security-compliance.md
       - API Design: ronl-business-api/features/api-design.md
+      - Archive:
+        - Caseworker Dashboard: ronl-business-api/features/archive/caseworker-dashboard.md
+        - Caseworker Dashboard (V2): ronl-business-api/features/archive/caseworker-dashboard-v2.md
+        - Commercial Organisation Integration: ronl-business-api/features/archive/commercial-org-integration.md
+        - Multi-Tenant Municipality Portal: ronl-business-api/features/archive/multi-tenant-portal.md
     - User Guides:
-      - Logging In — Citizen & Caseworker: ronl-business-api/user-guide/login-flow.md
-      - Submitting an Application: ronl-business-api/user-guide/submitting-application.md
-      - Zorgtoeslag via Commercial Org: en/ronl-business-api/user-guide/zorgtoeslag-cross-org-journey.md
-      - Using Timeline Navigation: ronl-business-api/user-guide/timeline-navigation.md
-      - Caseworker Workflow: ronl-business-api/user-guide/caseworker-workflow.md
-      - HR Onboarding: ronl-business-api/user-guide/hr-onboarding.md
-      - RIP Phase 1 Workflow: ronl-business-api/user-guide/rip-phase1-workflow.md
-      - Adding a Municipality: ronl-business-api/user-guide/adding-municipality.md
-      - Multiple interacting rules example: ronl-business-api/user-guide/assessing-income-support-schemes.md
-      - PA-Cockpit Testen: ronl-business-api/user-guide/pa-cockpit-gebruikershandleiding.md
-      - Dossierbeheer Testhandleiding: ronl-business-api/user-guide/dossierbeheer-testhandleiding.md
-      - Capaciteitsclaim Testhandleiding: ronl-business-api/user-guide/capaciteitsclaim-testhandleiding.md
+      - Getting Started: ronl-business-api/user-guide/getting-started.md
+      - Caseworker: ronl-business-api/user-guide/caseworker.md
+      - PA-Cockpit: ronl-business-api/user-guide/pa-cockpit.md
+      - Infra-board: ronl-business-api/user-guide/infra-board.md
+      - Woo-dashboard: ronl-business-api/user-guide/woo-dashboard.md
+      - Public Site: ronl-business-api/user-guide/public-site.md
+      - Test guides:
+        - PA-Cockpit Testen: ronl-business-api/user-guide/test-guides/pa-cockpit-gebruikershandleiding.md
+        - Dossierbeheer Testhandleiding: ronl-business-api/user-guide/test-guides/dossierbeheer-testhandleiding.md
+        - Capaciteitsclaim Testhandleiding: ronl-business-api/user-guide/test-guides/capaciteitsclaim-testhandleiding.md
+      - Archive:
+        - Logging In — Citizen & Caseworker: ronl-business-api/user-guide/archive/login-flow.md
+        - Submitting an Application: ronl-business-api/user-guide/archive/submitting-application.md
+        - Zorgtoeslag via Commercial Org: ronl-business-api/user-guide/archive/zorgtoeslag-cross-org-journey.md
+        - Using Timeline Navigation: ronl-business-api/user-guide/archive/timeline-navigation.md
+        - Caseworker Workflow: ronl-business-api/user-guide/archive/caseworker-workflow.md
+        - HR Onboarding: ronl-business-api/user-guide/archive/hr-onboarding.md
+        - RIP Phase 1 Workflow: ronl-business-api/user-guide/archive/rip-phase1-workflow.md
+        - Adding a Municipality: ronl-business-api/user-guide/archive/adding-municipality.md
+        - Multiple interacting rules example: ronl-business-api/user-guide/archive/assessing-income-support-schemes.md
     - Developer Docs:
       - Local Development Setup: ronl-business-api/developer/local-development.md
       - Backend Development: ronl-business-api/developer/backend-development.md
@@ -148,16 +167,16 @@ nav:
         - PostgreSQL (Azure): ronl-business-api/developer/deployment/postgresql.md
         - PROD Deployment Notes - v2.9.1: ronl-business-api/developer/deployment/prod-deployment-v2.9.1.md
     - References:
-      - API Endpoints: ronl-business-api/references/api-endpoints.md
-      - BRP API Endpoints: ronl-business-api/references/brp-api-endpoints.md
-      - BPMN Design Criteria: ronl-business-api/references/bpmn-design-criteria.md
-      - Environment Variables: ronl-business-api/references/environment-variables.md
-      - JWT Claims: ronl-business-api/references/jwt-claims.md
-      - Keycloak Realm Configuration: ronl-business-api/references/keycloak-realm.md
-      - Keycloak Timeline Setup: ronl-business-api/references/keycloak-timeline-setup.md
-      - Municipality Themes: ronl-business-api/references/municipality-themes.md
-      - BRP Timeline Integration: ronl-business-api/references/brp-timeline-integration.md
-      - Standards & Compliance: ronl-business-api/references/standards-compliance.md
+      - API Endpoints: ronl-business-api/reference/api-endpoints.md
+      - BRP API Endpoints: ronl-business-api/reference/brp-api-endpoints.md
+      - BPMN Design Criteria: ronl-business-api/reference/bpmn-design-criteria.md
+      - Environment Variables: ronl-business-api/reference/environment-variables.md
+      - JWT Claims: ronl-business-api/reference/jwt-claims.md
+      - Keycloak Realm Configuration: ronl-business-api/reference/keycloak-realm.md
+      - Keycloak Timeline Setup: ronl-business-api/reference/keycloak-timeline-setup.md
+      - Municipality Themes: ronl-business-api/reference/municipality-themes.md
+      - BRP Timeline Integration: ronl-business-api/reference/brp-timeline-integration.md
+      - Standards & Compliance: ronl-business-api/reference/standards-compliance.md
   
   - 🖍️ Norm Editor:
     - Overview: norm-editor/index.md
@@ -217,10 +236,12 @@ nav:
       - CPRMV RuleSet Generation: cpsv-editor/developer/cprmv-dataset-generation.md
       - Deployment: cpsv-editor/developer/deployment.md
       - DMN Implementation: cpsv-editor/developer/dmn-implementation.md
+      - Cell-Level Legislative Grounding: cpsv-editor/developer/cell-level-grounding.md
       - TriplyDB Publish Implementation: cpsv-editor/developer/triplydb-publish-implementation.md
       - Vendor Tab Implementation: cpsv-editor/developer/vendor-tab-implementation.md
       - Vocabulary Configuration: cpsv-editor/developer/vocabulary-configuration.md
       - RONL Namespace Migration: cpsv-editor/developer/ronl-namespace-migration.md
+      - Testing: cpsv-editor/developer/testing.md
       - Changelog & Roadmap: cpsv-editor/developer/changelog-roadmap.md
     - References:
       - Namespace & Property Reference: cpsv-editor/reference/namespace-property-reference.md
@@ -288,6 +309,7 @@ nav:
         - Deployment: linked-data-explorer/developer/deployment.md
         - PostgreSQL Deployment: linked-data-explorer/developer/deployment-postgresql.md
         - Test Cases: linked-data-explorer/developer/test-cases.md
+        - Testing: linked-data-explorer/developer/testing.md
         - Changelog & Roadmap: linked-data-explorer/developer/changelog-roadmap.md
     - References:
         - Operaton DMN Compatibility: linked-data-explorer/reference/operaton-dmn-compatibility.md

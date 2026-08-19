@@ -1,0 +1,51 @@
+{#-
+  Per-page metadata header.
+
+  Rendered as the first element inside <article class="md-content__inner">,
+  which places it directly below the breadcrumb trail (partials/path.html
+  renders just outside the article). It carries the git created/updated
+  facts that Material normally prints at the *bottom* of the page via
+  partials/source-file.html, plus the documented version of the component
+  the page describes.
+
+  Only pages that declare a `component:` front-matter key reach this
+  partial — see the content block in main.html, which also suppresses the
+  bottom source-file aside for those pages so the facts move rather than
+  appear twice.
+
+  The component version comes from docs/repo-versions.json, loaded into
+  config.extra by hooks/repo_versions.py.
+-#}
+{% set repo = config.extra.repo_versions.get(page.meta.component) %}
+<aside class="doc-meta">
+  {% if page.meta.git_creation_date_localized %}
+    <span class="doc-meta__fact">
+      <span class="md-icon" title="{{ lang.t('source.file.date.created') }}">
+        {% include ".icons/material/clock-plus-outline.svg" %}
+      </span>
+      {{ page.meta.git_creation_date_localized }}
+    </span>
+  {% endif %}
+  {% if page.meta.git_revision_date_localized %}
+    <span class="doc-meta__fact">
+      <span class="md-icon" title="{{ lang.t('source.file.date.updated') }}">
+        {% include ".icons/material/clock-edit-outline.svg" %}
+      </span>
+      {{ page.meta.git_revision_date_localized }}
+    </span>
+  {% endif %}
+  {% if repo %}
+    <span class="doc-meta__fact doc-meta__version">
+      <span class="md-icon" title="Documented component version">
+        {% include ".icons/material/tag-outline.svg" %}
+      </span>
+      {{ repo.icon }}&nbsp;{{ repo.name }}
+      <code>{{ repo.version }}</code>
+      {%- if repo.environment %}
+        <span class="env-badge env-{{ repo.environment | lower }}">
+          {{- repo.environment | upper -}}
+        </span>
+      {%- endif %}
+    </span>
+  {% endif %}
+</aside>

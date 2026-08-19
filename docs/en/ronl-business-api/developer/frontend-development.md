@@ -115,7 +115,7 @@ if (authenticated) {
 
 **3. Caseworker dashboard (`/dashboard/caseworker` — V2 shell)**
 
-The caseworker portal. From v3.0.0 this route renders the V2 shell (`pages/CaseworkerDashboardV2.tsx`, with the "V2" suffix dropped after the Phase 3 file rename). The V1 page shell is retired; `/dashboard/caseworker/v2` redirects to the canonical route for one release. This route is **not wrapped in `ProtectedRoute`** — authentication is handled inside the component so public content (Nieuws, Berichten, Regelcatalogus, Procesbibliotheek) can render without a login. The component observes `keycloak.authenticated` on mount. The shell owns auth state, tenant theme, navigation state, and layout only; `SectionRouter` dispatches every section. See [Caseworker Dashboard (V2)](../features/caseworker-dashboard-v2.md).
+The caseworker portal. From v3.0.0 this route renders the V2 shell (`pages/CaseworkerDashboardV2.tsx`, with the "V2" suffix dropped after the Phase 3 file rename). The V1 page shell is retired; `/dashboard/caseworker/v2` redirects to the canonical route for one release. This route is **not wrapped in `ProtectedRoute`** — authentication is handled inside the component so public content (Nieuws, Berichten, Regelcatalogus, Procesbibliotheek) can render without a login. The component observes `keycloak.authenticated` on mount. The shell owns auth state, tenant theme, navigation state, and layout only; `SectionRouter` dispatches every section. See [Caseworker Dashboard (V2)](../features/archive/caseworker-dashboard-v2.md).
 ```typescript
 const [isAuthenticated] = useState(() => !!keycloak.authenticated);
 ```
@@ -465,7 +465,7 @@ On mount, fires two requests in parallel via `Promise.allSettled`:
 
 Caseworker-only fields are excluded from both rendering paths.
 
-See [Dynamic Forms — Decision Viewer](../features/dynamic-forms.md#decision-viewer-decisionviewer) for the feature description.
+See [Dynamic Forms — Document templates](../features/dynamic-forms.md#document-templates) for the feature description.
 
 ---
 
@@ -688,7 +688,7 @@ keycloak.onTokenExpired = () => console.log("Token expired");
 - [Local Development Setup](local-development.md) — Prerequisites and getting started
 - [Frontend Deployment](deployment/frontend.md) — Azure Static Web Apps deployment
 - [Keycloak Deployment](deployment/keycloak.md) — Custom theme setup
-- [Multi-Tenant Portal Features](../features/multi-tenant-portal.md) — Theming and tenant isolation
+- [Multi-Tenant Portal Features](../features/archive/multi-tenant-portal.md) — Theming and tenant isolation
 
 ---
 

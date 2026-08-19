@@ -4,20 +4,43 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
 ---
 
-!!! note "RONL Business API: only the Developer docs are current to v3.9.1"
-    A recent pass through the 28-version documentation gap (v3.0.8 → v3.9.1) reconciled only the [Developer](ronl-business-api/developer/changelog-roadmap.md) perspective. Of those 28 versions, just 8 carried developer-relevant content (architecture, backend/frontend internals, deployment, testing, MCP/AI-assistant config) — documented and cross-linked from the changelog. The other 20 shipped PA-Cockpit, Woo-dashboard, or Infra-board **feature** work with no developer-page target, and are **not yet reflected** in the Features, Reference, or User-guide sections for RONL Business API.
+## 📘 How this documentation is maintained
+
+Components differ in how fast they change, so they are documented to different depths.
+
+| Component | Cadence | User Guides |
+|---|---|---|
+| **RONL Business API** | Short-cycle, co-designed with users | Landing page and a brief page per board on ACC; full guides when a board reaches PROD |
+| **CPSV Editor** | Release-tagged | Full |
+| **Linked Data Explorer** | Release-tagged | Full |
+| **Norm Editor** | Release-tagged | Full |
+| **CPRMV API** | Spec-driven | Full |
+
+Features, Developer Docs and References follow the same pattern for every component.
+
+---
+
+## Documentation Status
+
+<div id="doc-status">
+  <div class="admonition info">
+    <p class="admonition-title">Loading documentation status…</p>
+  </div>
+</div>
+
+---
 
 ## 🆕 What's New
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v3.9.1** · *July 2026*
+-   **⚙️ RONL Business API — v2026.08.19** · *August 2026*
 
     ---
 
-    **eDOCS joins the AI Assistant as a fifth MCP source**
+    **A public knowledge base, a twelve-phase portfolio ladder, and tenant-scoping closed out**
 
-    A new [`edocs` MCP source](ronl-business-api/developer/mcp-ai-assistant.md#edocs-tools-edocs) lets the AI Assistant browse OpenText eDOCS workspaces and documents. Unlike every other source, it calls this backend's own `/v1/edocs/*` HTTP surface rather than the DM server directly, authenticating via a dedicated `edocs-mcp-client` — live-verified end-to-end against real eDOCS data.
+    A new [public site](ronl-business-api/user-guide/public-site.md) — a separate, auth-free package with federated search, a rule catalogue, a provenance explorer, prerendering, and axe-core accessibility scans — joins a twelve-phase RIP portfolio ladder with live phase-count and deployment-status APIs. Tenant-scoping was closed out across the platform, including a cross-tenant data leak fixed in two endpoints that queried Operaton with no tenant filter at all. A test-coverage campaign completed its final phases (P1–P11) alongside new Playwright E2E suites, and the project switched to CalVer versioning.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
@@ -31,23 +54,23 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v1.10.6** · *July 2026*
+-   **✏️ CPSV Editor — v2026.08.0** · *August 2026*
 
     ---
 
-    **CPRMV version selector & verified DMN test cases**
+    **Cell-level legislative grounding & backend-routed DMN calls**
 
-    Preview, export and publish now target a [selectable CPRMV vocabulary version](cpsv-editor/features/import-export.md#cprmv-vocabulary-version-041-032) — `0.4.1` (`cprmv:RuleSet`) or `0.3.2` (`cprmv:Dataset`) — with consolidation dates derived from the rules and collision-free rule URIs. DMN [test cases are now functionally verified](cpsv-editor/user-guide/dmn-testing.md): PASS/FAIL/ERROR/OK-unchecked verdicts with Expected-vs-Actual diffs, per-decision routing, and empty-result checks.
+    Legislation can now be linked at [decision-table cell granularity](cpsv-editor/developer/cell-level-grounding.md) — finer than DMN's decision-level `knowledgeSource` or CPRMV's rule-level `isBasedOn` — published as per-cell `cprmv:Rule` resources that validate clean against the CPRMV shapes. DMN deploy and evaluate now route through the Linked Data Explorer backend instead of the browser calling Operaton directly, and a [phased test suite](cpsv-editor/developer/testing.md) of 257 tests landed alongside the switch to CalVer versioning.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.9.11** · *July 2026*
+-   **🔍 Linked Data Explorer — v2026.08.2** · *August 2026*
 
     ---
 
-    **Board-owner deploys & a negotiable `/v1/norms` CPRMV version**
+    **DMN deploy/evaluate proxies, and ten validation rules that never ran**
 
-    The BPMN deploy modal now requires a [board owner](linked-data-explorer/user-guide/bpmn-modeler.md#deploying-to-operaton) — auto-detected from candidate groups, stamped as `camunda:property boardOwner`, and exposed via `/bundles/public`. The [`/v1/norms`](linked-data-explorer/developer/backend.md#norms) endpoint gained a `?cprmv_version=` selector (`0.3.0` default, `0.3.2`/`0.4.1` experimental) matching the CPSV Editor's export targets, and the CPRMV SHACL layer added the `ParameterWaarde`/`TemporalRule` shapes.
+    Two new backend routes — [`POST /v1/dmns/deploy` and `POST /v1/dmns/evaluate/:decisionKey`](linked-data-explorer/reference/api-reference.md#post-v1dmnsdeploy) — let the CPSV Editor reach Operaton without tripping CORS. A coverage campaign took the backend from 17% to 98% statements and uncovered that [`EXEC-002`–`EXEC-010` and `CON-001`–`CON-003` had never fired](linked-data-explorer/reference/dmn-validation-reference.md) for any DMN while reporting clean results. Organization is now mandatory at BPMN deploy, sent as Operaton's native tenant-id, and a [full test suite](linked-data-explorer/developer/testing.md) of 1702 tests landed alongside the switch to CalVer.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
@@ -147,16 +170,6 @@ Python/FastAPI service that fetches individual rules from Dutch and European leg
 **Live App**: [cprmv.open-regels.nl/docs](https://cprmv.open-regels.nl/docs)  
 
 [View Documentation →](cprmv-api/index.md){ .md-button }
-
----
-
-## Documentation Status
-
-<div id="doc-status">
-  <div class="admonition info">
-    <p class="admonition-title">Loading documentation status…</p>
-  </div>
-</div>
 
 ---
 

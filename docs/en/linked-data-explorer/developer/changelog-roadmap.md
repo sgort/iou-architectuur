@@ -1,8 +1,107 @@
+---
+component: Linked Data Explorer
+---
+
 # Changelog & Roadmap
 
 ---
 
 ## Changelog
+
+### v2026.08.2 — DMN deploy/evaluate proxies & ten dead validation rules (August 2026)
+
+**v2026.08.2 — Feature & Patch (August 18, 2026)**
+
+- **`POST /v1/dmns/deploy`** deploys raw DMN XML ad hoc, without requiring a pre-registered LDE norm identifier — built for the CPSV Editor's DMN tab, which holds an uploaded or generated file with no registry entry of its own. A thin wrapper around the proven `operatonService.deployDrd()`.
+- **`POST /v1/dmns/evaluate/:decisionKey`** proxies an evaluate call server-side. Both routes exist for the same reason: the CPSV Editor called Operaton directly from the browser, which CORS blocks for a local dev origin. The evaluate proxy forwards Operaton's response **byte-for-byte and status-for-status** — the raw success array or exception object, *not* the usual `{success, data, error}` envelope — because the DMN tab reads Operaton's own JSON. A new `evaluateRaw()` passes variables straight through, skipping the type inference `evaluateDecision()` does for its different caller contract, which would otherwise double-wrap an already Operaton-shaped body. See [API Reference](../reference/api-reference.md#post-v1dmnsdeploy) and the CPSV Editor's [DMN Implementation](../../cpsv-editor/developer/dmn-implementation.md#operaton-calls-go-through-the-backend-v2026080).
+- **Ten CPRMV validation rules were dead code and had been since the file was written.** `cprmvAttr()`'s primary lookup called `el.attr({ name, ns })`, which in libxmljs2 0.37 is the *setter* overload, not a namespaced getter: it sets attributes literally named `name` and `ns` on the element and returns a value with no `.value()`, so the call threw. The function's own `try`/`catch` swallowed the throw and returned `null`, so the working `attrs()` fallback beneath it was never reached. `EXEC-002`–`EXEC-010` and `CON-001`–`CON-003` therefore **never fired for any DMN, while the validator reported a clean result** — and every inspected element was mutated with two junk attributes. Dropping the object-form fast path is the whole fix. See [DMN Validation Reference](../reference/dmn-validation-reference.md).
+- `CPRMV_NS` was additionally hardcoded to the legacy `cprmv.open-regels.nl/0.3.0/` namespace, so a DMN using the current `standaarden.open-regels.nl/standards/cprmv/0.4.1#` namespace short-circuited on an `EXEC-001` *"CPRMV not declared"* before reaching any check. `CPRMV_NAMESPACES` now accepts both.
+- New **`EXEC-011`/`EXEC-012`** validate cell-level `dct:source` / `cprmv:isBasedOn` format on grounded DMN cells — the [cell-level grounding](../../cpsv-editor/developer/cell-level-grounding.md) the CPSV Editor now emits — and **`EXEC-013`** closes a pre-existing gap where `cprmv:extends`' format was never checked at all.
+- `INT-007` false-positive fix: `FEEL_RESERVED` carried the singular `year`/`month`/`day`/… for the single-word built-ins but not the plural `years`/`months`, which are the leading words of the `years and months duration(...)` built-in's own name. Those words aren't preceded by a dot, so only the reserved-word check catches them. Reproduced live against `HvA_full_dmn_export-patched.dmn`: 12 warnings across 6 decisions, all false positives from this one construct.
+- **BPMN shell/subprocess matching now keys on `shellId`, not `bpmnProcessId` alone.** Once a shell is deliberately duplicated — an e2e-fixtures copy keeps the same `bpmn:process` id, since that is the real production Operaton key — the catalog rendered every subprocess under *every* shell sharing that id. `shellId` (the parent shell's own local record id) is now stored alongside `calledElement`, with a fallback to the old match for records saved earlier.
+- That fix did not survive a remount until the data actually reached the database: `hydrateFromServer()` treats the Postgres list as authoritative and replaces local state on every `BpmnModeler` mount. `process_definitions.status` had `CHECK (status IN ('example','wip'))` with no `'e2e'`, so saving an e2e process violated the constraint and failed **silently** (`fetch()` does not reject on non-2xx), and `shell_id` was not in the schema, upsert or list query at all. Adds `shell_id` (additive, idempotent) and widens the `status` CHECK.
+- New **E2E status badge** for imported e2e-fixtures forms and documents, detected at import from a self-describing marker in each fixture. A shared `StatusBadge` component replaces three near-identical inline badge blocks across `ProcessList`, `FormList` and `DocumentList`. The badge is orange — indigo read too close to EXAMPLE's blue.
+- Seed versions bumped for `example_tree_felling`, `example_zorgtoeslag_provisional` and `example_zorgtoeslag_final` so existing users' copies actually receive `shellId`; without the `EXAMPLE_VERSIONS` bump, `seed()` skipped re-saving them and both stores kept the `shellId`-less copy.
+- **Backend statement coverage raised from 16.79% to 98.06%** (branches 18.10% → 89.18%) by adding 31 test files and extending 3, with no production code changed. This is the campaign that *found* the `cprmvAttr()` defect above — documented first as a testing-scope decision, fixed two commits later. Line endings normalised to LF via `.gitattributes`, closing a loop where a Windows checkout produced CRLF files that `format:check` rejected and Git kept renormalising back. See [Testing](testing.md).
+
+**Files:** `packages/backend/src/routes` (`/v1/dmns`), `packages/backend/src/services` (`operaton.service.ts`, `dmn-validation.service.ts`), `packages/backend/src/db`, `packages/frontend/src/components` (`BpmnModeler`, `StatusBadge`)
+
+---
+
+### v2026.08.1 — Mandatory deploy organization & the e2e-fixtures bundle (August 2026)
+
+**v2026.08.1 — Feature (August 14, 2026)**
+
+- **Organization is now mandatory when deploying a BPMN process.** The Deploy action will not submit without one, and sends it to Operaton as its native tenant-id (`POST /deployment/create`'s `tenant-id` field) — closing the gap where a process could deploy with no tenant-id at all, invisible to any tenant-scoped lookup an application later makes against it.
+- **Shared DMN decisions resolve as untenanted from tenant-scoped business-rule-tasks.** Confirmed empirically against a live Operaton instance: a business-rule-task's `camunda:decisionRef` resolves against a decision definition under the *exact same* tenant-id as the calling process instance, with **no fallback** to a shared untenanted decision even when one exists. `camunda:decisionRefTenantId` can override this, but only as an EL expression evaluating to null (`${null}`) — a literal empty string is silently ignored. Applied to all 7 business-rule-tasks across the 4 fixture BPMNs that reference genuinely tenant-agnostic regulatory logic.
+- A new `e2e-fixtures/<tenant>/` directory with a `manifest.json` and an integrity test becomes the single source of truth for the RONL Business API's E2E suite, replacing two pre-existing and already-diverged "examples" locations.
+- The e2e sub-processes were renamed (`TreeFellingPermitSubProcessE2E`, `ZorgtoeslagProvisionalSubProcessE2E`) so LDE's own catalog stops conflating the fixture copy with the seeded-example copy of the same sub-process — previously both shared a `bpmn:process` id, so importing the fixture could silently reuse the example's stale content.
+- Fixed a fixture that Operaton's BPMN parser rejected (`ENGINE-09005`): a `textAnnotation`/`association` pair immediately preceding the file's first `businessRuleTask`. Every other fixture has a `scriptTask` in that position, which validates fine, so this adjacency had never been parsed for real. Moving the annotation to the end of the process body is also the more conventional placement.
+- Fixed a copy-pasted `processKey` on the Zorgtoeslag provisional document template, and nested each sub-process fixture under its shell's `subProcesses` array rather than listing it as a flat sibling.
+
+**Files:** `packages/frontend/src/components/BpmnModeler`, `e2e-fixtures/`
+
+---
+
+### v2026.08.0 — Ede and Gelderland location presets (August 2026)
+
+**v2026.08.0 — Feature (August 6, 2026)**
+
+- The DSO Viewer's Activities tab gains the municipality of **Ede** and the province of **Gelderland** alongside the existing Lelystad and Flevoland presets. One array drives both the location filter buttons and the authority-name lookup used when importing forms, so no other change was needed.
+- OINs were sourced from overheid.nl's Identificatiecodes records and cross-checked structurally — each OIN embeds the organisation's own RSIN, and both new values follow the same `00000001<RSIN>000` pattern as the existing entries.
+
+**Files:** `packages/frontend/src/components/DsoExplorer`
+
+---
+
+### v2026.07.1 — DMN validator: missing-id deploy failures and FEEL false positives (July 2026)
+
+**v2026.07.1 — Patch (July 23, 2026)**
+
+- Adds **`BIZ-010` through `BIZ-014`**, flagging `<input>`, `<output>`, `<rule>`, `<inputEntry>` and `<outputEntry>` elements missing the `id` attribute as **errors**. Operaton's DMN transformer requires `id` on these decision-table clause elements even though the DMN 1.3 XSD marks it optional, and rejects such files with `DMN-02011` at deploy time — a class of failure this validator previously reported as fully valid.
+- Fixes two `INT-007` false-positive sources. FEEL names may legally contain spaces, and a bare `<inputExpression>` that is itself one multi-word declared name was being shredded word-by-word by the identifier tokenizer, with every word flagged as an unresolved variable; a whole-string match against declared and produced names is now tried first, falling back to tokenization. Separately, `FEEL_RESERVED` was missing the single-word FEEL date/time component functions (`year`, `month`, `day`, `hour`, `minute`, `second`), so a `year(...)` call flagged `year` itself as unresolved.
+- Found while debugging an Amsterdam DMN's Operaton deploy failure in the CPSV Editor repository; together the fixes cut that file's Interaction Rules warnings from **83 to 12**. The residual 12 — multi-word names embedded inside compound expressions, plus one likely real DRD-wiring gap in the source — are documented as open issues rather than fixed, since closing them properly needs a materially larger longest-match tokenizer change.
+
+**Files:** `packages/backend/src/services/dmn-validation.service.ts`
+
+---
+
+### v2026.07.0 — Test suite (P0–P6.8), CalVer, and a coverage baseline (July 2026)
+
+**v2026.07.0 — Infrastructure (July 22, 2026)**
+
+- A phased test suite lands across both packages, taking the repository from **zero test files** — `npm test` exited 1 with *"No tests found"* — to full-stack coverage. Backend P0–P3 covered utilities, errors and middleware, the ropa/vendor/assets services, and the five smallest routes with supertest. Frontend P4–P6.8 bootstrapped Vitest and covered pure-logic utils, the 11-module service layer with `msw`, then every component directory in coupling-severity order: no third-party coupling first, then `@dnd-kit`, then one embedded editor library, then two, with the top-level integration components last. See [Testing](testing.md).
+- **P7 measured real coverage and deliberately deferred CI wiring.** At the time: 109 backend tests at 13.82% statements, against 557 frontend tests at 74.03%. No CI test step was added to the Azure workflows, blocking or non-blocking, because the backend gap was *breadth* — whole route and service files never touched — rather than depth. The condition for revisiting it is recorded: once backend breadth improves, or the team accepts breadth alone as a gate. (Backend breadth was subsequently closed in v2026.08.2; the CI step remains deferred.)
+- Two real pre-existing tooling gaps surfaced and were fixed, both latent only because the repository had no test files: `tsconfig.eslint.json` extended `tsconfig.json` without overriding its `exclude` of `**/*.test.ts`, so ESLint's type-aware parser could not see any test file; and `.gitignore`'s blanket `*.js` rule, meant for compiled output, silently blocked `jest.config.js` from ever being tracked.
+- **Release versions switch to CalVer** (`YYYY.MM.patch`), matching the CPSV Editor. The sequence is product-wide rather than per-scope, so a backend-only and a frontend-only release still share the next number. Historical SemVer entries are left as they are.
+- Local development now points at the `ronl-operaton` container from the RONL Business API stack (`localhost:8081`) instead of the remote instance, and `docker:check` verifies it alongside `ronl-postgres`.
+
+**Files:** `packages/backend` (Jest), `packages/frontend` (Vitest, RTL, msw), root `package.json`
+
+---
+
+### v1.9.13 — Per-commit changelog format (July 2026)
+
+**v1.9.13 — Enhancement (July 22, 2026)**
+
+- The in-app Changelog renders `"format": "commits"` entries — an icon-and-colour header per commit, an sha/author trailer, a scope badge and an Upcoming/Released status badge — alongside the existing `"sections"` shape, adopting the same convention as the RONL Business API and the CPSV Editor. Legacy entries render exactly as before.
+- A repo-local release command is now tracked with the repository, tailored to this real npm-workspaces monorepo: frontend/backend scope, no endpoint-map reconciliation step (the route registry is already a self-maintaining single source of truth), and a note that `packages/ropa-site` has no `package.json` and is never version-bumped even though it deploys via its own path filter.
+
+**Files:** `packages/frontend/src/components/Changelog.tsx`
+
+---
+
+### v1.9.12 — Query library resolves CPRMV 0.4.1 datasets (July 2026)
+
+**v1.9.12 — Patch (July 9, 2026)**
+
+- *Rules with Their Services*, *Count Rules per Service* and *Services with All Their Rules (Detailed)* joined `?rule cpsv:implements ?service` directly. Since the CPSV-AP RuleShape change, a `cpsv:Rule`'s `cpsv:implements` points at an `eli:LegalResource` — the resource the service declares via `cv:hasLegalResource` — so datasets published in the newer shape returned **no rules at all**. The queries now UNION over both link paths.
+- *NL-SBB Concepts and Services* broke at the variable-to-DMN hop: a concept's `dct:subject` points at a bare DMN variable URI (`<dmnUri>/input/N`) that newer exports emit without a `cpsv:isRequiredBy` / `cpsv:produces` edge, so the concept could not reach its DMN or service. The query keeps the explicit edge for older data and, when absent, derives the DMN URI from the variable URI.
+- Auto-generated DMN decision rules (placeholder *"Decision rule &lt;id&gt;"* titles) are filtered out of rule listings, and `SELECT DISTINCT` de-duplicates. For the Flevoland Thuisbatterij dataset this surfaces its 3 business rules — previously hidden entirely — and 21 concepts, while dropping roughly 60 placeholder rows across the catalogue.
+
+**Files:** `packages/frontend/src/utils` (sample query library)
+
+---
 
 ### v1.9.11 — Board-owner deploy fix & Operaton error surfacing (July 2026)
 

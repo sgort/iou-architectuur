@@ -1,161 +1,45 @@
-## Overview
+---
+component: RONL Business API
+---
 
-The Timeline Navigation feature allows citizens to view their personal data at any point in time - past, present, or future. This enables "what if" scenario planning for life events and helps citizens understand how their circumstances affect eligibility for government services.
+# Timeline Navigation
 
-<figure markdown style="width:100%; margin:0;">
-  ![Timeline showing Wessel Kooyman on marriage date](../../../assets/screenshots/ronl-timeline-getrouwd.png)
-  <figcaption>Example dashboard MijnOmgeving Timeline showing Wessel Kooyman on marriage date</figcaption>
-</figure>
+**Timeline navigation** presents a person's own record along a time axis rather than as a single, present-day snapshot: a point in time is selected, and the data shown updates to reflect what the record looked like — or would look like — as of that date.
 
 ---
 
-## What It Does
+## What a timeline presents
 
-The timeline provides:
-
-1. **Historical View** - See how your personal data looked at any date since birth
-2. **Event Markers** - Visual indicators for major life events (birth, marriage, children)
-3. **Dynamic Data** - Person, partner, and children information updates based on selected date
-4. **Future Scenarios** - Select future dates to plan for upcoming life changes
-5. **Interactive Navigation** - Drag slider or click event buttons to jump to specific dates
+A timeline draws on a personal-records source — currently the BRP (Basisregistratie Personen), the municipal register of personal data — and presents the caller's own information, partner, and any children as of the selected date. Nothing about this view is stored separately per date: each time the selected date changes, the displayed state is derived again from the underlying record and its own dated fields, such as a marriage date or a date of birth, rather than read from a saved historical copy.
 
 ---
 
-## User Flow
+## Selecting a point in time
 
-### Accessing the Timeline
-
-1. **Login** to MijnOmgeving using DigiD
-2. Navigate to **Dashboard**
-3. Click **"📅 Toon Tijdlijn"** button
-4. Timeline loads with your life events from BRP data
-
-### Using the Timeline
-
-**Navigation Methods:**
-
-- **Drag the slider** - Smooth navigation through time
-- **Click year markers** - Jump to a specific year (1980, 1985, 1990...)
-- **Click event buttons** - Jump directly to major life events
-  - Vandaag (Today)
-  - Geboren (Birth)
-  - Getrouwd (Marriage)
-  - Kinderen geboren (Children born)
-
-**What You See:**
-
-- **Top Panel** - Interactive timeline with current date display
-- **Left Panel** - Personal data that updates as you change the date:
-  - Your information (name, BSN, age, birthplace)
-  - Partner information (appears after marriage date)
-  - Children information (appears after birth dates, ages update)
-- **Right Panel** - Placeholder for products and services (future functionality)
-
-### Example Scenarios
-
-#### Viewing Past Data
-
-**"What did my household look like in 2005?"**
-
-1. Drag slider to 2005 or click near 2005 on timeline
-2. See your age at that time (25 years old)
-3. See partner information (married since 2002)
-4. See children information (triplets age 2 years old)
-
-#### Planning Future Changes
-
-**"What if I have another child in 2027?"**
-
-1. Select a date in 2027
-2. See current household composition
-3. (Future) Compare eligibility for toeslagen with/without additional child
-4. (Future) See how income requirements change
+A point in time can be reached by moving continuously along the timeline or by jumping directly to a marker. The range is not limited to the present or the past: a date can also be selected ahead of today, within a bounded window, to see how the record would present if nothing about it changes before then.
 
 ---
 
-## "What If" Scenario Planning (Vision)
+## Event markers
 
-The right panel will eventually support:
-
-- **Add Life Events** - Simulate birth, marriage, divorce, moving
-- **Compare Scenarios** - Side-by-side comparison of benefits
-- **Historical Applications** - See past zorgtoeslag calculations
-- **Service Matching** - Automatically show eligible services for that time period
-- **Impact Analysis** - Understand how life changes affect your benefits
-
-### Use Cases
-
-**Financial Planning:**
-
-- "How would my zorgtoeslag change if I get divorced?"
-- "What benefits am I eligible for if I have another child?"
-
-**Retroactive Understanding:**
-
-- "Was my zorgtoeslag calculation correct in 2020?"
-- "What services was I eligible for when my children were born?"
-
-**Future Preparation:**
-
-- "When will my child turn 18 and how does that affect my benefits?"
-- "What happens to my toeslagen when I retire?"
+A timeline surfaces markers for the dates on which something in the record changed — a birth, a marriage — detected automatically from the record's own dated fields rather than entered separately. Selecting a marker jumps straight to that date.
 
 ---
 
-## Data Sources
+## What changes when the date changes
 
-The timeline integrates with:
-
-1. **BRP (Basisregistratie Personen)**
-   - Municipal Personal Records Database
-   - Current personal data
-   - Partner information
-   - Children information
-   - Birth dates and relationships
-
-2. **(Future) Verblijfplaatshistorie** - Address history
-3. **(Future) Stored Applications** - Historical zorgtoeslag calculations
+Moving the selected date can add or remove sections from view and recompute the values within them: a partner appears only once the record's marriage date has passed; a child appears only once their birth date has passed; an age is computed relative to the selected date rather than to today. The mechanism is the same as ordinary filtering and derivation — nothing is precomputed or cached per date.
 
 ---
 
-## Privacy & Security
+## Access and privacy
 
-- **Authentication Required** - DigiD login with LoA "hoog"
-- **Personal Data Only** - You can only view your own timeline
-- **Audit Logging** - All timeline access is logged for compliance
-- **No Data Storage** - Timeline calculations are done in real-time
+Viewing a timeline requires authentication, and a caller can only view their own record — never another person's. Reaching this level of assurance is required the same way described in [Authentication & IAM](authentication-iam.md). Every access to timeline data is logged, consistent with the audit trail described in [Security & Compliance](security-compliance.md).
 
 ---
 
-## Technical Notes
+## Related
 
-- Timeline range: Birth date - 2 years to Current date + 10 years
-- Event detection: Automatic from BRP data (marriage, children)
-- Age calculations: Dynamic based on selected date
-- Section visibility: Partner/children sections only appear after relevant dates
-
----
-
-## Current Limitations
-
-- Only test data available (Wessel Kooyman, BSN: 999992235)
-- No address history yet
-- No historical application data
-- No actual "what if" simulation yet
-- Single persona across all municipalities
-
----
-
-## Timeline View - Current date
-<figure markdown style="width:100%; margin:0;">
-  ![Timeline showing Wessel Kooyman with partner and children](../../../assets/screenshots/ronl-timeline-view-current-date.png)
-  <figcaption>Example dashboard MijnOmgeving Timeline showing Wessel Kooyman with partner and children</figcaption>
-</figure>
-
----
-
-## Related Documentation
-
-- [BRP API Integration](../references/brp-timeline-integration.md)
-- [Developer Guide](../developer/implementing-timeline.md)
-- [API Reference](../references/brp-api-endpoints.md)
+- [Authentication & IAM](authentication-iam.md) — the assurance level required to reach a personal record
+- [Security & Compliance](security-compliance.md) — the audit trail timeline access is recorded in
+- [Documents](documents.md) — the other way a case's accumulated data is presented

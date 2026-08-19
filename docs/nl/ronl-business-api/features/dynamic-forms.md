@@ -11,29 +11,28 @@
 
 ---
 
-## De drie AWB Kapvergunning-formulieren
+## Authoring and deployment
 
 ---
 
-## BPMN-koppeling
+## Binding
 
 ---
 
-## Implementatie
+## Fetching a schema
 
 ---
 
-## Runtime-weergave
-
-### Startformulier burger — `ProcessStartFormViewer`
-
-### Taakformulieren medewerker — `TaskFormViewer`
-
-### Beslissings-document viewer — `DecisionViewer`
+## Rendering
 
 ---
 
-## API-eindpunten
+## Submitting
+
 ---
 
-## Gerelateerde documentatie
+## Document templates
+
+---
+
+## Related

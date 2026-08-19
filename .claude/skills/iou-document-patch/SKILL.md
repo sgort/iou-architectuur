@@ -29,12 +29,16 @@ adapt the paths — the same staging applies.
 | Four perspectives (NL) | `docs/nl/cpsv-editor/{developer,features,reference,user-guide}/*.md` |
 | Home "What's New" card | `docs/en/index.md` (and `docs/nl/index.md`) — CPSV Editor grid card |
 | Screenshots referenced by docs | `../../assets/screenshots/cpsv-editor-*.png` → real files in `docs/assets/screenshots/` (language-neutral, served at site root) |
+| Testing page | `docs/en/<component>/developer/testing.md` — the site is the **single source of truth** for test docs (see Stage 2d) |
+| Per-page metadata header | `component:` front matter on every edited/added page (see below) |
 
 ### Known components beyond CPSV Editor
 
 | Component | Source repo | Changelog | Notes |
 |---|---|---|---|
-| **Norm Editor** | not a sibling repo — ask the user for its path (seen at `/home/steven/Development/editor`) | `gui/public/changelog.json`, schema **`{versions: {<service>: <semver>, ...}, releases: [{version, date, changes: {<conventional-commit-type>: [commit, ...]}, commits: [...]}]}`** — git-log-derived, not curated. `version-gap.py` auto-detects this shape (a `releases` array) vs. the curated `versions` array and normalizes both to the same `sections`/`items` shape; it also drops the synthetic `"Unreleased"` pseudo-version. Pass `--changelog <path> --component "Norm Editor"` explicitly. | No `developer/changelog-roadmap.md` existed before the 2026.07.0 sync (create it + add the mkdocs.yml nav entry — don't assume the page is there). Docs currently have **zero** screenshots — don't force a manifest entry for that reason alone. `docs/nl/index.md` is a placeholder with no "What's New" section to mirror at all — check before assuming both `docs/en/index.md` and `docs/nl/index.md` need the card edit. Because the first tag can land long after the code it covers, don't backfill version numbers onto pre-existing features you can't date — only claim what genuinely changed inside the tagged commit range. |
+| **Norm Editor** | sibling repo **`../editor`** (confirmed on the Windows workstation at `C:\Users\gorts01\Development\editor`; also seen at `/home/steven/Development/editor` on Linux) | `gui/public/changelog.json`, schema **`{versions: {<service>: <semver>, ...}, releases: [{version, date, changes: {<conventional-commit-type>: [commit, ...]}, commits: [...]}]}`** — git-log-derived, not curated. `version-gap.py` auto-detects this shape (a `releases` array) vs. the curated `versions` array and normalizes both to the same `sections`/`items` shape; it also drops the synthetic `"Unreleased"` pseudo-version. Pass `--changelog <path> --component "Norm Editor"` explicitly. | No `developer/changelog-roadmap.md` existed before the 2026.07.0 sync (create it + add the mkdocs.yml nav entry — don't assume the page is there). Docs currently have **zero** screenshots — don't force a manifest entry for that reason alone. `docs/nl/index.md` is a placeholder with no "What's New" section to mirror at all — check before assuming both `docs/en/index.md` and `docs/nl/index.md` need the card edit. Because the first tag can land long after the code it covers, don't backfill version numbers onto pre-existing features you can't date — only claim what genuinely changed inside the tagged commit range. |
+| **Linked Data Explorer** | sibling repo `../linked-data-explorer` | `packages/frontend/src/changelog.json` — a dict with a **`versions`** array, same curated `format: "commits"` shape as the CPSV Editor, plus a per-entry `scope` field (`frontend` / `backend` / `both`, absent on most). **`version-gap.py` works against it unmodified** — pass `--changelog ../linked-data-explorer/packages/frontend/src/changelog.json --component "Linked Data Explorer"`. | Versions switched from SemVer to CalVer mid-history (…, 1.9.12, 1.9.13, 2026.07.0, …), so an ordered gap can span both schemes — the same transition the CPSV Editor made. `repo-versions.json` and the roadmap headings carry a `v` prefix; the changelog does not. **i18n differs from the CPSV Editor**: all 60 EN pages have an NL counterpart, and **three are real translations** — `developer/backend.md`, `reference/api-stability.md`, `user-guide/multilingualism.md` — so check each NL page before assuming it is a placeholder. A screenshot manifest already exists at `screenshot-manifest/linked-data-explorer-screenshots-todo.md`. There is no `developer/testing.md` yet (note `developer/test-cases.md` is a *feature* doc, not the test-suite page). |
+| **RONL Business API** | sibling repo `../ronl-business-api` | `packages/frontend/src/pages/changelog-data.ts` — a **TypeScript file**, not JSON: unquoted object keys, mixed single/double-quoted strings, trailing commas, and a `ChangelogItem = string \| FeedbackItem` union mixed into `items` arrays. `version-gap.py`'s `json.loads()` cannot parse it directly, and no safe regex conversion exists (a colon inside changelog prose would get mangled by a naive `key:` → `"key":` transform). **Do not run `version-gap.py` against this component** — manually read the `versions` array in `changelog-data.ts` and compare against `repo-versions.json`'s `"RONL Business API"` entry / the top heading in `developer/changelog-roadmap.md` to compute the gap, until a Node-based `.ts`→JSON shim is built for it. | Version strings carry a `v` prefix in `repo-versions.json` and `changelog-roadmap.md` headings (`v3.9.1`) but not in `changelog-data.ts` itself (`'3.9.1'`) — normalize before comparing. **Documentation convention for User Guides**: pages are **ACC-brief / PROD-full** — a page's depth follows the release maturity of what it documents, not a fixed template. The current set is Getting Started, four board pages (Caseworker, PA-Cockpit, Infra-board, Woo-dashboard), and Public Site. `user-guide/test-guides/` holds live Dutch test scripts that are **maintained, not archived** — never give them the archive banner or treat them as frozen. Promoting a board from ACC to PROD is the trigger to expand its brief page into a full guide. |
 
 ### i18n rule (do not violate)
 
@@ -46,11 +50,67 @@ are placeholders** (an "Documentatie in ontwikkeling" admonition + mirrored empt
 
 Consequences for this skill:
 - Write substantive content in the **EN** page.
-- Update the **NL** page only when it is a real translation (currently just
-  `due-diligence.md`), or when its mirrored section headers must change to match
-  a restructured EN page.
+- Update the **NL** page only when it is a real translation, or when its
+  mirrored section headers must change to match a restructured EN page.
+- **Which NL pages are real differs per component.** For the CPSV Editor it is
+  only `developer/due-diligence.md`; the Linked Data Explorer has three (see the
+  Known components table). Check before assuming — the reliable test is whether
+  the page contains the "Documentatie in ontwikkeling" admonition:
+
+  ```
+  grep -L "Documentatie in ontwikkeling" docs/nl/<component>/**/*.md
+  ```
 - The **What's New** card exists in both `docs/en/index.md` and
   `docs/nl/index.md` — update both.
+
+### Archived pages are frozen (do not violate)
+
+`docs/{en,nl}/<component>/user-guide/archive/**` is **never edited by a sync** —
+not reworded, not version-stamped, not given a new or altered metadata header, not relinked.
+Archived pages describe an older release on purpose; "updating" one destroys the
+only record of how the product behaved then.
+
+If a sync's content belongs on an archived topic, write it on the current page
+instead. The archive only ever grows: pages enter it when a restructure retires
+them, and never leave.
+
+This freeze governs *content*, not the mechanical link repair a move itself
+makes necessary. When pages are moved into `archive/`, their relative links and
+image paths have to be re-depthed or they resolve nowhere — that repair is a
+consequence of the move, not a sync touching frozen content. A link that
+resolves nowhere after a move is **broken**, not frozen; fix it. Rewording the
+prose it sits in, or adding a version stamp, is not.
+
+### Per-page metadata header (every page you touch)
+
+Pages opt into a metadata header — rendered directly below the breadcrumbs,
+carrying the git created/updated dates and the component's documented version
+— by declaring the component name in YAML front matter:
+
+```yaml
+---
+component: CPSV Editor
+---
+```
+
+The name must match a `name` in `docs/repo-versions.json` exactly.
+
+**Add this front matter to every page this patch edits or creates**, EN and NL
+alike, including placeholders. It is deliberately opt-in: untouched pages keep
+Material's default rendering, with the dates at the bottom of the page. Over
+successive syncs the header spreads only as far as pages actually get revised.
+
+Supporting infrastructure (already in place — do not rebuild it):
+
+| File | Role |
+|---|---|
+| `hooks/repo_versions.py` | `on_config` hook loading `repo-versions.json` into `config.extra.repo_versions` |
+| `overrides/partials/doc-meta.html` | Renders the header |
+| `overrides/main.html` | `content` block override — renders the header first, suppresses the bottom `source-file.html` for opted-in pages |
+| `docs/stylesheets/extra.css` | `.doc-meta*` rules |
+
+The `content` block mirrors Material's own `partials/content.html`. If a
+Material upgrade changes that file, re-check the override.
 
 ---
 
@@ -201,6 +261,55 @@ command; `docs_built` = today; keep the existing environment/repo_url base) and
 ask the user to confirm each field. The user is the authority on version,
 environment, and the exact commit that was deployed.
 
+### Stage 2d — Testing documentation
+
+**Every component gets a `developer/testing.md` page.** A great deal of work
+has gone into test coverage across these repositories, and the documentation
+site is the **single source of truth** for it: repo-side test docs
+(`docs/TESTS.md`, `docs/TESTING-GUIDE.md` and equivalents) are being retired.
+
+Consequences:
+
+- **Write the page self-contained.** Do not cross-link repo-side test docs as
+  the authority, and do not send readers there for detail — they are going
+  away. Fold in what is worth keeping.
+- **Do not update the repo's own test docs.** They are out of scope.
+
+!!! danger "Run every command; never copy figures from repo docs"
+    Repo-side test docs drift badly — in the CPSV Editor sync they understated
+    one file by 9 tests, omitted a whole 12-test suite, and claimed no coverage
+    report existed. **Every number on the page must come from a command you
+    actually ran in this session.**
+
+    1. Run the full suite (e.g. `npm run test:ci`) and record suites, tests,
+       pass/fail, and wall-clock time.
+    2. Run **each** scoped/phase script individually and record its counts —
+       this also proves the script works and its pattern still matches.
+    3. Get authoritative per-file counts from the runner's own JSON reporter
+       (e.g. `--json --outputFile=…`), not by grepping for `it(`, which
+       miscounts multi-line and parameterised cases.
+    4. Capture the coverage table if the runner produces one.
+    5. Run the lint/format commands too, and read the git hooks
+       (`.husky/*`) to state exactly what is gated — say so plainly if the
+       hooks do **not** run the tests.
+
+    State the version and date the figures were measured against, so a future
+    reader knows how stale they are.
+
+Page structure that worked well:
+
+| Section | Contents |
+|---|---|
+| At a glance | Suites, tests, pass state, runtime |
+| Running the tests | Every command in a table with its measured counts, plus copyable examples and any gotchas (watch mode not exiting, coverage pinning) |
+| Linting, formatting, git hooks | What each does and what is actually gated |
+| Test inventory | Per-file: count, mocking style, what it covers — grouped by layer/phase |
+| Coverage | Measured percentages by area and per module, with an honest reading of what the headline number means |
+| Defects the tests found | Real bugs surfaced by writing them |
+| Documented behaviour | Couplings locked in by assertions rather than silently patched |
+| Adding tests | Conventions — colocation, splitting, phase scripts, where to mock |
+| Roadmap | Remaining phases and what is deliberately out of scope |
+
 ---
 
 ## Stage 3 — Apply (only after approval)
@@ -229,9 +338,17 @@ Work in this order so a failure leaves the docs in an obvious half-state:
 5. **NL pages** — for real translations (`due-diligence.md`) apply the
    corresponding edit; for placeholders, only sync mirrored section headers if
    the EN page structure changed.
-6. **`screenshot-manifest/<component-slug>-screenshots-todo.md`** — write the
+6. **`developer/testing.md`** — create or refresh it from the figures measured
+   in Stage 2d, and add a `mkdocs.yml` nav entry plus an NL placeholder if the
+   page is new. Update any page that repeats a now-stale testing claim — the
+   due-diligence review in particular tends to carry a "no automated tests"
+   assessment that a coverage push invalidates.
+7. **Front matter** — add `component: <Name>` to **every** page created or
+   edited in this patch, EN and NL, placeholders included (see *Per-page
+   metadata header*). Easiest as one sweep at the end over the file list.
+8. **`screenshot-manifest/<component-slug>-screenshots-todo.md`** — write the
    manifest (root folder, **not** under `docs/`).
-7. **`repo-versions.json`** — set the CPSV Editor `version`/`commit`/
+9. **`repo-versions.json`** — set the component's `version`/`commit`/
    `commit_date`/`environment`/`repo_url` and the top-level `docs_built` to the
    user-confirmed values.
 
@@ -250,7 +367,17 @@ Work in this order so a failure leaves the docs in an obvious half-state:
 
    Every row must report ≥ 1. A `0` means a NEW entry has no `<figure>` — add the
    figure or drop the row.
-3. If `mkdocs` is available, offer a build check. Use a **non-strict** build and
+3. **Metadata header** — confirm the header rendered and the bottom aside did
+   not survive on an opted-in page, and that a page you did *not* touch still
+   renders the stock bottom dates:
+
+   ```
+   grep -c 'aside class="doc-meta"' site/<component>/<some-edited-page>/index.html   # 1
+   grep -c 'md-source-file'        site/<component>/<some-edited-page>/index.html   # 0
+   grep -c 'md-source-file'        site/<component>/<untouched-page>/index.html     # 1
+   ```
+
+4. If `mkdocs` is available, offer a build check. Use a **non-strict** build and
    scan the warnings — do **not** use `--strict`, which fails on the NEW
    screenshots this patch intentionally references before they are captured:
 
@@ -261,7 +388,7 @@ Work in this order so a failure leaves the docs in an obvious half-state:
    The only image warnings should be exactly the **NEW** manifest files (the not-
    yet-captured `.png`s). Any warning about a missing `.md` target or an existing
    screenshot is a real broken link — fix it.
-4. Report a summary: gap closed, files changed grouped by perspective, the
+5. Report a summary: gap closed, files changed grouped by perspective, the
    screenshot manifest path with NEW/REPLACE counts, and the metadata written.
    Explicitly list what still needs a human: capturing the screenshots and
    translating any NL pages left as placeholders.
@@ -273,6 +400,19 @@ Work in this order so a failure leaves the docs in an obvious half-state:
 - **Do not invent code behaviour.** Every doc claim must trace to a changelog
   entry (or, if verifying, to the actual `../ttl-editor` source). If a changelog
   item is ambiguous, read the referenced source file before writing.
+- **Code is leading. Docs follow.** When an existing page asserts something the
+  source does not support, the claim is **deleted** — not preserved out of
+  deference to whoever wrote it, not softened into a hedge, and not carried
+  forward through a rewrite just because it was already there. This applies
+  with most force to security, compliance, privacy, and certification claims,
+  where a reader may act on the statement: in one pass a component's Features
+  pages claimed BSN encryption and compliance with named standards, neither
+  supported by the source, and both were removed.
+- **This licenses contradicting the brief.** If the source disagrees with an
+  orientation note, an assumption, or an instruction given for the task, follow
+  the source and say so — that is expected behaviour, not insubordination. In
+  one pass three separate subagents correctly overrode orientation notes
+  because the source said otherwise.
 - **Respect the i18n rule** — never turn an NL placeholder into a half-English
   page; leave placeholders as placeholders unless the user asks for translation.
 - **repo-versions.json values come from the user**, not from guesses.

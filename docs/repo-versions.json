@@ -1,14 +1,14 @@
 {
-  "docs_built": "2026-07-18",
+  "docs_built": "2026-08-19",
   "repositories": [
     {
       "name": "RONL Business API",
       "icon": "⚙️",
-      "version": "v3.9.1",
+      "version": "v2026.08.19",
       "environment": "acc",
-      "commit": "311a818...",
-      "commit_date": "2026-07-18",
-      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/311a818c2db0ace74090460fdc570992f624d56d"
+      "commit": "e14b475...",
+      "commit_date": "2026-08-18",
+      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/e14b475e74046a72d3d816a7d443f4c53e8e6e56"
     },
     {
       "name": "Norm Editor",
@@ -22,20 +22,20 @@
     {
       "name": "CPSV Editor",
       "icon": "✏️",
-      "version": "v1.10.6",
+      "version": "v2026.08.0",
       "environment": "acc",
-      "commit": "3959e94...",
-      "commit_date": "2026-07-08",
-      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/3959e9409d143749923604b5c1b9f2b0671b256a"
+      "commit": "0efbacf...",
+      "commit_date": "2026-08-18",
+      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/0efbacf931496e4b3fca7d673fbcb5957462a51a"
     },
     {
       "name": "Linked Data Explorer",
       "icon": "🔍",
-      "version": "v1.9.11",
+      "version": "v2026.08.2",
       "environment": "acc",
-      "commit": "9bcac33...",
-      "commit_date": "2026-07-08",
-      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/9bcac33cf5fccf46a225c676d32e37b91c362a86"
+      "commit": "f236b1b...",
+      "commit_date": "2026-08-18",
+      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/f236b1bfa96e9c7640fe4399ac03469cb3cf608e"
     },
     {
       "name": "CPRMV",

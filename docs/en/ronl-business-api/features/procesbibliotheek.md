@@ -1,60 +1,42 @@
+---
+component: RONL Business API
+---
+
 # Procesbibliotheek
 
-From v2.9.7, the caseworker dashboard includes a **Procesbibliotheek** — a public section showing all deployed BPMN process bundles from the Linked Data Explorer (LDE). It gives caseworkers and unauthenticated visitors an at-a-glance view of the processes, forms, document templates, and decision models that are live in the platform.
-
-<figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Procesbibliotheek — card grid showing deployed BPMN bundles with status and role badges](../../../assets/screenshots/caseworker-dashboard-procesbibliotheek.png)
-  <figcaption>Procesbibliotheek — each card represents a deployed BPMN bundle. Expanding a card reveals linked forms, document templates, and DMN keys.</figcaption>
-</figure>
+A **procesbibliotheek** is a browsable library of the process definitions deployed to the platform: what each one is called, what state it is in, and what else is deployed alongside it. Where a [regelcatalogus](regelcatalogus.md) catalogues rules against the services they implement, a procesbibliotheek catalogues the process definitions themselves.
 
 ---
 
-## Placement and access
+## What a library entry describes
 
-The Procesbibliotheek appears under the **Home** tab in the caseworker dashboard left panel for all tenants whose `tenants.json` entry includes `{ "id": "procesbibliotheek", "label": "Procesbibliotheek", "isPublic": true }` in `leftPanelSections.home`. It is rendered by the `ProcesBibliotheek` React component (`src/components/CaseworkerDashboard/ProcesBibliotheek.tsx`).
-
-`isPublic: true` means it is accessible without login, alongside Nieuws, Berichten, and Regelcatalogus.
+An entry represents one deployed process definition. It carries the process's name, the identifying key it is deployed under, a lifecycle status, and whether it runs standalone or as a subprocess invoked by another. An entry also lists what is deployed alongside that process definition and bound to it: the forms it uses, any document templates it produces, and the decision tables it evaluates — so the entry reflects everything that ships with the process, not the process definition in isolation.
 
 ---
 
-## What the cards show
+## How a definition reaches the library
 
-Each card represents one deployed BPMN bundle from the LDE. The collapsed card shows:
-
-- Process name (from the LDE bundle metadata)
-- `bpmnProcessId` (the Operaton process definition key)
-- Status badge: **WIP**, **Actief**, or **Concept**
-- Role badge: **Standalone** or **Subprocess**
-- Deployment date
-
-Expanding a card reveals:
-
-- Linked Camunda Form schemas (by `camunda:formRef`)
-- Linked document templates (by `ronl:documentRef`)
-- Linked DMN decision keys
-- LDE deployment ID
+An entry is not authored separately from the deployment itself. It is derived from a deployment index that tracks every deployed process bundle, so a process definition appears in the library once it has actually been deployed — and disappears from it, or its listed status changes, as that deployment changes. There is no parallel documentation step to keep in sync: the library is a read view onto what is deployed.
 
 ---
 
-## Data source
+## What it relates to
 
-Data is fetched on mount from `VITE_LDE_API_URL/bundles/public`. This is the same public endpoint used by the LDE frontend and requires no authentication. A dedicated `ldeApi` Axios instance in `services/api.ts` is used to avoid attaching the Keycloak `Authorization` header to LDE requests.
-
-!!! warning "Cross-origin prerequisite"
-    `VITE_LDE_API_URL` points at the standalone LDE backend (`backend.linkeddata.open-regels.nl`), a separate deployment from the business API. The browser calls it directly, so that backend's CORS allowlist must include the frontend origin (`https://mijn.open-regels.nl` for PROD, `https://acc.mijn.open-regels.nl` for ACC). If a new environment is added, its origin must be added there too. See [Troubleshooting — Procesbibliotheek CORS](../developer/troubleshooting.md#procesbibliotheek-cors-error).
+Because an entry is derived from the deployment itself, it stays tied to what is actually runnable rather than describing a process definition as it was once designed. A form, document template, or decision key listed against an entry is the one that resolves at runtime — the same binding described in [Dynamic Forms](dynamic-forms.md) and [Business Rules Execution](business-rules-execution.md) — not a separately maintained description of it.
 
 ---
 
-## AI Assistant integration
+## Public and internal exposure
 
-The LDE MCP provider (`LdeMcpProvider`) exposes the same bundle data to the AI Assistant via six tools (`bundle_list`, `bundle_get`, `form_list`, `form_get`, `document_list`, `document_get`). A caseworker can ask the AI Assistant questions about deployed processes, forms, and document templates and receive answers drawn directly from the LDE database, complementing the visual browse experience in the Procesbibliotheek.
+A process definition can be attributed to the surface that owns it, and only definitions owned by a public-facing surface — or carrying no such attribution at all — are exposed on the library's public, read-only view; others stay restricted to internal use. A lifecycle status gates visibility the same way: a definition still in progress is held back from the public view by default, independently of who owns it.
 
-See [MCP AI Assistant — Process Library tools](../developer/mcp-ai-assistant.md#process-library-tools-lde) for the tool reference.
+Within that public boundary, the library is reachable in more than one place at once — inside an otherwise authenticated working environment, and on a public site with no login — both reading the same underlying data; see [Public Publication](public-publication.md).
 
 ---
 
-## Related documentation
+## Related
 
-- [Caseworker Dashboard](caseworker-dashboard.md) — Section ID table and left panel architecture
-- [MCP AI Assistant](../developer/mcp-ai-assistant.md) — LDE Process Library provider
-- [Regelcatalogus](regelcatalogus.md) — Knowledge graph browser, similar public section
+- [Regelcatalogus](regelcatalogus.md) — the equivalent catalogue for rules and the services they implement
+- [Processes](processes.md) — deploying and starting the process definitions a library entry describes
+- [Dynamic Forms](dynamic-forms.md) and [Business Rules Execution](business-rules-execution.md) — the forms and decisions a library entry links to
+- [Public Publication](public-publication.md) — the public, unauthenticated surface a library entry can be exposed on

@@ -53,7 +53,7 @@ The RONL Business API is the OAuth 2.0 resource server. Keycloak is the authoris
 
 ## eDOCS routes
 
-`packages/backend/src/routes/edocs.routes.ts` registers the `/v1/edocs` surface — workspace and document lifecycle endpoints, all protected by `jwtMiddleware` (a valid Bearer token issued by Keycloak is required on every request). For the full, current endpoint list and request/response shapes, see [API Endpoints — eDOCS](../references/api-endpoints.md#edocs); for live-tested results and known issues per endpoint, see [eDOCS — Live Testing](testing/edocs-live-testing.md).
+`packages/backend/src/routes/edocs.routes.ts` registers the `/v1/edocs` surface — workspace and document lifecycle endpoints, all protected by `jwtMiddleware` (a valid Bearer token issued by Keycloak is required on every request). For the full, current endpoint list and request/response shapes, see [API Endpoints — eDOCS](../reference/api-endpoints.md#edocs); for live-tested results and known issues per endpoint, see [eDOCS — Live Testing](testing/edocs-live-testing.md).
 
 The routes are registered in `packages/backend/src/index.ts`:
 

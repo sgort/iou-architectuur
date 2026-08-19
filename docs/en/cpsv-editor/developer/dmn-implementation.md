@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # DMN Implementation
 
 ---
@@ -239,10 +243,61 @@ Console log on extraction:
 When a DMN file is loaded, `generateRequestBodyFromDMN` walks the top-level `<inputData>` elements and builds a starter request body. For each input it picks a starter value using three sources, in priority order:
 
 1. **`<inputValues>` constraint (v1.9.5+).** If the inputData name matches the `<inputExpression>` text of a decisionTable input column that carries an `<inputValues>` FEEL allowed-values list, the first allowed value is used. Quoted strings are unwrapped; booleans and numbers are coerced from their FEEL literal forms.
-2. **`typeRef` from the inputData `<variable>` child.** When no `<inputValues>` constraint applies, the type drives a switch: `boolean` → `false`, `integer`/`long` → `0`, `number`/`double`/`decimal` → `0`, `date` → today's date in `YYYY-MM-DD`, `string` → empty.
+2. **`typeRef` from the inputData `<variable>` child.** When no `<inputValues>` constraint applies, the type drives a switch: `boolean` → `false`, `integer`/`long` → `0`, `number`/`double`/`decimal` → `0`, `date` → today's date as a full ISO timestamp with offset, `string` → empty.
 3. **Name-based heuristics.** `string`-typed inputs whose name contains `datum`/`date`/`dag` default to today's date; `geboorte` defaults to a random adult birth date; `aantal`/`bedrag`/`inkomen` default to `0`. Heuristics run only when steps 1 and 2 leave the value empty.
 
 The resulting body is editable in the DMN tab's request-body panel before each evaluate call. Authors who want a richer starter body without writing custom code can simply add `<inputValues>` constraints to the relevant decisionTable input columns — this also documents intent in the DMN itself, which downstream tooling (validators, decision-table editors) can consume.
+
+**Date inputs are typed `Date`, not `String` (v2026.08.0).** The `typeRef="date"`
+branch previously emitted `{ value: "YYYY-MM-DD", type: "String" }` on the
+assumption that Operaton would convert internally. It does not, for any DMN
+that calls `.year`/`.years` on the input directly — confirmed from Operaton's
+own logs (`DMN-01005 Invalid value … for clause with type 'date'`). The branch
+now emits a full ISO timestamp with offset and `type: 'Date'`:
+
+```json
+{ "geboortedatum": { "value": "1990-03-17T00:00:00+01:00", "type": "Date" } }
+```
+
+---
+
+## Output discovery
+
+`extractOutputsFromTestResult(dmnData)` derives the Concepts tab's output
+variables from the last evaluate result — so it can only discover an output
+that the engine actually returned. A DRD root with `hitPolicy="RULE ORDER"`
+and no catch-all rule legitimately returns an empty result set against the
+auto-generated baseline request body, which left the tab with **zero** output
+concepts even though the DMN declares one. Inputs never had this problem:
+`generateRequestBodyFromDMN` reads `<dmn:inputData>` straight from the XML,
+independent of any result.
+
+`extractOutputsFromDMN(content, decisionKey)` (v2026.08.0) closes the same gap
+for outputs, reading a decision's declared `<dmn:output>` name and type from
+the XML — namespace-agnostically, handling multiple output columns and the
+name-vs-label fallback. `handleEvaluateDMN` prefers the live result and falls
+back to the static read whenever it yields nothing:
+
+```js
+const liveOutputs = extractOutputsFromTestResult({ lastTestResult: result });
+const outputs = liveOutputs.length
+  ? liveOutputs
+  : extractOutputsFromDMN(dmnData.content, apiConfig.decisionKey);
+```
+
+---
+
+## Cell-level legislative grounding
+
+`extractRulesFromDMN` also reads each decision-table cell's id, FEEL text and
+`dct:source`/`cprmv:sourceQuote`/`cprmv:isBasedOn` groundings into
+`rule.inputEntries`/`outputEntries`, which `ttlGenerator.js` publishes as
+per-cell `cprmv:Rule` resources. Building it surfaced — and fixed — a
+namespace defect that had silently broken *every* selector-based DMN lookup
+against real, `dmn:`-prefixed files.
+
+See [Cell-Level Legislative Grounding](cell-level-grounding.md) for the full
+design.
 
 ---
 
@@ -299,23 +354,45 @@ uploaded — without this, deploy/test stayed gated on the internal `uploadedFil
 
 ---
 
-## Operaton REST API
+## Operaton calls go through the backend (v2026.08.0)
 
-**Deploy endpoint:**
+Deploy and evaluate both used to run browser → Operaton directly, which hits
+CORS in local development. Both now route through the Linked Data Explorer
+backend, mirroring the pattern `runBackendValidation()` already used for
+`/v1/dmns/validate`: **browser → LDE backend (CORS-allowed) → Operaton
+server-to-server.**
 
-```
-POST /engine-rest/deployment/create
-Content-Type: multipart/form-data
-Body: deployment-name={serviceId}, upload={dmnFile}
-```
-
-**Evaluate endpoint:**
+**Deploy** — `handleDeployDMN` posts to:
 
 ```
-POST /engine-rest/decision-definition/key/{decisionKey}/evaluate
+POST {REACT_APP_BACKEND_URL}/v1/dmns/deploy
+```
+
+**Evaluate** — Evaluate Decision, *Run intermediate tests* and *Run test
+cases* all go through one shared helper, `evaluateViaBackend(decisionKey,
+bodyStr)`, forwarding the request body unchanged:
+
+```
+POST {REACT_APP_BACKEND_URL}/v1/dmns/evaluate/{decisionKey}
 Content-Type: application/json
 Body: { "variables": { ... } }
 ```
+
+The backend calls Operaton's own `/engine-rest/deployment/create` and
+`/engine-rest/decision-definition/key/{decisionKey}/evaluate` on the editor's
+behalf. Both routes are documented from the backend side in the Linked Data
+Explorer's [API Reference](../../linked-data-explorer/reference/api-reference.md#post-v1dmnsdeploy)
+— note the evaluate route is a **raw passthrough** that returns Operaton's own
+JSON rather than the backend's usual `{success, data, error}` envelope, which is
+why the tab can read the response directly. Consequences in the tab:
+
+- The **Evaluation URL** preview in the API Configuration panel shows the
+  backend URL actually called, not an Operaton URL.
+- `apiConfig.deploymentEndpoint` is removed — it no longer has a caller.
+- `apiConfig.baseUrl` reads `REACT_APP_OPERATON_URL`, falling back to the
+  production instance. It identifies the Operaton engine the backend should
+  target; without it, local development silently pointed at the shared
+  ACC/PROD engine instead of a local container.
 
 ---
 

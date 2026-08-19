@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # Local Development
 
 This guide covers setting up and running the CPSV Editor — and the backend it depends on — locally for development and testing.
@@ -89,10 +93,44 @@ Opens at `http://localhost:5173`.
 
 ---
 
+## Environment variables
+
+Set these in a `.env` file at the CPSV Editor repository root.
+
+| Variable | Purpose | Fallback when unset |
+|---|---|---|
+| `REACT_APP_BACKEND_URL` | The shared Linked Data Explorer backend — SPARQL proxy, TriplyDB publishing, and DMN validate/deploy/evaluate | — |
+| `REACT_APP_OPERATON_URL` | The Operaton engine the backend should target for DMN deploy and evaluate | The shared production instance |
+
+!!! warning "Set `REACT_APP_OPERATON_URL` when running a local engine"
+    Without it, the DMN tab's Base URL falls back to the shared production
+    Operaton instance — so local development would deploy to, and evaluate
+    against, shared infrastructure rather than your container.
+
+---
+
+## Running the tests
+
+```bash
+npm run test:ci      # everything, once, with coverage
+npm test             # watch mode
+npm run test:p2      # one layer in isolation
+```
+
+The full suite is 16 files and 257 tests and takes roughly 50 seconds with
+coverage. Note that the pre-push hook runs `lint` and `check-format` **only** —
+it does not run the tests, so run `test:ci` yourself before pushing.
+
+See [Testing](testing.md) for the full command list and per-file inventory.
+
+---
+
 ## Pre-deployment checklist
 
 Before pushing to ACC, verify:
 
+- [ ] `npm run test:ci` passes (16 suites, 257 tests)
+- [ ] `npm run lint` and `npm run check-format` pass
 - [ ] All verification tests pass locally
 - [ ] Both CPSV Editor and Linked Data Explorer work correctly
 - [ ] No CORS errors in the browser console

@@ -11,23 +11,19 @@
 
 ---
 
-## Applicable standards
+## Transport
 
 ---
 
-## Security controls
+## Request-level protections
 
-### HTTPS everywhere
+---
 
-### Helmet middleware
+## Authentication and authorization
 
-### Rate limiting
+---
 
-### CORS
-
-### JWT validation
-
-### Secrets management
+## Secrets management
 
 ---
 
@@ -35,4 +31,8 @@
 
 ---
 
-## Data minimisation
+## Data handling
+
+---
+
+## Related

@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # Namespace & Property Reference
 
 **Editor version:** 1.10.x  
@@ -275,6 +279,45 @@ Independent of the selected version:
 | Rules-derived consolidation date | `eli:is_realized_by` and each ruleset's `cprmv:validFrom`/versioned `cprmv:id` come from the BWB in-force date in the rules' `ruleIdPath`; the manual date field is a fallback only |
 | Unique rule subject URIs | Rules sharing a legal path get an `_N` suffix (`_2`, `_3`, …) instead of collapsing onto one subject; duplicates share a `rule_id_path_key` dedup key |
 | Nested sub-clause folding | Import folds `rule_id_path`-less nested members into the parent `cprmv:definition` rather than creating norm-less rules |
+
+---
+
+## Cell-level grounding (v2026.08.0)
+
+Legislative grounding can be attached to an individual decision-table **cell**,
+one level below the rule-level `cprmv:isBasedOn`. The cell resources are
+ordinary `cprmv:Rule` instances composed onto their Decision Rule with the
+existing `cprmv:hasPart`, so no new classes or shapes are introduced.
+
+**Carried in the DMN**, on `<inputEntry>`/`<outputEntry>` elements:
+
+| Attribute | Range | Meaning |
+|---|---|---|
+| `dct:source` | id or URI | The annotation or concept the cell derives from |
+| `cprmv:sourceQuote` | literal | The quoted text fragment the grounding rests on |
+| `cprmv:isBasedOn` | URI or JCI string | The citation |
+
+A numbered family (`dct:source1`, `cprmv:sourceQuote1`, `cprmv:isBasedOn1`,
+`…2`, …) grounds compound cells whose conjuncts need separate citations.
+
+**Emitted in the Turtle:**
+
+| Property | On | Notes |
+|---|---|---|
+| `cprmv:hasPart` | `cprmv:DecisionRule` | Ordered list of the rule's grounded cell resources |
+| `cprmv:hasPart` | cell `cprmv:Rule` | Nested list, for compound cells only |
+| `cprmv:id` | every minted resource | **Required** — `RuleShape` sets `sh:minCount 1`. `dct:identifier` does not satisfy it |
+| `cprmv:isBasedOn` | cell / concept resource | **Object property** with `sh:class cprmv:Rule` — the target must itself be typed `cprmv:Rule`, so external citation URIs get a minted stub |
+| `cprmv:sourceQuote` | cell resource | Emitted with `dct:source` when the cell carries a quote |
+| `dct:source` | cell / concept resource | The originating annotation or concept, as a URI |
+
+Two conformance rules are easy to get wrong and are worth restating:
+`cprmv:id` is mandatory on **every** `cprmv:Rule` this layer mints, including
+compound sub-groundings and concept resources; and because `cprmv:isBasedOn`
+is `sh:class cprmv:Rule`, a bare citation URI cannot be its object without a
+stub declaring it one.
+
+Full design and worked examples: [Cell-Level Legislative Grounding](../developer/cell-level-grounding.md).
 
 ---
 

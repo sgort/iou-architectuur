@@ -1,7 +1,8 @@
 # Procesbibliotheek
 
-!!! info "Engelstalige pagina beschikbaar"
-    Deze pagina is nog niet vertaald naar het Nederlands. Raadpleeg de <a href="ronl-business-api/features/procesbibliotheek/">Engelse versie</a> voor de volledige inhoud.
+!!! info "Documentatie in ontwikkeling"
+    De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
+    Raadpleeg de <a href="/ronl-business-api/features/procesbibliotheek/">Engelse versie</a> voor de huidige inhoud.
 
 ---
 
@@ -10,20 +11,20 @@
 
 ---
 
-## Placement and access
+## What a library entry describes
 
 ---
 
-## What the cards show
+## How a definition reaches the library
 
 ---
 
-## Data source
+## What it relates to
 
 ---
 
-## AI Assistant integration
+## Public and internal exposure
 
 ---
 
-## Related documentation
+## Related
