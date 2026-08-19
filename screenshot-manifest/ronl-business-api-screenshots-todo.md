@@ -68,3 +68,22 @@ ronl-business-api-pa-cockpit-board -> 1 page(s)
 ronl-business-api-infra-board -> 1 page(s)
 ronl-business-api-woo-dashboard-board -> 1 page(s)
 ```
+
+## 2026-08-19 — v2026.08.19 docs sync: no new screenshots needed
+
+This pass (bringing the RONL Business API docs from `v3.9.1` to
+`v2026.08.19`) requires **no new screenshots**, by design rather than
+oversight:
+
+- The Features pages were rewritten as functional capability descriptions,
+  under a rule that they describe capabilities and never name a use case.
+  They embed no screenshots at all — a screenshot of a running system
+  inherently shows one particular case. Verified directly:
+  `grep -rn "\.png" docs/en/ronl-business-api/features/*.md` returns zero
+  matches.
+- The case-specific screenshots that used to appear on Features pages now
+  live only in `features/archive/` and `user-guide/archive/`, alongside the
+  pages that reference them. Archived pages keep their historical imagery
+  and need no re-capture.
+- The four board screenshots captured during the earlier restructure (see
+  above) remain in place; nothing outstanding.

@@ -4,11 +4,11 @@
     {
       "name": "RONL Business API",
       "icon": "⚙️",
-      "version": "v3.9.1",
+      "version": "v2026.08.19",
       "environment": "acc",
-      "commit": "311a818...",
-      "commit_date": "2026-07-18",
-      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/311a818c2db0ace74090460fdc570992f624d56d"
+      "commit": "e14b475...",
+      "commit_date": "2026-08-18",
+      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/e14b475e74046a72d3d816a7d443f4c53e8e6e56"
     },
     {
       "name": "Norm Editor",

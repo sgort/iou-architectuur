@@ -34,13 +34,13 @@ Features, Developer Docs and References follow the same pattern for every compon
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v3.9.1** · *July 2026*
+-   **⚙️ RONL Business API — v2026.08.19** · *August 2026*
 
     ---
 
-    **eDOCS joins the AI Assistant as a fifth MCP source**
+    **A public knowledge base, a twelve-phase portfolio ladder, and tenant-scoping closed out**
 
-    A new [`edocs` MCP source](ronl-business-api/developer/mcp-ai-assistant.md#edocs-tools-edocs) lets the AI Assistant browse OpenText eDOCS workspaces and documents. Unlike every other source, it calls this backend's own `/v1/edocs/*` HTTP surface rather than the DM server directly, authenticating via a dedicated `edocs-mcp-client` — live-verified end-to-end against real eDOCS data.
+    A new [public site](ronl-business-api/user-guide/public-site.md) — a separate, auth-free package with federated search, a rule catalogue, a provenance explorer, prerendering, and axe-core accessibility scans — joins a twelve-phase RIP portfolio ladder with live phase-count and deployment-status APIs. Tenant-scoping was closed out across the platform, including a cross-tenant data leak fixed in two endpoints that queried Operaton with no tenant filter at all. A test-coverage campaign completed its final phases (P1–P11) alongside new Playwright E2E suites, and the project switched to CalVer versioning.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
