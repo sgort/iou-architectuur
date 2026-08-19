@@ -400,6 +400,19 @@ Work in this order so a failure leaves the docs in an obvious half-state:
 - **Do not invent code behaviour.** Every doc claim must trace to a changelog
   entry (or, if verifying, to the actual `../ttl-editor` source). If a changelog
   item is ambiguous, read the referenced source file before writing.
+- **Code is leading. Docs follow.** When an existing page asserts something the
+  source does not support, the claim is **deleted** — not preserved out of
+  deference to whoever wrote it, not softened into a hedge, and not carried
+  forward through a rewrite just because it was already there. This applies
+  with most force to security, compliance, privacy, and certification claims,
+  where a reader may act on the statement: in one pass a component's Features
+  pages claimed BSN encryption and compliance with named standards, neither
+  supported by the source, and both were removed.
+- **This licenses contradicting the brief.** If the source disagrees with an
+  orientation note, an assumption, or an instruction given for the task, follow
+  the source and say so — that is expected behaviour, not insubordination. In
+  one pass three separate subagents correctly overrode orientation notes
+  because the source said otherwise.
 - **Respect the i18n rule** — never turn an NL placeholder into a half-English
   page; leave placeholders as placeholders unless the user asks for translation.
 - **repo-versions.json values come from the user**, not from guesses.

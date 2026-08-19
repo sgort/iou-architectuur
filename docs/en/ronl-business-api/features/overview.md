@@ -36,7 +36,7 @@ See [Getting Started](../user-guide/getting-started.md) for how these surfaces a
 - [Authentication & IAM](authentication-iam.md) — token validation, claims mapping, and role-based authorisation
 - [Business Rules Execution](business-rules-execution.md) — DMN decision evaluation via Operaton
 - [Dynamic Forms](dynamic-forms.md) — rendering start and task forms from deployed schemas
-- [Dossiers & Documents](dossiers-and-documents.md) — a case's accumulated data and its documents in an external system
+- [Documents](documents.md) — a case's documents held in an external system
 - [Regelcatalogus](regelcatalogus.md) and [Procesbibliotheek](procesbibliotheek.md) — public, read-only views into the underlying rule and process catalogues
 - [Public Publication](public-publication.md) — the public, unauthenticated surface those catalogues are exposed on
 - [Timeline Navigation](timeline-navigation.md) — presenting a process instance's history along a time axis

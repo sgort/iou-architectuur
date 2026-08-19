@@ -105,7 +105,7 @@ nav:
       - Authentication & IAM: ronl-business-api/features/authentication-iam.md
       - Business Rules Execution: ronl-business-api/features/business-rules-execution.md
       - Dynamic Forms: ronl-business-api/features/dynamic-forms.md
-      - Dossiers & Documents: ronl-business-api/features/dossiers-and-documents.md
+      - Documents: ronl-business-api/features/documents.md
       - Regelcatalogus: ronl-business-api/features/regelcatalogus.md
       - Procesbibliotheek: ronl-business-api/features/procesbibliotheek.md
       - Public Publication: ronl-business-api/features/public-publication.md

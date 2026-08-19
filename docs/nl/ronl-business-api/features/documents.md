@@ -1,13 +1,13 @@
-# Dossiers & Documents
+# Documents
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
-    Raadpleeg de <a href="/ronl-business-api/features/dossiers-and-documents/">Engelse versie</a> voor de huidige inhoud.
+    Raadpleeg de <a href="/ronl-business-api/features/documents/">Engelse versie</a> voor de huidige inhoud.
 
 ---
 
 **Status:** Concept  
-**Engelstalige bron:** `ronl-business-api/features/dossiers-and-documents.md`
+**Engelstalige bron:** `ronl-business-api/features/documents.md`
 
 ---
 

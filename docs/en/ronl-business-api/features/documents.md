@@ -2,9 +2,9 @@
 component: RONL Business API
 ---
 
-# Dossiers & Documents
+# Documents
 
-A case's own record is the variables its running process instance has accumulated — described in [Processes](processes.md) and [Tasks](tasks.md). Alongside that record, a case can also carry documents held in an external system rather than inside the platform itself. This page describes how that external document material is reached.
+A case can carry documents held in an external system rather than inside the platform itself. This page describes how that external document material is reached. A case's own record, by contrast, is the variables its running process instance has accumulated — described in [Processes](processes.md) and [Tasks](tasks.md).
 
 ---
 

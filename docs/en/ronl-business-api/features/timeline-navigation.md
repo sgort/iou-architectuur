@@ -42,4 +42,4 @@ Viewing a timeline requires authentication, and a caller can only view their own
 
 - [Authentication & IAM](authentication-iam.md) — the assurance level required to reach a personal record
 - [Security & Compliance](security-compliance.md) — the audit trail timeline access is recorded in
-- [Dossiers & Documents](dossiers-and-documents.md) — the other way a case's accumulated data is presented
+- [Documents](documents.md) — the other way a case's accumulated data is presented

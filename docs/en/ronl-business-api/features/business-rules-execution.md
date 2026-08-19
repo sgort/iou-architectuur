@@ -33,7 +33,7 @@ Evaluating a decision directly requires the caller to hold at least a minimum le
 
 ## Decisions shared across tenants
 
-Every caller carries a tenant, and that tenant id is added into the evaluation's variables alongside the caller's own inputs. But the evaluate endpoint itself resolves whatever decision is deployed under the requested key — it does not scope the lookup to the caller's own tenant the way starting a process does. In practice this means a single deployed decision table can serve every tenant that invokes it by key, and any tenant-specific behaviour is left entirely to the table's own rules: a decision table that wants to treat tenants differently does so by branching on the tenant variable it receives, not because the platform routed the request to a tenant-specific deployment.
+A decision is designed to be deployed once and serve every tenant that invokes it by key. Every caller carries a tenant, and that tenant id is added into the evaluation's variables alongside the caller's own inputs — but the evaluate endpoint resolves the requested key directly, without scoping the lookup to the caller's own tenant the way starting a process does. That is deliberate: tenant-specific behaviour belongs inside the decision table's own rules, expressed by branching on the tenant variable the platform passes in, rather than by routing the request to a per-tenant deployment. A single deployed table can therefore serve every tenant, with any differences in outcome authored into the table itself.
 
 ---
 
