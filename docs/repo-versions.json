@@ -1,5 +1,5 @@
 {
-  "docs_built": "2026-08-18",
+  "docs_built": "2026-08-19",
   "repositories": [
     {
       "name": "RONL Business API",
@@ -31,11 +31,11 @@
     {
       "name": "Linked Data Explorer",
       "icon": "🔍",
-      "version": "v1.9.11",
+      "version": "v2026.08.2",
       "environment": "acc",
-      "commit": "9bcac33...",
-      "commit_date": "2026-07-08",
-      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/9bcac33cf5fccf46a225c676d32e37b91c362a86"
+      "commit": "f236b1b...",
+      "commit_date": "2026-08-18",
+      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/f236b1bfa96e9c7640fe4399ac03469cb3cf608e"
     },
     {
       "name": "CPRMV",

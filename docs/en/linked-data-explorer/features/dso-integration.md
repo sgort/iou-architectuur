@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # DSO Integration
 
 ## Overview
@@ -66,11 +70,11 @@ Default sort order is `meestGekozen` — the most-used Omgevingsloket werkzaamhe
 
 ## Activities tab — activiteiten
 
-Browse the RTR (Registratie Toepasbare Regels) for activiteiten. The default view lists recent activities; the **authority presets** (Lelystad, Flevoland) filter the list by authority OIN (Organisatie-identificatienummer) using `POST /activiteiten/_zoek` with `bestuursorgaan.oin` as the body filter.
+Browse the RTR (Registratie Toepasbare Regels) for activiteiten. The default view lists recent activities; the **authority presets** — Lelystad, Flevoland, and, since v2026.08.0, Ede and Gelderland — filter the list by authority OIN (Organisatie-identificatienummer) using `POST /activiteiten/_zoek` with `bestuursorgaan.oin` as the body filter.
 
 The date input above the list defaults to today; changing the date and clicking **Load** re-fetches the authority list valid on that date.
 
-**Name search (v1.9.4).** Fixing a location (Lelystad / Flevoland) loads that authority's full activity set in one call and reveals a search box that live-filters by name — so activities such as "Boom kappen of houtopstand vellen" are findable without walking the hierarchy.
+**Name search (v1.9.4).** Fixing a location loads that authority's full activity set in one call and reveals a search box that live-filters by name — so activities such as "Boom kappen of houtopstand vellen" are findable without walking the hierarchy.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: Activities tab showing the date input at the top with todays date, the authority preset dropdown showing Lelystad selected, a Load button next to it, and below a list of activiteiten cards each with omschrijving, validity period, and small badges indicating which rule types are present — Conclusie, Indieningsvereisten, Maatregelen](../../assets/screenshots/linked-data-explorer-dso-activities-list.png)

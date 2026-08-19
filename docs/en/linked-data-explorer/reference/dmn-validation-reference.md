@@ -1,6 +1,30 @@
+---
+component: Linked Data Explorer
+---
+
 # DMN Validation Reference
 
 This reference documents every validation code produced by the RONL DMN+ syntactic validator, the rule each code enforces, and the rationale for why that rule exists. The validator runs on the shared backend at `POST /v1/dmns/validate` and is used both by the Linked Data Explorer's standalone DMN Validator view and by the CPSV Editor's inline validation in the DMN tab.
+
+---
+
+!!! danger "EXEC and CON checks did not run before v2026.08.2"
+    Ten rules in this reference — **`EXEC-002` through `EXEC-010` and `CON-001`
+    through `CON-003`** — were inert from the day the validator was written until
+    **v2026.08.2**. A defect in the CPRMV attribute lookup threw on every call and
+    had its exception swallowed, so those rules never fired for any DMN while the
+    validator reported a **clean result**.
+
+    **A clean validation obtained before v2026.08.2 is not evidence that these
+    rules passed.** If you validated a DMN carrying `cprmv:*` attributes during
+    that period and relied on the result, re-run it.
+
+    A second defect compounded this: the CPRMV namespace was hardcoded to the
+    legacy `0.3.0` path, so a DMN declaring the current
+    `standaarden.open-regels.nl/standards/cprmv/0.4.1#` namespace short-circuited
+    on `EXEC-001` before reaching any other check. Both namespaces are now
+    accepted. See the [Changelog](../developer/changelog-roadmap.md) and
+    [Testing](../developer/testing.md) — the coverage campaign is what found it.
 
 ---
 
@@ -200,9 +224,20 @@ Layer 2 checks the structural correctness of decision table definitions: that en
 
 ---
 
+### BIZ-010 — BIZ-014
+
+| | |
+|---|---|
+| **Severity** | 🔴 error |
+| **Trigger** | A decision-table clause element is missing its `id` attribute. One code per element type: `BIZ-010` `<input>`, `BIZ-011` `<output>`, `BIZ-012` `<rule>`, `BIZ-013` `<inputEntry>`, `BIZ-014` `<outputEntry>` |
+| **Rationale** | The DMN 1.3 XSD marks `id` optional on these elements, but Operaton's DMN transformer requires it and rejects the file at deploy time with `DMN-02011`. Before v2026.07.1 this validator reported such files as fully valid, so the failure only surfaced against a live engine. Per-cell `id`s are additionally the stable key that [cell-level legislative grounding](../../cpsv-editor/developer/cell-level-grounding.md) mints its URIs from — without them, grounding falls back to column position and breaks when columns are reordered. |
+| **Fix** | Add an `id` to every `<input>`, `<output>`, `<rule>`, `<inputEntry>` and `<outputEntry>`. Most authoring tools do this on re-export; a Camunda Modeler resave is usually enough. |
+
+---
+
 ## Layer 3 — Execution Rules (EXEC-*)
 
-Layer 3 validates CPRMV extension attributes. The CPRMV namespace (`https://cprmv.open-regels.nl/0.3.0/`) is defined by the RONL initiative to capture the legal provenance and classification of each decision rule. These attributes are required for RONL-compliant publishing but are not enforced by Operaton itself.
+Layer 3 validates CPRMV extension attributes. **Two CPRMV namespaces are accepted** (v2026.08.2): the legacy `https://cprmv.open-regels.nl/0.3.0/` and the current `https://standaarden.open-regels.nl/standards/cprmv/0.4.1#`. Before that release only the legacy path was recognised, so a DMN using the current namespace short-circuited on `EXEC-001` and reached no other check. The CPRMV namespace is defined by the RONL initiative to capture the legal provenance and classification of each decision rule. These attributes are required for RONL-compliant publishing but are not enforced by Operaton itself.
 
 ---
 
@@ -316,6 +351,39 @@ Layer 3 validates CPRMV extension attributes. The CPRMV namespace (`https://cprm
 
 ---
 
+### EXEC-011
+
+| | |
+|---|---|
+| **Severity** | 🟡 warning |
+| **Trigger** | A grounded decision-table cell carries a `dct:source` whose value is not a usable identifier or URI |
+| **Rationale** | Cell-level grounding records which annotation or concept a single `<inputEntry>`/`<outputEntry>` derives from. A malformed `dct:source` cannot be resolved into the concept resource the published Turtle mints, so the grounding is silently lost on export. |
+| **Fix** | Set `dct:source` to the annotation or concept identifier, or to a full URI. See [Cell-Level Legislative Grounding](../../cpsv-editor/developer/cell-level-grounding.md). |
+
+---
+
+### EXEC-012
+
+| | |
+|---|---|
+| **Severity** | 🟡 warning |
+| **Trigger** | A grounded decision-table cell carries a `cprmv:isBasedOn` whose value is neither a full URI nor a well-formed JuriConnect reference |
+| **Rationale** | `cprmv:isBasedOn` is the citation itself. The generator passes full URLs through and resolves bare JuriConnect references against `wetten.overheid.nl`; a value that is neither produces an unresolvable citation URI in the published graph. `cprmv:isBasedOn` also has `sh:class cprmv:Rule` in the CPRMV shapes, so its target must be typed — the CPSV Editor mints a stub for external citations to satisfy this. |
+| **Fix** | Use a full citation URL, or a valid JuriConnect reference. |
+
+---
+
+### EXEC-013
+
+| | |
+|---|---|
+| **Severity** | 🟡 warning |
+| **Trigger** | A `cprmv:extends` attribute has a malformed value |
+| **Rationale** | Closes a long-standing gap — `cprmv:extends`' format was never checked at all before v2026.08.2, so a malformed legal reference passed validation and only failed downstream. |
+| **Fix** | Correct the reference. Note that `cprmv:extends` was renamed `cprmv:isBasedOn` in CPRMV 0.4.1; new files should use the latter. |
+
+---
+
 ## Layer 4 — Interaction Rules (INT-*)
 
 Layer 4 validates the Decision Requirements Diagram (DRD) — the graph of decisions and information requirements that connects inputs to the final decision output.
@@ -393,9 +461,16 @@ Layer 4 validates the Decision Requirements Diagram (DRD) — the graph of decis
 | | |
 |---|---|
 | **Severity** | 🟡 warning |
-| **Trigger** | An `<inputExpression>` references a variable name that has no corresponding top-level `<inputData name="...">` declaration in the `<definitions>` element. Not checked for empty expressions, literal booleans (`true` / `false`), or numeric and quoted-string literals — these are hardcoded values, not variable references. |
+| **Trigger** | An `<inputExpression>` references a variable name that has no corresponding top-level `<inputData name="...">` declaration in the `<definitions>` element. Not checked for empty expressions, literal booleans (`true` / `false`), numeric and quoted-string literals, or FEEL built-in names — these are hardcoded values or reserved words, not variable references. |
 | **Rationale** | Without a matching `<inputData>` declaration, the CPSV Editor cannot discover the DMN's input contract and generates an empty request body on deploy. Adding `<inputData>` elements with `<variable>` children makes the input contract explicit for both tooling and human readers. |
 | **Fix** | For each flagged variable name, add a top-level `<inputData id="InputData_<n>" name="<n>">` element with a `<variable id="Variable_<n>" name="<n>" typeRef="<type>" />` child, placed between `</decision>` and `<dmndi:DMNDI>`. |
+
+!!! note "Two false-positive sources fixed in v2026.07.1 and v2026.08.2"
+    **Multi-word FEEL names.** FEEL names may legally contain spaces. A bare `<inputExpression>` that is itself one multi-word declared name was shredded word-by-word by the identifier tokenizer, and every word flagged. A whole-string match against declared and produced names is now tried first, falling back to tokenization (v2026.07.1). On one real Amsterdam DMN this cut Interaction Rules warnings from 83 to 12.
+
+    **FEEL built-in names.** The reserved-word list was missing the single-word date/time component functions (`year`, `month`, `day`, `hour`, `minute`, `second`), so `year(...)` flagged `year` itself (v2026.07.1); and later the plural `years`/`months`, which are the leading words of the `years and months duration(...)` built-in's own name (v2026.08.2).
+
+    Residual known false positives: multi-word names embedded *inside* compound expressions rather than as bare references. Closing those needs a longest-match tokenizer change and is not yet done.
  
 ---
 

@@ -41,13 +41,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v1.9.11** · *July 2026*
+-   **🔍 Linked Data Explorer — v2026.08.2** · *August 2026*
 
     ---
 
-    **Board-owner deploys & a negotiable `/v1/norms` CPRMV version**
+    **DMN deploy/evaluate proxies, and ten validation rules that never ran**
 
-    The BPMN deploy modal now requires a [board owner](linked-data-explorer/user-guide/bpmn-modeler.md#deploying-to-operaton) — auto-detected from candidate groups, stamped as `camunda:property boardOwner`, and exposed via `/bundles/public`. The [`/v1/norms`](linked-data-explorer/developer/backend.md#norms) endpoint gained a `?cprmv_version=` selector (`0.3.0` default, `0.3.2`/`0.4.1` experimental) matching the CPSV Editor's export targets, and the CPRMV SHACL layer added the `ParameterWaarde`/`TemporalRule` shapes.
+    Two new backend routes — [`POST /v1/dmns/deploy` and `POST /v1/dmns/evaluate/:decisionKey`](linked-data-explorer/reference/api-reference.md#post-v1dmnsdeploy) — let the CPSV Editor reach Operaton without tripping CORS. A coverage campaign took the backend from 17% to 98% statements and uncovered that [`EXEC-002`–`EXEC-010` and `CON-001`–`CON-003` had never fired](linked-data-explorer/reference/dmn-validation-reference.md) for any DMN while reporting clean results. Organization is now mandatory at BPMN deploy, sent as Operaton's native tenant-id, and a [full test suite](linked-data-explorer/developer/testing.md) of 1702 tests landed alongside the switch to CalVer.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

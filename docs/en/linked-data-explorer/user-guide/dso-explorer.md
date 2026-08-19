@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # DSO Explorer
 
 A step-by-step walkthrough for searching the Digitaal Stelsel Omgevingswet from inside LDE and linking the result to a BPMN subprocess. For the architectural overview and API surface, see [DSO Integration](../features/dso-integration.md).
@@ -42,7 +46,9 @@ The `functioneleStructuurRef` URI on each result is the pivot to the STTR file u
 Use this when you know which authority publishes the activity (e.g. gemeente Lelystad) and want to see what they have on a given date.
 
 1. Open the **Activities** tab.
-2. Pick an authority preset — **Lelystad** or **Flevoland**.
+2. Pick an authority preset — **Lelystad**, **Flevoland**, **Ede** or **Gelderland**.
+   Ede (municipality) and Gelderland (province) were added in v2026.08.0. The same
+   preset list drives both this filter and the authority name shown when importing a form.
 3. The date input defaults to today; change it if you need a historical view.
 4. Click **Load**. The list refreshes with that authority's activiteiten valid on the selected date.
 

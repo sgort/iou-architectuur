@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Local Development
 
 This guide covers setting up the full local development environment: the Linked Data Explorer frontend and its backend. Both must run simultaneously because the frontend calls the backend for all SPARQL and Operaton operations.
@@ -48,8 +52,8 @@ CORS_ORIGIN=http://localhost:3000,http://localhost:5173
 TRIPLYDB_ENDPOINT=https://api.open-regels.triply.cc/datasets/stevengort/DMN-discovery/services/DMN-discovery/sparql
 TRIPLYDB_TIMEOUT=30000
 
-# Operaton
-OPERATON_BASE_URL=https://operaton.open-regels.nl/engine-rest
+# Operaton — the ronl-operaton container (RONL Business API stack)
+OPERATON_BASE_URL=http://localhost:8081/engine-rest
 OPERATON_TIMEOUT=10000
 
 # Logging
@@ -191,7 +195,7 @@ The frontend reads environment variables via Vite. The `packages/frontend/.env.d
 
 ```env
 VITE_API_BASE_URL=http://localhost:3001
-VITE_OPERATON_BASE_URL=https://operaton.open-regels.nl/engine-rest
+VITE_OPERATON_BASE_URL=http://localhost:8081/engine-rest
 ```
 
 No changes needed for standard local development.
@@ -204,7 +208,7 @@ Open three terminal windows.
 
 ### Docker readiness check (v1.5.1+)
 
-Before starting the backend, the `npm run dev` script in `packages/backend` runs `scripts/check-docker.sh`. The script verifies the `ronl-postgres` container is up and healthy, fails fast with a clear remediation message if not, and prevents nodemon from starting against a broken database.
+Before starting the backend, the `npm run dev` script in `packages/backend` runs `scripts/check-docker.sh`. The script verifies the `ronl-postgres` container is up and healthy, fails fast with a clear remediation message if not, and prevents nodemon from starting against a broken database. Since v2026.07.0 it also checks the **`ronl-operaton`** container from the same RONL Business API stack, since local development now points at that container (`localhost:8081`) rather than the shared remote engine — deploying or evaluating against shared infrastructure from a dev session was too easy to do by accident.
 
 Coloured output:
 

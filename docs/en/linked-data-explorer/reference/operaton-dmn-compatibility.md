@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Operaton DMN Compatibility Checklist
 
 A practical checklist for authoring DMN files that deploy and execute correctly in Operaton (the open-source Camunda 7 CE fork). Work through this list when a DMN fails to deploy or produces unexpected results.
@@ -18,6 +22,7 @@ A practical checklist for authoring DMN files that deploy and execute correctly 
 - ✅ `<requiredDecision href="#...">` must reference the `id` of another `<decision>` in the same `<definitions>`, not its `name`
 - ✅ `<informationRequirement>` elements need their own unique `id` attribute
 - ✅ Avoid duplicate `id` values anywhere in the document — even across `<dmndi:DMNDI>` elements
+- ✅ **Decision-table clause elements need `id` too** — `<input>`, `<output>`, `<rule>`, `<inputEntry>` and `<outputEntry>`. The DMN 1.3 XSD marks these optional, but Operaton's transformer rejects the file at deploy with `DMN-02011`. Flagged as `BIZ-010`–`BIZ-014` since v2026.07.1; a Camunda Modeler resave usually adds them
 
 ---
 
@@ -57,6 +62,14 @@ The engine ignores the `<dmndi:DMNDI>` block for execution, but the Operaton Mod
 - ✅ Avoid multiple DI elements referencing the same `dmnElementRef`
 - ✅ `<dmndi:DMNEdge>` `dmnElementRef` must reference an `<informationRequirement>` ID, not a `<decision>` ID
 - ✅ If deployment fails and you cannot isolate the cause, temporarily remove the entire `<dmndi:DMNDI>…</dmndi:DMNDI>` block, deploy without it, and re-add once the execution logic is confirmed working
+
+---
+
+## 6b) Tenancy
+
+- ✅ A `businessRuleTask`'s `camunda:decisionRef` resolves against a decision definition under the **exact same tenant-id** as the calling process instance. There is **no fallback** to a shared, untenanted decision even when one exists — confirmed empirically against a live engine
+- ✅ To call a genuinely shared, untenanted decision from a tenant-scoped process, set `camunda:decisionRefTenantId` to an EL expression evaluating to null: `${null}`. A **literal empty string is silently ignored**
+- ✅ A BPMN deployment's tenant comes from `POST /deployment/create`'s `tenant-id` field — which the BPMN Modeler now always sends, since organization became mandatory at deploy time in v2026.08.1
 
 ---
 

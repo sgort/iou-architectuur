@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # DMN Validator Implementation
 
 ---
@@ -148,10 +152,42 @@ export async function validateDmnContent(xmlContent: string): Promise<DmnValidat
 ### Namespace constants
 
 ```typescript
-const DMN_NS   = 'https://www.omg.org/spec/DMN/20191111/MODEL/';
-const CPRMV_NS = 'https://cprmv.open-regels.nl/0.3.0/';
-const NS       = { d: DMN_NS };
+const DMN_NS = 'https://www.omg.org/spec/DMN/20191111/MODEL/';
+// Both CPRMV namespaces are accepted (v2026.08.2) — see below.
+const CPRMV_NAMESPACES = [
+  'https://cprmv.open-regels.nl/0.3.0/',
+  'https://standaarden.open-regels.nl/standards/cprmv/0.4.1#',
+];
+const NS = { d: DMN_NS };
 ```
+
+!!! danger "`cprmvAttr()` threw on every call — ten rules were dead code"
+    Until v2026.08.2, `cprmvAttr()` tried a namespace-aware fast path before
+    falling back to a scan:
+
+    ```typescript
+    el.attr({ name, ns: CPRMV_NS })   // ← not a namespaced lookup
+    ```
+
+    In libxmljs2 0.37 that object form is the **setter** overload, not a getter.
+    It sets attributes literally called `name` and `ns` on the element and returns
+    a value with no `.value()` method, so the call threw — and the function's own
+    `try`/`catch` swallowed the throw and returned `null`, so the working
+    `attrs()` fallback beneath it was never reached.
+
+    Consequences: **`EXEC-002`–`EXEC-010` and `CON-001`–`CON-003` never fired for
+    any DMN**, while the validator reported a clean result, and every inspected
+    element was silently mutated with two junk attributes. Dropping the
+    object-form fast path is the entire fix.
+
+    A second defect compounded it: `CPRMV_NS` was pinned to the legacy `0.3.0`
+    path, so a DMN declaring the current `0.4.1` namespace short-circuited on
+    `EXEC-001` before any other check ran. Hence `CPRMV_NAMESPACES` above.
+
+    Verified against all 16 tracked `.dmn` files — no newly reported issues,
+    since none carried `cprmv:*` attributes at the time. The rules now work for
+    RONL DMN+ files that do. Found by the backend coverage campaign; see
+    [Testing](testing.md).
 
 All XPath queries use the `d:` prefix mapped to `DMN_NS`. The namespace-agnostic fallback `//*[local-name()="decision"]` is used in Layer 1 to handle any DMN version.
 

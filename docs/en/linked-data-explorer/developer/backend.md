@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Backend Architecture
 
 The backend is a Node.js/Express TypeScript API. It sits between the React frontend and two external services: TriplyDB (SPARQL knowledge graph) and Operaton (DMN execution engine). Its responsibilities are SPARQL querying, DMN chain orchestration, variable mapping between chain steps, and proxying dynamic TriplyDB endpoint calls.
@@ -33,6 +37,31 @@ Returns service health including TriplyDB and Operaton latency checks. Used by C
   }
 }
 ```
+
+### DMN deploy and evaluate (v2026.08.2)
+
+```
+POST /v1/dmns/deploy
+POST /v1/dmns/evaluate/:decisionKey
+```
+
+Two routes added for the CPSV Editor's DMN tab, which used to call Operaton
+directly from the browser — blocked by CORS for a local dev origin. The browser
+posts here; the backend talks to Operaton server-to-server.
+
+`deploy` takes raw DMN XML and requires no pre-registered norm identifier, so an
+uploaded or generated file with no registry entry can still be deployed. It wraps
+`operatonService.deployDrd()`.
+
+`evaluate/:decisionKey` is a **raw passthrough**: it forwards Operaton's response
+byte-for-byte and status-for-status — the success array or the exception object —
+rather than the usual `{success, data, error}` envelope, because the calling tab
+reads Operaton's own JSON. `evaluateRaw()` also passes the request body through
+untouched, skipping the type inference `evaluateDecision()` applies for its
+different caller contract; the DMN tab already builds Operaton-shaped bodies, so
+re-wrapping would double-wrap them.
+
+See the [API Reference](../reference/api-reference.md#post-v1dmnsdeploy).
 
 ### DMN discovery
 

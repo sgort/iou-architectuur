@@ -296,6 +296,7 @@ nav:
         - Deployment: linked-data-explorer/developer/deployment.md
         - PostgreSQL Deployment: linked-data-explorer/developer/deployment-postgresql.md
         - Test Cases: linked-data-explorer/developer/test-cases.md
+        - Testing: linked-data-explorer/developer/testing.md
         - Changelog & Roadmap: linked-data-explorer/developer/changelog-roadmap.md
     - References:
         - Operaton DMN Compatibility: linked-data-explorer/reference/operaton-dmn-compatibility.md

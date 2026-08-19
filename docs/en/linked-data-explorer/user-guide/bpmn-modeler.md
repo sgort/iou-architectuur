@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # BPMN Modeler
 
 The BPMN Modeler lets you design government service workflows and link decision model references directly to DMNs and DRDs you have discovered or saved in the Chain Builder.
@@ -94,10 +98,11 @@ The modal also has a required **Board ownership** section (v1.9.9). It auto-dete
 
 1. Review the resource list. If a referenced form ID is shown as unmatched, open the Form Editor and save a form with that ID before deploying.
 2. Check the **Board ownership** section — accept the auto-detected board or override it. A board owner is required to deploy.
-3. Confirm or edit the **Operaton endpoint** URL. It is pre-filled from the environment configuration.
-4. If your Operaton instance requires authentication, enter the **Username** and **Password**.
-5. Click **Deploy**. All resources are sent in one multipart request.
-6. On success, a deployment ID is shown and the Deploy button is disabled to prevent accidental re-deploy.
+3. Set the **Organization**. Since v2026.08.1 this is **required** — the deploy will not submit without one. It is sent to Operaton as the deployment's tenant-id, so a process deployed without it would be invisible to any tenant-scoped lookup made later.
+4. Confirm or edit the **Operaton endpoint** URL. It is pre-filled from the environment configuration.
+5. If your Operaton instance requires authentication, enter the **Username** and **Password**.
+6. Click **Deploy**. All resources are sent in one multipart request.
+7. On success, a deployment ID is shown and the Deploy button is disabled to prevent accidental re-deploy.
 
 Because the BPMN and all its forms land in the same Operaton deployment, `camunda:formRef` resolves correctly at runtime with no additional steps.
 

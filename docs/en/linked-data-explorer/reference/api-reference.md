@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # API Reference
 
 Base URL — production: `https://backend.linkeddata.open-regels.nl`
@@ -170,6 +174,46 @@ Streams the deployed DMN XML for a single DMN, fetched from Operaton. The file i
 | `identifier` | The `dct:identifier` value of the DMN |
 
 **Response:** The raw DMN XML document (not the JSON envelope).
+
+---
+
+### `POST /v1/dmns/deploy`
+
+Deploys raw DMN XML to Operaton ad hoc, without requiring a pre-registered LDE norm identifier.
+
+Added in v2026.08.2 for the [CPSV Editor's DMN tab](../../cpsv-editor/user-guide/dmn-workflow.md#step-4-deploy-to-operaton), which holds an uploaded or generated DMN file that has no registry entry of its own. The browser cannot call Operaton's `/engine-rest/deployment/create` directly — CORS blocks it for a local dev origin — so the call is routed here and forwarded server-to-server. A thin wrapper around the same `operatonService.deployDrd()` the registry-backed deploy path uses.
+
+**Body:** the DMN XML plus a deployment name.
+
+**Response:** the standard `{ success, data, error }` envelope.
+
+---
+
+### `POST /v1/dmns/evaluate/:decisionKey`
+
+Evaluates a deployed decision on Operaton and returns the engine's response.
+
+Added in v2026.08.2 alongside the deploy route above, for the same CORS reason. It backs Evaluate Decision, *Run intermediate tests* and *Run test cases* in the CPSV Editor's DMN tab — see its [DMN Implementation](../../cpsv-editor/developer/dmn-implementation.md#operaton-calls-go-through-the-backend-v2026080).
+
+!!! warning "This route is a raw passthrough — it does not use the standard envelope"
+    Unlike every other endpoint in this reference, the response is Operaton's own
+    JSON forwarded **byte-for-byte and status-for-status**: the raw success array,
+    or the raw exception object on failure. There is no `{ success, data, error }`
+    wrapper, because the calling DMN tab reads Operaton's shape directly.
+
+    The request body is passed through equally unchanged. `evaluateRaw()` skips
+    the plain-JS-value type inference that `evaluateDecision()` applies for its
+    own, different caller contract — the DMN tab already constructs
+    Operaton-shaped bodies, so re-wrapping would double-wrap and break the
+    request.
+
+**Path parameters:**
+
+| Parameter     | Description                                    |
+| ------------- | ---------------------------------------------- |
+| `decisionKey` | The Operaton decision-definition key to evaluate |
+
+**Body:** `{ "variables": { ... } }`, in Operaton's own variable format.
 
 ---
 

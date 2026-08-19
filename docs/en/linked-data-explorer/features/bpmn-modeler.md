@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # BPMN Modeler
 
 The BPMN Modeler is a full BPMN 2.0 process editor integrated into the Linked Data Explorer. It lets you design government service workflows visually, link `BusinessRuleTask` elements to DMN decision models or DRD chains, link `UserTask` and `StartEvent` elements to Camunda Forms authored in the Form Editor, and deploy the complete bundle — BPMN, subprocess BPMNs, and forms — to Operaton in a single operation.
@@ -164,6 +168,7 @@ The modal provides:
 - **Operaton endpoint** — pre-filled from `VITE_OPERATON_BASE_URL`, editable per deployment
 - **Username / Password** — optional HTTP Basic Auth for instances that require it
 - **Resource list** — shows exactly what will be included before you commit
+- **Organization** *(required, v2026.08.1)* — the deploy will not submit without one. It is sent to Operaton as its native **tenant-id** (`POST /deployment/create`'s `tenant-id` field), closing the gap where a process could be deployed with no tenant at all and stay invisible to every tenant-scoped lookup made against it afterwards
 - **Deploy button** — disabled after a successful deployment to prevent accidental re-deploy
 
 If a `camunda:formRef` references a form ID that is not found in `localStorage`, it is listed as an unmatched reference. The deployment still proceeds, but that form will not resolve at runtime.
@@ -182,6 +187,16 @@ Every process in the LDE can be linked to a RoPA record via `ronl:ropaRef`. Two 
 **BPMN Link tab in the RoPA Editor** — the RoPA Editor's BPMN Link tab writes the same attribute and shows whether the current record ID matches the value already in the XML.
 
 Both mechanisms produce identical results. The attribute is registered in `ronlModdleDescriptor.json` under the `http://ronl.nl/schema/1.0` namespace so it survives `saveXML()` serialisation.
+
+!!! warning "Shared DMN decisions and tenancy"
+    Now that deployed processes always carry a tenant-id, a `businessRuleTask`'s
+    `camunda:decisionRef` resolves against a decision definition under the
+    **exact same tenant** — with no fallback to a shared, untenanted decision
+    even when one exists. This was confirmed empirically against a live engine.
+
+    To call a genuinely shared decision from a tenant-scoped process, set
+    `camunda:decisionRefTenantId` to an EL expression evaluating to null
+    (`${null}`). A literal empty string is silently ignored.
 
 ### Deploy warning
 
