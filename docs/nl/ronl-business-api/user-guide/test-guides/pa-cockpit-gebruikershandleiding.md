@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # PA-Cockpit — Gebruikershandleiding (test)
 
 **Provincie Flevoland · versie 3.4.2**
