@@ -1,8 +1,10 @@
 # RONL Business API — screenshots to capture (2026-08-19 User Guides restructure)
 
 Generated for the User Guides restructure of 2026-08-19, which split the RONL
-Business API user guide into per-board pages. Four of the new board pages
-each embed a screenshot that does not exist yet.
+Business API user guide into per-board pages. Four new board pages each embed a
+screenshot. **All four were captured on 2026-08-19 and are in place — nothing is
+outstanding.** The file is retained as the record of what each image shows and
+why it was needed.
 
 Real screenshot files live in **`docs/assets/screenshots/`** (language-neutral,
 served at the site root). Docs reference them as
@@ -15,20 +17,21 @@ stale UI.
 
 | # | Status | File | Embedding page | What it must show |
 |---|---|---|---|---|
-| 1 | NEW | `ronl-business-api-caseworker-board.png` | `user-guide/caseworker.md` | The Caseworker board after sign-in — the personal task list with claims and deadlines |
-| 2 | NEW | `ronl-business-api-pa-cockpit-board.png` | `user-guide/pa-cockpit.md` | The PA-Cockpit board — dossier and issue overview showing priority and momentum |
-| 3 | NEW | `ronl-business-api-infra-board.png` | `user-guide/infra-board.md` | The Infra-board — phase swimlanes with per-project status |
-| 4 | NEW | `ronl-business-api-woo-dashboard-board.png` | `user-guide/woo-dashboard.md` | The Woo-dashboard — compliance figures, traffic lights and the "Woo in cijfers" benchmark |
+| 1 | ✅ **DONE** (was NEW) | `ronl-business-api-caseworker-board.png` | `user-guide/caseworker.md` | The Caseworker board after sign-in — the personal task list with claims and deadlines |
+| 2 | ✅ **DONE** (was NEW) | `ronl-business-api-pa-cockpit-board.png` | `user-guide/pa-cockpit.md` | The PA-Cockpit board — dossier and issue overview showing priority and momentum |
+| 3 | ✅ **DONE** (was NEW) | `ronl-business-api-infra-board.png` | `user-guide/infra-board.md` | The Infra-board — phase swimlanes with per-project status |
+| 4 | ✅ **DONE** (was NEW) | `ronl-business-api-woo-dashboard-board.png` | `user-guide/woo-dashboard.md` | The Woo-dashboard — compliance figures, traffic lights and the "Woo in cijfers" benchmark |
 
-**Outstanding: all four.** Each board requires an authenticated session to
-reach, so capture is a human step, not something a scripted pass can perform.
-This manifest is the handover for that step.
+**Nothing outstanding.** All four were captured by the maintainer on
+2026-08-19, while the restructure was still running. Each board sits behind
+sign-in, so capture was necessarily a human step — this manifest was the
+handover for it, and that handover is complete.
 
 ## Notes
 
-- **All four require an authenticated session.** They sit behind sign-in on
-  their respective boards, so they cannot be captured headlessly — this is
-  why they are outstanding rather than a documentation defect.
+- **All four required an authenticated session.** They sit behind sign-in on
+  their respective boards and could not be captured headlessly, which is why
+  they were handed over rather than automated.
 - **The landing-page and public-site captures are already in place.**
   `ronl-business-api-landing-page.png` (embedded in
   `user-guide/getting-started.md`) and `ronl-business-api-public-site.png`
