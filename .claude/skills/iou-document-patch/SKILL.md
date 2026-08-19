@@ -36,7 +36,8 @@ adapt the paths — the same staging applies.
 
 | Component | Source repo | Changelog | Notes |
 |---|---|---|---|
-| **Norm Editor** | not a sibling repo — ask the user for its path (seen at `/home/steven/Development/editor`) | `gui/public/changelog.json`, schema **`{versions: {<service>: <semver>, ...}, releases: [{version, date, changes: {<conventional-commit-type>: [commit, ...]}, commits: [...]}]}`** — git-log-derived, not curated. `version-gap.py` auto-detects this shape (a `releases` array) vs. the curated `versions` array and normalizes both to the same `sections`/`items` shape; it also drops the synthetic `"Unreleased"` pseudo-version. Pass `--changelog <path> --component "Norm Editor"` explicitly. | No `developer/changelog-roadmap.md` existed before the 2026.07.0 sync (create it + add the mkdocs.yml nav entry — don't assume the page is there). Docs currently have **zero** screenshots — don't force a manifest entry for that reason alone. `docs/nl/index.md` is a placeholder with no "What's New" section to mirror at all — check before assuming both `docs/en/index.md` and `docs/nl/index.md` need the card edit. Because the first tag can land long after the code it covers, don't backfill version numbers onto pre-existing features you can't date — only claim what genuinely changed inside the tagged commit range. |
+| **Norm Editor** | sibling repo **`../editor`** (confirmed on the Windows workstation at `C:\Users\gorts01\Development\editor`; also seen at `/home/steven/Development/editor` on Linux) | `gui/public/changelog.json`, schema **`{versions: {<service>: <semver>, ...}, releases: [{version, date, changes: {<conventional-commit-type>: [commit, ...]}, commits: [...]}]}`** — git-log-derived, not curated. `version-gap.py` auto-detects this shape (a `releases` array) vs. the curated `versions` array and normalizes both to the same `sections`/`items` shape; it also drops the synthetic `"Unreleased"` pseudo-version. Pass `--changelog <path> --component "Norm Editor"` explicitly. | No `developer/changelog-roadmap.md` existed before the 2026.07.0 sync (create it + add the mkdocs.yml nav entry — don't assume the page is there). Docs currently have **zero** screenshots — don't force a manifest entry for that reason alone. `docs/nl/index.md` is a placeholder with no "What's New" section to mirror at all — check before assuming both `docs/en/index.md` and `docs/nl/index.md` need the card edit. Because the first tag can land long after the code it covers, don't backfill version numbers onto pre-existing features you can't date — only claim what genuinely changed inside the tagged commit range. |
+| **Linked Data Explorer** | sibling repo `../linked-data-explorer` | `packages/frontend/src/changelog.json` — a dict with a **`versions`** array, same curated `format: "commits"` shape as the CPSV Editor, plus a per-entry `scope` field (`frontend` / `backend` / `both`, absent on most). **`version-gap.py` works against it unmodified** — pass `--changelog ../linked-data-explorer/packages/frontend/src/changelog.json --component "Linked Data Explorer"`. | Versions switched from SemVer to CalVer mid-history (…, 1.9.12, 1.9.13, 2026.07.0, …), so an ordered gap can span both schemes — the same transition the CPSV Editor made. `repo-versions.json` and the roadmap headings carry a `v` prefix; the changelog does not. **i18n differs from the CPSV Editor**: all 60 EN pages have an NL counterpart, and **three are real translations** — `developer/backend.md`, `reference/api-stability.md`, `user-guide/multilingualism.md` — so check each NL page before assuming it is a placeholder. A screenshot manifest already exists at `screenshot-manifest/linked-data-explorer-screenshots-todo.md`. There is no `developer/testing.md` yet (note `developer/test-cases.md` is a *feature* doc, not the test-suite page). |
 | **RONL Business API** | sibling repo `../ronl-business-api` | `packages/frontend/src/pages/changelog-data.ts` — a **TypeScript file**, not JSON: unquoted object keys, mixed single/double-quoted strings, trailing commas, and a `ChangelogItem = string \| FeedbackItem` union mixed into `items` arrays. `version-gap.py`'s `json.loads()` cannot parse it directly, and no safe regex conversion exists (a colon inside changelog prose would get mangled by a naive `key:` → `"key":` transform). **Do not run `version-gap.py` against this component** — manually read the `versions` array in `changelog-data.ts` and compare against `repo-versions.json`'s `"RONL Business API"` entry / the top heading in `developer/changelog-roadmap.md` to compute the gap, until a Node-based `.ts`→JSON shim is built for it. | Version strings carry a `v` prefix in `repo-versions.json` and `changelog-roadmap.md` headings (`v3.9.1`) but not in `changelog-data.ts` itself (`'3.9.1'`) — normalize before comparing. |
 
 ### i18n rule (do not violate)
@@ -49,9 +50,16 @@ are placeholders** (an "Documentatie in ontwikkeling" admonition + mirrored empt
 
 Consequences for this skill:
 - Write substantive content in the **EN** page.
-- Update the **NL** page only when it is a real translation (currently just
-  `due-diligence.md`), or when its mirrored section headers must change to match
-  a restructured EN page.
+- Update the **NL** page only when it is a real translation, or when its
+  mirrored section headers must change to match a restructured EN page.
+- **Which NL pages are real differs per component.** For the CPSV Editor it is
+  only `developer/due-diligence.md`; the Linked Data Explorer has three (see the
+  Known components table). Check before assuming — the reliable test is whether
+  the page contains the "Documentatie in ontwikkeling" admonition:
+
+  ```
+  grep -L "Documentatie in ontwikkeling" docs/nl/<component>/**/*.md
+  ```
 - The **What's New** card exists in both `docs/en/index.md` and
   `docs/nl/index.md` — update both.
 
