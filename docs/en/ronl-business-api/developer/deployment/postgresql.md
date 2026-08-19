@@ -176,5 +176,5 @@ No firewall configuration is needed for local development.
 ## Related documentation
 
 - [Backend Deployment](backend.md) — App Service environment variable configuration
-- [Environment Variables](../../references/environment-variables.md) — Full variable reference including `DATABASE_POOL_MIN` and `DATABASE_POOL_MAX`
+- [Environment Variables](../../reference/environment-variables.md) — Full variable reference including `DATABASE_POOL_MIN` and `DATABASE_POOL_MAX`
 - [Security & Compliance](../../features/security-compliance.md) — Audit log retention policy (7-year / 2555 days)

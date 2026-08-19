@@ -154,16 +154,16 @@ nav:
         - PostgreSQL (Azure): ronl-business-api/developer/deployment/postgresql.md
         - PROD Deployment Notes - v2.9.1: ronl-business-api/developer/deployment/prod-deployment-v2.9.1.md
     - References:
-      - API Endpoints: ronl-business-api/references/api-endpoints.md
-      - BRP API Endpoints: ronl-business-api/references/brp-api-endpoints.md
-      - BPMN Design Criteria: ronl-business-api/references/bpmn-design-criteria.md
-      - Environment Variables: ronl-business-api/references/environment-variables.md
-      - JWT Claims: ronl-business-api/references/jwt-claims.md
-      - Keycloak Realm Configuration: ronl-business-api/references/keycloak-realm.md
-      - Keycloak Timeline Setup: ronl-business-api/references/keycloak-timeline-setup.md
-      - Municipality Themes: ronl-business-api/references/municipality-themes.md
-      - BRP Timeline Integration: ronl-business-api/references/brp-timeline-integration.md
-      - Standards & Compliance: ronl-business-api/references/standards-compliance.md
+      - API Endpoints: ronl-business-api/reference/api-endpoints.md
+      - BRP API Endpoints: ronl-business-api/reference/brp-api-endpoints.md
+      - BPMN Design Criteria: ronl-business-api/reference/bpmn-design-criteria.md
+      - Environment Variables: ronl-business-api/reference/environment-variables.md
+      - JWT Claims: ronl-business-api/reference/jwt-claims.md
+      - Keycloak Realm Configuration: ronl-business-api/reference/keycloak-realm.md
+      - Keycloak Timeline Setup: ronl-business-api/reference/keycloak-timeline-setup.md
+      - Municipality Themes: ronl-business-api/reference/municipality-themes.md
+      - BRP Timeline Integration: ronl-business-api/reference/brp-timeline-integration.md
+      - Standards & Compliance: ronl-business-api/reference/standards-compliance.md
   
   - 🖍️ Norm Editor:
     - Overview: norm-editor/index.md

@@ -76,7 +76,7 @@ az webapp config appsettings set \
     ENABLE_TENANT_ISOLATION=true
 ```
 
-The full variable reference is in [Environment Variables](../../references/environment-variables.md).
+The full variable reference is in [Environment Variables](../../reference/environment-variables.md).
 
 Complete command for **ACC** (all 30+ variables in one call):
 

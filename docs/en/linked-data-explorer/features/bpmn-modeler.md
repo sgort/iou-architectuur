@@ -255,6 +255,6 @@ The Modeler targets Operaton, the open-source fork of Camunda 7 CE. It uses `cam
 
 - [Form Editor](form-editor.md) — creating and managing Camunda Forms in the LDE
 - [RONL Business API — Dynamic Forms](../../../ronl-business-api/features/dynamic-forms.md) — how deployed forms are fetched and rendered at runtime in MijnOmgeving
-- [RONL API Endpoints — Process definition deployment](../../../ronl-business-api/references/api-endpoints.md#process-definition-deployment) — the `POST /api/dmns/process/deploy` endpoint this button calls
+- [RONL API Endpoints — Process definition deployment](../../../ronl-business-api/reference/api-endpoints.md#process-definition-deployment) — the `POST /api/dmns/process/deploy` endpoint this button calls
 - [Document Composer](document-composer.md) — authoring decision document templates
 - [Document Composer user guide](../user-guide/document-composer.md) — step-by-step workflow

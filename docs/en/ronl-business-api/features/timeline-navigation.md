@@ -156,6 +156,6 @@ The timeline integrates with:
 
 ## Related Documentation
 
-- [BRP API Integration](../references/brp-timeline-integration.md)
+- [BRP API Integration](../reference/brp-timeline-integration.md)
 - [Developer Guide](../developer/implementing-timeline.md)
-- [API Reference](../references/brp-api-endpoints.md)
+- [API Reference](../reference/brp-api-endpoints.md)

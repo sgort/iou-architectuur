@@ -2,12 +2,12 @@
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
-    Raadpleeg de <a href="/ronl-business-api/references/jwt-claims/">Engelse versie</a> voor de huidige inhoud.
+    Raadpleeg de <a href="/ronl-business-api/reference/jwt-claims/">Engelse versie</a> voor de huidige inhoud.
 
 ---
 
 **Status:** Concept  
-**Engelstalige bron:** `ronl-business-api/references/jwt-claims.md`
+**Engelstalige bron:** `ronl-business-api/reference/jwt-claims.md`
 
 ---
 

@@ -945,5 +945,5 @@ useEffect(() => {
 ## Related Documentation
 
 - [Feature Overview](../features/timeline-navigation.md)
-- [Technical Architecture](../references/brp-timeline-integration.md)
-- [API Reference](../references/brp-api-endpoints.md)
+- [Technical Architecture](../reference/brp-timeline-integration.md)
+- [API Reference](../reference/brp-api-endpoints.md)

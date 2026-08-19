@@ -293,4 +293,4 @@ Web Origins: +
 - [Caseworker Workflow](caseworker-workflow.md) — What caseworkers can do after login
 - [Frontend Development](../developer/frontend-development.md) — `LoginChoice.tsx` and `AuthCallback.tsx` implementation details
 - [Keycloak Deployment](../developer/deployment/keycloak.md) — Theme files, caseworker banner, container management
-- [JWT Claims Reference](../references/jwt-claims.md) — Complete JWT token structure
+- [JWT Claims Reference](../reference/jwt-claims.md) — Complete JWT token structure

@@ -86,4 +86,4 @@ The system is hosted across two platforms. Azure hosts the stateless application
 - [**Features**](features/overview.md) — What RONL Business API does and why
 - [**User Guides**](user-guide/login-flow.md) — How residents, caseworkers, and operators use the system
 - [**Developer Docs**](developer/local-development.md) — Local setup, backend, frontend, deployment
-- [**References**](references/api-endpoints.md) — API endpoints, environment variables, JWT claims, standards
+- [**References**](reference/api-endpoints.md) — API endpoints, environment variables, JWT claims, standards

@@ -148,4 +148,4 @@ Recommended values:
 
 - [Business Rules Execution](../features/business-rules-execution.md) — BPMN/DMN execution via Operaton
 - [Operaton DMN Compatibility](../../linked-data-explorer/reference/operaton-dmn-compatibility.md) — DMN authoring constraints for the Linked Data Explorer
-- [API Endpoints Reference](../references/api-endpoints.md) — `/v1/process` and `/v1/task` endpoints
+- [API Endpoints Reference](../reference/api-endpoints.md) — `/v1/process` and `/v1/task` endpoints

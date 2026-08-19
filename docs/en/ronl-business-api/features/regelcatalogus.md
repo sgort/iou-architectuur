@@ -70,7 +70,7 @@ The endpoint fires five parallel SPARQL queries against the RONL TriplyDB endpoi
 
 Results are cached in-memory per data slice for 5 minutes. On TriplyDB failure the stale cache is returned so the UI never renders blank.
 
-The SPARQL endpoint can be overridden per deployment using the `RONL_SPARQL_ENDPOINT` environment variable (see [Environment Variables](../references/environment-variables.md)).
+The SPARQL endpoint can be overridden per deployment using the `RONL_SPARQL_ENDPOINT` environment variable (see [Environment Variables](../reference/environment-variables.md)).
 
 **Response shape:**
 
@@ -135,6 +135,6 @@ All current tenants include `"regelcatalogus"` in their `home` left panel sectio
 
 ## Related documentation
 
-- [Environment Variables](../references/environment-variables.md) — `RONL_SPARQL_ENDPOINT`
-- [API Endpoints](../references/api-endpoints.md) — `GET /v1/public/regelcatalogus`
+- [Environment Variables](../reference/environment-variables.md) — `RONL_SPARQL_ENDPOINT`
+- [API Endpoints](../reference/api-endpoints.md) — `GET /v1/public/regelcatalogus`
 - [Caseworker Workflow](../user-guide/caseworker-workflow.md) — Caseworker dashboard navigation

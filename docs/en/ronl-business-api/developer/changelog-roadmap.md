@@ -63,7 +63,7 @@ Following [work item #33](https://git.open-regels.nl/showcases/iou-architectuur/
 PROD (previously v2.9.2) brought up to the ACC line. Operationally notable:
 
 - **PROD backend workflow fix.** `.github/workflows/azure-backend-prod.yml` corrected to delete the `@ronl/shared` workspace dependency from the deploy `package.json` before `npm install --production` (`npm pkg delete dependencies.@ronl/shared`) and to copy `shared/dist` into `node_modules/@ronl/shared/` with the correct nesting — matching the ACC workflow. The previous PROD workflow produced a non-functional zip.
-- **New PROD App Service settings.** `ANTHROPIC_API_KEY` (required — the backend aborts at startup without it), plus the MCP/TriplyDB/CPRMV/LDE, GitLab, eDOCS, and `REDIS_URL` settings. See [Environment Variables](../references/environment-variables.md).
+- **New PROD App Service settings.** `ANTHROPIC_API_KEY` (required — the backend aborts at startup without it), plus the MCP/TriplyDB/CPRMV/LDE, GitLab, eDOCS, and `REDIS_URL` settings. See [Environment Variables](../reference/environment-variables.md).
 - **PROD Keycloak realm sync.** The nine Management Capacity Claim roles and associated clients/mappers imported into the PROD realm.
 - **Frontend env.** `.env.production` / `.env.acceptance` are force-tracked in the repo and travel with the merge; `VITE_LDE_API_URL` points at the standalone LDE backend, not the business API.
 

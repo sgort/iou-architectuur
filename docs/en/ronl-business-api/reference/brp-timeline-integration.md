@@ -753,4 +753,4 @@ interface HistoricalApplication {
 
 - [Feature Overview](../features/timeline-navigation.md)
 - [Developer Guide](../developer/implementing-timeline.md)
-- [API Reference](../references/brp-api-endpoints.md)
+- [API Reference](../reference/brp-api-endpoints.md)

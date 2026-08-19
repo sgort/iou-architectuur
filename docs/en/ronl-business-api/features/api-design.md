@@ -78,4 +78,4 @@ An OpenAPI 3.0 specification is planned at `/v1/openapi.json` (rule API-16 / API
 
 ## Route inventory
 
-The full list of registered routes, including legacy `/api/*` equivalents, is documented in [API Endpoints](../references/api-endpoints.md).
+The full list of registered routes, including legacy `/api/*` equivalents, is documented in [API Endpoints](../reference/api-endpoints.md).

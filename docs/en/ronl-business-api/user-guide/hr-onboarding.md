@@ -173,6 +173,6 @@ Password for all test accounts: `test123`
 ## Related documentation
 
 - [Caseworker Workflow](caseworker-workflow.md) — General task queue and claim-first workflow
-- [API Endpoints](../references/api-endpoints.md) — HR endpoints
-- [Keycloak Realm Configuration](../references/keycloak-realm.md) — `hr-medewerker` role, `employeeId` mapper
-- [BPMN Design Criteria](../references/bpmn-design-criteria.md) — `candidateGroups` pattern
+- [API Endpoints](../reference/api-endpoints.md) — HR endpoints
+- [Keycloak Realm Configuration](../reference/keycloak-realm.md) — `hr-medewerker` role, `employeeId` mapper
+- [BPMN Design Criteria](../reference/bpmn-design-criteria.md) — `candidateGroups` pattern

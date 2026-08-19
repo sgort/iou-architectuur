@@ -119,7 +119,7 @@ Caseworker-only action fields are excluded from both rendering paths.
 | `GET` | `/v1/process/:id/historic-variables` | Fetch final variable state of a completed process instance |
 | `GET` | `/v1/process/:id/decision-document` | Fetch the DocumentTemplate bundled in the Operaton deployment for a completed process instance |
 
-See [API Endpoints](../references/api-endpoints.md) for full details and error codes.
+See [API Endpoints](../reference/api-endpoints.md) for full details and error codes.
 
 ---
 

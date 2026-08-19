@@ -689,6 +689,6 @@ Before going to production with real DigiD:
 ## Related Documentation
 
 - [Feature Overview](../features/timeline-navigation.md)
-- [Technical Architecture](../references/brp-timeline-integration.md)
+- [Technical Architecture](../reference/brp-timeline-integration.md)
 - [Developer Guide](../developer/implementing-timeline.md)
 - [Haal Centraal BRP API Documentation](https://github.com/VNG-Realisatie/Haal-Centraal-BRP-bevragen)

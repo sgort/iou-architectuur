@@ -167,7 +167,7 @@ If you have multiple mappers for `preferred_username`:
 Beyond this mapper, ensure these are also configured:
 
 1. **Shared Package Types** — `KeycloakUser` interface includes `preferred_username`
-2. **Backend tsconfig** — Removed `composite: true` (see [Technical Architecture](../references/brp-timeline-integration.md))
+2. **Backend tsconfig** — Removed `composite: true` (see [Technical Architecture](../reference/brp-timeline-integration.md))
 3. **BSN Mapping Service** — Maps usernames to BSN (see [Developer Guide](../developer/implementing-timeline.md))
 
 ### Test Users Setup
@@ -278,6 +278,6 @@ docker compose exec keycloak \
 
 - [Keycloak Protocol Mappers Documentation](https://www.keycloak.org/docs/latest/server_admin/#_protocol-mappers)
 - [OIDC Standard Claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims)
-- [JWT Claims Reference](../references/jwt-claims.md)
-- [Timeline Technical Architecture](../references/brp-timeline-integration.md)
+- [JWT Claims Reference](../reference/jwt-claims.md)
+- [Timeline Technical Architecture](../reference/brp-timeline-integration.md)
 
