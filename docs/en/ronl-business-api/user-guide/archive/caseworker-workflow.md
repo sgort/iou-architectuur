@@ -19,7 +19,7 @@ The caseworker dashboard at `/dashboard/caseworker` uses a three-zone shell: a t
 
 The dashboard is accessible without login — public sections (Nieuws, Berichten, Regelcatalogus) under the Home tab are visible to anyone. Private sections show a login prompt when clicked unauthenticated; no page redirect occurs.
 
-See [Caseworker Dashboard](../../features/caseworker-dashboard.md) for the full shell architecture.
+See [Caseworker Dashboard](../../features/archive/caseworker-dashboard.md) for the full shell architecture.
 
 ---
 

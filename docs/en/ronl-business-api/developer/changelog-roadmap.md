@@ -286,7 +286,7 @@ PROD (previously v2.9.2) brought up to the ACC line. Operationally notable:
 - Defence-in-depth gate in `SectionRouter` via `findGateFor()` + `<NoAccessPanel>` — gated sections cannot leak via deep-link or palette
 - `SectionErrorBoundary` — a render error in one section no longer takes down the shell
 
-See [Caseworker Dashboard (V2)](../features/caseworker-dashboard-v2.md).
+See [Caseworker Dashboard (V2)](../features/archive/caseworker-dashboard-v2.md).
 
 ### DvTP consent flow (v3.0.1)
 

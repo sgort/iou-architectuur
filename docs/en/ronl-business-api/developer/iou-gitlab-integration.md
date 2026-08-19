@@ -129,6 +129,6 @@ No backend changes are required if the section only reads from existing endpoint
 
 ## Related documentation
 
-- [Caseworker Dashboard](../features/caseworker-dashboard.md) — IOU tab and tenant-scoped sections
+- [Caseworker Dashboard](../features/archive/caseworker-dashboard.md) — IOU tab and tenant-scoped sections
 - [API Endpoints](../reference/api-endpoints.md) — Full endpoint reference
 - [Environment Variables](../reference/environment-variables.md) — GitLab configuration

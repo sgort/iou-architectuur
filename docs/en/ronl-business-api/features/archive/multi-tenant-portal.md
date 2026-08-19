@@ -1,9 +1,19 @@
+---
+component: RONL Business API
+---
+
+!!! warning "Archived — not maintained"
+    This page is kept for reference and is no longer updated. It describes the
+    product as a multi-tenant municipality portal — a specific use case —
+    rather than a capability. For current documentation see the
+    [Features overview](../overview.md).
+
 # Multi-Tenant Municipality Portal
 
 RONL Business API is built for multi-tenancy from the ground up. Each Dutch municipality that integrates with the platform has its own branded portal, its own set of users and roles, its own isolated data, and its own audit logs — all running on shared infrastructure.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: RONL Business API Municipality Portal Utrecht](../../../assets/screenshots/ronl-business-api-municipality-portal-utrecht.png)
+  ![Screenshot: RONL Business API Municipality Portal Utrecht](../../../../assets/screenshots/ronl-business-api-municipality-portal-utrecht.png)
   <figcaption>Example dashboard MijnOmgeving showing Zorgtoeslag calculation</figcaption>
 </figure>
 
@@ -22,7 +32,7 @@ Six tenants are currently configured across three organisation types:
 | Provincie Flevoland | `province`         | `#0046ad` (blue)       | —                           |
 | UWV                 | `national`         | —                      | —                           |
 
-Adding a new tenant requires a `tenants.json` entry and a Keycloak user — see [Adding a Municipality](../user-guide/archive/adding-municipality.md).
+Adding a new tenant requires a `tenants.json` entry and a Keycloak user — see [Adding a Municipality](../../user-guide/archive/adding-municipality.md).
 
 ---
 

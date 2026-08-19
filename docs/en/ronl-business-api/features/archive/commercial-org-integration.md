@@ -1,3 +1,13 @@
+---
+component: RONL Business API
+---
+
+!!! warning "Archived — not maintained"
+    This page is kept for reference and is no longer updated. It describes a
+    specific use case — Zorgtoeslag via a commercial organisation — rather
+    than a capability. For current documentation see the
+    [Features overview](../overview.md).
+
 # Commercial Organisation Integration
 
 The RONL Business API supports **commercial organisations** as a first-class tenant

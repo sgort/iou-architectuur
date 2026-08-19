@@ -15,7 +15,7 @@ On opening the board you see your own tasks and cases, with claims and deadlines
   <figcaption>Caseworker board — personal work queue for case handlers</figcaption>
 </figure>
 
-For more depth on how the board and its assistant work, see [Caseworker Dashboard](../features/caseworker-dashboard.md) and [Caseworker Dashboard (V2)](../features/caseworker-dashboard-v2.md).
+For more depth on how the board and its assistant work, see [Caseworker Dashboard](../features/archive/caseworker-dashboard.md) and [Caseworker Dashboard (V2)](../features/archive/caseworker-dashboard-v2.md).
 
 ---
 

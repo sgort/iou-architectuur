@@ -100,18 +100,19 @@ nav:
     - Overview: ronl-business-api/index.md
     - Features:
       - Overview: ronl-business-api/features/overview.md
-      - Multi-Tenant Municipality Portal: ronl-business-api/features/multi-tenant-portal.md
       - Authentication & IAM: ronl-business-api/features/authentication-iam.md
       - Business Rules Execution: ronl-business-api/features/business-rules-execution.md
       - Dynamic Forms: ronl-business-api/features/dynamic-forms.md
       - Regelcatalogus: ronl-business-api/features/regelcatalogus.md
       - Procesbibliotheek: ronl-business-api/features/procesbibliotheek.md
-      - Caseworker Dashboard: ronl-business-api/features/caseworker-dashboard.md
-      - Caseworker Dashboard (V2): en/ronl-business-api/features/caseworker-dashboard-v2.md
-      - Commercial Organisation Integration: en/ronl-business-api/features/commercial-org-integration.md
       - Timeline Navigation: ronl-business-api/features/timeline-navigation.md
       - Security & Compliance: ronl-business-api/features/security-compliance.md
       - API Design: ronl-business-api/features/api-design.md
+      - Archive:
+        - Caseworker Dashboard: ronl-business-api/features/archive/caseworker-dashboard.md
+        - Caseworker Dashboard (V2): ronl-business-api/features/archive/caseworker-dashboard-v2.md
+        - Commercial Organisation Integration: ronl-business-api/features/archive/commercial-org-integration.md
+        - Multi-Tenant Municipality Portal: ronl-business-api/features/archive/multi-tenant-portal.md
     - User Guides:
       - Getting Started: ronl-business-api/user-guide/getting-started.md
       - Caseworker: ronl-business-api/user-guide/caseworker.md

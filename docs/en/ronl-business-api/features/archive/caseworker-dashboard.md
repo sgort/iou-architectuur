@@ -1,3 +1,13 @@
+---
+component: RONL Business API
+---
+
+!!! warning "Archived — not maintained"
+    This page is kept for reference and is no longer updated. It describes a
+    specific dashboard (the caseworker dashboard V1 shell) rather than a
+    capability. For current documentation see the
+    [Features overview](../overview.md).
+
 # Caseworker Dashboard
 
 The MijnOmgeving caseworker dashboard is the primary interface for municipality staff. It loads at `/dashboard/caseworker` and remains publicly accessible — authentication is handled inside the component rather than at the route level, allowing unauthenticated visitors to browse public content before logging in.
@@ -6,7 +16,7 @@ The MijnOmgeving caseworker dashboard is the primary interface for municipality 
     From v3.0.0 this route is served by the V2 shell — a three-mode information architecture (Werk · Zoeken · Beheer) with a ⌘K command palette and a toggleable assistant dock. The V1 three-zone shell described below is retired. The section-ID and tenant-vs-platform scoping rules on this page still apply (the section components are re-used unchanged), but the navigation chrome is described in [Caseworker Dashboard (V2)](caseworker-dashboard-v2.md). Read that page first; this page remains the reference for the section catalogue.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard — authenticated shell](../../../assets/screenshots/ronl-caseworker-dashboard-shell.png)
+  ![Screenshot: Caseworker Dashboard — authenticated shell](../../../../assets/screenshots/ronl-caseworker-dashboard-shell.png)
   <figcaption>The three-zone caseworker dashboard: top navigation bar, left panel, and main content area</figcaption>
 </figure>
 
@@ -57,7 +67,7 @@ The user block shows:
 - **Uitloggen** button when authenticated, or an **Inloggen als medewerker** button when not
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard — header user block](../../../assets/screenshots/ronl-caseworker-dashboard-header-user.png)
+  ![Screenshot: Caseworker Dashboard — header user block](../../../../assets/screenshots/ronl-caseworker-dashboard-header-user.png)
   <figcaption>Header showing username, LoA badge, and role badges for a user with both caseworker and hr-medewerker roles</figcaption>
 </figure>
 
@@ -114,11 +124,11 @@ The dashboard is accessible without login. Whether a section renders its content
 When an unauthenticated visitor lands on the dashboard and navigates to a top-nav page whose first section is private, the dashboard selects the first _public_ section for that page automatically, avoiding an empty content area.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard — unauthenticated login prompt](../../../assets/screenshots/ronl-caseworker-dashboard-unauthenticated.png)
+  ![Screenshot: Caseworker Dashboard — unauthenticated login prompt](../../../../assets/screenshots/ronl-caseworker-dashboard-unauthenticated.png)
   <figcaption>Clicking a private section while unauthenticated shows the login prompt inline without leaving the page</figcaption>
 </figure>
 
-Clicking **Inloggen als medewerker** in the prompt stores `medewerker` in `sessionStorage` and navigates to `/auth`, following the same caseworker login path described in [Logging In](../user-guide/archive/login-flow.md#caseworker-login).
+Clicking **Inloggen als medewerker** in the prompt stores `medewerker` in `sessionStorage` and navigates to `/auth`, following the same caseworker login path described in [Logging In](../../user-guide/archive/login-flow.md#caseworker-login).
 
 ---
 
@@ -131,7 +141,7 @@ The Home tab contains three public sections, all visible without authentication.
 Fetches the latest government news from the Rijksoverheid RSS feed via `GET /v1/public/nieuws`. Items are shown as expandable cards with title, publication date, and stripped body text. The feed is cached for 10 minutes on the backend; on cache failure the stale result is returned to prevent a blank UI.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard — Home Nieuws](../../../assets/screenshots/ronl-caseworker-dashboard-home-nieuws.png)
+  ![Screenshot: Caseworker Dashboard — Home Nieuws](../../../../assets/screenshots/ronl-caseworker-dashboard-home-nieuws.png)
   <figcaption>Home → Nieuws — government news items from Rijksoverheid</figcaption>
 </figure>
 
@@ -146,7 +156,7 @@ Each card in the list shows the subject, preview, priority badge, and publicatio
 The section is registered as `{ id: "berichten", label: "Berichten", isPublic: true }` in `leftPanelSections.home` for all tenants in `tenants.json`, and appears above `nieuws`.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Berichten section showing a list of Provincie Flevoland announcements with subject, preview text, and a 'Lees meer →' link in the card footer](../../../assets/screenshots/ronl-caseworker-dashboard-home-berichten.png)
+  ![Screenshot: Berichten section showing a list of Provincie Flevoland announcements with subject, preview text, and a 'Lees meer →' link in the card footer](../../../../assets/screenshots/ronl-caseworker-dashboard-home-berichten.png)
   <figcaption>Berichten section — live RSS feed from Provincie Flevoland.</figcaption>
 </figure>
 
@@ -161,7 +171,7 @@ The section is registered as `{ id: "berichten", label: "Berichten", isPublic: t
 **Stats row.** A summary row above the grid shows the total number of visible products and the count of items with online aanvraag enabled.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Producten & Diensten Catalogus showing a 2-column card grid with audience badges and an 'Online aanvragen' badge on applicable cards; stats row visible at the top](../../../assets/screenshots/ronl-caseworker-dashboard-home-producten-diensten.png)
+  ![Screenshot: Producten & Diensten Catalogus showing a 2-column card grid with audience badges and an 'Online aanvragen' badge on applicable cards; stats row visible at the top](../../../../assets/screenshots/ronl-caseworker-dashboard-home-producten-diensten.png)
   <figcaption>Producten & Diensten Catalogus — Flevoland SC4.0 feed rendered as an expandable card grid.</figcaption>
 </figure>
 
@@ -174,13 +184,13 @@ The backend service (`productenDiensten.service.ts`) currently hard-codes the Fl
 
 ### Regelcatalogus
 
-Displays the RONL knowledge graph via `GET /v1/public/regelcatalogus`. See [Regelcatalogus](regelcatalogus.md) for the full feature description.
+Displays the RONL knowledge graph via `GET /v1/public/regelcatalogus`. See [Regelcatalogus](../regelcatalogus.md) for the full feature description.
 
 ---
 
 ## Persoonlijke info tab
 
-The Persoonlijke info tab exposes four left-panel sections, all requiring authentication. See [HR Onboarding Workflow](../user-guide/archive/hr-onboarding.md) for a full walkthrough of each section.
+The Persoonlijke info tab exposes four left-panel sections, all requiring authentication. See [HR Onboarding Workflow](../../user-guide/archive/hr-onboarding.md) for a full walkthrough of each section.
 
 | Section                | Accessible to             |
 | ---------------------- | ------------------------- |
@@ -206,7 +216,7 @@ The Flevoland province tenant exposes the following sections:
 | Actieve zaken      | All caseworkers     | Placeholder                                               |
 | Archief            | All caseworkers     | Placeholder                                               |
 
-See [Caseworker Workflow](../user-guide/archive/caseworker-workflow.md) for the task queue and [RIP Phase 1 Workflow](../user-guide/archive/rip-phase1-workflow.md) for the full RIP process walkthrough.
+See [Caseworker Workflow](../../user-guide/archive/caseworker-workflow.md) for the task queue and [RIP Phase 1 Workflow](../../user-guide/archive/rip-phase1-workflow.md) for the full RIP process walkthrough.
 
 ---
 
@@ -260,7 +270,7 @@ Two further features follow the same pattern: the **Changelog button** in the to
 The practical rule when adding new dashboard functionality: if the feature is organisation-specific, add it to `tenants.json` and implement the corresponding `case` in `renderContent()`. If the feature is cross-tenant and role-gated, add it directly to `CaseworkerDashboard.tsx` without touching `tenants.json`.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard — Gereedschap tab](../../../assets/screenshots/ronl-caseworker-gereedschap.png)
+  ![Screenshot: Caseworker Dashboard — Gereedschap tab](../../../../assets/screenshots/ronl-caseworker-gereedschap.png)
   <figcaption>Gereedschap tab — platform tools hub with live status badges. Operaton Cockpit shows Online with latency; eDOCS shows Stub mode.</figcaption>
 </figure>
 
@@ -301,18 +311,18 @@ The IOU tab is a tenant-scoped top-nav tab currently enabled only for the `flevo
 The IOU tab is enabled in `tenants.json` by adding an `iou` key to `leftPanelSections` for the relevant tenant. Removing or commenting out the `iou` key for a tenant hides the tab entirely without any code change.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: IOU tab showing the Gebruiksscenario indienen form with the 10-section card layout and Provincie Flevoland pre-filled in the organisation field](../../../assets/screenshots/caseworker-dashboard-iou-gebruiksscenario.png)
+  ![Screenshot: IOU tab showing the Gebruiksscenario indienen form with the 10-section card layout and Provincie Flevoland pre-filled in the organisation field](../../../../assets/screenshots/caseworker-dashboard-iou-gebruiksscenario.png)
   <figcaption>The Gebruiksscenario indienen form. Organisation is pre-filled from the tenant configuration.</figcaption>
 </figure>
 
 <figure markdown style="width:100%; margin:0;">
-  <img src="../../../assets/screenshots/caseworker-dashboard-iou-feedback.png"
+  <img src="../../../../assets/screenshots/caseworker-dashboard-iou-feedback.png"
        alt="IOU tab: Feedback geven form with screenshot upload area showing drag-and-drop zone" />
   <figcaption>The Feedback geven form. Screenshots can be pasted (Ctrl+V), dragged, or selected via file picker.</figcaption>
 </figure>
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: IOU tab Actieve zaken list showing expandable cards with issue title, status, and parsed markdown sections for Beschrijving and Gewenst resultaat](../../../assets/screenshots/caseworker-dashboard-iou-actieve-zaken.png)
+  ![Screenshot: IOU tab Actieve zaken list showing expandable cards with issue title, status, and parsed markdown sections for Beschrijving and Gewenst resultaat](../../../../assets/screenshots/caseworker-dashboard-iou-actieve-zaken.png)
   <figcaption>Actieve zaken renders GitLab issues as expandable cards. No authentication is required to view this section.</figcaption>
 </figure>
 
@@ -331,9 +341,9 @@ The IOU tab depends on three environment variables that must be set on the backe
 
 ## Related documentation
 
-- [Caseworker Workflow](../user-guide/archive/caseworker-workflow.md) — Task queue, claim, complete, AWB Kapvergunning, Archief
-- [HR Onboarding Workflow](../user-guide/archive/hr-onboarding.md) — Persoonlijke info sections in detail
-- [RIP Phase 1 Workflow](../user-guide/archive/rip-phase1-workflow.md) — Projecten tab RIP sections in detail
-- [Regelcatalogus](regelcatalogus.md) — Knowledge graph browser
+- [Caseworker Workflow](../../user-guide/archive/caseworker-workflow.md) — Task queue, claim, complete, AWB Kapvergunning, Archief
+- [HR Onboarding Workflow](../../user-guide/archive/hr-onboarding.md) — Persoonlijke info sections in detail
+- [RIP Phase 1 Workflow](../../user-guide/archive/rip-phase1-workflow.md) — Projecten tab RIP sections in detail
+- [Regelcatalogus](../regelcatalogus.md) — Knowledge graph browser
 - [Multi-Tenant Municipality Portal](multi-tenant-portal.md) — Tenant theming and isolation
-- [Frontend Development](../developer/frontend-development.md) — CaseworkerDashboard.tsx architecture
+- [Frontend Development](../../developer/frontend-development.md) — CaseworkerDashboard.tsx architecture

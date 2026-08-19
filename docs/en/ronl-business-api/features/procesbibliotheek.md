@@ -55,6 +55,6 @@ See [MCP AI Assistant — Process Library tools](../developer/mcp-ai-assistant.m
 
 ## Related documentation
 
-- [Caseworker Dashboard](caseworker-dashboard.md) — Section ID table and left panel architecture
+- [Caseworker Dashboard](archive/caseworker-dashboard.md) — Section ID table and left panel architecture
 - [MCP AI Assistant](../developer/mcp-ai-assistant.md) — LDE Process Library provider
 - [Regelcatalogus](regelcatalogus.md) — Knowledge graph browser, similar public section

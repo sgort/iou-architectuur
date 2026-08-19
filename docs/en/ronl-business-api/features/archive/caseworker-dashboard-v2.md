@@ -1,9 +1,19 @@
+---
+component: RONL Business API
+---
+
+!!! warning "Archived — not maintained"
+    This page is kept for reference and is no longer updated. It describes a
+    specific dashboard (the caseworker dashboard V2 shell) rather than a
+    capability. For current documentation see the
+    [Features overview](../overview.md).
+
 # Caseworker Dashboard (V2)
 
 From v3.0.0 the caseworker portal at `/dashboard/caseworker` is served by the **V2 shell**. The earlier three-zone V1 shell has been retired; there is one caseworker dashboard and the `/dashboard/caseworker/v2` path now redirects to the canonical route for one release to catch stale bookmarks.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker Dashboard V2 — three-mode shell with rail and assistant dock](../../../assets/screenshots/ronl-caseworker-v2-shell.png)
+  ![Screenshot: Caseworker Dashboard V2 — three-mode shell with rail and assistant dock](../../../../assets/screenshots/ronl-caseworker-v2-shell.png)
   <figcaption>The V2 caseworker shell: top bar with ⌘K search, a mode tab strip (Werk · Zoeken · Beheer), a mode-scoped rail, the main content area, and the toggleable assistant dock.</figcaption>
 </figure>
 
@@ -51,7 +61,7 @@ When switching modes, the shell jumps to that mode's `defaultSectionId` if the c
 `components/CaseworkerDashboardV2/CommandPalette.tsx` provides keyboard-driven navigation. ⌘K (or Ctrl+K) toggles it; any section is reachable in two keystrokes. The palette searches all non-filter sections via `allSearchableSections()` and applies the same visibility gate as the rail (see [Section gating](#section-gating)), so a section the user cannot see in the rail is also absent from palette results.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: V2 command palette open, showing fuzzy-matched section results with mode labels](../../../assets/screenshots/ronl-caseworker-v2-command-palette.png)
+  ![Screenshot: V2 command palette open, showing fuzzy-matched section results with mode labels](../../../../assets/screenshots/ronl-caseworker-v2-command-palette.png)
   <figcaption>The ⌘K command palette. Each result shows the section label and its owning mode.</figcaption>
 </figure>
 
@@ -61,7 +71,7 @@ When switching modes, the shell jumps to that mode's `defaultSectionId` if the c
 
 The AI assistant is hosted in a toggleable right-side dock (`components/CaseworkerDashboardV2/AssistantDock.tsx`), not as a rail item. The dock re-uses `McpChatSection` verbatim; conversation state is hoisted into the dock and persisted to `sessionStorage`, so toggling the dock or reloading the page keeps the thread. A floating "Vraag de assistent" button opens the dock when it is closed.
 
-See [MCP AI Assistant](../developer/mcp-ai-assistant.md) for the assistant itself.
+See [MCP AI Assistant](../../developer/mcp-ai-assistant.md) for the assistant itself.
 
 ---
 
@@ -99,5 +109,5 @@ The current gate populations:
 
 - [Caseworker Dashboard (section reference)](caseworker-dashboard.md) — section ID table, tenant vs platform scoping
 - [Multi-Tenant Municipality Portal](multi-tenant-portal.md) — tenant theming and isolation
-- [MCP AI Assistant](../developer/mcp-ai-assistant.md) — the assistant hosted in the dock
-- [Frontend Development](../developer/frontend-development.md) — V2 shell architecture
+- [MCP AI Assistant](../../developer/mcp-ai-assistant.md) — the assistant hosted in the dock
+- [Frontend Development](../../developer/frontend-development.md) — V2 shell architecture
