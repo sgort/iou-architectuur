@@ -1,140 +1,46 @@
+---
+component: RONL Business API
+---
+
 # Regelcatalogus
 
-From v2.5.0, the RONL Business API caseworker dashboard includes a **Regelcatalogus** — a public-facing section that exposes the RONL knowledge graph directly inside MijnOmgeving, without requiring a caseworker login. It draws on five parallel SPARQL queries against the RONL TriplyDB endpoint and presents services, organisations, concepts, and implementation rules in a tabbed interface.
-
-<figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Regelcatalogus — Diensten tab](../../../assets/screenshots/ronl-caseworker-regelcatalogus-diensten.png)
-  <figcaption>Regelcatalogus — Diensten tab showing public service cards</figcaption>
-</figure>
+A **regelcatalogus** is a browsable catalogue of the public services a government body offers, paired with the rules used to carry each one out. It answers two questions together rather than separately: what a service is, and which concrete rule implements it — alongside the organisation responsible for the service and the concepts a rule refers to.
 
 ---
 
-## Placement and access
+## What an entry carries
 
-The Regelcatalogus appears as a third item under the **Home** tab in the caseworker dashboard left panel. It is declared with `"isPublic": true` in `tenants.json`, so it is visible to unauthenticated visitors alongside Nieuws and Berichten.
-
-The section is rendered by the `RegelCatalogus` React component (`src/components/CaseWorkerDashboard/RegelCatalogus.tsx`), which calls `GET /v1/public/regelcatalogus` on mount and distributes the response across four internal tabs.
+A catalogue is organised around four related kinds of entry: a **service**, described by a title and a description; the **organisation** that implements it, with a name and a link to its own site; a **rule**, the concrete implementation of a service, carrying a title, a description, and — where it applies — a validity date; and a **concept** a rule or service refers to, drawn from a shared vocabulary and linked back to the service it belongs to. An entry in any of the four is connected to the others: a rule belongs to a service, a service belongs to an organisation, a concept is scoped to the service that uses it.
 
 ---
 
-## The four tabs
+## Where entries come from
 
-From v2.9.2 the tabs render in this order: **Organisaties**, **Diensten**, **Regels**, **Concepten**.
-
-### Organisaties
-
-Implementing organisations are listed with their logo (resolved via the TriplyDB assets API to a versioned CDN URL), homepage link, and the services they implement. The same logo resolution mechanism is used in the Linked Data Explorer.
-
-<figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Regelcatalogus — Organisaties tab](../../../assets/screenshots/ronl-caseworker-regelcatalogus-organisaties.png)
-  <figcaption>Regelcatalogus — Organisaties tab with implementing organisations</figcaption>
-</figure>
-
-### Diensten
-
-Public services from the RONL knowledge graph are shown as expandable cards. Each card displays the service title, a full description, and a link to the service URI in TriplyDB. Clicking **Toon concepten** navigates directly to the Concepten tab with that service pre-selected as a filter.
-
-### Regels
-
-Implementation rules are grouped by service. Each group is collapsible. A search input filters across all groups simultaneously; matching groups expand automatically. Each rule entry shows the rule title, optional validity date, and an expandable description.
-
-<figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Regelcatalogus — Regels tab](../../../assets/screenshots/ronl-caseworker-regelcatalogus-regels.png)
-  <figcaption>Regelcatalogus — Regels tab with grouped implementation rules</figcaption>
-</figure>
-
-### Concepten
-
-NL-SBB concepts are searchable by label and filterable by service. Each row has an external link icon that opens the `skos:exactMatch` URI in a new tab.
-
-<figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Regelcatalogus — Concepten tab](../../../assets/screenshots/ronl-caseworker-regelcatalogus-concepten.png)
-  <figcaption>Regelcatalogus — Concepten tab with search and service filter</figcaption>
-</figure>
+Entries are not authored inside the catalogue itself. They are read live from an underlying knowledge graph, queried on demand rather than copied into the catalogue's own storage — so the catalogue always reflects whatever the graph currently holds, with no separate authoring step and no risk of the two drifting apart. Because the graph is the single source, the same data can be queried again for other purposes without a second copy being kept in sync.
 
 ---
 
-## Backend endpoint
+## Browsing and finding an entry
 
-`GET /v1/public/regelcatalogus` — no authentication required.
-
-The endpoint fires five parallel SPARQL queries against the RONL TriplyDB endpoint:
-
-| Query | Data returned |
-|---|---|
-| `PublicService` | Service titles, descriptions, URIs |
-| `PublicOrganisation` | Organisation names, homepages, logo assets |
-| Competent authority links | Maps organisations to services |
-| NL-SBB concept traversal | Concept labels, service links, `skos:exactMatch` URIs |
-| `cpsv:Rule` implementations | Rule titles, descriptions, service grouping, validity dates |
-
-Results are cached in-memory per data slice for 5 minutes. On TriplyDB failure the stale cache is returned so the UI never renders blank.
-
-The SPARQL endpoint can be overridden per deployment using the `RONL_SPARQL_ENDPOINT` environment variable (see [Environment Variables](../reference/environment-variables.md)).
-
-**Response shape:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "services": [
-      {
-        "uri": "https://example.org/service/zorgtoeslag",
-        "title": "Zorgtoeslag",
-        "description": "...",
-        "organisationUri": "https://example.org/org/belastingdienst"
-      }
-    ],
-    "organisations": [
-      {
-        "uri": "https://example.org/org/belastingdienst",
-        "name": "Belastingdienst",
-        "homepage": "https://belastingdienst.nl",
-        "logo": "https://api.triplydb.com/assets/..."
-      }
-    ],
-    "concepts": [
-      {
-        "uri": "https://example.org/concept/toetsingsinkomen",
-        "prefLabel": "Toetsingsinkomen",
-        "serviceTitle": "Zorgtoeslag",
-        "exactMatch": "https://wetten.overheid.nl/..."
-      }
-    ],
-    "rules": [
-      {
-        "uri": "https://example.org/rule/zorgtoeslag-artikel-1",
-        "ruleTitle": "Zorgtoeslag artikel 1",
-        "description": "...",
-        "serviceTitle": "Zorgtoeslag",
-        "validFrom": "2026-01-01",
-        "confidence": "high"
-      }
-    ]
-  },
-  "meta": { "generatedAt": "2026-03-12T12:00:00.000Z" }
-}
-```
+A catalogue can be browsed by kind — organisations, services, rules, or concepts — with a rule list groupable by the service it implements. A search narrows the list by matching text against an entry's title and description; a filter narrows it further by the service or organisation an entry belongs to. Selecting an entry can also cross-navigate: choosing a service can jump straight to the concepts scoped to it, filtered accordingly.
 
 ---
 
-## tenants.json configuration
+## Freshness and resilience
 
-All current tenants include `"regelcatalogus"` in their `home` left panel sections:
-
-```json
-{
-  "id": "regelcatalogus",
-  "label": "Regelcatalogus",
-  "isPublic": true
-}
-```
+Because entries are read live rather than stored, a catalogue caches what it reads for a short interval so that repeated browsing does not re-query the graph on every request. If the underlying graph is briefly unreachable, the catalogue keeps serving what it last read rather than showing nothing.
 
 ---
 
-## Related documentation
+## Public and internal exposure
 
-- [Environment Variables](../reference/environment-variables.md) — `RONL_SPARQL_ENDPOINT`
-- [API Endpoints](../reference/api-endpoints.md) — `GET /v1/public/regelcatalogus`
-- [Caseworker Workflow](../user-guide/archive/caseworker-workflow.md) — Caseworker dashboard navigation
+A regelcatalogus is read-only and reachable without authentication — see [Public Publication](public-publication.md) for what that means for the surface it sits on. The same underlying data can be surfaced in more than one place at once: as a section inside an otherwise authenticated working environment, and as its own page on a public site with no login at all. Both read the same catalogue through the same public endpoint, so what one shows is exactly what the other shows.
+
+---
+
+## Related
+
+- [Procesbibliotheek](procesbibliotheek.md) — the equivalent catalogue for process definitions rather than rules
+- [Public Publication](public-publication.md) — the public, unauthenticated surface a catalogue is exposed on
+- [API Design](api-design.md) — the public-versus-authenticated surface a catalogue's endpoint follows
+- [Security & Compliance](security-compliance.md) — the rate limiting that protects a public, unauthenticated endpoint
