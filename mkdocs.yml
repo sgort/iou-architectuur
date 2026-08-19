@@ -113,6 +113,7 @@ nav:
       - Security & Compliance: ronl-business-api/features/security-compliance.md
       - API Design: ronl-business-api/features/api-design.md
     - User Guides:
+      - Getting Started: ronl-business-api/user-guide/getting-started.md
       - Test guides:
         - PA-Cockpit Testen: ronl-business-api/user-guide/test-guides/pa-cockpit-gebruikershandleiding.md
         - Dossierbeheer Testhandleiding: ronl-business-api/user-guide/test-guides/dossierbeheer-testhandleiding.md
