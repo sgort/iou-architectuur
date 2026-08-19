@@ -31,13 +31,13 @@ Welcome to the comprehensive documentation for the IOU Architecture Framework an
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v1.10.6** · *July 2026*
+-   **✏️ CPSV Editor — v2026.08.0** · *August 2026*
 
     ---
 
-    **CPRMV version selector & verified DMN test cases**
+    **Cell-level legislative grounding & backend-routed DMN calls**
 
-    Preview, export and publish now target a [selectable CPRMV vocabulary version](cpsv-editor/features/import-export.md#cprmv-vocabulary-version-041-032) — `0.4.1` (`cprmv:RuleSet`) or `0.3.2` (`cprmv:Dataset`) — with consolidation dates derived from the rules and collision-free rule URIs. DMN [test cases are now functionally verified](cpsv-editor/user-guide/dmn-testing.md): PASS/FAIL/ERROR/OK-unchecked verdicts with Expected-vs-Actual diffs, per-decision routing, and empty-result checks.
+    Legislation can now be linked at [decision-table cell granularity](cpsv-editor/developer/cell-level-grounding.md) — finer than DMN's decision-level `knowledgeSource` or CPRMV's rule-level `isBasedOn` — published as per-cell `cprmv:Rule` resources that validate clean against the CPRMV shapes. DMN deploy and evaluate now route through the Linked Data Explorer backend instead of the browser calling Operaton directly, and a [phased test suite](cpsv-editor/developer/testing.md) of 257 tests landed alongside the switch to CalVer versioning.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 

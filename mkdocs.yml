@@ -86,6 +86,12 @@ plugins:
       enable_creation_date: true
       type: timeago
 
+# Loads docs/repo-versions.json into config.extra so the per-page metadata
+# header (overrides/partials/doc-meta.html) can render the documented
+# component version server-side.
+hooks:
+  - hooks/repo_versions.py
+
 # Navigation structure
 nav:
   - Home: index.md
@@ -217,10 +223,12 @@ nav:
       - CPRMV RuleSet Generation: cpsv-editor/developer/cprmv-dataset-generation.md
       - Deployment: cpsv-editor/developer/deployment.md
       - DMN Implementation: cpsv-editor/developer/dmn-implementation.md
+      - Cell-Level Legislative Grounding: cpsv-editor/developer/cell-level-grounding.md
       - TriplyDB Publish Implementation: cpsv-editor/developer/triplydb-publish-implementation.md
       - Vendor Tab Implementation: cpsv-editor/developer/vendor-tab-implementation.md
       - Vocabulary Configuration: cpsv-editor/developer/vocabulary-configuration.md
       - RONL Namespace Migration: cpsv-editor/developer/ronl-namespace-migration.md
+      - Testing: cpsv-editor/developer/testing.md
       - Changelog & Roadmap: cpsv-editor/developer/changelog-roadmap.md
     - References:
       - Namespace & Property Reference: cpsv-editor/reference/namespace-property-reference.md

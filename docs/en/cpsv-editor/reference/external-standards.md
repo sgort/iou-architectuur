@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # External Standards & Links
 
 ---
@@ -17,6 +21,29 @@
 | W3C ORG | — | <https://www.w3.org/TR/vocab-org/> |
 | W3C Turtle | — | <https://www.w3.org/TR/turtle/> |
 | DMN | 1.3 | <https://www.omg.org/spec/DMN/1.3/> |
+
+### CPRMV — in flight
+
+Two CPRMV developments affect what the editor emits, neither of them shipped
+in the 0.4.1 target it currently writes:
+
+**Cell-level legislative linking.** A proposal to link legislation at
+decision-table cell granularity, finer than DMN's decision-level
+`knowledgeSource` or CPRMV's rule-level `extends`/`ruleType`/`confidence`. It
+was prototyped against a real rule and cross-referenced against annotation
+data, and the editor implements it today using only existing CPRMV terms
+(`cprmv:hasPart`, `cprmv:isBasedOn`, `cprmv:sourceQuote`, `cprmv:id`) — no new
+classes or shapes. See [Cell-Level Legislative Grounding](../developer/cell-level-grounding.md).
+
+**`ReferenceMethod` (CPRMV 0.4.2).** JuriConnect is *not* being mandated as
+the citation grammar. 0.4.2 introduces `ReferenceMethod` as a pluggable
+concept, with JCI and ELI as known methods alongside an internal rule-id-path
+method for citing minted `cprmv:Rule`s. The editor's current emission predates
+this and resolves JCI references directly; aligning with `ReferenceMethod` is
+a future change.
+
+Note also that `cprmv:implements` does not exist — the correct relation is
+`cpsv:implements`.
 
 ---
 

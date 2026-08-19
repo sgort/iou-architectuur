@@ -1,8 +1,58 @@
+---
+component: CPSV Editor
+---
+
 # Changelog & Roadmap
 
 ---
 
 ## Changelog
+
+### v2026.08.0 — Cell-Level Legislative Grounding & Backend-Routed DMN Calls (August 2026)
+
+> Full deep-dive: [Cell-Level Legislative Grounding](cell-level-grounding.md).
+
+**Legislation is now linked at decision-table cell granularity.** DMN's native `knowledgeSource` links legislation at *decision* level, and CPRMV's `extends`/`ruleType`/`confidence` at *rule* level — neither can express that one cell of one rule rests on one specific article. Three layers close that gap. In the DMN, `<inputEntry>`/`<outputEntry>` elements carry `dct:source`, `cprmv:sourceQuote` and `cprmv:isBasedOn` attributes, with a numbered family (`dct:source1`, `cprmv:sourceQuote1`, …) for compound cells whose conjuncts each need their own citation. `extractRulesFromDMN` in `dmnHelpers.js` reads every cell's id, FEEL text and groundings into `rule.inputEntries`/`outputEntries`. `generateDmnSection` in `ttlGenerator.js` then emits a `cprmv:hasPart` list of per-cell `cprmv:Rule` resources on each `DecisionRule`, deduplicating minted concepts and nesting a further `hasPart` for compound cells.
+
+**A namespace-agnostic DOM lookup, fixing a defect that predates cell grounding.** Building Layer 2 surfaced that every selector-based DMN lookup silently matched nothing against a real, `dmn:`-prefixed file: CSS type selectors match on (namespace, local name), and an unprefixed selector implies the null namespace. Cell-level grounding — and the pre-existing rule-level export — therefore never actually worked for real DMN files. New `queryAllLocal`/`queryLocal` helpers match on local name regardless of prefix.
+
+**Cell-grounding resources are SHACL-conformant.** Live validation against a published `.ttl` surfaced two `RuleShape` violations. `cprmv:id` is required (`sh:minCount 1`) on every `cprmv:Rule`, but cell resources emitted `dct:identifier` — a property that shape does not check at all — and concept resources carried no identifier whatsoever; both now emit `cprmv:id`, including compound-cell sub-resources. And `cprmv:isBasedOn` has `sh:class cprmv:Rule`, so its object must itself be typed `cprmv:Rule`: concept targets already were, but a bare external citation URI (CVDR, `wetten.overheid.nl`) was not. Every distinct citation URI referenced via `isBasedOn` now gets a minted, deduplicated stub — `<uri> a cprmv:Rule ; cprmv:id "<uri>" .`
+
+**DMN deploy and evaluate now route through the Linked Data Explorer backend.** Posting straight from the browser to Operaton's `/engine-rest/…` hits CORS in local development. `handleDeployDMN` now posts to the backend's `POST /v1/dmns/deploy`, and Evaluate Decision, *Run intermediate tests* and *Run test cases* all go through a shared `evaluateViaBackend()` helper hitting `POST /v1/dmns/evaluate/:decisionKey` — mirroring the pattern `runBackendValidation()` already used for `/v1/dmns/validate`. The browser talks to the backend; the backend talks to Operaton server-to-server. The **Evaluation URL** preview in the API Configuration panel shows the backend URL it actually calls, and the now-unused `apiConfig.deploymentEndpoint` field is removed.
+
+**Date-typed DMN inputs are sent as `Date`, not `String`.** `generateRequestBodyFromDMN`'s `typeRef="date"` branch typed every date input as `{ value: "YYYY-MM-DD", type: "String" }`, assuming Operaton would convert internally. That is wrong for any DMN calling `.year`/`.years` on the input directly, as several Amsterdam decisions do — confirmed from Operaton's own logs (`DMN-01005 Invalid value … for clause with type 'date'`). The generated body now emits a full ISO timestamp with offset and `type: 'Date'`.
+
+**The Concepts tab keeps its output variables when an evaluation returns no match.** A DRD root with `hitPolicy="RULE ORDER"` and no catch-all rule legitimately returns an empty result set against the auto-generated baseline request body. `extractOutputsFromTestResult` could only learn an output's name and type from what the engine actually returned, so an empty result yielded zero output concepts even though the DMN declares one — a gap inputs never had, since `generateRequestBodyFromDMN` reads `<dmn:inputData>` straight from the XML. New `extractOutputsFromDMN` closes it for outputs, reading a decision's declared `<dmn:output>` name and type from the XML namespace-agnostically, handling multiple output columns and the name-vs-label fallback; `handleEvaluateDMN` falls back to it whenever the live result yields nothing.
+
+**The DMN tab's Base URL follows `REACT_APP_OPERATON_URL` in development.** `apiConfig.baseUrl` now reads that variable, falling back to the production instance, instead of hardcoding the shared Operaton URL — without it, local development silently pointed at the shared ACC/PROD engine rather than a local Docker container.
+
+**Amsterdam HvA reference DMN: deploy blockers, FEEL fixes and a 100-case MC/DC suite.** The `HvA_full_dmn_export.dmn` reference export was brought to a deployable, evaluable state, and the fixes double as standing guidance for DMN authors — see the [DMN Workflow](../user-guide/dmn-workflow.md) tips and [DMN Testing](../user-guide/dmn-testing.md) troubleshooting. Deployment was blocked by a missing `camunda:historyTimeToLive` and 48 unescaped `&` characters in `knowledgeSource` URLs. Evaluation was blocked by multi-word FEEL bare names — Operaton's feel-scala engine consumes only the first word and throws `FEEL/SCALA-01008` — and by `<dmn:output>` elements declaring only `label` and no `name`, which makes evaluation throw a blank, unlogged exception. Malformed rule cells (`not -` on boolean columns, `not(null) -` on string columns, bare `and`-joined comparisons, and an unparenthesised `not "met partner"`) were rewritten, and two decisions that defaulted to `hitPolicy="UNIQUE"` while carrying a wildcard default rule were corrected to `FIRST`. A test suite now covers every one of the 99 rules across all 25 decisions with one empirically-verified case each (100 cases, run live), and `extract-legal-sources.py` resolves each decision's `authorityRequirement` → `knowledgeSource` links against the annotation registry — 97 of 99 resolve cleanly across 14 source documents and 23 distinct JuriConnect citations.
+
+---
+
+### v2026.07.0 — CalVer Releases & a Real Test Suite (July 2026)
+
+> Full inventory and commands: [Testing](testing.md).
+
+**Release versions switch to CalVer.** New releases are numbered `YYYY.MM.patch` — `2026.07.0`, then `2026.07.1` for a same-month follow-up, `2026.08.0` the next month — matching the Norm Editor's tagging convention. Only the version string changes; the release workflow is otherwise untouched. Historical SemVer entries up to and including v1.10.7 are left as they were.
+
+**A phased test suite lands (P0–P4).** The suite grew from three incidental regression files to 16 suites covering the pure-logic core, the hooks, and the network-boundary utilities: TTL round-trip tests against real `examples/*.ttl` fixtures (P1); `validators`, `ttlHelpers`, `ronlHelper`, `dmnHelpers`, `iknowParser` and `cprmvImport` (P2); `useEditorState`, `useArrayHandlers` and `useDsoImport` via `renderHook` (P3); and `shaclHelper` and `triplydbHelper` behind a plain `global.fetch` mock (P4). Each phase has its own `test:<phase>` script pair so a layer can be run in isolation. The CRA `App.test.js` stub — which asserted on text this app never rendered and had kept `test:ci` red since the project was scaffolded — was replaced with a real smoke test (P0).
+
+**Two defects surfaced by writing the tests.** A past commit renamed the generator's `cprmv:extends` predicate to `cprmv:isBasedOn`, but `parseTTL.enhanced.js`'s read side was never updated to match — so since that rename, **every export-then-reimport of a temporal rule silently dropped its `isBasedOn` relationship**. The round-trip test caught it immediately as a field that came back empty; the parser now recognises both spellings, `isBasedOn` first and `extends` for historical exports. Separately, `flattenCprmvRules` minted ids as `Date.now()` plus a sequence counter that reset on every call, so two calls landing in the same millisecond produced identical ids that collided as React keys; a module-level counter now keeps ids unique for the life of the page.
+
+**Coverage collection moved to `test:ci`.** In interactive watch mode, `react-scripts test --coverage` pins collection to whatever matched the very first run — on a clean start, *"no tests found related to files changed since last commit"*, i.e. nothing — so pressing `a` afterwards still reported 0% across the board. `--coverage` now lives on `test:ci`, which runs `--watchAll=false`, leaving `npm test` plain for day-to-day watch mode.
+
+---
+
+### v1.10.7 — Per-Commit Changelog Format (July 2026)
+
+**The in-app Changelog tab renders per-commit entries.** `ChangelogTab.jsx` now renders `"format": "commits"` entries — an icon-and-colour header per commit, an sha/author trailer, and an Upcoming/Released status badge — alongside the existing `"sections"` shape, adopting the same per-commit changelog convention already used by the RONL Business API and the Linked Data Explorer. Legacy entries are unaffected and render exactly as before.
+
+**Version reconciled with the changelog.** `package.json` still carried the scaffold's `0.1.0` while `changelog.json` was at `1.10.6`; the two are now in lockstep. A repo-local `bump-release` command ships with the repository rather than staying machine-local, adapted for this single-package repo — no scope dimension, no endpoint-map reconciliation — and targeting `src/data/changelog.json` directly.
+
+**A testing strategy was drafted**, grounding a phased plan in the app's state at the time — thin and undocumented coverage, a stale failing `App.test.js` stub, no RDF library, no local backend — and sequencing it against the CRA-to-Vite migration flagged in the [Due Diligence](due-diligence.md) review: pure-logic tests first, then the bundler swap, then the DOM-heavy component and E2E work written once directly under Vite/Vitest. The phases it defined are what shipped in v2026.07.0; see [Testing](testing.md) for the current state.
+
+---
 
 ### v1.10.6 — Empty-result Test Verification (July 2026)
 
@@ -266,6 +316,11 @@ Initial release. React + Tailwind CSS web application. Five-tab interface: Servi
 | Per-decision test routing & DMN-wide concept coverage | v1.10.4 |
 | CPRMV version selector (0.4.1 / 0.3.2 export) | v1.10.5 |
 | Rules-derived consolidation dates & unique rule URIs | v1.10.5 |
+| Per-commit in-app changelog format | v1.10.7 |
+| CalVer release versioning (`YYYY.MM.patch`) | v2026.07.0 |
+| [Automated test suite](testing.md) (P0–P4, 257 tests) | v2026.07.0 |
+| [Cell-level legislative grounding](cell-level-grounding.md) (Layers 1–3) | v2026.08.0 |
+| Backend-mediated DMN deploy & evaluate | v2026.08.0 |
 
 ---
 

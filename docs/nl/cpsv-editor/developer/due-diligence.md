@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # CPSV Editor — Product- & Architectuuroverzicht
 
 **Repository:** `ttl-editor` (publiek, GitLab — gespiegeld naar GitHub)
@@ -72,9 +76,9 @@ Het DMN-tabblad (`DMNTab.jsx`, ~1520 regels) behandelt de volledige levenscyclus
 
 Validatieresultaten (fouten, waarschuwingen, info per laag) worden inline weergegeven met inklapbaar detail per laag. Dit is dezelfde validatie-engine die wordt gebruikt door de drag-and-drop DMN-validator van de Linked Data Explorer voor meerdere bestanden. Als de backend onbereikbaar is, toont het paneel een aparte amberkleurige *"Syntax validation result not available"*-status (v1.9.5) in plaats van stil te falen — deployen en testen blijven werken; alleen de syntactische voorcontrole wordt overgeslagen.
 
-**Deployen.** Eenkliksdeploy naar de Operaton-regelengine (`operaton.open-regels.nl/engine-rest/deployment/create`) via multipart-formulierupload. Slaat het deployment-ID en tijdstempel op in de editor-state.
+**Deployen.** Eenkliksdeploy naar de Operaton-regelengine, via `POST /v1/dmns/deploy` op de gedeelde LDE-backend in plaats van een directe aanroep vanuit de browser (v2026.08.0 — die directe aanroep liep vast op CORS bij lokale ontwikkeling). Slaat het deployment-ID en tijdstempel op in de editor-state.
 
-**Testen.** Drie testniveaus, alle via directe aanroep van Operaton `/engine-rest/decision-definition/key/{key}/evaluate`-endpoint vanuit de browser:
+**Testen.** Drie testniveaus, alle via `POST /v1/dmns/evaluate/{key}` op de gedeelde LDE-backend (v2026.08.0), die Operaton server-to-server aanroept:
 
 | Testmodus | Wat het doet |
 |---|---|
@@ -103,6 +107,7 @@ De `useDsoImport`-hook (`src/hooks/useDsoImport.js`, v1.9.6) verwerkt een deep-l
 | Frontend | React 19, Create React App (verouderd — zie hieronder), Tailwind CSS, Lucide-iconen |
 | Statusbeheer | React hooks (`useEditorState`, `useArrayHandlers`), geen externe state-library |
 | Build & lint | CRA, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
+| Testen | Jest via `react-scripts test`, `@testing-library/react` — 257 tests, 16 suites ([Testing](testing.md)) |
 | TTL-parsing | Eigen handgeschreven parser (geen RDF-library-afhankelijkheid) |
 | DMN-parsing | Browser DOMParser (XML) |
 | Externe API's | TriplyDB REST + SPARQL, Operaton REST (Camunda-compatibel), RONL SPARQL-vocabulaire |
@@ -122,7 +127,7 @@ De `useDsoImport`-hook (`src/hooks/useDsoImport.js`, v1.9.6) verwerkt een deep-l
 
 - **App.js-orkestratie.** De hoofd-`App.js` (1143 regels) is gedeeltelijk gemodulariseerd: datastatus leeft in `useEditorState`, array-CRUD-operaties in `useArrayHandlers`, TTL-importlogica in `importHandler.js` en TTL-generatie in `ttlGenerator.js`. Wat in App.js overblijft is UI-orkestratie (tabweergave, bericht-/statusbeheer), de publicatieworkflow (~300 regels stap-voor-stap voortgangsregistratie) en code die status aan child componenten koppelt. Verdere extractiedoelen: de publicatie-handler zou een custom hook kunnen worden (`usePublishWorkflow`), en de tabnavigatie + berichtensysteem kan worden gescheiden van de data wiring.
 
-- **Geen geautomatiseerde tests voor TTL-output.** Het testbestand (`App.test.js`) is een CRA-stub. De werkelijke validatie vindt handmatig plaats via voorbeeldbestanden. Een testsuite die gegenereerde TTL vergelijkt met de referentievoorbeelden zou zeer waardevol zijn.
+- **Geautomatiseerde tests — deels opgelost.** Dit werd hier oorspronkelijk aangemerkt als *"geen geautomatiseerde tests voor TTL-output"*: het enige testbestand was een CRA-stub en validatie gebeurde handmatig via voorbeeldbestanden. In v2026.07.0 is een gefaseerde testsuite opgeleverd, inmiddels **257 tests verdeeld over 16 suites**, inclusief de hier voorgestelde round-trip-dekking — een echte referentie-export inlezen, opnieuw genereren, opnieuw inlezen en vergelijken. Die suite legde direct twee werkelijke defecten bloot, waarvan er één sinds een hernoeming van een predicaat stilzwijgend gegevens liet wegvallen bij herimport. `ttlGenerator.js` en `parseTTL.enhanced.js` zitten nu rond 80% statement-dekking. Wat ongetest blijft is de UI-laag: `App.js` (14%), `DMNTab.jsx` (8%) en `importHandler.js` (10%) — precies waar de fasen P5–P6 zich na de Vite-migratie op richten. Zie [Testing](testing.md).
 
 - **localStorage voor configuratie.** TriplyDB-credentials worden opgeslagen in localStorage. Prima voor een prototype, maar voor een productietool die door meerdere teams wordt gebruikt, behoeft een andere secrets-/configuratiebeheer­aanpak.
 
