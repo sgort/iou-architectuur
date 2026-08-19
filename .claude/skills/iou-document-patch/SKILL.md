@@ -66,7 +66,7 @@ Consequences for this skill:
 ### Archived pages are frozen (do not violate)
 
 `docs/{en,nl}/<component>/user-guide/archive/**` is **never edited by a sync** —
-not reworded, not version-stamped, not given a metadata header, not relinked.
+not reworded, not version-stamped, not given a new or altered metadata header, not relinked.
 Archived pages describe an older release on purpose; "updating" one destroys the
 only record of how the product behaved then.
 

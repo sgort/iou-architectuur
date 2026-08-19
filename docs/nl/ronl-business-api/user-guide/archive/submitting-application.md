@@ -12,12 +12,12 @@ component: RONL Business API
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
-    Raadpleeg de <a href="/ronl-business-api/user-guide/submitting-application/">Engelse versie</a> voor de huidige inhoud.
+    Raadpleeg de <a href="/ronl-business-api/user-guide/archive/submitting-application/">Engelse versie</a> voor de huidige inhoud.
 
 ---
 
 **Status:** Concept  
-**Engelstalige bron:** `ronl-business-api/user-guide/submitting-application.md`
+**Engelstalige bron:** `ronl-business-api/user-guide/archive/submitting-application.md`
 
 ---
 
