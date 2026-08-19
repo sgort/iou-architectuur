@@ -4,7 +4,7 @@ component: RONL Business API
 
 # Getting Started
 
-RONL Business API (RBA) is made up of two separate environments. The **werkomgeving** is where provincial staff sign in with a medewerkersaccount to do their work; citizens never use it — they interact with government services through other channels, authenticated with DigiD. The **public knowledge base** is a separate, public site with no login and no account, where the same information that provincial staff can see is published for anyone to read. Which of the werkomgeving's boards you see depends on your role and authorisations within the province.
+RONL Business API (RBA) is made up of two separate environments. The **werkomgeving** is where provincial staff sign in with a medewerkersaccount to do their work. The **public knowledge base** is a separate, public site with no login and no account, where the same information that provincial staff can see is published for anyone to read. Which of the werkomgeving's boards you see depends on your role and authorisations within the province.
 
 ---
 
