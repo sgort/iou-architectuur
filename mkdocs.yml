@@ -118,6 +118,7 @@ nav:
       - PA-Cockpit: ronl-business-api/user-guide/pa-cockpit.md
       - Infra-board: ronl-business-api/user-guide/infra-board.md
       - Woo-dashboard: ronl-business-api/user-guide/woo-dashboard.md
+      - Public Site: ronl-business-api/user-guide/public-site.md
       - Test guides:
         - PA-Cockpit Testen: ronl-business-api/user-guide/test-guides/pa-cockpit-gebruikershandleiding.md
         - Dossierbeheer Testhandleiding: ronl-business-api/user-guide/test-guides/dossierbeheer-testhandleiding.md
