@@ -16,7 +16,13 @@
   The component version comes from docs/repo-versions.json, loaded into
   config.extra by hooks/repo_versions.py.
 -#}
-{% set repo = config.extra.repo_versions.get(page.meta.component) %}
+{#- An archived page describes an older release on purpose, and says so in its
+   own banner. Showing the component's CURRENT version here would contradict
+   that banner on the same screen, and would drift further with every sync.
+   Archived pages therefore render the git dates only, and assert no version.
+   Matched on a path SEGMENT so a page like "my-archive/" is unaffected. -#}
+{% set is_archived = "archive" in page.url.split("/") %}
+{% set repo = none if is_archived else config.extra.repo_versions.get(page.meta.component) %}
 <aside class="doc-meta">
   {% if page.meta.git_creation_date_localized %}
     <span class="doc-meta__fact">

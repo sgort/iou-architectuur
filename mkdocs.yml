@@ -345,6 +345,11 @@ nav:
 
   - 🤝 Contributing:
     - Overview: contributing/index.md
+    - Development Workflow:
+      - Overview: contributing/development-workflow/overview.md
+      - Design & Handoff: contributing/development-workflow/design-and-handoff.md
+      - Working with Claude Code: contributing/development-workflow/working-with-claude-code.md
+      - Skills & Boundaries: contributing/development-workflow/skills-and-boundaries.md
     - Documentation Architecture:
       - Overview: contributing/doc-architecture/overview.md
       - Navigation Structure: contributing/doc-architecture/navigation.md
@@ -423,6 +428,11 @@ extra:
 # Watch additional directories for changes
 watch:
   - docs/includes
+  # mkdocs serve watches docs_dir and mkdocs.yml by default, but NOT the
+  # theme's custom_dir. Without these, editing a template or the hook leaves
+  # a running server rendering the previous version with no visible sign.
+  - overrides
+  - hooks
 
 not_in_nav: |
   includes/abbreviations.md
