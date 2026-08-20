@@ -345,6 +345,8 @@ nav:
 
   - 🤝 Contributing:
     - Overview: contributing/index.md
+    - Development Workflow:
+      - Overview: contributing/development-workflow/overview.md
     - Documentation Architecture:
       - Overview: contributing/doc-architecture/overview.md
       - Navigation Structure: contributing/doc-architecture/navigation.md
