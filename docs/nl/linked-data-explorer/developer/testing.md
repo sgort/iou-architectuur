@@ -23,7 +23,7 @@ component: Linked Data Explorer
 
 ---
 
-## CI — no test step, by design
+## CI — the test gate
 
 ---
 
@@ -39,9 +39,7 @@ component: Linked Data Explorer
 
 ## Defects the tests found
 
----
-
-## Documented quirks
+### The one the tests missed
 
 ---
 

@@ -12,16 +12,19 @@ before that the repository had no test files at all and `npm test` exited 1 with
 
 !!! info "Figures on this page are measured, not estimated"
     Every count, command and coverage percentage below was produced by running
-    the suites against **v2026.08.2** on **19 August 2026**. Rerun the commands
-    in [Running the tests](#running-the-tests) to reproduce them.
+    the suites against **v2026.08.3** on **20 August 2026**. Rerun the commands
+    in [Running the tests](#running-the-tests) to reproduce them — and use those
+    exact commands: backend branch coverage reads 91.49% via
+    `npm test -w packages/backend`, but 92.22% when Jest is invoked directly
+    from the repo root with the same config and the same 1130 tests.
 
-**At a glance:** 110 test files · **1702 tests** · all passing · backend 98.56%
-statements, frontend 74.73%.
+**At a glance:** 110 test files · **1703 tests** · all passing · backend 98.56%
+statements, frontend 74.72%.
 
 | Package | Runner | Files | Tests | Statements | Branches | Functions | Lines |
 |---|---|---:|---:|---:|---:|---:|---:|
-| `packages/backend` | Jest + ts-jest | 50 | 1129 | 98.56% | 91.49% | 97.15% | 99.05% |
-| `packages/frontend` | Vitest + RTL | 60 | 573 | 74.73% | 65.65% | 69.44% | 77.01% |
+| `packages/backend` | Jest + ts-jest | 50 | 1130 | 98.56% | 91.49% | 97.15% | 99.05% |
+| `packages/frontend` | Vitest + RTL | 60 | 573 | 74.72% | 65.68% | 69.38% | 77.00% |
 
 ---
 
@@ -32,8 +35,8 @@ both workspaces with `--workspaces --if-present`.
 
 | Command | Scope | Files | Tests |
 |---|---|---:|---:|
-| `npm test` | Both packages | 110 | 1702 |
-| `npm test -w packages/backend` | Backend only (Jest, with coverage) | 50 | 1129 |
+| `npm test` | Both packages | 110 | 1703 |
+| `npm test -w packages/backend` | Backend only (Jest, with coverage) | 50 | 1130 |
 | `npm test -w packages/frontend` | Frontend only (Vitest, with coverage) | 60 | 573 |
 
 Both packages' `test` scripts include coverage by default, so a plain run always
@@ -92,28 +95,46 @@ Both root commands fan out over both packages. The backend checks
 rewriting files the other never checks.
 
 !!! important "The hooks do not run the tests"
-    Neither hook invokes a test script, and — see [CI](#ci-no-test-step-by-design)
-    — neither does any CI workflow. Nothing anywhere blocks a push or a deploy
-    that breaks the suite, so run `npm test` yourself before pushing.
+    Neither hook invokes a test script, so nothing *client-side* stops a push
+    that breaks the suite — run `npm test` yourself before pushing. What has
+    changed is what happens next: since 20 August 2026 the deploy pipelines run
+    the suites and a failure blocks the deploy, so a broken push no longer
+    reaches acceptance. See [CI](#ci-the-test-gate).
 
 ---
 
-## CI — no test step, by design
+## CI — the test gate
 
-None of the six Azure workflows (`azure-backend-acc`, `azure-backend-production`,
-`azure-frontend-acc`, `azure-frontend-production`, `azure-ropa-site-acc`,
-`azure-ropa-site-prod`) runs a test step, blocking or non-blocking.
+Four of the six Azure workflows run the suites, and a failure blocks the deploy:
 
-This was a deliberate decision taken in P7, when coverage was first measured:
-109 backend tests at 13.82% statements against 557 frontend tests at 74.03%. The
-reasoning was that the backend gap at that point was **breadth** — whole route
-and service files never touched — rather than depth, and gating on a number that
-low would be theatre. The same call the RONL Business API made at 83.39%.
+| Workflow | Lint | **Tests** | Build | Deploy |
+|---|:---:|:---:|:---:|:---:|
+| `azure-backend-acc` / `-production` | ✅ | **✅** | ✅ | ✅ |
+| `azure-frontend-acc` / `-production` | ✅ | **✅** | ✅ | ✅ |
+| `azure-ropa-site-acc` / `-prod` | – | – | – | ✅ |
 
-The condition recorded for revisiting it was *"once backend breadth improves"*.
-**That condition has since been met** — v2026.08.2 took the backend from 16.79%
-to 98.06% statements — but the CI step has not yet been added. Wiring one in is
-now a straightforward, and overdue, change.
+The two `ropa-site` workflows run nothing, correctly: `packages/ropa-site` is a
+static `index.html` plus a `staticwebapp.config.json`, with no build and no test
+script to run.
+
+The backend workflows already installed and linted, so the test step slots in
+beside the existing `npm run lint`. The frontend workflows had no npm steps at
+all — the Static Web Apps action builds inside its own container and runs none of
+the repository's scripts — so they gained an explicit install, lint and test
+sequence ahead of the deploy action, installing from the workspace root since
+that is where the only lockfile lives.
+
+!!! note "Why this was deferred, and what changed"
+    There was no test step anywhere until 20 August 2026. That was a deliberate
+    P7 decision taken when coverage was first measured: 109 backend tests at
+    13.82% statements against 557 frontend tests at 74.03%. The reasoning was
+    that the backend gap was **breadth** — whole route and service files never
+    touched — rather than depth, and gating on a number that low would be
+    theatre. The same call the RONL Business API made at 83.39%.
+
+    The condition recorded for revisiting it was *"once backend breadth
+    improves"*. v2026.08.2 took the backend from 16.79% to 98.06% statements,
+    which met it.
 
 ---
 
@@ -131,6 +152,7 @@ headline number honest.
 | `src/utils` | 85 | `etag`, `errors`, `logger`, `rootViews`, `config` |
 | `src/db` | 22 | `pool`, `migrate` |
 | `src/middleware` | 9 | `error.middleware`, `version.middleware` |
+| `src/e2e-fixtures.test.ts` | 5 | The `e2e-fixtures/` bundle consumed by the RONL Business API's E2E suite — manifest parses, every declared file exists, each BPMN's process id matches its `processDefinitionKey`, each shell's `calledElement` references resolve, and every process keeps its artifacts after its flow elements |
 
 Techniques worth knowing before adding tests here:
 
@@ -166,7 +188,8 @@ a DOM. Uses `@testing-library/react`, `jest-dom`, `user-event`, `jsdom` and
 | `components/FormEditor` | 38 | `@bpmn-io/form-js` mocked — exercising the real library would mean mounting a full canvas editor |
 | `src/utils` | 37 | Pure logic: `exportFormats`, `exampleVersions`, `testData`, `logoResolver` |
 | `components/RopaEditor` | 33 | Record fields, legal-basis SPARQL lookup, hydrate-from-linked-forms, the BPMN `ronl:ropaRef` tab, confirm-gated status transitions |
-| `src/` (App, Changelog) | 26 | `App.tsx` renders 12 feature components as inspectable stubs, isolating the orchestrator's own state machine |
+| `src/App.test.tsx` | 26 | `App.tsx` renders 12 feature components as inspectable stubs, isolating the orchestrator's own state machine. Includes the regression test for the error overlay, which is asserted on the view that raises it |
+| `components/Changelog` | 5 | The in-app changelog viewer, rendering `changelog.json` |
 | `components/common` | 26 | Toolbar, language and organisation selectors |
 | `components/DsoExplorer` | 21 | The largest single component file; `dsoService` mocked via `vi.mock` + `vi.importActual` so the pure URL/URN helpers stay real |
 | `components/Tutorial` | 9 | Fixture-mocked `tutorial.json` |
@@ -191,7 +214,9 @@ Documented rather than silently skipped:
 
 ## Defects the tests found
 
-Four real problems surfaced from writing tests rather than from use.
+Six real problems surfaced from writing tests rather than from use. A seventh,
+at the end, is the reverse case — one the suite was well placed to catch and
+did not.
 
 **`tsconfig.eslint.json` excluded every test file from linting.** It extended
 `tsconfig.json` without overriding its `exclude` of `**/*.test.ts`, so ESLint's
@@ -213,23 +238,64 @@ DMN while the validator reported clean results. See
 **`assetService.ts` had a cross-test-polluting module-level cache**, found in P5
 and fixed by giving each test a distinct dataset name.
 
----
+The last two were first written up as *documented quirks* — pre-existing,
+unrelated to the test that found them, and left alone on purpose. Both were
+fixed on 20 August 2026 once the CI gate made an unexplained red run expensive.
 
-## Documented quirks
+**The error overlay was unreachable from the Orchestration view.** It lived
+inside `App`'s right panel, which is itself hidden whenever `viewMode` is
+Orchestration — so a failed cache refresh, triggerable only from that view, set
+the error state correctly and had nowhere to render until the user happened to
+navigate elsewhere. Documented as a quirk when first found, fixed on 20 August
+2026 by lifting the overlay to be a direct child of the workspace container, so
+it renders in every view. `App.test.tsx` now asserts the error appears on the
+view that caused it, and is dismissible there.
 
-Surfaced while testing, documented rather than patched, because each is
-pre-existing and unrelated to the test that found it:
+**The deploy modal's process key was always the literal string `"process"`.**
+`doc.querySelector('process')` is a CSS *type* selector, which matches only the
+null namespace and so never found the `<bpmn:process>` element that real
+`bpmn-js` output always emits; `BpmnCanvas` fell through to its own fallback
+every time. Sub-process lookups by `calledElement` failed the same way. Also
+documented as a jsdom quirk when first found — the fixture behind that reading
+declared none of the prefixes it used, so `DOMParser` rejected it outright and
+returned a `<parsererror>` document in which nothing was findable under any
+lookup, masking the real defect underneath. Fixed on 20 August 2026 with a
+`findProcessElement` helper matching on local name across namespaces, and the
+fixture made well-formed.
 
-- **The error overlay is unreachable from the Orchestration view.** It lives
-  inside `App`'s right panel, which is itself hidden whenever `viewMode` is
-  Orchestration — so a failed cache refresh, triggerable only from that view,
-  sets the error state correctly but has nowhere to render until the user
-  navigates elsewhere.
-- **The deploy modal's process-key extraction never matches under jsdom.**
-  `doc.querySelector('process')` does not match a namespace-prefixed
-  `<bpmn:process>` element in jsdom's XML parser, so the component's own
-  fallback to the literal string `"process"` always wins for XML shaped like
-  real `bpmn-js` output.
+### The one the tests missed
+
+**Four of the five E2E fixture BPMNs were undeployable for weeks.** BPMN 2.0's
+`tProcess` is an ordered sequence — `laneSet*`, `flowElement*`, `artifact*`,
+`resourceRole*`, `correlationSubscription*`, `supports*` — so once an artifact
+appears, no further flow element may follow it. The commit that added the
+on-canvas "E2E FIXTURE" warning inserted its `textAnnotation` and `association`
+directly after the first flow element in each file, and Operaton's XSD
+validation rejects the whole deployment on sight:
+
+```
+cvc-complex-type.2.4.a: Invalid content was found starting with element
+'{http://www.omg.org/spec/BPMN/20100524/MODEL}scriptTask'. One of
+'{…}artifact, {…}resourceRole, {…}correlationSubscription, {…}supports'
+is expected.
+```
+
+`TreeFellingPermitSubProcessE2E` was the one file with its banner correctly at
+the end of the process, and the only one that deployed.
+
+This is worth recording precisely because the suite had every opportunity. The
+manifest integrity test read each BPMN, checked that the file existed, that its
+process id matched the declared `processDefinitionKey`, and that a shell's
+`calledElement` references resolved to its nested sub-processes — but never that
+the document would survive the validator it was written for. These fixtures are
+hand-edited and never round-trip through bpmn-js, which would have re-serialised
+them into schema order and silently repaired the mistake, so nothing else stood
+between the edit and a failed deploy.
+
+The fix was a pure move of each banner to just before `</bpmn:process>`; all five
+now validate against `bpmn-moddle`'s `BPMN20.xsd`. The integrity test gained a
+fifth case asserting the ordering rule directly, confirmed failing against the
+broken fixtures before it was allowed to pass.
 
 ---
 
@@ -253,9 +319,6 @@ pre-existing and unrelated to the test that found it:
 ---
 
 ## Roadmap
-
-**Wire the CI test step.** The P7 deferral was conditional on backend breadth
-improving, and it has. This is the outstanding item.
 
 **Close the remaining frontend gaps** — `DsoExplorer.tsx` at 72%, and a decision
 on whether `exportService.ts` is worth the DOM/JSZip harness it would need.

@@ -117,9 +117,12 @@ npm test             # watch mode
 npm run test:p2      # one layer in isolation
 ```
 
-The full suite is 16 files and 257 tests and takes roughly 50 seconds with
+The full suite is 16 files and 257 tests and takes roughly 46 seconds with
 coverage. Note that the pre-push hook runs `lint` and `check-format` **only** —
-it does not run the tests, so run `test:ci` yourself before pushing.
+it does not run the tests, so run `test:ci` yourself before pushing. Since
+v2026.08.1 both deploy workflows do run the suite and a failure blocks the
+deploy, so a broken push no longer reaches acceptance or production — but the
+feedback arrives in CI rather than on your machine.
 
 See [Testing](testing.md) for the full command list and per-file inventory.
 

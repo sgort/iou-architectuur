@@ -14,31 +14,35 @@ maintainer against a live dev stack — see
 [E2E and live smoke suites](#e2e-and-live-smoke-suites).
 
 !!! info "Figures on this page are measured, not estimated"
-    Every count, command and coverage percentage below — including both
-    Playwright E2E suites — was produced by running the suites against
-    **v2026.08.19** on **19 August 2026**. The two E2E suites were run by
-    the maintainer, who owns the dev stack and local Operaton container
-    they need; their figures come from that Playwright JSON reporter
-    output (the reports themselves are not committed to this repo). Rerun
-    the commands in [Running the tests](#running-the-tests) to reproduce
-    the unit figures. The four live-smoke shell scripts remain described
-    from source only, not run for this page — see
+    Every count, command and coverage percentage below — including the
+    frontend Playwright E2E suite — was produced by running the suites against
+    **v2026.08.20** on **20 August 2026**. The frontend E2E suite was run by
+    the maintainer, who owns the dev stack and local Operaton container it
+    needs; its figures come from that run's Playwright HTML report, which
+    embeds the same result data (the report itself is not committed to this
+    repo). Rerun the commands in [Running the tests](#running-the-tests) to
+    reproduce the unit figures. Two things on this page were **not** re-run
+    for this release: the public-site E2E suite, whose figures still date
+    from v2026.08.19, and the four live-smoke shell scripts, which remain
+    described from source only — see
     [E2E and live smoke suites](#e2e-and-live-smoke-suites).
 
 **At a glance:**
 
 | Package | Runner | Files | Tests | Result | Wall time | Statements | Branches | Functions | Lines |
 |---|---|---:|---:|---|---:|---:|---:|---:|---:|
-| `packages/backend` | Jest + ts-jest | 71 | 1145 | all passing | ~40s | 94.28% | 73.54% | 94.13% | 95.69% |
-| `packages/frontend` | Vitest + RTL | 130 | 1065 | all passing | ~86s¹ | 85.18% | 76.63% | 80.21% | 86.55% |
-| `packages/public-site` | Vitest + jsdom | 28 | 134 | all passing | ~15s | 86.34% | 70.17% | 87.09% | 88.49% |
+| `packages/backend` | Jest + ts-jest | 71 | 1145 | all passing | ~23s | 94.28% | 73.54% | 94.13% | 95.69% |
+| `packages/frontend` | Vitest + RTL | 130 | 1064 | all passing | ~61s¹ | 85.04% | 76.51% | 80.16% | 86.40% |
+| `packages/public-site` | Vitest + jsdom | 28 | 134 | all passing | ~12s | 86.82% | 70.39% | 87.63% | 88.76% |
 
-¹ Clean re-run, nothing else executing, 19 August 2026 against v2026.08.19:
-**130 files, 1065 tests, all passing, 85.71s.** An earlier measurement on a
-machine contended by a starting dev server reported 2 tests failing rather
-than flaky in the suite itself — see the note in
-[Running the tests](#running-the-tests) on why one of them is load-sensitive
-by design.
+¹ Wall time varies with machine load, so treat it as an order of magnitude
+rather than a figure to match. The ~61s above is from a full `npm test` root run
+on 20 August 2026; the same suite measured 88.28s earlier the same day on a
+contended machine. That contention used to make two tests **fail**, not merely
+run slow; both were fixed on 20 August rather than left as known flakes, and the
+wall-clock budget that was one of them now runs separately as
+`npm run test:perf` (1 test, making 1065 in total). See
+[The performance budget](#the-performance-budget).
 
 ---
 
@@ -49,9 +53,10 @@ already be installed in every workspace).
 
 | Command | Scope | Files | Tests |
 |---|---|---:|---:|
-| `npm test` | Every workspace with a `test` script (see below) | 229 | 2344 |
+| `npm test` | Every workspace with a `test` script (see below) | 229 | 2343 |
 | `npm test --workspace=@ronl/backend` | Backend only (Jest, coverage on by default) | 71 | 1145 |
-| `npm test --workspace=@ronl/frontend` | Frontend only (Vitest, coverage on by default) | 130 | 1065 |
+| `npm test --workspace=@ronl/frontend` | Frontend only (Vitest, coverage on by default) | 130 | 1064 |
+| `npm run test:perf --workspace=@ronl/frontend` | The wall-clock budget, run without file parallelism | 1 | 1 |
 | `npm test --workspace=@ronl/public-site` | Public site only (Vitest, coverage on by default) | 28 | 134 |
 
 ```bash
@@ -82,29 +87,48 @@ fourth, `@ronl/shared`, which has no `test` script at all (only `build`,
 `prepare`, `clean`, `type-check`). That's expected, not a gap: `shared` is a
 types-only package with nothing to unit test.
 
-!!! note "One frontend test carries a load-sensitive wall-clock budget"
-    `simEngine.test.ts`'s performance assertion requires `run(cfg)` to
-    complete under a **250ms budget**. On a clean, unloaded machine — the
-    conditions behind the 1065/1065 figure above — it passes comfortably;
-    but a wall-clock budget is inherently sensitive to CPU contention, and
-    on a machine contended by another process starting (e.g. a dev server)
-    it was observed degrading to **302ms, then 837ms, then 1297ms** across
-    three consecutive contended runs. That is a characteristic of asserting
-    on wall-clock time, not a defect in the test, and it is a plausible
-    source of intermittent CI failures on a busy runner.
-    `ChangelogPanel.test.tsx` carries a generous 15-second timeout for the
-    same reason — `changelog-data.ts` renders 60+ real version entries, so
-    the timeout is generous because the test is slow, not because it is
-    unreliable. Both tests carry source comments explaining the budget and
-    timeout.
+### The performance budget
+
+`simEngine.ts` carries a real budget: `run(cfg)` must process the default
+3,150-application population in under **250ms**. Its source comment is
+emphatic that if the assertion ever fails, the threshold must not be
+loosened — the intended remedy is a web worker, not a bigger number.
+
+The problem was never the threshold. It was that a single `performance.now()`
+call measures the machine as much as it measures the engine. On a machine
+contended by another process starting, the assertion was observed degrading to
+**302ms, then 837ms, then 1297ms** across three consecutive runs; inside a full
+`npm test`, where Vitest saturates every core with 130 parallel test files, even
+the fastest of three CPU-time samples came out at **468ms**. Against ~100ms in
+isolation. Wiring the CI test gate would have made that a permanently red
+pipeline.
+
+So on 20 August 2026 the budget moved rather than moved up:
+
+- The assertion lives in `simEngine.perf.test.ts`, still asserting `< 250ms`,
+  now with a warm-up run and the fastest of three samples so a JIT pause or a
+  stray GC cannot decide it.
+- `vite.config.ts` excludes `src/**/*.perf.test.ts` from the default run.
+- `vitest.perf.config.ts` mirrors it — same plugins, aliases and setup, but the
+  perf specs are the only thing *included*, and `fileParallelism` is off. It
+  spreads and overrides the base test block rather than using `mergeConfig`,
+  which concatenates arrays and would have kept the base `exclude`, hiding the
+  perf specs from their own run.
+- `npm run test:perf` runs it, and both frontend workflows run that as their own
+  blocking CI step.
+
+`ChangelogPanel.test.tsx` was the other casualty of the same contention: its
+15-second timeout was enough in isolation but not inside a full run, where it was
+observed taking 22s. `changelog-data.ts` renders 60+ real version entries, so the
+test is genuinely slow rather than unreliable — and a timeout exists to catch a
+hang, not to assert a speed, so it was raised to 60s. That costs no coverage;
+`simEngine.perf.test.ts` remains the one place a real budget is asserted.
 
 !!! note "Coverage report on failure"
-    Vitest's default is to skip writing a coverage report when any test
-    fails. The frontend figures on this page were captured with
-    `--coverage.reportOnFailure=true` as a precaution against exactly the
-    kind of contended-run failure described above blanking the report; a
-    plain `npm test --workspace=@ronl/frontend` on a contended machine may
-    still finish red with no `coverage/` output at all.
+    Vitest's default is to skip writing a coverage report when any test fails,
+    so a red run loses its coverage figures exactly when you want them. Both the
+    frontend and public-site configs now set `coverage.reportOnFailure: true`,
+    rather than relying on anyone remembering the CLI flag.
 
 ---
 
@@ -140,48 +164,58 @@ fanning out over workspace scripts in the first place.
 ```json
 {
   "packages/frontend/**/*.{ts,tsx}": ["npm run lint:fix --workspace=@ronl/frontend", "prettier --write"],
+  "packages/public-site/**/*.{ts,tsx}": ["npm run lint:fix --workspace=@ronl/public-site", "prettier --write"],
   "packages/backend/**/*.ts": ["npm run lint:fix --workspace=@ronl/backend", "prettier --write"],
   "packages/shared/**/*.ts": ["prettier --write"],
   "*.{json,md}": ["prettier --write"]
 }
 ```
 
-**`packages/public-site/**/*.{ts,tsx}` has no entry.** A staged public-site
-source file gets no ESLint pass and no Prettier pass at commit time — only
-the generic `*.{json,md}` rule applies, and that doesn't match `.ts`/`.tsx`.
-It isn't uncaught for long: `pre-push`'s `npm run lint` and
-`npm run check-format` both cover public-site in full before anything
-reaches the remote, since neither is scoped by the `lint-staged` glob. But a
-local commit alone can carry an unformatted or unlinted public-site change.
+!!! note "`public-site` had no `lint-staged` entry until 20 August 2026"
+    A staged public-site source file got no ESLint pass and no Prettier pass at
+    commit time — only the generic `*.{json,md}` rule applied, and that doesn't
+    match `.ts`/`.tsx`. It was never uncaught for long, since `pre-push`'s
+    `npm run lint` and `npm run check-format` both cover public-site in full and
+    neither is scoped by the `lint-staged` glob, but a local commit alone could
+    carry an unformatted or unlinted public-site change. The glob above closes
+    it; the package already passed both checks, so there was no fallout.
 
 !!! important "The hooks do not run the tests"
-    Neither `pre-commit` nor `pre-push` invokes any `test` script. Nothing
-    client-side stops a push that breaks the backend, frontend, or
-    public-site suite — run `npm test` yourself before pushing anything
-    nontrivial.
+    Neither `pre-commit` nor `pre-push` invokes any `test` script, so nothing
+    client-side stops a push that breaks the backend, frontend, or public-site
+    suite — run `npm test` yourself before pushing anything nontrivial. Since
+    20 August 2026 every deploy pipeline does run them, so a broken push no
+    longer reaches acceptance; the client-side gap is now a matter of feedback
+    speed rather than of what ships.
 
 ### CI
 
 Six Azure workflows under `.github/workflows/`, one acc/prod pair per
 package:
 
-| Workflow | Lint | Type-check | **Tests** | Build | Deploy |
-|---|:---:|:---:|:---:|:---:|:---:|
-| `azure-backend-acc.yml` / `-prod.yml` | ✅ | – | – | ✅ | ✅ |
-| `azure-frontend-acc.yml` / `-prod.yml` | – | – | – | ✅ | ✅ |
-| `azure-publicsite-acc.yml` / `-prod.yml` | ✅ | ✅ | **✅** | ✅ | ✅ |
+| Workflow | Lint | Type-check | **Tests** | Perf budget | Build | Deploy |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| `azure-backend-acc.yml` / `-prod.yml` | ✅ | – | **✅** | – | ✅ | ✅ |
+| `azure-frontend-acc.yml` / `-prod.yml` | ✅ | – | **✅** | **✅** | ✅ | ✅ |
+| `azure-publicsite-acc.yml` / `-prod.yml` | ✅ | ✅ | **✅** | – | ✅ | ✅ |
 
-**Public-site is the one package with a real CI test gate.** Both
-`azure-publicsite-*.yml` workflows run `npm run lint`, `npm run type-check`,
-then `npm test` (Vitest, with coverage) inside `packages/public-site` before
-building and deploying — a failing test blocks the deploy. Backend CI lints
-and builds but never runs Jest. Frontend CI does neither lint nor test — it
-goes straight from `npm ci` to `vite build` to deploy. For backend and
-frontend, `npm test` is a manual discipline enforced by review, not an
-automated gate; for public-site it's enforced by the pipeline itself. A
+**Every package now has a real CI test gate**, as of 20 August 2026 — a failing
+test blocks the deploy in all six workflows. Public-site had one already: both
+`azure-publicsite-*.yml` workflows run `npm run lint`, `npm run type-check`, then
+`npm test` before building. Backend CI lints and builds, and now runs Jest
+alongside the existing lint step. Frontend CI previously ran neither lint nor
+test — straight from `npm ci` to `vite build` to deploy — and now runs
+`npm run lint`, `npm test`, and `npm run test:perf` before the build. A
 post-deployment health check (backend only: 5 retries, 10s apart, against
 `/v1/health`) confirms the deployed instance responds before a backend
 deployment is marked successful.
+
+The gap was deliberate while it lasted: gating on coverage that was still
+climbing was judged theatre, the same call the
+[Linked Data Explorer](../../../linked-data-explorer/developer/testing.md#ci-the-test-gate)
+made and has since reversed for the same reason. All three RONL packages have
+been through their coverage campaigns; there is nothing left for the deferral to
+wait on.
 
 ---
 
@@ -210,11 +244,11 @@ and Doccle live-switch paths, the standalone `mcp-servers/edocs` server, the
 PA dossier-authoring routes/db, `search.service`, `slug`, `notifications.service`,
 `query-match`, and `rss`.
 
-### Frontend (Vitest + RTL) — 130 files, 1065 tests
+### Frontend (Vitest + RTL) — 130 files, 1064 tests
 
 | Area | Files | Tests | Covers |
 |---|---:|---:|---|
-| `src/components` | 90 | 598 | Every dashboard's shared section-component library (`CaseworkerDashboard/`, reused across three of the four V2 dashboards), each dashboard's own components (`CaseworkerDashboardV2`, `PADashboardV2`, `WooDashboard`, `InfraBoardDashboard`), the `*SectionRouter*`/`*Dock*`/`*CommandPalette*`/`*NoAccessPanel*` shells, and reusable widgets (`DecisionViewer`, `AltchaWidget`, `SessionExpiryWarning`, `PersonalDataPanel`, `ProcessStartFormViewer`, `TimeLine`) |
+| `src/components` | 90 | 597 | Every dashboard's shared section-component library (`CaseworkerDashboard/`, reused across three of the four V2 dashboards), each dashboard's own components (`CaseworkerDashboardV2`, `PADashboardV2`, `WooDashboard`, `InfraBoardDashboard`), the `*SectionRouter*`/`*Dock*`/`*CommandPalette*`/`*NoAccessPanel*` shells, and reusable widgets (`DecisionViewer`, `AltchaWidget`, `SessionExpiryWarning`, `PersonalDataPanel`, `ProcessStartFormViewer`, `TimeLine`) |
 | `src/pages` | 28 | 278 | Top-level pages/containers — `Dashboard`, `LoginChoice`, `AuthCallback`, `ChangelogPanel` — plus pure data/config modules (`infra-board/*.data.ts`, `woo/woo.data.ts`, `caseworker-v2/modes.config.ts`, `public-affairs-v2/kompas.ts`) |
 | `src/services` | 10 | 180 | `api.ts` (46 tests — the typed client, `chatStream`'s SSE parsing counted separately at 11), `pa.api` (45), `infra.api`, `dossierbeheer.api`, `brp.api`/`brp.timeline`, `keycloak`, `tenant`, `bsn.mapping` |
 | `src/hooks` | 1 | 4 | `useProfielData` — the manual loading/error/data hook pattern |
@@ -255,14 +289,23 @@ For eDOCS-specific live results, see
 
 ## Coverage
 
-Measured with `npm test --workspace=<pkg>` per package against v2026.08.19
-on 19 August 2026.
+Measured with `npm test --workspace=<pkg>` per package against v2026.08.20
+on 20 August 2026.
 
 | Package | Statements | Branches | Functions | Lines |
 |---|---:|---:|---:|---:|
 | Backend | 94.28% | 73.54% | 94.13% | 95.69% |
-| Frontend | 85.18% | 76.63% | 80.21% | 86.55% |
-| Public site | 86.34% | 70.17% | 87.09% | 88.49% |
+| Frontend | 85.04% | 76.51% | 80.16% | 86.40% |
+| Public site | 86.82% | 70.39% | 87.63% | 88.76% |
+
+The backend figures are unchanged from v2026.08.19 — no file it counts was
+touched. The frontend moved slightly because `src/**/*.perf.test.ts` is now
+excluded from the default run, taking the coverage that spec contributed to
+`simEngine.ts` with it. The public-site figures are a **correction**: no file
+under `packages/public-site/src/` has changed since v2026.08.19, yet the
+previously published numbers do not come out of the command. Re-measured three
+times, including once against the pre-release `vite.config.ts` to rule out this
+release's own change, the result was identical every time.
 
 All three configure `collectCoverageFrom`/`coverage.include` to span the
 whole `src` tree rather than only the files a test happens to import, so an
@@ -285,16 +328,26 @@ silently absent).
 
 ### Backend by area
 
+These are the rows Jest prints, verbatim, so each one can be matched against
+the output of `npm test --workspace=@ronl/backend -- --coverageReporters=text`.
+Sub-directories report separately rather than rolling up into their parent, and
+istanbul truncates to two decimals rather than rounding.
+
 | Area | Statements | Branches | Functions | Lines |
 |---|---:|---:|---:|---:|
-| `middleware/` | 100.00% | 95.83% | 92.31% | 100.00% |
-| `mcp-servers/` | 98.94% | 83.87% | 100.00% | 99.45% |
-| `services/` | 95.97% | 77.73% | 95.95% | 97.14% |
-| `media-aggregator/` | 95.76% | 85.64% | 98.21% | 96.88% |
-| `pa-monitoring/` | 95.26% | 75.99% | 92.05% | 97.48% |
-| `routes/` | 93.44% | 68.62% | 93.04% | 95.05% |
-| `auth/` | 88.89% | 85.71% | 84.62% | 88.06% |
-| `utils/` | 43.48% | 6.54% | 73.33% | 40.48% |
+| `middleware` | 100 | 95.83 | 92.3 | 100 |
+| `mcp-servers/edocs` | 100 | 78.12 | 100 | 100 |
+| `mcp-servers/triplydb` | 100 | 90.9 | 100 | 100 |
+| `services/llm` | 99.02 | 92.3 | 100 | 98.95 |
+| `pa-monitoring/sources` | 96.64 | 75.1 | 91.04 | 98.4 |
+| `mcp-servers/lde` | 96.07 | 82.14 | 100 | 97.95 |
+| `services/mcp` | 96 | 71.62 | 93.9 | 97.84 |
+| `media-aggregator` | 95.75 | 85.63 | 98.21 | 96.87 |
+| `services` | 95.68 | 77.56 | 96.27 | 96.78 |
+| `pa-monitoring` | 94.52 | 76.32 | 92.66 | 97 |
+| `routes` | 93.43 | 68.62 | 93.04 | 95.05 |
+| `auth` | 88.88 | 85.71 | 84.61 | 88.05 |
+| `utils` | 43.47 | 6.54 | 73.33 | 40.47 |
 
 `utils/` is the one deliberately-low area, and it's a known, documented
 artifact, not a gap: `utils/config.ts` sits at 0% because it self-runs
@@ -325,7 +378,7 @@ oversight.
 |---|---:|---:|---:|---:|
 | `src/components` | 96.77% | 100.00% | 96.15% | 96.66% |
 | `src/lib` | 84.90% | 73.17% | 88.88% | 86.20% |
-| `src/pages` | 81.00% | 61.15% | 77.90% | 83.70% |
+| `src/pages` | 82 | 61.51 | 79.06 | 84.26 |
 
 ---
 
@@ -347,8 +400,10 @@ remain described from their configuration and specs only.
 same caseworker against the shared local Operaton engine, so the suite
 trades parallelism for correctness).
 
-**Measured 19 August 2026 against v2026.08.19: 12 tests, 12 passed, 0
-failed, 0 flaky, 0 skipped, 44.7s.**
+**Measured 20 August 2026 against v2026.08.20: 12 tests, 12 passed, 0
+failed, 0 flaky, 0 skipped, 54.1s.** Run against the corrected `e2e-fixtures`
+BPMNs redeployed from the Linked Data Explorer, confirming that chain end to
+end.
 
 | Spec | Covers |
 |---|---|
@@ -382,7 +437,9 @@ navigation, plus three axe-core accessibility scans (home, results, a detail
 page) asserting no critical/serious violations.
 
 **Measured 19 August 2026 against v2026.08.19: 6 tests, 6 passed, 0 failed,
-0 flaky, 0 skipped, 8.9s.**
+0 flaky, 0 skipped, 8.9s.** Unlike every other figure on this page, this one was
+not re-measured for v2026.08.20 — nothing under `packages/public-site/src/`
+changed between the two releases, but the suite was not re-run to confirm it.
 
 Unlike the frontend suite, Playwright starts its own dev server for this
 package (`webServer` in `playwright.config.ts`) — only the backend needs to
@@ -440,6 +497,11 @@ status, independent of the smoke scripts.
   coverage — mock every child component/context one level below what the
   container under test actually consumes, since those children have their
   own test files already.
+- **Keep wall-clock assertions out of the main suite.** A budget asserted
+  against `performance.now()` measures the machine as much as the code once 130
+  test files are competing for cores. Name such a spec `*.perf.test.ts`: the
+  default run excludes them and `npm run test:perf` executes them without file
+  parallelism, as its own CI step.
 - **Update the counts on this page** when a phase lands, from a real run
   (`--json --outputFile=...` for Jest, `--reporter=json --outputFile=...`
   for Vitest) rather than an estimate or a grep for `it(`/`test(` — both
@@ -448,12 +510,6 @@ status, independent of the smoke scripts.
 ---
 
 ## Roadmap
-
-**No CI test gate for backend or frontend.** Public-site is the only package
-where a failing test blocks a deploy. Backend CI lints and builds but never
-runs Jest; frontend CI does neither lint nor test. Wiring a test step into
-`azure-backend-*.yml` (mirroring its existing `npm run lint` step) and into
-`azure-frontend-*.yml` are both open items, not scheduled.
 
 **E2E CI wiring is deliberately deferred for both Playwright suites.** Both
 run locally only today. The frontend suite needs a `webServer`-style

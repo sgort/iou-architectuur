@@ -4,6 +4,22 @@
 
 ## Changelog
 
+## v2026.08.20 — Every Deploy Gated on Its Tests (August 2026)
+
+### Backend and frontend deploys now run the suites
+
+Public-site was the only package whose pipeline could block a deploy. Backend CI linted and built but never ran its 1145 Jest tests; frontend CI ran neither lint nor test, going straight from `npm ci` to `vite build` to deploy. For those two, `npm test` was a manual discipline enforced by review rather than an automated gate. The backend workflows gain a Jest step beside their existing linter, and the frontend workflows gain a linter, the Vitest suite, and the performance budget as a step of its own.
+
+### The simEngine budget moved rather than moved up
+
+`simEngine.ts` carries a real budget: `run(cfg)` must process the default 3,150-application population in under 250ms, and its source comment is emphatic that the threshold must not be loosened — the intended remedy is a web worker, not a bigger number. The problem was never the threshold but what the assertion measured. On a contended host it was observed at 302ms, then 837ms, then 1297ms; inside a full `npm test`, where Vitest saturates every core with 130 parallel files, even the fastest of three CPU-time samples came out at 468ms, against ~100ms in isolation. Wiring the CI gate would have made that a permanently red pipeline. The assertion now lives in `simEngine.perf.test.ts`, still asserting `< 250ms`, run by `npm run test:perf` with file parallelism disabled and gated as its own CI step. `ChangelogPanel.test.tsx` was the other casualty of the same contention — 15s timeout, observed at 22s — raised to 60s, since a timeout catches a hang rather than asserting a speed.
+
+### Two Vitest config defects, and a lint-staged blind spot
+
+`setupFiles` resolved against the process cwd rather than the config file, so the single-file command documented on the [Testing](testing/overview.md) page failed from the repo root and worked only from inside the package. `coverage.reportOnFailure` is now set in both frontend and public-site, so a red run keeps its coverage figures instead of discarding them exactly when they are wanted. And `lint-staged` had globs for frontend, backend and shared but none for `packages/public-site`, so a staged public-site source file got neither ESLint nor Prettier at commit time — `pre-push` always caught it, but a local commit could carry it.
+
+---
+
 ## v2026.08.19 — DMN Downloads + Tenant-Mandatory Deployment Closed Out (August 2026)
 
 ### DMN source files downloadable from the public rule catalogue
