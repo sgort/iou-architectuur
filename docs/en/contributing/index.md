@@ -55,6 +55,13 @@ For component-specific development setup, refer to each component's Developer Do
 
 ## How to Contribute for Developers
 
+There are two equally valid routes into development, depending on the tooling you have
+to hand. **Maintainers and core contributors** working with the AI-assisted pipeline
+should follow the [Development Workflow](development-workflow/overview.md) subsection
+instead. **Everyone else** — anyone contributing without that toolchain — should use the
+fork-and-merge-request process below, which is the complete and correct route into the
+project regardless of which repository you're contributing to.
+
 ### 1. Open an issue first
 
 Before starting any significant work, open an issue in the relevant repository to describe
