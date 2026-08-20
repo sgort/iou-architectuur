@@ -423,6 +423,11 @@ extra:
 # Watch additional directories for changes
 watch:
   - docs/includes
+  # mkdocs serve watches docs_dir and mkdocs.yml by default, but NOT the
+  # theme's custom_dir. Without these, editing a template or the hook leaves
+  # a running server rendering the previous version with no visible sign.
+  - overrides
+  - hooks
 
 not_in_nav: |
   includes/abbreviations.md

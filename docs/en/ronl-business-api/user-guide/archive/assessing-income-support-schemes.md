@@ -5,7 +5,7 @@ title: Assessing income support schemes
 
 !!! warning "Archived — not maintained"
     This guide is kept for reference and is no longer updated. It describes the
-    application around **v2.9.1**; the current documented version is **v3.9.1**.
+    application around **v2.9.1**.
     For current documentation see [Getting Started](../getting-started.md).
 
 # Assessing income support schemes

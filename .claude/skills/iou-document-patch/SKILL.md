@@ -74,6 +74,16 @@ If a sync's content belongs on an archived topic, write it on the current page
 instead. The archive only ever grows: pages enter it when a restructure retires
 them, and never leave.
 
+**An archive banner must never name the component's current version.** Say what
+the archived page describes ("describes the application around v2.9.1") and
+where to go instead — never "the current documented version is vX". That clause
+is stale the moment the next sync lands, and it cannot be corrected later
+without editing frozen pages. The rendered metadata header is likewise
+suppressed on any page under an `archive/` path segment, for the same reason:
+the version is looked up globally at build time, so an archived page would
+otherwise assert the current version directly above a banner describing an
+older one.
+
 This freeze governs *content*, not the mechanical link repair a move itself
 makes necessary. When pages are moved into `archive/`, their relative links and
 image paths have to be re-depthed or they resolve nowhere — that repair is a
