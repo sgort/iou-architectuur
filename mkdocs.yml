@@ -349,6 +349,7 @@ nav:
       - Overview: contributing/development-workflow/overview.md
       - Design & Handoff: contributing/development-workflow/design-and-handoff.md
       - Working with Claude Code: contributing/development-workflow/working-with-claude-code.md
+      - Skills & Boundaries: contributing/development-workflow/skills-and-boundaries.md
     - Documentation Architecture:
       - Overview: contributing/doc-architecture/overview.md
       - Navigation Structure: contributing/doc-architecture/navigation.md

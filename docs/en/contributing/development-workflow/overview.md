@@ -41,12 +41,12 @@ documentation repository — brings these docs into sync with the new release.
 This page is a map, not the territory. The rest of the subsection covers each stage in
 more depth:
 
-- **Design & Handoff** — when a feature warrants Claude Design, and what the handoff
-  package contains
-- **Working with Claude Code** — `claude-mem`, inline work versus the `superpowers`
-  plugin, and red/green TDD in practice
-- **Skills & Boundaries** — user-level versus project-level skills, and the working
-  rules every session follows
+- **[Design & Handoff](design-and-handoff.md)** — when a feature warrants Claude
+  Design, and what the handoff package contains
+- **[Working with Claude Code](working-with-claude-code.md)** — `claude-mem`, inline
+  work versus the `superpowers` plugin, and red/green TDD in practice
+- **[Skills & Boundaries](skills-and-boundaries.md)** — user-level versus
+  project-level skills, and the working rules every session follows
 
 For the process outside contributors follow instead, see the
 [Contributing overview](../index.md).

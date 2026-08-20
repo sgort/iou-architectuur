@@ -44,5 +44,5 @@ and pretending otherwise is cargo cult.
 ## What this means for a contributor
 
 Within all of this, the assistant works inside recorded boundaries — rules about what it
-will do unprompted and what it always asks first. The next page in this subsection
-covers those boundaries in detail.
+will do unprompted and what it always asks first. [Skills & Boundaries](skills-and-boundaries.md),
+the next page in this subsection, covers those boundaries in detail.
