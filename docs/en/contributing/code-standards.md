@@ -63,23 +63,36 @@ didn't break a test — only CI, or running the suite yourself, tells you that.
 
 ## CI
 
-CI is not a mirror of the hooks, and where it diverges the gap matters. Both gaps below
-are in RONL Business API's per-package Azure deployment workflows, which each build and
-deploy one package independently:
+Every deploy pipeline that has something to test now runs the suite before it builds,
+and a failing test blocks the deploy. That has only been true since 20 August 2026 —
+before then CI and the hooks left the same gap, and RONL Business API's public-site
+package had the only real test gate anywhere.
 
-- The **public-site** package's CI runs lint, a type check, and the unit test suite
-  before it builds — the only one of the three packages with a real test gate in CI.
-- The **frontend** package's CI — despite carrying the repository's largest test
-  suite — runs neither lint nor tests. Its workflow goes straight to
-  `npm run build:acc` / `npm run build:prod`.
-- The **backend** package's CI runs lint before building, but not tests.
+**RONL Business API** — six workflows, one acc/prod pair per package:
 
-Linked Data Explorer's backend CI runs lint before building; its frontend deploy runs
-only the Azure Static Web Apps build step, with no separate lint or test step. CPSV
-Editor's CI is a plain Azure Static Web Apps build with no lint or test step at all.
+| Workflow pair | Lint | Type-check | Tests | Notes |
+|---|:---:|:---:|:---:|---|
+| `azure-backend-*` | ✅ | – | ✅ | Builds and uploads a deployment artifact; it does not deploy |
+| `azure-frontend-*` | ✅ | – | ✅ | Also runs `npm run test:perf`, the wall-clock budget, as a step of its own |
+| `azure-publicsite-*` | ✅ | ✅ | ✅ | Its build additionally gates on a prerender and a bundle-cleanliness check |
 
-None of this replaces running the suite yourself before you open a merge request — see
-Testing, below.
+The frontend's performance budget runs separately because it asserts wall-clock time,
+which means nothing while 130 test files compete for cores — see
+[The performance budget](../ronl-business-api/developer/testing/overview.md#the-performance-budget).
+
+**Linked Data Explorer** — six workflows. Both backend and both frontend workflows run
+lint and then the suite before building. The two `ropa-site` workflows run neither, and
+correctly so: that package is a static `index.html` plus a `staticwebapp.config.json`,
+with no build and no test script to run.
+
+**CPSV Editor** — both Azure Static Web Apps workflows, `acc` and `main` alike, run
+`npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy action.
+
+None of this replaces running the suite yourself before opening a merge request — and a
+green local run is weaker evidence than it looks. RONL Business API's first gated run
+failed on test files that had been latently broken for weeks: ts-jest caches type
+diagnostics per file, so a warm local cache kept skipping the check that CI, starting
+cold, performed immediately. Clearing the cache reproduced it at once.
 
 ---
 

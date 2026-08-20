@@ -65,7 +65,9 @@ graph LR
 
 ## Build & Deploy Pipeline
 
-Every push to `main` triggers a GitHub Actions workflow that builds the site and deploys to Azure Static Web Apps. The `acc` branch deploys to the acceptance environment.
+Every push to `main` triggers a GitHub Actions workflow that builds the site with MkDocs and deploys the result to Azure Static Web Apps; pull requests against `main` build a preview. That workflow is the repository's only pipeline, and `main` is its only trigger — `acc` is an integration branch that accumulates work for review and does **not** deploy anywhere.
+
+The build runs `mkdocs build --verbose`, not `--strict`, so a broken internal link or a page missing from the nav produces a warning rather than failing the deploy. Run `mkdocs build --strict` locally before pushing if you want that caught.
 
 ```mermaid
 graph TB
