@@ -30,6 +30,7 @@ adapt the paths — the same staging applies.
 | Home "What's New" card | `docs/en/index.md` (and `docs/nl/index.md`) — CPSV Editor grid card |
 | Screenshots referenced by docs | `../../assets/screenshots/cpsv-editor-*.png` → real files in `docs/assets/screenshots/` (language-neutral, served at site root) |
 | Testing page | `docs/en/<component>/developer/testing.md` — the site is the **single source of truth** for test docs (see Stage 2d) |
+| Cross-cutting contributor docs | `docs/en/contributing/**` — **not component-scoped, and easy to miss.** These pages describe the tooling across *all* components at once: CI, git hooks, lint/format scripts, the repository table, the release process. A single component's release can falsify them. See Stage 2e |
 | Per-page metadata header | `component:` front matter on every edited/added page (see below) |
 
 ### Known components beyond CPSV Editor
@@ -320,6 +321,53 @@ Page structure that worked well:
 | Adding tests | Conventions — colocation, splitting, phase scripts, where to mock |
 | Roadmap | Remaining phases and what is deliberately out of scope |
 
+### Stage 2e — Cross-cutting contributor documentation
+
+Everything above is component-scoped. `docs/en/contributing/**` is not, and that
+is exactly why it goes stale unnoticed: it describes the tooling across **all**
+components at once, so a change in any one of them can falsify a sentence that
+never mentions that component by name.
+
+**This has already happened.** The CI test gates added on 20 August 2026 —
+across three separate repositories, in three separate releases — invalidated
+every claim in `code-standards.md`'s CI section. Three consecutive
+`/iou-document-patch` runs updated the component pages correctly and left that
+section describing a world that no longer existed, because nothing in this skill
+pointed at it.
+
+So for every sync, grep these pages for claims about the component you are
+syncing, and about the tooling its release touched:
+
+| Page | Goes stale when |
+|---|---|
+| `contributing/code-standards.md` | CI steps, git hooks, or a lint/format/test script name changes in any repo |
+| `contributing/index.md` | A repository is added or renamed, or its issue tracker or local-development page moves |
+| `contributing/development-workflow/overview.md` | The pipeline's shape changes — a stage added, removed, or reordered |
+| `contributing/development-workflow/working-with-claude-code.md` | Session-memory tooling, the plugin set, or the TDD/subagent workflow changes |
+| `contributing/development-workflow/skills-and-boundaries.md` | A `~/.claude/CLAUDE.md` rule is added or promoted, or a project-level command/skill is added, moved or removed. Note it states the rule **count** — verify it |
+| `contributing/development-workflow/design-and-handoff.md` | The handoff package's shape or its route into the repo changes |
+| `contributing/doc-architecture/*.md` | This site's own stack, hosting or build changes — those pages describe the documentation repository itself |
+
+Two checks worth running every time, because both have caught real drift:
+
+```
+grep -rniE "no test|not run|never run|only .* (has|one)|neither lint nor" docs/en/contributing/
+grep -rniE "azure-[a-z-]+|Static Web Apps|pre-push|pre-commit|lint-staged" docs/en/contributing/
+```
+
+The second pattern matters more than it looks: these pages name CI jobs and git
+hooks without naming the component they belong to, so a component-scoped search
+never surfaces them.
+
+**Read the workflow and hook files rather than the previous prose.** The CI
+section was rewritten by enumerating all fourteen workflow files across the three
+repositories; doing that surfaced three facts the old text never had. Editing the
+sentence that looks wrong will leave the four beside it that also are.
+
+Where a claim counts things (`all three repositories`, `nine rules`, `the only
+package that…`), re-count. A release that adds a fourth of something turns an
+exhaustive claim into a false one without touching any word in the sentence.
+
 ---
 
 ## Stage 3 — Apply (only after approval)
@@ -361,6 +409,9 @@ Work in this order so a failure leaves the docs in an obvious half-state:
 9. **`repo-versions.json`** — set the component's `version`/`commit`/
    `commit_date`/`environment`/`repo_url` and the top-level `docs_built` to the
    user-confirmed values.
+10. **Cross-cutting contributor pages** — apply any corrections found in
+    Stage 2e. Verify each against the source file (workflow YAML, `.husky/*`,
+    `package.json`) rather than against the prose being replaced.
 
 ## Stage 4 — Verify & report
 
@@ -398,7 +449,12 @@ Work in this order so a failure leaves the docs in an obvious half-state:
    The only image warnings should be exactly the **NEW** manifest files (the not-
    yet-captured `.png`s). Any warning about a missing `.md` target or an existing
    screenshot is a real broken link — fix it.
-5. Report a summary: gap closed, files changed grouped by perspective, the
+5. **Cross-cutting claims** — re-read whatever you changed under
+   `docs/en/contributing/` against the source one last time, and confirm no
+   *neighbouring* sentence in the same section still describes the old state.
+   The failure mode here is a half-corrected section, which reads as
+   authoritative while being wrong.
+6. Report a summary: gap closed, files changed grouped by perspective, the
    screenshot manifest path with NEW/REPLACE counts, and the metadata written.
    Explicitly list what still needs a human: capturing the screenshots and
    translating any NL pages left as placeholders.
@@ -426,3 +482,8 @@ Work in this order so a failure leaves the docs in an obvious half-state:
 - **Respect the i18n rule** — never turn an NL placeholder into a half-English
   page; leave placeholders as placeholders unless the user asks for translation.
 - **repo-versions.json values come from the user**, not from guesses.
+- **A component sync is not finished at the component boundary.** The
+  cross-cutting pages under `docs/en/contributing/` describe every component at
+  once and carry no `component:` front matter to flag them as in-scope. They
+  have already been left stale by three consecutive syncs of this skill. Treat
+  Stage 2e as part of the sync, not as optional tidying.
