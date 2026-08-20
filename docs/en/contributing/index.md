@@ -36,6 +36,7 @@ Each component of the IOU Architecture ecosystem lives in its own repository on 
 |---|---|---|
 | IOU Architecture Docs | [showcases/iou-architectuur](https://git.open-regels.nl/showcases/iou-architectuur) | [Issues](https://git.open-regels.nl/showcases/iou-architectuur/-/issues) |
 | RONL Business API | [hosting/ronl-business-api](https://git.open-regels.nl/hosting/ronl-business-api) | [Issues](https://git.open-regels.nl/hosting/ronl-business-api/-/issues) |
+| Norm Editor | [regels/editor](https://git.open-regels.nl/regels/editor) | [Issues](https://git.open-regels.nl/regels/editor/-/issues) |
 | CPSV Editor | [showcases/ttl-editor](https://git.open-regels.nl/showcases/ttl-editor) | [Issues](https://git.open-regels.nl/showcases/ttl-editor/-/issues) |
 | Linked Data Explorer | [hosting/linked-data-explorer](https://git.open-regels.nl/hosting/linked-data-explorer) | [Issues](https://git.open-regels.nl/hosting/linked-data-explorer/-/issues) |
 | CPRMV API | [standards/cprmv](https://git.open-regels.nl/standards/cprmv) | [Issues](https://git.open-regels.nl/standards/cprmv/-/issues) |
@@ -43,6 +44,7 @@ Each component of the IOU Architecture ecosystem lives in its own repository on 
 For component-specific development setup, refer to each component's Developer Docs:
 
 - [RONL Business API — Local Development](../ronl-business-api/developer/local-development.md)
+- [Norm Editor — Local Development](../norm-editor/developer/local-development.md)
 - [CPSV Editor — Local Development](../cpsv-editor/developer/local-development.md)
 - [Linked Data Explorer — Local Development](../linked-data-explorer/developer/local-development.md)
 - [CPRMV API — Local Development](../cprmv-api/developer/local-development.md)
@@ -57,10 +59,10 @@ For component-specific development setup, refer to each component's Developer Do
 
 There are two equally valid routes into development, depending on the tooling you have
 to hand. **Maintainers and core contributors** working with the AI-assisted pipeline
-should follow the [Development Workflow](development-workflow/overview.md) subsection
-instead. **Everyone else** — anyone contributing without that toolchain — should use the
-fork-and-merge-request process below, which is the complete and correct route into the
-project regardless of which repository you're contributing to.
+should follow the [Development Workflow](development-workflow/overview.md) subsection.
+**Contributors working from a fork** should use the fork-and-merge-request process
+below, which is the complete and correct route into the project regardless of which
+repository you're contributing to.
 
 ### 1. Open an issue first
 

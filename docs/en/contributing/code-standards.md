@@ -1,9 +1,10 @@
 # Code Standards
 
-This page covers the three application repositories with npm-based tooling — CPSV
-Editor (`ttl-editor`), Linked Data Explorer, and RONL Business API. It documents what
-their tooling actually enforces, measured from each repository's own configuration
-rather than assumed to be uniform.
+This page covers three application repositories — CPSV Editor (`ttl-editor`), Linked
+Data Explorer, and RONL Business API — that share a common tooling convention:
+Husky-managed git hooks, npm workspaces, and four identically named root scripts. It
+documents what their tooling actually enforces, measured from each repository's own
+configuration rather than assumed to be uniform.
 
 ---
 
@@ -85,7 +86,11 @@ Testing, below.
 ## Commit messages
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/), as
-described in [Contributing → Commit your changes](index.md#5-commit-your-changes).
+described in [Contributing → Commit your changes](index.md#5-commit-your-changes). None
+of the three repositories above enforce this mechanically — Norm Editor does: its
+`commit-msg` and `pre-push` git hooks reject any commit whose subject line does not
+match the Conventional Commits pattern, so a non-conforming message there hard-fails
+rather than merely failing review.
 
 **No Claude attribution trailers.** If you're using an AI assistant to help prepare a
 commit, the commit message ends with its substantive body and nothing else —

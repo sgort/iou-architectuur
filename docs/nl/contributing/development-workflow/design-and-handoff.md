@@ -1,4 +1,4 @@
-# Design & Handoff
+# Design & Overdracht
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.

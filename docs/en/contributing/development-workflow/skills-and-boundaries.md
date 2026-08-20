@@ -89,3 +89,6 @@ verify. It is a *skill*, defined once in this repository at
 
 Neither is documented here beyond what it is for and where it lives — read the skill
 and command files themselves for how they work.
+
+Once a change is ready to commit, [Code Standards](../code-standards.md) covers what
+the repository's own tooling — lint, format and hooks — actually enforces.

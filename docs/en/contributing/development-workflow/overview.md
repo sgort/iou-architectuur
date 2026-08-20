@@ -21,14 +21,13 @@ stage, not something that enters the repository as-is.
 ## 3. Implementation
 
 Implementation happens in Claude Code, with `claude-mem` capturing session memory by
-default (its viewer runs at `http://localhost:37780`). Depending on the size of the
-change, work proceeds either inline or through the `superpowers` plugin. Either way it
-follows **red/green TDD**: the failing test comes first, then the minimum code needed
-to make it pass.
+default. Depending on the size of the change, work proceeds either inline or through the
+`superpowers` plugin. Either way it follows **red/green TDD**: the failing test comes
+first, then the minimum code needed to make it pass.
 
 ## 4. Release
 
-A release is cut with `/bump-release`, a skill defined per repository — each component
+A release is cut with `/bump-release`, a command defined per repository — each component
 keeps its own version, tailored to its own changelog format.
 
 ## 5. Documentation
@@ -47,6 +46,8 @@ more depth:
   work versus the `superpowers` plugin, and red/green TDD in practice
 - **[Skills & Boundaries](skills-and-boundaries.md)** — user-level versus
   project-level skills, and the working rules every session follows
+- **[Code Standards](../code-standards.md)** — what lint, format, hooks and CI
+  actually enforce, measured per repository
 
 For the process outside contributors follow instead, see the
 [Contributing overview](../index.md).

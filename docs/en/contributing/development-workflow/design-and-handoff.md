@@ -36,3 +36,6 @@ against the wrong data.
 specifies into the real source files and leave the folder untracked, or remove it
 before the final commit. It has done its job once implementation starts; it does not
 belong in the commit history alongside it.
+
+From here, implementation itself is [Working with Claude Code](working-with-claude-code.md),
+the next page in this subsection.

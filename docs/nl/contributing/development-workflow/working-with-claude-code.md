@@ -1,4 +1,4 @@
-# Working with Claude Code
+# Werken met Claude Code
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
@@ -14,6 +14,8 @@
 ## Session memory
 
 ## Inline versus superpowers
+
+## Subagent-driven development
 
 ## Red/green test-driven development
 

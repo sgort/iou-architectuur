@@ -214,10 +214,12 @@ Features, Developer Docs and References follow the same pattern for every compon
 - **Design** — for features where the UX is substantial, work starts in Claude Design; small changes skip straight to implementation.
 - **Handoff** — a finished design leaves as a briefing package for the next stage, not as code.
 - **Implementation** — happens in Claude Code, following red/green TDD: a failing test first, then the minimum code needed to pass it.
-- **Release** — each component cuts its own release with a versioning skill tailored to its changelog.
+- **Release** — each of the application repositories cuts its own release with a versioning command tailored to its changelog.
 - **Documentation** — once a component ships, these docs are brought back into sync with it.
 
 [Development Workflow →](contributing/development-workflow/overview.md){ .md-button }
+
+Not part of the core team? Start from the [Contributing Guide](contributing/index.md) instead.
 
 ---
 

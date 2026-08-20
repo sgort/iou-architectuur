@@ -5,7 +5,8 @@ once a change (with or without a handoff package behind it) reaches Claude Code.
 
 ## Session memory
 
-`claude-mem` runs by default and captures session memory as work proceeds. Its viewer
+[`claude-mem`](https://github.com/thedotmack/claude-mem) runs by default and captures
+session memory as work proceeds. Its viewer
 runs at `http://localhost:37780`. The port is configurable via
 `CLAUDE_MEM_WORKER_PORT` in `~/.claude-mem/settings.json` — if you have changed it
 locally, use your own value instead.
@@ -13,12 +14,41 @@ locally, use your own value instead.
 ## Inline versus superpowers
 
 Small, well-understood changes proceed inline. Multi-step work goes through the
-`superpowers` plugin instead, which structures it as brainstorming a design, writing a
-plan, and executing it with review between tasks.
+[`superpowers`](https://github.com/obra/superpowers) plugin instead, which structures it
+as brainstorming a design, writing a plan, and executing it with review between tasks.
 
 The choice is made by the size and uncertainty of the work, not by preference. A change
 whose steps and outcome are already clear does not need a plan written for it; a change
 where either is still unclear benefits from `superpowers` slowing it down.
+
+## Subagent-driven development
+
+Once a plan exists, it is executed one task at a time, and each task goes to a **fresh
+subagent** rather than continuing in the session that wrote the plan. The subagent
+receives a brief containing only what its own task needs — the files, the exact values,
+the constraints that bind it — and none of the conversation history behind it.
+
+After each task, a **separate reviewer** reads the resulting diff and checks two things:
+that the task did what the plan specified, and that the result is good work on its own
+terms. The implementer's own self-review does not replace this. When the reviewer finds
+something, a fix round follows and the review is repeated, scoped to the fix. When every
+task is done, one broader review reads the whole branch at once, which is the only stage
+that can catch the things no single task could see — a page contradicting another page,
+a reader's route through the result, a claim that drifted.
+
+Progress is recorded in a **ledger file**, not only in the conversation, because
+conversation memory does not survive being compacted. The ledger names every commit and
+every decision taken along the way, so work can resume accurately after a break.
+
+Two properties make this worth the overhead:
+
+- **Context isolation.** An implementer that never sees the preceding twenty tasks
+  cannot be distracted or misled by them, and the reviewing agent has no stake in the
+  implementation it is judging.
+- **The brief is not the authority.** Where a brief and the source disagree, the source
+  wins and the implementer is expected to say so. During the work that produced this
+  subsection, five separate briefs turned out to be wrong and were correctly overridden
+  from what was actually on disk. That is the intended behaviour, not insubordination.
 
 ## Red/green test-driven development
 
