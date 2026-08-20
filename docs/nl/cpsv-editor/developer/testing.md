@@ -21,6 +21,8 @@ component: CPSV Editor
 
 ### Git hooks
 
+### CI
+
 ---
 
 ## Test inventory

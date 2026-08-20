@@ -8,6 +8,20 @@ component: Linked Data Explorer
 
 ## Changelog
 
+### v2026.08.3 — A test gate, and two defects it did not catch (August 2026)
+
+> Full inventory, commands and coverage: [Testing](testing.md).
+
+**Every deploy now runs the suites, and a failure blocks the deploy.** None of the six Azure workflows previously ran a test step. That was a deliberate P7 decision taken when backend coverage was first measured at 13.82% statements — gating on a number that low would have been theatre — and it was recorded as conditional on backend breadth improving. v2026.08.2 took the backend from 16.79% to 98.06%, meeting the condition. The backend workflows already installed and linted, so a Jest step slots in beside the existing lint; the frontend workflows had no npm steps at all, because the Static Web Apps action builds inside its own container and runs none of this repository's scripts, and they gain an explicit install, lint and test sequence ahead of the deploy action. The two `ropa-site` workflows are deliberately untouched — that package is a static `index.html` with no build and no tests.
+
+**E2E fixture BPMNs were undeployable, and nothing caught it.** BPMN 2.0's `tProcess` is an ordered sequence — `laneSet*`, `flowElement*`, `artifact*`, … — so once an artifact appears, no further flow element may follow. The commit that added the on-canvas "E2E FIXTURE" warning inserted its `textAnnotation` and `association` directly after the first flow element, leaving four of the five fixtures rejected by Operaton's XSD validation on deploy. `TreeFellingPermitSubProcessE2E` was the one file with the banner correctly at the end, and the only one that deployed. Each banner moved to just before `</bpmn:process>`; all five now validate against `bpmn-moddle`'s `BPMN20.xsd`. The manifest integrity test checked file existence, process ids and `calledElement` references but never whether the BPMN would deploy — it now asserts the ordering rule directly.
+
+**The BPMN deploy dialog sent the wrong process key for every model.** `doc.querySelector('process')` is a CSS *type* selector, which matches only the null namespace, so it never found the `<bpmn:process>` element that real bpmn-js output always emits. All four call sites fell through to their own fallbacks: deployments posted the literal string `"process"` instead of the model's id, and sub-process lookups by `calledElement` never matched. A `findProcessElement` helper now matches on local name across namespaces. The test covering this had asserted the fallback as correct, blaming a jsdom quirk — half right, since its fixture declared none of the prefixes it used, so `DOMParser` rejected the document outright and returned a `<parsererror>` in which nothing was findable, masking the real defect underneath.
+
+**The error overlay is reachable from the view that raises it.** It lived inside `App`'s right panel, which is hidden whenever `viewMode` is Orchestration — the only view from which Refresh Cache can be triggered. A failed cache clear set the error state correctly and had nowhere to render, staying silent until the user happened to navigate elsewhere, where a stale error then appeared out of context. The overlay is now a direct child of the workspace container and renders in every view.
+
+---
+
 ### v2026.08.2 — DMN deploy/evaluate proxies & ten dead validation rules (August 2026)
 
 **v2026.08.2 — Feature & Patch (August 18, 2026)**

@@ -12,10 +12,10 @@ design; see [Roadmap](#roadmap) for why, and what comes next.
 
 !!! info "Figures on this page are measured, not estimated"
     Every count, command and coverage percentage below was produced by
-    running the suite against **v2026.08.0** on **18 August 2026**. Rerun the
+    running the suite against **v2026.08.1** on **20 August 2026**. Rerun the
     commands in [Running the tests](#running-the-tests) to reproduce them.
 
-**At a glance:** 16 suites · **257 tests** · all passing · ~50 s for a full
+**At a glance:** 16 suites · **257 tests** · all passing · ~46 s for a full
 run with coverage.
 
 ---
@@ -80,11 +80,25 @@ Husky installs two hooks:
 | `pre-push` | `npm run lint` then `npm run check-format` |
 
 !!! important "The hooks do not run the tests"
-    `pre-push` gates on lint and formatting only. Nothing stops a push that
-    breaks the suite, so run `npm run test:ci` yourself before pushing.
+    `pre-push` gates on lint and formatting only, so nothing client-side stops
+    a push that breaks the suite — run `npm run test:ci` yourself before
+    pushing. Since 20 August 2026 the deploy pipelines do run it, so a broken
+    push no longer reaches acceptance or production; see [CI](#ci).
     Note that `check-format` runs across the **whole tree**, not just staged
     files — a Prettier violation in a Markdown file fails the push just as a
     source file would.
+
+### CI
+
+Both Azure Static Web Apps workflows — `azure-static-web-apps-orange-beach-…`
+(deploying `acc`) and `azure-static-web-apps-white-sky-…` (deploying `main`) —
+run `npm run lint` and then `npm run test:ci` before the deploy action, and a
+failure blocks the deploy.
+
+Until 20 August 2026 neither ran anything of ours at all: the Static Web Apps
+action builds inside its own container and invokes none of the repository's
+scripts, so the workflows went from checkout straight to build-and-deploy. Both
+now carry an explicit Node setup, `npm ci`, lint and test sequence ahead of it.
 
 ---
 
@@ -117,7 +131,7 @@ it.
 | File | Tests | Style | Covers |
 |---|---:|---|---|
 | `src/utils/dmnHelpers.test.js` | 54 | Real DOM parsing (jsdom `DOMParser`) | Primary-decision-key extraction (root detection, `p_*` constant skipping, multi-root tie-breaking), rule and cell extraction, `validateDMNData`, concept generation, `evaluateTestCaseExpectation`, `extractOutputsFromDMN` |
-| `src/utils/validators.test.js` | 29 | Pure unit | All eight form validators, plus `validateForm` aggregation across every section including array fields |
+| `src/utils/validators.test.js` | 29 | Pure unit | All eight exports: the six per-section validators, the `validateForm` aggregation across every section including array fields, and the `isValidDate` helper |
 | `src/utils/iknowParser.test.js` | 24 | Real DOM parsing | Both iKnow XML export formats, format auto-detection, the field-map helper, the dot-path value extractor, and `applyMapping` including filters and transforms |
 | `src/utils/cprmvImport.test.js` | 13 | Pure unit | `flattenCprmvRules` — sub-clause folding, namespace variants (0.4.1 slash, 0.3.0 `contains`, legacy flat arrays), multi-entry input, malformed input tolerance, id uniqueness |
 | `src/utils/ronlHelper.test.js` | 5 | `global.fetch` mock | The two SPARQL functions that query the RONL vocabulary through the shared backend proxy |
@@ -153,7 +167,7 @@ tests.
 
 ## Coverage
 
-Measured with `npm run test:ci` against v2026.08.0 on 18 August 2026.
+Measured with `npm run test:ci` against v2026.08.1 on 20 August 2026.
 
 **Overall: 54.58% statements · 40.81% branches · 38.51% functions · 55.42% lines.**
 
@@ -287,9 +301,10 @@ toolchain instead of twice.
 round-trip tests are the data that should decide whether the hand-rolled
 parser is fragile enough to justify the migration cost); OIDC and production
 publishing auth, which is a separate security workstream described in
-[Due Diligence](due-diligence.md); and visual regression, cross-browser
-matrices and CI wiring, which are worth revisiting once the phases above are
-stable locally.
+[Due Diligence](due-diligence.md); and visual regression and cross-browser
+matrices, which are worth revisiting once the phases above are stable locally.
+CI wiring was on this list too, and came off it on 20 August 2026 — see
+[CI](#ci).
 
 An E2E phase here will not resemble the RONL Business API's. There is no
 Keycloak, no roles and no tenants — the editor is a single-user authoring tool

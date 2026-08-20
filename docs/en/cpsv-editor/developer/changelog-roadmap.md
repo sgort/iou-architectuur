@@ -8,6 +8,18 @@ component: CPSV Editor
 
 ## Changelog
 
+### v2026.08.1 — Deploys Gated on the Test Suite (August 2026)
+
+> Full inventory, commands and coverage: [Testing](testing.md).
+
+**Both deploy workflows now run lint and the full test suite before deploying, and a failure blocks the deploy.** Neither Azure Static Web Apps workflow previously ran anything of this repository's own: the deploy action builds inside its own container and invokes none of the project's scripts, so both went from checkout straight to build-and-deploy. With `pre-push` gating only `lint` and `check-format`, nothing anywhere stopped a deploy that broke the suite. Both workflows now carry an explicit Node 20 setup, `npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy action — covering `acc` (orange-beach) and `main` (white-sky) alike. Measured before wiring: 16 suites, 257 tests, all passing.
+
+**Repo-side test documentation is retired in favour of this site.** `docs/TESTS.md` (333 lines) and `docs/TESTING-GUIDE.md` (188 lines) are deleted. [Testing](testing.md) is the single source of truth for the suite, and the repo-side copies had drifted from what the tests actually do.
+
+**The Changelog tab label loses a stray exclamation mark.** An earlier commit changed the label from `Changelog` to `Changelog!` with nothing else in that commit touching it and no test asserting on it; it read as an accidental edit rather than deliberate copy, and is reverted. The two changes cancel out within this release, so there is no net change for users.
+
+---
+
 ### v2026.08.0 — Cell-Level Legislative Grounding & Backend-Routed DMN Calls (August 2026)
 
 > Full deep-dive: [Cell-Level Legislative Grounding](cell-level-grounding.md).

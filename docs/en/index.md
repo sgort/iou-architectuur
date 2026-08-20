@@ -137,13 +137,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.08.19** · *August 2026*
+-   **⚙️ RONL Business API — v2026.08.20** · *August 2026*
 
     ---
 
-    **A public knowledge base, a twelve-phase portfolio ladder, and tenant-scoping closed out**
+    **Every deploy gated on its tests**
 
-    A new [public site](ronl-business-api/user-guide/public-site.md) — a separate, auth-free package with federated search, a rule catalogue, a provenance explorer, prerendering, and axe-core accessibility scans — joins a twelve-phase RIP portfolio ladder with live phase-count and deployment-status APIs. Tenant-scoping was closed out across the platform, including a cross-tenant data leak fixed in two endpoints that queried Operaton with no tenant filter at all. A test-coverage campaign completed its final phases (P1–P11) alongside new Playwright E2E suites, and the project switched to CalVer versioning.
+    Public-site was the only package whose pipeline could block a deploy: backend CI never ran its 1145 Jest tests, and frontend CI ran neither lint nor test. All six workflows now run the [suites](ronl-business-api/developer/testing/overview.md) before deploying. Wiring that up meant confronting a wall-clock performance budget that failed under the parallel suite's own CPU contention — it now runs as its own non-parallel step, with the 250ms threshold intact rather than loosened.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
@@ -157,23 +157,23 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.08.0** · *August 2026*
+-   **✏️ CPSV Editor — v2026.08.1** · *August 2026*
 
     ---
 
-    **Cell-level legislative grounding & backend-routed DMN calls**
+    **Deploys gated on the test suite**
 
-    Legislation can now be linked at [decision-table cell granularity](cpsv-editor/developer/cell-level-grounding.md) — finer than DMN's decision-level `knowledgeSource` or CPRMV's rule-level `isBasedOn` — published as per-cell `cprmv:Rule` resources that validate clean against the CPRMV shapes. DMN deploy and evaluate now route through the Linked Data Explorer backend instead of the browser calling Operaton directly, and a [phased test suite](cpsv-editor/developer/testing.md) of 257 tests landed alongside the switch to CalVer versioning.
+    Both Azure deploy workflows now run lint and the full [test suite](cpsv-editor/developer/testing.md) — 16 suites, 257 tests — before deploying, and a failure blocks the deploy. Previously neither ran any of the project's own scripts, so nothing anywhere stopped a deploy that broke the suite. The repo-side test documentation is retired in favour of this site, which is now its single source of truth.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.08.2** · *August 2026*
+-   **🔍 Linked Data Explorer — v2026.08.3** · *August 2026*
 
     ---
 
-    **DMN deploy/evaluate proxies, and ten validation rules that never ran**
+    **A test gate, and two defects it did not catch**
 
-    Two new backend routes — [`POST /v1/dmns/deploy` and `POST /v1/dmns/evaluate/:decisionKey`](linked-data-explorer/reference/api-reference.md#post-v1dmnsdeploy) — let the CPSV Editor reach Operaton without tripping CORS. A coverage campaign took the backend from 17% to 98% statements and uncovered that [`EXEC-002`–`EXEC-010` and `CON-001`–`CON-003` had never fired](linked-data-explorer/reference/dmn-validation-reference.md) for any DMN while reporting clean results. Organization is now mandatory at BPMN deploy, sent as Operaton's native tenant-id, and a [full test suite](linked-data-explorer/developer/testing.md) of 1702 tests landed alongside the switch to CalVer.
+    Every deploy now runs the [suites](linked-data-explorer/developer/testing.md) — 1703 tests — and a failure blocks it; the P7 deferral was conditional on backend breadth improving, and 98% statements met that condition. Two defects surfaced anyway, neither by a test: four of the five E2E fixture BPMNs were undeployable, their on-canvas warning annotation placed where the BPMN schema forbids a flow element to follow; and the deploy dialog had been sending the literal string `"process"` as every model's process key, because a CSS type selector never matches a namespace-prefixed element.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
