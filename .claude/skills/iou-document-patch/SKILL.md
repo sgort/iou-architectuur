@@ -22,7 +22,7 @@ adapt the paths — the same staging applies.
 
 | Thing | Location |
 |---|---|
-| Source changelog | `../ttl-editor/src/data/changelog.json` (array of versions, newest first) |
+| Source changelog | `../ttl-editor/src/data/changelog.json` — a **top-level object** `{versions: [...]}`, newest first. Not a bare array; `json.load()` gives you a dict, so index `["versions"]`. Entries carry `format` / `version` / `status` / `date` / `commits`, and there is **no** `scope` field (single-package repo). Read it as UTF-8 — it contains non-cp1252 bytes, so a bare `open()` fails on Windows. |
 | Documented version of record | `docs/repo-versions.json` → repository named **"CPSV Editor"** → `version` |
 | Developer changelog page | `docs/en/cpsv-editor/developer/changelog-roadmap.md` |
 | Four perspectives (EN) | `docs/en/cpsv-editor/{developer,features,reference,user-guide}/*.md` |

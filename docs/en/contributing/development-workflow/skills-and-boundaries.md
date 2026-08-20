@@ -55,6 +55,11 @@ day-to-day contributor:
   A shared runner (for example `npm run dev` fanning out to several packages via
   `concurrently`) means killing one process can take its siblings down with it — and an
   orphaned background process can outlive the session and collide on the next port.
+- **Never self-drive a browser to verify UI.** Standing up Playwright, `chromium-cli`
+  or an SSR proxy-render script to prove a frontend change works is slower and less
+  reliable than asking. Run typecheck, lint and the unit tests as usual, then ask the
+  contributor to look at it — they already have the app running and can confirm in
+  under a minute.
 - **Ask before every commit.** Approval is per commit, not inferred from an earlier
   one in the same session — an established pattern earlier does not carry forward to
   the next change.
