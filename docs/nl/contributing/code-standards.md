@@ -11,4 +11,12 @@
 
 ---
 
-## Coming Soon
+## Linting and formatting
+
+## Git hooks
+
+## CI
+
+## Commit messages
+
+## Testing

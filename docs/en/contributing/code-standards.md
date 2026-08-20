@@ -1,19 +1,111 @@
 # Code Standards
 
-!!! info "Documentation In Progress"
-    This page is being developed. Content will be added soon.
+This page covers the three application repositories with npm-based tooling — CPSV
+Editor (`ttl-editor`), Linked Data Explorer, and RONL Business API. It documents what
+their tooling actually enforces, measured from each repository's own configuration
+rather than assumed to be uniform.
 
 ---
 
-## Coming Soon
+## Linting and formatting
 
-This section will contain comprehensive documentation about Code Standards.
+Every repository exposes the same four commands at its root, but the shape behind them
+differs — RONL Business API and Linked Data Explorer are npm workspaces fanning out
+across multiple packages; CPSV Editor is a single package.
 
-For now, please refer to:
-- The main [documentation index](../index.md)
-- Related sections in the navigation
+| Command | RONL Business API | Linked Data Explorer | CPSV Editor |
+|---|---|---|---|
+| Lint | `npm run lint` | `npm run lint` | `npm run lint` |
+| Lint, fixing what it can | `npm run lint:fix` | `npm run lint:fix` | `npm run lint:fix` |
+| Format | `npm run format` | `npm run format` | `npm run format` |
+| Format, check only | `npm run check-format` | `npm run check-format` | `npm run check-format` |
+
+At the root, the four names line up. Underneath, they don't. RONL Business API's root
+`check-format` isn't a workspace fan-out at all — it runs `prettier --check` directly
+against the whole tree (`**/*.{ts,tsx,json,md}`), so it reaches every package in one
+pass regardless of what each package calls its own script. Linked Data Explorer's root
+`check-format` instead runs `npm run check-format --workspaces --if-present`, which
+invokes *whichever workspace defines a script of that exact name* and silently omits
+any that don't, because `--if-present` treats a missing script as nothing to do rather
+than an error.
+
+That distinction was not academic. Linked Data Explorer's backend package used to name
+its script `format:check`, not `check-format` — a one-character difference from what the
+root fan-out was looking for. The root command exited 0 on every run, having quietly
+checked only the frontend the whole time. The fix keeps `check-format` as the backend's
+canonical name and `format:check` as an alias that delegates to it, so the workspace is
+picked up under either name. The practical rule this leaves behind: if you're running a
+formatter or linter by drilling into a single workspace (`npm run check-format
+--workspace=@ronl/backend`, for example) rather than from the repository root, check
+that package's own `package.json` for the script's actual name — don't assume it matches
+the root's.
 
 ---
 
-**Status**: Draft  
-**Last Updated**: January 2026
+## Git hooks
+
+All three repositories wire the same two hooks through Husky, and they gate the same
+two things everywhere: staged-file linting and formatting on commit, full linting and
+formatting on push.
+
+- **`pre-commit`** runs `lint-staged`, formatting and linting only the files staged for
+  that commit (via `prettier --write` and each affected workspace's `lint:fix`).
+- **`pre-push`** runs the full lint and format-check across the repository (RONL
+  Business API's `pre-push` also rebuilds the shared package and runs a type check
+  first, since its packages depend on it).
+
+**None of the three repositories' git hooks run the test suite.** Neither `pre-commit`
+nor `pre-push` invokes `npm test` anywhere. A passing hook is not evidence your change
+didn't break a test — only CI, or running the suite yourself, tells you that.
+
+---
+
+## CI
+
+CI is not a mirror of the hooks, and where it diverges the gap matters. Both gaps below
+are in RONL Business API's per-package Azure deployment workflows, which each build and
+deploy one package independently:
+
+- The **public-site** package's CI runs lint, a type check, and the unit test suite
+  before it builds — the only one of the three packages with a real test gate in CI.
+- The **frontend** package's CI — despite carrying the repository's largest test
+  suite — runs neither lint nor tests. Its workflow goes straight to
+  `npm run build:acc` / `npm run build:prod`.
+- The **backend** package's CI runs lint before building, but not tests.
+
+Linked Data Explorer's backend CI runs lint before building; its frontend deploy runs
+only the Azure Static Web Apps build step, with no separate lint or test step. CPSV
+Editor's CI is a plain Azure Static Web Apps build with no lint or test step at all.
+
+None of this replaces running the suite yourself before you open a merge request — see
+Testing, below.
+
+---
+
+## Commit messages
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/), as
+described in [Contributing → Commit your changes](index.md#5-commit-your-changes).
+
+**No Claude attribution trailers.** If you're using an AI assistant to help prepare a
+commit, the commit message ends with its substantive body and nothing else —
+`Co-Authored-By` and similar trailers are not added, regardless of what a tool's default
+template suggests appending. This applies whether the change came from Claude Code, the
+`superpowers` plugin, or any other assistant.
+
+---
+
+## Testing
+
+Each application repository documents its own testing setup, and this page doesn't
+repeat it, because counts and commands there go stale the moment a suite grows:
+
+- [CPSV Editor — Testing](../cpsv-editor/developer/testing.md)
+- [Linked Data Explorer — Testing](../linked-data-explorer/developer/testing.md)
+- [RONL Business API — Testing](../ronl-business-api/developer/testing/overview.md)
+
+New code is expected to arrive with tests written red/green — the failing test first,
+watched to fail for the right reason, then the minimum code to pass. For the mechanics
+of that cycle, see
+[Working with Claude Code](development-workflow/working-with-claude-code.md) rather than
+this page.
