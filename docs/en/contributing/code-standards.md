@@ -77,7 +77,7 @@ package had the only real test gate anywhere.
 | `azure-publicsite-*` | ✅ | ✅ | ✅ | Its build additionally gates on a prerender and a bundle-cleanliness check |
 
 The frontend's performance budget runs separately because it asserts wall-clock time,
-which means nothing while 130 test files compete for cores — see
+which means nothing while 133 test files compete for cores — see
 [The performance budget](../ronl-business-api/developer/testing/overview.md#the-performance-budget).
 
 **Linked Data Explorer** — six workflows. Both backend and both frontend workflows run

@@ -152,6 +152,16 @@ nav:
       - Timeline Implementation: ronl-business-api/developer/implementing-timeline.md
       - Testing:
         - Overview: ronl-business-api/developer/testing/overview.md
+        - Coverage: ronl-business-api/developer/testing/coverage.md
+        - Backend Suite: ronl-business-api/developer/testing/backend.md
+        - Public Site Suite: ronl-business-api/developer/testing/public-site.md
+        - Dashboards:
+          - Caseworker: ronl-business-api/developer/testing/dashboards/caseworker.md
+          - PA Cockpit: ronl-business-api/developer/testing/dashboards/pa-cockpit.md
+          - Infra-board: ronl-business-api/developer/testing/dashboards/infra-board.md
+          - Woo-dashboard: ronl-business-api/developer/testing/dashboards/woo-dashboard.md
+        - E2E & Live Smoke: ronl-business-api/developer/testing/e2e.md
+        - Writing Tests: ronl-business-api/developer/testing/writing-tests.md
         - eDOCS — Live Testing: ronl-business-api/developer/testing/edocs-live-testing.md
         - Doccle — Live Testing: ronl-business-api/developer/testing/doccle-live-testing.md
       - CI/CD: ronl-business-api/developer/cicd.md

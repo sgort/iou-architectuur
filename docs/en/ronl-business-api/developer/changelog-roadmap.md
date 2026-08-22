@@ -4,6 +4,54 @@
 
 ## Changelog
 
+## v2026.08.23 — Mock Mode Made Real, and the Throttle That Looked Like an Outage (August 2026)
+
+> Test detail: [PA cockpit — tests](testing/dashboards/pa-cockpit.md).
+
+### Mock mode becomes a working demo, driven end to end
+
+Mock mode stopped being a read-only snapshot: curating a signal moves the rail badges and the move survives a reload, an ignored signal stays ignored, and *Reset demodata* restores every source to its fixture baseline. Every signaalbron now carries a watchlist orphan that can be linked to a dossier, and the demo counts are no longer identical across sources. `PA_USE_MOCK` was dropped — nothing read it.
+
+Two Playwright specs now drive the cockpit: `pa-mock-journey.spec.ts` against the real store with no mocking, and `pa-live-authoring.spec.ts` against the live backend and a real database. Every mock-mode defect fixed in this window was invisible to the unit suites by construction — a saved-search write that was a bare `return;`, a confirm that built an object and discarded it, notifications hardcoded to empty — because a component test mocks the very seam that was broken.
+
+### The shipped rate limit was below what the cockpit costs to use
+
+One short authoring journey measures 21 requests to `/v1/pa/*` against a 100/minute per-IP budget, so two specs back to back exhausted it, and the UI rendered the resulting 429 as *"Kon dossiers niet laden"* — indistinguishable from a backend that is down. The default is now 1000/minute, and `e2e/helpers/rate-limit.ts` fails a test with a message naming the throttle rather than retrying past it.
+
+### Mocks that could not pass vacuously
+
+`expectMockNamesRealExports` originally compared a mocked path against the mock — itself — and would have passed no matter what; it was caught by injecting a bogus export and noticing the assertion failed to fail. Both `mockModule` helpers now require `importActual`/`requireActual`, the PA mocks are built on the real modules rather than replacing them, and a parity-checked stub for the `usePaData` context fails loudly when a member is added to one side and not the other.
+
+### Data-integrity and feed fixes
+
+Deleting a dossier now takes its signals and zoekcriteria with it. A created dossier is on the overview by the time you arrive there. TK is fetched one term at a time so multi-term criteria stop aborting, an empty cached feed is no longer served for the rest of its TTL, and the rail's confirmed counter no longer freezes at mount.
+
+---
+
+## v2026.08.22 — EU Feed Recovery and One Switch for the Cockpit (August 2026)
+
+**The mock/live toggle is now one switch for the whole cockpit**, and demo data stopped leaking into the live database — neither the demo taxonomy nor demo dossiers are seeded there any more.
+
+**Half the plenary feed was missing.** EU refs are now recovered from the guid, restoring it. Europarl receives a `User-Agent` and an empty `202` is no longer read as a feed; EP motions that arrive once per political group are collapsed into a single signal; EP press releases are surfaced and `commissie` is populated for EU items. The raw EU feed can now be searched from the cockpit directly.
+
+**Inbox badges stay current** instead of freezing at page load, and every badge is populated on mount from a single counts request.
+
+M2M decision checks became environment-aware, and the local client secret is read from the realm export rather than from `.env`.
+
+---
+
+## v2026.08.21 — Backend Coverage, and Nine Test Files That Never Compiled (August 2026)
+
+> Test detail: [Backend suite](testing/backend.md) · [Writing tests](testing/writing-tests.md).
+
+**Backend test files made modules so their globals stop colliding.** Nine test files had no top-level `import` or `export`, which makes each a global script to TypeScript, so every top-level declaration landed in the global scope: `mockAxios` collided across five files, `Mod` and `freshModule` across six each. The suite passed locally for weeks because ts-jest caches type diagnostics per file; the first CI run on a cold runner failed immediately. Adding `export {};` to each scopes them.
+
+**Backend branch and function coverage lifted above 80% for every file.** This is the release that took `utils/` from 43.47% statements and 6.54% branches — long documented as an accepted artifact, with `config.ts` at 0% and `logger.ts` mocked everywhere — to **100% across all four metrics**, `tls-bootstrap.ts` included. Backend coverage overall moved from 94.28/73.54/94.13/95.69 to 98.35/91.49/96.65/98.75.
+
+**Required-env checks now actually fire**, and `/v1/health` reports the deployment tier. A seed dossier without an owner is now a compile error, `inferType` was extracted from four routers into one tested helper, and local M2M targets the Docker Operaton so its route script runs locally.
+
+---
+
 ## v2026.08.20 — Every Deploy Gated on Its Tests (August 2026)
 
 ### Backend and frontend deploys now run the suites
