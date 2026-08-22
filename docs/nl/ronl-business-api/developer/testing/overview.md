@@ -10,21 +10,22 @@ component: RONL Business API
 
 ---
 
-**Status:** Concept  
+**Status:** Concept
 **Engelstalige bron:** `ronl-business-api/developer/testing/overview.md`
 
 ---
 
+## Where to look
+
 ## Running the tests
+
+### The performance budget
 
 ## Linting, formatting, git hooks, and CI
 
-## Test inventory
+### Git hooks
 
-## Coverage
-
-## E2E and live smoke suites
-
-## Adding tests
+### CI
 
 ## Roadmap
+

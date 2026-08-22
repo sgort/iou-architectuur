@@ -137,13 +137,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.08.20** · *August 2026*
+-   **⚙️ RONL Business API — v2026.08.23** · *August 2026*
 
     ---
 
-    **Every deploy gated on its tests**
+    **Mock mode made real, and the throttle that looked like an outage**
 
-    Public-site was the only package whose pipeline could block a deploy: backend CI never ran its 1145 Jest tests, and frontend CI ran neither lint nor test. All six workflows now run the [suites](ronl-business-api/developer/testing/overview.md) before deploying. Wiring that up meant confronting a wall-clock performance budget that failed under the parallel suite's own CPU contention — it now runs as its own non-parallel step, with the 250ms threshold intact rather than loosened.
+    The Public Affairs cockpit's mock mode became a working demo rather than a read-only snapshot, and gained [two Playwright suites](ronl-business-api/developer/testing/dashboards/pa-cockpit.md) — every defect they found was invisible to the unit tests by construction, because a component test mocks the very seam that was broken. A live spec failing every other run turned out to be the shipped rate limit, not the stack: 21 requests per authoring journey against a 100/minute budget, rendered in the UI as an error indistinguishable from an outage. Backend `utils/` went from 6.54% branch coverage to [100% across the board](ronl-business-api/developer/testing/coverage.md).
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

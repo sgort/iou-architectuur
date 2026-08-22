@@ -12,7 +12,7 @@ A **task** is a unit of human work produced by a running process. Where a proces
 
 A task becomes visible to the people entitled to see it, not to everyone. Operaton scopes a task to one or more **candidate groups**, defined in the BPMN model, which the platform maps onto a signed-in user's roles: a user only sees a task in their list if at least one of their roles matches one of the task's candidate groups.
 
-A task list is also scoped to the tenant its underlying process instance belongs to, so a task only appears to people working within that tenant. This scoping is covered by an automated end-to-end test — see [Testing](../developer/testing/overview.md#frontend-playwright-suite).
+A task list is also scoped to the tenant its underlying process instance belongs to, so a task only appears to people working within that tenant. This scoping is covered by an automated end-to-end test — see [Testing](../developer/testing/dashboards/caseworker.md#e2e).
 
 Once a task has been claimed, it does not disappear from view — it stays visible, so the person who claimed it (and anyone else entitled to see it) can find it again, including through a filtered view of "my claimed work".
 

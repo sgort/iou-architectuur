@@ -43,7 +43,7 @@ This makes multi-tenancy a property of the deployment, not of the caller: the sa
 
 Every running instance also carries its own tenant as a process variable, separate from Operaton's native tenant-id, which is what scopes later access to that instance's status, variables, and history to the tenant it belongs to.
 
-This tenant scoping is covered by an automated end-to-end test — see [Testing](../developer/testing/overview.md#frontend-playwright-suite).
+This tenant scoping is covered by an automated end-to-end test — see [Testing](../developer/testing/dashboards/caseworker.md#e2e).
 
 ---
 
