@@ -65,9 +65,20 @@ graph LR
 
 ## Build & Deploy Pipeline
 
-Every push to `main` triggers a GitHub Actions workflow that builds the site with MkDocs and deploys the result to Azure Static Web Apps; pull requests against `main` build a preview. That workflow is the repository's only pipeline, and `main` is its only trigger — `acc` is an integration branch that accumulates work for review and does **not** deploy anywhere.
+This repository has **two** deployment pipelines, on two different hosts, and they are easy to confuse:
 
-The build runs `mkdocs build --verbose`, not `--strict`, so a broken internal link or a page missing from the nav produces a warning rather than failing the deploy. Run `mkdocs build --strict` locally before pushing if you want that caught.
+| Pipeline | Host | Trigger | Deploys |
+|---|---|---|---|
+| `.github/workflows/azure-static-web-apps-*.yml` | GitHub Actions | Push to `main`, and pull requests against it | The production site; PRs build a preview |
+| `pipeline/azure_ado_pipeline.yml` | Azure DevOps | **Manual only**, since 21 August 2026 | The acceptance site |
+
+Both build with MkDocs and publish to Azure Static Web Apps.
+
+The Azure DevOps pipeline used to fire on every push to `acc` and on pull requests against it, which is what made `acc` the acceptance branch in practice. It now carries `trigger: none` and `pr: none`, so it runs only when someone starts it by hand. Pushing to `acc` therefore deploys nothing on its own today — but the pipeline is still there, and re-enabling it is a two-line change.
+
+The GitHub remote is not the only one: this repository is also pushed to Azure DevOps (`flevoland`) and to the open-regels GitLab instance. Only the first two run anything.
+
+Both builds run `mkdocs build --verbose`, not `--strict`, so a broken internal link or a page missing from the nav produces a warning rather than failing the deploy. Run `mkdocs build --strict` locally before pushing if you want that caught.
 
 ```mermaid
 graph TB
