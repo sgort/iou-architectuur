@@ -1,14 +1,8 @@
 name: Azure Static Web Apps CI/CD
 
-trigger:
-  branches:
-    include:
-      - acc
+trigger: none
 
-pr:
-  branches:
-    include:
-      - acc
+pr: none
 
 pool:
   vmImage: ubuntu-latest
