@@ -53,12 +53,16 @@ Both are passed to `GET /toepasbareRegels?functioneleStructuurRef=...` in Phase 
 | Catalogus opvragen | v3 | Concepts search |
 | Zoekinterface | v2.2.3 | Werkzaamheden search + autocomplete, `functioneleStructuurRef` retrieval |
 | Opvragen Werkzaamheden | v1 | Werkzaamheid version history |
+| Uitvoeren Gegevens | v1 | STTR metadata + download by `functioneleStructuurRef`, DMN extraction, form scaffold (shipped v1.9.3–v1.9.5) |
+
+That is five upstream APIs in total — see
+[DSO Integration — the five DSO APIs](dso-integration.md#the-five-dso-apis-behind-the-viewer)
+for their base URLs and environment variables.
 
 ### Pending integration
 
 | API | Version | Key capability |
 |---|---|---|
-| Uitvoeren Gegevens | v1 | STTR file metadata + download by `functioneleStructuurRef` |
 | Samengestelde RTR services | v2 | Rule type completeness check for werkzaamheid + location |
 
 ### STTR standard (XSD)

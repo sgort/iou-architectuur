@@ -30,7 +30,7 @@ Use this when you know the public name of the task (the term a citizen would use
 1. Open the **Works** tab.
 2. Start typing — autocomplete suggestions appear after two characters. The list is sorted by `meestGekozen`, so the most-used Omgevingsloket terms surface first.
 3. Pick a suggestion or hit Enter to run the full search.
-4. Click a result to open the detail panel. The panel shows the current version's omschrijving, validity period, and the full version history with start/end dates.
+4. Click a result to open the detail panel. The panel shows the current version's omschrijving, validity period, and the full version history with start/end dates. (Search and autocomplete come from the Zoekinterface; the detail panel is a separate call to the Opvragen Werkzaamheden API.)
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: Works tab showing the detail panel open for a selected werkzaamheid — heading with the omschrijving, a metadata row with begindatum and a current badge, the functioneleStructuurRef URI on its own line, and below that a Version history section with three rows each showing a date range and one marked current](../../assets/screenshots/linked-data-explorer-dso-works-detail.png)
@@ -62,6 +62,14 @@ The badges tell you ahead of time which downstream LDE assets the activity can s
 
 5. Click an activity card to open the detail panel.
 
+!!! note "Activities with many children take a moment to open"
+    The RTR hands LDE only a list of links for an activity's child activities, with no names
+    attached, so the panel looks each child up individually — one request per child, fired in
+    parallel, on top of the request for the activity itself. Opening an activity with 23
+    children means 24 calls. Children whose lookup fails or that come back nameless are shown
+    as their raw URN instead of a name; they are still clickable. Nothing is cached, so
+    re-opening the same activity fetches it all again.
+
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: Activities tab with the Lelystad preset selected, todays date shown in the date input, and a list of activity cards beneath — each card has the omschrijving, validity from-date, and small green pill badges for the rule types present, with the Bed & Breakfast starten card highlighted to show it has both Conclusie and Indieningsvereisten](../../assets/screenshots/linked-data-explorer-dso-activities-with-badges.png)
   <figcaption>Activities filtered by Lelystad with rule-type badges</figcaption>
@@ -75,18 +83,28 @@ Use this when someone has handed you a DSO URN and you need to confirm it resolv
 
 1. Open a BPMN process in the **BPMN Modeler**.
 2. Scroll to the **DSO Activity** section in the footer panel.
-3. Paste the URN into the input.
-4. Click **Verify**. LDE queries the live DSO RTR.
+3. Paste the URN into the input. The button next to it changes from **Verify** to **Save** as
+   soon as the text differs from what is stored — it is one button doing both jobs.
+4. Click it. The URN is written to the process straight away, and LDE then queries the live
+   DSO RTR — **always the pre-production one**. (A URN already stored on the process is
+   re-verified automatically whenever the panel opens.)
    - On success, a teal info card appears below showing the omschrijving, the authority block, and a link icon that opens the URN in the public DSO RTR viewer.
-   - On 404, a red error appears: "URN not found in DSO". Check the environment toggle — the URN may exist only in production.
+   - On 404, a red error appears: "URN not found in DSO".
 5. The URN is persisted as `ronl:dsoActiviteitUrn` on the BPMN process when you click **Save** in the canvas toolbar.
+
+!!! warning "This panel ignores the DSO environment setting"
+    Unlike the DSO Explorer, the BPMN **DSO Activity** selector always queries pre-production.
+    Switching to production in Settings changes nothing here, so a production-only URN — for
+    example `nl.imow-gm0995.activiteit.HoutopstandVellen` — will always report "URN not found
+    in DSO". Confirm such a URN in the DSO Explorer's Activities tab (with the toggle on
+    production), then paste it in and save it without verification.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: BPMN Modeler with the footer DSO Activity section showing a URN field with a Lelystad URN entered, the Verify button just clicked, and below it the teal verification card showing the activity omschrijving, the authority block on three lines (gemeente Lelystad GM 0995), and an external-link icon link to the RTR viewer](../../assets/screenshots/linked-data-explorer-dso-verify-bpmn.png)
   <figcaption>Verifying a URN against the live DSO RTR</figcaption>
 </figure>
 
-If you switch DSO environments after verifying, re-verify — a URN that resolved in pre-production may 404 in production.
+The URN is stored as typed, whether or not verification succeeded — verification is a check, not a gate.
 
 ---
 
@@ -109,6 +127,8 @@ Use this to turn a DSO activity's *toepasbare regels* into LDE assets. Open the 
 **The detail panel shows "not available in this environment".** The URN was queried with the wrong DSO environment toggle. Switch in Settings and try again.
 
 **A werkzaamheid result shows no `ref:` line.** The Zoekinterface didn't return a `functioneleStructuurRef` for that werkzaamheid version. Try a different version from the version history, or contact the publishing authority — the activity may not yet carry a structuur reference.
+
+**Some child activities show as long URNs instead of names.** Their individual name lookup failed or returned no omschrijving. The links still work — click through and the child's own detail panel will load.
 
 **Authority preset Load button gives an empty list.** Either the authority has no activities for that date, or the date is outside the validity windows of all activities. Try a recent date close to today.
 

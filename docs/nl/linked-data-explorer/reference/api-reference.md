@@ -127,6 +127,8 @@
 
 ### `GET /v1/dso/toepasbare-regels/:id/form-scaffold`
 
+### Endpoint map
+
 ---
 
 ## Error responses

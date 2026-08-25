@@ -278,6 +278,7 @@ nav:
         - RoPA Records: linked-data-explorer/features/ropa-records.md
         - Multilingualism: linked-data-explorer/features/multilingualism.md
         - DSO Viewer & Integration: linked-data-explorer/features/dso-integration.md
+        - DSO Viewer APIs (slides): linked-data-explorer/features/dso-viewer-apis-deck.md
         - DSO (WIP): linked-data-explorer/features/dso-integration-phase-plan.md
         - Governance & Validation: linked-data-explorer/features/governance-validation.md
         - Vendor Services: linked-data-explorer/features/vendor-services.md
