@@ -210,7 +210,12 @@ defines no format-check script of its own.
 
 ### CI
 
-Six Azure workflows under `.github/workflows/`, one acc/prod pair per package:
+Six Azure workflows under `.github/workflows/`, one acc/prod pair per
+package — this table covers three of the four packages on this page.
+`pa-demo` ships its own CI pipeline once merged; see
+[pa-demo suite → CI](pa-demo.md#ci) for its two deploy workflows and the
+separate, non-blocking drift-check workflow, none of which are on `acc`
+yet.
 
 | Workflow | Lint | Type-check | **Tests** | Perf budget | Build | Deploys? |
 |---|:---:|:---:|:---:|:---:|:---:|---|
