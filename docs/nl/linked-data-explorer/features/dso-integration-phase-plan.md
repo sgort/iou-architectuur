@@ -8,7 +8,7 @@
 
 ---
 
-## Current state — v1.5.1 / v1.5.2
+## Current state — v1.5.3
 
 ---
 

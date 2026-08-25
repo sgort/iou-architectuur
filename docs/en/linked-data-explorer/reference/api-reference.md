@@ -720,11 +720,25 @@ As above, but first fetches the already-published triples for the document's sub
 
 ## DSO Integration
 
-Server-side proxy for the **Digitaal Stelsel Omgevingswet (DSO)** APIs — the Stelselcatalogus (concepts), the Zoekinterface (werkzaamheden), the RTR (activiteiten), and the Uitvoeren Gegevens API (toepasbare regels). Proxying server-side keeps the DSO API key off the client and avoids browser CORS.
+Server-side proxy for the **Digitaal Stelsel Omgevingswet (DSO)** APIs. Proxying server-side keeps the DSO API key off the client and avoids browser CORS.
 
-**Environment selection.** Every DSO endpoint targets the **pre-production** DSO by default. To target **production**, send the header `X-Dso-Env: prod` (used by the frontend) or append `?env=prod`. Each environment uses its own base URLs and API key (`DSO_API_KEY` / `DSO_API_KEY_PROD`).
+**Five upstream APIs** sit behind this one `/v1/dso` surface:
 
-Unless noted, responses are the DSO payload wrapped in LDE's standard `{ success, data }` envelope. On failure the DSO routes return `{ "success": false, "error": "<message>" }` (a plain string, not the `{ code, message }` error object used elsewhere): `400` for missing required parameters, `404` for an unknown URN/resource, `422` when a Conclusie STTR has no DMN to extract, and `502` for upstream DSO failures.
+| # | API | Upstream path | Backs |
+|---|---|---|---|
+| 1 | Stelselcatalogus | `catalogus/api/opvragen/v3` | `/begrippen` |
+| 2 | RTR Gegevens | `toepasbare-regels/api/rtrgegevens/v2` | `/activiteiten*` |
+| 3 | Zoekinterface | `toepasbare-regels/api/zoekinterface/v2` | `/werkzaamheden/zoek`, `/werkzaamheden/suggereer` |
+| 4 | Opvragen Werkzaamheden | `toepasbare-regels/api/opvragenwerkzaamheden/v1` | `/werkzaamheden/:urn` |
+| 5 | Toepasbare Regels Uitvoeren Gegevens | `toepasbare-regels/api/toepasbareregelsuitvoerengegevens/v1` | `/toepasbare-regels*` |
+
+Pre-production base URLs are `service.pre.omgevingswet.overheid.nl/publiek/<path>`; production is the same path on `service.omgevingswet.overheid.nl`. Each is overridable via `DSO_CATALOGUE_BASE_URL`, `DSO_RTR_BASE_URL`, `DSO_ZOEKINTERFACE_BASE_URL`, `DSO_OPVRAGEN_WERKZAAMHEDEN_BASE_URL` and `DSO_UITVOEREN_GEGEVENS_BASE_URL`, each with a `_PROD` counterpart.
+
+**Environment selection.** Every DSO endpoint targets the **pre-production** DSO by default. To target **production**, send the header `X-Dso-Env: prod` (used by the frontend) or append `?env=prod` — the header wins when both are present, and any other value falls back to `pre`. Each environment uses its own base URLs and API key (`DSO_API_KEY` / `DSO_API_KEY_PROD`).
+
+**Transport.** Outbound calls carry `x-api-key` and `Accept: application/hal+json` — except STTR downloads (`application/xml`) and `_suggereer` (`application/json`). The request timeout is `DSO_TIMEOUT`, default 15 000 ms, enforced with an `AbortController`; the production config block has no timeout of its own, so both environments share the pre-production value.
+
+Unless noted, responses are the DSO payload — HAL, returned verbatim, `_embedded` and `_links` intact for the caller to unwrap — wrapped in LDE's standard `{ success, data }` envelope. On failure the DSO routes return `{ "success": false, "error": "<message>" }` (a plain string, not the `{ code, message }` error object used elsewhere): `400` for missing required parameters, `404` for an unknown URN/resource, `422` when a Conclusie STTR has no DMN to extract, and `502` for upstream DSO failures (the upstream body travels in the message).
 
 ### Concepts (Stelselcatalogus)
 
@@ -737,7 +751,13 @@ Full-text search over the Stelselcatalogus concepts.
 | `zoekTerm` | query | No | Free-text search term |
 | `geldigOp` | query | No | Validity date `YYYY-MM-DD` (defaults to current) |
 | `page` | query | No | Page number (default 1) |
-| `pageSize` | query | No | `10` \| `20` \| `40` \| `100` (default 10) |
+| `pageSize` | query | No | `10` \| `20` \| `40` \| `100` (default 20) |
+
+!!! note "Route comments say 10"
+    The source comments on `/begrippen` and `/activiteiten` still claim a `pageSize` default of
+    10, while `dso.service.ts` has used `DEFAULT_PAGE_SIZE = 20` since. The frontend always
+    sends an explicit `pageSize`, so the discrepancy only reaches direct API consumers — for
+    whom 20 is the value that applies.
 
 ### Activities (RTR)
 
@@ -749,7 +769,7 @@ All legal activities valid on a given date.
 |---|---|---|---|
 | `datum` | query | No | Date `dd-MM-yyyy` (defaults to today) |
 | `page` | query | No | Page number (default 1) |
-| `pageSize` | query | No | `10` \| `20` \| `40` \| `100` (default 10) |
+| `pageSize` | query | No | `10` \| `20` \| `40` \| `100` (default 20) |
 
 #### `GET /v1/dso/activiteiten/:urn`
 
@@ -757,9 +777,11 @@ Fetch a single activity by URN. `datum` query param (`dd-MM-yyyy`, optional, def
 
 #### `POST /v1/dso/activiteiten/oin`
 
-All activities registered by one authority (OIN) — backs the Lelystad / Flevoland presets.
+All activities registered by one authority (OIN) — backs the Lelystad, Flevoland, Ede and Gelderland presets.
 
 **Request body:** `{ "oin": "<OIN>", "datum"?: "dd-MM-yyyy" }` — `oin` is required (`400` otherwise).
+
+Upstream this is `POST /activiteiten/_zoek` with `{ datum, bestuursorgaan: { oin } }` and a fixed `pageSize=200`, so one call returns the authority's complete set and the Activities tab can filter by name client-side.
 
 #### `POST /v1/dso/activiteiten/zoek`
 
@@ -767,7 +789,16 @@ Search activities by date and optional point geometry.
 
 **Request body:** `{ "datum"?: "dd-MM-yyyy", "lat"?: number, "lon"?: number, "page"?: number, "pageSize"?: number }`
 
-### Werkzaamheden (Zoekinterface)
+When `lat` and `lon` are both supplied they become a WGS84 `geometrie` point (`{ type: "Point", coordinates: [lon, lat] }`) with `crs=epsg:4326` on the query string; without them the search is date-only.
+
+!!! info "Implemented, but no UI calls it"
+    Geometry search is complete and tested end to end in both the backend and `dsoService.ts`,
+    yet nothing in the DSO Explorer uses it — the Activities tab offers date and authority
+    modes only. It is ready for a map or point-selection feature.
+
+### Werkzaamheden (Zoekinterface + Opvragen Werkzaamheden)
+
+Search and autocomplete go to the **Zoekinterface**; the versioned detail call goes to a different API, **Opvragen Werkzaamheden**.
 
 #### `POST /v1/dso/werkzaamheden/zoek`
 
@@ -779,7 +810,7 @@ Autocomplete suggestions. **Request body:** `{ "zoekterm": string }` — require
 
 #### `GET /v1/dso/werkzaamheden/:urn`
 
-Versioned detail (version history) for a single werkzaamheid.
+Versioned detail (version history) for a single werkzaamheid. Unlike the two endpoints above, this one proxies **Opvragen Werkzaamheden** (`GET /werkzaamheden/{urn}?pageSize=100`), which is what returns the full `_embedded.werkzaamheidversies` list with `trefwoorden` and `logischeRelaties`.
 
 ### Toepasbare regels (Uitvoeren Gegevens API)
 
@@ -810,6 +841,31 @@ Generates a form-js field scaffold from an **Indieningsvereisten** STTR question
 | `formId` | query | No | Desired form-js schema id (defaults to the toepasbare-regel `:id`) |
 
 **Response:** the form-js JSON scaffold wrapped in the standard envelope.
+
+Two of the three STTR endpoints above — `/dmn` and `/form-scaffold` — fetch the *same* upstream file as `/sttr` (`GET /toepasbareRegels/{id}/sttrBestand`) and differ only in what LDE does with the XML: pass it through, extract and normalise the embedded DMN, or parse `uitv:uitvoeringsregels` into a form-js schema.
+
+`/toepasbare-regels/:id/dmn` is a **cross-application contract**, not an internal route: the CPSV Editor is handed only identifiers in its deep link and fetches the DMN from this endpoint itself.
+
+### Endpoint map
+
+Every `/v1/dso` route and the upstream call it makes:
+
+| LDE endpoint | Method | DSO API | Upstream call |
+|---|---|---|---|
+| `/v1/dso/begrippen` | GET | 1 Catalogus | `GET /begrippen` |
+| `/v1/dso/activiteiten` | GET | 2 RTR | `GET /activiteiten` |
+| `/v1/dso/activiteiten/:urn` | GET | 2 RTR | `GET /activiteiten/{urn}` |
+| `/v1/dso/activiteiten/oin` | POST | 2 RTR | `POST /activiteiten/_zoek` (bestuursorgaan) |
+| `/v1/dso/activiteiten/zoek` | POST | 2 RTR | `POST /activiteiten/_zoek` (date + geometry) |
+| `/v1/dso/werkzaamheden/zoek` | POST | 3 Zoekinterface | `POST /werkzaamheden/_zoek` |
+| `/v1/dso/werkzaamheden/suggereer` | POST | 3 Zoekinterface | `POST /werkzaamheden/_suggereer` |
+| `/v1/dso/werkzaamheden/:urn` | GET | 4 Opvragen Werkzaamheden | `GET /werkzaamheden/{urn}` |
+| `/v1/dso/toepasbare-regels` | GET | 5 Uitvoeren Gegevens | `GET /toepasbareRegels` |
+| `/v1/dso/toepasbare-regels/:id/sttr` | GET | 5 Uitvoeren Gegevens | `GET /toepasbareRegels/{id}/sttrBestand` |
+| `/v1/dso/toepasbare-regels/:id/dmn` | GET | 5 Uitvoeren Gegevens | `GET /toepasbareRegels/{id}/sttrBestand` + DMN extraction |
+| `/v1/dso/toepasbare-regels/:id/form-scaffold` | GET | 5 Uitvoeren Gegevens | `GET /toepasbareRegels/{id}/sttrBestand` + form-js scaffold |
+
+Note that a single activity-detail click in the UI is not a single upstream call: the Activity Detail panel resolves each child activity with its own `GET /v1/dso/activiteiten/:urn`, so one click costs `1 + N` RTR requests. See [DSO Integration — child-activity fan-out](../features/dso-integration.md#child-activity-fan-out-one-click-1-n-requests).
 
 ---
 
