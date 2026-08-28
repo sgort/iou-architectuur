@@ -3,10 +3,49 @@
 This page covers the third stage of the [pipeline](overview.md): implementation itself,
 once a change (with or without a handoff package behind it) reaches Claude Code.
 
+## The plugin set
+
+Six plugins are installed and enabled at **user level**, so they apply in every
+repository and every session. They come from three marketplaces: Anthropic's
+`claude-plugins-official`, and one each for `claude-mem` and `understand-anything`.
+
+| Plugin | Version | What it contributes |
+|---|---|---|
+| [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.16.1 | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
+| [`superpowers`](https://github.com/obra/superpowers) | 6.3.0 | The brainstorm → plan → execute structure for multi-step work, and a TDD skills library |
+| [`understand-anything`](https://github.com/Lum1104/Understand-Anything) | 2.7.6 | Builds a navigable knowledge graph of a codebase — architecture, domains, guided tours, diff analysis |
+| `github` | — | The official GitHub MCP server: issues, pull requests, reviews, repository search |
+| `semgrep` | 2.1.4 | Scans generated code for security findings — SAST, secrets, and supply-chain |
+| `typescript-lsp` | 1.0.0 | TypeScript/JavaScript language server: go-to-definition, find references, error checking |
+
+Two notes on that table, because both are easy to get wrong:
+
+- **`superpowers` used to be project-scoped.** It was installed only for
+  `ronl-business-api` and was promoted to user level on 2026-08-28, on the same
+  reasoning that moved the working rules to `~/.claude/CLAUDE.md` — it describes *how
+  you work*, not *what the repository is*. See
+  [Skills & Boundaries](skills-and-boundaries.md#user-level-versus-project-level).
+- **`typescript-lsp` needs `typescript-language-server` on the `PATH`, and it resolves
+  `typescript` from the workspace — not globally.** Install the server with
+  `npm install -g typescript-language-server`. Do **not** add `typescript` to that
+  command: npm now resolves it to 7.x, the native rewrite, which ships `tsc` only —
+  no `tsserver.js`, no `typescript.js`, and no `tsserver` bin. The language server
+  cannot use it, and the failure surfaces as
+  `Could not find a valid TypeScript installation`. The working arrangement is the
+  server installed globally, plus a `typescript` package carrying `lib/tsserver.js`
+  in the repository you have **open** — the workspace root is the session's working
+  directory, not wherever the file lives. Measured on 28 August 2026:
+  `ronl-business-api` and `linked-data-explorer` both have 5.9.3, `ttl-editor` has
+  4.9.5 via `react-scripts`; the Norm Editor has no `typescript` dependency, and this
+  documentation repository is Python/MkDocs, so the plugin does nothing in either.
+
+`semgrep` deserves a specific mention: it is the assistant-side counterpart to the
+[supply-chain gate](../supply-chain.md) in CI. One scans what is being written, the
+other gates what the pipeline executes — and neither substitutes for the other.
+
 ## Session memory
 
-[`claude-mem`](https://github.com/thedotmack/claude-mem) runs by default and captures
-session memory as work proceeds. Its viewer
+`claude-mem` runs by default and captures session memory as work proceeds. Its viewer
 runs at `http://localhost:37780`. The port is configurable via
 `CLAUDE_MEM_WORKER_PORT` in `~/.claude-mem/settings.json` — if you have changed it
 locally, use your own value instead.
@@ -14,8 +53,8 @@ locally, use your own value instead.
 ## Inline versus superpowers
 
 Small, well-understood changes proceed inline. Multi-step work goes through the
-[`superpowers`](https://github.com/obra/superpowers) plugin instead, which structures it
-as brainstorming a design, writing a plan, and executing it with review between tasks.
+`superpowers` plugin instead, which structures it as brainstorming a design, writing a
+plan, and executing it with review between tasks.
 
 The choice is made by the size and uncertainty of the work, not by preference. A change
 whose steps and outcome are already clear does not need a plan written for it; a change

@@ -117,12 +117,12 @@ npm test             # watch mode
 npm run test:p2      # one layer in isolation
 ```
 
-The full suite is 16 files and 257 tests and takes roughly 46 seconds with
-coverage. Note that the pre-push hook runs `lint` and `check-format` **only** —
-it does not run the tests, so run `test:ci` yourself before pushing. Since
-v2026.08.1 both deploy workflows do run the suite and a failure blocks the
-deploy, so a broken push no longer reaches acceptance or production — but the
-feedback arrives in CI rather than on your machine.
+The full suite is 16 files and 257 tests. Note that the pre-push hook runs
+`lint` and `check-format` **only** — it does not run the tests, so run
+`test:ci` yourself before pushing. Since v2026.08.1 both deploy workflows do
+run the suite and a failure blocks the deploy, and since v2026.08.2 a failing
+pull request cannot be merged into `acc` at all — but the feedback arrives in
+CI rather than on your machine.
 
 See [Testing](testing.md) for the full command list and per-file inventory.
 
@@ -146,17 +146,36 @@ Before pushing to ACC, verify:
 
 ## Deploying to ACC
 
+!!! danger "`git push origin acc` no longer works"
+    Since v2026.08.2, `acc` is protected by the `acc supply-chain gate`
+    ruleset — it requires a pull request and a passing `audit` check, with no
+    bypass actors. A direct push is rejected outright, for releases and for the
+    repository owner alike. Deployment goes through a pull request.
+
 ```bash
-# 1. Commit your changes
+# 1. Work on a branch, never on acc directly
+git checkout -b feature/your-topic
+
+# 2. Commit your changes
 git add .
 git commit -m "feat: your change description"
 
-# 2. Push to ACC branch
-git push origin acc
+# 3. Push the branch and open a pull request against acc
+git push -u origin feature/your-topic
+gh pr create --base acc --title "feat: your change description"
 
-# 3. Monitor the GitHub Actions workflow
-# https://github.com/sgort/cpsv-editor/actions
+# 4. Watch both required checks — `audit` and `Build and Deploy`
+gh pr checks
 
-# 4. Verify the ACC deployment
+# 5. Merge once green. Merging IS the push to acc, and triggers the deploy.
+#    Use a merge commit for a release PR; squash a Renovate dependency PR.
+gh pr merge <n> --merge --delete-branch
+
+# 6. Verify the ACC deployment
 curl https://acc.cpsv-editor.open-regels.nl
 ```
+
+The pull request also produces a Static Web Apps preview deployment, so the
+change can be checked before it reaches acceptance at all. See
+[Deployment](deployment.md) for the pipeline itself and
+[Supply-Chain Pinning](../../contributing/supply-chain.md) for the gate.

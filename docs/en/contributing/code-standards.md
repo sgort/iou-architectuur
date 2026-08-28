@@ -57,7 +57,10 @@ formatting on push.
 
 **None of the three repositories' git hooks run the test suite.** Neither `pre-commit`
 nor `pre-push` invokes `npm test` anywhere. A passing hook is not evidence your change
-didn't break a test — only CI, or running the suite yourself, tells you that.
+didn't break a test — only CI, or running the suite yourself, tells you that. Since
+August 2026 CI closes that gap on the way in as well as on the way out: in CPSV Editor
+and RONL Business API a failing check now blocks the *merge*, not just the deploy — see
+[Enforcement](#enforcement-what-blocks-a-merge) below.
 
 ---
 
@@ -68,13 +71,15 @@ and a failing test blocks the deploy. That has only been true since 20 August 20
 before then CI and the hooks left the same gap, and RONL Business API's public-site
 package had the only real test gate anywhere.
 
-**RONL Business API** — six workflows, one acc/prod pair per package:
+**RONL Business API** — **nine** workflows: an acc/prod pair for each of **four**
+packages, plus the supply-chain `audit`:
 
 | Workflow pair | Lint | Type-check | Tests | Notes |
 |---|:---:|:---:|:---:|---|
 | `azure-backend-*` | ✅ | – | ✅ | Builds and uploads a deployment artifact; it does not deploy |
 | `azure-frontend-*` | ✅ | – | ✅ | Also runs `npm run test:perf`, the wall-clock budget, as a step of its own |
 | `azure-publicsite-*` | ✅ | ✅ | ✅ | Its build additionally gates on a prerender and a bundle-cleanliness check |
+| `azure-pa-demo-*` | ✅ | ✅ | ✅ | Also installs Chromium and runs the Playwright E2E suite before the bundle gate |
 
 The frontend's performance budget runs separately because it asserts wall-clock time,
 which means nothing while 133 test files compete for cores — see
@@ -85,14 +90,48 @@ lint and then the suite before building. The two `ropa-site` workflows run neith
 correctly so: that package is a static `index.html` plus a `staticwebapp.config.json`,
 with no build and no test script to run.
 
-**CPSV Editor** — both Azure Static Web Apps workflows, `acc` and `main` alike, run
-`npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy action.
+**CPSV Editor** — three workflows: both Azure Static Web Apps workflows, `acc` and
+`main` alike, run `npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy
+action, and a third runs the supply-chain `audit`.
 
 None of this replaces running the suite yourself before opening a merge request — and a
 green local run is weaker evidence than it looks. RONL Business API's first gated run
 failed on test files that had been latently broken for weeks: ts-jest caches type
 diagnostics per file, so a warm local cache kept skipping the check that CI, starting
 cold, performed immediately. Clearing the cache reproduced it at once.
+
+### Enforcement: what blocks a *merge*
+
+Running a check and being able to block on it are different things, and until August
+2026 these repositories only did the first. **CPSV Editor** and **RONL Business API**
+now each carry a branch ruleset named `acc supply-chain gate`, active on
+`refs/heads/acc` with **no bypass actors**, combining two rules:
+
+- `required_status_checks` → the `audit` context must pass
+- `pull_request` → a pull request is required (0 approvals; these repositories have a
+  single maintainer, and GitHub does not permit self-approval)
+
+Both rules are needed together — requiring the status check alone would still let a
+direct push to `acc` sail past it. The practical effect is that **`git push origin acc`
+is rejected outright** in those two repositories, including for releases and including
+for the repository owner. Linked Data Explorer has no ruleset yet.
+
+### Supply-chain hardening
+
+Alongside the test gate, CPSV Editor (the pilot, v2026.08.2) and RONL Business API have
+adopted a common set of pipeline controls: every `uses:` reference pinned to a commit
+digest rather than a tag, `permissions: contents: read` as the workflow default,
+`persist-credentials: false` on checkout, a blocking zizmor `audit` job, and Renovate
+maintaining the digests under a 14-day cooldown with a no-cooldown lane for security
+advisories. What *cannot* be pinned is written down in each repository's
+`SECURITY-PIPELINE.md` rather than glossed over.
+
+Linked Data Explorer's workflows are still on floating tags (`actions/checkout@v3`,
+`Azure/static-web-apps-deploy@v1`) and are next in the rollout.
+
+[Supply-Chain Pinning](supply-chain.md) covers the mechanism, the measured
+16-findings-to-zero result, what the gate deliberately does not protect, and the order
+to copy the four artifacts into the next repository.
 
 ---
 

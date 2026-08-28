@@ -13,6 +13,9 @@ Capabilities are defined at one of two levels:
 | User | `~/.claude/` | Every repository, every session |
 | Project | `<repo>/.claude/` | That repository only |
 
+Both levels carry the same three kinds of thing — **commands**, **skills**, and
+**plugins** — plus, at user level, the working rules in `~/.claude/CLAUDE.md`.
+
 The distinction is not arbitrary, and the clearest way to see it is a pair of commands
 that sit on opposite sides of it.
 
@@ -35,21 +38,31 @@ on which repository it happens to run from.
 The rule that follows: a capability belongs at user level when it describes *how you
 work*, and stays at project level when it depends on *what the repository is*.
 
-This is not a theoretical distinction — it has history. The working rules now in
-`~/.claude/CLAUDE.md` were promoted to user level on 2026-08-19, after the same rules
-had been learned independently, project by project, in five separate repositories
-(`iou-architectuur`, `ttl-editor`, `linked-data-explorer`, `ronl-business-api` and
-`cprmv`). Each rule was already meant generally; it had only ever been written down
-project-scoped because that was where the correction happened. Consolidating them once,
-at user level, was the fix for that duplication.
+This is not a theoretical distinction — it has history, twice over.
+
+The working rules now in `~/.claude/CLAUDE.md` were promoted to user level on
+2026-08-19, after the same rules had been learned independently, project by project, in
+five separate repositories (`iou-architectuur`, `ttl-editor`, `linked-data-explorer`,
+`ronl-business-api` and `cprmv`). Each rule was already meant generally; it had only
+ever been written down project-scoped because that was where the correction happened.
+Consolidating them once, at user level, was the fix for that duplication.
+
+The same thing happened again on 2026-08-28, to a plugin. The
+[`superpowers`](working-with-claude-code.md#the-plugin-set) plugin had been installed
+for `ronl-business-api` alone, and was promoted to user level once it was clear the
+brainstorm-plan-execute structure is a property of *how the work is done*, not of that
+repository. Nothing about it depended on which repository it ran from — which is
+precisely the test.
 
 ## Working boundaries
 
 The assistant operates inside a set of recorded boundaries: things it will not do
 unprompted, and approvals it will not infer from an earlier one. `~/.claude/CLAUDE.md`
-is the authority for the full set — nine rules at the time of writing — and is not
-reproduced here in full, because a copy would drift. The boundaries most visible to a
-day-to-day contributor:
+is the authority for the full set — **ten rules** at the time of writing — and is not
+reproduced here in full, because a copy would drift. The set has grown since the
+2026-08-19 consolidation and will grow again; treat any count on this page as a
+snapshot, and the file as the authority. The boundaries most visible to a day-to-day
+contributor:
 
 - **Never start, stop or restart a dev server.** The contributor owns those processes.
   A shared runner (for example `npm run dev` fanning out to several packages via
@@ -71,19 +84,40 @@ day-to-day contributor:
 - **No Claude attribution trailers in commit messages.** Commit messages end with
   their substantive body and nothing else, regardless of what the harness's default
   prompt suggests appending.
+- **Never bypass a verification gate.** No `--no-verify`, no `SKIP=`/`HUSKY=0`, no
+  disabling, renaming or editing a hook to make a command succeed. If a gate fails, the
+  failure is the message: read it, fix what it names, run the command again. Where a
+  gate is believed to be wrong, that is a decision to escalate, not a step to route
+  around — and inspecting what a gate checks *after* disarming it is not diligence.
+  This applies with particular force now that CI gates are
+  [genuinely blocking](../supply-chain.md#5-the-acc-ruleset-what-makes-it-enforcement).
+- **A parallel-run test failure is not a finding until it fails in isolation.** Test
+  runners execute files in parallel, so a failure that appears only in a full run may
+  be contention or an order dependency rather than a defect. Re-run it on its own
+  before drawing a conclusion, and never disable parallelism globally to make the
+  symptom go away — that diverges local runs from CI and converts a signal into
+  silence.
 
 ## The two custom capabilities
 
-Two capabilities beyond the built-in ones are specific to this ecosystem.
+Two capabilities beyond the built-in ones are specific to this ecosystem. The
+general-purpose plugins that apply everywhere are covered in
+[Working with Claude Code](working-with-claude-code.md#the-plugin-set); these two are
+IOU's own.
 
 **`/bump-release`** cuts a release in the repository it is invoked in: it flips the
 current changelog entry from upcoming to released, versions the packages the release
-actually touched, and lands the result on the integration branch. It is a
-project-level *command*, defined separately in each of `ronl-business-api`,
+actually touched, and opens the pull request that lands it on the integration branch.
+It is a project-level *command*, defined separately in each of `ronl-business-api`,
 `linked-data-explorer` and `ttl-editor`, at `.claude/commands/bump-release.md` in each
 repository — see [User-level versus project-level](#user-level-versus-project-level)
 above for why three implementations are correct rather than duplicated effort. It is
 invoked by name, as `/bump-release`.
+
+Since August 2026 it no longer merges anything locally. Where a
+[supply-chain gate](../supply-chain.md) protects the branch, a release must land through
+a pull request that passes `audit` — which is the boundary above applied to the
+assistant's own tooling rather than to a contributor.
 
 **`/iou-document-patch`** brings this documentation site into sync with a component's
 latest release, in staged fashion: analyse the component's changelog against what the
