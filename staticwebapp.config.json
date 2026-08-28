@@ -53,7 +53,8 @@
   },
   "mimeTypes": {
     ".json": "application/json",
-    ".md": "text/markdown"
+    ".md": "text/markdown",
+    ".pdf": "application/pdf"
   },
   "platform": {
     "apiRuntime": "node:18"

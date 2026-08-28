@@ -14,11 +14,17 @@ Open het Works-tabblad, typ minimaal twee letters om autocomplete-suggesties te 
 
 ## Werkwijze 2 — Activiteiten doorbladeren per bevoegd gezag
 
-Open het Activities-tabblad, kies een authority-preset (Lelystad of Flevoland), stel een datum in en klik Load.
+Open het Activities-tabblad, kies een authority-preset (Lelystad, Flevoland, Ede of Gelderland),
+stel een datum in en klik Load. Een activiteit met veel onderliggende activiteiten opent
+langzamer: elk kind wordt afzonderlijk opgehaald om zijn naam te tonen.
 
 ## Werkwijze 3 — Een bestaande URN verifiëren
 
 Plak de URN in het footerpaneel van de BPMN Modeler en klik Verify. Bij succes verschijnt een teal infoblok met omschrijving en bevoegd gezag.
+
+**Let op:** dit paneel bevraagt altijd de pre-productieomgeving en negeert de
+omgevingsschakelaar in Instellingen. Een URN die alleen in productie bestaat, verifieert hier
+nooit.
 
 ## Werkwijze 4 — Regels van een activiteit naar LDE exporteren (Fase 4)
 

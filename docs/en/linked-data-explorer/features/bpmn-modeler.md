@@ -210,6 +210,10 @@ See [RoPA Records](ropa-records.md) for the full feature description.
 
 The BPMN Modeler footer panel includes a **DSO Activity** selector for linking a process to a DSO activiteit URN. Pasting a URN and clicking **Verify** queries the live DSO RTR; on success the panel shows the activity's omschrijving, authority block, and a link to the public RTR viewer. The URN is persisted on `<bpmn:process>` as the `ronl:dsoActiviteitUrn` attribute and survives `saveXML` round-trips.
 
+Verification always runs against the **pre-production** DSO — the selector passes no `env`
+argument, so the Settings toggle does not apply here. Production-only URNs will not verify in
+this panel.
+
 See [DSO Integration](dso-integration.md) for the full integration overview and [DSO Explorer user guide](../user-guide/dso-explorer.md) for the verification workflow.
 
 ---
