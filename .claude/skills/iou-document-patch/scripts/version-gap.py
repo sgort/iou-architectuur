@@ -26,6 +26,7 @@ Exit code is non-zero only on a hard error (missing/unparseable inputs).
 import argparse
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -34,6 +35,69 @@ try:
     sys.stdout.reconfigure(encoding="utf-8")
 except (AttributeError, ValueError):
     pass
+
+
+def clone_freshness(changelog_path):
+    """Report whether the checkout holding the changelog is behind its remote.
+
+    version-gap.py reads the changelog from the WORKING TREE. A stale clone
+    therefore yields a confident, silent false negative: the docs get compared
+    against an old changelog and the script reports in_sync for a component that
+    is several releases ahead. This happened during the v2026.08.3 sync, against
+    a checkout 93 commits behind origin/acc.
+
+    Returns a dict describing the checkout, with "stale" True/False/None
+    (None = could not determine, e.g. no upstream configured or git absent).
+    """
+    repo = changelog_path.parent
+    def git(*a):
+        try:
+            r = subprocess.run(
+                ["git", "-C", str(repo), *a],
+                capture_output=True, text=True, timeout=15,
+            )
+        except (OSError, subprocess.SubprocessError):
+            return None
+        return r.stdout.strip() if r.returncode == 0 else None
+
+    if git("rev-parse", "--is-inside-work-tree") != "true":
+        return {"stale": None, "reason": "not a git checkout"}
+
+    # The hint below must name the repository root, not the changelog's folder.
+    root = git("rev-parse", "--show-toplevel") or str(repo)
+    branch = git("rev-parse", "--abbrev-ref", "HEAD")
+    upstream = git("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}")
+    if not upstream:
+        return {
+            "branch": branch,
+            "stale": None,
+            "reason": "no upstream configured for this branch",
+        }
+
+    counts = git("rev-list", "--left-right", "--count", f"{upstream}...HEAD")
+    if not counts:
+        return {"branch": branch, "upstream": upstream, "stale": None,
+                "reason": "could not compare with upstream"}
+    behind, ahead = (int(x) for x in counts.split())
+    try:
+        rel = str(Path(changelog_path).resolve().relative_to(Path(root).resolve()))
+    except ValueError:
+        rel = "<changelog-path>"
+    return {
+        "repo_root": root,
+        "branch": branch,
+        "upstream": upstream,
+        "behind": behind,
+        "ahead": ahead,
+        "stale": behind > 0,
+        "reason": (
+            f"{behind} commit(s) behind {upstream} — the changelog read here may "
+            f"be out of date. Fetch, then ask the user before pulling; or read "
+            f"the file straight from the remote ref, which mutates nothing:\n"
+            f"    git -C {root} show {upstream}:{rel}"
+            if behind > 0 else "up to date with upstream"
+        ),
+    }
 
 
 def parse_semver(v):
@@ -189,9 +253,17 @@ def main(argv=None):
     # oldest-first so docs are written in release order
     gap_sorted = sorted(gap, key=lambda v: parse_semver(v.get("version", "")))
 
+    freshness = clone_freshness(changelog_path)
+
+    # A latest that is not newer than what the docs record means the INPUTS are
+    # wrong (usually a stale clone), not that the docs are ahead of the code.
+    inputs_suspect = bool(latest) and parse_semver(latest) < doc_key
+
     result = {
         "component": args.component,
         "changelog_path": str(changelog_path),
+        "source_clone": freshness,
+        "inputs_suspect": inputs_suspect,
         "repo_versions_path": str(rv_path),
         "documented_version": doc_ver,
         "roadmap_top_version": roadmap_ver,
@@ -205,12 +277,27 @@ def main(argv=None):
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
 
+    if freshness.get("stale"):
+        print(f"🛑 STALE SOURCE CLONE: {freshness['reason']}\n")
+    if inputs_suspect:
+        print(
+            f"🛑 INPUTS LOOK WRONG: the newest version in the source changelog "
+            f"({latest}) is OLDER than the documented version ({doc_ver}). "
+            f"Do not trust the gap below — check the clone and the branch first.\n"
+        )
+
     print(f"Component            : {args.component}")
     print(f"Source changelog     : {changelog_path}")
     print(f"repo-versions.json   : {doc_ver}")
     print(f"changelog-roadmap.md : {roadmap_ver}")
     print(f"Latest in source     : {latest}")
     if result["in_sync"]:
+        if freshness.get("stale") or inputs_suspect:
+            print(
+                "\n⚠️  Reported in sync, but the inputs are suspect (see above). "
+                "Re-run against a current checkout before believing this."
+            )
+            return 0
         print("\n✅ Documentation is already in sync — no gap.")
         return 0
     print(f"\n⚠️  Gap: {len(gap_sorted)} version(s) to document (oldest first):")

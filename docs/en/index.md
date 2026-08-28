@@ -157,13 +157,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.08.1** · *August 2026*
+-   **✏️ CPSV Editor — v2026.08.3** · *August 2026*
 
     ---
 
-    **Deploys gated on the test suite**
+    **The supply-chain gate gets teeth**
 
-    Both Azure deploy workflows now run lint and the full [test suite](cpsv-editor/developer/testing.md) — 16 suites, 257 tests — before deploying, and a failure blocks the deploy. Previously neither ran any of the project's own scripts, so nothing anywhere stopped a deploy that broke the suite. The repo-side test documentation is retired in favour of this site, which is now its single source of truth.
+    Every action a pipeline runs is now pinned to a commit digest, `GITHUB_TOKEN` is scoped down, and a blocking [supply-chain audit](contributing/supply-chain.md) took the repository from 16 findings to zero. A branch ruleset turns that from reporting into enforcement: `acc` requires a pull request and a passing `audit`, with no bypass actors — so releases now land through a pull request too, and a `postcss` advisory became the first end-to-end proof that the no-cooldown security lane bypasses the 14-day cooldown exactly where it should. This repository is the pilot; `ronl-business-api` has since followed.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 

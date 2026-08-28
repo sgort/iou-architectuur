@@ -39,6 +39,26 @@ describes.
   embed no images. Only `developer/due-diligence.md` is a full translation, and
   it carries no figures.
 
+## Sync v2026.08.1 → v2026.08.3 — nothing to capture
+
+Checked on 28 August 2026 for the sync covering **v2026.08.2** and
+**v2026.08.3**, and **no rows were added**.
+
+Both releases are entirely CI, supply-chain and release-process work: digest
+pinning, least-privilege `permissions:`, a blocking zizmor `audit` job, Renovate
+under a cooldown, the `acc` branch ruleset, and the change that makes releases
+land through a pull request. None of it alters a view the documentation depicts.
+
+The one user-visible change is a `ci` icon in the in-app Changelog tab. No page
+documents that tab, so under the manifest's own rule — a **NEW** row obliges a
+`<figure>` on a page, and a row with no embedding page is a defect — there is
+nothing to add. The new [Supply-Chain Pinning](../docs/en/contributing/supply-chain.md)
+page is prose, tables and a policy snippet only.
+
+**Item 3 below remains the only outstanding entry**, and it is still optional.
+
+---
+
 ## Previous sync (v1.10.2 → v1.10.6) — all captured
 
 Retained for reference; nothing outstanding. The two NEW items from that round,

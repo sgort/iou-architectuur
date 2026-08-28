@@ -12,11 +12,15 @@ design; see [Roadmap](#roadmap) for why, and what comes next.
 
 !!! info "Figures on this page are measured, not estimated"
     Every count, command and coverage percentage below was produced by
-    running the suite against **v2026.08.1** on **20 August 2026**. Rerun the
-    commands in [Running the tests](#running-the-tests) to reproduce them.
+    running the suite against **v2026.08.3** on **28 August 2026** — the full
+    run and each scoped script individually. Rerun the commands in
+    [Running the tests](#running-the-tests) to reproduce them.
 
-**At a glance:** 16 suites · **257 tests** · all passing · ~46 s for a full
-run with coverage.
+**At a glance:** 16 suites · **257 tests** · all passing · ~13 s for a full
+run with coverage. The two dependency updates in v2026.08.2 and v2026.08.3
+(`@testing-library/react` 16.3.2, `postcss` 8.5.23) moved no count and shifted
+coverage by under half a percentage point. Wall-clock time is machine-dependent
+— treat the suite counts as the stable figures, not the seconds.
 
 ---
 
@@ -82,23 +86,42 @@ Husky installs two hooks:
 !!! important "The hooks do not run the tests"
     `pre-push` gates on lint and formatting only, so nothing client-side stops
     a push that breaks the suite — run `npm run test:ci` yourself before
-    pushing. Since 20 August 2026 the deploy pipelines do run it, so a broken
-    push no longer reaches acceptance or production; see [CI](#ci).
+    pushing. Since 20 August 2026 the deploy pipelines do run it, and since
+    v2026.08.2 a branch ruleset means a failing pull request cannot be merged
+    into `acc` at all; see [CI](#ci).
     Note that `check-format` runs across the **whole tree**, not just staged
     files — a Prettier violation in a Markdown file fails the push just as a
     source file would.
 
 ### CI
 
-Both Azure Static Web Apps workflows — `azure-static-web-apps-orange-beach-…`
-(deploying `acc`) and `azure-static-web-apps-white-sky-…` (deploying `main`) —
-run `npm run lint` and then `npm run test:ci` before the deploy action, and a
-failure blocks the deploy.
+Three workflows run in this repository.
 
-Until 20 August 2026 neither ran anything of ours at all: the Static Web Apps
-action builds inside its own container and invokes none of the repository's
-scripts, so the workflows went from checkout straight to build-and-deploy. Both
-now carry an explicit Node setup, `npm ci`, lint and test sequence ahead of it.
+| Workflow | Job | Runs |
+|---|---|---|
+| `azure-static-web-apps-orange-beach-…` | `build_and_deploy_job` | `npm ci` → `npm run lint` → `npm run test:ci` → deploy to acceptance |
+| `azure-static-web-apps-white-sky-…` | `build_and_deploy_job` | The same sequence, deploying production |
+| `zizmor.yml` (*Supply-chain audit*) | `audit` | zizmor 1.29.0 over the repository — pin format, token scope, credential persistence |
+
+The two deploy workflows run lint and then the full suite before the deploy
+action, and a failure blocks the deploy. Until 20 August 2026 neither ran
+anything of ours at all: the Static Web Apps action builds inside its own
+container and invokes none of the repository's scripts, so the workflows went
+from checkout straight to build-and-deploy. Both now carry an explicit Node
+setup, `npm ci`, lint and test sequence ahead of it.
+
+Since v2026.08.2 the `acc supply-chain gate` ruleset makes this *enforcement*
+rather than reporting: `acc` requires a pull request, and `audit` is a required
+status check. A workflow that runs but cannot block is advice — and requiring
+the check without also requiring a pull request would still let a direct push
+past it. There are no bypass actors, so this applies to releases and to the
+repository owner alike. The mechanics are covered in
+[Supply-Chain Pinning](../../contributing/supply-chain.md).
+
+!!! note "`audit` does not run the tests, and the deploy job does not run the audit"
+    They are separate gates on the same pull request. `audit` reasons about the
+    pipeline's own supply chain; `build_and_deploy_job` reasons about the code.
+    A pull request needs both to be green before it can merge.
 
 ---
 
@@ -167,9 +190,9 @@ tests.
 
 ## Coverage
 
-Measured with `npm run test:ci` against v2026.08.1 on 20 August 2026.
+Measured with `npm run test:ci` against v2026.08.3 on 28 August 2026.
 
-**Overall: 54.58% statements · 40.81% branches · 38.51% functions · 55.42% lines.**
+**Overall: 54.75% statements · 40.88% branches · 38.68% functions · 55.57% lines.**
 
 That headline number is dominated by untested UI. The layers the suite
 actually targets are well covered:
@@ -178,7 +201,7 @@ actually targets are well covered:
 |---|---:|---:|---:|---:|
 | `src/hooks` | 96.73% | 75.40% | 97.05% | 100% |
 | `src/config` | 92.15% | 80.39% | 75.00% | 91.83% |
-| `src/utils` | 84.66% | 62.11% | 90.05% | 85.35% |
+| `src/utils` | 85.05% | 62.27% | 90.57% | 85.69% |
 | `src/components` | 24.44% | 4.05% | 18.18% | 23.80% |
 | `src/components/tabs` | 5.74% | 2.72% | 2.46% | 6.03% |
 
@@ -198,7 +221,7 @@ Per module, highest first:
 | `utils/cprmvImport.js` | 90.54% | 81.81% |
 | `utils/iknowParser.js` | 88.95% | 70.10% |
 | `parseTTL.enhanced.js` | 81.34% | 71.11% |
-| `utils/ttlGenerator.js` | 80.09% | 53.87% |
+| `utils/ttlGenerator.js` | 80.99% | 54.25% |
 | `utils/importHandler.js` | 10.34% | 0% |
 | `App.js` | 14.16% | 31.87% |
 | `components/tabs/DMNTab.jsx` | 8.24% | 3.31% |

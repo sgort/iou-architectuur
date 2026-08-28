@@ -141,6 +141,12 @@ release cycle.
 
 [Read Code Standards →](code-standards.md)
 
+!!! warning "`acc` may be protected"
+    In CPSV Editor and RONL Business API, the `acc` branch requires a pull request and a
+    passing supply-chain `audit` check, with no bypass actors — a direct
+    `git push origin acc` is rejected. See
+    [Supply-Chain Pinning](supply-chain.md) for what the gate checks and why.
+
 ---
 
 ## Contact

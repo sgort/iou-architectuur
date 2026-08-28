@@ -11,6 +11,8 @@
 
 ---
 
+## The plugin set
+
 ## Session memory
 
 ## Inline versus superpowers

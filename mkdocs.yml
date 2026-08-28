@@ -366,6 +366,7 @@ nav:
       - Navigation Structure: contributing/doc-architecture/navigation.md
       - Technology Stack: contributing/doc-architecture/technology-stack.md
     - Code Standards: contributing/code-standards.md
+    - Supply-Chain Pinning: contributing/supply-chain.md
 
 # Markdown extensions
 markdown_extensions:

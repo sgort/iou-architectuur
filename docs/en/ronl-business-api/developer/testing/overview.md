@@ -4,17 +4,22 @@ component: RONL Business API
 
 # Testing
 
-RONL Business API is an npm-workspaces monorepo with three tested packages:
+RONL Business API is an npm-workspaces monorepo with four tested packages:
 the Express/TypeScript backend on **Jest**, the caseworker portal
-(`packages/frontend`) on **Vitest** + React Testing Library, and the public
-search site (`packages/public-site`) on **Vitest** + jsdom. All three run with
+(`packages/frontend`) on **Vitest** + React Testing Library, the public
+search site (`packages/public-site`) on **Vitest** + jsdom, and the public
+PA Cockpit demo (`packages/pa-demo`) on **Vitest** + jsdom. All four run with
 coverage by default.
 
 !!! info "Figures on this page are measured, not estimated"
-    Every count and percentage below was produced by running the suites against
-    **v2026.08.23** on **22 August 2026**, from a cold cache, on `acc` at
-    `57ce4c2`. Rerun the commands in [Running the tests](#running-the-tests) to
-    reproduce them.
+    Backend, frontend and public-site figures were produced by running the
+    suites against **v2026.08.23** on **22 August 2026**, from a cold cache,
+    on `acc` at `57ce4c2`. The `packages/pa-demo` row was measured separately,
+    on **25 August 2026**, on branch `feat/public-pa-cockpit` at `a59a0a7` —
+    that package has not merged to `acc` yet, so its figures carry a
+    different date and commit than its three siblings on this page. Rerun the
+    commands in [Running the tests](#running-the-tests) to reproduce any of
+    them.
 
     Two things were **not** re-run for this release and say so where they
     appear: the public-site Playwright suite, whose figures date from
@@ -28,10 +33,13 @@ coverage by default.
 | `packages/backend` | Jest + ts-jest | 74 | 1576 | all passing | ~23s | 98.35% | 91.49% | 96.65% | 98.75% |
 | `packages/frontend` | Vitest + RTL | 133 | 1155 | all passing | ~61s¹ | 87.47% | 78.68% | 83.35% | 88.87% |
 | `packages/public-site` | Vitest + jsdom | 28 | 134 | all passing | ~12s | 86.82% | 70.39% | 87.63% | 88.76% |
+| `packages/pa-demo` | Vitest + jsdom | 13 | 68 | all passing | ~5s | 73.94% | 63.41% | 72.22% | 73.87% |
 
-**235 files · 2865 tests**, plus one performance spec run separately — 2866 in
-total. See [Coverage](coverage.md) for what those percentages mean and where
-the remaining gaps are.
+**248 files · 2933 tests**, plus one performance spec run separately — 2934 in
+total. `packages/pa-demo` also carries its own 9-test Playwright suite (see
+[pa-demo suite](pa-demo.md)), not included in that count — same treatment as
+the other two Playwright suites on this page. See [Coverage](coverage.md) for
+what those percentages mean and where the remaining gaps are.
 
 ¹ Wall time varies with machine load; treat it as an order of magnitude rather
 than a figure to match. The same frontend suite has measured 61s on an idle
@@ -46,9 +54,10 @@ separately — see [The performance budget](#the-performance-budget).
 
 | Page | Covers |
 |---|---|
-| [Coverage](coverage.md) | Headline and per-area coverage for all three packages, and why the last two decimals are noise |
+| [Coverage](coverage.md) | Headline and per-area coverage for all four packages, and why the last two decimals are noise |
 | [Backend suite](backend.md) | The 74 files and 1576 tests in `packages/backend`, by area |
 | [Public site suite](public-site.md) | The 28 files and 134 tests in `packages/public-site`, plus its own Playwright suite |
+| [pa-demo suite](pa-demo.md) | The 13 files and 68 tests in `packages/pa-demo`, the four no-Live layers, the bundle gate, the drift checker, and its own Playwright suite |
 | [Caseworker](dashboards/caseworker.md) · [PA cockpit](dashboards/pa-cockpit.md) · [Infra-board](dashboards/infra-board.md) · [Woo-dashboard](dashboards/woo-dashboard.md) | The frontend suite, split the way the product is — one page per board |
 | [E2E & live smoke](e2e.md) | The Playwright suites, what they need running, and the four cross-app shell scripts |
 | [Writing tests](writing-tests.md) | Conventions for adding tests here, and the traps that have already cost time |
@@ -79,11 +88,12 @@ be installed in every workspace).
 
 | Command | Scope | Files | Tests |
 |---|---|---:|---:|
-| `npm test` | Every workspace with a `test` script (see below) | 235 | 2865 |
+| `npm test` | Every workspace with a `test` script (see below) | 248 | 2933 |
 | `npm test --workspace=@ronl/backend` | Backend only (Jest, coverage on by default) | 74 | 1576 |
 | `npm test --workspace=@ronl/frontend` | Frontend only (Vitest, coverage on by default) | 133 | 1155 |
 | `npm run test:perf --workspace=@ronl/frontend` | The wall-clock budget, run without file parallelism | 1 | 1 |
 | `npm test --workspace=@ronl/public-site` | Public site only (Vitest, coverage on by default) | 28 | 134 |
+| `npm test --workspace=@ronl/pa-demo` | PA Cockpit demo only (Vitest, coverage on by default) | 13 | 68 |
 
 ```bash
 # Everything
@@ -93,25 +103,28 @@ npm test
 npm test --workspace=@ronl/backend
 npm test --workspace=@ronl/frontend
 npm test --workspace=@ronl/public-site
+npm test --workspace=@ronl/pa-demo
 
 # Watch mode
 npm run test:watch --workspace=@ronl/backend
 npm run test:watch --workspace=@ronl/frontend
 npm run test:watch --workspace=@ronl/public-site
+npm run test:watch --workspace=@ronl/pa-demo
 
 # Single file / pattern
 npx jest --config packages/backend/jest.config.js --no-coverage --testPathPattern=rules
 npx vitest run --config packages/frontend/vite.config.ts session
 npx vitest run --config packages/public-site/vite.config.ts SectionIndex
+npx vitest run --config packages/pa-demo/vite.config.ts mock-lock
 ```
 
 **What `npm test` at the root actually runs.** The root script is
 `npm run test --workspaces --if-present`, fanning out over every package under
-`packages/*`. Three of the four have a `test` script — `@ronl/backend`,
-`@ronl/frontend`, `@ronl/public-site` — and `--if-present` silently skips the
-fourth, `@ronl/shared`, which has no `test` script at all (only `build`,
-`prepare`, `clean`, `type-check`). That is expected, not a gap: `shared` is a
-types-only package with nothing to unit test.
+`packages/*`. Four of the five have a `test` script — `@ronl/backend`,
+`@ronl/frontend`, `@ronl/public-site`, `@ronl/pa-demo` — and `--if-present`
+silently skips the fifth, `@ronl/shared`, which has no `test` script at all
+(only `build`, `prepare`, `clean`, `type-check`). That is expected, not a gap:
+`shared` is a types-only package with nothing to unit test.
 
 !!! warning "Clear the Jest cache before trusting a green backend run"
     ts-jest caches type diagnostics per file, so a warm cache can skip
@@ -197,7 +210,12 @@ defines no format-check script of its own.
 
 ### CI
 
-Six Azure workflows under `.github/workflows/`, one acc/prod pair per package:
+Six Azure workflows under `.github/workflows/`, one acc/prod pair per
+package — this table covers three of the four packages on this page.
+`pa-demo` ships its own CI pipeline once merged; see
+[pa-demo suite → CI](pa-demo.md#ci) for its two deploy workflows and the
+separate, non-blocking drift-check workflow, none of which are on `acc`
+yet.
 
 | Workflow | Lint | Type-check | **Tests** | Perf budget | Build | Deploys? |
 |---|:---:|:---:|:---:|:---:|:---:|---|

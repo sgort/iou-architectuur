@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # CPSV Editor
 
 **Generate CPSV-AP 3.2.0 compliant RDF/Turtle files for Dutch government services**
@@ -87,8 +91,11 @@ Tab state → generateTTL() → combine sections + namespaces → download .ttl
 ### Deployment pipeline
 
 ```
-Git push → GitHub Actions → npm run build → Azure Static Web Apps → cpsv-editor.open-regels.nl
+Pull request → audit + lint + test:ci → GitHub Actions → Azure Static Web Apps → cpsv-editor.open-regels.nl
 ```
+
+`acc` requires a pull request and a passing supply-chain `audit`; a direct push
+is rejected. See [Deployment](developer/deployment.md).
 
 ---
 
