@@ -1,6 +1,6 @@
 ---
 name: iou-document-patch
-description: Bring the IOU architecture documentation site into sync with the latest documented version of a linked component's code, in a controlled staged manner. Analyzes the component's changelog.json against what the docs currently record, plans per-perspective doc updates (developer / features / reference / user-guide), builds a required-screenshots manifest, updates the What's New card and repo-versions.json metadata, and keeps EN/NL in sync. Use when the user asks to sync/patch/update the docs to a component's latest version, or invokes /iou-document-patch.
+description: Bring the IOU architecture documentation site into sync with the latest documented version of a linked component's code, in a controlled staged manner. Verifies the source clone is current, analyzes the component's changelog.json against what the docs currently record, plans per-perspective doc updates (developer / features / reference / user-guide), and — as a required stage, not optional tidying — updates the cross-cutting contributor documentation under docs/en/contributing/ (CI, git hooks, the supply-chain gate, the release process, the assistant's plugin set and its working boundaries in ~/.claude/), re-counting every counted claim against source. Also builds a required-screenshots manifest, updates the What's New card and repo-versions.json metadata, and keeps EN/NL in sync. Use when the user asks to sync/patch/update the docs to a component's latest version, or invokes /iou-document-patch.
 ---
 
 # IOU Document Patch
@@ -10,6 +10,13 @@ Synchronise the documentation site (`iou-architectuur`) with the latest
 default component is the **CPSV Editor**, whose code lives in the sibling
 `../ttl-editor` repo and whose per-release notes live in
 `../ttl-editor/src/data/changelog.json`.
+
+A sync has **two halves**, and both are required: the component's own pages
+(four perspectives, EN/NL, screenshots, `repo-versions.json`), and the
+cross-cutting contributor pages under `docs/en/contributing/` that describe the
+tooling across *every* component at once. For a release made of CI,
+supply-chain, release-process or tooling work, the second half is the larger
+one.
 
 The work is **staged**: analyse → present a plan + screenshot manifest → get the
 user's approval and the `repo-versions.json` metadata → apply → verify. Never
@@ -22,7 +29,7 @@ adapt the paths — the same staging applies.
 
 | Thing | Location |
 |---|---|
-| Source changelog | `../ttl-editor/src/data/changelog.json` — a **top-level object** `{versions: [...]}`, newest first. Not a bare array; `json.load()` gives you a dict, so index `["versions"]`. Entries carry `format` / `version` / `status` / `date` / `commits`, and there is **no** `scope` field (single-package repo). Read it as UTF-8 — it contains non-cp1252 bytes, so a bare `open()` fails on Windows. |
+| Source changelog | `../ttl-editor/src/data/changelog.json` — a **top-level object** `{versions: [...]}`, newest first. Not a bare array; `json.load()` gives you a dict, so index `["versions"]`. Entries carry `format` / `version` / `status` / `date` / `commits`, and there is **no** `scope` field (single-package repo). Read it as UTF-8 — it contains non-cp1252 bytes, so a bare `open()` fails on Windows. Two shapes coexist: legacy entries up to v1.10.6 use `sections`/`items`; everything from v1.10.7 uses `format: "commits"` with per-commit `sha`/`author`/`type`/`subject`/`details`. Recognised types include `ci` (added in v2026.08.2) alongside `feat`/`fix`/`test`/`docs`/`chore`/`refactor`/`other`. Versioning switched from SemVer to CalVer at v2026.07.0, so an ordered gap can span both schemes. Read the changelog from the **`acc`** branch — that is the branch of record. |
 | Documented version of record | `docs/repo-versions.json` → repository named **"CPSV Editor"** → `version` |
 | Developer changelog page | `docs/en/cpsv-editor/developer/changelog-roadmap.md` |
 | Four perspectives (EN) | `docs/en/cpsv-editor/{developer,features,reference,user-guide}/*.md` |
@@ -30,7 +37,8 @@ adapt the paths — the same staging applies.
 | Home "What's New" card | `docs/en/index.md` (and `docs/nl/index.md`) — CPSV Editor grid card |
 | Screenshots referenced by docs | `../../assets/screenshots/cpsv-editor-*.png` → real files in `docs/assets/screenshots/` (language-neutral, served at site root) |
 | Testing page | `docs/en/<component>/developer/testing.md` — the site is the **single source of truth** for test docs (see Stage 2d) |
-| Cross-cutting contributor docs | `docs/en/contributing/**` — **not component-scoped, and easy to miss.** These pages describe the tooling across *all* components at once: CI, git hooks, lint/format scripts, the repository table, the release process. A single component's release can falsify them. See Stage 2e |
+| Cross-cutting contributor docs | `docs/en/contributing/**` — **not component-scoped, and easy to miss.** These pages describe the tooling across *all* components at once: CI, git hooks, lint/format scripts, the repository table, the release process, the supply-chain gate, the assistant's plugin set and its working boundaries. A single component's release can falsify them, and they carry no `component:` front matter to flag them as in-scope. **Stage 2e is a required stage, not optional tidying** |
+| Assistant-tooling sources of truth | `~/.claude/CLAUDE.md` (working boundaries), `~/.claude/plugins/installed_plugins.json` (what is installed, and at which scope), `~/.claude/settings.json` → `enabledPlugins` (what is actually on), `~/.claude/plugins/known_marketplaces.json`. These are the **only** authority for `development-workflow/skills-and-boundaries.md` and `working-with-claude-code.md` — never restate those pages from memory. See Stage 2e |
 | Per-page metadata header | `component:` front matter on every edited/added page (see below) |
 
 ### Known components beyond CPSV Editor
@@ -131,6 +139,41 @@ Material upgrade changes that file, re-check the override.
    source repo is reachable (default `../ttl-editor`). If the user linked it
    elsewhere, ask for the path.
 2. Confirm the changelog file exists.
+3. **Confirm the local clone is not stale — before running anything else.**
+
+!!! danger "A stale clone makes `version-gap.py` confidently wrong"
+    The script reads the changelog from the **working tree**. If the local
+    checkout is behind its remote, it compares the docs against an old changelog
+    and reports `in_sync: true` for a component that is several releases ahead.
+    This is silent: there is no error, no warning, and the JSON looks healthy.
+
+    It has happened. In the v2026.08.3 sync the local `ttl-editor` checkout was
+    **93 commits behind `origin/acc`** and still carried `1.10.6`, while the docs
+    already recorded `v2026.08.1`. The script reported `in_sync: true`. Only the
+    absurdity of `latest_version` being *older* than `documented_version` gave it
+    away — and that tell will not always be there.
+
+    So, always:
+
+    ```bash
+    git -C ../<component-repo> fetch --all --prune
+    git -C ../<component-repo> status -sb | head -1     # "behind N" ⇒ stale
+    ```
+
+    If it is behind, **stop and ask the user before pulling** — a pull mutates a
+    repository this skill does not own. Alternatively, read the changelog from the
+    remote ref without touching the working tree, which is always safe:
+
+    ```bash
+    git -C ../<component-repo> show origin/acc:src/data/changelog.json > /tmp/changelog-acc.json
+    ```
+
+    `acc` is the branch of record for these components. Do not compute a gap
+    against `main`.
+
+    Sanity check regardless of what the script says: if `latest_version` is not
+    newer than `documented_version`, something is wrong with the *inputs*, not
+    with the docs.
 
 ## Stage 1 — Compute the version gap
 
@@ -321,52 +364,114 @@ Page structure that worked well:
 | Adding tests | Conventions — colocation, splitting, phase scripts, where to mock |
 | Roadmap | Remaining phases and what is deliberately out of scope |
 
-### Stage 2e — Cross-cutting contributor documentation
+### Stage 2e — Cross-cutting contributor documentation (REQUIRED)
 
 Everything above is component-scoped. `docs/en/contributing/**` is not, and that
 is exactly why it goes stale unnoticed: it describes the tooling across **all**
 components at once, so a change in any one of them can falsify a sentence that
-never mentions that component by name.
+never mentions that component by name. These pages carry no `component:` front
+matter, so nothing flags them as in-scope.
 
-**This has already happened.** The CI test gates added on 20 August 2026 —
-across three separate repositories, in three separate releases — invalidated
-every claim in `code-standards.md`'s CI section. Three consecutive
-`/iou-document-patch` runs updated the component pages correctly and left that
-section describing a world that no longer existed, because nothing in this skill
-pointed at it.
+**This stage is not optional and not tidying.** It has been skipped before, with
+consequences:
 
-So for every sync, grep these pages for claims about the component you are
-syncing, and about the tooling its release touched:
+- The CI test gates added on 20 August 2026 — across three repositories, in
+  three releases — invalidated every claim in `code-standards.md`'s CI section.
+  Three consecutive runs of this skill updated the component pages correctly and
+  left that section describing a world that no longer existed.
+- In the v2026.08.3 sync, `code-standards.md` still said RONL Business API had
+  **six** workflows when `acc` carried **nine**; `skills-and-boundaries.md` still
+  said `~/.claude/CLAUDE.md` held **nine** rules when it held **ten**; and
+  `working-with-claude-code.md` named **two** plugins when **six** were
+  installed. None of those sentences mentions the component that falsified them.
+
+!!! important "Some releases are *mostly* a contributing-docs change"
+    Classify the gap before planning. A release made of CI, supply-chain,
+    release-process, tooling or repository-policy work has almost no component
+    surface — its real footprint is `docs/en/contributing/**`, and the component
+    pages are the *smaller* half of the job. Do not let the four-perspective
+    routing in Stage 2 make such a release look thin. If most changelog entries
+    are typed `ci`, `chore` or `docs`, this stage is the main event.
+
+#### The page-by-page staleness table
 
 | Page | Goes stale when |
 |---|---|
-| `contributing/code-standards.md` | CI steps, git hooks, or a lint/format/test script name changes in any repo |
-| `contributing/index.md` | A repository is added or renamed, or its issue tracker or local-development page moves |
-| `contributing/development-workflow/overview.md` | The pipeline's shape changes — a stage added, removed, or reordered |
-| `contributing/development-workflow/working-with-claude-code.md` | Session-memory tooling, the plugin set, or the TDD/subagent workflow changes |
-| `contributing/development-workflow/skills-and-boundaries.md` | A `~/.claude/CLAUDE.md` rule is added or promoted, or a project-level command/skill is added, moved or removed. Note it states the rule **count** — verify it |
+| `contributing/code-standards.md` | CI steps, git hooks, a lint/format/test script name, the number of workflows, or which packages are gated changes in **any** repo |
+| `contributing/supply-chain.md` | A repository adopts (or has not yet adopted) digest pinning, the `audit` gate, Renovate or an `acc` ruleset; a pinned digest, a zizmor version or an exception in `SECURITY-PIPELINE.md` changes |
+| `contributing/index.md` | A repository is added or renamed, or its issue tracker or local-development page moves; a branch gains protection that changes how a contributor lands work |
+| `contributing/development-workflow/overview.md` | The pipeline's shape changes — a stage added, removed, or reordered; how a release lands changes |
+| `contributing/development-workflow/working-with-claude-code.md` | **A plugin is installed, removed, enabled, disabled, or changes scope**; session-memory tooling or the TDD/subagent workflow changes |
+| `contributing/development-workflow/skills-and-boundaries.md` | **A `~/.claude/CLAUDE.md` rule is added or promoted**, or a project-level command/skill is added, moved or removed, or a plugin changes scope. Note it states the rule **count** — re-count it, every time |
 | `contributing/development-workflow/design-and-handoff.md` | The handoff package's shape or its route into the repo changes |
 | `contributing/doc-architecture/*.md` | This site's own stack, hosting or build changes — those pages describe the documentation repository itself |
 
-Two checks worth running every time, because both have caught real drift:
+#### Required checks
+
+**1. Read the sources, never the prose.** The CI section was rewritten by
+enumerating all fourteen workflow files across the three repositories; doing that
+surfaced three facts the old text never had. Editing the one sentence that looks
+wrong will leave the four beside it that also are.
+
+For repository tooling, read on the **`acc` branch of each repo**, not the local
+working tree, which may be on a feature branch or stale:
+
+```bash
+git -C ../<repo> ls-tree -r --name-only acc | grep -E '^\.github/|renovate|SECURITY-PIPELINE|\.husky'
+git -C ../<repo> show acc:.github/workflows/<file>.yml
+git -C ../<repo> show acc:package.json
+```
+
+Where a claim is about a GitHub setting rather than a file — branch protection,
+required checks, bypass actors — verify it with `gh`, not from prose:
+
+```bash
+gh api repos/<owner>/<repo>/rulesets --jq '.[] | "\(.name) \(.target) \(.enforcement)"'
+gh api repos/<owner>/<repo>/rulesets/<id> --jq '[.rules[] | {type, checks:(.parameters.required_status_checks//null|if .==null then null else map(.context) end)}]'
+```
+
+**2. Re-derive the assistant-tooling pages from `~/.claude/`.** Two pages
+describe the assistant itself, and both drift silently because nothing in a
+component repository changes when the assistant's configuration does:
+
+```bash
+grep -c '^## ' ~/.claude/CLAUDE.md                      # the rule COUNT — the page states it
+grep -n '^## ' ~/.claude/CLAUDE.md                      # which rules, in order
+python3 -c "import json;d=json.load(open('$HOME/.claude/plugins/installed_plugins.json'));\
+[print(k, e['scope'], e.get('version')) for k,v in d['plugins'].items() for e in v]"
+python3 -c "import json;print(json.load(open('$HOME/.claude/settings.json')).get('enabledPlugins'))"
+```
+
+Three traps in that data, all of which have produced wrong documentation:
+
+- **Installed ≠ enabled.** A plugin can be present in `installed_plugins.json`
+  and absent from `enabledPlugins`. Document what is *enabled*.
+- **Scope matters and can change.** The same plugin can appear twice — once
+  `project`, once `user`. A promotion from project to user scope leaves the old
+  project entry in place; the user entry is the one that governs. A scope change
+  is itself worth documenting, because it is the concrete illustration of the
+  user-versus-project rule the page is built around.
+- **Enabled ≠ working.** A plugin may need an external binary. Check before
+  claiming a capability — `typescript-lsp` needs `typescript-language-server` on
+  the `PATH` and is inert without it.
+
+**3. Two greps that have both caught real drift:**
 
 ```
 grep -rniE "no test|not run|never run|only .* (has|one)|neither lint nor" docs/en/contributing/
-grep -rniE "azure-[a-z-]+|Static Web Apps|pre-push|pre-commit|lint-staged" docs/en/contributing/
+grep -rniE "azure-[a-z-]+|Static Web Apps|pre-push|pre-commit|lint-staged|zizmor|renovate|ruleset" docs/en/contributing/
 ```
 
-The second pattern matters more than it looks: these pages name CI jobs and git
-hooks without naming the component they belong to, so a component-scoped search
-never surfaces them.
+The second matters more than it looks: these pages name CI jobs and git hooks
+without naming the component they belong to, so a component-scoped search never
+surfaces them.
 
-**Read the workflow and hook files rather than the previous prose.** The CI
-section was rewritten by enumerating all fourteen workflow files across the three
-repositories; doing that surfaced three facts the old text never had. Editing the
-sentence that looks wrong will leave the four beside it that also are.
-
-Where a claim counts things (`all three repositories`, `nine rules`, `the only
-package that…`), re-count. A release that adds a fourth of something turns an
-exhaustive claim into a false one without touching any word in the sentence.
+**4. Re-count every counted claim.** Where a page counts things — *all three
+repositories*, *nine rules*, *six workflows*, *the two custom capabilities*, *the
+only package that…* — count them again against the source. A release that adds a
+fourth of something turns an exhaustive claim into a false one **without touching
+a single word in the sentence**, which is why re-reading the prose never catches
+it.
 
 ---
 
@@ -401,17 +506,33 @@ Work in this order so a failure leaves the docs in an obvious half-state:
    page is new. Update any page that repeats a now-stale testing claim — the
    due-diligence review in particular tends to carry a "no automated tests"
    assessment that a coverage push invalidates.
-7. **Front matter** — add `component: <Name>` to **every** page created or
-   edited in this patch, EN and NL, placeholders included (see *Per-page
-   metadata header*). Easiest as one sweep at the end over the file list.
-8. **`screenshot-manifest/<component-slug>-screenshots-todo.md`** — write the
-   manifest (root folder, **not** under `docs/`).
-9. **`repo-versions.json`** — set the component's `version`/`commit`/
-   `commit_date`/`environment`/`repo_url` and the top-level `docs_built` to the
-   user-confirmed values.
-10. **Cross-cutting contributor pages** — apply any corrections found in
-    Stage 2e. Verify each against the source file (workflow YAML, `.husky/*`,
-    `package.json`) rather than against the prose being replaced.
+7. **Cross-cutting contributor pages** — apply every correction found in
+   Stage 2e, verifying each against the source (workflow YAML on `acc`,
+   `.husky/*`, `package.json`, `gh api .../rulesets`, `~/.claude/CLAUDE.md`,
+   `~/.claude/plugins/installed_plugins.json`) rather than against the prose
+   being replaced.
+
+    **Do this before the cosmetic steps below, not after.** It used to be step
+    10 and was the step that got dropped when a run ran long — three consecutive
+    syncs left these pages stale. If a new cross-cutting page is warranted
+    (a topic that spans every component, such as the supply-chain gate), create
+    it under `docs/en/contributing/`, add a `mkdocs.yml` nav entry, and add an
+    NL placeholder with mirrored `##` headers. Cross-cutting pages get **no**
+    `component:` front matter — the metadata header renders one component's
+    version, which would be wrong on a page about all of them.
+
+8. **Front matter** — add `component: <Name>` to **every** *component* page
+   created or edited in this patch, EN and NL, placeholders included (see
+   *Per-page metadata header*). Easiest as one sweep at the end over the file
+   list. Skip `docs/en/contributing/**` and the home page.
+9. **`screenshot-manifest/<component-slug>-screenshots-todo.md`** — write the
+   manifest (root folder, **not** under `docs/`). If the gap warrants no
+   screenshots at all, say so explicitly in the manifest with the reasoning,
+   rather than leaving the file untouched — a silent no-op is indistinguishable
+   from a forgotten step on the next run.
+10. **`repo-versions.json`** — set the component's `version`/`commit`/
+    `commit_date`/`environment`/`repo_url` and the top-level `docs_built` to the
+    user-confirmed values.
 
 ## Stage 4 — Verify & report
 
@@ -454,10 +575,36 @@ Work in this order so a failure leaves the docs in an obvious half-state:
    *neighbouring* sentence in the same section still describes the old state.
    The failure mode here is a half-corrected section, which reads as
    authoritative while being wrong.
-6. Report a summary: gap closed, files changed grouped by perspective, the
-   screenshot manifest path with NEW/REPLACE counts, and the metadata written.
-   Explicitly list what still needs a human: capturing the screenshots and
-   translating any NL pages left as placeholders.
+
+   Then re-run the counted claims specifically, because these are the ones that
+   survive a careful re-read:
+
+   ```
+   grep -rniE "\b(two|three|four|five|six|seven|eight|nine|ten)\b (repositor|workflow|rule|plugin|package|capabilit)" docs/en/contributing/
+   ```
+
+   Every hit must be re-verified against the source, not against your memory of
+   having just edited nearby.
+
+6. **Anchors and nav** — cross-references between contributing pages are
+   deep-linked more often than component pages are. A non-strict `mkdocs build`
+   reports a bad anchor only at INFO level, so grep the built HTML for each
+   anchor you linked to:
+
+   ```
+   grep -c 'id="<anchor>"' site/contributing/<page>/index.html      # must be 1
+   ```
+
+   Any new page must appear in `mkdocs.yml`'s `nav`, or the build warns that it
+   is not included.
+
+7. Report a summary: gap closed, files changed grouped by perspective **and a
+   separate cross-cutting group**, the screenshot manifest path with
+   NEW/REPLACE counts, and the metadata written. State explicitly what was
+   checked under `docs/en/contributing/` and found **correct**, not only what
+   was changed — "verified, no change needed" is a result, and its absence from
+   a report is how a skipped stage hides. Then list what still needs a human:
+   capturing screenshots and translating any NL pages left as placeholders.
 
 ## Guardrails
 
@@ -486,4 +633,14 @@ Work in this order so a failure leaves the docs in an obvious half-state:
   cross-cutting pages under `docs/en/contributing/` describe every component at
   once and carry no `component:` front matter to flag them as in-scope. They
   have already been left stale by three consecutive syncs of this skill. Treat
-  Stage 2e as part of the sync, not as optional tidying.
+  Stage 2e as part of the sync, not as optional tidying — and report on it
+  explicitly, including where nothing needed changing.
+- **Verify the inputs before trusting the tooling.** `version-gap.py` is
+  deterministic but only as good as the working tree it reads. A stale clone
+  makes it report `in_sync` for a component that is releases ahead. Fetch first;
+  read from the remote `acc` ref when in doubt.
+- **The assistant's own configuration is documented content.** Plugins, their
+  scopes, and the rules in `~/.claude/CLAUDE.md` are described on two pages of
+  this site. They change without any component repository changing, so nothing
+  else in this skill will surface the drift. Re-derive them from `~/.claude/`
+  every run — never from the pages themselves, and never from memory.
