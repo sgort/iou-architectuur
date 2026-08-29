@@ -89,10 +89,17 @@ The frontend's performance budget runs separately because it asserts wall-clock 
 which means nothing while 133 test files compete for cores — see
 [The performance budget](../ronl-business-api/developer/testing/overview.md#the-performance-budget).
 
-**Linked Data Explorer** — six workflows. Both backend and both frontend workflows run
-lint and then the suite before building. The two `ropa-site` workflows run neither, and
-correctly so: that package is a static `index.html` plus a `staticwebapp.config.json`,
-with no build and no test script to run.
+**Linked Data Explorer** — **seven** workflows on `acc`: six deployment workflows plus
+the supply-chain `audit` gate added in v2026.08.7. Both backend and both frontend
+workflows run lint and then the suite before building. The two `ropa-site` workflows run
+neither, and correctly so: that package is a static `index.html` plus a
+`staticwebapp.config.json`, with no build and no test script to run.
+
+Unlike the other two, **the Linked Data Explorer's CI does deploy its backend** — the
+backend workflows end in `azure/webapps-deploy`, where RONL Business API's end in an
+uploaded artifact that a developer deploys by hand. Its backend workflows trigger on
+push only, though, so no pull request runs the backend suite; a break surfaces on `acc`
+after merge, where `npm test` gates the deploy step.
 
 **CPSV Editor** — three workflows: both Azure Static Web Apps workflows, `acc` and
 `main` alike, run `npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy
@@ -117,12 +124,14 @@ now each carry a branch ruleset named `acc supply-chain gate`, active on
 
 Both rules are needed together — requiring the status check alone would still let a
 direct push to `acc` sail past it. The practical effect is that **`git push origin acc`
-is rejected outright** in those two repositories, including for releases and including
-for the repository owner. Linked Data Explorer has no ruleset yet.
+is rejected outright** in all three repositories, including for releases and including
+for the repository owner. Linked Data Explorer adopted the same ruleset in v2026.08.7;
+all three are named `acc supply-chain gate` and carry zero bypass actors.
 
 ### Supply-chain hardening
 
-Alongside the test gate, CPSV Editor (the pilot, v2026.08.2) and RONL Business API have
+Alongside the test gate, all three application repositories — CPSV Editor (the pilot,
+v2026.08.2), RONL Business API, and Linked Data Explorer (v2026.08.7) — have
 adopted a common set of pipeline controls: every `uses:` reference pinned to a commit
 digest rather than a tag, `permissions: contents: read` as the workflow default,
 `persist-credentials: false` on checkout, a blocking zizmor `audit` job, and Renovate
@@ -130,12 +139,16 @@ maintaining the digests under a 14-day cooldown with a no-cooldown lane for secu
 advisories. What *cannot* be pinned is written down in each repository's
 `SECURITY-PIPELINE.md` rather than glossed over.
 
-Linked Data Explorer's workflows are still on floating tags (`actions/checkout@v3`,
-`Azure/static-web-apps-deploy@v1`) and are next in the rollout.
+The rollout is not identical across the three. RONL Business API has taken the v7
+action majors; the CPSV Editor and the Linked Data Explorer remain on v4, and the
+Linked Data Explorer carries one `actions/checkout` at v3.7.0 — all pinned by digest,
+but pinned to older majors. **No `main` branch carries any of this**, so the gate
+protects the acceptance path only.
 
-[Supply-Chain Pinning](supply-chain.md) covers the mechanism, the measured
-16-findings-to-zero result, what the gate deliberately does not protect, and the order
-to copy the four artifacts into the next repository.
+[Supply-Chain Pinning](supply-chain.md) covers the mechanism, the measured results
+(16 findings to zero in the CPSV Editor, 49 in RONL Business API, 40 in the Linked Data
+Explorer), what the gate deliberately does not protect, and the order to copy the four
+artifacts into the next repository.
 
 ---
 

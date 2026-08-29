@@ -8,6 +8,78 @@ component: Linked Data Explorer
 
 ## Changelog
 
+### v2026.08.9 — Changelog gains `ci` and `repo` scopes, and stops crashing on an unknown one (August 2026)
+
+**Three entries in the previous release changed no deployable's code at all**, and the scope field offered only `frontend`, `backend` and `both` — so none of the three was true for them. Labelling any of it `both` would have told a reader that a release touching only `.github/` had changed application code. `ci` now covers pipeline and supply-chain work, mirroring the tag `ronl-business-api` already uses so both repositories label the same kind of work the same way; `repo` covers everything else that ships no application code — documentation, and the Operaton deploy bundles under `examples/` and `e2e-fixtures/`. Those bundles are worth distinguishing from a frontend change, because the frontend serves its own copies from `packages/frontend/public/examples/`, while the root directories are read only by the backend's tests and deployed to Operaton separately.
+
+**An unrecognised scope would have taken the whole panel down.** The commit-type union had no `ci`, but unknown types fall back to `other`, so a `ci` entry rendered as a generic document icon — filing an entire supply-chain effort under "other" rather than crashing. `ScopeBadge` had no such fallback: `changelog.json` is imported as untyped JSON and cast at the module boundary, so TypeScript never checks the scope strings the data actually carries. An unrecognised one reached `SCOPE_BADGE[scope]`, yielded `undefined`, and would fail on `config.cls`. The type system cannot help here by construction, which is what makes the guard — not the types — the thing that made the new scope tags safe to introduce.
+
+**The release command lands through a pull request.** Two steps of `/bump-release` were not merely out of date but impossible: it fast-forwarded `acc` locally and asked separately about pushing, and both halves are now rejected, because `acc` requires a pull request and a passing `audit`. It pushes the branch and opens a pull request instead — merging *is* the push. The merge method is called out explicitly, because both alternatives silently break the changelog entry that names every commit by SHA: squash collapses them into one new commit, and rebase replays them as new commits, preserving the count while replacing every hash. A new first step reconciles open Renovate pull requests, which rewrite `package-lock.json` — the same file a version bump edits.
+
+---
+
+### v2026.08.8 — Four advisories closed, and a formatter that reformatted five untouched files (August 2026)
+
+**Twenty-three backend packages were brought up to date, of which exactly one carried an advisory**: `express` 4.18.2 → 4.22.2. The rest — `helmet`, `pg`, `winston`, `dotenv`, `cors`, `sparql-http-client` and the TypeScript, ESLint and Jest toolchain — are routine currency rather than security work, and are recorded as such rather than presented as advisory fixes.
+
+**Three further advisories closed through the security fast-lane**, which clears the 14-day cooldown for known advisories — the one class of update that must not wait. `axios` ^1.6.5 → ^1.18.0 (lockfile 1.20.0), spanning fourteen minor releases and the widest jump in this release; `fast-xml-parser` ^5.3.5 → ^5.7.0 (lockfile 5.11.1); and `vite` ^6.2.0 → ^6.4.3. The split between a raised floor and a newer resolved version is `rangeStrategy: bump` working as intended: raise the range to the safe minimum, let the lockfile pin what is current.
+
+**Only one of the three ran a full check.** The frontend workflow triggers on pull requests, so the `vite` update ran lint, tests and a preview deploy; the backend workflow triggers on push only, so the `axios` and `fast-xml-parser` updates had no pull-request check that said anything about whether a dependency had broken something. Both were verified against the full backend suite locally before merging. The same asymmetry meant `concurrently`'s branch was never rebased — it did not conflict — so the merge was trialled locally first and the lockfile checked with `npm ci`, because a clean textual merge of two lockfile diffs can still produce a file npm refuses.
+
+**Prettier 3.9 reformatted five files nobody had touched.** It formats short union types on a single line where 3.7 produced the leading-pipe multiline style, so those five began failing `prettier --check` the moment the upgrade landed. No workflow runs `check-format` — the deploy workflows run lint and tests only — so nothing in CI reported it. The gate that catches this is the `pre-push` hook, which means the symptom would otherwise have been the next person's push failing on files they had never opened.
+
+---
+
+### v2026.08.7 — Supply-chain pinning enforced, and a silently inert Renovate (August 2026)
+
+> Cross-repository detail: [Supply-chain gate](../../contributing/supply-chain.md).
+
+**Nothing this pipeline downloads or executes may float.** All twenty action references across the six deployment workflows are now commit digests with their version in a trailing comment, and a `zizmor` gate refuses any pull request that reintroduces a floating tag. Findings go from **40 to 0**. Each workflow also gains the hardening zizmor was reporting: `persist-credentials: false` on checkout, explicit workflow and job permissions, and a `concurrency` group keyed on the pull-request number rather than the ref — because `github.ref` alone puts the `pull_request(closed)` teardown and the `push` deploy that a merge fires into one group, where they cancel each other at random.
+
+**`renovate.json` supplies the other half of the policy**: a 14-day cooldown with `internalChecksFilter: strict`, cleared by `vulnerabilityAlerts` for known advisories, and dependencies grouped per workspace. `SECURITY-PIPELINE.md` records what is pinned and, more importantly, what is not — the `static-web-apps-deploy` Docker image behind four workflows, and the backend deploy step's lockfile-less `npm install`.
+
+**Renovate had been opening nothing at all.** It validates strictly and rejects unknown options, so the five `"//"`-prefixed keys used as JSON comments were read as five invalid settings rather than ignored, and Renovate stopped raising pull requests as a precaution. That is correct behaviour from it — but it meant the half of the supply-chain policy that keeps pins current was inert from the moment it landed. Pins without updates decay into an unpatched tree, so a silently inert Renovate is precisely the failure the audit exists to prevent. Every comment moved to a `description` field, valid at the top level and inside any nested object; no policy changed, only the annotation style.
+
+**The gate now validates the configuration too.** `renovate-config-validator` runs as a second step in the same `audit` job, so it is covered by the existing required status check and needs no ruleset change. It runs under `if: always()`, so a zizmor failure cannot hide a broken configuration behind it, and with no filename argument — passing one switches the validator into global-config mode, which applies different rules than the repository config this file actually is. `--strict` earned its place immediately: it fails on configuration Renovate would silently auto-migrate, which surfaced `baseBranches`, renamed upstream to `baseBranchPatterns` and therefore invisible on every previous run.
+
+**The validator runs on the Node version Renovate requires.** `renovate@44.50.3` declares `engines.node ^24.11.0` while the runner defaults to Node 22, and npm accepts that mismatch with an `EBADENGINE` *warning* rather than refusing — so the validator had been running unsupported and still reporting green. `setup-node` is placed before the zizmor step rather than beside the validator it serves: a step following a failed one is skipped, so putting it after would leave the validator's `if: always()` running on whatever Node the runner defaulted to, precisely when zizmor had already failed and the logs were being read.
+
+---
+
+### v2026.08.6 — A ValidSign signature on the R2.1 phase exit (August 2026)
+
+**One attribute is the switch for the whole signing feature.** `ronl:signatureRef="rip-pdp"` is added to `Task_AccorderenProjectplan4` — the *"Accorderen Projectplan 4. Uitgangspunten VO-fase"* task that closes R2.1. The RONL Business API resolves `ronl:signatureRef` on a user task and, when present, replaces that task's plain approval form with a ValidSign signing ceremony: the phase document is rendered from its deployed template, a signature package is created, and the Operaton task completes only once the signature lands.
+
+**The parity test had been failing since that commit.** `RipR21Process.bpmn` exists in two places the test locks together byte for byte — `examples/organizations/flevoland/rip-phase-21/` is the authored source, `e2e-fixtures/flevoland/` the mirror — and the attribute had been added to the mirror only. Because the backend deploy workflow triggers on push and not on pull requests, no pull request runs these tests: the failure would have surfaced on `acc` after merge, where `npm test` gates the deploy step, leaving a red acceptance branch and no deployment. The `xmlns:ronl` namespace was already declared in both files and the byte delta was exactly the length of the attribute, so the repair adds one attribute rather than reflowing the document.
+
+---
+
+### v2026.08.5 — The R2.2 VO bundle, and a parity test that locks each bundle's two copies together (August 2026)
+
+> Bundle contents and deployment: [RIP R2.2 VO Bundle](../features/rip-r22-bundle.md).
+
+**`RipR22Process` picks up where R2.1's "Fase 1 voltooid → R2.2" end event left off** — four lanes and nine user tasks, from `R2_2 - VO.pdf` (rev. 21-11-2024). All five branches of the opening parallel split rejoin the join gateway. The source PDF does not draw it that way: it shows *Inventariseren kabels en leidingen* and *Aanvragen raamvergunning* leaving the pool into CO1 and JU3.5 and never returning, which as control flow deadlocks at the join. Those hand-offs are `textAnnotation`s instead, because CO1 and JU3.5 do not exist as fixtures and a `callActivity` would dangle at deploy time and fail the manifest's `calledElement` test. They are referenced by several phases and belong in a shared bundle of their own.
+
+**Nine forms and five document templates complete the bundle.** One form per user task, bound by `camunda:formRef`, with field types kept inside the eight the R2.1 bundle already uses, since nothing else is exercised against this Camunda 7.21 stack. One template per green *"Format …"* box in the specification — KES, Ontwerptoelichting, Objectenboom, Bevindingenformulier and Hoeveelheidsbepaling — because a Format in the diagram and a `.document` here are the same thing: a template with bindings. The blue outputs beside them in the spec are instances of these templates rather than artifacts of their own. Their zone keys are `signOff` and `contactInformation` from the start, unlike R2.1's templates, which shipped with `signoff` and `contactInfo` — keys `DocumentZones` never declares, leaving their signature blocks unrendered until v2026.08.4 repaired them.
+
+**The templates would have imported and attached to nothing.** R2.1 wires each document template to the task that produces it with `ronl:documentRef` — the attribute `DocumentTemplateSelector` writes and `BpmnCanvas` reads to render the document badge on a task. The R2.2 specification never mentioned it, so the process shipped without it. The attribute is single-valued, so a task carries at most one template, and four of the five bind. `rip-objectenboom` stays unattached deliberately: `Task_OpstellenConceptVO` produces both the Ontwerptoelichting and the Objectenboom, and its one slot went to the Ontwerptoelichting. The Objectenboom still ships and imports normally — it simply carries no task badge, and its reference is maintained in Relatics instead.
+
+**Each bundle now exists twice on disk, and a test keeps the copies identical.** Authored under `examples/`, imported and deployed from `e2e-fixtures/` — with nothing stopping the two drifting, and they had: v2026.08.4 repaired the document zone keys in the `e2e-fixtures` copies only, and the `examples` copies kept the dead keys until they were re-pasted by hand. A new test asserts every file in a mirrored bundle is byte-identical to its twin; new bundles opt in by adding an entry to `MIRRORED_BUNDLES`.
+
+**`rip-phase1-swimlanes` is renamed to `rip-phase-21`.** The `-swimlanes` suffix distinguished the bundle from a competing `rip-phase1/` draft that has since been deleted, so it distinguished nothing, and the directory name no longer matched the process it holds. `rip-phase-21/` holds `RipR21Process` and `rip-phase-22/` holds `RipR22Process`, which makes the two obvious siblings. Contents are untouched, and exactly one reference to the old path existed — the `source` field of the `RipR21Process` entry in `e2e-fixtures/manifest.json`. Nothing resolves this directory at runtime: the application serves examples from `packages/frontend/public/examples/`, which has never held the RIP bundles.
+
+---
+
+### v2026.08.4 — Signature blocks that had never rendered, and the DSO API surface documented (August 2026)
+
+**Two defects had shipped with every deployment of the three RIP document templates.** The templates used `signoff` and `contactInfo` where `DocumentZones` declares `signOff` and `contactInformation`; `DocumentCanvas` iterates `ZONE_ORDER` and calls `getZoneBlocks('signOff')`, so the lowercase key meant the Signatures block was dropped silently — the three signature lines in these templates had never rendered at all. They also declared `processKey: "RipPhase1Process"` while the BPMN they deploy with declares `RipR21Process`, which is also the key the fixture manifest lists them under. The authored `examples/` copies were brought back in line with the `e2e-fixtures/` mirror ahead of the parity test that would later enforce it mechanically.
+
+**The DSO Viewer's full API surface was written down**, mapping each viewer feature to the upstream API behind it — Stelselcatalogus v3 for concepts, RTR Gegevens v2 for activities, Zoekinterface v2 for werkzaamheden search, Opvragen Werkzaamheden v1 for werkzaamheid detail, and Toepasbare Regels Uitvoeren Gegevens v1 for rule metadata — together with the call path per feature, a complete endpoint map, pre- and production base URLs, and the transport conventions. That material is already reflected on [DSO integration](../features/dso-integration.md) and [API reference](../reference/api-reference.md).
+
+**The Activity Detail panel's child fan-out was recorded as the viewer's heaviest interaction.** The RTR returns `onderliggendeActiviteiten` as bare HAL hrefs with no `omschrijving`, so the panel fires one extra activity-detail request per child, in parallel, purely to resolve names: opening a single activity costs 1 + N upstream calls, and 24 for an activity with 23 children. There is no cache and no concurrency cap, which makes it the first candidate for memoisation.
+
+---
+
 ### v2026.08.3 — A test gate, and two defects it did not catch (August 2026)
 
 > Full inventory, commands and coverage: [Testing](testing.md).

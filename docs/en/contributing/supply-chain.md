@@ -45,11 +45,33 @@ problem rather than solving it).
 |---|:---:|:---:|:---:|:---:|
 | **CPSV Editor** (`ttl-editor`) — pilot | ✅ | ✅ | ✅ | ✅ `acc supply-chain gate` |
 | **RONL Business API** | ✅ | ✅ | ✅ | ✅ `acc supply-chain gate` |
-| **Linked Data Explorer** | ❌ | ❌ | ❌ | ❌ |
+| **Linked Data Explorer** | ✅ | ✅ | ✅ | ✅ `acc supply-chain gate` |
 | **IOU Architecture Docs** (this site) | ❌ | ❌ | ❌ | ❌ |
 
 The CPSV Editor is the pilot, adopted in v2026.08.2; RONL Business API followed
-within the same week. Linked Data Explorer is next in the rollout order.
+within the same week, and Linked Data Explorer in v2026.08.7 — taking its
+findings from **40 to 0** across twenty action references in six deployment
+workflows. All three rulesets are named `acc supply-chain gate`, target
+`refs/heads/acc`, are `active`, and carry **zero bypass actors**; each requires a
+pull request and a passing `audit` check, and blocks branch deletion and
+non-fast-forward pushes.
+
+Adoption is not uniform, and the differences are worth knowing rather than
+flattening:
+
+| | CPSV Editor | RONL Business API | Linked Data Explorer |
+|---|---|---|---|
+| Action references pinned | 10 / 10 | 30 / 30 | 23 / 23 |
+| Action majors | v4 | **v7** | v4 (one v3) |
+| `skip_app_build` | not set | **set on all six deploy steps** | not set |
+| Backend deployed by CI | n/a | **no** — script from a developer machine | **yes** — `azure/webapps-deploy` |
+
+Two consequences follow from that table. **Where `skip_app_build` is not set,
+Oryx builds the production bundle inside the floating vendor container**, so
+lockfile integrity covers only what is tested — true for the CPSV Editor and the
+Linked Data Explorer, but not for RONL Business API. And **`main` carries none of
+this in any repository**: the gate is enforced on `acc` only, so a production
+deploy is not covered by the guarantees an `acc` pull request gets.
 
 **This documentation repository is a known gap, deliberately deferred.** Its
 `requirements.txt` uses `>=` floors for five of six packages and its workflow
@@ -230,11 +252,11 @@ the action makes the wrapper immutable and leaves the payload floating.
 Unreachable from our side; it would require Microsoft publishing digest-pinned
 image references, or IOU forking the action.
 
-!!! warning "How badly this bites depends on one flag, and the two repositories differ"
-    **CPSV Editor sets `skip_app_build` nowhere.** Oryx therefore runs *inside*
-    that floating image and builds the production bundle there, making the image
-    the **build toolchain that produces the deployed artifact**, not merely an
-    upload step.
+!!! warning "How badly this bites depends on one flag, and the three repositories differ"
+    **CPSV Editor and Linked Data Explorer set `skip_app_build` nowhere.** Oryx
+    therefore runs *inside* that floating image and builds the production bundle
+    there, making the image the **build toolchain that produces the deployed
+    artifact**, not merely an upload step.
 
     **RONL Business API sets `skip_app_build: true` on all six deploy steps**,
     pointing `app_location` at an already-built `dist/`. The container uploads an
@@ -243,12 +265,14 @@ image references, or IOU forking the action.
     nothing.)
 
     So for RBA's three static sites, lockfile integrity covers **what ships**;
-    for the CPSV Editor it covers only what is tested. The difference is one
-    flag, and it is worth preserving deliberately as the rollout continues.
+    for the other two it covers only what is tested. The difference is one flag,
+    and it is worth preserving deliberately as the rollout continues — the
+    majority position is currently the weaker one.
 
 **`npm ci` integrity covers what is tested, not necessarily what is shipped.**
 `package-lock.json` carries a `sha512` per package and `npm ci` verifies it. In
-the CPSV Editor that install feeds lint and the unit tests only, because Oryx
+the CPSV Editor and the Linked Data Explorer that install feeds lint and the
+unit tests only, because Oryx
 performs its own install inside the container to produce the deployed bytes;
 where `skip_app_build` is set, the verified install is the one that produces
 them.

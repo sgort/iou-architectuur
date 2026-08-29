@@ -1,121 +1,146 @@
-# RIP Phase 1 Bundle
+---
+component: Linked Data Explorer
+---
 
-The **RIP Phase 1 Bundle** is the first government process bundle shipped with the Linked Data Explorer for the Province of Flevoland. It automates the project definition and preliminary design preparation phases of the Regular Infrastructure Projects (RIP) workflow, from intake through to approved preliminary design principles.
+# RIP R2.1 Bundle
 
-The bundle lives at `examples/organizations/flevoland/rip-phase1/` alongside the existing HR onboarding bundle, and is deployed to Operaton in a single multipart request via the BPMN Modeler's Deploy modal.
+The **R2.1 bundle** is the first government process bundle shipped with the Linked Data Explorer for the Province of Flevoland. It automates the project-definition phase of the Regular Infrastructure Projects (RIP) workflow — *Projectplan planvoorbereiding* — from intake through to approved preliminary-design principles, and ends by handing off to the [R2.2 bundle](rip-r22-bundle.md).
+
+It lives at `examples/organizations/flevoland/rip-phase-21/` and deploys to Operaton in a single multipart request from the BPMN Modeler's Deploy modal.
+
+!!! info "Renamed in v2026.08.5"
+    This bundle was previously `rip-phase1-swimlanes/`, and its process was
+    briefly documented as `RipPhase1Process`. The `-swimlanes` suffix
+    distinguished it from a competing `rip-phase1/` draft that has since been
+    deleted, so it distinguished nothing. The directory is now `rip-phase-21/`
+    and the process is **`RipR21Process`**, which makes `rip-phase-22/` an
+    obvious sibling. If you have an older checkout or bookmark pointing at
+    `rip-phase1/`, it no longer resolves.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: LDE BPMN Canvas — RipPhase1Process](../../../assets/screenshots/ronl-lde-bpmn-rip-phase1-canvas.png)
-  <figcaption>LDE BPMN Canvas showing a small part of the RipPhase1Process with PDP steps and eDOCS ServiceTask</figcaption>
+  ![Screenshot: LDE BPMN Canvas — RipR21Process](../../../assets/screenshots/ronl-lde-bpmn-rip-phase1-canvas.png)
+  <figcaption>LDE BPMN Canvas showing part of RipR21Process with its PDP steps and the Relatics ServiceTask</figcaption>
 </figure>
 
 ---
 
 ## Process flow
 
-The process has seventeen steps across two phases and two approval gateways.
+`RipR21Process` has **thirteen user tasks**, one service task and three approval gateways, laid out in swimlanes. Task names are in Dutch, matching the source specification and what a caseworker sees in the task list.
 
-**Phase 1 — Project definition**
+| # | Type | Name |
+|---|---|---|
+| 1 | StartEvent | Start RIP fase 1 |
+| 2 | UserTask | Aanleveren Projectplan 1. Intake-formulier |
+| 3 | ExclusiveGateway | Projectplan 1. Intake-formulier akkoord? |
+| 4 | UserTask | Verbeteren kwaliteit 1. Intake-formulier ↺ |
+| 5 | ServiceTask | Laten aanmaken workspace Relatics |
+| 6 | UserTask | Organiseren intake-overleg |
+| 7 | UserTask | Uitvoeren intake-overleg |
+| 8 | UserTask | Aanvullen Projectplan 2. Intake-verslag |
+| 9 | UserTask | Accorderen Projectplan 2. Intake-verslag |
+| 10 | ExclusiveGateway | Akkoord? |
+| 11 | UserTask | Opstellen risicodossier en versturen aan PL |
+| 12 | UserTask | Opstellen planning en informeren PL en ondersteuner |
+| 13 | UserTask | Initiëren / organiseren PSU |
+| 14 | UserTask | Uitvoeren PSU en aanvullen Projectplan 3. PSU-verslag |
+| 15 | UserTask | Houden overleg uitgangspunten VO-fase |
+| 16 | UserTask | Aanvullen Projectplan 4. Uitgangspunten VO-fase |
+| 17 | UserTask | Accorderen Projectplan 4. Uitgangspunten VO-fase |
+| 18 | ExclusiveGateway | Akkoord? |
+| 19 | EndEvent | Fase 1 voltooid → R2.2 |
 
-The process starts with an intake form where the project contributor registers the project. A BusinessRuleTask evaluates the `RipProjectTypeAssignment` DMN to assign `candidateGroups` and `assignedRoles` based on `projectType` and `department`. A ServiceTask then creates the project workspace in eDOCS via the external task worker. After the intake meeting is organised and held, the contributor completes the intake report. A second ServiceTask uploads the report to eDOCS. A designated reviewer then approves or rejects the report — rejection loops back to the intake report step.
+### The phase-exit approval is signed
 
-**Phase 2 — Preliminary design preparation**
+`Task_AccorderenProjectplan4` — *"Accorderen Projectplan 4. Uitgangspunten VO-fase"*, the task that closes the phase — carries **`ronl:signatureRef="rip-pdp"`**.
 
-Once the intake report is approved, the PSU (project start-up meeting) is organised and executed. Outcomes are recorded in the PSU execution form and turned into a PSU report document, which is saved to eDOCS. The contributor then prepares the risk file in Relatics and records the reference number. Finally, the preliminary design principles document is authored, saved to eDOCS, and submitted for approval. Rejection loops back to the preliminary design principles step.
-
-| Step | Type | Description |
-|------|------|-------------|
-| 1 | StartEvent | Start RIP Phase 1 |
-| 2 | UserTask | Complete intake form (`rip-intake`) |
-| 3 | BusinessRuleTask | Determine project roles (`RipProjectTypeAssignment`) |
-| 4 | ScriptTask | Map role outputs to process variables |
-| 5 | ServiceTask | Create eDOCS project workspace |
-| 6 | UserTask | Organise intake meeting (`rip-intake-meeting`) |
-| 7 | UserTask | Complete intake report (`rip-intake-report`) |
-| 8 | ServiceTask | Save intake report to eDOCS |
-| 9 | UserTask | Approve intake report (`rip-approval`) |
-| 10 | ExclusiveGateway | Intake report approved? ↺ rejected → step 7 |
-| 11 | UserTask | Organise PSU (`rip-psu-organize`) |
-| 12 | UserTask | PSU execution (`rip-psu-execution`) |
-| 13 | UserTask | Complete PSU report (linked doc: `rip-psu-report`) |
-| 14 | ServiceTask | Save PSU report to eDOCS |
-| 15 | UserTask | Prepare risk file (`rip-risk-file`) |
-| 16 | UserTask | Complete preliminary design principles (linked doc: `rip-pdp`) |
-| 17 | ServiceTask | Save preliminary design principles to eDOCS |
-| 18 | UserTask | Approve preliminary design principles (`rip-approval`) |
-| 19 | ExclusiveGateway | PDP approved? ↺ rejected → step 16 |
-| 20 | EndEvent | Phase 1 complete |
+That single attribute is the switch for the whole signing feature. The RONL Business API resolves `ronl:signatureRef` on a user task and, where present, replaces that task's plain approval form with a **ValidSign signing ceremony**: the phase document is rendered from its deployed template, a signature package is created, and the Operaton task completes only once the signature lands.
 
 ---
 
 ## Bundle contents
 
-The bundle contains twelve files deployed together.
+Sixteen files deploy together: one BPMN, twelve forms and three document templates.
 
 ### BPMN
 
-`RipPhase1Process.bpmn` — the executable process. ServiceTasks use `camunda:type="external"` with topics `rip-edocs-workspace` and `rip-edocs-document`, polled by the LDE backend external task worker.
-
-### DMN
-
-`RipProjectTypeAssignment.dmn` — determines `candidateGroups` and `assignedRoles` from `projectType` and `department`. All rules currently resolve to `infra-projectteam` / `infra-medewerker`. The table structure supports adding granular RBAC rules later without touching the BPMN — add rows and redeploy the DMN only.
-
-The DMN includes `<inputData>` declarations with `<variable>` children for both inputs, required for the CPSV Editor to generate a valid request body on publish.
+`RipR21Process.bpmn` — the executable process. Its one ServiceTask uses `camunda:type="external"` with topic **`rip-relatics-workspace`**, polled by the LDE backend external task worker.
 
 ### Forms
 
 | File | Purpose |
-|------|---------|
-| `rip-intake.form` | Project number, name, type, department, contributor, official client, scope, budget, timeline |
-| `rip-intake-meeting.form` | Meeting date/time, location, participants confirmed, invitation sent |
-| `rip-intake-report.form` | Intake decisions, agreements, confirmed scope, budget and timeline (column 2) |
+|---|---|
+| `rip-intake.form` | Project number, name, type, department, contributor, client, scope, budget, timeline |
+| `rip-kwaliteit-verbetering.form` | Rework of a rejected intake form |
+| `rip-intake-meeting.form` | Meeting date/time, location, participants, invitation sent |
+| `rip-uitvoer-intake.form` | Conducting the intake meeting |
+| `rip-intake-report.form` | Intake decisions, agreements, confirmed scope, budget and timeline |
+| `rip-risk-file.form` | Relatics risk-dossier reference, date, preparer |
+| `rip-planning.form` | Planning, and informing the project lead and supporter |
 | `rip-psu-organize.form` | PSU participants, location, date, presentation prepared |
-| `rip-psu-execution.form` | PSU outcomes, action points, risks, project team roles |
-| `rip-risk-file.form` | Relatics risk dossier reference, date, preparer |
-| `rip-approval.form` | Reusable approval form — `approvalStatus` (approved / rejected) + remarks; used at both gateways |
+| `rip-psu-execution.form` | PSU outcomes, action points, risks, project-team roles |
+| `rip-overleg-vo.form` | The VO-phase principles meeting |
+| `rip-pdp-aanvullen.form` | Completing the preliminary-design principles |
+| `rip-approval.form` | Reusable approval form — `approvalStatus` plus remarks, used at each gateway |
 
 ### Document templates
 
-| File | Column | Key bindings |
-|------|--------|-------------|
-| `rip-intake-report.document` | Column 2 | `projectNumber`, `projectName`, `confirmedScope`, `confirmedBudget`, `confirmedTimeline`, `intakeDecisions`, `intakeAgreements` |
-| `rip-psu-report.document` | Column 3 | `psDate`, `psLocation`, `psOutcomes`, `psActionPoints`, `projectManager`, `projectSupporter` |
-| `rip-pdp.document` | Column 4 | `confirmedScope`, `confirmedBudget`, `confirmedTimeline`, `riskFileReference`, `pdpNotes` |
+Three templates, each bound to the task that produces it with `ronl:documentRef`.
+
+| File | Attached to | Key bindings |
+|---|---|---|
+| `rip-intake-report.document` | Aanvullen Projectplan 2. Intake-verslag | `projectNumber`, `projectName`, `confirmedScope`, `confirmedBudget`, `confirmedTimeline`, `intakeDecisions`, `intakeAgreements` |
+| `rip-psu-report.document` | Uitvoeren PSU | `psDate`, `psLocation`, `psOutcomes`, `psActionPoints`, `projectManager`, `projectSupporter` |
+| `rip-pdp.document` | Aanvullen Projectplan 4. | `confirmedScope`, `confirmedBudget`, `confirmedTimeline`, `riskFileReference`, `pdpNotes` |
+
+!!! warning "Their signature blocks did not render until v2026.08.4"
+    All three templates used `signoff` and `contactInfo` where `DocumentZones`
+    declares `signOff` and `contactInformation`. `DocumentCanvas` iterates
+    `ZONE_ORDER` and calls `getZoneBlocks('signOff')`, so the lowercase key meant
+    the Signatures block was dropped **silently** — the signature lines in these
+    templates had never rendered in any deployment. The same commit corrected a
+    `processKey` of `RipPhase1Process`, which no longer matched the BPMN.
 
 ---
 
 ## Deploying the bundle
 
 <figure markdown>
-  ![Deploy modal showing all 12 minus 1 RIP Phase 1 bundle resources](../../assets/screenshots/rip-phase1-bundle-deploy-modal.png)
-  <figcaption>The Deploy modal lists 11 resources — 1 BPMN, 7 forms, and 3 document templates — before deploying them to Operaton in a single request.</figcaption>
+  ![Deploy modal listing the RIP R2.1 bundle resources](../../../assets/screenshots/rip-phase1-bundle-deploy-modal.png)
+  <figcaption>The Deploy modal resolves every <code>camunda:formRef</code> and <code>ronl:documentRef</code> and posts the bundle to Operaton in one request.</figcaption>
 </figure>
 
-Open `RipPhase1Process.bpmn` in the BPMN Modeler and click **Deploy**. The modal resolves all `camunda:formRef` and `ronl:documentRef` attributes automatically and lists all 12 resources. Click **Deploy to Operaton** to deploy.
+Open `RipR21Process.bpmn` in the BPMN Modeler and click **Deploy**. The modal resolves all `camunda:formRef` and `ronl:documentRef` attributes automatically and lists the resources it will send. Click **Deploy to Operaton**.
 
 !!! tip
-    Set a Business Key equal to the project number when starting the process from the Operaton Cockpit. This makes process instances easy to find by project number.
+    Set a Business Key equal to the project number when starting the process
+    from the Operaton Cockpit. It makes process instances easy to find later.
+
+---
+
+## The mirrored copy
+
+This bundle exists twice on disk — authored under `examples/organizations/flevoland/rip-phase-21/`, imported and deployed from `e2e-fixtures/flevoland/`. A parity test asserts the two are byte-identical, and the pair opts in through `MIRRORED_BUNDLES`.
+
+That test earns its place: the ValidSign attribute in v2026.08.6 was added to the mirror only, and the parity test failed from that commit until the copies were reconciled. See [RIP R2.2 Bundle → The mirrored copy](rip-r22-bundle.md#the-mirrored-copy) for why a break surfaces on `acc` rather than on the pull request.
 
 ---
 
 ## Starting the process
 
-The process is designed to be started from the Human Tasks interface in MijnOmgeving (or the Operaton Tasklist), not directly from the Cockpit. Starting from the Cockpit's generic start dialog is possible for testing — click **Start** and the first user task (`Complete intake form`) will appear in the task list immediately.
+The process is designed to be started from the Human Tasks interface in MijnOmgeving, or the Operaton Tasklist — not directly from the Cockpit. Starting from the Cockpit's generic start dialog works for testing: click **Start** and the first user task appears in the task list immediately.
 
-!!! note
-    `candidateGroups` is set to `infra-projectteam` for all tasks by the DMN. Any user with this group membership can claim tasks.
+As of v1.9.9 a `leadRole` process variable is derived from the intake `projectType` (`contractbeheer` → `manager-pb`, otherwise `projectleider`). `leadRole` is distinct from a task's `candidateGroups`: it names who owns the project in the portfolio, not who can claim its tasks.
 
-As of v1.9.9, the Map-role outputs script also sets a `leadRole` process variable, derived from the intake `projectType` (`contractbeheer` → `manager-pb`, otherwise `projectleider`). `leadRole` is distinct from the task `candidateGroups`: it names who owns the project in the portfolio, not who can claim its tasks.
+<figure markdown>
+  ![MijnOmgeving task panel showing an intake task with its process variables](../../../assets/screenshots/rip-phase1-mijnomgeving-process-variables.png)
+  <figcaption>The MijnOmgeving task panel showing an intake task and the process data panel.</figcaption>
+</figure>
 
 ---
 
-## eDOCS integration
+## Related
 
-The three ServiceTasks in the process write documents to the project workspace in eDOCS. In stub mode (`EDOCS_STUB_MODE=true`), the external task worker returns realistic fake responses and logs all calls. No code changes are needed when switching to a live eDOCS server — set `EDOCS_STUB_MODE=false` and provide the real credentials.
-
-See [eDOCS Integration](../developer/edocs-integration.md) for setup and configuration.
-
-<figure markdown>
-  ![MijnOmgeving task panel showing Organise intake meeting with process variables including edocsWorkspaceId](../../assets/screenshots/rip-phase1-mijnomgeving-process-variables.png)
-  <figcaption>The MijnOmgeving task panel showing the Organise intake meeting task after the eDOCS workspace was created. The stub workspace ID (<code>stub-ws-2523EM</code>) and all intake variables are visible in the process data panel.</figcaption>
-</figure>
+- [RIP R2.2 Bundle](rip-r22-bundle.md) — the phase this one hands off to
+- [BPMN Modeler](bpmn-modeler.md) — the Deploy modal and the `ronl:*` attributes
+- [Document Composer](document-composer.md) — templates, zones and bindings

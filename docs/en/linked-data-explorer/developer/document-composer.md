@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Document Composer Implementation
 
 The Document Composer is a React feature for authoring structured government decision document templates (*beschikkingen*). It follows the same component, storage, and DnD patterns established by the BPMN Modeler and Form Editor.
@@ -161,7 +165,7 @@ if (elementType === 'bpmn:UserTask') {
     <DocumentTemplateSelector
       element={selectedElement}
       modeling={modeling}
-      selectedDocumentRef={businessObject.get('camunda:documentRef')}
+      selectedDocumentRef={businessObject.get('ronl:documentRef')}
     />
   );
 }
@@ -171,18 +175,18 @@ Selecting a template writes:
 
 ```typescript
 modeling.updateProperties(element, {
-  'camunda:documentRef': templateId,
+  'ronl:documentRef': templateId,
 });
 ```
 
-Selecting the blank option sets `camunda:documentRef` to `undefined` (removes the attribute).
+Selecting the blank option sets `ronl:documentRef` to `undefined` (removes the attribute).
 
 ### Document badge overlay
 
 The purple document badge is rendered in `BpmnCanvas.tsx` in the `element.changed` handler, immediately after the green form badge:
 
 ```typescript
-const documentRef = element.businessObject.get('camunda:documentRef');
+const documentRef = element.businessObject.get('ronl:documentRef');
 if (documentRef) {
   overlays.add(element.id, 'document-linked', {
     position: { bottom: -36, left: leftOffset }, // below the form badge

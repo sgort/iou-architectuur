@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # BPMN Modeler Implementation
 
 The BPMN Modeler wraps the `bpmn-js` library in a three-panel React component. This page covers the component structure, the canvas setup decisions, and known rendering issues with their fixes.
@@ -179,7 +183,7 @@ Styles are defined in `BpmnModeler.css`:
 
 ## DocumentTemplateSelector — document template linking for UserTask
 
-`DocumentTemplateSelector` is a React component injected into the bpmn-js properties panel when a `UserTask` is selected (not `StartEvent`). It reads available document templates from `DocumentService` and writes `camunda:documentRef` to the element via the bpmn-js `modeling` API. It follows the identical injection pattern as `FormTemplateSelector`.
+`DocumentTemplateSelector` is a React component injected into the bpmn-js properties panel when a `UserTask` is selected (not `StartEvent`). It reads available document templates from `DocumentService` and writes `ronl:documentRef` to the element via the bpmn-js `modeling` API. It follows the identical injection pattern as `FormTemplateSelector`.
 
 ### Injection
 
@@ -192,7 +196,7 @@ if (elementType === 'bpmn:UserTask') {
   docSelectorContainer.id = `document-template-custom-${selectedElement.id}`;
   propertiesPanel.appendChild(docSelectorContainer);
 
-  const currentDocumentRef = businessObject.get('camunda:documentRef');
+  const currentDocumentRef = businessObject.get('ronl:documentRef');
 
   const docRoot = ReactDOM.createRoot(docSelectorContainer);
   docRoot.render(
@@ -209,7 +213,7 @@ Selecting a template:
 
 ```typescript
 modeling.updateProperties(element, {
-  'camunda:documentRef': templateId,
+  'ronl:documentRef': templateId,
 });
 ```
 
@@ -217,7 +221,7 @@ Selecting the blank option:
 
 ```typescript
 modeling.updateProperties(element, {
-  'camunda:documentRef': undefined,
+  'ronl:documentRef': undefined,
 });
 ```
 
@@ -225,14 +229,14 @@ modeling.updateProperties(element, {
 
 ## Document badge overlay
 
-When a `UserTask` has `camunda:documentRef` set, `BpmnCanvas.tsx` renders a purple badge below the element. This is applied in `refreshDmnOverlays()` alongside the DMN and form badges:
+When a `UserTask` has `ronl:documentRef` set, `BpmnCanvas.tsx` renders a purple badge below the element. This is applied in `refreshDmnOverlays()` alongside the DMN and form badges:
 
 ```typescript
 overlays.remove({ type: 'document-linked' });
 
 // ...inside the elementRegistry.forEach loop, after the form badge check:
 if (element.type === 'bpmn:UserTask') {
-  const documentRef = element.businessObject.get('camunda:documentRef');
+  const documentRef = element.businessObject.get('ronl:documentRef');
   if (documentRef) {
     const badgeWidth = 130;
     const leftOffset = Math.round((element.width - badgeWidth) / 2);

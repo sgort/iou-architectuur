@@ -167,13 +167,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.08.3** · *August 2026*
+-   **🔍 Linked Data Explorer — v2026.08.9** · *August 2026*
 
     ---
 
-    **A test gate, and two defects it did not catch**
+    **The R2.2 bundle, and a Renovate that had quietly stopped**
 
-    Every deploy now runs the [suites](linked-data-explorer/developer/testing.md) — 1703 tests — and a failure blocks it; the P7 deferral was conditional on backend breadth improving, and 98% statements met that condition. Two defects surfaced anyway, neither by a test: four of the five E2E fixture BPMNs were undeployable, their on-canvas warning annotation placed where the BPMN schema forbids a flow element to follow; and the deploy dialog had been sending the literal string `"process"` as every model's process key, because a CSS type selector never matches a namespace-prefixed element.
+    The [R2.2 VO bundle](linked-data-explorer/features/rip-r22-bundle.md) lands — four lanes, nine user tasks, nine forms and five document templates — with one deliberate deviation from its source drawing, because two hand-offs leave the pool and never return, which as control flow deadlocks at the join. A new parity test locks each bundle's authored and mirrored copies together after they had already drifted. Meanwhile the [supply-chain gate](contributing/supply-chain.md) took the pipeline from 40 findings to zero — and immediately exposed that Renovate had been raising nothing at all: five `"//"` keys used as JSON comments were read as invalid settings, so the half of the policy that keeps pins current had been inert since the day it landed.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
