@@ -1,9 +1,8 @@
 # RONL Business API — screenshots to capture
 
-!!! important "Two captures are outstanding"
-    See [2026-08-29 — v2026.08.33 docs sync](#2026-08-29--v20260833-docs-sync-two-new-screenshots)
-    at the foot of this file. Everything above that section is complete and is
-    retained as the record of what each earlier image shows and why.
+!!! success "Nothing outstanding"
+    Every screenshot this manifest calls for has been captured. The file is
+    retained as the record of what each image shows and why it was needed.
 
 ## 2026-08-19 — User Guides restructure (complete)
 
@@ -97,16 +96,16 @@ oversight:
 
 ---
 
-## 2026-08-29 — v2026.08.33 docs sync: two NEW screenshots
+## 2026-08-29 — v2026.08.33 docs sync: two screenshots, both captured
 
 This pass (bringing the RONL Business API docs from `v2026.08.23` to
-`v2026.08.33`) adds the public **PA-Cockpit demo** to the User Guides. Two
-captures are outstanding.
+`v2026.08.33`) added the public **PA-Cockpit demo** to the User Guides. Both
+captures were taken on 2026-08-29 and are in place.
 
-| # | Status | File | Embedding page | What it must show |
+| # | Status | File | Embedding page | What it shows |
 |---|---|---|---|---|
-| 5 | 🔲 **NEW** | `ronl-business-api-pa-demo-plato.png` | `user-guide/pa-demo.md` | The demo cockpit as a visitor first sees it at `acc.plato.open-regels.nl` — the full rail and a populated board, with no sign-in prompt anywhere |
-| 6 | 🔲 **NEW** | `ronl-business-api-pa-demo-rollen.png` | `user-guide/pa-demo.md` | **Beheer → Rollen & rechten** — the four selectable role positions and the capability table beside them |
+| 5 | ✅ **DONE** (was NEW) | `ronl-business-api-pa-demo-plato.png` | `user-guide/pa-demo.md` | The demo cockpit as a visitor first sees it at `acc.plato.open-regels.nl` — the full rail and a populated board, with no sign-in prompt anywhere |
+| 6 | ✅ **DONE** (was NEW) | `ronl-business-api-pa-demo-rollen.png` | `user-guide/pa-demo.md` | **Beheer → Rollen & rechten** — the four selectable role positions and the capability table beside them |
 
 ### These two are different from every earlier entry
 
@@ -130,11 +129,10 @@ URL can capture them, and they can be re-shot later without arranging access.
 - Match the framing and width of the existing board captures
   (`ronl-business-api-pa-cockpit-board.png` is the closest comparator).
 
-### Expected `mkdocs build` state
+### `mkdocs build` state
 
-Until both are captured, a non-strict build reports exactly **two**
-missing-image warnings and nothing else. A **third** warning means something
-else is genuinely broken and should be investigated as such.
+With both captured, a non-strict build reports **zero** warnings. Any warning at
+all now means something is genuinely broken.
 
 ### Verification
 
