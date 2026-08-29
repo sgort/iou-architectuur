@@ -4,49 +4,49 @@ component: RONL Business API
 
 # Testing
 
-RONL Business API is an npm-workspaces monorepo with four tested packages:
-the Express/TypeScript backend on **Jest**, the caseworker portal
-(`packages/frontend`) on **Vitest** + React Testing Library, the public
-search site (`packages/public-site`) on **Vitest** + jsdom, and the public
-PA Cockpit demo (`packages/pa-demo`) on **Vitest** + jsdom. All four run with
-coverage by default.
+RONL Business API is an npm-workspaces monorepo with five tested packages: the
+Express/TypeScript backend on **Jest**, and four on **Vitest** — the caseworker
+portal (`packages/frontend`) with React Testing Library, the Public Affairs
+cockpit (`packages/pa-cockpit`), the public cockpit demo
+(`packages/pa-demo`) and the public search site (`packages/public-site`) with
+jsdom. All five run with coverage by default.
 
 !!! info "Figures on this page are measured, not estimated"
-    Backend, frontend and public-site figures were produced by running the
-    suites against **v2026.08.23** on **22 August 2026**, from a cold cache,
-    on `acc` at `57ce4c2`. The `packages/pa-demo` row was measured separately,
-    on **25 August 2026**, on branch `feat/public-pa-cockpit` at `a59a0a7` —
-    that package has not merged to `acc` yet, so its figures carry a
-    different date and commit than its three siblings on this page. Rerun the
-    commands in [Running the tests](#running-the-tests) to reproduce any of
-    them.
+    Every count and percentage below was produced by running
+    `npm run test:serial` against **v2026.08.33** on **29 August 2026**, on
+    `acc` at `1e7fb19`. Rerun the commands in
+    [Running the tests](#running-the-tests) to reproduce them.
 
     Two things were **not** re-run for this release and say so where they
-    appear: the public-site Playwright suite, whose figures date from
-    v2026.08.19, and the four live-smoke shell scripts, which remain described
-    from their configuration only. See [E2E & live smoke](e2e.md).
+    appear: the frontend and public-site Playwright suites, and the four
+    live-smoke shell scripts, which remain described from their configuration
+    only. See [E2E & live smoke](e2e.md).
 
 **At a glance:**
 
-| Package | Runner | Files | Tests | Result | Wall time | Statements | Branches | Functions | Lines |
+| Package | Runner | Files | Tests | Result | Wall time¹ | Statements | Branches | Functions | Lines |
 |---|---|---:|---:|---|---:|---:|---:|---:|---:|
-| `packages/backend` | Jest + ts-jest | 74 | 1576 | all passing | ~23s | 98.35% | 91.49% | 96.65% | 98.75% |
-| `packages/frontend` | Vitest + RTL | 133 | 1155 | all passing | ~61s¹ | 87.47% | 78.68% | 83.35% | 88.87% |
-| `packages/public-site` | Vitest + jsdom | 28 | 134 | all passing | ~12s | 86.82% | 70.39% | 87.63% | 88.76% |
-| `packages/pa-demo` | Vitest + jsdom | 13 | 68 | all passing | ~5s | 73.94% | 63.41% | 72.22% | 73.87% |
+| `packages/backend` | Jest + ts-jest | 74 | 1576 | all passing | ~86s | 98.35% | 91.49% | 96.65% | 98.75% |
+| `packages/frontend` | Vitest + RTL | 103 | 842 | all passing | ~276s | 88.07% | 80.09% | 83.53% | 88.96% |
+| `packages/pa-cockpit` | Vitest + RTL | 41 | 368 | all passing | ~92s | 86.16% | 75.55% | 83.46% | 88.53% |
+| `packages/pa-demo` | Vitest + jsdom | 19 | 104 | all passing | ~27s | 91.30% | 86.95% | 85.00% | 91.66% |
+| `packages/public-site` | Vitest + jsdom | 28 | 140 | all passing | ~108s | 86.82% | 70.39% | 87.63% | 88.76% |
 
-**248 files · 2933 tests**, plus one performance spec run separately — 2934 in
-total. `packages/pa-demo` also carries its own 9-test Playwright suite (see
-[pa-demo suite](pa-demo.md)), not included in that count — same treatment as
-the other two Playwright suites on this page. See [Coverage](coverage.md) for
-what those percentages mean and where the remaining gaps are.
+**265 files · 3030 tests**, plus one performance spec run separately — 3031 in
+total. See [Coverage](coverage.md) for what those percentages mean and where
+the remaining gaps are.
 
-¹ Wall time varies with machine load; treat it as an order of magnitude rather
-than a figure to match. The same frontend suite has measured 61s on an idle
-machine and 88s on a contended one. That contention used to make two tests
-**fail** rather than merely run slow; both were fixed on 20 August rather than
-left as known flakes, and the wall-clock budget that was one of them now runs
-separately — see [The performance budget](#the-performance-budget).
+!!! note "The frontend did not shrink — the cockpit moved"
+    The frontend reads 103 files / 842 tests here against 133 / 1155 at
+    v2026.08.23. Nothing was deleted: 41 files and 368 tests moved into
+    `packages/pa-cockpit` when the cockpit was extracted into a package. Taken
+    together the pair grew by **11 files and 55 tests**. See
+    [PA-Cockpit package](../pa-cockpit-package.md).
+
+¹ These are **serial** wall times, measured with `test:serial`, and are much
+longer than a parallel run — the frontend suite measures ~61s parallel on an
+idle machine. Treat them as an order of magnitude rather than a figure to match,
+and compare like with like.
 
 ---
 
@@ -54,11 +54,11 @@ separately — see [The performance budget](#the-performance-budget).
 
 | Page | Covers |
 |---|---|
-| [Coverage](coverage.md) | Headline and per-area coverage for all four packages, and why the last two decimals are noise |
+| [Coverage](coverage.md) | Headline and per-area coverage for all five packages, and why the last two decimals are noise |
 | [Backend suite](backend.md) | The 74 files and 1576 tests in `packages/backend`, by area |
-| [Public site suite](public-site.md) | The 28 files and 134 tests in `packages/public-site`, plus its own Playwright suite |
-| [pa-demo suite](pa-demo.md) | The 13 files and 68 tests in `packages/pa-demo`, the four no-Live layers, the bundle gate, the drift checker, and its own Playwright suite |
-| [Caseworker](dashboards/caseworker.md) · [PA cockpit](dashboards/pa-cockpit.md) · [Infra-board](dashboards/infra-board.md) · [Woo-dashboard](dashboards/woo-dashboard.md) | The frontend suite, split the way the product is — one page per board |
+| [Public site suite](public-site.md) | The 28 files and 140 tests in `packages/public-site`, plus its own Playwright suite |
+| [PA-demo suite](pa-demo.md) | The 19 files and 104 tests in `packages/pa-demo`, and the one Playwright suite that runs in CI |
+| [Caseworker](dashboards/caseworker.md) · [PA cockpit](dashboards/pa-cockpit.md) · [Infra-board](dashboards/infra-board.md) · [Woo-dashboard](dashboards/woo-dashboard.md) | The frontend and cockpit suites, split the way the product is — one page per board |
 | [E2E & live smoke](e2e.md) | The Playwright suites, what they need running, and the four cross-app shell scripts |
 | [Writing tests](writing-tests.md) | Conventions for adding tests here, and the traps that have already cost time |
 
@@ -88,43 +88,53 @@ be installed in every workspace).
 
 | Command | Scope | Files | Tests |
 |---|---|---:|---:|
-| `npm test` | Every workspace with a `test` script (see below) | 248 | 2933 |
+| `npm test` | Every workspace with a `test` script (see below) | 265 | 3030 |
+| `npm run test:serial` | The same, without file parallelism | 265 | 3030 |
 | `npm test --workspace=@ronl/backend` | Backend only (Jest, coverage on by default) | 74 | 1576 |
-| `npm test --workspace=@ronl/frontend` | Frontend only (Vitest, coverage on by default) | 133 | 1155 |
+| `npm test --workspace=@ronl/frontend` | Frontend only (Vitest, coverage on by default) | 103 | 842 |
+| `npm test --workspace=@ronl/pa-cockpit` | The cockpit package | 41 | 368 |
+| `npm test --workspace=@ronl/pa-demo` | The public demo | 19 | 104 |
+| `npm test --workspace=@ronl/public-site` | Public site only (Vitest, coverage on by default) | 28 | 140 |
 | `npm run test:perf --workspace=@ronl/frontend` | The wall-clock budget, run without file parallelism | 1 | 1 |
-| `npm test --workspace=@ronl/public-site` | Public site only (Vitest, coverage on by default) | 28 | 134 |
-| `npm test --workspace=@ronl/pa-demo` | PA Cockpit demo only (Vitest, coverage on by default) | 13 | 68 |
 
 ```bash
 # Everything
 npm test
 
+# Everything, serially — see the warning below
+npm run test:serial
+
 # One workspace
 npm test --workspace=@ronl/backend
-npm test --workspace=@ronl/frontend
-npm test --workspace=@ronl/public-site
-npm test --workspace=@ronl/pa-demo
-
-# Watch mode
-npm run test:watch --workspace=@ronl/backend
-npm run test:watch --workspace=@ronl/frontend
-npm run test:watch --workspace=@ronl/public-site
-npm run test:watch --workspace=@ronl/pa-demo
+npm test --workspace=@ronl/pa-cockpit
 
 # Single file / pattern
 npx jest --config packages/backend/jest.config.js --no-coverage --testPathPattern=rules
 npx vitest run --config packages/frontend/vite.config.ts session
 npx vitest run --config packages/public-site/vite.config.ts SectionIndex
-npx vitest run --config packages/pa-demo/vite.config.ts mock-lock
 ```
+
+!!! warning "Reach for `test:serial`, not for a flag"
+    This repository runs **two test runners behind one command shape** — the
+    backend on Jest, the other four on Vitest. Any serial flag you reach for is
+    right in four places and wrong in the fifth: `--no-file-parallelism` is
+    Vitest's, `--runInBand` is Jest's, and Jest rejects the Vitest flags
+    outright. Every workspace defines a `test:serial` script for exactly this
+    reason, so the runner's identity stops being something the caller has to
+    know.
+
+    Note that a **parallel-run failure is not a finding until it fails
+    serially.** The flakiness chased through August turned out to be timeouts at
+    Vitest's 5000ms default under machine load, not a defect in the code under
+    test; `testTimeout` is now 20s in all four Vitest workspaces.
 
 **What `npm test` at the root actually runs.** The root script is
 `npm run test --workspaces --if-present`, fanning out over every package under
-`packages/*`. Four of the five have a `test` script — `@ronl/backend`,
-`@ronl/frontend`, `@ronl/public-site`, `@ronl/pa-demo` — and `--if-present`
-silently skips the fifth, `@ronl/shared`, which has no `test` script at all
-(only `build`, `prepare`, `clean`, `type-check`). That is expected, not a gap:
-`shared` is a types-only package with nothing to unit test.
+`packages/*`. Five of the six have a `test` script — `@ronl/backend`,
+`@ronl/frontend`, `@ronl/pa-cockpit`, `@ronl/pa-demo`, `@ronl/public-site` — and
+`--if-present` silently skips the sixth, `@ronl/shared`, which has no `test`
+script at all (only `build`, `prepare`, `clean`, `type-check`). That is
+expected, not a gap: `shared` is a types-only package with nothing to unit test.
 
 !!! warning "Clear the Jest cache before trusting a green backend run"
     ts-jest caches type diagnostics per file, so a warm cache can skip
@@ -210,29 +220,31 @@ defines no format-check script of its own.
 
 ### CI
 
-Six Azure workflows under `.github/workflows/`, one acc/prod pair per
-package — this table covers three of the four packages on this page.
-`pa-demo` ships its own CI pipeline once merged; see
-[pa-demo suite → CI](pa-demo.md#ci) for its two deploy workflows and the
-separate, non-blocking drift-check workflow, none of which are on `acc`
-yet.
+**Nine** workflows under `.github/workflows/` on `acc` — an acc/prod pair per
+package, plus the supply-chain `audit` gate:
 
-| Workflow | Lint | Type-check | **Tests** | Perf budget | Build | Deploys? |
-|---|:---:|:---:|:---:|:---:|:---:|---|
-| `azure-backend-acc.yml` / `-prod.yml` | ✅ | – | **✅** | – | ✅ | **No** — packages and uploads an artifact |
-| `azure-frontend-acc.yml` / `-prod.yml` | ✅ | – | **✅** | **✅** | ✅ | Yes |
-| `azure-publicsite-acc.yml` / `-prod.yml` | ✅ | ✅ | **✅** | – | ✅ | Yes |
+| Workflow | Lint | Type-check | **Tests** | E2E | Perf budget | Build | Deploys? |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|---|
+| `azure-backend-acc.yml` / `-prod.yml` | ✅ | – | **✅** | – | – | ✅ | **No** — packages and uploads an artifact |
+| `azure-frontend-acc.yml` / `-prod.yml` | ✅ | – | **✅** | – | **✅** | ✅ | Yes |
+| `azure-pa-demo-acc.yml` / `-prod.yml` | ✅ | ✅ | **✅** | **✅ (acc only)** | – | ✅ | Yes |
+| `azure-publicsite-acc.yml` / `-prod.yml` | ✅ | ✅ | **✅** | – | – | ✅ | Yes |
+| `zizmor.yml` | – | – | – | – | – | – | No — blocking `audit` gate |
 
 **Every package has a real CI test gate**, as of 20 August 2026 — a failing test
-blocks the pipeline in all six workflows. Public-site had one already. Backend
-CI now runs Jest alongside its existing lint step; frontend CI previously ran
-neither lint nor test, going straight from `npm ci` to `vite build`, and now
-runs lint, the suite, and the performance budget before building.
+blocks the pipeline in all eight Azure workflows. Public-site had one already.
+Backend CI now runs Jest alongside its existing lint step; frontend CI previously
+ran neither lint nor test, going straight from `npm ci` to `vite build`.
+
+**`azure-pa-demo-acc.yml` is the only workflow that runs an end-to-end suite** —
+the first Playwright in CI anywhere in this repository. See
+[PA-demo suite](pa-demo.md#the-playwright-suite).
 
 The backend workflows are the exception to "deploy": they end at *Create
 deployment zip* → *Upload deployment artifact*. Nothing in them calls a deploy
 action, and there is no post-deployment health check — the artifact is
-deployed separately.
+deployed separately, from a developer machine. See
+[CI/CD](../cicd.md) and the [supply-chain gate](../../../contributing/supply-chain.md).
 
 The gap was deliberate while it lasted: gating on coverage that was still
 climbing was judged theatre, the same call the
@@ -243,11 +255,18 @@ made and has since reversed for the same reason.
 
 ## Roadmap
 
-**E2E CI wiring is deliberately deferred for both Playwright suites.** Both run
-locally only today. The frontend suite needs a `webServer`-style auto-boot for
-Keycloak/Postgres/Redis/backend/LDE-backend — there is no human to start the
-stack manually in CI — plus a known Node v24-on-Windows exit crash in
-`globalSetup` and an unbounded local-Operaton-history-growth gap to close first.
+**E2E CI wiring is done for one of the three Playwright suites.** The
+[PA-demo suite](pa-demo.md#the-playwright-suite) runs as a blocking step of
+`azure-pa-demo-acc.yml`, which was possible because that demo needs no backend,
+database or Keycloak — Playwright starts its own dev server and that is the whole
+environment.
+
+The other two still run locally only. The frontend suite needs a
+`webServer`-style auto-boot for Keycloak/Postgres/Redis/backend/LDE-backend —
+there is no human to start the stack manually in CI — plus a known Node
+v24-on-Windows exit crash in `globalSetup` and an unbounded
+local-Operaton-history-growth gap to close first. The public-site suite has no
+such blocker and is the obvious next candidate.
 
 **Two boards have no end-to-end coverage.** [Infra-board](dashboards/infra-board.md)
 and [Woo-dashboard](dashboards/woo-dashboard.md) are well covered by unit tests

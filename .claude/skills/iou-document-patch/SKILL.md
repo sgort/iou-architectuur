@@ -139,7 +139,43 @@ Material upgrade changes that file, re-check the override.
    source repo is reachable (default `../ttl-editor`). If the user linked it
    elsewhere, ask for the path.
 2. Confirm the changelog file exists.
-3. **Confirm the local clone is not stale — before running anything else.**
+3. **Confirm _this_ repository is not stale — before anything else.**
+4. **Confirm the component clone is not stale.**
+
+!!! danger "Fetch the documentation repository too — it is the one you are standing in"
+    Stage 0 has always checked the *component* clone. It said nothing about
+    `iou-architectuur` itself, and that is the gap that bit hardest, because a
+    stale docs clone is invisible: every page reads plausibly, `mkdocs serve`
+    renders happily, and `repo-versions.json` shows versions that look like
+    findings rather than like your own staleness.
+
+    **It has happened.** On 29 August 2026 an RBA sync ran from a clone **5
+    commits behind `origin/acc`**. It missed a completed CPSV Editor sync to
+    v2026.08.3, then *reported that component as two releases adrift* — a
+    fabricated finding, defended twice, and only settled when the user compared
+    the live site against localhost. The branch was cut from the stale `acc`, so
+    the work also had to be rebased afterwards, resolving six conflicts in files
+    that had been edited on both sides in the meantime.
+
+    So, first command of the run, before reading a single page:
+
+    ```bash
+    git fetch --quiet origin
+    git status -sb | head -1              # "behind N" ⇒ stale
+    git log --oneline acc..origin/acc     # what you have not seen
+    ```
+
+    If it is behind, **stop and tell the user before pulling** — and branch from
+    `origin/acc`, never from a stale local `acc`. Two failure modes follow from
+    skipping this, and the second is the expensive one:
+
+    - the sync duplicates work already done, and
+    - **it silently reverts it.** The stale clone's `repo-versions.json` still
+      carried the *old* CPSV version, so committing it would have rolled that
+      component's recorded version backwards on the live site.
+
+    A version on the front page that looks wrong is far more often this than a
+    real gap. Rule out your own clone before reporting drift in anyone's repo.
 
 !!! danger "A stale clone makes `version-gap.py` confidently wrong"
     The script reads the changelog from the **working tree**. If the local
@@ -605,11 +641,54 @@ Work in this order so a failure leaves the docs in an obvious half-state:
    was changed — "verified, no change needed" is a result, and its absence from
    a report is how a skipped stage hides. Then list what still needs a human:
    capturing screenshots and translating any NL pages left as placeholders.
+8. Run the **sibling drift check** below and report it, whatever it says.
+
+---
+
+## Stage 5 — Sibling drift check
+
+A run is scoped to one component. `repo-versions.json` and the home page's
+What's New grid are **not** — they show every component at once, so a sibling
+that shipped since its own last sync sits on the front page displaying a stale
+version, and nothing in a single-component run would notice.
+
+Do this **only after Stage 0 has confirmed this clone is current.** Run against
+a stale clone it reports fiction, and the fiction is convincing: it names real
+components and plausible version numbers. That is exactly how the 29 August run
+produced a false "CPSV Editor is two releases behind".
+
+| Component | Read the shipped version from |
+|---|---|
+| CPSV Editor | `git -C ../ttl-editor show acc:package.json` → `version` |
+| Linked Data Explorer | `git -C ../linked-data-explorer show acc:packages/frontend/src/changelog.json` → first `versions[]` |
+| RONL Business API | `git -C ../ronl-business-api show acc:packages/frontend/src/pages/changelog-data.ts` → first `version:` (TypeScript — read it, do not `json.loads` it) |
+| Norm Editor | `git -C ../editor show origin/main:gui/public/changelog.json` → first non-`Unreleased` `releases[]`. **Its releases live on `main`, not `acc`**, though `repo-versions.json` records the environment as `acc` — check both and say which you read |
+| CPRMV | `git -C ../cprmv rev-parse --short main` against the recorded `commit` |
+
+Read from a **ref**, never the working tree — a sibling repo is very often
+parked on a feature branch, and its working tree will answer confidently and
+wrongly. On Windows/Git Bash, `git show <ref>:<path>` needs `MSYS_NO_PATHCONV=1`
+or the argument is mangled into a Windows path.
+
+**Report, do not act.** A drifted sibling is a *finding*, not a licence to widen
+the run: syncing it properly means its own changelog reading, per-perspective
+plan, screenshot manifest and approval. Say which components have drifted and by
+how many releases, and let the user decide.
+
+Distinguish two cases, because they need different fixes: an entry merely
+*behind*, versus one *wrong about its environment*. The Norm Editor is currently
+the second kind.
 
 ## Guardrails
 
 - **Staged, not one-shot.** Always present the Stage 2 plan and stop for
   approval before any edit.
+- **Fetch this repository first, and branch from `origin/acc`.** A stale docs
+  clone is silent, duplicates finished work, reverts `repo-versions.json`, and
+  manufactures drift findings about components that are perfectly in sync. Rule
+  out your own clone before reporting a gap in anyone's repo.
+- **A run is scoped to one component; the home page is not.** Always finish with
+  the Stage 5 sibling drift check, and report it even when clean.
 - **Do not invent code behaviour.** Every doc claim must trace to a changelog
   entry (or, if verifying, to the actual `../ttl-editor` source). If a changelog
   item is ambiguous, read the referenced source file before writing.

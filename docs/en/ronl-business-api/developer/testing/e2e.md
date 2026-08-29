@@ -4,14 +4,21 @@ component: RONL Business API
 
 # E2E & live smoke
 
-Two Playwright suites and four gated shell scripts. None of them runs as part
-of `npm test`.
+Three Playwright suites and four gated shell scripts. None of them runs as part
+of `npm test`, and **one of the three runs in CI**.
 
-| Suite | Where | Tests | Last measured |
-|---|---|---:|---|
-| Frontend Playwright | `packages/frontend/e2e/` | 19 | 12 on 20 Aug, 7 on 22 Aug |
-| Public-site Playwright | `packages/public-site/e2e/` | 6 | 19 Aug — **not re-run since** |
-| Live smoke scripts | `scripts/*.sh` | 4 scripts | never run for these pages |
+| Suite | Where | Tests | In CI? | Last measured |
+|---|---|---:|---|---|
+| Frontend Playwright | `packages/frontend/e2e/` | 19 | No | 12 on 20 Aug, 7 on 22 Aug |
+| Public-site Playwright | `packages/public-site/e2e/` | 6 | No | 19 Aug — **not re-run since** |
+| **PA-demo Playwright** | `packages/pa-demo/e2e/` | **11** | **Yes** — `azure-pa-demo-acc.yml` | 29 Aug |
+| Live smoke scripts | `scripts/*.sh` | 4 scripts | No | never run for these pages |
+
+The PA-demo suite is covered on its own page — see
+[PA-demo suite](pa-demo.md#the-playwright-suite). It is in CI because it needs
+no backend, database or Keycloak: Playwright starts its own dev server and that
+is the whole environment. The other two need a running stack, which is the
+whole of why they are not there yet.
 
 ---
 
@@ -40,8 +47,9 @@ backend on `:3001` — the last is required for the Procesbibliotheek journey.
 
 `e2e/global-setup.ts` checks all of these before any test runs and fails fast
 with the exact start commands if one is down. **It does not start anything
-itself**, which is why the suite is not wired into CI: there is no human to
-start the stack on a runner. See
+itself**, which is why *this* suite is not wired into CI: there is no human to
+start the stack on a runner. The PA-demo suite has no such dependency and does
+run in CI — the difference is the stack, not the tooling. See
 [Overview → Roadmap](overview.md#roadmap) for what closing that would take.
 
 ### Getting JSON output

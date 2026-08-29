@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Frontend Development
 
 The frontend is `packages/frontend` (`@ronl/frontend`) — a React 18 + TypeScript SPA built with Vite.
@@ -5,6 +9,13 @@ The frontend is `packages/frontend` (`@ronl/frontend`) — a React 18 + TypeScri
 ---
 
 ## Project structure
+
+!!! info "The Public Affairs cockpit is no longer in this package"
+    As of v2026.08.27 the PA cockpit lives in
+    [`@ronl/pa-cockpit`](pa-cockpit-package.md), which the frontend imports and
+    configures through a host adapter. What remains below is the caseworker
+    application. The structure shown is the caseworker tree, not the whole
+    front end of the product.
 
 ```
 packages/frontend/src/

@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Local Development Setup
 
 ---
@@ -22,7 +26,7 @@ cd ronl-business-api
 npm install          # installs all workspace packages
 ```
 
-The monorepo uses npm workspaces. `npm install` at the root installs dependencies for `@ronl/backend`, `@ronl/frontend`, and `@ronl/shared` simultaneously.
+The monorepo uses npm workspaces. `npm install` at the root installs dependencies for all six packages simultaneously — `@ronl/backend`, `@ronl/frontend`, `@ronl/shared`, `@ronl/pa-cockpit`, `@ronl/pa-demo` and `@ronl/public-site`.
 
 ---
 
@@ -114,12 +118,20 @@ Keycloak is ready when you see: `Keycloak 23.x.x on ... started`
 npm run dev
 ```
 
-Before starting either server, `npm run dev` first runs a `deps:check` preflight (`scripts/check-deps.sh`), then a Docker check, then starts both servers in parallel via `concurrently`:
+Before starting anything, `npm run dev` first runs a `deps:check` preflight (`scripts/check-deps.sh`), then a Docker check, then starts **four** servers in parallel via `concurrently`:
 
 - **Backend** — `http://localhost:3002` (tsx watch, hot-reloads on TypeScript changes)
 - **Frontend** — `http://localhost:5173` (Vite HMR, hot-reloads on React changes)
+- **Public site** — `http://localhost:5175` (Vite HMR)
+- **PA-demo** — `http://localhost:5176` (Vite HMR)
 
 Open `http://localhost:5173` in your browser. You will be redirected to Keycloak for login.
+
+!!! tip "Why the demo starts too"
+    The [PA-demo](../user-guide/pa-demo.md) renders from the shared
+    [`@ronl/pa-cockpit`](pa-cockpit-package.md) package rather than its own copy,
+    so a cockpit change affects both it and the caseworker frontend. Starting one
+    without the other makes it easy to verify the frontend and miss the demo.
 
 !!! note "Dependency preflight"
     `deps:check` compares `package-lock.json`'s modification time against the `node_modules/.package-lock.json` install marker npm writes after every `npm install`. If the lockfile is newer — e.g. after a `git pull` that changed dependencies — it fails fast with an explicit "run `npm install`" message instead of letting the servers start and crash mid-boot with a confusing `MODULE_NOT_FOUND`. It's advisory only; it never runs `npm install` on its own.

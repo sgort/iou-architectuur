@@ -28,7 +28,7 @@ component: RONL Business API
 
 The **RONL Business API** implements the **Business API Layer** pattern: a security and business-logic layer that sits between an IAM system and the Operaton BPMN engine, exposing scoped capabilities — processes, tasks, forms, decisions — rather than raw engine access.
 
-It is deployed for the **Province of Flevoland**, currently on the acceptance environment. Two surfaces put its capabilities to work: a signed-in **werkomgeving** where provincial staff work through role-scoped boards, and a public **knowledge base** reachable with no login. See [Getting Started](user-guide/getting-started.md) for how these surfaces are organised, and [Features](features/overview.md) for the capabilities themselves.
+It is deployed for the **Province of Flevoland**, currently on the acceptance environment. Three surfaces put its capabilities to work: a signed-in **werkomgeving** where provincial staff work through role-scoped boards, a public **knowledge base** reachable with no login, and a public **cockpit demo** running on demonstration data with no backend behind it. See [Getting Started](user-guide/getting-started.md) for how these surfaces are organised, and [Features](features/overview.md) for the capabilities themselves.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: RONL Business API Main UI](../../assets/screenshots/ronl-business-api-main-ui.png)

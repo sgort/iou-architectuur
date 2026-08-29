@@ -218,21 +218,36 @@ that claims total coverage produces a permanent unfixable finding at the first
 audit, and the predictable response is to weaken the gate — so the register is
 what allows the gate to stay strict *honestly*.
 
-**The Static Web Apps container cannot be pinned, and it builds what ships.**
-`Azure/static-web-apps-deploy` is a three-line wrapper whose `action.yml`
-declares `runs: using: docker, image: "Dockerfile"`, and that Dockerfile is
-`FROM mcr.microsoft.com/appsvc/staticappsclient:stable`. Because `skip_app_build`
-is not set, Oryx runs *inside* that floating image and builds the production
-bundle there. The image is therefore the **build toolchain that produces the
-deployed artifact**, not merely an upload step. Pinning the action makes the
-wrapper immutable and leaves the payload floating. Unreachable from our side; it
-would require Microsoft publishing digest-pinned image references, or IOU
-forking the action.
+**The Static Web Apps container cannot be pinned**, and in the pilot it builds
+what ships. `Azure/static-web-apps-deploy` is a three-line wrapper whose
+`action.yml` declares `runs: using: docker, image: "Dockerfile"`, and that
+Dockerfile is `FROM mcr.microsoft.com/appsvc/staticappsclient:stable`. Pinning
+the action makes the wrapper immutable and leaves the payload floating.
+Unreachable from our side; it would require Microsoft publishing digest-pinned
+image references, or IOU forking the action.
 
-**`npm ci` integrity covers what is tested, not what is shipped.**
-`package-lock.json` carries a `sha512` per package and `npm ci` verifies it —
-but that install feeds lint and the unit tests. Oryx performs its own install
-inside the container to produce the deployed bytes.
+!!! warning "How badly this bites depends on one flag, and the two repositories differ"
+    **CPSV Editor sets `skip_app_build` nowhere.** Oryx therefore runs *inside*
+    that floating image and builds the production bundle there, making the image
+    the **build toolchain that produces the deployed artifact**, not merely an
+    upload step.
+
+    **RONL Business API sets `skip_app_build: true` on all six deploy steps**,
+    pointing `app_location` at an already-built `dist/`. The container uploads an
+    artifact the pipeline built on pinned `setup-node` via `npm ci`. (Its other
+    three references to the action are `action: 'close'` steps, which build
+    nothing.)
+
+    So for RBA's three static sites, lockfile integrity covers **what ships**;
+    for the CPSV Editor it covers only what is tested. The difference is one
+    flag, and it is worth preserving deliberately as the rollout continues.
+
+**`npm ci` integrity covers what is tested, not necessarily what is shipped.**
+`package-lock.json` carries a `sha512` per package and `npm ci` verifies it. In
+the CPSV Editor that install feeds lint and the unit tests only, because Oryx
+performs its own install inside the container to produce the deployed bytes;
+where `skip_app_build` is set, the verified install is the one that produces
+them.
 
 **`node-version: '20'` floats** across all 20.x patches and is downloaded at run
 time. Closing this is reachable in principle — an exact patch, or an `.nvmrc` —
