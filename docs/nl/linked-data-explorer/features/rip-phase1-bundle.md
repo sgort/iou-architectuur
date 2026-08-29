@@ -1,4 +1,8 @@
-# RIP Fase 1 Bundle
+---
+component: Linked Data Explorer
+---
+
+# RIP R2.1-bundel
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.

@@ -48,3 +48,34 @@ missing-image warnings.
 Retained for reference; nothing outstanding. All 56 Linked Data Explorer
 screenshots referenced anywhere in `docs/en/linked-data-explorer/` resolve to a
 real file.
+
+---
+
+## 2026-08-29 — v2026.08.9 docs sync: no new screenshots needed
+
+This pass (v2026.08.3 → v2026.08.9) requires **no new or replaced screenshots**,
+by design rather than oversight:
+
+- **The R2.2 bundle is deployable content, not UI.** One BPMN, nine forms and
+  five document templates, consumed through the existing Deploy modal. The
+  Modeler itself did not change, and the new
+  `features/rip-r22-bundle.md` page embeds no figures — matching
+  `rip-phase1-bundle.md`, which carried three from earlier passes and gained
+  none here.
+- **The R2.1 page's three existing screenshots still hold.** The canvas, deploy
+  modal and MijnOmgeving captures show behaviour the rewrite did not change;
+  the rewrite corrected the bundle's *path, process name and contents*, none of
+  which those images assert. Their relative paths were re-depthed to
+  `../../../assets/` during the rewrite, which is link repair rather than a
+  re-capture.
+- **`ronl:signatureRef` has no UI.** The Modeler neither reads nor writes it and
+  renders no badge for it — it is hand-authored and consumed by the RONL
+  Business API. There is nothing to photograph.
+- **The supply-chain half of this release is pipeline configuration.** Workflow
+  YAML, `renovate.json` and a ruleset; nothing rendered.
+
+**Deploy-modal caveat for a future pass.** `rip-phase1-bundle-deploy-modal.png`
+was captured when the bundle held 11 resources; it now holds 16. The figure is
+illustrative of the modal rather than a resource inventory, and its caption no
+longer claims a count — but if a future pass wants the count to be legible from
+the image, that capture is the one to redo.

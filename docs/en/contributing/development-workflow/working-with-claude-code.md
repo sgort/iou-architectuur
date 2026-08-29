@@ -9,18 +9,24 @@ once a change (with or without a handoff package behind it) reaches Claude Code.
 
 ## The plugin set
 
-Six plugins are installed and enabled at **user level**, so they apply in every
-repository and every session. They come from three marketplaces: Anthropic's
-`claude-plugins-official`, and one each for `claude-mem` and `understand-anything`.
+**Five** plugins are installed and enabled at **user level**, so they apply in every
+repository and every session. They come from two marketplaces: Anthropic's
+`claude-plugins-official`, and `thedotmack` for `claude-mem`.
 
 | Plugin | Version | What it contributes |
 |---|---|---|
-| [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.16.1 | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
+| [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.12.1 | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
 | [`superpowers`](https://github.com/obra/superpowers) | 6.3.0 | The brainstorm → plan → execute structure for multi-step work, and a TDD skills library |
-| [`understand-anything`](https://github.com/Lum1104/Understand-Anything) | 2.7.6 | Builds a navigable knowledge graph of a codebase — architecture, domains, guided tours, diff analysis |
-| `github` | — | The official GitHub MCP server: issues, pull requests, reviews, repository search |
+| `github` | `ed404106fcd8` | The official GitHub MCP server: issues, pull requests, reviews, repository search |
 | `semgrep` | 2.1.4 | Scans generated code for security findings — SAST, secrets, and supply-chain |
 | `typescript-lsp` | 1.0.0 | TypeScript/JavaScript language server: go-to-definition, find references, error checking |
+
+!!! warning "Enabled is not the same as reachable"
+    Both MCP-backed plugins can be enabled and still fail to connect in a given
+    session — `github` on a malformed authorization header, `semgrep` on a cached
+    connection failure. The session reports this at startup; treat a plugin's
+    presence in this table as *configured*, not as *available right now*. The
+    `gh` CLI is the fallback for anything the `github` plugin would have done.
 
 Two notes on that table, because both are easy to get wrong:
 

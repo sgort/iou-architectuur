@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Document Composer
 
 This guide walks through the complete workflow for creating a government decision document (*beschikking*) template in the Document Composer, binding it to process variables, and linking it to a BPMN process in the BPMN Modeler.
@@ -93,7 +97,7 @@ Once your document is saved, switch to the **BPMN Modeler**:
 1. Open or create a process.
 2. Click a `UserTask` element to open its properties.
 3. Scroll down to **Link decision template**. Your saved document appears in the dropdown.
-4. Select it. A purple badge (📄) appears below the `UserTask` on the canvas, and `camunda:documentRef` is written to the BPMN XML.
+4. Select it. A purple badge (📄) appears below the `UserTask` on the canvas, and `ronl:documentRef` is written to the BPMN XML.
 
 The badge is distinct from the green form badge (📝) and the amber DMN badge so you can confirm all three links at a glance.
 

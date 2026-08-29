@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Document Composer
 
 The Document Composer lets you author formal government decision documents (*beschikkingen*) as structured templates inside the Linked Data Explorer. Templates are zone-based, block-driven, and bound to Operaton process variables — so a document authored here can be rendered at runtime by MijnOmgeving for any completed process instance.
@@ -104,7 +108,7 @@ See [Multilingualism](multilingualism.md) for the architectural overview.
 
 ## BPMN Modeler integration
 
-A **Link decision template** selector is injected into the BPMN properties panel for every `UserTask` element. Selecting a document template writes `camunda:documentRef` to the BPMN XML. A purple badge appears below the element on the canvas, distinct from the green form badge (📝) and the amber DMN badge.
+A **Link decision template** selector is injected into the BPMN properties panel for every `UserTask` element. Selecting a document template writes `ronl:documentRef` to the BPMN XML. A purple badge appears below the element on the canvas, distinct from the green form badge (📝) and the amber DMN badge.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: BPMN canvas showing a UserTask with all three badges: amber DMN badge, green form badge, and purple document badge stacked below the element](../../assets/screenshots/linked-data-explorer-bpmn-document-badge.png)

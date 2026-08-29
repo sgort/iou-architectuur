@@ -133,15 +133,23 @@ When a `UserTask` is selected, the properties panel shows a **Link decision temp
   <figcaption>Link decision template dropdown in the UserTask properties panel</figcaption>
 </figure>
 
-Selecting a template writes `camunda:documentRef` to the BPMN XML and renders a **purple badge** (📄) beneath the element on the canvas. The badge is positioned below the green form badge so all three linked artefacts are visible simultaneously:
+Selecting a template writes `ronl:documentRef` to the BPMN XML and renders a **purple badge** (📄) beneath the element on the canvas. The badge is positioned below the green form badge so all three linked artefacts are visible simultaneously:
 
 | Badge colour | Artefact type | Attribute written |
 |---|---|---|
 | Amber | DMN / DRD decision | `camunda:decisionRef` |
 | Green | Camunda Form | `camunda:formRef` |
-| **Purple** | **Document template** | **`camunda:documentRef`** |
+| **Purple** | **Document template** | **`ronl:documentRef`** |
 
 Document template linking is only available for `UserTask` elements (not `StartEvent`).
+
+!!! note "`ronl:signatureRef` is hand-authored, not written by the Modeler"
+    A fourth `ronl:*` attribute exists on user tasks — `ronl:signatureRef` — but
+    the Modeler neither reads nor writes it and shows no badge for it. It is set
+    by hand in the BPMN and consumed by the RONL Business API, which replaces the
+    task's plain approval form with a ValidSign signing ceremony where the
+    attribute is present. See
+    [RIP R2.1 Bundle](rip-phase1-bundle.md#the-phase-exit-approval-is-signed).
 
 See [Document Composer](document-composer.md) for how to create and manage document templates.
 
