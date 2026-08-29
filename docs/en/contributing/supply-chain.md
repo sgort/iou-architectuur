@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Supply-Chain Pinning
 
 Nothing a pipeline downloads or executes may float. No `latest`, no empty

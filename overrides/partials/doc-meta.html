@@ -8,13 +8,29 @@
   partials/source-file.html, plus the documented version of the component
   the page describes.
 
-  Only pages that declare a `component:` front-matter key reach this
-  partial — see the content block in main.html, which also suppresses the
-  bottom source-file aside for those pages so the facts move rather than
+  The partial has two modes, and a page reaches it by declaring either key:
+
+    component: RONL Business API   → names one component; shows its version
+    scope: cross-cutting           → describes every component at once
+
+  The second mode exists because pages under docs/en/contributing/ describe
+  the tooling across ALL components simultaneously. Stamping such a page with
+  any single component's version would be false, and picking one of the five
+  arbitrary — but leaving the header off entirely made "no badge" ambiguous
+  between "no version applies here" and "this page has not been synced yet".
+  So the header is present either way, and its right-hand fact says which
+  kind of page you are on.
+
+  Cross-cutting pages assert the docs_built date instead of a version, since
+  that is the one date that genuinely applies to them: it is when the site
+  was last reconciled against every component at once.
+
+  See the content block in main.html, which gates on either key and also
+  suppresses the bottom source-file aside so the facts move rather than
   appear twice.
 
-  The component version comes from docs/repo-versions.json, loaded into
-  config.extra by hooks/repo_versions.py.
+  The component version and docs_built date both come from
+  docs/repo-versions.json, loaded into config.extra by hooks/repo_versions.py.
 -#}
 {#- An archived page describes an older release on purpose, and says so in its
    own banner. Showing the component's CURRENT version here would contradict
@@ -23,6 +39,10 @@
    Matched on a path SEGMENT so a page like "my-archive/" is unaffected. -#}
 {% set is_archived = "archive" in page.url.split("/") %}
 {% set repo = none if is_archived else config.extra.repo_versions.get(page.meta.component) %}
+{#- Cross-cutting mode. Suppressed on archived paths for the same reason a
+   version is: an archived page must not assert a build date that keeps moving
+   underneath it. -#}
+{% set is_cross_cutting = page.meta.scope == "cross-cutting" and not is_archived %}
 <aside class="doc-meta">
   {% if page.meta.git_creation_date_localized %}
     <span class="doc-meta__fact">
@@ -51,6 +71,22 @@
         <span class="env-badge env-{{ repo.environment | lower }}">
           {{- repo.environment | upper -}}
         </span>
+      {%- endif %}
+    </span>
+  {% elif is_cross_cutting %}
+    {#- The site is bilingual, and mkdocs-static-i18n sets theme.language per
+       locale build (reconfigure_material: true). These two strings are not in
+       Material's own translation catalogue, so they are switched here rather
+       than through lang.t(). Any locale other than nl falls back to English,
+       which is also the site's default. -#}
+    {% set is_nl = config.theme.language == "nl" %}
+    <span class="doc-meta__fact doc-meta__scope">
+      <span class="md-icon" title="{{ 'Deze pagina beschrijft alle componenten tegelijk' if is_nl else 'This page describes every component at once' }}">
+        {% include ".icons/material/sitemap-outline.svg" %}
+      </span>
+      {{ "Geldt voor alle componenten" if is_nl else "Applies to all components" }}
+      {%- if config.extra.docs_built %}
+        <code>{{ "docs gebouwd" if is_nl else "docs built" }} {{ config.extra.docs_built }}</code>
       {%- endif %}
     </span>
   {% endif %}

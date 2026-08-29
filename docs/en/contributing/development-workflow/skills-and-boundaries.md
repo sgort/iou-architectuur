@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Skills & Boundaries
 
 This page covers two things a first-time contributor needs before relying on the

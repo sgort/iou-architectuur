@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Design & Handoff
 
 This page covers the first two stages of the [pipeline](overview.md): deciding whether

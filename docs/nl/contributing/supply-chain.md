@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Supply-Chain Pinning
 
 !!! info "Documentatie in ontwikkeling"

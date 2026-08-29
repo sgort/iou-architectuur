@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Contributing to IOU Architecture
 
 The IOU Architecture Framework is an open-source project published under the

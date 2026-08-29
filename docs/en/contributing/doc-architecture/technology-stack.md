@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Technology Stack
 
 ---

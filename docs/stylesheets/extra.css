@@ -413,13 +413,24 @@ button:focus {
   vertical-align: middle;
 }
 
-/* The version fact is the point of the header — let it carry a little
-   more weight than the two date facts beside it. */
-.doc-meta__version {
+/* The right-hand fact is the point of the header — let it carry a little
+   more weight than the two date facts beside it.
+
+   Both modes share this styling deliberately. `.doc-meta__version` names a
+   component and its release; `.doc-meta__scope` (pages under
+   docs/{en,nl}/contributing/**) says the page applies to every component and
+   carries the docs_built date instead. They sit in the same position and answer
+   the same question — "what release does this page describe?" — so styling one
+   more faintly than the other read as though the cross-cutting answer were less
+   authoritative, when it is simply a different answer. */
+.doc-meta__version,
+.doc-meta__scope {
   font-weight: 600;
   color: var(--md-default-fg-color);
 }
 
-.doc-meta__version code {
+.doc-meta__version code,
+.doc-meta__scope code {
   font-size: 0.9em;
+  white-space: nowrap;
 }

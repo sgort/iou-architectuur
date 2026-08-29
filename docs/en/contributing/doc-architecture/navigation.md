@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Navigation Structure
 
 The site uses MkDocs Material's tabbed navigation. Each top-level tab corresponds to a major component. Within each tab, pages are grouped into Features, User Guides, Developer Docs, and References.

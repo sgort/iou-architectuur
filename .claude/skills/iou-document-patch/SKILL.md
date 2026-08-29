@@ -39,7 +39,7 @@ adapt the paths — the same staging applies.
 | Testing page | `docs/en/<component>/developer/testing.md` — the site is the **single source of truth** for test docs (see Stage 2d) |
 | Cross-cutting contributor docs | `docs/en/contributing/**` — **not component-scoped, and easy to miss.** These pages describe the tooling across *all* components at once: CI, git hooks, lint/format scripts, the repository table, the release process, the supply-chain gate, the assistant's plugin set and its working boundaries. A single component's release can falsify them, and they carry no `component:` front matter to flag them as in-scope. **Stage 2e is a required stage, not optional tidying** |
 | Assistant-tooling sources of truth | `~/.claude/CLAUDE.md` (working boundaries), `~/.claude/plugins/installed_plugins.json` (what is installed, and at which scope), `~/.claude/settings.json` → `enabledPlugins` (what is actually on), `~/.claude/plugins/known_marketplaces.json`. These are the **only** authority for `development-workflow/skills-and-boundaries.md` and `working-with-claude-code.md` — never restate those pages from memory. See Stage 2e |
-| Per-page metadata header | `component:` front matter on every edited/added page (see below) |
+| Per-page metadata header | `component:` front matter on every edited/added component page; `scope: cross-cutting` on every `contributing/**` page (see below) |
 
 ### Known components beyond CPSV Editor
 
@@ -113,6 +113,26 @@ component: CPSV Editor
 ```
 
 The name must match a `name` in `docs/repo-versions.json` exactly.
+
+**Cross-cutting pages use the other key.** A page under
+`docs/{en,nl}/contributing/**` describes every component at once, so no single
+component's version is true of it. Those pages declare:
+
+```yaml
+---
+scope: cross-cutting
+---
+```
+
+which renders the same header with *"Applies to all components · docs built
+&lt;date&gt;"* (Dutch: *"Geldt voor alle componenten · docs gebouwd …"*) in place
+of a version badge. Never put a `component:` key on a contributing page — it
+would stamp one arbitrary component's version onto a page that describes five.
+
+The two keys exist because absence had become ambiguous: a page with no header
+could mean either "no version applies here" or "not synced yet". Now the header
+is present on every page a sync touches, and its right-hand fact says which
+kind of page it is.
 
 **Add this front matter to every page this patch edits or creates**, EN and NL
 alike, including placeholders. It is deliberately opt-in: untouched pages keep

@@ -3,7 +3,10 @@
 {#-
   Content block override — moves the git created/updated facts from the
   bottom of the page to a metadata header directly below the breadcrumbs,
-  for pages that opt in with a `component:` front-matter key.
+  for pages that opt in with either a `component:` or a `scope:` front-matter
+  key. `component:` names one component and shows its version; `scope:
+  cross-cutting` marks a page that describes every component at once and
+  shows the docs_built date instead. See partials/doc-meta.html.
 
   This mirrors the theme's own partials/content.html (Material 9.x) with two
   changes: doc-meta.html is rendered first, and source-file.html is skipped
@@ -14,7 +17,7 @@
   changes that file, re-check this block.
 -#}
 {% block content %}
-  {% set doc_meta = page.meta.component if page.meta else none %}
+  {% set doc_meta = (page.meta.component or (page.meta.scope == "cross-cutting")) if page.meta else none %}
   {% if doc_meta %}
     {% include "partials/doc-meta.html" %}
   {% endif %}
