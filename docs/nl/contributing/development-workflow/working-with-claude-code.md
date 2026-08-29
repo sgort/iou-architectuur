@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Werken met Claude Code
 
 !!! info "Documentatie in ontwikkeling"

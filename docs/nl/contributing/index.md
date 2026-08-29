@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Bijdragen
 
 !!! info "Documentatie in ontwikkeling"

@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Code Standaarden
 
 !!! info "Documentatie in ontwikkeling"

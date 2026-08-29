@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Design & Overdracht
 
 !!! info "Documentatie in ontwikkeling"

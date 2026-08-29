@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Ontwikkelworkflow
 
 !!! info "Documentatie in ontwikkeling"

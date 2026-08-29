@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Navigatiestructuur
 
 !!! info "Documentatie in ontwikkeling"

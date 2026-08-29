@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Overview
 
 This documentation site serves as the central reference for the IOU Architecture Framework and the RONL ecosystem. It is built with MkDocs and published to Azure Static Web Apps, supporting both English and Dutch.

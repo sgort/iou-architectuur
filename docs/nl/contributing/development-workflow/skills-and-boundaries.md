@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Skills & Grenzen
 
 !!! info "Documentatie in ontwikkeling"

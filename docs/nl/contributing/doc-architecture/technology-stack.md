@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Technologiestack
 
 !!! info "Documentatie in ontwikkeling"

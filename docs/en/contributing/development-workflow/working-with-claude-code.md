@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Working with Claude Code
 
 This page covers the third stage of the [pipeline](overview.md): implementation itself,

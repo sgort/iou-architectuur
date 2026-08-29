@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Development Workflow
 
 This section describes how the maintainers actually build IOU Architecture features —

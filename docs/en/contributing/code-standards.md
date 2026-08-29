@@ -1,3 +1,7 @@
+---
+scope: cross-cutting
+---
+
 # Code Standards
 
 This page covers three application repositories — CPSV Editor (`ttl-editor`), Linked
