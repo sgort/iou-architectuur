@@ -1,6 +1,15 @@
+---
+component: RONL Business API
+---
+
 # Shared Package
 
-`packages/shared` (`@ronl/shared`) contains TypeScript types and utilities shared between the backend and frontend packages. It has no runtime dependencies and must be built before either package can consume it.
+`packages/shared` (`@ronl/shared`) contains TypeScript types and utilities shared across the workspace. It has no runtime dependencies and must be built before a consuming package can be built or type-checked.
+
+It is consumed by the backend, the frontend and the PA-demo. The demo's imports are **type-only** and erased before the bundler sees them, so a shared-only change cannot alter its compiled output — but `packages/shared/**` still appears in the demo's CI path filter, so that a breaking type change fails there rather than surfacing later at an unrelated pull request.
+
+!!! note "This is not the only workspace package"
+    [`@ronl/pa-cockpit`](pa-cockpit-package.md) is the other one: the Public Affairs cockpit, imported by both the caseworker frontend and the public demo. Unlike `shared` it ships React components and carries a host contract.
 
 ---
 

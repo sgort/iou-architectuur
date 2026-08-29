@@ -17,6 +17,11 @@ On opening the board you see dossiers and issues laid out for steering, so prior
 
 ---
 
+!!! tip "There is a public demo of this board"
+    The same cockpit runs publicly on demonstration data, with no sign-in and no
+    backend, at `acc.plato.open-regels.nl` — useful for showing the board to
+    someone who has no account. See [PA-Cockpit demo](pa-demo.md).
+
 !!! note "Brief by design"
     This board is on the acceptance environment. The page covers what it is for
     and what you see; a full step-by-step guide follows when it reaches

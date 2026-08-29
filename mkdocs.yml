@@ -121,6 +121,7 @@ nav:
       - Getting Started: ronl-business-api/user-guide/getting-started.md
       - Caseworker: ronl-business-api/user-guide/caseworker.md
       - PA-Cockpit: ronl-business-api/user-guide/pa-cockpit.md
+      - PA-Cockpit Demo: ronl-business-api/user-guide/pa-demo.md
       - Infra-board: ronl-business-api/user-guide/infra-board.md
       - Woo-dashboard: ronl-business-api/user-guide/woo-dashboard.md
       - Public Site: ronl-business-api/user-guide/public-site.md
@@ -149,12 +150,14 @@ nav:
       - MCP AI Assistant: ronl-business-api/developer/mcp-ai-assistant.md
       - Frontend Development: ronl-business-api/developer/frontend-development.md
       - Shared Package: ronl-business-api/developer/shared-package.md
+      - PA-Cockpit Package: ronl-business-api/developer/pa-cockpit-package.md
       - Timeline Implementation: ronl-business-api/developer/implementing-timeline.md
       - Testing:
         - Overview: ronl-business-api/developer/testing/overview.md
         - Coverage: ronl-business-api/developer/testing/coverage.md
         - Backend Suite: ronl-business-api/developer/testing/backend.md
         - Public Site Suite: ronl-business-api/developer/testing/public-site.md
+        - PA-demo Suite: ronl-business-api/developer/testing/pa-demo.md
         - Dashboards:
           - Caseworker: ronl-business-api/developer/testing/dashboards/caseworker.md
           - PA Cockpit: ronl-business-api/developer/testing/dashboards/pa-cockpit.md

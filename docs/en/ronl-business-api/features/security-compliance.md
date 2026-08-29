@@ -50,8 +50,27 @@ Log output at debug verbosity is disabled outside development, so operational lo
 
 ---
 
+## Build and pipeline integrity
+
+The delivery pipeline is itself a security surface, and is treated as one on the
+`acc` branch: every GitHub Actions reference is pinned to an immutable commit
+digest, the pipeline token is read-only unless a job demonstrably needs more, no
+git credential is left in the workspace after checkout, and a blocking audit
+gate enforces all three on every pull request. Dependency updates are held for
+fourteen days before adoption, except security advisories, which bypass the wait.
+
+Two limits are worth stating plainly. The gate does **not** cover the backend's
+path to production, which runs from a developer machine rather than CI. And the
+`main` branch does not yet carry any of this.
+
+For what is enforced, what cannot be, and where the coverage stops, see
+[Supply-chain gate](../../contributing/supply-chain.md).
+
+---
+
 ## Related
 
+- [Supply-chain gate](../../contributing/supply-chain.md) — pipeline pinning, least privilege, and the audit gate
 - [Authentication & IAM](authentication-iam.md) — the identity and tenancy checks this page's audit trail traces back to
 - [API Design](api-design.md) — the response conventions error handling follows
 - [Tasks](tasks.md) and [Processes](processes.md) — the actions an audit record most often describes

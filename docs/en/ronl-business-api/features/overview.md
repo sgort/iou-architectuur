@@ -20,10 +20,11 @@ These capabilities are generic. They are not tied to any one process, form, or b
 
 ## The surfaces
 
-The capabilities described in this section are instantiated by two surfaces:
+The capabilities described in this section are instantiated by three surfaces:
 
 - A signed-in **werkomgeving**, where authenticated staff work through role-scoped boards.
 - A public **knowledge base**, reachable with no login, publishing the same underlying information for anyone to read.
+- A public **cockpit demo**, reachable with no login, running the Public Affairs cockpit on demonstration data with no connection to any backend.
 
 See [Getting Started](../user-guide/getting-started.md) for how these surfaces are organised.
 

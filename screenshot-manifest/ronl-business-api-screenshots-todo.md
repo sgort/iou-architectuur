@@ -1,10 +1,17 @@
-# RONL Business API — screenshots to capture (2026-08-19 User Guides restructure)
+# RONL Business API — screenshots to capture
+
+!!! important "Two captures are outstanding"
+    See [2026-08-29 — v2026.08.33 docs sync](#2026-08-29--v20260833-docs-sync-two-new-screenshots)
+    at the foot of this file. Everything above that section is complete and is
+    retained as the record of what each earlier image shows and why.
+
+## 2026-08-19 — User Guides restructure (complete)
 
 Generated for the User Guides restructure of 2026-08-19, which split the RONL
 Business API user guide into per-board pages. Four new board pages each embed a
-screenshot. **All four were captured on 2026-08-19 and are in place — nothing is
-outstanding.** The file is retained as the record of what each image shows and
-why it was needed.
+screenshot. **All four were captured on 2026-08-19 and are in place.** This
+section is retained as the record of what each image shows and why it was
+needed.
 
 Real screenshot files live in **`docs/assets/screenshots/`** (language-neutral,
 served at the site root). Docs reference them as
@@ -87,3 +94,62 @@ oversight:
   and need no re-capture.
 - The four board screenshots captured during the earlier restructure (see
   above) remain in place; nothing outstanding.
+
+---
+
+## 2026-08-29 — v2026.08.33 docs sync: two NEW screenshots
+
+This pass (bringing the RONL Business API docs from `v2026.08.23` to
+`v2026.08.33`) adds the public **PA-Cockpit demo** to the User Guides. Two
+captures are outstanding.
+
+| # | Status | File | Embedding page | What it must show |
+|---|---|---|---|---|
+| 5 | 🔲 **NEW** | `ronl-business-api-pa-demo-plato.png` | `user-guide/pa-demo.md` | The demo cockpit as a visitor first sees it at `acc.plato.open-regels.nl` — the full rail and a populated board, with no sign-in prompt anywhere |
+| 6 | 🔲 **NEW** | `ronl-business-api-pa-demo-rollen.png` | `user-guide/pa-demo.md` | **Beheer → Rollen & rechten** — the four selectable role positions and the capability table beside them |
+
+### These two are different from every earlier entry
+
+**No authenticated session is needed.** Every previous screenshot in this
+manifest sat behind sign-in, which is why they had to be handed to the
+maintainer. These two are on a public, unauthenticated site — anyone with the
+URL can capture them, and they can be re-shot later without arranging access.
+
+### Capture notes
+
+- **Capture from acceptance**, `https://acc.plato.open-regels.nl`, not from a
+  local dev server. The footer carries an `ACCEPTATIEOMGEVING` badge and the
+  acceptance hostname; that is the honest state of this surface today, since
+  production is not yet stood up.
+- **Use the default role.** The demo opens on the broadest of the four
+  positions deliberately, and screenshot 5 should show what a visitor actually
+  lands on.
+- **Screenshot 6 should show a role that is *not* the default selected**, so the
+  capability table visibly differs from the landing state — that is the point
+  the surrounding prose makes.
+- Match the framing and width of the existing board captures
+  (`ronl-business-api-pa-cockpit-board.png` is the closest comparator).
+
+### Expected `mkdocs build` state
+
+Until both are captured, a non-strict build reports exactly **two**
+missing-image warnings and nothing else. A **third** warning means something
+else is genuinely broken and should be investigated as such.
+
+### Verification
+
+```bash
+for i in pa-demo-plato pa-demo-rollen; do
+  echo "ronl-business-api-$i -> $(grep -rl "ronl-business-api-$i" docs/en | wc -l) page(s)"
+done
+```
+
+Each line must report `1`.
+
+### Nothing needed a REPLACE
+
+The `@ronl/pa-cockpit` extraction was deliberately pixel-preserving — converted
+styles use the literal computed values rather than the nearest design token,
+precisely so the rendered result did not move. `ronl-business-api-pa-cockpit-board.png`
+therefore still shows the current UI, and the other three board captures were
+untouched by this release.

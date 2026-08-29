@@ -4,7 +4,7 @@ component: RONL Business API
 
 # Getting Started
 
-RONL Business API (RBA) is made up of two separate environments. The **werkomgeving** is where provincial staff sign in with a medewerkersaccount to do their work. The **public knowledge base** is a separate, public site with no login and no account, where the same information that provincial staff can see is published for anyone to read. Which of the werkomgeving's boards you see depends on your role and authorisations within the province.
+RONL Business API (RBA) is made up of three separate environments. The **werkomgeving** is where provincial staff sign in with a medewerkersaccount to do their work. The **public knowledge base** is a separate, public site with no login and no account, where the same information that provincial staff can see is published for anyone to read. The **PA-Cockpit demo** is a third public site, running the PA-Cockpit itself on demonstration data so it can be shown to someone without an account. Which of the werkomgeving's boards you see depends on your role and authorisations within the province.
 
 ---
 
@@ -36,6 +36,16 @@ The werkomgeving (`ronl.werkomgeving`, Province of Flevoland) presents four boar
 </figure>
 
 This site is currently **ACC-only**, at `acc.publiek.open-regels.nl`.
+
+---
+
+## PA-Cockpit demo
+
+[The PA-Cockpit demo](pa-demo.md) is the third public surface. It runs the same PA-Cockpit the werkomgeving does, but on demonstration data and with no connection to any backend — so it can be opened by anyone with the link, including people who will never have an account.
+
+It exists for showing the product: to a prospective province, to a colleague from another organisation, or to a room. Because it is the real cockpit rather than a mock-up, what a visitor clicks is what the product does. A role selector lets a visitor see how the same board changes for a narrower set of rights.
+
+This site is currently **ACC-only**, at `acc.plato.open-regels.nl`.
 
 ---
 

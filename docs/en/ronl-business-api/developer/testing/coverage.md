@@ -4,28 +4,34 @@ component: RONL Business API
 
 # Coverage
 
-Measured with `npm test --workspace=<pkg>` per package against **v2026.08.23**
-on **22 August 2026**, from a cold cache. `packages/pa-demo` was measured
-separately, on **25 August 2026** on branch `feat/public-pa-cockpit` at
-`a59a0a7` — it has not merged to `acc` yet, so its row carries a different
-date and commit than the other three.
+Measured with `npm run test:serial` against **v2026.08.33** on **29 August
+2026**, on `acc` at `1e7fb19`. All five packages were measured in the same run,
+on the merged branch — unlike the previous pass, where pa-demo still sat on a
+feature branch and carried its own date.
 
-| Package | Statements | Branches | Functions | Lines | Δ since v2026.08.20 |
+| Package | Statements | Branches | Functions | Lines | Δ since v2026.08.23 |
 |---|---:|---:|---:|---:|---|
-| Backend | 98.35% | 91.49% | 96.65% | 98.75% | +4.07 / +17.95 / +2.52 / +3.06 |
-| Frontend | 87.47% | 78.68% | 83.35% | 88.87% | +2.43 / +2.17 / +3.19 / +2.47 |
+| Backend | 98.35% | 91.49% | 96.65% | 98.75% | unchanged |
+| Frontend | 88.07% | 80.09% | 83.53% | 88.96% | see the note below |
+| pa-cockpit | 86.16% | 75.55% | 83.46% | 88.53% | new package |
+| pa-demo | 91.30% | 86.95% | 85.00% | 91.66% | +17.36 / +23.54 / +12.78 / +17.79 |
 | Public site | 86.82% | 70.39% | 87.63% | 88.76% | unchanged |
-| pa-demo | 73.94% | 63.41% | 72.22% | 73.87% | new package |
 
-Public site is unchanged because nothing under `packages/public-site/src/` was
-touched in this window; its figures reproduced the 20 August numbers exactly.
-pa-demo is new to this table and excludes `src/vendor/**` from every figure —
-see [pa-demo by area](#pa-demo-by-area) below.
+!!! note "The frontend row is not comparable to v2026.08.23"
+    The Public Affairs cockpit was extracted into `packages/pa-cockpit` in this
+    window, taking 41 test files and 368 tests with it. The frontend percentage
+    is therefore measured over a **different, smaller** body of code than the
+    87.47% recorded last time — it did not simply improve. Read the frontend and
+    pa-cockpit rows together.
 
-The backend branch figure moved most — **73.54% → 91.49%**, nearly eighteen
-points — from the coverage campaign and the PA route work. On the frontend the
-gain came from four surfaces that had little or nothing: `NotificationsPanel`
-(previously 0%), `Issuekaart`, `Monitoring`, and `PaDataProvider`.
+**pa-demo's jump is the vendored fork leaving**, not a testing campaign. Its
+figures previously spanned a byte-identical copy of the cockpit with
+`src/vendor/**` excluded by hand; the fork was deleted in v2026.08.28 and the
+package is now a thin host adapter over `@ronl/pa-cockpit`. There is nothing
+left to exclude — see [pa-demo by area](#pa-demo-by-area) below.
+
+Backend and public site are unchanged because nothing under their `src/` trees
+was touched in this window; both reproduced the 22 August figures exactly.
 
 !!! warning "The last two decimals are noise"
     Frontend coverage is **not deterministic**. Six runs at the same commit,
@@ -39,32 +45,32 @@ gain came from four surfaces that had little or nothing: `NotificationsPanel`
     invocation. `npm test --workspace=@ronl/backend` is the command these
     numbers come from.
 
-All four configure `collectCoverageFrom` / `coverage.include` to span the whole
+All five configure `collectCoverageFrom` / `coverage.include` to span the whole
 `src` tree rather than only the files a test happens to import, so an untested
-file shows as 0% instead of silently disappearing from the report. pa-demo's
-`coverage.include` is `src/**/*.{ts,tsx}` with `src/vendor/**` explicitly
-excluded — see [pa-demo by area](#pa-demo-by-area).
+file shows as 0% instead of silently disappearing from the report. pa-demo no
+longer needs a `src/vendor/**` exclusion, because there is no vendored tree left
+to exclude — see [pa-demo by area](#pa-demo-by-area).
 
-**What the headline numbers mean here.** The first three packages have been
-through a dedicated coverage campaign that closed *breadth* gaps
-deliberately — every backend feature area, every frontend component and
-page, and every public-site module now has at least a test file. What
-remains there is *depth*, and it is no longer uniform across the three.
-pa-demo has not had that campaign yet — it is a new package, and its
-lower headline figures reflect breadth gaps rather than depth ones (see
+**What the headline numbers mean here.** Backend, frontend and public site have
+been through a dedicated coverage campaign that closed *breadth* gaps
+deliberately — every backend feature area, every frontend component and page,
+and every public-site module now has at least a test file. What remains there is
+*depth*. pa-cockpit inherits the frontend's profile, since it *is* the code that
+used to be measured there. pa-demo is the outlier in the other direction (see
 [pa-demo by area](#pa-demo-by-area)):
 
 | Package | Statements → branches | Gap |
 |---|---|---:|
 | Backend | 98.35 → 91.49 | 6.9 |
-| Frontend | 87.47 → 78.68 | 8.8 |
+| Frontend | 88.07 → 80.09 | 8.0 |
+| pa-cockpit | 86.16 → 75.55 | 10.6 |
+| pa-demo | 91.30 → 86.95 | 4.4 |
 | Public site | 86.82 → 70.39 | 16.4 |
-| pa-demo | 73.94 → 63.41 | 10.5 |
 
 The backend's gap has largely closed; the public site's has not moved, because
-nothing there changed. pa-demo is new and has not been through a coverage
-campaign at all yet — its gap is closer to the backend's than to public
-site's, but at a much lower base. What is left in the first three is the same
+nothing there changed. **pa-demo now has the narrowest gap of the five**, which
+is a property of what it became rather than of effort spent: a thin host adapter
+over a package that carries its own tests. What is left elsewhere is the same
 kind of thing:
 defensive `if (!req.user)` guards behind real middleware, `?? null` fallbacks,
 catch blocks unreachable through a legal input, and deliberately-scoped
@@ -166,20 +172,27 @@ these files are and what is deliberately not covered.
 
 | Area | Statements | Branches | Functions | Lines |
 |---|---:|---:|---:|---:|
+| **All files** | **91.30** | **86.95** | **85.00** | **91.66** |
+| `src/demo` | 95.91 | 84.61 | 100 | 97.72 |
+| `src/demo/changelog` | 100 | 87.50 | 100 | 100 |
+| `src/demo/shims` | 75.00 | 100 | 44.44 | 75.00 |
 | `src/` (root) | 75.00 | 100 | 50.00 | 75.00 |
-| `src/demo` | 76.08 | 61.53 | 95.45 | 76.19 |
-| `src/demo/shims` | 65.21 | 100 | 33.33 | 65.21 |
 
-**`src/vendor/**` is excluded from every figure on this page and this table.**
-Those 39 files are the same ones already exercised by the 1155 tests counted
-under Frontend above — measuring them again here would double-count that
-work and let pa-demo's own, much smaller, demo-owned surface
-(`src/demo/**`, `src/main-helpers.ts`, `src/App.tsx`) hide behind an
-inflated package total. A reader comparing this table to that 39-file
-vendored tree should not expect it to appear here at all; it is covered,
-just not by this package's suite. See
-[pa-demo suite → Coverage excludes `src/vendor/**`](pa-demo.md#coverage-excludes-srcvendor)
-for the full rationale.
+**The `src/vendor/**` exclusion is gone, because the vendored tree is.** Until
+v2026.08.28 this package held a byte-identical copy of the cockpit — 39 files
+kept honest by a manifest, a sync script and a drift checker — which had to be
+excluded from these figures to avoid double-counting code the frontend suite
+already exercised. The extraction into
+[`@ronl/pa-cockpit`](../pa-cockpit-package.md) deleted the fork and all of that
+machinery, so every figure above is now pa-demo's own demo-owned surface and
+nothing else. That is the whole reason the package total jumped from 73.94% to
+91.30% without a single test being written for that purpose.
+
+What remains uncovered is almost entirely **shims that deliberately return
+nothing**: the dock stand-in and the session-expiry warning both render `null`
+by design, because the real components pull in chat machinery and session
+handling that a public, unauthenticated page must not have. They depress the
+function percentage without representing a gap.
 
 Two more files are excluded from coverage entirely, by config rather than by
 this table's rounding: `src/main.tsx` (it calls `createRoot`; its one

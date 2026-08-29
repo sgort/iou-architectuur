@@ -137,13 +137,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.08.23** · *August 2026*
+-   **⚙️ RONL Business API — v2026.08.33** · *August 2026*
 
     ---
 
-    **Mock mode made real, and the throttle that looked like an outage**
+    **A public cockpit, the fork deleted, and a pipeline that can no longer float**
 
-    The Public Affairs cockpit's mock mode became a working demo rather than a read-only snapshot, and gained [two Playwright suites](ronl-business-api/developer/testing/dashboards/pa-cockpit.md) — every defect they found was invisible to the unit tests by construction, because a component test mocks the very seam that was broken. A live spec failing every other run turned out to be the shipped rate limit, not the stack: 21 requests per authoring journey against a 100/minute budget, rendered in the UI as an error indistinguishable from an outage. Backend `utils/` went from 6.54% branch coverage to [100% across the board](ronl-business-api/developer/testing/coverage.md).
+    The Public Affairs cockpit now runs [publicly on demonstration data](ronl-business-api/user-guide/pa-demo.md) with no sign-in and no backend — enforced by a Content-Security-Policy *and* a build-time bundle gate, because a negative guarantee is exactly the kind that passes vacuously when wrong. Built first as a deliberate vendored copy so the seam could be found by construction, it then became [`@ronl/pa-cockpit`](ronl-business-api/developer/pa-cockpit-package.md) and the 44-file fork was deleted. Meanwhile the pipeline went from [49 supply-chain findings to zero](contributing/supply-chain.md): every action pinned to a digest, the token scoped to least privilege, and a blocking audit gate that a pull request cannot get past — on `acc`, not yet on `main`.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

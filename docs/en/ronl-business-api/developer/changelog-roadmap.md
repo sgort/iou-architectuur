@@ -1,8 +1,144 @@
+---
+component: RONL Business API
+---
+
 # Changelog & Roadmap
 
 ---
 
 ## Changelog
+
+## v2026.08.33 — The Action Majors, Verified by the Gate They Upgrade (August 2026)
+
+> Pipeline detail: [Supply-chain gate](../../contributing/supply-chain.md).
+
+Three Renovate pull requests, each held for the full 14-day cooldown, moved the pinned first-party actions to their current majors: `actions/checkout` to `3d3c42e5` (v7.0.1) across nine workflows, `actions/setup-node` to `820762786` (v7.0.0) across eight, and `actions/upload-artifact` to `043fb46d` (v7.0.1) in the two backend workflows. Each digest moved together with its `# vX.Y.Z` comment, which is what makes a pin readable rather than merely immutable.
+
+This closes the Node-runtime deprecation. The pinned v4 actions targeted a Node version the runner had begun force-upgrading; v7 declares node24 natively. Pinning had deliberately frozen those versions in place, and upgrading them was kept as separate work so that a broken deploy would be attributable to one change or the other rather than to both at once.
+
+The `checkout` upgrade also covers `zizmor.yml`, which made it the one upgrade whose failure would have been self-obscuring — a broken checkout inside the audit gate breaks the mechanism that would otherwise report it. The gate passed on all three merges, so the upgrade is verified by the thing it upgrades.
+
+---
+
+## v2026.08.32 — CI Work Gets Its Own Changelog Type (August 2026)
+
+Pipeline and supply-chain work had no home in the changelog, so it landed as a chore, filed next to housekeeping — when it is the one category whose commits change how everything else is built and shipped. `ci` is now a changelog type in its own right.
+
+It is also a release scope, and deliberately **not** a deployable one: a CI-scoped release bumps the root version only. Bumping a package version for pipeline work would trip that package's path-filtered workflow and deploy code that had not changed.
+
+---
+
+## v2026.08.31 — The Gate Gets Teeth: 49 Findings to Zero (August 2026)
+
+> Pipeline detail: [Supply-chain gate](../../contributing/supply-chain.md) · [CI/CD](cicd.md).
+
+**Every action reference is now an immutable commit digest.** All 27 `uses:` references across eight workflows were pinned, each at its then-current major so the change stayed behaviour-preserving. A tag can be moved; a digest cannot — and the Static Web Apps deploy action referenced here publishes one ref as *both* a 2021 tag and a 2024 branch head, 3.5 years apart, across nine references in four deploy pipelines.
+
+**Credentials are no longer left in the workspace.** Before this, `actions/checkout` wrote a live `GITHUB_TOKEN` into `.git/config`, which was then mounted into a closed-source third-party container. `persist-credentials: false` is now set everywhere. Token scope drops to read-only by default, with write granted only to the six jobs that comment on pull requests, and none at all to the three that only tear down a preview environment.
+
+**A blocking audit gate enforces it.** The `audit` job runs zizmor on every pull request and on pushes to `acc` and `main`, pinned to an exact tool version rather than the action's default of `latest` — a supply-chain gate that pulled an unpinned tool would defeat itself. Together with an `acc` ruleset requiring a pull request and a passing check, the workflow became enforcement rather than advice: the check alone would still have let a direct push bypass it.
+
+**Renovate keeps the pins alive.** Its configuration had to land *before* the app was installed, because Renovate reads configuration only from the default branch. Updates are held for fourteen days so vendors and researchers have time to find problems, with one deliberate exception — security advisories bypass the wait entirely, which is the clause most cooldown policies omit and the reason such policies get switched off mid-incident.
+
+**The register was corrected on one important point.** It had implied CI deploys the backend. It does not: the backend workflows build, test and upload an artifact with no deploy step at all.
+
+Squash and rebase merging were disabled repo-wide, leaving merge commits only — changelog entries name commits by SHA, and both alternatives rewrite those hashes, rebase deceptively so since it preserves the commit count while replacing every hash. Releases consequently land through a pull request rather than a local fast-forward. The lockfile's `engines` were brought into line with `package.json`, committed as its own change rather than riding along in an unrelated one.
+
+---
+
+## v2026.08.30 — Guards for the Duplication the Extraction Did Not Reach (August 2026)
+
+The investigation changed its own framing twice. Three of the four listed duplications turned out to be **required copies rather than decay**: the demo never imports the caseworker stylesheet, so the package must carry its own rule for every class its components render, or the demo renders unstyled. The answer was therefore to make divergence detectable, not to remove it.
+
+**The five brand colours are pinned across all four files** — two stylesheet root blocks and two build-config fallbacks. One fact, four hand-maintained copies, previously with nothing keeping them in step. **Every rendered class must be styled in both sheets**, so a package-owned component that grows a new class fails the guard rather than letting the demo silently render unstyled. Both guards strip CSS comments before matching, because a class named only inside a comment would otherwise count as defined — a hole that a later task in the same plan would have opened by adding prose comments naming real selectors.
+
+**The demo's auth adapter is pinned, including where it correctly differs** from the frontend's. The two differ in exactly two places and both differences are right, so the test pins the differences too rather than asserting a false equivalence.
+
+Stylesheet citations now cite by anchor rather than line number, after an eleven-line comment inserted near the top of a shared stylesheet shifted every citation below it — one of them landing mid-declaration inside an unrelated rule.
+
+---
+
+## v2026.08.29 — The Session Seam Goes Back to the Host (August 2026)
+
+> Test detail: [PA cockpit — tests](testing/dashboards/pa-cockpit.md).
+
+The package had hardcoded five facts belonging to a host application: two session-storage key names, an identity-provider literal and two router paths. That protocol is a house convention shared by five files in the caseworker frontend — the cockpit was its sixth participant, and extraction had stranded it outside the app that owns the convention. Session controls are now handed back: optional login and logout callbacks are added to the host contract and both hosts wired to supply them, the cockpit's three control sites key off those callbacks, and `logout` leaves the auth contract once nothing calls it. Each step leaves all five workspaces green.
+
+**The parallel-run flakiness was timeouts, not shared state.** The frontend suite is green in five consecutive parallel runs on an idle machine and produces 8–16 failures under concurrent load — every one of them a timeout at Vitest's 5000ms default, which none of the four Vitest workspaces had overridden. The affected file set tracks machine load rather than any property of the tests, which is what ruled out contention. `testTimeout` is now 20s in all four.
+
+**Every workspace gained a `test:serial` script.** The repo runs two test runners behind one command shape — the backend on Jest, the other four on Vitest — so any serial flag a caller reaches for is right in four places and wrong in the fifth, and Jest rejects the Vitest ones outright. A named script per workspace means the runner's identity stops being something the caller has to know.
+
+Two guard residuals closed: a decoy function declared in an inner scope could disarm the modes rule for a whole file while compiling with zero type and lint errors, and the auth-path guard's needle was quote-wrapped so a double-quoted path or a template literal walked straight past it.
+
+---
+
+## v2026.08.28 — The Fork Is Deleted (August 2026)
+
+**The demo renders from the package, and the vendored copy is gone** — 44 files and 1.1 MB of byte-identical cockpit, together with the manifest, sync script, byte-level drift checker and the workflow that ran it. That deletion is what the whole extraction was for. The demo now supplies its own host adapter rather than overlaying files, which is the seam the vendored fork existed to discover.
+
+**The bundle gate had silently no-opped on Windows.** Both bundle-check scripts guarded their entry point by comparing a module URL against the process argument; on Windows that argument is a drive-letter path with backslashes, so the comparison never held. The gate exited zero having checked nothing, and the build passed. Both scripts run as the last step of every build for two public, unauthenticated sites, checking for auth libraries, telemetry and backend origins — on Windows, none of that had ever been checked.
+
+`pa-cockpit` was wired into the CI path filters and the release scoping, without which a change to the cockpit would trigger nothing and version nothing. The demo now starts alongside the other dev servers, which matters once a cockpit change affects both apps. Deny-by-default section filtering and the user forward were pinned by regression tests, and the demo gained its own changelog panel rather than a vendored stand-in.
+
+---
+
+## v2026.08.27 — The Cockpit Becomes `@ronl/pa-cockpit` (August 2026)
+
+> Developer detail: [PA-Cockpit package](pa-cockpit-package.md).
+
+Thirteen tasks against an approved design, in an order that is load-bearing: pure data and mode config first so later tasks have something to import, the API services next because they carry the auth seam and nothing else, then the views, then the modes context, and the shell last since it carries all five seams.
+
+**The host declares what it provides.** The package publishes the interface a host must satisfy to mount the cockpit — auth and tenant services, plus the components the shell renders but does not own. The shell takes those seams as a **required** prop rather than an optional one, so a host cannot silently omit a seam and discover it at runtime. Auth and tenant resolve through configured getters inside functions, so a refreshed token is never captured by value and left stale.
+
+**One `PaSectionsRouter` replaces a fourteen-export surface.** The frontend's section router and the demo's carried byte-identical id groupings, an identical panel dispatch and an identical remount branch — section-id grammar about the package's own ids, not host knowledge. Exporting fourteen components and asking every host to hand-maintain that grammar would have kept the vendored fork's most-duplicated behaviour, merely formalised.
+
+The rail and command palette now derive from the mode set the host injects, which is what lets the demo present a curated subset without the package knowing anything about curation. The notifications panel dropped Tailwind for scoped `pac-*` rules, using the literal Tailwind-computed values rather than the nearest design token so the rendered result stays pixel-identical.
+
+The frontend deliberately does not type-check between two of these tasks. That was stated up front in the plan so an implementer would not try to repair it early and fight the migration.
+
+---
+
+## v2026.08.26 — A Social Card, and the Tenant Config That Should Never Have Shipped (August 2026)
+
+**18 KB of internal multi-tenant configuration was being deployed to the public demo.** Because the asset vendor root was the public directory, vendoring the tenant config shipped real contact details, non-public sections, entries explicitly flagged as not public, and the very IOU sections the demo deliberately drops. Nothing in the demo ever fetched it; its only consumer was a drift test, which now reads the frontend copy directly.
+
+**The demo gained an Open Graph social card** — 1200×630, with a full OG and Twitter meta block and a description tag it never had. The part needing care is the origin: a static `index.html` cannot know its own deploy target, and the OG specification requires absolute URLs because scrapers do not resolve relative paths. The page is authored against production and a build plugin rewrites the URL and image to whichever origin is being built; without it, an acceptance deploy would advertise production assets.
+
+**The E2E suite runs in the acceptance deploy workflow** — the first Playwright suite in this repository to run in CI at all. It is the only proof of two of the four no-Live layers: that the live toggle is actually hidden in a real browser's cascade, and that the page issues no network request. The demo needs no backend, database or Keycloak; Playwright starts its own dev server and that is the whole environment.
+
+**The mock-only environment invariant is now actually guarded.** The existing lock test only ever proved the test environment file, because Vitest's mode is always `test` — nothing read the production or acceptance files, so deleting a mock flag from either would have left every check green. A new test asserts across all four environment files that the three mock flags are true and the API URL absent, verified red then green.
+
+The floating assistant toggle turned out to be a one-way trap rather than a dead control: clicking it set the open flag, which both hid the button and rendered a null shim, leaving nothing able to unset it. The backend-request guard now compares against the run's own origin instead of hardcoding localhost, which had produced two false failures against the acceptance site. A curated executive-summary changelog replaced the placeholder, covering the CalVer releases in eight themed entries rather than re-listing every commit.
+
+---
+
+## v2026.08.25 — The Demo Bar Retired, the Theme Applied at Runtime (August 2026)
+
+The role selector had existed in three places — the demo bar, Beheer → Rollen & rechten, and Dossierbeheer's inert vendored role bar — plus two separate resets. Role switching now lives only on Rollen & rechten, and reset only in Dossierbeheer's own mock banner.
+
+**The cockpit was silently rebranding itself orange.** Its stylesheets read theme custom properties with Flevoland blue and magenta as *fallbacks*, which apply only while those properties are undefined — and the vendored global stylesheet set them to generic RONL blue and orange at the root, satisfying the fallback. The theme is now applied at runtime on the document element, which is how the real tenant service solves it for every tenant, and wins the cascade over an inherited value.
+
+**Every monitor icon 404ed on two sections.** A vendored component reads 14 icons from a hard-coded path rather than an import, so a manifest that discovers files by following imports could never find them. A second asset root now sits alongside the source manifest. Tailwind, PostCSS and Autoprefixer were vendored at the exact versions the frontend pins, fixing three visual bugs caused by utility classes never being processed at all, and a double scrollbar was removed by capping the root to the viewport in a column flexbox.
+
+Deploy workflows for `acc.plato.open-regels.nl` and `plato.open-regels.nl` landed alongside a vendor-drift workflow, triggered on frontend source pushes rather than demo ones since the deploy workflows are path-filtered to the demo package and would never see an edit to the origin the copy tracks.
+
+---
+
+## v2026.08.24 — A Public, Mock-Only PA Cockpit (August 2026)
+
+> User guide: [PA-Cockpit demo](../user-guide/pa-demo.md) · Test detail: [PA-demo suite](testing/pa-demo.md).
+
+A showcase instance of the Public Affairs cockpit on an unauthenticated public site, with no option to switch to Live. Mock mode was already a working demo driven by the same mutation actions live uses, so the work was packaging and severing auth rather than building demo behaviour.
+
+**It shipped as a vendored copy deliberately ahead of extracting the package, not after it.** An extraction has to commit to an interface, and nothing outside `packages/frontend` had ever consumed the cockpit — so building a real second consumer first made that boundary empirical instead of imagined, and left the shipping cockpit alone during a 342-commit promotion.
+
+**Sections are curated by a deny-by-default allow-list**: 21 static ids plus the data-driven dossiers sentinel, with five dropped ids, reconciled one-to-one against the real modes config's 26 rail items. The filter is applied at the data source rather than at the router, because the command palette calls the section list directly with no props — filtering anywhere else would have missed it.
+
+**No-Live is enforced twice over.** `staticwebapp.config.json` ships a CSP with `connect-src 'self'`, so the browser refuses any outbound request the demo's code might someday make. The stronger layer is a build-time bundle gate that scans every built `.js` file for auth libraries, telemetry and the real backend origins and fails the build if any appear — proving the URL is not in the bundle to be requested at all. Dossierbeheer's own switch-to-live button is suppressed separately: a visitor clicking it mid-demo would have flipped the cockpit to live against a backend that does not exist, in front of the audience the demo exists to persuade.
+
+Selecting a role rewrites the shim's synthetic Keycloak roles array and derives capabilities through the product's own `deriveDossierRole`, so capability chips, editor lock hints and every disabled action follow, with no vendored file touched. Four positions are offered with the broadest as the default — a visitor should see the whole product before being shown what a narrower role loses. Profiel and Rollen & rechten are demo-owned pages rather than reused caseworker ones, and five Playwright tests drive the journey end to end with no backend, database or Keycloak.
+
+---
 
 ## v2026.08.23 — Mock Mode Made Real, and the Throttle That Looked Like an Outage (August 2026)
 

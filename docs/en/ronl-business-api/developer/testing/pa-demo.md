@@ -2,165 +2,192 @@
 component: RONL Business API
 ---
 
-# pa-demo suite
+# PA-demo suite
 
-`packages/pa-demo`, Vitest with jsdom. **13 files · 68 tests · all passing ·
-~5s**, plus a 9-test Playwright suite in ~6.3s.
+`packages/pa-demo` — the public, mock-only [PA-Cockpit demo](../../user-guide/pa-demo.md).
+Vitest + jsdom, plus a Playwright suite that is the only one in this repository
+wired into CI.
 
 !!! info "Figures on this page are measured, not estimated"
-    Measured **25 August 2026** on branch `feat/public-pa-cockpit` at `a59a0a7`
-    — pa-demo has not merged to `acc` yet, so these figures stand apart from
-    the rest of this page's siblings, which remain dated 22 August 2026
-    against `acc` @ `57ce4c2`. Rerun with:
+    **19 files · 104 tests, all passing**, measured with
+    `npm run test:serial --workspace=@ronl/pa-demo` on 29 August 2026 against
+    `acc` at `1e7fb19` (v2026.08.33). Coverage **91.30 % statements ·
+    86.95 % branches · 85.00 % functions · 91.66 % lines**.
 
-    ```bash
-    npm test --workspace=@ronl/pa-demo -- --reporter=json --outputFile=/tmp/pa-demo-tests.json
-    npm run test:e2e --workspace=@ronl/pa-demo
-    ```
+**At a glance:**
 
-pa-demo is `plato.open-regels.nl` — a public, unauthenticated, **mock-only**
-showcase build of the PA Cockpit. It holds a byte-identical vendored copy of
-`packages/frontend`'s cockpit (39 source files + 15 assets, kept in sync by a
-drift checker — see below) plus demo-owned shims, an allow-list curating
-Beheer down to nine sections, a role context, and a build that proves the
-result never talks to a backend.
+| | |
+|---|---|
+| Runner | Vitest 4 + jsdom, coverage via v8 |
+| Files / tests | 19 / 104 |
+| Wall time | ~27 s serial |
+| Playwright | 11 tests in `e2e/plato-demo.spec.ts`, **runs in CI** |
 
 ---
 
-## Inventory
+## Why this suite is shaped the way it is
 
-| Area | Files | Tests | Covers |
-|---|---:|---:|---|
-| `src/demo` | 6 | 36 | `DemoRoleContext` (7 — role switching writes the synthetic token, caps derivation for each of the four positions, StrictMode-safe); `DemoSectionRouter` (5 — routes `profiel`/`rollen` to the demo-owned pages, renders nothing for a dropped id, imports no `CaseworkerDashboard` component, re-renders on a role change rather than a stale mount-time snapshot); `modes.filtered` (9 — keeps exactly the nine Beheer sections, drops IOU and Gereedschap entirely, hides them from the command palette, resolves a dropped id to `null`); `Profiel` (6); `RollenRechten` (6); `demo-overrides` (3 — source-text guard on the CSS, see [The four no-Live layers](#the-four-no-live-layers)) |
-| `src/demo/shims` | 2 | 8 | `keycloak` shim (5 — the synthetic user's two gating claims, role swap without disturbing `public-affairs`, never exposes a real token); `tenant` shim (3 — Flevoland theme applied via `setProperty`, matches the vendored `tenants.json` so the two cannot silently diverge) |
-| `src/` (root) | 3 | 9 | `mock-lock.test.ts` (3), `staticwebapp-csp.test.ts` (4), `scaffold.test.ts` (2 — the injected `__APP_VERSION__` global and a sanity check that the suite runs in a DOM environment) |
-| `scripts/` | 2 | 15 | `check-bundle.test.ts` (7), `check-drift.test.ts` (8) |
+Nearly every guarantee the demo makes is a **negative** assertion:
 
-Coverage: **73.94% statements, 63.41% branches, 72.22% functions, 73.87%
-lines** package-wide (`src/` 75.00/100/50.00/75.00, `src/demo`
-76.08/61.53/95.45/76.19, `src/demo/shims` 65.21/100/33.33/65.21) — see
-[Coverage](coverage.md#pa-demo-by-area).
+- no backend origin in the Content-Security-Policy
+- no auth library or API URL in the built bundle
+- no dropped section reachable from the rail or the command palette
+- no inherited storage key able to flip the demo out of mock mode
 
-### Coverage excludes `src/vendor/**`
+Negative assertions are exactly the ones that pass vacuously when wrong. A test
+asserting *the absence* of something is green both when the guard works and when
+the test is looking in the wrong place. That shaped the plan the demo was built
+from: five of its twelve steps write no production code at all, and instead name
+the thing to break, the failure message to expect, and the restore.
 
-`vite.config.ts`'s `coverage.exclude` drops `src/vendor/**` explicitly. Those
-39 files are the **same files** already exercised by the frontend suite's
-1155 tests — measuring them again here would double-count work done
-elsewhere, and worse, would inflate pa-demo's own figures with someone else's
-coverage and let demo-owned code (`src/demo/**`, `src/main-helpers.ts`,
-`src/App.tsx`) hide behind a healthy-looking package total. Coverage on this
-page is coverage of the ~13% of this package that pa-demo actually wrote.
+That discipline caught real holes, twice over:
 
----
-
-## The four no-Live layers
-
-plato issues no network requests at all — no App Service, no CORS entry, no
-Keycloak client, no database. That guarantee is not one control but four
-independent layers, each sufficient alone, and each has its own test:
-
-| Layer | Mechanism | Asserted by |
-|---|---|---|
-| 1. Forced mock | Both legacy mock env vars are `true` (an absent `paV2.mock` key means mock by build-time default), and `main.tsx` writes `'1'` to `paV2.mock` before mounting so an inherited or stale key from another Open Regels app on the same origin cannot win | `src/mock-lock.test.ts` |
-| 2. No toggle in the UI | `src/demo/demo-overrides.css` hides Dossierbeheer's vendored `toggleMock` button with a CSS override loaded after the vendored stylesheet (the reset button is deliberately spared, via a `:not()` on its own class) | `src/demo/demo-overrides.test.ts` (source-text guard) plus the E2E test `Dossierbeheer hides its own live toggle; only Reset demodata is offered` (the one that proves the CSS actually wins the cascade in a real browser) |
-| 3. CSP | `public/staticwebapp.config.json` ships `connect-src 'self'` — no backend origin in any directive, unlike `public-site`, which lists its API origins because it genuinely calls them | `src/staticwebapp-csp.test.ts` |
-| 4. Build-time bundle gate | `scripts/check-bundle.mjs` scans every built `.js` file for forbidden strings and fails the build if any are found | `scripts/check-bundle.test.ts` |
-
-Layer 1 is a build-time default plus a boot-time write, not an absolute lock
-against someone with devtools open — layers 3 and 4 are what make that
-acceptable even so: even if a visitor forced `paV2.mock` to `'0'` by hand, the
-CSP would refuse the resulting request and the bundle would not contain a
-backend URL to request in the first place.
-
-### Why the bundle gate's forbidden list differs from public-site's
-
-`packages/public-site/scripts/check-bundle.mjs` fails on the bare string
-`'keycloak'` anywhere in the bundle. Copying that list verbatim would fail
-plato's build on **correct** code: `DB_ROLES` carries
-`keycloak: 'pa-author' | 'pa-editor' | 'pa-admin'`, and `Dossierbeheer.tsx`
-renders `· Keycloak: {role.keycloak}` as visible UI in the role bar — a
-legitimate label, not a leaked credential. So plato's list targets the
-**library and the origins** instead of the word: `keycloak-js`, `msal`,
-`@azure/msal`, `oidc-client` (the other auth libraries), `react-ga`,
-`google-analytics`, `gtag(` (telemetry), and `api.open-regels.nl` /
-`acc.api.open-regels.nl` (the backend origins) — a stronger assertion than the
-CSP, since an origin absent from the bundle cannot be requested at all,
-regardless of what the CSP would otherwise allow.
-`check-bundle.test.ts` asserts both directions: the forbidden list is
-rejected, and the bare word `keycloak` — including the exact shape
-`{keycloak:"pa-admin",label:"Beheerder"}` — is explicitly allowed.
+- **The mock-lock test only ever proved the test environment file.** Vitest's
+  mode is always `test`, so nothing read the production or acceptance
+  environment files. Deleting a mock flag from either would have left every
+  check green. `env-files.test.ts` now asserts across **all four** environment
+  files that the three mock flags are true and the API URL absent — verified red
+  by deleting a flag from the production file and confirming the failure names
+  that file and that flag.
+- **The network-isolation guard compared hostnames only**, so it could not catch
+  a same-origin backend-shaped request — which is exactly what the agenda fetch
+  issues when the API URL is unset, since the resulting path resolves relative
+  to the demo's own origin.
 
 ---
 
-## The drift checker
+## Test inventory
 
-`scripts/check-drift.mjs` (exercised by `scripts/check-drift.test.ts`, 8
-tests) compares every vendored file against its `packages/frontend` origin
-and reports anything that no longer matches — `npm run vendor:check
---workspace=@ronl/pa-demo`.
+### The no-Live guarantees
 
-The comparison reads both sides as raw `Buffer`s and compares with
-`Buffer.equals()`, not as decoded UTF-8 strings. That is deliberate for the
-15 binary PNG assets in the vendored tree: a lossy UTF-8 decode replaces any
-invalid byte sequence with U+FFFD, so two **different** PNGs can decode to an
-**identical** string once their differing bytes all collapse to the same
-replacement character — which would silently defeat drift detection for
-exactly the files most likely to need it. `check-drift.test.ts` proves this
-directly: two five-byte buffers differing only in their last byte
-(`0x...ff` vs `0x...fe`, neither a valid standalone UTF-8 sequence) are
-correctly reported as changed.
+| File | Covers |
+|---|---|
+| `src/staticwebapp-csp.test.ts` | The shipped CSP really carries `connect-src 'self'` |
+| `scripts/check-bundle.test.ts` | The build-time bundle gate — its forbidden list, and that it fails rather than warns |
+| `src/mock-lock.test.ts` | Mock mode is written before mount, so an inherited flag from another Open Regels app on the same origin cannot win |
+| `src/env-files.test.ts` | All four environment files, not just the one the runner happens to load |
 
-The checker has its own workflow rather than living inside pa-demo's deploy
-pipeline — see [CI](#ci) below — because drift is caused by edits to
-`packages/frontend/**`, which never touch `packages/pa-demo/**` and so would
-never trigger a path-filtered check placed there.
+The bundle gate's forbidden list is **adapted from the public site's rather than
+copied**: it targets the auth library and the two backend origins, not the bare
+product name, which this bundle ships legitimately in its role tables and its
+visible role bar. The first real build caught a genuine finding.
+
+!!! warning "The gate silently no-opped on Windows until v2026.08.28"
+    Both bundle-check scripts guarded their entry point by comparing a module
+    URL against the process argument. On Windows that argument is a
+    drive-letter path with backslashes, so the comparison never held: the gate
+    exited zero having checked nothing, and the build passed. Both scripts run
+    as the last step of every build for two public, unauthenticated sites. On
+    Windows, none of it had ever been checked.
+
+### Section curation
+
+| File | Covers |
+|---|---|
+| `src/demo/allowed-modes.test.ts` | The deny-by-default allow-list — 21 static ids plus the dossiers sentinel, reconciled one-to-one against the real mode config's 26 rail items |
+| `src/demo/DemoSectionRouter.test.tsx` | Dropped and unmatched ids render nothing rather than falling through to a placeholder |
+
+!!! note "Deny-by-default is only deny-by-default while both lists stay exhaustive"
+    A section added to the cockpit later and named in neither list is filtered
+    out of the rail and the palette — which looks exactly like the policy
+    working, rather than like a gap. That is the failure mode to watch for when
+    the cockpit grows.
+
+### Roles and the host adapter
+
+| File | Covers |
+|---|---|
+| `src/demo/DemoRoleContext.test.tsx` | Role state, including a StrictMode double-invocation regression |
+| `src/demo/RollenRechten.test.tsx` | The role selector and the capability table |
+| `src/demo/pa-cockpit-host.test.ts` · `.auth.test.ts` | The host adapter, pinned against the frontend's equivalent |
+| `src/demo/shims/keycloak.test.ts` · `tenant.test.ts` | The synthetic auth and tenant shims |
+| `src/demo/Profiel.test.tsx` | That the tenant row names the right *kind* of organisation |
+
+The host adapter test **pins the two places the demo's adapter correctly differs
+from the frontend's**, rather than asserting a false equivalence. The Profiel
+test overrides the shim to a municipality tenant for one render and confirms the
+label follows, so the coverage is not merely correct by coincidence for the
+single tenant the shim ships.
+
+### Presentation and build
+
+| File | Covers |
+|---|---|
+| `src/brand-colours.test.ts` | The five brand colours across all four files that declare them |
+| `src/demo/demo-overrides.test.ts` | The override rules, including the suppressed live toggle |
+| `src/demo/changelog/*.test.*` | The demo's own changelog panel and data |
+| `scripts/social-card-origin.test.ts` | The build plugin rewrites the card's absolute URLs per origin |
+| `src/scaffold.test.ts` | Package wiring |
+
+Both the brand-colour and class-coverage guards **strip CSS comments before
+matching**. Without that, a colour or class named only inside a comment would
+count as defined — and a later task in the same plan added prose comments naming
+real selectors, which would have opened exactly that hole.
 
 ---
 
-## Playwright suite
+## The Playwright suite
 
-`e2e/plato-demo.spec.ts` (`npm run test:e2e --workspace=@ronl/pa-demo`),
-Chromium only, `fullyParallel: true`. **9 tests, all passing, ~6.3s** (25
-August 2026, `a59a0a7`):
+`packages/pa-demo/e2e/plato-demo.spec.ts` — **11 tests**, Chromium only.
 
-- the landing view carries no disclaimer and offers no Live toggle
-- the page has one scrollbar, not two
-- Beheer shows nine sections and no IOU or Hulpmiddelen
-- switching role on Rollen & rechten changes what Dossierbeheer permits
-- an authored dossier appears immediately and does not survive a reload
-- Dossierbeheer hides its own live toggle; only Reset demodata is offered
-- Reset demodata clears an authored dossier without a full page reload
-- the page issues no request to any backend
-- Feiten & cijfers renders its monitor icons and issues no backend request
+This is the one Playwright suite in the repository that **runs in CI**, as a
+blocking step of `azure-pa-demo-acc.yml`, before the build. It is the only proof
+of two of the four no-Live layers: that the live toggle is actually hidden in a
+real browser's cascade, and that the page issues no network request at all. A
+source-text assertion that the suppressing CSS rule exists cannot show either.
 
-### The E2E suite needs no backend
+It needs no backend, database or Keycloak. Playwright starts its own dev server
+and that is the whole environment — which is why this suite could be wired into
+CI when the frontend's, needing a five-service stack, could not.
 
-Unlike every other Playwright suite in this repo, pa-demo's needs **nothing**
-else running. The frontend suite needs Keycloak, Postgres, Redis and two
-backends up first (see [E2E & live smoke](e2e.md#what-it-needs-running));
-public-site's needs the real backend for its `/v1/public/*` data. plato talks
-to neither — Playwright's own `webServer` (`npm run dev` on `:5176`) is the
-entire environment, because plato itself makes no network request to
-anything but its own origin. `E2E_BASE_URL` retargets the suite at
-`acc.plato.open-regels.nl` / `plato.open-regels.nl` for post-deploy
-verification, the same pattern as the other two suites.
+```bash
+npm run test:e2e --workspace=@ronl/pa-demo
+
+# against a deployed environment instead of a local dev server
+E2E_BASE_URL=https://acc.plato.open-regels.nl \
+  npm run test:e2e --workspace=@ronl/pa-demo
+```
+
+Two assertions carry the weight: that switching role actually changes what
+Dossierbeheer permits, and that the page issues no request to any backend —
+the latter proven load-bearing by a red probe with the agenda mock disabled.
+
+!!! tip "Selectors were read off the running app, not taken from the brief"
+    The task brief held several wrong assumptions: rail items are buttons rather
+    than links, two expected test ids do not exist, and a created dossier
+    survives in-app navigation but not a reload. Read the app.
+
+!!! warning "A guard that hardcodes localhost fails against a real deployment"
+    The backend-request guard originally treated localhost as the only
+    same-origin host, which is correct only when Playwright serves the app
+    itself. Run against a live deployment, the app's own document, bundle and
+    stylesheet became off-host by that check, producing two false failures. It
+    now compares against the configured base URL's own origin and fails loudly
+    if that is missing, rather than silently reverting to the old assumption.
 
 ---
 
-## CI
+## Coverage
 
-Two Azure Static Web Apps workflows, `azure-pa-demo-acc.yml` (branch `acc` →
-`acc.plato.open-regels.nl`) and `azure-pa-demo-prod.yml` (branch `main` →
-`plato.open-regels.nl`), each path-filtered to `packages/pa-demo/**` and
-`packages/shared/**`. Both gate, in order: lint → type-check → unit tests →
-`vendor:check` → build (which itself runs the bundle gate) → deploy. A
-failing step at any of those blocks the deploy.
+| Area | Stmts | Branch | Funcs | Lines |
+|---|---:|---:|---:|---:|
+| **All files** | **91.30** | **86.95** | **85.00** | **91.66** |
+| `src/demo` | 95.91 | 84.61 | 100 | 97.72 |
+| `src/demo/changelog` | 100 | 87.50 | 100 | 100 |
+| `src/demo/shims` | 75.00 | 100 | 44.44 | 75.00 |
+| `src` | 75.00 | 100 | 50.00 | 75.00 |
 
-A third workflow, `pa-demo-drift.yml`, is separate from both and
-**deliberately non-blocking**. It triggers on `packages/frontend/src/**`
-rather than on pa-demo's own path, runs `check-drift.mjs`, and writes a
-GitHub annotation (`::notice` when clean, `::warning` when stale) rather than
-failing the job — failing the build would turn an unrelated cockpit PR red
-because a demo copy had drifted, training people to ignore the signal. The
-`@ronl/pa-cockpit` extraction (tracked separately) is what resolves drift for
-good; the annotation only has to keep it visible until then.
+The uncovered remainder is almost entirely **shims that deliberately return
+nothing**: the dock stand-in and the session-expiry warning both render `null`
+by design, because the real components pull in chat machinery and session
+handling that a public page must not have. They depress the function percentage
+without representing a gap.
+
+---
+
+## Related
+
+- [PA-Cockpit demo](../../user-guide/pa-demo.md) — the user-facing guide
+- [PA-Cockpit package](../pa-cockpit-package.md) — the package the demo consumes
+- [PA cockpit — tests](dashboards/pa-cockpit.md) — the cockpit's own suite
+- [E2E & live smoke](e2e.md) — the other Playwright suites

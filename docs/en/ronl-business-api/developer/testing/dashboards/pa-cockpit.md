@@ -7,32 +7,76 @@ component: RONL Business API
 The Public Affairs cockpit is the most heavily tested surface in the product,
 and the only board with its own end-to-end suite.
 
-**Frontend: 31 files · 258 tests.** **Backend: 16 files · 533 tests** in
+!!! info "These tests moved into a package"
+    As of v2026.08.27 the cockpit lives in
+    [`@ronl/pa-cockpit`](../../pa-cockpit-package.md), and its tests travelled
+    with it — they are no longer part of the `packages/frontend` suite. That is
+    why the frontend's own totals fell between v2026.08.23 and v2026.08.33
+    without anything being deleted.
+
+**Package: 41 files · 368 tests.** **Backend: 16 files · 533 tests** in
 `src/pa-monitoring` — the largest single area in the repository.
-**E2E: 2 specs · 7 tests.**
+**E2E: 2 specs · 7 tests**, still in the frontend package.
+
+Measured with `npm test --workspace=@ronl/pa-cockpit` on 29 August 2026 against
+`acc` at `1e7fb19`: **368 of 368 passing**. Coverage **86.16 % statements ·
+75.55 % branches · 83.46 % functions · 88.53 % lines**.
 
 ---
 
-## Frontend
+## The package suite
 
 | File | Tests | Covers |
 |---|---:|---|
+| `services/pa.api.test.ts` | 66 | The cockpit's API client — the single largest test file in the package |
 | `pages/public-affairs-v2/PaDataProvider.test.tsx` | 21 | The context every cockpit screen consumes |
-| `components/PADashboardV2/PASectionRouter.test.tsx` | 19 | Section routing and the shell's own state machine |
 | `pages/public-affairs-v2/NotificationsPanel.test.tsx` | 19 | Previously 0% — notifications were hardcoded to empty |
+| `services/dossierbeheer.api.test.ts` | 17 | The dossier API client |
 | `components/PADashboardV2/dossierbeheer/Dossierbeheer.test.tsx` | 17 | Dossier list, filters, status transitions |
-| `components/PADashboardV2/dossierbeheer/DossierEditor.test.tsx` | 14 | Authoring a dossier |
-| `pages/public-affairs-v2/Issuekaart.test.tsx` | 14 | The issue map |
+| `pages/PADashboardV2.test.tsx` | 15 | The page container and the host contract it requires |
+| `components/PADashboardV2/PaSectionsRouter.test.tsx` | 15 | The section-id grammar that replaced a fourteen-export surface |
 | `pages/public-affairs-v2/Monitoring.test.tsx` | 14 | Monitoring view |
+| `pages/public-affairs-v2/Issuekaart.test.tsx` | 14 | The issue map |
+| `components/PADashboardV2/dossierbeheer/DossierEditor.test.tsx` | 14 | Authoring a dossier |
+| `services/mock-demo.store.test.ts` | 11 | The mock store both hosts drive |
 | `pages/public-affairs-v2/Kompas.test.tsx` + `kompas.test.ts` | 20 | The kompas view and its pure data module |
-| `components/PADashboardV2/ZoekcriteriaSection.test.tsx` | 9 | Saved-search criteria |
 | `components/PADashboardV2/dossierbeheer/MdEditor.test.tsx` | 9 | The Markdown editor |
-| `pages/PADashboardV2.test.tsx` | 9 | The page container |
-| `components/PADashboardV2/dossierbeheer/DossierRow.test.tsx` | 8 | Row rendering and actions |
+| `components/PADashboardV2/ZoekcriteriaSection.test.tsx` | 9 | Saved-search criteria |
+| `pages/public-affairs-v2/Vandaag.test.tsx` | 8 | The 30-second start screen |
 | `pages/public-affairs-v2/FeitenCijfers.test.tsx` | 8 | Facts and figures |
+| `components/PADashboardV2/dossierbeheer/DossierRow.test.tsx` | 8 | Row rendering and actions |
+| `pages/public-affairs-v2/AgendaView.test.tsx` | 7 | The agenda |
+| `components/PADashboardV2/PACommandPalette.test.tsx` | 7 | The ⌘K palette |
 
-Coverage: `src/pages/public-affairs-v2` **86.67%** statements (up from 67.83%),
-`src/components/PADashboardV2` 84.77%, `…/dossierbeheer` 81.35%.
+By directory: `pages/public-affairs-v2` **119**, `services` **94**,
+`components/PADashboardV2/dossierbeheer` **67**, `components/PADashboardV2`
+**53**, `pages` **15**, `modes` **7**, package root **10**, `test` **3**.
+
+### The guards that came with the extraction
+
+Seven of the smallest files are not feature tests at all — they are structural
+guards protecting the package boundary, and they matter out of proportion to
+their test counts:
+
+| File | Tests | Guards |
+|---|---:|---|
+| `host.test.ts` | 3 | That a host must configure the package before render, and fails with a named error if it does not |
+| `index.test.ts` | 2 | The public surface — so a re-export added by accident is caught |
+| `modes/no-module-scope-modes.test.ts` | 2 | That the unfiltered mode helpers stay unreachable, which is what keeps the demo's curation honest |
+| `no-tailwind.test.ts` | 1 | That no Tailwind utility class returns to the package |
+| `no-host-protocol.test.ts` | 1 | That no host session-storage key, IdP literal or router path is hardcoded back in |
+
+The last one is the residue of a real defect class. The package had previously
+hardcoded five facts belonging to a host application; the guard exists so the
+seam cannot silently close again.
+
+!!! warning "Two of these guards were themselves defective when written"
+    The modes guard matched raw text, so a single line of documentation-shaped
+    string could disarm the only rule covering dynamic imports — and a decoy
+    function declared in an inner scope disarmed it for a whole file while
+    compiling with zero type and lint errors. It now parses the source, and its
+    accusing and excusing inputs are split so one can no longer feed the other.
+    A guard is code, and needs its own red/green like anything else.
 
 ## Backend
 
