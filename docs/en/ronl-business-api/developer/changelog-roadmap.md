@@ -8,6 +8,50 @@ component: RONL Business API
 
 ## Changelog
 
+## v2026.08.36 — ValidSign Phase-Approval Signing (August 2026)
+
+> Developer detail: [ValidSign phase-approval signing](validsign-signing.md).
+
+**A project leader signs the phase-exit approval without leaving the Infra-board.** The task panel's actions section becomes three-way: an unclaimed task shows the claim button, a claimed signature-bearing task shows the signing panel, and everything else keeps the form it had. The whole feature is opt-in from the process model — it activates on a user task carrying `ronl:signatureRef`, and returns nothing for a task without it, which is every ordinary task. The Linked Data Explorer sets that one attribute on the task that closes R2.1; everything else is implemented here.
+
+**Live signing is behind three locks, because the licence has no sandbox.** The ValidSign API key is account-wide and production-only, so a misconfigured environment must not be able to fire a real request. Stub mode must be off, an API key present, **and** `DEPLOYMENT_ENV` named in `VALIDSIGN_LIVE_TIERS` — which is empty by default, so no tier signs for real until one is deliberately named. It is an allowlist rather than a hardcoded exclusion of acceptance: adding `acceptance` makes ACC sign exactly as production does.
+
+**Two of the five routes sit outside JWT, and neither is an oversight.** ValidSign's cloud posts the callback with no bearer token, so it is verified by a shared secret; the stub ceremony loads in an iframe, which cannot carry one either. Stub package ids were sequential, which on any internet-reachable deployment would let someone enumerate values and approve a phase-exit another person was mid-way through signing. They are random UUIDs now, making the ceremony URL a capability, and both pre-auth routes share a rate limiter keyed on client IP rather than the attacker-controlled secret header.
+
+**Completion is one idempotent path with two racing callers.** The webhook and a poller both drive it: archive the signed PDF and the evidence summary into the project's eDOCS workspace, then complete the Operaton task. The poller is not belt-and-braces — ValidSign's cloud cannot reach a developer's localhost, so during local work the callback never arrives at all. Which header carries the callback key is still unconfirmed with ValidSign; the route expects `x-validsign-secret`, and if the platform sends the OneSpan-conventional one instead, every callback 401s silently because the poller completes the task anyway.
+
+**Documents come from one intermediate representation.** A deployed template plus the instance's process variables render to an IR, from which Markdown and PDF are emitted separately, so the archived copy and the signed artifact cannot drift apart. `rip-pdp` moved off a hardcoded switch that restated, as TypeScript string literals, content the templates already define.
+
+**Six design claims proved wrong under live testing** — against production ValidSign, live eDOCS and a real browser. The ceremony iframe loaded the app's own landing page, because a relative stub path resolved against the board's origin; `helmet`'s global `X-Frame-Options` then refused to frame it at all; the panel could never observe success, so a completed signature looked stalled; the first real signature archived nothing, from two separate defects; stub documents were 27-byte strings that uploaded perfectly and would not open; and package creation had no guard, so a second call could put a second signature request into a real person's inbox, which cannot be recalled. Each is marked in the design as a correction rather than quietly rewritten.
+
+**The signer's identity was not arriving.** Package creation takes the name and email from the caller's Keycloak token, and a real token carried no email claim and no name claim at all — so creation would have refused for every user, working exactly as designed and useless. Three protocol mappers are now added by a tracked, idempotent script that touches only the Admin REST protocol-mappers endpoint. A partial realm import cannot do this safely: `SKIP` skips an existing client entirely and `OVERWRITE` replaces the whole definition.
+
+**The end-to-end guard now refuses before a package is requested**, not after. It checked the ceremony URL, which only exists once the package exists — so running the journey against a live backend still created a real package that then sat unsigned against the licence. The guard stopped the signature but not the request that costs something.
+
+---
+
+## v2026.08.35 — Two Advisories Closed (August 2026)
+
+`uuid` and `@anthropic-ai/sdk` advisories closed through the security fast-lane, which clears the 14-day cooldown for known advisories.
+
+---
+
+## v2026.08.34 — CI Follow-Ups Closed, and OIDC Ruled Out (August 2026)
+
+> Pipeline detail: [CI/CD](cicd.md) · [Supply-chain gate](../../contributing/supply-chain.md).
+
+**The backend deploy scripts run anywhere, and fail fast on a dead session.** Both were Ubuntu-specific; the portable path falls back to the bsdtar bundled at `System32\tar.exe`, because Info-ZIP's `zip` cannot be installed on a managed Windows laptop.
+
+**The SCM basic-auth hypothesis is disproved — OIDC is not needed.** The standing theory for why a workflow-based App Service deploy could not be made to work was that `azure/webapps-deploy` authenticates over SCM basic auth, which Azure now disables by default, and that the route forward was an app registration with a federated credential. Tested against a real failed run, that turned out not to be the cause. The follow-up list records the disproof rather than carrying a plausible diagnosis forward as if it were established.
+
+**The supply-chain register was reconciled with the workflows.** After the v7 action upgrades landed in v2026.08.33, `SECURITY-PIPELINE.md` still listed the superseded v4 digests for `actions/checkout`, `actions/setup-node` and `actions/upload-artifact`, and every gate stayed green throughout — which is exactly the drift its own *"What the audit cannot see"* section predicts. A quieter second drift came with it: `setup-node` had gone from ×8 to ×9 when the config-validator step was added, and the `renovate@44.50.3` pin that step introduced was missing from the table entirely. A count is as easy to falsify as a digest, and neither the audit nor review catches it.
+
+**Two further register corrections.** The deploy scripts were described as *deliberately gitignored*; `.gitignore` carries the pattern, but two of the three were committed before it and remain tracked, since an ignore rule does not untrack an existing file. And `node-version` no longer floats uniformly: eight workflows request `20` while the config validator requests `24`, because `renovate@44.50.3` declares `engines.node ^24.11.0` and npm accepts the mismatch with a warning rather than refusing.
+
+**`renovate.json` is validated by the audit gate**, as a second step in the same job so it needs no ruleset change, under `if: always()` so a zizmor failure cannot hide a broken configuration behind it. Each remaining open follow-up now points at its tracking issue.
+
+---
+
 ## v2026.08.33 — The Action Majors, Verified by the Gate They Upgrade (August 2026)
 
 > Pipeline detail: [Supply-chain gate](../../contributing/supply-chain.md).

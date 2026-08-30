@@ -13,35 +13,38 @@ jsdom. All five run with coverage by default.
 
 !!! info "Figures on this page are measured, not estimated"
     Every count and percentage below was produced by running
-    `npm run test:serial` against **v2026.08.33** on **29 August 2026**, on
-    `acc` at `1e7fb19`. Rerun the commands in
+    `npm run test:serial` against **v2026.08.36** on **30 August 2026**, on
+    `acc` at `15dfbf9`. Rerun the commands in
     [Running the tests](#running-the-tests) to reproduce them.
 
-    Two things were **not** re-run for this release and say so where they
-    appear: the frontend and public-site Playwright suites, and the four
-    live-smoke shell scripts, which remain described from their configuration
-    only. See [E2E & live smoke](e2e.md).
+    **All three Playwright suites were re-run for this release**, against a
+    live local stack — see [E2E & live smoke](e2e.md). The four live-smoke shell
+    scripts remain described from their configuration only.
 
 **At a glance:**
 
 | Package | Runner | Files | Tests | Result | Wall time¹ | Statements | Branches | Functions | Lines |
 |---|---|---:|---:|---|---:|---:|---:|---:|---:|
-| `packages/backend` | Jest + ts-jest | 74 | 1576 | all passing | ~86s | 98.35% | 91.49% | 96.65% | 98.75% |
-| `packages/frontend` | Vitest + RTL | 103 | 842 | all passing | ~276s | 88.07% | 80.09% | 83.53% | 88.96% |
-| `packages/pa-cockpit` | Vitest + RTL | 41 | 368 | all passing | ~92s | 86.16% | 75.55% | 83.46% | 88.53% |
-| `packages/pa-demo` | Vitest + jsdom | 19 | 104 | all passing | ~27s | 91.30% | 86.95% | 85.00% | 91.66% |
-| `packages/public-site` | Vitest + jsdom | 28 | 140 | all passing | ~108s | 86.82% | 70.39% | 87.63% | 88.76% |
+| `packages/backend` | Jest + ts-jest | 84 | 1754 | all passing | ~119s | 97.52% | 90.01% | 96.81% | 98.08% |
+| `packages/frontend` | Vitest + RTL | 106 | 879 | all passing | ~444s | 88.32% | 80.33% | 83.77% | 89.28% |
+| `packages/pa-cockpit` | Vitest + RTL | 41 | 368 | all passing | ~111s | 86.16% | 75.55% | 83.46% | 88.53% |
+| `packages/pa-demo` | Vitest + jsdom | 19 | 104 | all passing | ~37s | 91.30% | 86.95% | 85.00% | 91.66% |
+| `packages/public-site` | Vitest + jsdom | 28 | 140 | all passing | ~47s | 86.82% | 70.39% | 87.63% | 88.76% |
 
-**265 files · 3030 tests**, plus one performance spec run separately — 3031 in
+**278 files · 3245 tests**, plus one performance spec run separately — 3246 in
 total. See [Coverage](coverage.md) for what those percentages mean and where
 the remaining gaps are.
 
-!!! note "The frontend did not shrink — the cockpit moved"
-    The frontend reads 103 files / 842 tests here against 133 / 1155 at
-    v2026.08.23. Nothing was deleted: 41 files and 368 tests moved into
-    `packages/pa-cockpit` when the cockpit was extracted into a package. Taken
-    together the pair grew by **11 files and 55 tests**. See
-    [PA-Cockpit package](../pa-cockpit-package.md).
+!!! note "The growth is all ValidSign, and so is the coverage dip"
+    Backend gained **10 files and 178 tests**, frontend **3 and 37** — the
+    signing feature and nothing else. The three untouched packages reproduced
+    their previous figures to the decimal, which is a useful check that the run
+    is sound.
+
+    Backend statement coverage moved **98.35% → 97.52%** and branches
+    **91.49% → 90.01%**. That is dilution by a large new subsystem rather than a
+    regression: no existing area lost coverage, and the new one arrived below the
+    package average it is now part of.
 
 ¹ These are **serial** wall times, measured with `test:serial`, and are much
 longer than a parallel run — the frontend suite measures ~61s parallel on an

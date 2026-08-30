@@ -137,13 +137,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.08.33** · *August 2026*
+-   **⚙️ RONL Business API — v2026.08.36** · *August 2026*
 
     ---
 
-    **A public cockpit, the fork deleted, and a pipeline that can no longer float**
+    **A phase approval you sign, and six design claims that live testing broke**
 
-    The Public Affairs cockpit now runs [publicly on demonstration data](ronl-business-api/user-guide/pa-demo.md) with no sign-in and no backend — enforced by a Content-Security-Policy *and* a build-time bundle gate, because a negative guarantee is exactly the kind that passes vacuously when wrong. Built first as a deliberate vendored copy so the seam could be found by construction, it then became [`@ronl/pa-cockpit`](ronl-business-api/developer/pa-cockpit-package.md) and the 44-file fork was deleted. Meanwhile the pipeline went from [49 supply-chain findings to zero](contributing/supply-chain.md): every action pinned to a digest, the token scoped to least privilege, and a blocking audit gate that a pull request cannot get past — on `acc`, not yet on `main`.
+    A project leader now [signs a RIP phase-exit approval](ronl-business-api/developer/validsign-signing.md) from the Infra-board itself — opt-in from the process model, activated by a single `ronl:signatureRef` attribute the Linked Data Explorer sets on one task. Live signing sits behind three locks with an allowlist that is empty by default, because the licence is production-only with an account-wide key and no sandbox. Six claims in the design proved wrong once it ran against production ValidSign, live eDOCS and a real browser: an iframe that loaded the app's own landing page, a signature that completed but looked stalled, and stub documents that uploaded perfectly and would not open. Each is recorded as a correction rather than quietly rewritten.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

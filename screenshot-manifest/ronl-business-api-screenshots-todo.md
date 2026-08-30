@@ -151,3 +151,31 @@ styles use the literal computed values rather than the nearest design token,
 precisely so the rendered result did not move. `ronl-business-api-pa-cockpit-board.png`
 therefore still shows the current UI, and the other three board captures were
 untouched by this release.
+
+---
+
+## 2026-08-30 — v2026.08.36 docs sync: no new screenshots
+
+This pass (v2026.08.33 → v2026.08.36) adds the ValidSign phase-approval signing
+feature and requires **no new or replaced captures**, deliberately:
+
+- **The signing panel cannot be photographed usefully without signing
+  something.** A representative screenshot would need a real ceremony in flight,
+  which on a live tier means a real signature request against a production-only
+  licence that cannot be recalled. In stub mode it shows a stand-in ceremony that
+  is not what a reader would meet in production, so the image would misrepresent
+  the feature either way.
+- **The page it lands on is a developer page.** `developer/validsign-signing.md`
+  documents routes, guards, configuration and failure modes — none of which is
+  visual. The existing developer pages in this section embed no figures either.
+- **The Infra-board capture still holds.** `ronl-business-api-infra-board.png`
+  shows the board's phase swimlanes, which the signing work did not change. The
+  panel replaces a form *inside* a task, not the board view the figure shows.
+- **The remaining releases are pipeline and dependency work.** v2026.08.34 and
+  v2026.08.35 ship no UI at all.
+
+**If one screenshot were to be added later**, the candidate is the three-way
+actions section — claim button, signing panel, ordinary form — since that
+distinction is the one thing prose describes less efficiently than an image.
+It is deliberately not requested here, because capturing the middle state needs
+a claimed signature-bearing task in a state a reader can be shown safely.

@@ -64,7 +64,15 @@ flattening:
 | Action references pinned | 10 / 10 | 30 / 30 | 23 / 23 |
 | Action majors | v4 | **v7** | v4 (one v3) |
 | `skip_app_build` | not set | **set on all six deploy steps** | not set |
-| Backend deployed by CI | n/a | **no** — script from a developer machine | **yes** — `azure/webapps-deploy` |
+| Backend deployed by CI | n/a | **no** — script from a developer machine¹ | **yes** — `azure/webapps-deploy` |
+
+¹ Not for want of trying, and **not for the reason long assumed**. The standing
+theory was that `azure/webapps-deploy` authenticates over SCM basic auth, which
+Azure now disables by default, and that the route forward was OIDC with a
+federated credential. Tested against a real failed run in v2026.08.34, that was
+**disproved — OIDC is not needed**, and the blocker is now open rather than
+diagnosed. Worth stating, because a plausible-sounding cause that has been ruled
+out is more useful written down than quietly dropped.
 
 Two consequences follow from that table. **Where `skip_app_build` is not set,
 Oryx builds the production bundle inside the floating vendor container**, so
@@ -289,6 +297,21 @@ alike. Nothing currently re-checks that a digest resolves to the tag it claims.
 **The register will drift.** Renovate updates workflow pins and never touches
 `SECURITY-PIPELINE.md`, and nothing checks that the two agree. Those last two
 gaps are the motivation for a planned `check-supply-chain` preflight script.
+
+!!! warning "It drifted, was caught by a documentation review, and was reconciled by hand"
+    Between the v7 action upgrades and 30 August 2026, RONL Business API's
+    register still listed the superseded v4 digests for `actions/checkout`,
+    `actions/setup-node` and `actions/upload-artifact` — every gate green
+    throughout. A quieter second drift came with it: `setup-node` had gone from
+    ×8 to ×9 when a config-validator step was added, and the `renovate@44.50.3`
+    pin that step introduced was missing from the table entirely. **A count is as
+    easy to falsify as a digest**, and neither the audit nor review catches it.
+
+    It was reconciled in v2026.08.34 and currently matches: 30 `uses:`
+    references across nine workflows, digests agreeing. That reconciliation was
+    manual and prompted by a docs review rather than by any check in the
+    repository — which is the argument for the preflight, not against it. Until
+    it exists, treat "the register matches the workflows" as an assumption.
 
 ---
 
