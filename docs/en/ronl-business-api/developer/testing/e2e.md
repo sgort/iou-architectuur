@@ -81,6 +81,32 @@ It also carries a `test.skip(true, reason)` **inside** the test body, which
 skips the run when its preconditions are not met and logs the reason first. It
 did not skip in this measurement.
 
+### Coverage per board
+
+The 27 tests do not spread evenly, and three of the ten specs belong to no board
+at all. This table is the one to check before claiming a board has or lacks
+end-to-end coverage — the per-board pages defer to it.
+
+| Board | Specs | Tests | Which |
+|---|---:|---:|---|
+| [Infra-board](dashboards/infra-board.md) | 2 | **8** | `infra-board-journey` (7, the shell), `rip-r21-journey` (1, the work) |
+| [PA cockpit](dashboards/pa-cockpit.md) | 2 | **7** | `pa-mock-journey` (5), `pa-live-authoring` (2) |
+| [Caseworker](dashboards/caseworker.md) | 2 | **2** | `caseworker-journey` (1), `zorgtoeslag-journey` (1) |
+| [Woo-dashboard](dashboards/woo-dashboard.md) | 0 | **0** | — |
+| *No single board* | 4 | **10** | `login-redirect` (5), `protected-route` (3), `tenant-isolation` (1), `smoke` (1) |
+
+The last row is the reason a naive per-board sum does not reach 27: authentication
+redirects, route guards, tenant scoping and the boot smoke test cut across every
+board and belong to none.
+
+!!! warning "Re-derive this table from the spec directory, not from the release being synced"
+    The Infra-board specs landed on 24 August 2026 and this documentation
+    continued to record the board as having *no end-to-end coverage at all*
+    through two subsequent syncs. Nothing in a changelog-driven pass pointed at
+    them, because neither release that added them was the one being documented.
+    A per-board E2E claim is only as current as the last time somebody listed
+    `packages/frontend/e2e/`.
+
 ### What it needs running
 
 `docker compose up -d` at the repo root (Keycloak + Postgres + Redis), the

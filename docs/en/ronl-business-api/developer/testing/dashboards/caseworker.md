@@ -54,10 +54,21 @@ sub-directory 97.66%.
 
 ## E2E
 
-Five specs, twelve tests. **Measured 20 August 2026 against v2026.08.20: 12
-tests, 12 passed, 0 failed, 0 flaky, 0 skipped, 54.1s.** Not re-run on
-22 August — the PA cockpit specs added alongside them were measured separately,
-bringing the `e2e/` directory to 19 tests in total.
+**Two specs, two tests** drive this board specifically:
+`caseworker-journey.spec.ts` (the Kapvergunning roundtrip) and
+`zorgtoeslag-journey.spec.ts` (a citizen submitting through a commercial
+organisation, handled by the competent authority's caseworker).
+
+Measured 30 August 2026 against `acc` at `15dfbf9`, as part of the full frontend
+run: 27 tests, all passing, 1.9m.
+
+!!! note "The other three specs measured here before are cross-cutting, not caseworker"
+    This section used to read *"five specs, twelve tests"*, counting
+    `login-redirect`, `protected-route`, `tenant-isolation` and `smoke` towards
+    this board. Those four cut across every board and belong to none — they are
+    now attributed as such in
+    [Coverage per board](../e2e.md#coverage-per-board), which is why this figure
+    dropped without any test being removed.
 
 That run was against the corrected `e2e-fixtures` BPMNs redeployed from the
 Linked Data Explorer, which confirms that chain end to end.

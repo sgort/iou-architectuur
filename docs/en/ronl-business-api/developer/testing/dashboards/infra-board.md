@@ -4,11 +4,12 @@ component: RONL Business API
 
 # Infra-board — tests
 
-**Frontend: 17 files · 188 tests. E2E: none yet.**
+**Frontend: 17 files · 188 tests. E2E: 2 specs · 8 tests.**
 
 The infra-board is well covered at the unit level — `src/pages/infra-board` is
-the single best-covered area in the frontend at **99.64%** statements — and has
-no end-to-end coverage at all.
+the single best-covered area in the frontend at **99.64%** statements — and it
+is the **only board with two Playwright specs**: one driving the shell, one
+driving the work that happens inside it.
 
 ---
 
@@ -49,20 +50,45 @@ modules are exhaustively covered, while the components carry the
 
 ## E2E
 
-**None.** There is no Playwright spec that drives this board.
+**Two specs, eight tests.** Measured 30 August 2026 against `acc` at `15dfbf9`
+as part of the full frontend run: 27 tests, all passing, 1.9m.
 
-This is a gap rather than a decision. The PA cockpit work in the 21–22 August
-window demonstrated concretely what unit tests cannot see on a board like this
-one: a saved write that was a bare `return;`, a confirm that built an object and
-discarded it, a panel hardcoded to empty, a resource fetched once at mount and
-never again. Every one of those passed its component tests, because a component
-test mocks the very seam that was broken.
+| Spec | Tests | Covers |
+|---|---:|---|
+| `infra-board-journey.spec.ts` | 7 | The shell |
+| `rip-r21-journey.spec.ts` | 1 | The work |
 
-The infra-board has the same shape — a section router, a command palette, data
-panels reading through a provider — so it is exposed to the same class of
-defect, and nothing currently would catch it.
+These eight are the largest per-board share of the frontend suite — see
+[Coverage per board](../e2e.md#coverage-per-board) for how they sit against the
+other nineteen.
 
-If a spec is added, the PA cockpit's structure is the model to copy: drive mock
-mode against the real store with no mocking, which is affordable precisely
-because the fixtures are deterministic. See
-[PA cockpit → Why mock mode is worth an E2E suite](pa-cockpit.md#why-mock-mode-is-worth-an-e2e-suite).
+**`infra-board-journey.spec.ts`** drives the board itself: opening on Mijn dag
+with all three werkmodi available, each werkmodus reaching its own surface and
+back, the rail carrying all twelve RIP phases with each opening its own detail,
+every account/IOU/hulpmiddelen section rendering real content, the RIP archive
+opening from its own rail entry rather than the IOU one, and the command palette
+jumping straight to a section. One test is a full sweep asserting **no failed
+request and no console error** across the board.
+
+**`rip-r21-journey.spec.ts`** starts a RIP R2.1 process, works every user task,
+and completes the phase. Its own header puts the division plainly: the first
+spec covers the shell, this one covers the work. It signs in as
+`test-infra-flevoland`, navigates the Faseladder rail to R2.1, and drives all
+twelve tasks — the last of which now renders the
+[signing panel](../../validsign-signing.md) rather than a form.
+
+It carries a `test.skip(true, reason)` **inside** the test body, which skips the
+run when its preconditions are not met and logs the reason first. It did not
+skip in this measurement.
+
+!!! warning "This page said *none* for six days"
+    Both specs landed on **24 August 2026**. This page, its at-a-glance line and
+    the testing overview's roadmap all continued to say the board had no
+    end-to-end coverage through two subsequent documentation syncs. The specs
+    were visible the whole time in `packages/frontend/e2e/`; nothing in a
+    changelog-driven sync pointed at them, because neither release that added
+    them was the one being documented.
+
+    The lesson is narrow and worth stating: **a per-board page's E2E section
+    cannot be derived from the release being synced.** It has to be re-derived
+    from the spec directory, every time.
