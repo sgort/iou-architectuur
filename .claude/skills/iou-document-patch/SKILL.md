@@ -406,6 +406,61 @@ Consequences:
     State the version and date the figures were measured against, so a future
     reader knows how stale they are.
 
+!!! danger "E2E coverage is derived from the spec directory, never from the changelog"
+    Everything above concerns unit suites, which a release usually mentions. The
+    end-to-end suites are different, and they have been documented wrongly three
+    times: **a spec can be added in a release you are not syncing, and then no
+    changelog entry will ever point at it.**
+
+    **It has happened.** `infra-board-journey.spec.ts` and
+    `rip-r21-journey.spec.ts` landed on 24 August 2026. Two subsequent syncs ran
+    without noticing, and the docs recorded the Infra-board as having *"no
+    end-to-end coverage at all"* in three separate places — while the second
+    spec's own header read *"infra-board-journey covers the shell; this covers
+    the work."* The second of those syncs even put the seven passing tests into
+    one page's table and left the contradiction standing two files away. The user
+    found it.
+
+    So every run, list the directory rather than reasoning from the release:
+
+    ```bash
+    git -C ../<repo> ls-tree -r --name-only acc | grep 'e2e/.*\.spec\.ts'
+    ```
+
+    Then **run the suites and count with the runner**, because a static count is
+    wrong in both directions:
+
+    - a single parameterised `test(` can run five cases —
+      `login-redirect.spec.ts` does exactly that, so `grep -c` said 1 where the
+      runner said 5;
+    - a `test.skip(true, reason)` **inside a test body** is a runtime skip, not a
+      skipped declaration, and a grep reads it as one.
+
+    In the 30 August measurement a static grep gave **23** and the runner gave
+    **27**, against docs claiming **19**.
+
+**Attribute E2E tests per board or surface, and make one page own the table.**
+A suite of cross-cutting specs (`login-redirect`, `protected-route`,
+`tenant-isolation`, `smoke`) belongs to no single board, so a per-board sum will
+not reach the total — and if each per-board page keeps its own figure, they drift
+apart. Put one table on the E2E page, have every per-board page link to it, and
+state the cross-cutting row explicitly so the arithmetic is legible. Caseworker
+had been counting four cross-cutting specs towards itself, which is how twelve
+became two with no test removed.
+
+**Some suites need a stack this skill may not start.** Where a Playwright config
+has no `webServer`, it needs services running, and the working rules forbid
+starting them. Ask the user to bring the stack up rather than reporting the suite
+as unmeasurable — one request turned two "not re-run" rows into measured ones.
+Where a suite *does* declare `webServer`, check the ports are free first so
+Playwright's own server cannot collide with one the user is running.
+
+**A failing E2E suite is not a finding until you know what it needed.** Three of
+six public-site tests failed on timeouts; all three needed search results, the
+site's `VITE_API_URL` pointed at a backend that was not listening, and the same
+specs passed 6/6 once it was up. Re-run serially first to rule out contention,
+then check the suite's environment dependencies, and only then call it a defect.
+
 Page structure that worked well:
 
 | Section | Contents |
