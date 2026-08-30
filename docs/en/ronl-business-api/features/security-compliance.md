@@ -50,6 +50,32 @@ Log output at debug verbosity is disabled outside development, so operational lo
 
 ---
 
+## Electronic signatures
+
+Phase-exit approvals on the Infra-board can be signed electronically rather than
+merely approved. The signing platform is ValidSign, the EU-branded OneSpan Sign.
+
+Three properties matter for this page:
+
+- **Signing is opt-in from the process model**, activated by an attribute on a
+  single user task. A task without it behaves exactly as before, which is every
+  ordinary task.
+- **Live signing is gated by an allowlist that is empty by default.** The licence
+  is production-only with an account-wide key and no sandbox tenant, so a
+  misconfigured environment cannot fire a real signature request: stub mode must
+  be off, a key present, and the deployment tier explicitly named.
+- **The signed document and its evidence summary are archived** into the
+  project's document workspace, and the process task completes only once the
+  signature has landed — through the platform's callback or a periodic sweep,
+  whichever arrives first, on one idempotent path.
+
+The ceremony URL is a capability: package identifiers are random UUIDs, and the
+two unauthenticated routes it needs are rate-limited per client IP. Full detail,
+including a callback-header caveat that is not yet confirmed with the vendor, is
+on [ValidSign phase-approval signing](../developer/validsign-signing.md).
+
+---
+
 ## Build and pipeline integrity
 
 The delivery pipeline is itself a security surface, and is treated as one on the
@@ -70,6 +96,7 @@ For what is enforced, what cannot be, and where the coverage stops, see
 
 ## Related
 
+- [ValidSign phase-approval signing](../developer/validsign-signing.md) — the signing feature, its environment locks and its unauthenticated routes
 - [Supply-chain gate](../../contributing/supply-chain.md) — pipeline pinning, least privilege, and the audit gate
 - [Authentication & IAM](authentication-iam.md) — the identity and tenancy checks this page's audit trail traces back to
 - [API Design](api-design.md) — the response conventions error handling follows

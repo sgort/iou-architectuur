@@ -4,18 +4,25 @@ component: RONL Business API
 
 # Coverage
 
-Measured with `npm run test:serial` against **v2026.08.33** on **29 August
-2026**, on `acc` at `1e7fb19`. All five packages were measured in the same run,
+Measured with `npm run test:serial` against **v2026.08.36** on **30 August
+2026**, on `acc` at `15dfbf9`. All five packages were measured in the same run,
 on the merged branch — unlike the previous pass, where pa-demo still sat on a
 feature branch and carried its own date.
 
-| Package | Statements | Branches | Functions | Lines | Δ since v2026.08.23 |
+| Package | Statements | Branches | Functions | Lines | Δ since v2026.08.33 |
 |---|---:|---:|---:|---:|---|
-| Backend | 98.35% | 91.49% | 96.65% | 98.75% | unchanged |
-| Frontend | 88.07% | 80.09% | 83.53% | 88.96% | see the note below |
-| pa-cockpit | 86.16% | 75.55% | 83.46% | 88.53% | new package |
-| pa-demo | 91.30% | 86.95% | 85.00% | 91.66% | +17.36 / +23.54 / +12.78 / +17.79 |
+| Backend | 97.52% | 90.01% | 96.81% | 98.08% | −0.83 / −1.48 / +0.16 / −0.67 |
+| Frontend | 88.32% | 80.33% | 83.77% | 89.28% | +0.25 / +0.24 / +0.24 / +0.32 |
+| pa-cockpit | 86.16% | 75.55% | 83.46% | 88.53% | unchanged |
+| pa-demo | 91.30% | 86.95% | 85.00% | 91.66% | unchanged |
 | Public site | 86.82% | 70.39% | 87.63% | 88.76% | unchanged |
+
+!!! note "The backend dip is dilution, not regression"
+    ValidSign added 10 backend test files and 178 tests alongside a substantially
+    larger body of new code. No existing area lost coverage; the new subsystem
+    simply arrived below the package average it is now part of, which pulls the
+    headline down. Function coverage went *up* over the same window, which is
+    what that pattern looks like.
 
 !!! note "The frontend row is not comparable to v2026.08.23"
     The Public Affairs cockpit was extracted into `packages/pa-cockpit` in this
@@ -61,8 +68,8 @@ used to be measured there. pa-demo is the outlier in the other direction (see
 
 | Package | Statements → branches | Gap |
 |---|---|---:|
-| Backend | 98.35 → 91.49 | 6.9 |
-| Frontend | 88.07 → 80.09 | 8.0 |
+| Backend | 97.52 → 90.01 | 7.5 |
+| Frontend | 88.32 → 80.33 | 8.0 |
 | pa-cockpit | 86.16 → 75.55 | 10.6 |
 | pa-demo | 91.30 → 86.95 | 4.4 |
 | Public site | 86.82 → 70.39 | 16.4 |

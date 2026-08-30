@@ -9,16 +9,38 @@ of `npm test`, and **one of the three runs in CI**.
 
 | Suite | Where | Tests | In CI? | Last measured |
 |---|---|---:|---|---|
-| Frontend Playwright | `packages/frontend/e2e/` | 19 | No | 12 on 20 Aug, 7 on 22 Aug |
-| Public-site Playwright | `packages/public-site/e2e/` | 6 | No | 19 Aug — **not re-run since** |
-| **PA-demo Playwright** | `packages/pa-demo/e2e/` | **11** | **Yes** — `azure-pa-demo-acc.yml` | 29 Aug |
+| Frontend Playwright | `packages/frontend/e2e/` | **27** | No | **30 Aug — 27 passed, 1.9m** |
+| Public-site Playwright | `packages/public-site/e2e/` | **6** | No | **30 Aug — 6 passed, 26.5s** |
+| **PA-demo Playwright** | `packages/pa-demo/e2e/` | **11** | **Yes** — `azure-pa-demo-acc.yml` | **30 Aug — 11 passed, 14.7s** |
 | Live smoke scripts | `scripts/*.sh` | 4 scripts | No | never run for these pages |
+
+**44 end-to-end tests, all three suites green**, measured on 30 August 2026
+against `acc` at `15dfbf9` with a full local stack running. This is the first
+pass in which all three were run together rather than described from
+configuration.
+
+!!! warning "Count these with the runner, never with `grep`"
+    A static count of `test(` across the frontend specs gives **23**. The runner
+    reports **27**. `login-redirect.spec.ts` alone declares one `test(` and runs
+    five, because the cases are parameterised — and `rip-r21-journey.spec.ts`
+    contains a `test.skip(true, reason)` *inside* its test body, a runtime skip
+    that a naive grep reads as a skipped declaration. Neither is visible from
+    the source text.
+
+!!! note "The public-site suite needs the backend, and says nothing useful without it"
+    Run with no backend on `:3002`, three of its six fail on timeouts — the two
+    search-journey tests and the detail-page axe scan, all of which need search
+    results. That is an unmet dependency, not a regression: the same specs at the
+    same commit pass 6/6 once the backend is up. Re-running serially reproduces
+    the same three, so it is not contention either.
 
 The PA-demo suite is covered on its own page — see
 [PA-demo suite](pa-demo.md#the-playwright-suite). It is in CI because it needs
 no backend, database or Keycloak: Playwright starts its own dev server and that
-is the whole environment. The other two need a running stack, which is the
-whole of why they are not there yet.
+is the whole environment. The other two need a running stack, which is the whole
+of why they are not there yet — though the gap is narrower than it looks: the
+public-site suite needs **one** service, not five, and starts its own dev server
+already.
 
 ---
 
@@ -31,13 +53,33 @@ The single worker is deliberate: two specs race to claim an identically-named
 task for the same caseworker against the shared local Operaton engine, so the
 suite trades parallelism for correctness.
 
-The directory holds **19 tests across 7 specs**, measured in two groups:
+The directory holds **27 tests across 10 specs**, measured in one pass on
+30 August 2026 against `acc` at `15dfbf9`: **27 passed, 1.9m**, no failures, no
+flakes, nothing skipped.
 
-- **12 tests** — the caseworker journeys, tenant isolation, role redirects and
-  smoke, measured 20 August against v2026.08.20 in 54.1s. Detailed on
-  [Caseworker](dashboards/caseworker.md#e2e).
-- **7 tests** — the two PA cockpit specs, measured 22 August in 18.9s. Detailed
-  on [PA cockpit](dashboards/pa-cockpit.md#e2e).
+| Spec | Tests | Covers |
+|---|---:|---|
+| `infra-board-journey.spec.ts` | 7 | The Infra-board, including a full sweep asserting no failed request and no console error |
+| `pa-mock-journey.spec.ts` | 5 | PA cockpit mock mode against the real store |
+| `login-redirect.spec.ts` | 5 | Role-based landing, parameterised per role |
+| `protected-route.spec.ts` | 3 | Route guards |
+| `pa-live-authoring.spec.ts` | 2 | Authoring against the live backend and a real database |
+| `rip-r21-journey.spec.ts` | 1 | **The R2.1 phase, all twelve tasks, ending in the signing panel** |
+| `caseworker-journey.spec.ts` | 1 | The caseworker journey end to end |
+| `zorgtoeslag-journey.spec.ts` | 1 | The zorgtoeslag journey |
+| `tenant-isolation.spec.ts` | 1 | Tenant scoping |
+| `smoke.spec.ts` | 1 | Boot and render |
+
+The R2.1 journey is the one to watch after a signing change. Because the
+approval task carries `ronl:signatureRef`, the board renders the
+[signing panel](../validsign-signing.md) where a form used to be — and the
+journey previously drove every task by filling a form, so it failed on the last
+one reporting that a form never rendered. A true statement about a task that no
+longer has one.
+
+It also carries a `test.skip(true, reason)` **inside** the test body, which
+skips the run when its preconditions are not met and logs the reason first. It
+did not skip in this measurement.
 
 ### What it needs running
 

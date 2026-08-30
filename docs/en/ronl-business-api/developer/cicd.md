@@ -38,11 +38,25 @@ All eight Azure workflows also support `workflow_dispatch`.
     step**, and nothing consumes the artifact. The backend reaches acceptance
     and production through `deploy-backend-to-{acc,prod}.sh`, run from a
     developer machine — a workflow-based App Service deploy could not be made to
-    work, and the blocker was authentication rather than workflow YAML.
+    work.
 
     Two consequences follow. There is no post-deployment health check in CI, and
     the [supply-chain gate](../../contributing/supply-chain.md) does not see the backend's
     path to production at all.
+
+    **The cause is not what it was assumed to be.** The standing theory was that
+    `azure/webapps-deploy` authenticates over SCM basic auth, which Azure now
+    disables by default, and that the way forward was OIDC — an app registration
+    with a federated credential. Tested against a real failed run in
+    v2026.08.34, that was **disproved: OIDC is not needed**, and the blocker
+    remains open rather than diagnosed. The plausible explanation was recorded as
+    a hypothesis and has now been retired rather than carried forward as if it
+    were established.
+
+    Both deploy scripts now run on any platform: the portable path falls back to
+    the bsdtar bundled at `System32	ar.exe`, because Info-ZIP's `zip` cannot be
+    installed on a managed Windows laptop. They also fail fast on a dead Azure
+    session rather than part-way through.
 
 ---
 
