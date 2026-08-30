@@ -58,7 +58,10 @@ Coverage: `components/WooDashboard` **97.68 / 89.56 / 98.52 / 97.85** and
 
 ## E2E
 
-**None.** There is no Playwright spec that drives this board.
+**None.** There is no Playwright spec that drives this board — verified against
+`packages/frontend/e2e/` on 30 August 2026, not inferred from a changelog. It is
+now the only board in that position; see
+[Coverage per board](../e2e.md#coverage-per-board).
 
 As with [Infra-board](infra-board.md), this is a gap rather than a decision, and
 the case for closing it is a little stronger here: the combination of few

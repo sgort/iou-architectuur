@@ -106,9 +106,14 @@ Plus the TK, OB, EU, agenda and media source clients under
 Two Playwright specs, run with the same `playwright.config.ts` as the rest of
 the frontend suite.
 
-**Measured 22 August 2026: 7 tests, 7 passed, 0 failed, 0 flaky, 0 skipped,
-18.9s** for the two together. The live spec was additionally run six
-consecutive times while chasing a flake, passing 2/2 each time in 7.3–11.7s.
+**Re-measured 30 August 2026 against `acc` at `15dfbf9`: 7 tests, all passing**,
+as part of the full frontend run of 27 tests in 1.9m. The count is unchanged
+since 22 August, when the two together ran in 18.9s and the live spec was
+additionally run six consecutive times while chasing a flake, passing 2/2 each
+time in 7.3–11.7s.
+
+See [Coverage per board](../e2e.md#coverage-per-board) for how these seven sit
+against the other twenty.
 
 | Spec | Tests | Covers |
 |---|---:|---|

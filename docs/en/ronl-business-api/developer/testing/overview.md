@@ -271,10 +271,16 @@ v24-on-Windows exit crash in `globalSetup` and an unbounded
 local-Operaton-history-growth gap to close first. The public-site suite has no
 such blocker and is the obvious next candidate.
 
-**Two boards have no end-to-end coverage.** [Infra-board](dashboards/infra-board.md)
-and [Woo-dashboard](dashboards/woo-dashboard.md) are well covered by unit tests
-and have no Playwright specs at all. That is a gap rather than a decision — the
-PA cockpit work showed exactly which class of defect unit tests cannot see.
+**One board has no end-to-end coverage.** [Woo-dashboard](dashboards/woo-dashboard.md)
+is well covered by unit tests and has no Playwright spec at all. That is a gap
+rather than a decision — the PA cockpit work showed exactly which class of
+defect unit tests cannot see, and the Woo-dashboard has the same shape.
+
+The [Infra-board](dashboards/infra-board.md) **was** in that sentence and should
+not have been: two specs driving it landed on 24 August 2026, and this roadmap
+item kept naming it through two subsequent syncs. E2E coverage per board is now
+tabulated on [E2E & live smoke](e2e.md#coverage-per-board), which is the place
+to check it rather than this paragraph.
 
 **Doccle has no live-tested results yet.** `test-doccle-live.sh` exists and is
 ready to run, but every run so far has been in `DOCCLE_STUB_MODE=true` — see
