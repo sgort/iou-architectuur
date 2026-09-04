@@ -157,13 +157,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.08.3** · *August 2026*
+-   **✏️ CPSV Editor — v2026.09.0** · *September 2026*
 
     ---
 
-    **The supply-chain gate gets teeth**
+    **The gate widens, the tree settles, Vite is planned**
 
-    Every action a pipeline runs is now pinned to a commit digest, `GITHUB_TOKEN` is scoped down, and a blocking [supply-chain audit](contributing/supply-chain.md) took the repository from 16 findings to zero. A branch ruleset turns that from reporting into enforcement: `acc` requires a pull request and a passing `audit`, with no bypass actors — so releases now land through a pull request too, and a `postcss` advisory became the first end-to-end proof that the no-cooldown security lane bypasses the 14-day cooldown exactly where it should. This repository is the pilot; `ronl-business-api` has since followed.
+    The [supply-chain audit](contributing/supply-chain.md) now runs on *every* pull request — the old branch filter let a stacked pull request accumulate no checks at all, report as clean, and then block permanently once GitHub retargeted it. The gate also validates `renovate.json` now, because pinning without working automated updates decays into an unpatched tree. Deploys skip documentation-only changes, Renovate is capped below the staging ceiling it had been exhausting, and the merge method is enforced by repository settings rather than by remembering. A run of dependency majors — React 19.2.8, two testing-library majors — moved [not one test or coverage figure](cpsv-editor/developer/testing.md), which is the point: they were taken deliberately before the Create React App to Vite migration, whose four-phase plan is now written.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 

@@ -9,17 +9,25 @@ once a change (with or without a handoff package behind it) reaches Claude Code.
 
 ## The plugin set
 
-**Five** plugins are installed and enabled at **user level**, so they apply in every
-repository and every session. They come from two marketplaces: Anthropic's
-`claude-plugins-official`, and `thedotmack` for `claude-mem`.
+**Six** plugins are installed and enabled at **user level**, so they apply in every
+repository and every session. They come from three marketplaces: Anthropic's
+`claude-plugins-official`, `thedotmack` for `claude-mem`, and `understand-anything`.
 
 | Plugin | Version | What it contributes |
 |---|---|---|
-| [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.12.1 | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
+| [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.24.0 | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
 | [`superpowers`](https://github.com/obra/superpowers) | 6.3.0 | The brainstorm → plan → execute structure for multi-step work, and a TDD skills library |
-| `github` | `ed404106fcd8` | The official GitHub MCP server: issues, pull requests, reviews, repository search |
-| `semgrep` | 2.1.4 | Scans generated code for security findings — SAST, secrets, and supply-chain |
+| [`understand-anything`](https://github.com/Lum1104/Understand-Anything) | 2.7.6 | Builds a navigable knowledge graph of a codebase — architecture, domains, guided tours, diff analysis |
+| `github` | `1dd995193ba2` | The official GitHub MCP server: issues, pull requests, reviews, repository search |
+| `semgrep` | 2.1.5 | Scans generated code for security findings — SAST, secrets, and supply-chain |
 | `typescript-lsp` | 1.0.0 | TypeScript/JavaScript language server: go-to-definition, find references, error checking |
+
+!!! note "Versions in that table are a snapshot, not a contract"
+    Read from `~/.claude/plugins/installed_plugins.json` on 4 September 2026.
+    `claude-mem`'s marketplace is configured with `autoUpdate: true`, so its
+    version moves on its own between sessions — it went 13.12.1 → 13.24.0 without
+    anyone asking. Treat the **set** of plugins as the durable claim and the
+    version column as the date-stamped observation it is.
 
 !!! warning "Enabled is not the same as reachable"
     Both MCP-backed plugins can be enabled and still fail to connect in a given
@@ -27,6 +35,11 @@ repository and every session. They come from two marketplaces: Anthropic's
     connection failure. The session reports this at startup; treat a plugin's
     presence in this table as *configured*, not as *available right now*. The
     `gh` CLI is the fallback for anything the `github` plugin would have done.
+
+    This is not a one-off: the `github` plugin failed to connect again on
+    4 September 2026, with the same malformed-authorization-header error, and the
+    v2026.09.0 documentation sync used `gh api` throughout instead. A capability
+    you can only reach half the time is one you should have a fallback for.
 
 Two notes on that table, because both are easy to get wrong:
 
@@ -52,6 +65,13 @@ Two notes on that table, because both are easy to get wrong:
 `semgrep` deserves a specific mention: it is the assistant-side counterpart to the
 [supply-chain gate](../supply-chain.md) in CI. One scans what is being written, the
 other gates what the pipeline executes — and neither substitutes for the other.
+
+It also has a working-tree side effect worth knowing about, because it is the only
+plugin here that writes into the repository: it drops a machine-local `.semgrep/`
+cache in the project root, which shows up as untracked noise in every `git status`
+until it is ignored. The CPSV Editor added it to `.gitignore` in v2026.09.0; a
+repository adopting the plugin will want to do the same. Machine-local plugin state
+belongs in `.gitignore`, not in a commit.
 
 ## Session memory
 

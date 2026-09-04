@@ -51,7 +51,7 @@ External services do not need to be running locally. They are always accessed re
 
 ## Prerequisites
 
-- Node.js 20.x or higher
+- Node.js 20.x or higher (CI builds on Node 24 since v2026.09.0)
 - npm 10.x or higher
 - Git
 - Access to the `cpsv-editor` and `linked-data-explorer` repositories
