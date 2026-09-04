@@ -23,18 +23,30 @@ Three workflows live in `.github/workflows/`. The two deploy workflows are
 structurally identical, differing only in target branch, Azure token and
 backend URL.
 
-| File | Target | Purpose |
-|---|---|---|
-| `azure-static-web-apps-orange-beach-0574c2a03.yml` | `acc` | Build, test and deploy acceptance |
-| `azure-static-web-apps-white-sky-02b674303.yml` | `main` | Build, test and deploy production |
-| `zizmor.yml` | `acc`, `main` | *Supply-chain audit* — job name `audit` |
+| Workflow name | File | Target | Purpose |
+|---|---|---|---|
+| **Deploy ACC (orange-beach)** | `azure-static-web-apps-orange-beach-0574c2a03.yml` | `acc` | Build, test and deploy acceptance |
+| **Deploy PROD (white-sky)** | `azure-static-web-apps-white-sky-02b674303.yml` | `main` | Build, test and deploy production |
+| **Supply-chain audit** | `zizmor.yml` | every PR; pushes to `acc`/`main` | Job name `audit` — the required status check |
+
+Both deploy workflows were called `Azure Static Web Apps CI/CD` until v2026.09.0,
+with both jobs named `Build and Deploy Job`. A production run was therefore
+indistinguishable from an acceptance one in the Actions list and in `gh run list`.
+They now say which environment they are. Renaming a job renames the check it
+reports, so it was done before any deploy check is made required.
+
+A deploy is also skipped entirely for documentation-only changes —
+`paths-ignore` covers `docs/**`, `.claude/**` and `**/*.md`. That is a denylist
+on purpose: an allowlist would mean enumerating every path that affects the
+build, and anything forgotten from it would *silently skip a deploy*, which is
+worse than one unnecessary preview.
 
 A deploy workflow runs:
 
 ```
 checkout (persist-credentials: false)
        ↓
-setup-node 20  →  npm ci
+setup-node 24  →  npm ci
        ↓
 npm run lint  →  npm run test:ci        ← a failure here blocks the deploy
        ↓

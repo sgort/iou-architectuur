@@ -41,10 +41,19 @@ bypass actors, so the older flow of merging `acc` locally and pushing it is reje
 outright: a locally created bump commit has never been through CI. Merging the pull
 request *is* the push, and triggers the acceptance deploy.
 
-Two rules come with that. A release pull request is **merged, never squashed** — the
-changelog entry cites each commit by SHA, and squashing collapses them into one new
-commit, orphaning every citation. Renovate's dependency pull requests are the opposite
-case and should be squashed, since no entry names their constituent commits.
+A release pull request is **merged, never squashed and never rebased** — the changelog
+entry cites each commit by SHA, and both alternatives rewrite those hashes. Squashing
+collapses the commits into one new commit; rebasing replays them as new commits,
+deceptively, since it preserves the commit count while replacing every hash. Either
+orphans every citation in the entry.
+
+Since September 2026 that is enforced by repository settings rather than by
+remembering: all three repositories allow merge commits only, with
+`delete_branch_on_merge` enabled. GitHub's default button is *Squash and merge*, so
+without the setting one absent-minded click would orphan a release's entire entry. A
+side effect is that Renovate's dependency pull requests land as merge commits too,
+which costs nothing — the changelog range already excludes merge commits, and the
+underlying update commit is what an entry should name.
 
 ## 5. Documentation
 

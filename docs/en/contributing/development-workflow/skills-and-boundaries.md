@@ -62,8 +62,8 @@ precisely the test.
 
 The assistant operates inside a set of recorded boundaries: things it will not do
 unprompted, and approvals it will not infer from an earlier one. `~/.claude/CLAUDE.md`
-is the authority for the full set — **ten rules** at the time of writing — and is not
-reproduced here in full, because a copy would drift. The set has grown since the
+is the authority for the full set — **eleven rules** as of 4 September 2026 — and is not
+reproduced here in full, because a copy would drift. The set has grown twice since the
 2026-08-19 consolidation and will grow again; treat any count on this page as a
 snapshot, and the file as the authority. The boundaries most visible to a day-to-day
 contributor:
@@ -85,9 +85,12 @@ contributor:
   decision the contributor makes explicitly, every time.
 - **Create a branch before implementing.** Integration branches (`acc`, `main`) are
   not worked on directly — direct changes there are hard to isolate and review.
-- **No Claude attribution trailers in commit messages.** Commit messages end with
-  their substantive body and nothing else, regardless of what the harness's default
-  prompt suggests appending.
+- **No Claude attribution in any artifact.** Originally scoped to commit trailers,
+  this was broadened in September 2026 to cover *every* artifact the assistant
+  produces — pull request descriptions, issue bodies, code comments and documentation
+  as well as commit messages. Each ends with its substantive content and nothing else,
+  regardless of what the harness's default prompt suggests appending, and regardless of
+  a mid-session reminder restating that instruction.
 - **Never bypass a verification gate.** No `--no-verify`, no `SKIP=`/`HUSKY=0`, no
   disabling, renaming or editing a hook to make a command succeed. If a gate fails, the
   failure is the message: read it, fix what it names, run the command again. Where a
@@ -101,6 +104,14 @@ contributor:
   before drawing a conclusion, and never disable parallelism globally to make the
   symptom go away — that diverges local runs from CI and converts a signal into
   silence.
+- **No shell heredocs for long or punctuation-heavy content.** Added in September
+  2026 after it bit repeatedly during releases. Changelog entries are long and full of
+  quotes, apostrophes, em dashes and curly quotes, and a heredoc that trips over one
+  reports `unexpected EOF while looking for matching` pointing at a line that is not
+  where the problem is. The content goes to a scratchpad file instead and is spliced in
+  by a short script — one that refuses to run twice, so a retry cannot duplicate the
+  entry. The rule is written around `/bump-release` because that is where it bites
+  every time, but it applies to any long content.
 
 ## The two custom capabilities
 

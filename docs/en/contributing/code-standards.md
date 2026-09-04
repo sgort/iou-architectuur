@@ -101,9 +101,24 @@ uploaded artifact that a developer deploys by hand. Its backend workflows trigge
 push only, though, so no pull request runs the backend suite; a break surfaces on `acc`
 after merge, where `npm test` gates the deploy step.
 
-**CPSV Editor** — three workflows: both Azure Static Web Apps workflows, `acc` and
-`main` alike, run `npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy
-action, and a third runs the supply-chain `audit`.
+**CPSV Editor** — three workflows: two Azure Static Web Apps workflows, `acc` and `main`
+alike, running `npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy action,
+plus the supply-chain `audit`. Since v2026.09.0 the deploy workflows are named
+**`Deploy ACC (orange-beach)`** and **`Deploy PROD (white-sky)`**; both were previously
+called `Azure Static Web Apps CI/CD`, with both jobs named `Build and Deploy Job`, so a
+production run was indistinguishable from an acceptance one in the Actions list, in a
+pull request's checks, and in `gh run list` — telling them apart meant opening the run
+and reading which API token it used. Renaming a job renames the check it reports, which
+is why it was done before any deploy check is made required.
+
+Those two workflows also skip documentation-only changes, via `paths-ignore` on
+`docs/**`, `.claude/**` and `**/*.md`. The direction is deliberate: an allowlist
+(`paths:`) would mean enumerating every path that affects the build, and anything
+forgotten from such a list *silently skips a deploy* — a worse failure than one
+unnecessary preview. RONL Business API and Linked Data Explorer can use `paths:`
+because `packages/frontend/**` is a real boundary there; the CPSV Editor is a single
+package with no such boundary, so copying that pattern would be the obvious move and
+the wrong one.
 
 None of this replaces running the suite yourself before opening a merge request — and a
 green local run is weaker evidence than it looks. RONL Business API's first gated run
@@ -114,9 +129,9 @@ cold, performed immediately. Clearing the cache reproduced it at once.
 ### Enforcement: what blocks a *merge*
 
 Running a check and being able to block on it are different things, and until August
-2026 these repositories only did the first. **CPSV Editor** and **RONL Business API**
-now each carry a branch ruleset named `acc supply-chain gate`, active on
-`refs/heads/acc` with **no bypass actors**, combining two rules:
+2026 these repositories only did the first. **All three** now carry a branch ruleset
+named `acc supply-chain gate`, active on `refs/heads/acc` with **no bypass actors**.
+All three share the two rules that matter:
 
 - `required_status_checks` → the `audit` context must pass
 - `pull_request` → a pull request is required (0 approvals; these repositories have a
@@ -126,7 +141,15 @@ Both rules are needed together — requiring the status check alone would still 
 direct push to `acc` sail past it. The practical effect is that **`git push origin acc`
 is rejected outright** in all three repositories, including for releases and including
 for the repository owner. Linked Data Explorer adopted the same ruleset in v2026.08.7;
-all three are named `acc supply-chain gate` and carry zero bypass actors.
+all three are named `acc supply-chain gate` and carry zero bypass actors. They are not
+identical in shape, though: only the Linked Data Explorer's also blocks branch deletion
+and non-fast-forward pushes.
+
+Merge strategy is enforced by repository settings rather than by convention: all three
+disable squash and rebase merges, leaving merge commits only, with
+`delete_branch_on_merge` enabled. Both alternatives rewrite commit hashes — rebase
+deceptively so, since it preserves the commit count — and a changelog entry that cites
+commits by SHA is orphaned either way.
 
 ### Supply-chain hardening
 
@@ -139,11 +162,20 @@ maintaining the digests under a 14-day cooldown with a no-cooldown lane for secu
 advisories. What *cannot* be pinned is written down in each repository's
 `SECURITY-PIPELINE.md` rather than glossed over.
 
-The rollout is not identical across the three. RONL Business API has taken the v7
-action majors; the CPSV Editor and the Linked Data Explorer remain on v4, and the
-Linked Data Explorer carries one `actions/checkout` at v3.7.0 — all pinned by digest,
-but pinned to older majors. **No `main` branch carries any of this**, so the gate
-protects the acceptance path only.
+Since v2026.09.0 the CPSV Editor's `audit` job also validates `renovate.json` with
+`--strict` — pinning without working automated updates decays into an unpatched tree, so
+a Renovate that has silently stopped running is itself a supply-chain failure. That is
+not hypothetical: five keys used as JSON comments in the Linked Data Explorer's
+configuration were rejected as invalid and Renovate stopped opening pull requests, with
+nothing in CI noticing.
+
+The rollout is not identical across the three. RONL Business API and — since
+v2026.09.0 — the CPSV Editor have taken the v7 action majors; the Linked Data Explorer
+remains on v4 and carries one `actions/checkout` at v3.7.0, all pinned by digest but
+pinned to older majors. **No `main` branch is gated**: the rulesets target
+`refs/heads/acc` everywhere, so the gate protects the acceptance path only. The CPSV
+Editor is the only repository whose `main` even carries the four artifacts, and
+carrying them is not the same as enforcing them.
 
 [Supply-Chain Pinning](supply-chain.md) covers the mechanism, the measured results
 (16 findings to zero in the CPSV Editor, 49 in RONL Business API, 40 in the Linked Data

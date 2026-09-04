@@ -12,15 +12,30 @@ design; see [Roadmap](#roadmap) for why, and what comes next.
 
 !!! info "Figures on this page are measured, not estimated"
     Every count, command and coverage percentage below was produced by
-    running the suite against **v2026.08.3** on **28 August 2026** — the full
-    run and each scoped script individually. Rerun the commands in
-    [Running the tests](#running-the-tests) to reproduce them.
+    running the suite against **v2026.09.0** on **4 September 2026** — the full
+    run and each scoped script individually, after a clean `npm ci`. Rerun the
+    commands in [Running the tests](#running-the-tests) to reproduce them.
 
-**At a glance:** 16 suites · **257 tests** · all passing · ~13 s for a full
-run with coverage. The two dependency updates in v2026.08.2 and v2026.08.3
-(`@testing-library/react` 16.3.2, `postcss` 8.5.23) moved no count and shifted
-coverage by under half a percentage point. Wall-clock time is machine-dependent
-— treat the suite counts as the stable figures, not the seconds.
+**At a glance:** 16 suites · **257 tests** · all passing · ~4 s for a full run
+with coverage.
+
+v2026.09.0 took a run of dependency majors — `@testing-library/jest-dom` 7.0.1,
+`@testing-library/user-event` 14.6.5, React 19.2.8, `lucide-react` 1.33.0,
+`lint-staged` 17 — and **moved no count and no coverage figure at all**. That is
+the useful result: the majors were taken deliberately *before* the Vite migration
+begins, because these packages are the instrument the migration will be measured
+with, and re-measuring proved the instrument unchanged.
+
+!!! danger "Measure after `npm ci`, never after `npm install`"
+    Re-measuring these majors nearly went wrong. `npm install` reported
+    *"up to date"* while `node_modules` still held the **old** testing-library
+    versions — npm had written the new ones into its hidden lockfile without
+    replacing the package directories. A run against that tree would have
+    reported a green 257 measured on the old instrument and declared the majors
+    safe on no evidence. CI is immune because it installs with `npm ci` on a
+    clean runner; a local run is not. The figures on this page were taken after
+    a clean `npm ci`, and the installed versions were verified with `npm ls`
+    before the suite was run.
 
 ---
 
@@ -99,9 +114,9 @@ Three workflows run in this repository.
 
 | Workflow | Job | Runs |
 |---|---|---|
-| `azure-static-web-apps-orange-beach-…` | `build_and_deploy_job` | `npm ci` → `npm run lint` → `npm run test:ci` → deploy to acceptance |
-| `azure-static-web-apps-white-sky-…` | `build_and_deploy_job` | The same sequence, deploying production |
-| `zizmor.yml` (*Supply-chain audit*) | `audit` | zizmor 1.29.0 over the repository — pin format, token scope, credential persistence |
+| **Deploy ACC (orange-beach)** | `build_and_deploy_job` | `npm ci` → `npm run lint` → `npm run test:ci` → deploy to acceptance |
+| **Deploy PROD (white-sky)** | `build_and_deploy_job` | The same sequence, deploying production |
+| **Supply-chain audit** (`zizmor.yml`) | `audit` | zizmor 1.29.0 over the repository, then `renovate-config-validator --strict` |
 
 The two deploy workflows run lint and then the full suite before the deploy
 action, and a failure blocks the deploy. Until 20 August 2026 neither ran
@@ -109,6 +124,16 @@ anything of ours at all: the Static Web Apps action builds inside its own
 container and invokes none of the repository's scripts, so the workflows went
 from checkout straight to build-and-deploy. Both now carry an explicit Node
 setup, `npm ci`, lint and test sequence ahead of it.
+
+Two v2026.09.0 changes affect when you see a result. The deploy workflows now
+skip documentation-only pull requests (`paths-ignore` on `docs/**`, `.claude/**`
+and `**/*.md`), so a docs change gets **no test run and no preview
+environment** — if you changed only Markdown and expected a green tick from the
+suite, that is why. The `audit` workflow moved the opposite way: it lost its
+`branches` filter entirely and now runs on *every* pull request, including one
+based on another feature branch. Before that, a stacked pull request accumulated
+no audit and GitHub reported it as clean with zero checks, then blocked it
+permanently once the base was retargeted to `acc`.
 
 Since v2026.08.2 the `acc supply-chain gate` ruleset makes this *enforcement*
 rather than reporting: `acc` requires a pull request, and `audit` is a required
@@ -121,7 +146,9 @@ repository owner alike. The mechanics are covered in
 !!! note "`audit` does not run the tests, and the deploy job does not run the audit"
     They are separate gates on the same pull request. `audit` reasons about the
     pipeline's own supply chain; `build_and_deploy_job` reasons about the code.
-    A pull request needs both to be green before it can merge.
+    A pull request needs both to be green before it can merge — and because the
+    deploy workflow is path-filtered while the audit is not, a documentation-only
+    pull request is gated by `audit` alone.
 
 ---
 
@@ -190,7 +217,9 @@ tests.
 
 ## Coverage
 
-Measured with `npm run test:ci` against v2026.08.3 on 28 August 2026.
+Measured with `npm run test:ci` against v2026.09.0 on 4 September 2026,
+after a clean `npm ci`. Identical to the v2026.08.3 measurement to the last
+decimal place, across a React major and two testing-library majors.
 
 **Overall: 54.75% statements · 40.88% branches · 38.68% functions · 55.57% lines.**
 
