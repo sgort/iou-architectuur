@@ -9,10 +9,12 @@ Vitest + jsdom, plus a Playwright suite that is the only one in this repository
 wired into CI.
 
 !!! info "Figures on this page are measured, not estimated"
-    **19 files · 104 tests, all passing**, measured with
-    `npm run test:serial --workspace=@ronl/pa-demo` on 29 August 2026 against
-    `acc` at `1e7fb19` (v2026.08.33). Coverage **91.30 % statements ·
-    86.95 % branches · 85.00 % functions · 91.66 % lines**.
+    **19 files · 106 tests, all passing**, measured with
+    `npm run test:serial --workspace=@ronl/pa-demo` on 5 September 2026 against
+    `acc` at `66940d9` (v2026.09.5). Coverage **93.47 % statements ·
+    95.65 % branches · 85.00 % functions · 92.85 % lines** — branches up
+    8.70 points from v2026.08.33 under the per-file 80% floor adopted in
+    v2026.09.2.
 
 **At a glance:**
 
@@ -171,7 +173,7 @@ the latter proven load-bearing by a red probe with the agenda mock disabled.
 
 | Area | Stmts | Branch | Funcs | Lines |
 |---|---:|---:|---:|---:|
-| **All files** | **91.30** | **86.95** | **85.00** | **91.66** |
+| **All files** | **93.47** | **95.65** | **85.00** | **92.85** |
 | `src/demo` | 95.91 | 84.61 | 100 | 97.72 |
 | `src/demo/changelog` | 100 | 87.50 | 100 | 100 |
 | `src/demo/shims` | 75.00 | 100 | 44.44 | 75.00 |

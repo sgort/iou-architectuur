@@ -18,16 +18,19 @@ repository and every session. They come from three marketplaces: Anthropic's
 | [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.24.0 | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
 | [`superpowers`](https://github.com/obra/superpowers) | 6.3.0 | The brainstorm → plan → execute structure for multi-step work, and a TDD skills library |
 | [`understand-anything`](https://github.com/Lum1104/Understand-Anything) | 2.7.6 | Builds a navigable knowledge graph of a codebase — architecture, domains, guided tours, diff analysis |
-| `github` | `1dd995193ba2` | The official GitHub MCP server: issues, pull requests, reviews, repository search |
+| `github` | `85cce0381e78` | The official GitHub MCP server: issues, pull requests, reviews, repository search |
 | `semgrep` | 2.1.5 | Scans generated code for security findings — SAST, secrets, and supply-chain |
 | `typescript-lsp` | 1.0.0 | TypeScript/JavaScript language server: go-to-definition, find references, error checking |
 
 !!! note "Versions in that table are a snapshot, not a contract"
-    Read from `~/.claude/plugins/installed_plugins.json` on 4 September 2026.
-    `claude-mem`'s marketplace is configured with `autoUpdate: true`, so its
-    version moves on its own between sessions — it went 13.12.1 → 13.24.0 without
-    anyone asking. Treat the **set** of plugins as the durable claim and the
-    version column as the date-stamped observation it is.
+    Read from `~/.claude/plugins/installed_plugins.json` on 5 September 2026,
+    and already moved twice while this page was being written. `claude-mem`'s
+    marketplace is configured with `autoUpdate: true`, so its version advances
+    on its own — it went 13.12.1 → 13.24.0 without anyone asking. The `github`
+    plugin is worse: it carries a commit ref rather than a version, and that ref
+    moved twice in a single day (`ed404106fcd8` → `1dd995193ba2` →
+    `85cce0381e78`). Treat the **set** of plugins as the durable claim and the
+    version column as the dated observation it is.
 
 !!! warning "Enabled is not the same as reachable"
     Both MCP-backed plugins can be enabled and still fail to connect in a given

@@ -4,25 +4,35 @@ component: RONL Business API
 
 # Coverage
 
-Measured with `npm run test:serial` against **v2026.08.36** on **30 August
-2026**, on `acc` at `15dfbf9`. All five packages were measured in the same run,
-on the merged branch — unlike the previous pass, where pa-demo still sat on a
-feature branch and carried its own date.
+Measured with `npm run test:serial` against **v2026.09.5** on **5 September
+2026**, on `acc` at `66940d9`, after a clean `npm ci`. All five packages were
+measured in the same run.
 
-| Package | Statements | Branches | Functions | Lines | Δ since v2026.08.33 |
+| Package | Statements | Branches | Functions | Lines | Δ branches since v2026.08.36 |
 |---|---:|---:|---:|---:|---|
-| Backend | 97.52% | 90.01% | 96.81% | 98.08% | −0.83 / −1.48 / +0.16 / −0.67 |
-| Frontend | 88.32% | 80.33% | 83.77% | 89.28% | +0.25 / +0.24 / +0.24 / +0.32 |
-| pa-cockpit | 86.16% | 75.55% | 83.46% | 88.53% | unchanged |
-| pa-demo | 91.30% | 86.95% | 85.00% | 91.66% | unchanged |
-| Public site | 86.82% | 70.39% | 87.63% | 88.76% | unchanged |
+| Backend | 98.40% | 92.28% | 97.28% | 98.83% | +2.27 |
+| Frontend | 93.11% | 89.76% | 87.75% | 93.97% | **+9.43** |
+| pa-cockpit | 90.07% | 88.52% | 86.39% | 91.33% | **+12.97** |
+| pa-demo | 93.47% | 95.65% | 85.00% | 92.85% | **+8.70** |
+| Public site | 96.09% | 96.92% | 94.62% | 96.16% | **+26.53** |
 
-!!! note "The backend dip is dilution, not regression"
-    ValidSign added 10 backend test files and 178 tests alongside a substantially
-    larger body of new code. No existing area lost coverage; the new subsystem
-    simply arrived below the package average it is now part of, which pulls the
-    headline down. Function coverage went *up* over the same window, which is
-    what that pattern looks like.
+!!! note "Every package moved, and branches moved most"
+    v2026.09.2 extended the backend-only coverage campaign to all five
+    workspaces with a test runner, against a **per-file 80% branch floor**:
+    53 files were below it, none are now. That is why the branch column moved
+    furthest and why public-site — which started lowest at 70.39% — moved most.
+
+    This is unusual and worth noting as a check that the run is sound: the
+    previous pass had three packages reproducing their figures to the decimal.
+    Here every package gained on every measure, which is what a campaign
+    targeting *all* of them should look like.
+
+!!! warning "The floor is a convention, not a gate"
+    Nothing mechanical enforces it. No `coverageThreshold` is configured in any
+    of the five runner configs, and **no workflow measures coverage at all** —
+    so a file dropping below 80% branches fails neither a local run nor CI. The
+    floor is recorded in an implementation plan and held by review. See
+    [Code Standards](../../../contributing/code-standards.md#the-80-branch-floor-is-a-convention-not-a-gate).
 
 !!! note "The frontend row is not comparable to v2026.08.23"
     The Public Affairs cockpit was extracted into `packages/pa-cockpit` in this
@@ -179,11 +189,18 @@ these files are and what is deliberately not covered.
 
 | Area | Statements | Branches | Functions | Lines |
 |---|---:|---:|---:|---:|
-| **All files** | **91.30** | **86.95** | **85.00** | **91.66** |
+| **All files** | **93.47** | **95.65** | **85.00** | **92.85** |
 | `src/demo` | 95.91 | 84.61 | 100 | 97.72 |
 | `src/demo/changelog` | 100 | 87.50 | 100 | 100 |
 | `src/demo/shims` | 75.00 | 100 | 44.44 | 75.00 |
 | `src/` (root) | 75.00 | 100 | 50.00 | 75.00 |
+
+!!! note "The **All files** row is measured; the per-area rows below it are not"
+    The package total was re-measured against v2026.09.5 on 5 September 2026.
+    The per-area rows were last derived on 30 August and have not been
+    re-generated, so they will not sum to the new total — v2026.09.2's coverage
+    campaign added tests across the package. Treat the per-area breakdown as
+    indicative of *where* the gaps are, not of their current size.
 
 **The `src/vendor/**` exclusion is gone, because the vendored tree is.** Until
 v2026.08.28 this package held a byte-identical copy of the cockpit — 39 files

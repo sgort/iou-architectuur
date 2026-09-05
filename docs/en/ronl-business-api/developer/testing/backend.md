@@ -4,7 +4,7 @@ component: RONL Business API
 
 # Backend suite
 
-`packages/backend`, Jest with the `ts-jest` preset. **84 files · 1754 tests ·
+`packages/backend`, Jest with the `ts-jest` preset. **86 files · 2011 tests ·
 all passing · ~119s serially.** Coverage is on by default; see
 [Coverage](coverage.md#backend-by-area) for the per-area figures.
 

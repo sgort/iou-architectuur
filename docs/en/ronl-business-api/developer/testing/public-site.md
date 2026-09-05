@@ -4,7 +4,7 @@ component: RONL Business API
 
 # Public site suite
 
-`packages/public-site`, Vitest with jsdom. **28 files · 134 tests · all
+`packages/public-site`, Vitest with jsdom. **30 files · 204 tests · all
 passing · ~12s.**
 
 The public site is the auth-free search and rule-catalogue package. Nothing

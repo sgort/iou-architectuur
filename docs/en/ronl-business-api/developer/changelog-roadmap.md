@@ -8,6 +8,112 @@ component: RONL Business API
 
 ## Changelog
 
+## v2026.09.5 — The Board Asks Once (September 2026)
+
+**Rendering one Infra-board screen fired up to 48 HTTP requests.** The active-across-phases hook issued one request per modelled phase — twelve — and four components called it independently, because `useAsync` has no cache and no dedup: the page itself, Portfolio, the command palette and ProjectDetail. Browsers allow roughly six connections per host, so those queued about eight deep and the swimlane model request waited behind them. That is the likely explanation for a diagram occasionally needing a page refresh before it appeared: the request was never lost, it was starved.
+
+**One aggregate endpoint, and one provider sharing the fetch.** A new route returns every modelled phase's active instances in a single response, each row tagged with the phase it belongs to so the caller reshapes nothing. A provider at the board root shares that one fetch across all four consumers, following the `PaDataProvider` precedent. `useRipActiveAcrossPhases` keeps its name and signature and reads context instead, so three of the four call sites did not change at all. Calling the hook outside its provider now throws rather than quietly issuing a duplicate fetch — a deliberate trade toward loud failure, and one nothing at compile time enforces.
+
+**One phase failing must not blank the rest.** That property used to come from the frontend's per-request `catch`; the backend now owns it. `Promise.allSettled` runs over every modelled phase, a rejected phase is logged and omitted, the response stays `200`, and only a total failure answers `500`.
+
+**The parsed diagram is cached, not just its XML.** The swimlane model was rebuilt on every request: the BPMN was cached but the parse was not, so each diagram view re-read up to 74 shapes and 68 edges, re-ran the depth-first back-edge walk and re-layered the graph before throwing the result away. It is cached now, beside the XML cache and keyed the same tenant-inclusive way — a key without the tenant would reintroduce exactly the cross-tenant leak that convention exists to prevent. A definition's BPMN is immutable, so it never needs invalidating.
+
+---
+
+## v2026.09.4 — Swimlanes Derived From Deployed BPMN (September 2026)
+
+**The phase diagram is now parsed from the BPMN Operaton actually has deployed, for all twelve phases.** `FASE1_LANES`, `FASE1_NODES` and `FASE1_EDGES` are deleted: they were a hand-kept copy of something the engine already knew, and the bug that started this work was exactly that copy going stale. A new backend endpoint returns lanes, nodes and edges parsed from the deployed definition, fetched by process-definition key rather than definition id — deliberately, so a phase with no running instance still resolves and mock portfolio rows get a diagram too.
+
+**The parser is a pure function, so it is tested against the twelve real phase files rather than a mock of them.** BPMN XML in, swimlane model out: no I/O, no Operaton, no config. Lanes come from the drawn vertical position of their diagram shape; node-to-lane membership comes from the explicit lane references present in all twelve files, so no geometric inference is needed and a shape straddling a boundary cannot be misassigned. The BPMN's own coordinates are read for lane ordering and otherwise discarded — node positions are recomputed so all twelve share one visual language.
+
+**Layering and rework detection, in an order that is not the obvious one.** Back edges are found *structurally first*, by a depth-first walk where an edge into a node already on the stack closes a cycle, and only then are columns computed over the forward edges alone. Deriving them from the columns cannot work: a cyclic relaxation pushes both endpoints of a loop rightwards until the pass cap, so nothing is left pointing backwards and columns inflate to roughly the node count. Layering is longest-path rather than shortest, so a node never sits left of its own predecessor.
+
+**Four defects the R2.1-only renderer had never met.** *Thirty-eight nodes were invisible* across the twelve phases — nodes were positioned from their column and row alone, so two occupying the same cell drew at identical coordinates and all but the topmost vanished; R5.2 alone lost twelve. R2.1 is the only phase with no collisions, which is why it survived every review. Rework edges all routed through one fixed band, so loops with overlapping column ranges drew perfectly coincident lines; they now get their own reserve below the lane rows, and a phase with no rework loops renders at exactly the previous height. A finished rung drew every node white, because the activity history came from the *current* phase's instance while the diagram came from the *selected* one. And back-edge classification followed flat document order rather than each node's own outgoing list, so one R2.1 loop closed a cycle an edge downstream.
+
+**Staleness cannot be detected using the variable whose change caused it.** Two successive attempts inferred whether data was current from the phase code alone — the very value that has already changed on the render where stale data leaks. The model now carries the phase it describes, so the question is answerable directly, and an empty model's blank code can never equal a real one. That makes the leak structurally impossible rather than guarded against.
+
+**One renderer draws every phase, from a model prop** — a generalisation, not a redesign: same CSS classes, same SVG structure, same visual language. Four things R2.1 never exercised had to be handled: parallel gateways (R2.1 has none; the others hold 32, and drawing them as exclusive diamonds asserts the wrong semantics), more than one end event (twenty across the twelve, four in R5.3 alone), an empty model whose maximum over no nodes yields negative infinity and poisons every derived dimension, and wide models, which now scroll rather than clip. Tests assert that no SVG attribute contains `NaN` — a `NaN` in a width silently produces a broken diagram that every existence check would pass.
+
+**Several tests turned out to be asserting nothing.** One claimed to pin accepted-versus-fabricated behaviour while asserting only that a swimlane existed and a label rendered — it would have passed whether the node read todo, active or done. Another was titled "spanning done/active/todo" over a scenario that can only produce done or active. The per-fixture back-edge count table could not verify the classification fix at all, because eleven of its twelve counts were recorded from the implementation's own output; an order-independent invariant replaced it — removing the back edges must leave an acyclic graph, checked by an independent topological sort.
+
+**A coupling guard that was a copy checked against a copy.** `FASE1_DOCS` and `FASE1_NODE_ROLE` existed only as hand-transcribed duplicates in the backend suite, so editing a table left them green. A frontend test now imports the real tables, and the two sides triangulate from opposite ends of a boundary neither may cross.
+
+**The element map is an allowlist, and now says so.** A comment claimed anything unlisted was treated as a task; it was not — the loop iterates the map's own keys, so an unlisted element type was omitted from the model entirely, leaving edges pointing at ids that are not there. Deliberately *not* fixed by iterating every child and defaulting, which would manufacture nodes out of sequence flows and lane sets. The protection is an invariant test: every id a lane declares must appear as a node, across all twelve fixtures, with those ids re-derived from the raw XML by regex so the test cannot share the parser's blind spot.
+
+**The parsed tree is typed rather than cast to `any`.** Seven `any` annotations had put seven ESLint warnings into a repository that had none, and warnings do not fail the build, so the warning-clean state would have ended silently. `unknown` is the point: this file believes a document it did not write, and `any` would let a malformed one produce a confidently wrong model where `unknown` produces a compile error.
+
+---
+
+## v2026.09.3 — Twelve of Twelve Deelprocessen Inzetbaar (September 2026)
+
+**R5.3 was the last rung with no process model, and it is deployed.** Its design sheet arrived on 3 September and it runs as `RipR53Process` on both the local engine and ACC — verified against the engine's REST API rather than taken from the deploy pull request: deployment form bindings throughout, `boardOwner` and `organization` set, tenant `flevoland`, and no form on the start event. The catalogue entry had been a placeholder with a source line reading `PLACEHOLDER`; all of it now derives from the deployed BPMN, and the six roles match the six candidate groups on the engine exactly — an independent check that the entry and the engine agree.
+
+**The `beyond` phase concept is gone, and so is `geparkeerd`.** R5.3 was the catalogue's only `beyond` phase, so adopting it left the flag with no users. Removed with it: the `onbekend` deploy status, `skippedPhasesBefore` (which returned an empty list for every phase), `parkedCount`, the "Niet gemodelleerd" placeholder view and the parked badge on the Beheer rail. `geparkeerd` turned out to be entirely a frontend fiction — the live counts endpoint returns `wip` and `gereed` only, no backend code mentions the concept, and the mock counter credited it exclusively inside the `beyond` branch. It existed to give the one unmodelled phase something to show instead of WIP. Net 197 lines removed.
+
+**R5.4 reports no Klaar figure, because it cannot be derived.** Klaar is computed as `gereed[predecessor] − wip − gereed`, which assumes finishing a phase means advancing to the next one. That holds everywhere except the transition out of R5.3, which has four end events and only one leading to R5.4; the other three return to R5.2, and one of them — a *vervroegde ingebruikname*, where part of the areaal goes into use while work carries on — means a project can legitimately complete the phase more than once. A number there would overstate R5.4's candidates in a way nothing on the screen could reveal, so R5.4 shows `—`, the same treatment R2.1 gets for having no predecessor. The behaviour is driven by a `multipleExits` flag on the phase rather than a literal phase code in the arithmetic.
+
+**A live project shows its own RIP phase, not always R2.1.** ProjectDetail hard-coded the current phase for every live instance. That was true when it was written — R2.1 was the only process modelled — and deploying R2.2 through R6.1 falsified the premise while the constant stayed, producing three wrong things at once for a project sitting in R2.2.
+
+**PA caching had never worked in either environment.** The misconfiguration was fixed operationally on ACC; three things in code let a total cache outage run for at least nine days unnoticed. The root cause of the silence is the instructive one: `connect()` was unbounded. The timeout wrapper guarded `get()` and `set()` but not the connect itself, and `node-redis` retries a failing socket internally rather than rejecting — so the `await` never settled. `/v1/health` now reports cache state, with a down cache visible without failing the health check.
+
+**Three guards keep the changelog drawer a shim.** The drawer's lazy split is undone by three small edits that leave every behavioural test green, because none of them change what a user sees. The guard originally inspected only import *declarations*, so a bare dynamic import at module scope passed all three assertions while firing the fetch at module evaluation — and evaded `noUnusedLocals` by having no binding. A re-export with a module specifier was an equally static edge: adding one plus a consumer collapsed the output to a single 709 KB gzipped chunk, confirmed with a real build, where the split produces a 581 KB entry and a separate 129 KB changelog.
+
+---
+
+## v2026.09.2 — An 80% Branch Floor in Every Workspace (September 2026)
+
+> Measured figures: [Coverage](testing/coverage.md).
+
+**The backend-only coverage campaign extends to all five workspaces that have a test runner.** Fifty-three files were below 80% branch coverage; none are now. `@ronl/shared` has no test script and needs none — it is types plus two seed modules, with no functions and no branches.
+
+**The new tests are behavioural rather than coverage-shaped**, and three themes recur. *Per-type render arms*: `DecisionViewer`, `CapacityClaimDocumentsViewer` and `RipFase1WipViewer` each carry their own copy of the same TipTap renderer, and each now gets a document exercising every node type the composer can emit. *Upstream absence*: a source answering with no `value` array, or a signal from a source this build has no label for, each has a fallback that now has a test saying what it is for. And *the difference between "we looked and found nothing" and "we could not look"* — Results, GereedschapSection and Home all render those distinctly, because a zero in place of a failed fetch is a wrong statement of fact rather than a neutral default.
+
+**The EU signaalbron moves to the EP Open Data API.** The source returned nothing on ACC for a reason outside this repository: `www.europarl.europa.eu` is CDN-fronted with undocumented bot mitigation that answered ACC's outbound range with an empty `202 text/html`. That passes `res.ok`, so the empty body parsed to zero items and the source reported success while contributing nothing — starving both the Ongefilterd browse and the six-hourly curation cron. Measured from inside the App Service in one run: both RSS URLs returned 202 with zero bytes, while `data.europarl.europa.eu` returned 200 with 211 KB of Atom.
+
+Three things the live feed decided that the specification would not have. The parliamentary term is not always 10, because the window covers documents *updated* rather than only published — so the RSS-era pattern hardcoding `-10-` had silently dropped every older-term document. Amendment refs carry extra segments and are excluded deliberately, an amendment being a fragment of a document with no `doceo` page of its own. And the type now comes from the work-type vocabulary rather than the ref prefix, which had never learned `QOB`. Two trade-offs are recorded rather than discovered later: entries are English only, since they arrive `xml:lang="en"` and `Accept-Language` is ignored, while the `doceo` link stays Dutch because the document itself is translated even when its metadata is not; and press releases are gone, the API having no equivalent endpoint for what is a communications product rather than legislative data.
+
+**The release runbook stopped contradicting itself about which sites redeploy.** It stated the same fact twice and disagreed: a callout listed all four ACC workflows as path-filtered — the stated justification for the entire per-scope versioning scheme — while a step fifty-five lines below said frontend, pa-demo and public-site trigger on push to `acc` with no `paths:` filter. The callout was right, and a third of that sentence had been wrong on every backend release since the filters went in. The duplicate was deleted rather than corrected, because fixing the wrong copy in place would have left the duplication that produced it.
+
+**The supply-chain audit runs on every pull request** — see [Supply-Chain Pinning](../../contributing/supply-chain.md). The `pull_request` trigger was filtered to `acc` and `main`, so a stacked pull request matched no trigger, accumulated no audit, and reported `CLEAN` with zero checks: ready-looking and not ready. When the parent merged and GitHub retargeted it, the required audit was missing and the pull request blocked permanently, because retargeting emits no `pull_request` event. `push` keeps its filter — there is no reason to audit a push to a feature branch.
+
+---
+
+## v2026.09.1 — The Ladder Reaches R6.1, and the 28 Roles It Needed (September 2026)
+
+**Five more phases adopted, then four more: R2.3 through R4.1, and R5.1, R5.2, R5.4 and R6.1.** Eleven phases modelled at the close of this release, with the Faseladder reading 7 / 12 deelprocessen inzetbaar after the first batch. No source change was needed beyond the catalogue itself — the endpoints, readiness rule and progression generalised in v2026.09.0 already cover any modelled phase. Each was verified off the engine before adoption rather than taken from the deploy pull requests.
+
+**113 of the ladder's 201 user tasks were unreachable.** The process models address tasks to 34 candidate groups; the Keycloak realm defined six. `GET /v1/task` passes the caller's realm roles to Operaton as `candidateGroups`, so a task whose groups all fall outside them is filtered out before it reaches the client — not "cannot claim", not listed at all. The gap grew down the ladder: R4.1 onward was majority-invisible and R5.2 showed 9 of its 36 tasks. Nothing caught it because the surfaces used most do not take that path — the Faseladder and its WIP/Gereed lists filter on the municipality process variable and never look at candidate groups. **Only the local seed realm is changed here; ACC and production run their own realms, so the roles have to be created there too.**
+
+**Rollen & rechten describes roles that exist.** Of seven `rip-*` entries in the description map, exactly one described something real, while five of the six realm `rip` roles had no description at all. The map is maintained additively: an entry for something that appears in no list simply never renders, whereas a missing one degrades the page to a bare identifier.
+
+**Browse each signaalbron's raw feed, unfiltered.** An Ongefilterd segment sits beside Gecureerd and Inbox, showing the tab's own sources with no query applied. The data path already existed end to end — `GET /pa/feed` reads `q` as `string | null`, every source client defaults it to null, and that blank path is what the curation cycle itself runs on. What was missing was any way to reach it: `runSearch` returned early on an empty string, so a blank search showed nothing rather than everything. Where the segment appears is derived rather than listed, so a future source tab gets it for free and agenda — a monitoring tab with no feed — never does.
+
+**The Ongefilterd count reads as a cap, not a total.** The number on the segment was a page size wearing the clothes of an answer: Politiek showed 60 and the other signaalbronnen 30, not because the feeds hold that many but because the view asks for 30 per source and politiek has two. It now follows the convention the Inbox segment already had — `60+` / `30+` when capped, with a banner carrying the real total. Two judgements are pinned by tests: a full page counts as capped even when the total is unknown, because TK returns `total: null` for multi-term queries and a null must never be read as "nothing more"; and the total is shown only when every source reported one, since a partial sum would look authoritative without being so.
+
+**Vite 5 → 6** across frontend, pa-cockpit, pa-demo and public-site, closing a security advisory open since 29 August. Build-time only — nothing Vite-related ships in the deployed bundle.
+
+---
+
+## v2026.09.0 — Finishing a Phase Makes the Next One Ready (September 2026)
+
+**Completing R2.1 did nothing for R2.2.** `getReadyProjects` read only the mock portfolio, so a completed live instance never entered it — and in the mock data a project at ladder position 1 can never be *wachtend*, which is what R2.2's ready list requires. Both routes to a ready project were closed.
+
+**The rule comes from the phase specs: a completed instance of phase N makes its project ready to start the next modelled phase after N.** Every phase's entry criterion names the previous phase's exit artefact, several verbatim, so the ladder is strictly linear. R5.3 was the exception and the reason `previousModelledPhase` exists rather than `RIP_PHASES[i-1]`: R5.4 enters on *"Oplevering areaal na R5.3"*, so R5.3 happens — but at the time it had no overzichtsplaat, no process model and no observable exit, so skipping it was an assertion the code had to surface rather than assume.
+
+**`businessKey` identifies the project's journey rather than one instance.** The originating R2.1 run mints it and every later phase inherits it. It flows through both RIP list builders, and `useRipPhaseReadiness` excludes candidates whose key already has an active or completed instance of this phase. A candidate whose predecessor carries no key is kept deliberately — offering a possibly-duplicate start is recoverable, silently dropping a project from the board is not.
+
+**A caller-supplied business key survives instead of being overwritten.** `addTenantToProcessVariables` minted a fresh `businessKey` on every process start, unconditionally, discarding whatever the caller sent. It was invisible because the key it produced looked exactly like the one it threw away — and harmless while every instance stood alone. It stops being harmless the moment two instances need to be recognisably related: with the overwrite in place each RIP phase got its own key, nothing was related to anything, and the R2.2 Starten tab kept offering projects that were already running. Honouring a supplied key is safe, because `businessKey` grants no access — tenant isolation runs on the municipality variable taken from the token, which an added test asserts still holds.
+
+**RIP phase endpoints take a phase code instead of assuming R2.1.** Deploying `RipR22Process` exposed how much of the live data path was pinned to R2.1 by a literal: the Faseladder badge and per-phase counts generalised for free from the catalogue, but the WIP and Gereed lists, the portfolio's live rows and the command palette read `RipR21Process` or `R2.1` directly, so R2.2 rendered mock data beside a *Gedeployed* badge. `resolvePhaseKey` separates two failure modes an empty list would conflate — `404 UNKNOWN_PHASE` for a code the catalogue does not carry, `409 PHASE_NOT_MODELLED` for a known phase with no process yet. A caller must be able to tell "no process deployed" from "deployed and idle".
+
+**R2.2 maps to `RipR22Process` in the phase catalogue.** The process was deployed on the engine but `RIP_PHASE_KEYS` carried R2.2 with no `processDefinitionKey`, and that single omission broke the chain at both ends: the deployment-status endpoint builds its query from this list, so the engine was never asked about `RipR22Process`, and `getPhaseDeployStatus` requires the field before it can match a returned key. R2.2 rendered as *In ontwerp* and the Faseladder read 1 / 12.
+
+**The untenanted start-form fallback sees a text-typed error body.** `getByKeyWithTenantFallback` decides whether to retry against the untenanted path by matching Operaton's *"No matching process definition with key"* wording in `error.response.data.message`. `getDeployedStartForm` is the only caller passing `responseType: 'text'`, and axios disables JSON parsing of the error body when `responseType` is set — so the body arrived as an unparsed string, `.message` was `undefined`, the guard rethrew, and the fallback could never fire. Every process deployed without a tenant answered `404 FORM_NOT_FOUND` to any caller carrying one: on ACC, 21 of 23 latest-version definitions, including `AwbShellProcess` behind the citizen Kapvergunning form. The existing fallback test mocked the error body as an already-parsed object, which is why the suite stayed green while the path was dead.
+
+**A disabled button on the infra board now looks disabled.** `.cwd-v2 .v2-btn` set `cursor: pointer` unconditionally and no `:disabled` rule existed anywhere in the stylesheet, so a disabled button rendered in full accent pink with a hand cursor — indistinguishable from a live one, on every screen using the shared v2 chrome.
+
+---
+
 ## v2026.08.36 — ValidSign Phase-Approval Signing (August 2026)
 
 > Developer detail: [ValidSign phase-approval signing](validsign-signing.md).
@@ -1233,6 +1339,19 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 | Nieuws RSS feed migration → revert                       | v3.0.x  |
 | V1 dashboard retired; V2 is the default route            | v3.0.x  |
 | PROD brought to ACC parity (cutover)                     | v3.0.7  |
+| RIP phase endpoints generalised off R2.1                 | v2026.09.0 |
+| Phase progression: finishing a phase readies the next    | v2026.09.0 |
+| RIP ladder complete — twelve of twelve deelprocessen      | v2026.09.3 |
+| 80% per-file branch floor across all five workspaces     | v2026.09.2 |
+| [Phase swimlanes derived from deployed BPMN](#v20260904--swimlanes-derived-from-deployed-bpmn-september-2026) | v2026.09.4 |
+
+!!! note "This table has a gap"
+    Rows run from v1.0.0 to v3.0.7 and then jump to the September 2026 entries
+    above. The CalVer releases in between — roughly v2026.07 through v2026.08.36
+    — shipped without their roadmap-level items being recorded here. The
+    [Changelog](#changelog) above is complete for that period; this table is not,
+    and backfilling it accurately means re-reading forty-odd releases rather than
+    guessing, so it is left visible rather than quietly patched.
 
 ---
 

@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # API Endpoints
 
 All current endpoints use the `/v1/` prefix. Legacy `/api/*` endpoints are deprecated and will be removed in v2.0.0. They return `Deprecation: true` and `Link: <successor>; rel="successor-version"` headers.
@@ -364,17 +368,38 @@ Authorization: Bearer <token>
  
 ---
 
-## RIP Phase 1
+## RIP phases
 
 These endpoints require a valid JWT with the `caseworker` role. Tenant isolation is applied via the `municipality` process variable compared to the JWT `municipality` claim.
 
+!!! warning "Renamed in v2026.09.0 — the `phase1` routes are gone"
+    Until v2026.09.0 this group was pinned to R2.1 by a literal: `/v1/rip/phase1/active`, `/v1/rip/phase1/completed` and `/v1/rip/phase1/:instanceId/documents`. Deploying `RipR22Process` falsified that, so the routes now take a **phase code**, and the documents route is keyed on the **instance** rather than the phase — it resolves the deployment from the instance itself, and its three resource names are R2.1's document set rather than a general RIP convention.
+
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| `GET` | `/v1/rip/phase1/active` | Bearer JWT (caseworker) | Lists all active `RipPhase1Process` instances for the authenticated user's municipality, enriched with `projectNumber`, `projectName`, and `edocsWorkspaceId`. |
-| `GET` | `/v1/rip/phase1/:instanceId/documents` | Bearer JWT (caseworker) | Returns all three document templates bundled in the deployment for a given process instance, together with current process variables. Documents not yet produced return `null`. Applies tenant isolation via the `municipality` process variable. |
-| `GET` | `/v1/rip/phase1/completed` | Bearer JWT (caseworker) | Lists all completed `RipPhase1Process` instances for the authenticated user's municipality, enriched with `projectNumber`, `projectName`, `edocsWorkspaceId`, and `endTime`. |
+| `GET` | `/v1/rip/phases/active` | Bearer JWT (caseworker) | **Aggregate.** Active instances of *every* modelled phase in one response, each row tagged with the `phaseCode` it belongs to |
+| `GET` | `/v1/rip/phases/:code/active` | Bearer JWT (caseworker) | Active instances of one phase for the caller's municipality, enriched with `projectNumber`, `projectName` and `edocsWorkspaceId` |
+| `GET` | `/v1/rip/phases/:code/completed` | Bearer JWT (caseworker) | Completed instances of one phase, additionally carrying `endTime` |
+| `GET` | `/v1/rip/phases/:code/model` | Bearer JWT (caseworker) | The swimlane model — lanes, nodes and edges — parsed from the BPMN Operaton has deployed for that phase |
+| `GET` | `/v1/rip/phases/deployment-status` | Bearer JWT (caseworker) | Which phase process-definition keys are actually deployed on this environment's engine |
+| `GET` | `/v1/rip/phases/counts` | Bearer JWT (caseworker) | Per-phase `wip` / `gereed` counts |
+| `GET` | `/v1/rip/instances/:instanceId/documents` | Bearer JWT (caseworker) | The document templates bundled in the deployment for one instance, with its current process variables. Documents not yet produced return `null` |
 
-**`GET /v1/rip/phase1/active` response shape:**
+### Two failure modes an empty list would conflate
+
+`resolvePhaseKey` distinguishes them deliberately, because a caller must be able to tell *"no process deployed"* from *"deployed and idle"*:
+
+| Status | Code | Meaning |
+|---|---|---|
+| `404` | `UNKNOWN_PHASE` | The code is not in the phase catalogue at all |
+| `409` | `PHASE_NOT_MODELLED` | A known phase that has no process definition yet |
+
+The engine is **not** consulted for either. A phase modelled here but absent from the target environment still answers `200` with an empty list — only `deployment-status` speaks to what is deployed where.
+
+!!! note "`/phases/active` and `/phases/:code/active` do not collide"
+    The literal route is two path segments and the parameterised one is three, so Express's own routing keeps them apart regardless of registration order. A test pins this for all four literal `/phases/*` routes: the tell-tale sign of the aggregate being swallowed would be a `404 UNKNOWN_PHASE` naming `code="active"`.
+
+**`GET /v1/rip/phases/active` response shape:**
 ```json
 {
   "success": true,
@@ -384,13 +409,18 @@ These endpoints require a valid JWT with the `caseworker` role. Tenant isolation
       "startTime": "2026-03-13T09:00:00.000Z",
       "projectNumber": "123456789",
       "projectName": "Test",
-      "edocsWorkspaceId": "stub-ws-123456789"
+      "edocsWorkspaceId": "stub-ws-123456789",
+      "phaseCode": "R2.2"
     }
   ]
 }
 ```
 
-**`GET /v1/rip/phase1/:instanceId/documents` response shape:**
+One phase failing must not blank the rest. Every modelled phase is fetched under `Promise.allSettled`; a rejected phase is logged and its rows omitted, and the response still succeeds as long as **at least one** phase came back. Only a total failure — every modelled phase rejected — answers `500 RIP_ACTIVE_AGGREGATE_FAILED`.
+
+**`GET /v1/rip/phases/:code/active` response shape:** as above, without the `phaseCode` field.
+
+**`GET /v1/rip/instances/:instanceId/documents` response shape:**
 ```json
 {
   "success": true,
@@ -407,9 +437,9 @@ These endpoints require a valid JWT with the `caseworker` role. Tenant isolation
 }
 ```
 
-`intakeReport`, `psuReport`, and `pdp` are `DocumentTemplate` objects when the corresponding ServiceTask has completed, or `null` when not yet produced.
+`intakeReport`, `psuReport` and `pdp` are `DocumentTemplate` objects when the corresponding ServiceTask has completed, or `null` when not yet produced.
 
-**`GET /v1/rip/phase1/completed` response shape:**
+**`GET /v1/rip/phases/:code/completed` response shape:**
 ```json
 {
   "success": true,
@@ -426,8 +456,10 @@ These endpoints require a valid JWT with the `caseworker` role. Tenant isolation
 }
 ```
 
+**`GET /v1/rip/phases/:code/model`** returns `{ success, data: { lanes, nodes, edges } }`, parsed from the deployed BPMN and cached alongside the XML under a tenant-inclusive key. It is fetched by process-definition **key** rather than definition id, deliberately: a phase with no running instance still resolves, so mock portfolio rows get a diagram too. A failure answers `500 PHASE_MODEL_FAILED`.
+
 ---
- 
+
 ## eDOCS
  
 All `/v1/edocs` endpoints require a Bearer JWT issued by Keycloak (`aud: ronl-business-api`). They are intended for machine-to-machine access — the primary consumer is Microsoft Copilot Studio via the `copilot-studio-edocs` Keycloak client, though they can be called by any authenticated client.
