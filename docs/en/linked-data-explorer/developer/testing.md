@@ -12,24 +12,39 @@ before that the repository had no test files at all and `npm test` exited 1 with
 
 !!! info "Figures on this page are measured, not estimated"
     Every count, command and coverage percentage below was produced by running
-    the suites against **v2026.08.9** on **29 August 2026**, on `acc` at
-    `234a9ac`. Rerun the commands in [Running the tests](#running-the-tests) to
-    reproduce them — and use those exact commands: backend branch coverage reads
-    91.49% via `npm test -w packages/backend`, but 92.22% when Jest is invoked
-    directly from the repo root with the same config and the same tests.
+    the suites against **v2026.09.1** on **5 September 2026**, on `acc` at
+    `69bba13`, after a clean `npm ci`. Rerun the commands in
+    [Running the tests](#running-the-tests) to reproduce them.
 
-**At a glance:** 111 test files · **1707 tests** · all passing · backend 98.56%
-statements, frontend 74.72%.
+**At a glance:** 119 test files · **2160 tests** · all passing · backend 98.56%
+statements, frontend 94.30%.
 
 | Package | Runner | Files | Tests | Statements | Branches | Functions | Lines |
 |---|---|---:|---:|---:|---:|---:|---:|
-| `packages/backend` | Jest + ts-jest | 51 | 1134 | 98.56% | 91.49% | 97.15% | 99.05% |
-| `packages/frontend` | Vitest + RTL | 60 | 573 | 74.72% | 65.67% | 69.38% | 77.00% |
+| `packages/backend` | Jest + ts-jest | 51 | 1140 | 98.56% | 92.22% | 97.15% | 99.05% |
+| `packages/frontend` | Vitest + RTL | 68 | 1020 | 94.30% | 90.62% | 91.43% | 95.46% |
 
-The gap since v2026.08.3 is **one file and four tests**, all backend: the bundle
-parity suite added in v2026.08.5. Coverage is unchanged in every cell, which is
-what a parity test does — it asserts that two files are identical, not that more
-lines execute.
+**The frontend nearly doubled.** v2026.09.1 raised per-file branch coverage above
+80% across both packages: the frontend gained **8 files and 447 tests**, taking
+branches from 65.67% to **90.62%** and statements from 74.72% to 94.30%. The
+backend moved far less because it had further to go — six tests, and branches
+from 91.49% to 92.22%.
+
+Two jsdom limitations had to be worked around to reach the d3 drag and zoom
+paths, and they are the kind that make a branch look untestable when it is not:
+jsdom rejects `view` in the `MouseEvent` constructor, and `SVGSVGElement`
+carries no `width`/`height` `baseVal` for the default extent `d3-zoom`
+computes.
+
+!!! note "An invocation caveat that no longer reproduces"
+    Through v2026.08.9 this page warned that backend branch coverage read 91.49%
+    via `npm test -w packages/backend` but 92.22% when Jest was invoked directly
+    from the repository root, with the same config and the same tests. The
+    measurement above used the **workspace** invocation and read 92.22%, so the
+    discrepancy is not reproducible as described. Whether v2026.09.1 closed it or
+    the original diagnosis was wrong is not established here — only that the two
+    invocations no longer disagree in the way the warning claimed. The root
+    invocation was not separately re-run.
 
 ---
 
@@ -40,9 +55,9 @@ both workspaces with `--workspaces --if-present`.
 
 | Command | Scope | Files | Tests |
 |---|---|---:|---:|
-| `npm test` | Both packages | 111 | 1707 |
-| `npm test -w packages/backend` | Backend only (Jest, with coverage) | 51 | 1134 |
-| `npm test -w packages/frontend` | Frontend only (Vitest, with coverage) | 60 | 573 |
+| `npm test` | Both packages | 119 | 2160 |
+| `npm test -w packages/backend` | Backend only (Jest, with coverage) | 51 | 1140 |
+| `npm test -w packages/frontend` | Frontend only (Vitest, with coverage) | 68 | 1020 |
 
 Both packages' `test` scripts include coverage by default, so a plain run always
 produces a report. Watch modes are `test:watch` in either package; the backend

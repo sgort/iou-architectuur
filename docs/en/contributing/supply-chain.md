@@ -433,15 +433,25 @@ performs its own install inside the container to produce the deployed bytes;
 where `skip_app_build` is set, the verified install is the one that produces
 them.
 
-**The Node version floats.** The CPSV Editor's deploy workflows now pass
-`node-version: '24'` (raised from `'20'` in v2026.09.0), still a major rather
-than an exact patch, with no `.nvmrc` and no `engines` field pinning a runtime.
-`setup-node` therefore downloads whichever 24.x patch is current at run time.
-Closing this is reachable in principle — an exact patch, or an `.nvmrc` — but
-picking and then maintaining an exact Node version is a separate decision, and
-it is recorded as a known gap rather than silently ignored. Note that the
-audit job pins Node **24** for a different reason entirely: Renovate's
-`engines.node`, not supply-chain policy.
+**The Node version floats — in two of three repositories.** This was recorded as
+a general gap, "reachable in principle". The Linked Data Explorer reached it in
+v2026.09.1, which makes the remaining two a choice rather than a limitation:
+
+| Repository | `node-version` in the deploy workflows |
+|---|---|
+| CPSV Editor | `'24'` — major only, so whichever 24.x patch is current at run time |
+| RONL Business API | `'20'` — major only (its audit job pins `'24'`) |
+| **Linked Data Explorer** | **`20.20.2`** frontend, **`22.23.2`** backend, **`24.19.0`** audit — exact patches, with the `engines` floors raised to match |
+
+The Linked Data Explorer's pins landed alongside the workflow digest pins in the
+same release, which is the natural moment: the runtime is one more thing the
+pipeline downloads, and pinning the actions while leaving the interpreter
+floating is half the job. Neither of the other two has an `.nvmrc` or an
+`engines` field pinning a runtime.
+
+Note that the CPSV Editor's audit job pins Node **24** for a different reason
+entirely — Renovate's `engines.node`, not supply-chain policy — so its presence
+there is not evidence the gap is closed.
 
 **zizmor validates pin _format_, never pin _truth_.** A wrong or hostile digest
 with a plausible `# v7.0.1` comment passes zizmor, Prettier and human review

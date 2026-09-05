@@ -274,6 +274,7 @@ nav:
         - DRD Generation: linked-data-explorer/features/drd-generation.md
         - DMN Validator: linked-data-explorer/features/dmn-validator.md
         - SHACL Validator: linked-data-explorer/features/shacl-validator.md
+        - RIP Phase Ladder: en/linked-data-explorer/features/rip-phase-ladder.md
         - RIP R2.1 Bundle: en/linked-data-explorer/features/rip-phase1-bundle.md
         - RIP R2.2 VO Bundle: en/linked-data-explorer/features/rip-r22-bundle.md
         - Semantic Analysis: linked-data-explorer/features/semantic-analysis.md
