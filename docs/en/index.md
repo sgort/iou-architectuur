@@ -137,13 +137,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.08.36** · *August 2026*
+-   **⚙️ RONL Business API — v2026.09.5** · *September 2026*
 
     ---
 
-    **A phase approval you sign, and six design claims that live testing broke**
+    **Twelve of twelve phases, and diagrams the engine draws**
 
-    A project leader now [signs a RIP phase-exit approval](ronl-business-api/developer/validsign-signing.md) from the Infra-board itself — opt-in from the process model, activated by a single `ronl:signatureRef` attribute the Linked Data Explorer sets on one task. Live signing sits behind three locks with an allowlist that is empty by default, because the licence is production-only with an account-wide key and no sandbox. Six claims in the design proved wrong once it ran against production ValidSign, live eDOCS and a real browser: an iframe that loaded the app's own landing page, a signature that completed but looked stalled, and stub documents that uploaded perfectly and would not open. Each is recorded as a correction rather than quietly rewritten.
+    The RIP ladder is complete — every phase from R2.1 to R6.1 is modelled and deployed, the endpoints no longer assume R2.1, and finishing one phase now readies a project for the next. The phase diagram is [parsed from the BPMN Operaton actually has deployed](ronl-business-api/reference/api-endpoints.md#rip-phases) rather than from a hand-kept copy, which is what had gone stale: deleting that copy revealed **38 nodes drawn invisible** across the twelve phases, rework loops rendered as coincident lines, and a finished phase coloured entirely white. R2.1 was the one phase where none of it could happen, which is why it survived every review. Along the way, 113 of the ladder's 201 user tasks turned out to be unreachable because the realm defined six of the 34 candidate groups the models address work to.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

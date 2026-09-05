@@ -13,38 +13,49 @@ jsdom. All five run with coverage by default.
 
 !!! info "Figures on this page are measured, not estimated"
     Every count and percentage below was produced by running
-    `npm run test:serial` against **v2026.08.36** on **30 August 2026**, on
-    `acc` at `15dfbf9`. Rerun the commands in
+    `npm run test:serial` against **v2026.09.5** on **5 September 2026**, on
+    `acc` at `66940d9`, after a clean `npm ci`. Rerun the commands in
     [Running the tests](#running-the-tests) to reproduce them.
 
-    **All three Playwright suites were re-run for this release**, against a
-    live local stack — see [E2E & live smoke](e2e.md). The four live-smoke shell
-    scripts remain described from their configuration only.
+    **The Playwright suites were _not_ re-run for this release** — their figures
+    on [E2E & live smoke](e2e.md) remain those measured on 30 August. The spec
+    inventory was verified unchanged against `acc` (ten frontend specs, one
+    each in pa-demo and public-site), and this release added unit tests only,
+    but the counts themselves are older than the rest of this page. The four
+    live-smoke shell scripts remain described from their configuration only.
 
 **At a glance:**
 
 | Package | Runner | Files | Tests | Result | Wall time¹ | Statements | Branches | Functions | Lines |
 |---|---|---:|---:|---|---:|---:|---:|---:|---:|
-| `packages/backend` | Jest + ts-jest | 84 | 1754 | all passing | ~119s | 97.52% | 90.01% | 96.81% | 98.08% |
-| `packages/frontend` | Vitest + RTL | 106 | 879 | all passing | ~444s | 88.32% | 80.33% | 83.77% | 89.28% |
-| `packages/pa-cockpit` | Vitest + RTL | 41 | 368 | all passing | ~111s | 86.16% | 75.55% | 83.46% | 88.53% |
-| `packages/pa-demo` | Vitest + jsdom | 19 | 104 | all passing | ~37s | 91.30% | 86.95% | 85.00% | 91.66% |
-| `packages/public-site` | Vitest + jsdom | 28 | 140 | all passing | ~47s | 86.82% | 70.39% | 87.63% | 88.76% |
+| `packages/backend` | Jest + ts-jest | 86 | 2011² | all passing | ~119s | 98.40% | 92.28% | 97.28% | 98.83% |
+| `packages/frontend` | Vitest + RTL | 110 | 1104 | all passing | ~444s | 93.11% | 89.76% | 87.75% | 93.97% |
+| `packages/pa-cockpit` | Vitest + RTL | 43 | 476 | all passing | ~111s | 90.07% | 88.52% | 86.39% | 91.33% |
+| `packages/pa-demo` | Vitest + jsdom | 19 | 106 | all passing | ~37s | 93.47% | 95.65% | 85.00% | 92.85% |
+| `packages/public-site` | Vitest + jsdom | 30 | 204 | all passing | ~47s | 96.09% | 96.92% | 94.62% | 96.16% |
 
-**278 files · 3245 tests**, plus one performance spec run separately — 3246 in
+**288 files · 3901 tests**, plus one performance spec run separately — 3902 in
 total. See [Coverage](coverage.md) for what those percentages mean and where
 the remaining gaps are.
 
-!!! note "The growth is all ValidSign, and so is the coverage dip"
-    Backend gained **10 files and 178 tests**, frontend **3 and 37** — the
-    signing feature and nothing else. The three untouched packages reproduced
-    their previous figures to the decimal, which is a useful check that the run
-    is sound.
+² Backend reports 2011 total, of which **2008 pass and 3 are skipped**. The other
+four workspaces skip nothing.
 
-    Backend statement coverage moved **98.35% → 97.52%** and branches
-    **91.49% → 90.01%**. That is dilution by a large new subsystem rather than a
-    regression: no existing area lost coverage, and the new one arrived below the
-    package average it is now part of.
+!!! note "A coverage campaign, and every workspace moved at once"
+    v2026.09.2 extended the backend-only coverage push to **all five workspaces
+    that have a test runner**, against a per-file 80% branch floor: 53 files were
+    below it, and none are now. Every package gained on every measure, which is
+    unusual — the previous release's figures moved in one package and held to the
+    decimal in the others.
+
+    Branches moved furthest, which is the point of a *branch* floor:
+    public-site **70.39% → 96.92%**, pa-cockpit **75.55% → 88.52%**, frontend
+    **80.33% → 89.76%**, backend **90.01% → 92.28%**, pa-demo
+    **86.95% → 95.65%**.
+
+    The floor is a **convention, not a gate** — no coverage threshold is
+    configured in any runner config and no workflow measures coverage at all.
+    See [Code Standards](../../../contributing/code-standards.md#the-80-branch-floor-is-a-convention-not-a-gate).
 
 ¹ These are **serial** wall times, measured with `test:serial`, and are much
 longer than a parallel run — the frontend suite measures ~61s parallel on an
@@ -58,9 +69,9 @@ and compare like with like.
 | Page | Covers |
 |---|---|
 | [Coverage](coverage.md) | Headline and per-area coverage for all five packages, and why the last two decimals are noise |
-| [Backend suite](backend.md) | The 74 files and 1576 tests in `packages/backend`, by area |
-| [Public site suite](public-site.md) | The 28 files and 140 tests in `packages/public-site`, plus its own Playwright suite |
-| [PA-demo suite](pa-demo.md) | The 19 files and 104 tests in `packages/pa-demo`, and the one Playwright suite that runs in CI |
+| [Backend suite](backend.md) | The 86 files and 2011 tests in `packages/backend`, by area |
+| [Public site suite](public-site.md) | The 30 files and 204 tests in `packages/public-site`, plus its own Playwright suite |
+| [PA-demo suite](pa-demo.md) | The 19 files and 106 tests in `packages/pa-demo`, and the one Playwright suite that runs in CI |
 | [Caseworker](dashboards/caseworker.md) · [PA cockpit](dashboards/pa-cockpit.md) · [Infra-board](dashboards/infra-board.md) · [Woo-dashboard](dashboards/woo-dashboard.md) | The frontend and cockpit suites, split the way the product is — one page per board |
 | [E2E & live smoke](e2e.md) | The Playwright suites, what they need running, and the four cross-app shell scripts |
 | [Writing tests](writing-tests.md) | Conventions for adding tests here, and the traps that have already cost time |
@@ -91,13 +102,13 @@ be installed in every workspace).
 
 | Command | Scope | Files | Tests |
 |---|---|---:|---:|
-| `npm test` | Every workspace with a `test` script (see below) | 265 | 3030 |
-| `npm run test:serial` | The same, without file parallelism | 265 | 3030 |
-| `npm test --workspace=@ronl/backend` | Backend only (Jest, coverage on by default) | 74 | 1576 |
-| `npm test --workspace=@ronl/frontend` | Frontend only (Vitest, coverage on by default) | 103 | 842 |
-| `npm test --workspace=@ronl/pa-cockpit` | The cockpit package | 41 | 368 |
-| `npm test --workspace=@ronl/pa-demo` | The public demo | 19 | 104 |
-| `npm test --workspace=@ronl/public-site` | Public site only (Vitest, coverage on by default) | 28 | 140 |
+| `npm test` | Every workspace with a `test` script (see below) | 288 | 3901 |
+| `npm run test:serial` | The same, without file parallelism | 288 | 3901 |
+| `npm test --workspace=@ronl/backend` | Backend only (Jest, coverage on by default) | 86 | 2011 |
+| `npm test --workspace=@ronl/frontend` | Frontend only (Vitest, coverage on by default) | 110 | 1104 |
+| `npm test --workspace=@ronl/pa-cockpit` | The cockpit package | 43 | 476 |
+| `npm test --workspace=@ronl/pa-demo` | The public demo | 19 | 106 |
+| `npm test --workspace=@ronl/public-site` | Public site only (Vitest, coverage on by default) | 30 | 204 |
 | `npm run test:perf --workspace=@ronl/frontend` | The wall-clock budget, run without file parallelism | 1 | 1 |
 
 ```bash

@@ -62,7 +62,7 @@ precisely the test.
 
 The assistant operates inside a set of recorded boundaries: things it will not do
 unprompted, and approvals it will not infer from an earlier one. `~/.claude/CLAUDE.md`
-is the authority for the full set — **eleven rules** as of 4 September 2026 — and is not
+is the authority for the full set — **eleven rules** as of 5 September 2026 — and is not
 reproduced here in full, because a copy would drift. The set has grown twice since the
 2026-08-19 consolidation and will grow again; treat any count on this page as a
 snapshot, and the file as the authority. The boundaries most visible to a day-to-day

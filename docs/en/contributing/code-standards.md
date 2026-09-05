@@ -215,3 +215,30 @@ watched to fail for the right reason, then the minimum code to pass. For the mec
 of that cycle, see
 [Working with Claude Code](development-workflow/working-with-claude-code.md) rather than
 this page.
+
+### The 80% branch floor is a convention, not a gate
+
+RONL Business API adopted a **per-file 80% branch-coverage floor across all five
+workspaces that have a test runner** in v2026.09.2, taking 53 files below the line to
+none. It is a real standard and new code is held to it — but it is worth being precise
+about what enforces it, because the answer is *review*, and nothing else:
+
+- **No coverage threshold is configured** in any of the five runner configs
+  (`packages/backend/jest.config.js`, and the four Vite/Vitest configs). A file that
+  drops below 80% fails nothing locally.
+- **Coverage is not run in CI at all.** None of the nine workflows mentions it, so no
+  pipeline measures coverage, let alone gates on it.
+- The floor is recorded in an implementation plan in the repository, and honoured by
+  the people and reviews that read it.
+
+That is a legitimate way to hold a standard, and stating it plainly is better than
+implying a gate that does not exist — a contributor who assumes CI will catch a
+coverage regression will be wrong. The measured figures live on
+[Coverage](../ronl-business-api/developer/testing/coverage.md), which records when they
+were last taken.
+
+`@ronl/shared` is deliberately outside this: it has no test script and needs none,
+being types plus two seed modules with no functions and no branches. That exemption has
+a consequence worth knowing — **executable logic placed in the shared package is
+unmeasurable by construction**, which is why a branching helper was moved out of it in
+v2026.09.4 rather than left where a passing test run concealed the gap.
