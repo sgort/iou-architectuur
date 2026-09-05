@@ -372,6 +372,7 @@ nav:
       - Technology Stack: contributing/doc-architecture/technology-stack.md
     - Code Standards: contributing/code-standards.md
     - Supply-Chain Pinning: contributing/supply-chain.md
+    - Build Provenance: contributing/build-provenance.md
 
 # Markdown extensions
 markdown_extensions:
