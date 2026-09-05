@@ -1,21 +1,22 @@
 # RONL Business API — screenshots to capture
 
-!!! warning "Two outstanding — see the v2026.09.5 section below"
-    One **NEW** capture and one **REPLACE**, both triggered by the RIP ladder
-    reaching twelve of twelve phases and the phase diagram becoming
-    BPMN-derived. Everything from earlier sections has been captured; this file
-    is also the record of what each image shows and why it was needed.
+!!! success "Nothing outstanding"
+    Every screenshot this manifest calls for has been captured, including the two
+    the v2026.09.5 sync requested — both landed on 5 September 2026, the same day
+    they were asked for. The file is retained as the record of what each image
+    shows and why it was needed.
 
-## Sync v2026.08.36 → v2026.09.5 — one NEW, one REPLACE
+## Sync v2026.08.36 → v2026.09.5 — one NEW, one REPLACE (both captured)
 
 Reviewed on 5 September 2026 for the six-version gap covering **v2026.09.0**
 through **v2026.09.5**. Unlike the two preceding entries, this release does
-change what a reader sees, so there are rows.
+change what a reader sees, so there are rows — **both captured the same day**,
+and a non-strict `mkdocs build` now reports no missing-image warning at all.
 
 | # | Status | File | Embedding page | What it must show | Trigger |
 |---|---|---|---|---|---|
-| 1 | **NEW** | `ronl-business-api-rip-phase-swimlane.png` | `user-guide/infra-board.md` | A phase diagram **derived from deployed BPMN** — lanes with their names, per-task colouring (todo / active / done), and at least one **rework loop** routed in its own band below the lane rows. Ideally a phase other than R2.1, since R2.1 is the one phase whose diagram looked correct before this work | v2026.09.4 |
-| 2 | **REPLACE** | `ronl-business-api-infra-board.png` | `user-guide/infra-board.md` | The board with the **Faseladder reading `12 / 12 deelprocessen inzetbaar`**. The current capture predates the ladder being complete and shows the old count | v2026.09.3 |
+| 1 | ✅ **DONE** (was NEW) | `ronl-business-api-rip-phase-swimlane.png` | `user-guide/infra-board.md` | A phase diagram **derived from deployed BPMN** — lanes with their names, per-task colouring (todo / active / done), and at least one **rework loop** routed in its own band below the lane rows. Ideally a phase other than R2.1, since R2.1 is the one phase whose diagram looked correct before this work | v2026.09.4 |
+| 2 | ✅ **DONE** (was REPLACE) | `ronl-business-api-infra-board.png` | `user-guide/infra-board.md` | The board with the **Faseladder reading `12 / 12 deelprocessen inzetbaar`**. The current capture predates the ladder being complete and shows the old count | v2026.09.3 |
 
 **Why item 1 is worth capturing and the signing panel was not.** The previous
 entry declined a screenshot because the feature could not be photographed
