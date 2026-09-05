@@ -167,13 +167,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.08.9** · *August 2026*
+-   **🔍 Linked Data Explorer — v2026.09.1** · *September 2026*
 
     ---
 
-    **The R2.2 bundle, and a Renovate that had quietly stopped**
+    **Nine phases in one release, and the typechecker that was never running**
 
-    The [R2.2 VO bundle](linked-data-explorer/features/rip-r22-bundle.md) lands — four lanes, nine user tasks, nine forms and five document templates — with one deliberate deviation from its source drawing, because two hand-offs leave the pool and never return, which as control flow deadlocks at the join. A new parity test locks each bundle's authored and mirrored copies together after they had already drifted. Meanwhile the [supply-chain gate](contributing/supply-chain.md) took the pipeline from 40 findings to zero — and immediately exposed that Renovate had been raising nothing at all: five `"//"` keys used as JSON comments were read as invalid settings, so the half of the policy that keeps pins current had been inert since the day it landed.
+    The [RIP phase ladder](linked-data-explorer/features/rip-phase-ladder.md) goes from two modelled phases to eleven — R2.3 through R6.1, the densest of them carrying 56 nodes over 36 forms — each authored here and deployed to Operaton, where the [Infra-board](ronl-business-api/user-guide/infra-board.md) draws its diagrams from them. Alongside it, **fifteen type errors that had accumulated invisibly**: `build` strips types without checking, `lint` is ESLint and `test` is Vitest, so nothing in the repository ran `tsc` at all. A Typecheck step now runs in all four deployment workflows, Node is pinned to exact patches rather than majors, and per-file branch coverage clears 80% across both packages — the frontend rising from 65.67% to [90.62%](linked-data-explorer/developer/testing.md).
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
