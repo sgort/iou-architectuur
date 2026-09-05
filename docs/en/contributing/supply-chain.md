@@ -201,6 +201,13 @@ on **every** pull request and on pushes to `acc` and `main`.
     neither. `push` stays filtered, because `acc` and `main` are the only
     branches whose post-merge state is worth re-auditing.
 
+    **All three repositories now run the audit on every pull request** — the
+    CPSV Editor in v2026.08.3, RONL Business API and the Linked Data Explorer
+    following in early September, each independently reaching the same shape.
+    It was not a theoretical fix in any of them: it cost four rounds of manual
+    intervention in the Linked Data Explorer and blocked a pull request outright
+    in RONL Business API before the filter came off.
+
     **Do not copy this shape into a deploy workflow.** Those fail in the
     opposite direction: an absent filter on the *audit* makes a required check
     silently missing, while an absent filter on a *deploy* silently exhausts a

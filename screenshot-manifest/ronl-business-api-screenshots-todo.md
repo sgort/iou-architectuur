@@ -1,8 +1,48 @@
 # RONL Business API — screenshots to capture
 
-!!! success "Nothing outstanding"
-    Every screenshot this manifest calls for has been captured. The file is
-    retained as the record of what each image shows and why it was needed.
+!!! warning "Two outstanding — see the v2026.09.5 section below"
+    One **NEW** capture and one **REPLACE**, both triggered by the RIP ladder
+    reaching twelve of twelve phases and the phase diagram becoming
+    BPMN-derived. Everything from earlier sections has been captured; this file
+    is also the record of what each image shows and why it was needed.
+
+## Sync v2026.08.36 → v2026.09.5 — one NEW, one REPLACE
+
+Reviewed on 5 September 2026 for the six-version gap covering **v2026.09.0**
+through **v2026.09.5**. Unlike the two preceding entries, this release does
+change what a reader sees, so there are rows.
+
+| # | Status | File | Embedding page | What it must show | Trigger |
+|---|---|---|---|---|---|
+| 1 | **NEW** | `ronl-business-api-rip-phase-swimlane.png` | `user-guide/infra-board.md` | A phase diagram **derived from deployed BPMN** — lanes with their names, per-task colouring (todo / active / done), and at least one **rework loop** routed in its own band below the lane rows. Ideally a phase other than R2.1, since R2.1 is the one phase whose diagram looked correct before this work | v2026.09.4 |
+| 2 | **REPLACE** | `ronl-business-api-infra-board.png` | `user-guide/infra-board.md` | The board with the **Faseladder reading `12 / 12 deelprocessen inzetbaar`**. The current capture predates the ladder being complete and shows the old count | v2026.09.3 |
+
+**Why item 1 is worth capturing and the signing panel was not.** The previous
+entry declined a screenshot because the feature could not be photographed
+without firing a real signature against a production-only licence. This one has
+the opposite property: the diagram is the whole point of the release, it renders
+from data already on ACC, and prose describes it poorly — "lanes, columns, and
+rework loops drawn as returns rather than forward steps" is a picture's job.
+
+**Why item 2 is a REPLACE rather than a leave-alone.** The existing capture is
+not wrong about anything the board still does; it is wrong about one number that
+happens to be the release's headline. The Faseladder badge went from **1 / 12**
+to **12 / 12** over v2026.09.0–.3, and that badge is visible in the current
+image.
+
+**Not requested, deliberately:**
+
+- **The Ongefilterd segment** (v2026.09.1). It is a third tab beside Gecureerd
+  and Inbox on the PA cockpit, and `user-guide/pa-cockpit.md` carries one figure
+  of the board. A segment control is legible in prose, and the page is
+  ACC-brief by convention — a second figure there would outweigh the text
+  around it.
+- **The disabled-button fix** (v2026.09.0). A `:disabled` rule so a disabled
+  button stops looking live. Real, and not worth an image.
+- **Everything in v2026.09.2 and v2026.09.5.** Coverage, a feed-source
+  migration, request fan-out and caching — none of it visible.
+
+---
 
 ## 2026-08-19 — User Guides restructure (complete)
 

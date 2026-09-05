@@ -14,13 +14,20 @@ and the only board with its own end-to-end suite.
     why the frontend's own totals fell between v2026.08.23 and v2026.08.33
     without anything being deleted.
 
-**Package: 41 files · 368 tests.** **Backend: 16 files · 533 tests** in
+**Package: 43 files · 476 tests.** **Backend: 16 files · 533 tests** in
 `src/pa-monitoring` — the largest single area in the repository.
 **E2E: 2 specs · 7 tests**, still in the frontend package.
 
-Measured with `npm test --workspace=@ronl/pa-cockpit` on 29 August 2026 against
-`acc` at `1e7fb19`: **368 of 368 passing**. Coverage **86.16 % statements ·
-75.55 % branches · 83.46 % functions · 88.53 % lines**.
+Measured with `npm run test:serial --workspace=@ronl/pa-cockpit` on 5 September
+2026 against `acc` at `66940d9` (v2026.09.5): **476 of 476 passing**. Coverage
+**90.07 % statements · 88.52 % branches · 86.39 % functions · 91.33 % lines** —
+branches up 12.97 points from v2026.08.36 under the per-file 80% floor adopted
+in v2026.09.2.
+
+!!! note "The backend and E2E figures above are older"
+    The package counts and coverage are from 5 September. The `src/pa-monitoring`
+    backend figure and the two E2E specs were last measured on 29–30 August and
+    were not re-run for this release.
 
 ---
 

@@ -10,6 +10,18 @@ Infra-board is portfolio steering for infrastructure projects. It organises proj
 
 On opening the board you see projects grouped by phase, with their status and RIP information, so the portfolio's progress is visible in one view.
 
+Since September 2026 the **Faseladder reads twelve of twelve deelprocessen inzetbaar** — every RIP phase from R2.1 through R6.1 is modelled and deployed, where previously only R2.1 was. Two things follow for you:
+
+- **Finishing a phase readies the project for the next one.** A completed instance moves its project into the following phase's *Starten* list automatically, so you no longer start each phase from a standing position.
+- **Every phase has a real diagram.** Opening a project shows the process drawn from the model actually deployed on the engine, not a hand-maintained sketch — including its rework loops, and coloured by what genuinely ran when you select a finished rung.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: a RIP phase swimlane diagram derived from the deployed BPMN, showing lanes, task states and a rework loop](../../assets/screenshots/ronl-business-api-rip-phase-swimlane.png)
+  <figcaption>A phase diagram drawn from the BPMN Operaton has deployed — lanes, per-task state, and rework loops routed below the lane rows</figcaption>
+</figure>
+
+One number is deliberately absent: **R5.4 shows `—` rather than a Klaar figure.** Klaar is derived from the preceding phase's completions, and R5.3 has four possible endings — only one leads to R5.4, and one of the others lets a project legitimately complete R5.3 more than once. Any number there would overstate R5.4's candidates without the screen being able to show why, so none is given.
+
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: RONL Business API Infra-board showing phase swimlanes with per-project status](../../assets/screenshots/ronl-business-api-infra-board.png)
   <figcaption>Infra-board — portfolio steering for infrastructure projects</figcaption>
