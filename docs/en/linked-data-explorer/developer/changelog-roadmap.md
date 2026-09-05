@@ -8,6 +8,47 @@ component: Linked Data Explorer
 
 ## Changelog
 
+### v2026.09.1 — Nine Phases, and the Typechecker That Was Never Running (September 2026)
+
+> The ladder as a whole: [RIP Phase Ladder](../features/rip-phase-ladder.md). Measured suites: [Testing](testing.md).
+
+**Nine RIP phases were modelled in one release, taking the ladder from two to eleven.** R2.3, R2.4, R3.1, R3.2 and R4.1 cover estimation, design and procurement; R5.1, R5.2 and R5.4 cover preparation, supervision and delivery; R6.1 closes the project. Only R5.3 remained unmodelled at this release. Each is authored here and deployed through the BPMN Modeler — the [RONL Business API](../../ronl-business-api/developer/changelog-roadmap.md) adopts them into its phase catalogue separately.
+
+**R5.2 is the densest phase in the ladder, and the only one whose subject is a period rather than a deliverable.** 56 nodes and 67 flows over 36 forms and 11 documents, modelled as a parallel split into the weekly cycle, invoicing and the delivery request, joined before R5.3. The flat alternative was rejected for a concrete reason: one loop containing every stream would force an invoice and a delivery request through *every* week, and deadlock a real instance on the parallel join. Three rework loops remain — weekstaat rejected, AWR overview rejected, and work not finished.
+
+**Where the source sheets and BPMN semantics disagree, the disagreement is recorded rather than smoothed over.** R6.1's sheet draws two *Einde proces* markers, one per closing action; they are modelled as a single end event behind a parallel join, because they mean the same completion and one exit keeps the phase end detectable the way every other phase's is. R5.4's sheet draws an *Aannemer* band carrying no activity — the contractor is written about but never acts in that phase — and an empty lane would deploy as a lane no task can land in, so it is omitted and the reason left in a text annotation. R5.1's BO13.1 branch is a round trip rather than an exit: on *ja* the installation part is handed to Beheer en Onderhoud, which communicates the handover back, so the leg rejoins the document check and the phase keeps its single R5.2 exit.
+
+**R2.3 is the first phase generated from the reusable BPMN toolchain** rather than laid out by hand, and it surfaced a start-form trap: the start form was moved into the first task, because on a programmatic start the gating variable would be unset, leaving the instance with no selectable outgoing flow.
+
+**Fifteen type errors had accumulated invisibly, because nothing in the repository ran `tsc`.** `build` is `vite build`, which strips types through esbuild without checking them; `lint` is ESLint; `test` is Vitest. None of the three typechecks. A `typecheck` script now exists at the root and in both workspaces, and a **Typecheck step runs in all four Azure deployment workflows**, so the gap cannot reopen. Four of the errors were in the ChainComposer test fixtures and each was fixed by correcting the fixture rather than loosening an assertion — the instructive one being a `missingInputs` array of strings where `RequiredInput` was declared, which passed because only its `length` reaches the DOM. Exactly what an absent typechecker hides.
+
+**Node versions are pinned to exact patches in the deployment workflows** — 20.20.2 for the frontend, 22.23.2 for the backend, 24.19.0 for the supply-chain audit — with the `engines` floors raised to match. This closes, for this repository, the floating-runtime gap that [Supply-Chain Pinning](../../contributing/supply-chain.md#what-this-does-not-protect) records as an open exception elsewhere.
+
+**Per-file branch coverage clears 80% across both packages.** Frontend branches rise from 65.67% to **90.62%** and backend from 91.49% to **92.22%**, with every file above the bar — see [Testing](testing.md) for the measured figures. Two jsdom limitations had to be worked around for the d3 drag and zoom paths: jsdom rejects `view` in the `MouseEvent` constructor, and `SVGSVGElement` carries no `width`/`height` `baseVal` for the default extent `d3-zoom` computes.
+
+**The deploy modal keeps its actions reachable.** With bundles now reaching 48 resources it had grown past the viewport, pushing Deploy and Close off-screen. It is restructured into a pinned header, a scrolling body and a pinned footer — the body needing `min-h-0` to shrink below its content, since a flex child defaults to `min-height: auto` and will not.
+
+**Frontend dependencies updated**: `bpmn-js` 18.24, `form-js` 1.25, `bpmn-js-properties-panel` 5.64, React 19.2.8, TypeScript 5.9.3, Prettier 3.9.6 and the surrounding ESLint and testing-library packages. Verified before merge rather than after: `check-format` passes untouched under Prettier 3.9.6, and TypeScript 5.9 produces exactly the same fifteen pre-existing type errors as 5.8 — no new ones — so the `tsc` gate landing in the same release covers precisely the intended set.
+
+---
+
+### v2026.09.0 — A Deploy That Refuses an Incomplete Bundle (September 2026)
+
+**A bundle could deploy with none of its documents and still show a green panel.** The deploy modal filtered referenced forms and document templates against the browser's own storage and dropped every miss silently. `RipR21Process` deployed with its BPMN and twelve forms but none of its three documents.
+
+**The failure surfaced a long way from its cause**, which is why it is worth recording in full. At runtime the RONL Business API read `ronl:signatureRef` from the engine, looked for `rip-pdp.document` in the deployment, threw `SIGNATURE_TEMPLATE_NOT_FOUND` and returned 500 from the task-spec endpoint. `ProjectDetail` fetches that spec inside a `Promise.allSettled` and degrades a failure to *"no signature required"* — so the phase-exit approval task rendered an ordinary form instead of the signing panel, and the end-to-end journey failed on a missing panel. Three components away from the modal that dropped the resource.
+
+Missing resources are now listed by name and the deploy button is disabled while any remain, matching the existing board-owner and organization guards. `unmatchedForms` was already computed but rendered nowhere, and is surfaced alongside. `extractDocumentRefs` now also follows `ronl:signatureRef`: a task binding a template through that attribute alone never contributed it, and `rip-pdp` survived only because it carries both.
+
+**Forms bind to their own deployment instead of the latest version.** Tenanting a process definition made the process unambiguous and its forms ambiguous: `camunda:formRefBinding="latest"` resolves a form key across the whole repository rather than within the bundle, so deploying `AwbShellProcess` under tenant `flevoland` produced `ENGINE-03109` — the key `kapvergunning-start` existed for multiple tenants. `"deployment"` resolves the form from the process definition's own deployment, unique by construction, so tenanted and untenanted copies coexist and no deployment history has to be destroyed.
+
+**91 of 109 references were converted**, across the three trees that hold BPMN: `packages/frontend/public/examples/` (seed and deploy source for the Awb, Zorgtoeslag, DvTP and HR bundles), `examples/organizations/` (authoring source for RIP and HR-capacity), and `e2e-fixtures/` (what the RONL Business API's E2E suite deploys). `thuisbatterij` and `ind` stay on `"latest"` because their form keys resolve nowhere in the repository.
+
+!!! warning "Already-deployed definitions do not heal"
+    `public/examples` is seeded into `localStorage` and re-fetched only when its version rises, so the seven seeded BPMN entries in `EXAMPLE_VERSIONS` were bumped — without that, the edit would be invisible to every existing user. ACC users get the fix only after a frontend deploy and a page load that re-seeds, and the `e2e-fixtures` bundles must be re-imported through the BPMN Modeler before an E2E run exercises them.
+
+---
+
 ### v2026.08.9 — Changelog gains `ci` and `repo` scopes, and stops crashing on an unknown one (August 2026)
 
 **Three entries in the previous release changed no deployable's code at all**, and the scope field offered only `frontend`, `backend` and `both` — so none of the three was true for them. Labelling any of it `both` would have told a reader that a release touching only `.github/` had changed application code. `ci` now covers pipeline and supply-chain work, mirroring the tag `ronl-business-api` already uses so both repositories label the same kind of work the same way; `repo` covers everything else that ships no application code — documentation, and the Operaton deploy bundles under `examples/` and `e2e-fixtures/`. Those bundles are worth distinguishing from a frontend change, because the frontend serves its own copies from `packages/frontend/public/examples/`, while the root directories are read only by the backend's tests and deployed to Operaton separately.
