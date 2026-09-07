@@ -1,5 +1,5 @@
 {
-  "docs_built": "2026-09-05",
+  "docs_built": "2026-09-07",
   "repositories": [
     {
       "name": "RONL Business API",
@@ -13,11 +13,11 @@
     {
       "name": "Norm Editor",
       "icon": "🖍️",
-      "version": "2026.07.0",
-      "environment": "acc",
-      "commit": "c20c86f80...",
-      "commit_date": "2026-07-09",
-      "repo_url": "https://git.open-regels.nl/regels/editor/-/commit/c20c86f805a17dbcf53b57589f5bdf8384d43af6"
+      "version": "2026.09.1",
+      "environment": "prod",
+      "commit": "46e44c8...",
+      "commit_date": "2026-09-01",
+      "repo_url": "https://git.open-regels.nl/regels/editor/-/commit/46e44c8e9f1f0e47a28659831e5743bcf4088647"
     },
     {
       "name": "CPSV Editor",

@@ -214,6 +214,7 @@ nav:
       - Local Development: norm-editor/developer/local-development.md
       - Frontend: norm-editor/developer/frontend.md
       - Backend & API Services: norm-editor/developer/backend-and-apis.md
+      - Testing: norm-editor/developer/testing.md
       - Deployment: norm-editor/developer/deployment.md
       - Changelog & Roadmap: norm-editor/developer/changelog-roadmap.md
     - References:

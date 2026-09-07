@@ -10,6 +10,11 @@ Husky-managed git hooks, npm workspaces, and four identically named root scripts
 documents what their tooling actually enforces, measured from each repository's own
 configuration rather than assumed to be uniform.
 
+**The Norm Editor is the fourth application repository and is deliberately out of
+scope below**, because it shares none of that convention — see
+[The Norm Editor is shaped differently](#the-norm-editor-is-shaped-differently) at the
+foot of this page.
+
 ---
 
 ## Linting and formatting
@@ -195,10 +200,9 @@ artifacts into the next repository.
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/), as
 described in [Contributing → Commit your changes](index.md#5-commit-your-changes). None
-of the three repositories above enforce this mechanically — Norm Editor does: its
-`commit-msg` and `pre-push` git hooks reject any commit whose subject line does not
-match the Conventional Commits pattern, so a non-conforming message there hard-fails
-rather than merely failing review.
+of the three repositories above enforce this mechanically — the Norm Editor does, and
+how it does so is covered in
+[The Norm Editor is shaped differently](#the-norm-editor-is-shaped-differently).
 
 **No Claude attribution trailers.** If you're using an AI assistant to help prepare a
 commit, the commit message ends with its substantive body and nothing else —
@@ -261,3 +265,47 @@ being types plus two seed modules with no functions and no branches. That exempt
 a consequence worth knowing — **executable logic placed in the shared package is
 unmeasurable by construction**, which is why a branching helper was moved out of it in
 v2026.09.4 rather than left where a passing test run concealed the gap.
+
+
+---
+
+## The Norm Editor is shaped differently
+
+The three repositories above converged on one toolchain. The Norm Editor did not, and
+the differences are structural rather than stylistic — which is why applying this
+page's expectations to it would produce wrong answers rather than merely strict ones.
+
+| | The other three | Norm Editor |
+|---|---|---|
+| CI | GitHub Actions | **GitLab CI** (`.gitlab-ci.yml`) |
+| Languages | TypeScript / JavaScript | **JavaScript *and* Python**, five services |
+| Repository shape | npm workspaces (two of three) | **No root `package.json` at all** — each service stands alone |
+| Git hooks | Husky + `lint-staged` | **`.githooks/`**, plain shell, no Husky |
+| Deploy artifact | Static Web Apps bundle or artifact | **Docker images** pushed to Azure Container Registry |
+
+### Its hooks enforce more, not less
+
+The other three gate formatting and linting on commit. The Norm Editor's hooks do
+something the others do not attempt:
+
+- **`commit-msg`** rejects any subject line not matching the Conventional Commits
+  pattern, with merge, revert and fixup commits explicitly exempted. A non-conforming
+  message hard-fails rather than merely failing review.
+- **`pre-push`** re-checks that pattern across every commit in the push range, so a
+  message that slipped through locally cannot reach the remote.
+- **`pre-commit`** regenerates `gui/public/changelog.json` from the git history via
+  `scripts/generate-changelog.mjs`, so the in-app changelog cannot drift from what was
+  actually committed. It degrades gracefully when `node` is absent rather than
+  blocking the commit.
+
+That last one is the reason its changelog is **git-log-derived** rather than
+hand-curated, and why its entries read as commit subjects. A sync reading it should
+expect terse text and check the source for anything substantive.
+
+### What it does not have
+
+No lint or format script is wired into CI, and **no coverage is measured anywhere** —
+neither runner is invoked with coverage flags and no threshold is configured. Its
+pipeline gates on tests alone. See
+[Testing](../norm-editor/developer/testing.md) for what those tests are and what the
+pipeline actually blocks.
