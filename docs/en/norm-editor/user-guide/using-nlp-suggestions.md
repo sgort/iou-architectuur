@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Using NLP Suggestions
 
 The editor can suggest the constituents of an act frame — actor, action, object, recipient —
@@ -22,12 +26,14 @@ source without it.
 ## How to use it
 
 1. Work on a selected Dutch sentence in the source panel.
-2. Request suggestions for that sentence.
-3. The model returns each word labelled as **Actor**, **Action**, **Object**, **Recipient**,
+2. Optionally pick a different model from the **NLP model** dropdown beside the suggestion
+   controls. Leaving it alone uses the default.
+3. Request suggestions for that sentence.
+4. The model returns each word labelled as **Actor**, **Action**, **Object**, **Recipient**,
    or *none*.
-4. The editor surfaces these suggestions so you can turn them into facts and place them into
+5. The editor surfaces these suggestions so you can turn them into facts and place them into
    the matching roles of an act.
-5. **Review every suggestion.** Accept the ones that are right, adjust the boundaries where the
+6. **Review every suggestion.** Accept the ones that are right, adjust the boundaries where the
    model over- or under-selected, and ignore anything incorrect.
 
 When the editor creates an **agent** fact from a suggestion, it records the model's

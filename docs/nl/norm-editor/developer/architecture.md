@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Architecture
 
 !!! info "Documentatie in ontwikkeling"

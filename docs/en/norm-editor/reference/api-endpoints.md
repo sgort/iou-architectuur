@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # API Endpoints
 
 All browser requests go through nginx, which routes by path prefix to one of the services
@@ -79,14 +83,22 @@ Predicts the constituents of an act frame for Dutch text.
 **Request**
 
 ```json
-{ "text": "de verwerkingsverantwoordelijke verwerkt persoonsgegevens" }
+{
+  "text": "de verwerkingsverantwoordelijke verwerkt persoonsgegevens",
+  "model": "bertje_2022_e4"
+}
 ```
+
+`model` is **optional**. It names an entry in the service's model registry —
+`bertje_2022_e4` (the default) or `legal-bert-dutch-english`. An unknown key, or an
+absent one, falls back to the default rather than erroring.
 
 **Response**
 
 ```json
 {
   "text": "...",
+  "model": "bertje_2022_e4",
   "predicted_entities": [
     ["de", "None"],
     ["verwerkingsverantwoordelijke", "Actor"],
@@ -96,8 +108,18 @@ Predicts the constituents of an act frame for Dutch text.
 }
 ```
 
-Labels are `Action`, `Actor`, `Object`, `Recipient`, or `None`. A Swagger UI is available at
-`/swagger`.
+Labels are `Action`, `Actor`, `Object`, `Recipient`, or `None`. The `model` field echoes
+the model **actually used**, which is not always the one requested — an unrecognised key
+returns the default's name, so a caller can tell the difference rather than assuming its
+request was honoured.
+
+**Errors**
+
+| Status | Body | When |
+|---|---|---|
+| `500` | `{ "text": "...", "error": "Model does not exist on filesystem." }` | The requested model resolves to a path that is not present. Model files are mounted rather than baked into the image, so a registry entry can name a model the deployment does not have |
+
+A Swagger UI is available at `/swagger`.
 
 ---
 

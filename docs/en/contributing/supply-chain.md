@@ -32,10 +32,19 @@ deploy undiagnosable between the two), and forking the actions into an IOU-owned
 namespace (disproportionate for a handful of actions, and it relocates the trust
 problem rather than solving it).
 
-!!! note "GitLab hosts code only"
-    All IOU CI/CD runs on GitHub Actions. There is no `.gitlab-ci.yml` in these
-    repositories, so "extend the policy to GitLab" is vacuous for them — the
-    entire attack surface is the GitHub workflows.
+!!! note "GitLab hosts code only — for the repositories on this page"
+    The three application repositories covered here run all their CI/CD on GitHub
+    Actions and contain no `.gitlab-ci.yml`, so "extend the policy to GitLab" is
+    vacuous for them: their entire attack surface is the GitHub workflows.
+
+    **The Norm Editor is the exception, and it is not covered by this page.** Its
+    pipeline *is* GitLab CI, it builds and pushes its own Docker images to Azure
+    Container Registry rather than handing a bundle to a vendor action, and none of
+    the five mechanisms below exists there in the same form — there are no `uses:`
+    references to digest-pin, no zizmor equivalent wired in, and no `acc` branch to
+    protect, because `main` is its only integration branch. Extending the policy to
+    it is a separate piece of work against a different CI system, not a fifth row in
+    the table below.
 
 ---
 

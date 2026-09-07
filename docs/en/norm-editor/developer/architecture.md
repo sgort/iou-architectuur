@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Architecture
 
 The Norm Editor is a multi-service application. This page describes the services, how they
@@ -40,7 +44,7 @@ graph TB
 | `nginx` | nginx | Single entry point; all routing lives here |
 | `web` | Vue 3 + Quasar (SPA), Pinia, D3 | The editor UI |
 | `backend` | Node.js, Express, `@triply/triplydb`, N3, SuperAgent | TriplyDB gateway: list/read/write sources and tasks |
-| `nlp-api` | Python, Flask, HuggingFace Transformers, PyTorch | BERTje token classification for act frames |
+| `nlp-api` | Python, Flask, HuggingFace Transformers, PyTorch | Token classification for act frames, over a registry of [selectable models](../features/nlp-assistance.md#choosing-a-model) loaded from mounted storage |
 | `unwrap-api` | Python, Flask, RDFLib | FLINT RDF → editor JSON |
 | `wrap-up-api` | Python, Flask, RDFLib | editor JSON → FLINT RDF |
 
