@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Using NLP Suggestions
 
 !!! info "Documentatie in ontwikkeling"

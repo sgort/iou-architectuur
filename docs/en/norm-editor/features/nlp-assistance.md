@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # NLP Assistance
 
 Interpreting an act frame means deciding which words are the **action**, which are the
@@ -8,8 +12,8 @@ automatically, using a machine-learning model trained on Dutch normative text.
 
 ## What it does
 
-The **nlp-api** service wraps a fine-tuned **BERTje** model (a Dutch BERT) configured for
-**token classification**. Given a piece of Dutch text, it labels each token as one of:
+The **nlp-api** service wraps a fine-tuned model configured for **token classification**.
+Given a piece of Dutch text, it labels each token as one of:
 
 | Model label | Meaning in the editor |
 |---|---|
@@ -18,6 +22,27 @@ The **nlp-api** service wraps a fine-tuned **BERTje** model (a Dutch BERT) confi
 | `OBJECT` | Object |
 | `RECIPIENT` | Recipient |
 | `O` | Not part of an act frame |
+
+### Choosing a model
+
+Since 2026.09.1 the model is chosen **per request** rather than fixed at deploy time.
+`nlp-api` carries a registry of selectable models and the request names one:
+
+| Key | Model |
+|---|---|
+| `bertje_2022_e4` | A fine-tuned **BERTje** (a Dutch BERT) — the default |
+| `legal-bert-dutch-english` | A legal-domain bilingual model |
+
+The Act frame form exposes these in an **NLP model** dropdown. An unknown key, or no
+key at all, falls back to the default, and the response echoes the model that was
+actually used — so a caller can always tell which one produced the labels rather than
+assuming its request was honoured.
+
+Adding an entry to the registry is what exposes it in the editor; there is no separate
+list to keep in step. Model files are **not** part of the service image — `nlp-api`
+takes its model root from configuration, backed by an Azure storage account, so adding
+a model does not mean rebuilding the service. A resolved path that does not exist is
+reported as an error rather than surfacing a loader traceback.
 
 Word-piece tokens (those continuing a previous word) are merged back into whole words, so the
 suggestions are returned as readable word/label pairs rather than sub-word fragments.

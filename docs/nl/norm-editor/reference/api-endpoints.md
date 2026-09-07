@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # API Endpoints
 
 !!! info "Documentatie in ontwikkeling"
