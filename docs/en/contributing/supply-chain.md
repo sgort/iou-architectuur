@@ -625,6 +625,38 @@ dependency updates — *which is how gates get resented and then bypassed*.
 Promoting it is tracked as
 [ronl-business-api#83](https://github.com/sgort/ronl-business-api/issues/83).
 
+The Linked Data Explorer promoted its step to blocking in v2026.09.2 without
+waiting for a tool change, because the problem is a habit rather than a defect.
+
+### The habit the register depends on
+
+Renovate rewrites a workflow's digest **and its version comment together**,
+honestly and correctly. It was predicted that this made the register safe — the
+pair moves as one, so pin truth still holds. **Pin truth does hold. Register
+agreement does not**, and a real Renovate pull request said so:
+
+```
+[register] actions/checkout: workflow pins 3d3c42e5aac5… (v7.0.1) but
+           SECURITY-PIPELINE.md records only 11d5960a3267… (v4.4.0), a37ce9120846… (v3.7.0)
+```
+
+The check is right and the register is stale — exactly the drift it exists to
+catch, caught on the branch rather than after the merge. So each repository’s
+`SECURITY-PIPELINE.md` records the rule — in RONL Business API’s case on `acc`,
+where it has not yet been promoted to `main`:
+
+!!! tip "When a Renovate pull request bumps an action, update the register on that pull request's branch — before merging it"
+    **Not afterwards.** The check runs on the pull request, so a register fixed
+    after the merge leaves that pull request red for its whole life. It also makes
+    the step impossible to promote: if no bump can ever present a green result,
+    blocking would mean no action ever gets updated.
+
+The Linked Data Explorer exercised this twice — on the `checkout` v7.0.1 and
+`setup-node` v7.0.0 bumps — before promoting its step. In both, the register moved
+on the bump's own branch, the check went green there, and the pull request merged
+green. That is the evidence the promotion rested on, and it is what RONL Business
+API needs before #83 can close.
+
 !!! danger "If it proves flaky the answer is `--offline`, never `continue-on-error`"
     The known cost is a network call inside a required job. `--offline` drops the
     pin-truth half and keeps register agreement blocking. `continue-on-error`

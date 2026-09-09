@@ -206,9 +206,13 @@ branch, `github.sha` is the real commit. Observed:
 
 ## Known gaps
 
-- **Production is wired everywhere and exercised nowhere.** All six workflow files
-  carry the `env:` block, but only the three acceptance workflows have run. Worth
-  one glance at the changelog on each application's first production release.
+- **Production has now run once, in one application.** All six workflow files carry
+  the `env:` block. The Linked Data Explorer promoted v2026.09.2 to `main` on
+  9 September 2026 and its production frontend workflow ran green, so the values it
+  injects are `github.sha` `007b350` and `github.run_number` **39** — a changelog
+  reading *`build 007b350 · #39`*. That is **derived from the run, not read off the
+  running application**, which is the glance still worth taking. The other two
+  applications' production workflows remain wired and unexercised.
 - **Backend versions are unaffected.** The line describes the frontend bundle being
   viewed; backends ship their versions separately.
 

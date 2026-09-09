@@ -32,7 +32,7 @@ measured in the same run.
     of the five runner configs, and **no workflow measures coverage at all** —
     so a file dropping below 80% branches fails neither a local run nor CI. The
     floor is recorded in an implementation plan and held by review. See
-    [Code Standards](../../../contributing/code-standards.md#the-80-branch-floor-is-a-convention-not-a-gate).
+    [Coverage Floor](../../../contributing/coverage-floor.md).
 
 !!! note "The frontend row is not comparable to v2026.08.23"
     The Public Affairs cockpit was extracted into `packages/pa-cockpit` in this

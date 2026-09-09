@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Linked Data Explorer
 
 **A React-based SPARQL visualization and query tool for exploring Dutch Government Data (Regels Overheid)**
@@ -116,8 +120,7 @@ linked-data-explorer/
 │   │   │   ├── utils/
 │   │   │   │   └── exportService.ts
 │   │   │   ├── types/
-│   │   │   ├── changelog.json
-│   │   │   └── tutorial.json
+│   │   │   └── changelog.json
 │   │   ├── .env.development
 │   │   ├── .env.acceptance
 │   │   └── .env.production

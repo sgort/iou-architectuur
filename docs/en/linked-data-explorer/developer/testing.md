@@ -12,23 +12,31 @@ before that the repository had no test files at all and `npm test` exited 1 with
 
 !!! info "Figures on this page are measured, not estimated"
     Every count, command and coverage percentage below was produced by running
-    the suites against **v2026.09.1** on **5 September 2026**, on `acc` at
-    `69bba13`, after a clean `npm ci`. Rerun the commands in
+    the suites against **v2026.09.2** on **9 September 2026**, at `007b350` on
+    `main` — the promoted commit — after a clean `npm ci`. Rerun the commands in
     [Running the tests](#running-the-tests) to reproduce them.
 
-**At a glance:** 119 test files · **2160 tests** · all passing · backend 98.56%
-statements, frontend 94.30%.
+**At a glance:** 119 test files · **2213 tests** · all passing · backend 98.56%
+statements, frontend 94.75%.
 
 | Package | Runner | Files | Tests | Statements | Branches | Functions | Lines |
 |---|---|---:|---:|---:|---:|---:|---:|
 | `packages/backend` | Jest + ts-jest | 51 | 1140 | 98.56% | 92.22% | 97.15% | 99.05% |
-| `packages/frontend` | Vitest + RTL | 68 | 1020 | 94.30% | 90.62% | 91.43% | 95.46% |
+| `packages/frontend` | Vitest + RTL | 68 | 1073 | 94.75% | 92.88% | 91.74% | 95.71% |
 
-**The frontend nearly doubled.** v2026.09.1 raised per-file branch coverage above
-80% across both packages: the frontend gained **8 files and 447 tests**, taking
-branches from 65.67% to **90.62%** and statements from 74.72% to 94.30%. The
-backend moved far less because it had further to go — six tests, and branches
-from 91.49% to 92.22%.
+**The frontend nearly doubled, and then was given margin.** v2026.09.1 raised
+per-file branch coverage above 80% across both packages: the frontend gained
+**8 files and 447 tests**, taking branches from 65.67% to 90.62% and statements
+from 74.72% to 94.30%. The backend moved far less because it had further to go —
+six tests, and branches from 91.49% to 92.22%.
+
+v2026.09.2 took the frontend from 1020 to **1073** tests. **31 of those came from
+one commit** that added them to twelve existing files and no new file, taking
+branches to **92.88%** and changing no production code — margin above the floor
+rather than new behaviour. See
+[The per-file branch floor](#the-per-file-branch-floor). The rest of the delta is
+ordinary work in the same release, minus the nine tests deleted with the Tutorial
+component.
 
 Two jsdom limitations had to be worked around to reach the d3 drag and zoom
 paths, and they are the kind that make a branch look untestable when it is not:
@@ -55,9 +63,9 @@ both workspaces with `--workspaces --if-present`.
 
 | Command | Scope | Files | Tests |
 |---|---|---:|---:|
-| `npm test` | Both packages | 119 | 2160 |
+| `npm test` | Both packages | 119 | 2213 |
 | `npm test -w packages/backend` | Backend only (Jest, with coverage) | 51 | 1140 |
-| `npm test -w packages/frontend` | Frontend only (Vitest, with coverage) | 68 | 1020 |
+| `npm test -w packages/frontend` | Frontend only (Vitest, with coverage) | 68 | 1073 |
 
 Both packages' `test` scripts include coverage by default, so a plain run always
 produces a report. Watch modes are `test:watch` in either package; the backend
@@ -202,18 +210,33 @@ a DOM. Uses `@testing-library/react`, `jest-dom`, `user-event`, `jsdom` and
 
 | Area | Tests | Notes |
 |---|---:|---|
-| `src/services` | 116 | All 11 service modules — `msw` for the network-calling ones, jsdom `localStorage` for the two storage modules, raw `fetch` mocking for `sparqlService`'s CORS-proxy fallback |
-| `components/ChainBuilder` | 102 | First `@dnd-kit`-coupled area. The hooks render fine with no `DndContext` wrapper — dnd-kit's context hooks fall back to sane defaults |
-| `components/BpmnModeler` | 84 | `bpmn-js` and the properties panel mocked outright via a small fake modeler class built in a `vi.hoisted` block |
-| `components/DocumentComposer` | 76 | The heaviest area, coupling `@tiptap/react` and `@dnd-kit`. Real ProseMirror runs under jsdom once `Range.getClientRects`/`getBoundingClientRect` and `document.elementFromPoint` are polyfilled |
-| `components/FormEditor` | 38 | `@bpmn-io/form-js` mocked — exercising the real library would mean mounting a full canvas editor |
-| `src/utils` | 37 | Pure logic: `exportFormats`, `exampleVersions`, `testData`, `logoResolver` |
-| `components/RopaEditor` | 33 | Record fields, legal-basis SPARQL lookup, hydrate-from-linked-forms, the BPMN `ronl:ropaRef` tab, confirm-gated status transitions |
-| `src/App.test.tsx` | 26 | `App.tsx` renders 12 feature components as inspectable stubs, isolating the orchestrator's own state machine. Includes the regression test for the error overlay, which is asserted on the view that raises it |
-| `components/Changelog` | 5 | The in-app changelog viewer, rendering `changelog.json` |
+| `components/ChainBuilder` | 184 | First `@dnd-kit`-coupled area. The hooks render fine with no `DndContext` wrapper — dnd-kit's context hooks fall back to sane defaults |
+| `components/DocumentComposer` | 167 | The heaviest area, coupling `@tiptap/react` and `@dnd-kit`. Real ProseMirror runs under jsdom once `Range.getClientRects`/`getBoundingClientRect` and `document.elementFromPoint` are polyfilled |
+| `src/components` (top level) | 149 | `ShaclValidator` 37, `DmnValidator` 30, `ResultsTable` 26, `GraphView` 23, `OrganizationCard` 12, `Changelog` 11, `OrganizationsView` 10 |
+| `src/services` | 142 | All 11 service modules — `msw` for the network-calling ones, jsdom `localStorage` for the two storage modules, raw `fetch` mocking for `sparqlService`'s CORS-proxy fallback |
+| `components/BpmnModeler` | 134 | `bpmn-js` and the properties panel mocked outright via a small fake modeler class built in a `vi.hoisted` block |
+| `src/utils` | 80 | Pure logic: `exportFormats`, `exampleVersions`, `testData`, `logoResolver` |
+| `components/DsoExplorer` | 64 | The largest single component file; `dsoService` mocked via `vi.mock` + `vi.importActual` so the pure URL/URN helpers stay real |
+| `components/FormEditor` | 58 | `@bpmn-io/form-js` mocked — exercising the real library would mean mounting a full canvas editor |
+| `components/RopaEditor` | 43 | Record fields, legal-basis SPARQL lookup, hydrate-from-linked-forms, the BPMN `ronl:ropaRef` tab, confirm-gated status transitions |
+| `src/App.test.tsx` | 26 | `App.tsx` renders 11 feature components as inspectable stubs, isolating the orchestrator's own state machine. Includes the regression test for the error overlay, which is asserted on the view that raises it |
 | `components/common` | 26 | Toolbar, language and organisation selectors |
-| `components/DsoExplorer` | 21 | The largest single component file; `dsoService` mocked via `vi.mock` + `vi.importActual` so the pure URL/URN helpers stay real |
-| `components/Tutorial` | 9 | Fixture-mocked `tutorial.json` |
+
+!!! note "These are the runner's own per-file counts, summed"
+    Every row above was derived from Vitest's default reporter — the
+    `(N tests)` it prints beside each file — grouped by directory. The rows
+    therefore sum to exactly 1073.
+
+    **The previous revision of this table did not.** Its rows summed to 573
+    against a stated total of 1020, because they had been gathered per area at
+    different times rather than from one run, and the top-level
+    `src/components` files were never a row at all. A per-area table that does
+    not reconcile with the headline is worth less than no table, so this one is
+    generated rather than maintained.
+
+`components/Tutorial` was a row here until v2026.09.2, which
+[removed the Tutorial view outright](changelog-roadmap.md) — the
+component, its nine tests and the 596 lines of `tutorial.json` behind it.
 
 The component strategy throughout is **critical interactions, not exhaustive
 branch coverage**: orchestrators mock their already-tested children as clickable
@@ -223,13 +246,66 @@ stubs and assert on their own state machine.
 
 Documented rather than silently skipped:
 
-- **`exportService.ts`** (0%) — only 2 of its 6 functions are exported; the rest
-  are reachable only through real DOM manipulation and JSZip archive building.
 - **`bpmnTemplates.ts`** (0%) — confirmed to be pure static XML template data.
 - **The actual `@dnd-kit` pointer-drag gesture** — `handleDragEnd`'s logic is
   exercised directly instead, by constructing `DragEndEvent` objects.
+- **Three submit-guard branches**, each sitting behind a button that is already
+  disabled on the same condition. Reaching them means driving the component into
+  a state the interface does not offer.
 
-`DsoExplorer.tsx` is the largest genuine gap at 72% statements.
+Two entries left this list. **`exportService.ts` was 0%** — only 2 of its 6
+functions are exported, the rest reachable only through real DOM manipulation and
+JSZip archive building — and now reads 100% statements, 94.66% branches.
+**`DsoExplorer.tsx` was the largest genuine gap at 72% statements** and now sits
+at 92.55%.
+
+---
+
+## The per-file branch floor
+
+Since v2026.09.2 both runners enforce **80% branch coverage per file**, natively:
+`jest.config.js` takes a glob key it applies to each matching file individually,
+`vite.config.ts` takes `thresholds: { branches: 80, perFile: true }`.
+
+`perFile` is the mechanism, not a detail. Against a package *average* the
+threshold is inert — the frontend sits at 92.88% and the backend at 92.22%, so a
+single file dropping to 40% would barely move either. Branches specifically,
+because statement and line coverage largely restate *"was this file imported"*,
+while an uncovered branch is a decision no test has ever checked.
+
+**Branches only.** A functions floor would fail today, and is not a companion
+setting to add without measuring first.
+
+### The margin, and why it needed widening
+
+The floor landed measured-clean but with none to spare:
+`ChainBuilder/TestCasePanel.tsx` sat at **exactly 80.00%**, with thirteen more
+files between 80 and 85. The first uncovered branch added to any of them would
+have turned CI red on an unrelated change — which is how a floor stops being read
+as a floor and starts being read as an obstacle.
+
+v2026.09.2 raised twelve files. Of the 68 frontend files carrying at least one
+branch, **one is now below 85%**: `GraphView.tsx` at 82.26%. Its eleven remaining
+uncovered branches are all inside d3's force-simulation tick and drag handlers —
+`d.x || 0` position fallbacks, `if (!event.active)` drag guards — which need a
+running simulation and synthesised drag events to reach. That is a d3 harness,
+not a test of this component. The config comment says so, so that whoever next
+turns this red knows the answer is to test their new branch rather than lower the
+floor.
+
+### Every new test was mutation-checked
+
+A test written against code that already exists **passes on its first run**,
+which proves nothing about whether it can fail. Each of the 31 tests written for
+the floor had the branch it targets deliberately broken and had to fail before it
+was kept.
+
+That caught **five tests asserting nothing**. Four share a shape worth knowing on
+any React codebase: an assertion that *"nothing happened"* stays true when the
+handler **throws** partway through, because React surfaces an error thrown inside
+a click handler on `window`'s `error` event rather than rejecting the click. The
+test sees no state change and passes — for the wrong reason. See
+[Raising coverage without writing hollow tests](../../contributing/coverage-floor.md#raising-coverage-without-writing-hollow-tests).
 
 ---
 
@@ -341,8 +417,11 @@ broken fixtures before it was allowed to pass.
 
 ## Roadmap
 
-**Close the remaining frontend gaps** — `DsoExplorer.tsx` at 72%, and a decision
-on whether `exportService.ts` is worth the DOM/JSZip harness it would need.
+**Close the remaining frontend gaps.** Both items that stood here are done —
+`DsoExplorer.tsx` went from 72% to 92.55% statements, and `exportService.ts` got
+its DOM/JSZip harness and reads 100%. What is left is `GraphView.tsx` at 82.26%
+branches, which is a deliberate hold rather than a gap: see
+[The per-file branch floor](#the-per-file-branch-floor).
 
 **Deliberately out of scope for now:** visual regression, a cross-browser matrix,
 and E2E in this repository. Note the E2E fixtures that live here under

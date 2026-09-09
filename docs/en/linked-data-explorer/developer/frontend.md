@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Frontend Architecture
 
 The frontend is a React 19 TypeScript SPA built with Vite. It has no routing library — navigation is a local state enum. It has no global state management library — state lives in component hooks, with `localStorage` as the only persistence layer.
@@ -43,9 +47,12 @@ packages/frontend/src/
 │   ├── index.ts                   core TypeScript interfaces
 │   ├── chainBuilder.types.ts      chain builder specific types
 │   └── export.types.ts            export types
-├── changelog.json                 version history data (JSON)
-└── tutorial.json                  in-app tutorial content
+└── changelog.json                 version history data (JSON)
 ```
+
+`tutorial.json` sat beside `changelog.json` until v2026.09.2, which removed the
+in-app tutorial and its 596 lines of content along with the `Tutorial` component
+and `ViewMode.TUTORIAL`.
 
 ---
 

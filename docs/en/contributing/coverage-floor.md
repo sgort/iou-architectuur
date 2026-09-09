@@ -126,6 +126,91 @@ would diverge from CI, cost real time on every run, and hide the order
 dependencies parallelism is good at exposing. Raising a wait is not a defect mask:
 an element that is genuinely never rendered still fails, only later.
 
+**The same shape at a much smaller dose.** The Linked Data Explorer added 31 tests
+(1042 → 1073) and saw exactly one parallel-only failure: a `ShaclValidator` test
+timing out at the 5000 ms default in a full run, passing **37 of 37 in isolation**,
+in a file the change had not touched. It did not recur, and no timeout was raised
+for it. Two readings, both worth carrying:
+
+- **The effect scales with how loaded the run is, not with how many tests you
+  added.** 31 was enough to surface it once.
+- **A parallel-only failure is not a finding until it fails in isolation.** That
+  one command is what separates contention from a real order dependency, and
+  changing code on the strength of a full-run failure alone is how a healthy suite
+  acquires defensive edits it never needed.
+
+---
+
+## Raising coverage without writing hollow tests
+
+Writing tests *to raise a number* is the failure mode this whole policy exists to
+avoid. Three mechanics kept the Linked Data Explorer's twelve-file push honest,
+and all three transfer.
+
+### Mutation-check every test — one written after the code cannot fail on its own merits
+
+A test written against code that already exists **passes on its first run**, which
+proves nothing about whether it *can* fail. So each new test had the branch it
+targets deliberately broken in the production file, and had to fail before being
+kept — then the file was restored. Cheap to automate: a shell loop over `sed`
+one-liners, one file-scoped run each.
+
+**That caught five of the thirty-one passing vacuously**, which would otherwise
+have shipped as coverage with nothing behind it:
+
+- **Two guard tests** used a response fixture with no `data` field at all, so
+  `data ?? []` and the real `success && Array.isArray(data)` guard behaved
+  identically. The fixture had to carry a payload that *survives* the guard's
+  removal before the test could fail.
+- **Four component tests** asserted *"nothing was added"* / *"nothing was saved"* —
+  which stays true when the handler **throws** partway through.
+
+!!! danger "On any React codebase, \"nothing happened\" is not a safe assertion"
+    React surfaces an error thrown inside a click handler on `window`'s **`error`
+    event** rather than rejecting the click, so an assertion on the DOM sees a
+    successful no-op either way. The fix is a listener around the interaction that
+    fails the test if anything was raised.
+
+    This is the transferable one. A test that asserts an absence needs something
+    watching for the throw, or it passes for the wrong reason.
+
+### Some branches are unreachable, and leaving them is the honest move
+
+Three guards sat behind a submit button already `disabled` on exactly the same
+condition — `filename.trim() || chainName` under `disabled={!filename.trim()}`.
+Covering them would mean invoking the handler directly, which tests nothing a user
+can do, and is why two files stop at 98.08% and 94.44% rather than 100%.
+
+**This is the same finding the CPSV Editor recorded** about `DMNTab.jsx`'s seven
+remaining guards — reached independently, in a different codebase and a different
+framework. Taken together they suggest a rule: *a per-file floor in the high
+nineties is usually the ceiling, and the last few points are dead code asking to be
+documented rather than tested.*
+
+### Say which mutations a test does **not** catch
+
+Two branches are covered but **behaviour-preserving**: a pair of
+`if (!templates) return null` guards whose removal only produces a throw the
+surrounding `try/catch` already swallows, and a `?? ''` feeding an `Array.join`
+that coerces `undefined` anyway. Their mutations survive by construction. They are
+worth keeping — they assert the returned contract — but a reader deserves to know
+which mutations they do not catch, and the comments say so rather than implying
+more.
+
+### One file deliberately left at the bottom
+
+`GraphView.tsx` stays at 82.26% — **51 of 62 branches**. The eleven uncovered ones
+are inside d3's force-simulation tick and drag handlers: `d.x || 0` fallbacks that
+need a node at the origin, and `if (!event.active)` guards that need synthesised
+`D3DragEvent`s. Reaching them means standing up a d3 harness and asserting on d3's
+mechanics rather than on the component.
+
+It has **one branch of slack**, and that is worth stating numerically rather than
+as a feeling: a twelfth uncovered branch still reads 80.95% and passes; the
+thirteenth fails. The config comment records it, so whoever next meets the floor
+there knows **the answer is to test their new branch rather than lower the
+threshold**.
+
 ---
 
 ## Runner mechanics
@@ -162,15 +247,41 @@ All three were measured clean before enforcing. That word hides a lot:
 |---|--:|---|
 | RONL Business API backend | — | comfortable |
 | Linked Data Explorer backend | 49 | `sparql.service.ts` 82.85% |
-| Linked Data Explorer frontend | 64 | **`CaseworkerCasePanel.tsx` exactly 80.00%** |
+| Linked Data Explorer frontend | 68 of 78 | `ChainBuilder/TestCasePanel.tsx` exactly 80.00% — **since raised to 100%** |
 | CPSV Editor | 41 | `useDsoImport.js` 80.39% |
 
-Thresholds pass at `>= 80`, so that Linked Data Explorer file is green with **zero
-margin**, and thirteen more sit between 80 and 85. The CPSV Editor arrived in the
-same position by a different route: its three lowest files — `useDsoImport.js`
-80.39%, `ConceptsTab.jsx` 80.56%, `ChangelogTab.jsx` 80.70% — are each **one
-uncovered branch** from failing, and now that the ratchet's pins are gone there is
-nothing to absorb a regression.
+*"Files measured" counts files carrying at least one branch* — 68 of the 78 in
+the Linked Data Explorer's frontend report, counted from `coverage-final.json`
+rather than from the printed table, which elides rows. A file with no branches
+cannot fail a branch threshold, so including it inflates the denominator without
+telling you anything.
+
+!!! bug "This table named a file that does not exist, and the error travelled"
+    Until 9 September 2026 the Linked Data Explorer row here read
+    **`CaseworkerCasePanel.tsx`**. No such file has ever existed in that
+    repository — the one sitting at exactly 80.00% was
+    `ChainBuilder/TestCasePanel.tsx`. The wrong name reached a commit message, a
+    config comment and a cross-repository record before anyone checked whether the
+    file was real, and this page copied it from there rather than verifying it.
+
+    The count was wrong too: **64** is not reproducible from any report, which is
+    why the rule is now stated rather than the number quoted.
+
+    Worth keeping as a caution about this page's own method. A margins table reads
+    like measurement, so it invites transcription — but only the percentages had
+    been measured, and the file names beside them had not.
+
+Thresholds pass at `>= 80`, so a file at exactly 80.00% is green with **zero
+margin** — the first uncovered branch added to it turns CI red on an otherwise
+unrelated change.
+
+**The Linked Data Explorer closed that gap in v2026.09.2**: twelve files raised,
+package branches 90.59% → **92.88%**, files under 85% from fourteen to one, tests
+1042 → 1073. **No production code changed** — test files only, plus the config
+comment. The CPSV Editor has not yet, and arrived at the same position by a
+different route: its three lowest files — `useDsoImport.js` 80.39%,
+`ConceptsTab.jsx` 80.55%, `ChangelogTab.jsx` 80.70% — are each one uncovered
+branch from failing, and the ratchet's pins that used to absorb a slip are gone.
 
 **The first uncovered branch added to any of them turns CI red on an otherwise
 unrelated change.** That is the floor working as designed, but it is worth meeting
@@ -196,9 +307,10 @@ on a pull request — it would fail on `acc`, after the fact, rather than on the
 branch that caused it. **The floor is real in four of its five workspaces and
 retrospective in the fifth.**
 
-That is the same gap the Linked Data Explorer closed, where it had let a genuine
-defect sit on a pushed branch for days because no pull request ever ran the test
-that caught it.
+The Linked Data Explorer had the same gap and **closed it in v2026.09.2**: its
+1140 backend tests now run on the pull request rather than only after the merge.
+It is the worked example, because it had already let a genuine defect sit on a
+pushed branch for days — no pull request ever ran the test that caught it.
 
 !!! warning "The fix is not identical, and the difference matters before copying one into the other"
     The Linked Data Explorer's backend workflow **deploys to Azure**, so its
