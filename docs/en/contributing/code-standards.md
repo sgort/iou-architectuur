@@ -115,7 +115,9 @@ ESLint; `test` is Vitest. None of the three typechecks, so a type error could re
 
 **CPSV Editor** — three workflows: two Azure Static Web Apps workflows, `acc` and `main`
 alike, running `npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy action,
-plus the supply-chain `audit`. Since v2026.09.0 the deploy workflows are named
+plus the supply-chain `audit`. Since v2026.09.2 that `audit` job also runs
+`npm run check-format` and `npm run check-supply-chain` — and it gained its first
+`npm ci` to do so, everything in it having previously run from `npx` or plain node. Since v2026.09.0 the deploy workflows are named
 **`Deploy ACC (orange-beach)`** and **`Deploy PROD (white-sky)`**; both were previously
 called `Azure Static Web Apps CI/CD`, with both jobs named `Build and Deploy Job`, so a
 production run was indistinguishable from an acceptance one in the Actions list, in a
@@ -227,38 +229,37 @@ of that cycle, see
 [Working with Claude Code](development-workflow/working-with-claude-code.md) rather than
 this page.
 
-### The 80% branch floor is a convention, not a gate
+### The 80% branch floor, natively enforced
 
-**Two repositories** have adopted a per-file 80% branch-coverage floor, within a day of
-each other. RONL Business API applied it across all five workspaces that have a test
-runner in v2026.09.2, taking 53 files below the line to none. The Linked Data Explorer
-applied it across both packages in v2026.09.1, taking frontend branch coverage from
-65.67% to 90.62% and backend from 91.49% to 92.22%.
+**All three repositories** hold new and changed code to 80% branch coverage **per
+file**, and as of September 2026 all three enforce it *natively* — in their test
+runners' own configuration, with no exemptions and no custom script:
 
-It is a real standard and new code is held to it — but it is worth being precise about
-what enforces it, because in **both** repositories the answer is *review*, and nothing
-else:
+| Repository | Where |
+|---|---|
+| CPSV Editor | `vite.config.mjs` — `{ branches: 80, perFile: true }` |
+| Linked Data Explorer | `packages/backend/jest.config.js` and `packages/frontend/vite.config.ts` |
+| RONL Business API | All five workspace runner configs |
 
-- **No coverage threshold is configured in any runner config** — not in RONL Business
-  API's five (`packages/backend/jest.config.js` plus four Vite/Vitest configs), and not
-  in the Linked Data Explorer's two. A file that drops below 80% fails nothing locally.
-- **Coverage is not run in CI at all**, in either repository. None of RONL Business
-  API's nine workflows mentions it and none of the Linked Data Explorer's seven does,
-  so no pipeline measures coverage, let alone gates on it. Note this is *not* for want
-  of a CI gate habit: the Linked Data Explorer added a Typecheck step to four workflows
-  in the same release it adopted the floor.
-- The floor is recorded in an implementation plan, and honoured by the people and
-  reviews that read it.
+!!! warning "This page said the opposite until 9 September 2026, and was right at the time"
+    Through v2026.09.1 the floor was a **convention held by review**: no threshold
+    was configured anywhere and no workflow measured coverage. Two things changed
+    it — RONL Business API and the Linked Data Explorer configured native
+    thresholds, and the CPSV Editor retired the ratchet script that had been
+    carrying its last exemption. A claim about enforcement is exactly the kind
+    that goes stale without a word of its own text changing.
 
-That is a legitimate way to hold a standard, and stating it plainly is better than
-implying a gate that does not exist — a contributor who assumes CI will catch a
-coverage regression will be wrong. Whether it *should* become a gate is tracked as
-[ronl-business-api#80](https://github.com/sgort/ronl-business-api/issues/80); the same
-question applies unchanged to the Linked Data Explorer. Measured figures live on each
-repository's own coverage page —
-[RONL Business API](../ronl-business-api/developer/testing/coverage.md) and
-[Linked Data Explorer](../linked-data-explorer/developer/testing.md) — both of which
-record when they were last taken.
+The route each took differs, and the CPSV Editor's is the instructive one: Vitest's
+threshold globs are **additive rather than overriding**, so a repository not yet at
+80% everywhere cannot express a partial rollout and needs a ratchet script instead.
+[The Coverage Floor](coverage-floor.md) covers that mechanism, why branches rather
+than functions, the load cost of bringing a large file up, and how to prove a
+threshold actually bites rather than trusting a green run.
+
+**A floor only gates where the tests run before the merge**, and there the three
+still differ — RONL Business API's backend workflow triggers on `push` alone, so its
+2008 tests run only *after* a merge and its branch threshold gates nothing on a pull
+request ([ronl-business-api#87](https://github.com/sgort/ronl-business-api/issues/87)).
 
 `@ronl/shared` is deliberately outside this: it has no test script and needs none,
 being types plus two seed modules with no functions and no branches. That exemption has

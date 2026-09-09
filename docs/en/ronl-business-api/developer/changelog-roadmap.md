@@ -1343,7 +1343,7 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 | Phase progression: finishing a phase readies the next    | v2026.09.0 |
 | RIP ladder complete — twelve of twelve deelprocessen      | v2026.09.3 |
 | 80% per-file branch floor across all five workspaces     | v2026.09.2 |
-| [Phase swimlanes derived from deployed BPMN](#v20260904--swimlanes-derived-from-deployed-bpmn-september-2026) | v2026.09.4 |
+| [Phase swimlanes derived from deployed BPMN](#v2026094-swimlanes-derived-from-deployed-bpmn-september-2026) | v2026.09.4 |
 
 !!! note "This table has a gap"
     Rows run from v1.0.0 to v3.0.7 and then jump to the September 2026 entries

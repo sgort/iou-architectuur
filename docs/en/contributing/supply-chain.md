@@ -480,9 +480,9 @@ Node 24.
     repository's register, precisely because the two are known to disagree.
     When they conflict, the workflow is what runs.
 
-Those last two gaps are the motivation for a planned `check-supply-chain`
-preflight script — and the register's drift is now the stronger argument for
-building it.
+Those last two gaps were the motivation for the `check-supply-chain` preflight,
+which **shipped in September 2026 and now runs in all three repositories** — see
+[below](#6-check-supply-chain-the-preflight-zizmor-cannot-be).
 
 !!! warning "It drifted, was caught by a documentation review, and was reconciled by hand"
     Between the v7 action upgrades and 30 August 2026, RONL Business API's
@@ -588,3 +588,95 @@ happens.
 Once a change is ready to commit,
 [Code Standards](code-standards.md) covers what lint, format, hooks and CI
 enforce in each repository.
+
+
+---
+
+## 6. `check-supply-chain` — the preflight zizmor cannot be
+
+The two gaps above — pin *truth* and register agreement — are now checked by a
+script rather than left as known limitations. It shipped in the CPSV Editor in
+v2026.09.1 and was adopted by the other two within days.
+
+### What it checks
+
+| Check | What it catches |
+|---|---|
+| **Pin truth** | Every digest is resolved against the GitHub API and compared with the version its trailing comment claims. Annotated tags are dereferenced to their commit |
+| **Register agreement** | The `Pinned` table is compared with the workflows — digests, version strings, the `(×N)` multiplicities, and the *"N `uses:` references across M workflows"* headline |
+
+The multiplicities are not decoration. In RONL Business API `setup-node` silently
+went from ×8 to ×9 when the config-validator step was added, and the register
+still said ×8 **with every gate green**. That is the drift this catches.
+
+### Where it runs, and where it blocks
+
+| Repository | State |
+|---|---|
+| CPSV Editor | ✅ blocking, in the `audit` job |
+| Linked Data Explorer | ✅ blocking |
+| RONL Business API | ⚠️ **non-blocking**, deliberately — see below |
+
+**RONL Business API's is non-blocking for a stated reason, not out of caution.**
+Renovate rewrites workflow pins and never touches `SECURITY-PIPELINE.md`, so
+every action-bump pull request fails the register half until the register is
+updated by hand. Blocking on that would fail a required check on routine
+dependency updates — *which is how gates get resented and then bypassed*.
+Promoting it is tracked as
+[ronl-business-api#83](https://github.com/sgort/ronl-business-api/issues/83).
+
+The Linked Data Explorer promoted its step to blocking in v2026.09.2 without
+waiting for a tool change, because the problem is a habit rather than a defect.
+
+### The habit the register depends on
+
+Renovate rewrites a workflow's digest **and its version comment together**,
+honestly and correctly. It was predicted that this made the register safe — the
+pair moves as one, so pin truth still holds. **Pin truth does hold. Register
+agreement does not**, and a real Renovate pull request said so:
+
+```
+[register] actions/checkout: workflow pins 3d3c42e5aac5… (v7.0.1) but
+           SECURITY-PIPELINE.md records only 11d5960a3267… (v4.4.0), a37ce9120846… (v3.7.0)
+```
+
+The check is right and the register is stale — exactly the drift it exists to
+catch, caught on the branch rather than after the merge. So each repository’s
+`SECURITY-PIPELINE.md` records the rule — in RONL Business API’s case on `acc`,
+where it has not yet been promoted to `main`:
+
+!!! tip "When a Renovate pull request bumps an action, update the register on that pull request's branch — before merging it"
+    **Not afterwards.** The check runs on the pull request, so a register fixed
+    after the merge leaves that pull request red for its whole life. It also makes
+    the step impossible to promote: if no bump can ever present a green result,
+    blocking would mean no action ever gets updated.
+
+The Linked Data Explorer exercised this twice — on the `checkout` v7.0.1 and
+`setup-node` v7.0.0 bumps — before promoting its step. In both, the register moved
+on the bump's own branch, the check went green there, and the pull request merged
+green. That is the evidence the promotion rested on, and it is what RONL Business
+API needs before #83 can close.
+
+!!! danger "If it proves flaky the answer is `--offline`, never `continue-on-error`"
+    The known cost is a network call inside a required job. `--offline` drops the
+    pin-truth half and keeps register agreement blocking. `continue-on-error`
+    looks equivalent and is not: it **rewrites the step's reported conclusion as
+    well as the job's**, so a failing check reports success rather than reporting
+    a failure that does not block. One is a narrower check; the other is a check
+    that lies.
+
+### It was proved by making it fail
+
+A green run proves nothing about a check that might be silently inert. Acceptance
+was a planted wrong digest carrying a plausible comment, a digest changed without
+updating the register, and a transport failure with a deliberately invalid token —
+which produced four API-error findings rather than silence.
+
+**Its assumptions were also wrong in a way this repository could not show.** Run
+against the other two before either adopted it, it reported findings that turned
+out to be its own bugs: an action can legitimately be pinned at **two digests**
+mid-upgrade, and a register may annotate a version cell (`v1 (branch head)`) where
+a workflow comment cannot. Rows are now matched by digest and versions compared on
+the leading token. Neither bug was visible in the repository that wrote the
+script, which pins every action once and annotates nothing — the same shape as the
+defect the script exists to catch.

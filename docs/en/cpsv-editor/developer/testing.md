@@ -4,60 +4,86 @@ component: CPSV Editor
 
 # Testing
 
-The CPSV Editor's automated test suite covers the pure-logic core the editor
-depends on — TTL generation and parsing, DMN XML handling, validators, the
-iKnow import mapping — plus the state hooks and the network-boundary
-utilities. Components and `App.js` orchestration are largely uncovered by
-design; see [Roadmap](#roadmap) for why, and what comes next.
+The CPSV Editor's automated test suite runs on **Vitest**, and covers the
+pure-logic core the editor depends on — TTL generation and parsing, DMN XML
+handling, validators, the iKnow import mapping — plus the state hooks, the
+network-boundary utilities, every tab component, and two end-to-end journeys
+driven against a live stack.
+
+The testing roadmap that ran from P0 to P7 is **complete**: every phase has
+landed, and the per-file 80% branch floor is enforced natively by the runner.
 
 !!! info "Figures on this page are measured, not estimated"
-    Every count, command and coverage percentage below was produced by
-    running the suite against **v2026.09.0** on **4 September 2026** — the full
-    run and each scoped script individually, after a clean `npm ci`. Rerun the
-    commands in [Running the tests](#running-the-tests) to reproduce them.
+    Every count and percentage below was produced by running the suite against
+    **v2026.09.2** on **9 September 2026** on `main` at `bbda389` — the full run
+    and each scoped script individually, after a clean `npm ci`. The two
+    end-to-end journeys were run against a live Linked Data Explorer backend and
+    Operaton engine. Rerun the commands in
+    [Running the tests](#running-the-tests) to reproduce them.
 
-**At a glance:** 16 suites · **257 tests** · all passing · ~4 s for a full run
-with coverage.
+**At a glance:** 60 files · **736 tests** · all passing · ~54 s for a full run
+with coverage, plus **2 end-to-end journeys** run separately.
 
-v2026.09.0 took a run of dependency majors — `@testing-library/jest-dom` 7.0.1,
-`@testing-library/user-event` 14.6.5, React 19.2.8, `lucide-react` 1.33.0,
-`lint-staged` 17 — and **moved no count and no coverage figure at all**. That is
-the useful result: the majors were taken deliberately *before* the Vite migration
-begins, because these packages are the instrument the migration will be measured
-with, and re-measuring proved the instrument unchanged.
+Coverage: **89.89% statements · 87.39% branches · 78.46% functions · 90.61%
+lines**, with every file at or above the 80% branch floor.
 
 !!! danger "Measure after `npm ci`, never after `npm install`"
-    Re-measuring these majors nearly went wrong. `npm install` reported
-    *"up to date"* while `node_modules` still held the **old** testing-library
-    versions — npm had written the new ones into its hidden lockfile without
-    replacing the package directories. A run against that tree would have
-    reported a green 257 measured on the old instrument and declared the majors
-    safe on no evidence. CI is immune because it installs with `npm ci` on a
-    clean runner; a local run is not. The figures on this page were taken after
-    a clean `npm ci`, and the installed versions were verified with `npm ls`
-    before the suite was run.
+    `npm install` has reported *"up to date"* here while `node_modules` still
+    held the **old** versions of a just-bumped dependency — npm had written the
+    new ones into its hidden lockfile without replacing the package directories.
+    A run against that tree reports a green suite measured on the wrong
+    instrument. CI is immune because it installs with `npm ci` on a clean
+    runner; a local run is not.
 
 ---
 
 ## Running the tests
 
-All tests run on Jest via `react-scripts test` — this is still a Create React
-App project, with a Vite/Vitest migration planned (see [Roadmap](#roadmap)).
-Run everything from the repository root after `npm install`.
+All tests run on **Vitest**. `react-scripts` and Create React App are gone as
+of v2026.09.1 — see [The Vite migration](#the-vite-migration). Run everything
+from the repository root after `npm ci`.
 
 | Command | Scope | Suites | Tests |
 |---|---|---:|---:|
-| `npm run test:ci` | Everything, once, with coverage | 16 | 257 |
-| `npm test` | Everything, interactive watch mode | 16 | 257 |
-| `npm run test:generator` | TTL generator regression tests | 3 | 22 |
+| `npm run test:ci` | Everything, once, with coverage | 60 | 736 |
+| `npm test` | Everything, interactive watch mode | 60 | 736 |
+| `npm run test:generator` | TTL generator regression tests | 7 | 111 |
 | `npm run test:roundtrip` | TTL round-trip tests (P1) | 1 | 9 |
-| `npm run test:p2` | Pure-logic utilities (P2) | 6 | 157 |
-| `npm run test:p3` | State hooks (P3) | 3 | 28 |
+| `npm run test:p2` | Pure-logic utilities (P2) | 8 | 184 |
+| `npm run test:p3` | State hooks (P3) | 3 | 33 |
 | `npm run test:p4` | Network-touching utilities (P4) | 2 | 40 |
+| `npm run test:p5` | Tab components, PreviewPanel, PublishDialog (P5) | 23 | 181 |
+| `npm run test:p6` | `DMNTab`'s full lifecycle (P6) | 6 | 96 |
+| `npm run test:e2e` | Playwright journeys (P7) — **needs a live stack** | 2 | 2 |
 
-Each scoped script has a `:watch` counterpart — `test:generator:watch`,
-`test:roundtrip:watch`, `test:p2:watch`, `test:p3:watch`, `test:p4:watch` —
-that runs the same `--testPathPattern` without `--watchAll=false`.
+Each scoped script has a `:watch` counterpart. The phase scripts overlap
+deliberately — a file can belong to more than one phase — so their counts do
+not sum to 736.
+
+### End-to-end journeys need a live stack
+
+`test:e2e` drives the real application against a real backend and a real engine,
+with nothing mocked between the browser and Operaton. It is **not wired into
+CI**: it needs the Linked Data Explorer backend and an Operaton engine, neither
+of which exists on a runner.
+
+| Command | What it does |
+|---|---|
+| `npm run test:e2e` | Headless, and opens the HTML report when it finishes |
+| `npm run test:e2e:headed` | A real browser window, actions slowed to 400 ms |
+| `npm run test:e2e:ui` | Playwright UI mode |
+
+A **global setup checks both services first and names what is missing**, because
+the failure otherwise arrives disguised: a connection refused surfaced as an
+amber validation banner, or as a deploy that quietly never enabled the Evaluate
+button, with the runner then reporting a timeout on a button several steps from
+the cause. The backend URL is read from `.env.development` rather than
+hardcoded, so the preflight checks the same host the application will call.
+
+!!! note "UI mode waits for you to press play"
+    An idle UI-mode window with an empty trace pane reads as a hang. It is not:
+    the runner discovers the tests and then waits, so no dev server starts and
+    nothing reaches the backend until play is pressed.
 
 ```bash
 # Full suite, non-interactive, with a coverage report
@@ -71,12 +97,9 @@ npm run test:p2
 ```
 
 !!! warning "`npm test` is watch mode — it does not exit"
-    Use `npm run test:ci` in CI, scripts, or anywhere a process must
-    terminate. Note also that `--coverage` lives on `test:ci` and not on
-    `npm test`: in watch mode Jest pins coverage collection to whatever
-    matched the *first* run, which on a clean start is nothing, so a watch
-    run would report 0% across the board no matter what you exercise
-    afterwards.
+    Use `npm run test:ci` in CI, scripts, or anywhere a process must terminate.
+    `--coverage` lives on `test:ci` and not on `npm test`, so a watch run
+    reports no coverage figures.
 
 ### Linting and formatting
 
@@ -108,6 +131,12 @@ Husky installs two hooks:
     files — a Prettier violation in a Markdown file fails the push just as a
     source file would.
 
+    **Since v2026.09.2 formatting is also checked in CI**, in the `audit` job
+    rather than the deploy workflows. Those carry `paths-ignore` for `docs/**`
+    and `**/*.md`, so a check placed there would never see markdown — precisely
+    what drifts, since `lint-staged` only formats `src/**` and `package.json` on
+    commit.
+
 ### CI
 
 Three workflows run in this repository.
@@ -116,7 +145,7 @@ Three workflows run in this repository.
 |---|---|---|
 | **Deploy ACC (orange-beach)** | `build_and_deploy_job` | `npm ci` → `npm run lint` → `npm run test:ci` → deploy to acceptance |
 | **Deploy PROD (white-sky)** | `build_and_deploy_job` | The same sequence, deploying production |
-| **Supply-chain audit** (`zizmor.yml`) | `audit` | zizmor 1.29.0 over the repository, then `renovate-config-validator --strict` |
+| **Supply-chain audit** (`zizmor.yml`) | `audit` | zizmor 1.29.0, `renovate-config-validator --strict`, `npm run check-format`, and `npm run check-supply-chain` |
 
 The two deploy workflows run lint and then the full suite before the deploy
 action, and a failure blocks the deploy. Until 20 August 2026 neither ran
@@ -155,7 +184,7 @@ repository owner alike. The mechanics are covered in
 ## Test inventory
 
 Test files are colocated with the source they cover (`foo.js` →
-`foo.test.js`). Counts are per file, as reported by Jest.
+`foo.test.js`). Counts are per file, as reported by Vitest.
 
 ### Core: TTL generation and parsing
 
@@ -215,52 +244,103 @@ tests.
 
 ---
 
+### Tab components and dialogs (P5)
+
+Twenty-three files, 181 tests. Deliberately thin and even: every component
+renders with realistic props, and one representative interaction proves the
+controlled-component contract. No component is left at zero, and `src/components`
+moved from 3.9% to 41% statements in this phase alone.
+
+These tests found a latent crash in `IKnowMappingTab`, which reads
+`mappingConfig.mappings` unguarded inside an expression short-circuited by an
+empty configuration name — so a config without that key renders fine and throws
+the moment someone types a name.
+
+They also pinned something that was invisible: **`VendorTab` switches on the
+vendor URI rather than a capability flag**, so iKnow gets integration tooling,
+Blueriq gets the contact form, and every other vendor gets an "under development"
+placeholder. Adding a vendor to the concept list gives it a dropdown entry and
+nothing else.
+
+### `DMNTab` lifecycle (P6)
+
+Six files, 96 tests, covering validate → deploy → evaluate. The suite walks the
+real lifecycle rather than testing each call in isolation, **because the interface
+enforces that order**: the Evaluate button stays disabled until a deployment has
+succeeded.
+
+Two findings worth keeping. The unreachable-backend path is a deliberate *third*
+outcome — not valid, not invalid, but skipped — and is now pinned as one. And
+`handleDeployDMN`'s opening guard is unreachable: the Deploy button renders inside
+the branch that requires an uploaded file, so the error it raises can never fire.
+
+### End-to-end journeys (P7)
+
+Two Playwright specs, run against a live stack rather than mocks.
+
+| Spec | What it proves |
+|---|---|
+| `e2e/authoring-journey.spec.js` | The application can create a service: empty form → real deploy → real evaluation → exported TTL |
+| `e2e/round-trip-journey.spec.js` | It can read an existing one back: import a full TTL, swap its decision model, deploy, evaluate, download and check what was written |
+
+Both assert **values rather than status codes** — zorgtoeslag 1150 and a specific
+annotation string — because a decision table that stopped matching would still
+answer 200 with an empty result set. That assertion was verified to bite by
+setting the expected value wrong and watching the test fail. The export assertion
+reads the downloaded file rather than trusting the filename, since a filename
+check passes on an empty file.
+
+Fixtures live in `e2e-fixtures/` with a manifest recording each one's provenance,
+so editing an example cannot silently change what a test asserts.
+
+The authoring journey **found a defect no unit test could reach**: below 1600px
+the preview panel, mounted fixed and 500px wide, covers the header controls — at
+1280px, opening the preview leaves no way to close it. The suite runs at 1600×900
+so the journey is not blocked, and the threshold is documented rather than dodged.
+
 ## Coverage
 
-Measured with `npm run test:ci` against v2026.09.0 on 4 September 2026,
-after a clean `npm ci`. Identical to the v2026.08.3 measurement to the last
-decimal place, across a React major and two testing-library majors.
+Measured with `npm run test:ci` against v2026.09.2 on 9 September 2026, after a
+clean `npm ci`.
 
-**Overall: 54.75% statements · 40.88% branches · 38.68% functions · 55.57% lines.**
-
-That headline number is dominated by untested UI. The layers the suite
-actually targets are well covered:
+**Overall: 89.89% statements · 87.39% branches · 78.46% functions · 90.61%
+lines** — against 54.75% / 40.88% / 38.68% / 55.57% at v2026.09.0. The jump is
+P5, P6 and the branch-floor work landing together.
 
 | Area | Statements | Branches | Functions | Lines |
 |---|---:|---:|---:|---:|
-| `src/hooks` | 96.73% | 75.40% | 97.05% | 100% |
-| `src/config` | 92.15% | 80.39% | 75.00% | 91.83% |
-| `src/utils` | 85.05% | 62.27% | 90.57% | 85.69% |
-| `src/components` | 24.44% | 4.05% | 18.18% | 23.80% |
-| `src/components/tabs` | 5.74% | 2.72% | 2.46% | 6.03% |
+| `src/hooks` | 99.33% | 83.60% | 100% | 100% |
+| `src/utils` | 94.76% | 86.74% | 98.43% | 95.63% |
+| `src/config` | 92.15% | 82.35% | 75.00% | 91.83% |
+| `src/components` | 84.41% | **88.65%** | 85.71% | 87.50% |
+| `src` (App, index) | 84.56% | 81.70% | 58.62% | 85.63% |
 
-Per module, highest first:
+`src/components` was at **4.05% branches** three releases ago. That is the P5 and
+P6 work.
 
-| Module | Statements | Branches |
-|---|---:|---:|
-| `utils/ttlHelpers.js` | 100% | 100% |
-| `utils/ronlHelper.js` | 100% | 100% |
-| `utils/shaclHelper.js` | 100% | 87.50% |
-| `hooks/useEditorState.js` | 96.77% | 50.00% |
-| `utils/validators.js` | 97.40% | 94.31% |
-| `hooks/useArrayHandlers.js` | 97.14% | 75.00% |
-| `utils/triplydbHelper.js` | 96.69% | 83.62% |
-| `hooks/useDsoImport.js` | 96.42% | 78.43% |
-| `utils/dmnHelpers.js` | 90.62% | 81.18% |
-| `utils/cprmvImport.js` | 90.54% | 81.81% |
-| `utils/iknowParser.js` | 88.95% | 70.10% |
-| `parseTTL.enhanced.js` | 81.34% | 71.11% |
-| `utils/ttlGenerator.js` | 80.99% | 54.25% |
-| `utils/importHandler.js` | 10.34% | 0% |
-| `App.js` | 14.16% | 31.87% |
-| `components/tabs/DMNTab.jsx` | 8.24% | 3.31% |
+### Every file clears the 80% branch floor
 
-The two hand-written files the [Due Diligence](due-diligence.md) review flagged
-as the biggest risk — `ttlGenerator.js` and `parseTTL.enhanced.js`, neither
-backed by an RDF library — now sit around 80% statement coverage with a
-round-trip harness over real fixtures. `importHandler.js`, `App.js` and
-`DMNTab.jsx` remain the largest gaps, and are exactly what phases P5 and P6
-target.
+The floor is enforced natively — `thresholds: { branches: 80, perFile: true }` —
+so this is a gate rather than a report. See
+[The Coverage Floor](../../contributing/coverage-floor.md) for how the three
+repositories reached it.
+
+`DMNTab.jsx`, the largest file in the repository at 1855 lines, is now the
+**best-covered component** at 98.34% branches, from 45.73% one release earlier.
+
+!!! warning "Three files sit one branch above the floor"
+    `useDsoImport.js` 80.39%, `ConceptsTab.jsx` 80.55% and `ChangelogTab.jsx`
+    80.70%. Thresholds pass at `>= 80`, and the ratchet that used to absorb a
+    slip is gone, so **a single added `?.` or `||` default in any of them turns
+    CI red** on an otherwise unrelated change.
+
+!!! note "What the branch column does not see"
+    A branch floor steps straight over branch-free code. `ConceptsTab.jsx` reads
+    80.55% on branches but **71.62% statements and 63.33% functions**;
+    `App.jsx` reads 81.48% / 72.44% / **55.55%**. The uncovered code there is
+    largely whole handlers no test calls. That asymmetry is why a functions floor
+    is [a separate decision](../../contributing/coverage-floor.md#a-functions-floor-is-a-separate-decision)
+    rather than a free companion setting.
 
 ---
 
@@ -327,27 +407,62 @@ question, deliberately left open.
 
 ---
 
+## The Vite migration
+
+Create React App is gone as of v2026.09.1, migrated in **four phases, each
+independently revertable**, in an order chosen so a working test suite exists at
+every point. `react-scripts` provided both the build and the test runner, so
+swapping the build first would have removed the regression net and the thing being
+tested at the same moment — leaving no way to tell a migration defect from a
+configuration defect.
+
+| Phase | What landed | What it proved |
+|---|---|---|
+| **1** | Vitest alongside Jest | Both runners reported the same 16 suites and 257 tests |
+| **2** | Vite builds alongside CRA | Same eleven public assets, main chunks within a kilobyte |
+| **3** | The atomic cutover | `build/` → `dist/`; `npm audit` 52 → 10; builds ~30 s → under 2 s |
+| **4** | The shims removed | 45 `jest` call sites migrated, not the 43 the plan counted |
+
+Two things the plan did not cover would have **deployed green and broken**: Vite
+only exposes `VITE_`-prefixed variables, so renaming the env call sites alone
+would have left both environments talking to `localhost`; and `react-scripts` was
+where ESLint itself came from, so removing it would have broken the lint step that
+runs before the tests.
+
+---
+
 ## Roadmap
 
-**Vite/Vitest migration checkpoint — next.** P0–P4 are green, which is the
-precondition. The plan is to migrate the bundler (CRA → Vite, following the
-Linked Data Explorer's proven configuration) and re-run the existing suite
-under Vitest as the proof the migration regressed nothing. These phases were
-written to port cheaply: they are pure logic and hooks, with Jest and Vitest
-sharing nearly the same API surface (`jest.fn()` → `vi.fn()` and
-`jest.mock()` → `vi.mock()` are close to mechanical renames), and they touch
-neither JSX nor CRA-specific tooling.
+**The P0–P7 roadmap is complete.** Every phase has landed:
 
-| Phase | Scope | Notes |
+| Phase | Scope | Landed |
 |---|---|---|
-| **P5** | Tab components, `PreviewPanel`, `PublishDialog` | Written directly under Vite/Vitest after the checkpoint. Critical interactions only — field entry → state update → preview reflects it; publish-workflow step transitions — not exhaustive branch coverage |
-| **P6** | `components/tabs/DMNTab.jsx` | The largest and most complex file. Mock the backend at the fetch boundary and validate the validate → deploy → test → generate-concepts lifecycle at the interaction level |
-| **P7** | Playwright E2E smoke tests | Start narrow: the app loads, a minimal service description exports successfully. Expand once there is more automated-testable surface |
+| P0 | Smoke test | v2026.07.0 |
+| P1 | TTL round-trip against real fixtures | v2026.07.0 |
+| P2 | Pure-logic utilities | v2026.07.0 |
+| P3 | State hooks | v2026.07.0 |
+| P4 | Network-boundary utilities | v2026.07.0 |
+| P5 | Tab components, `PreviewPanel`, `PublishDialog` | v2026.09.1 |
+| P6 | `DMNTab`'s validate → deploy → evaluate lifecycle | v2026.09.1 |
+| P7 | Playwright journeys against a live stack | v2026.09.1 |
 
-The DOM-heavy phases are sequenced deliberately *after* the migration so that
+The DOM-heavy phases were sequenced deliberately *after* the migration, so that
 bundler-sensitive work — Tailwind/CSS processing, the JSX transform,
-`process.env` versus `import.meta.env` — gets written once against the final
+`process.env` versus `import.meta.env` — was written once against the final
 toolchain instead of twice.
+
+### What remains
+
+Not phases, but the honest remaining edges:
+
+- **Seven unreachable branches in `DMNTab.jsx`**, all guards the UI cannot
+  reach — `if (!uploadedFile)` under a button that only renders once a file
+  exists, and three of the same shape. Chasing them would mean testing through
+  the component's internals; the file documents them as defensive dead code.
+- **Three files one branch above the floor**, with no ratchet left to absorb a
+  regression.
+- **A functions floor**, which is a separate decision needing its own
+  measurement — `App.jsx` sits at 55.55% functions against 81.48% branches.
 
 **Deliberately out of scope for now:** swapping in an RDF library (the
 round-trip tests are the data that should decide whether the hand-rolled

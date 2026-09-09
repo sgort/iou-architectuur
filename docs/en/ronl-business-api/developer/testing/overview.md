@@ -55,7 +55,7 @@ four workspaces skip nothing.
 
     The floor is a **convention, not a gate** — no coverage threshold is
     configured in any runner config and no workflow measures coverage at all.
-    See [Code Standards](../../../contributing/code-standards.md#the-80-branch-floor-is-a-convention-not-a-gate).
+    See [Coverage Floor](../../../contributing/coverage-floor.md).
 
 ¹ These are **serial** wall times, measured with `test:serial`, and are much
 longer than a parallel run — the frontend suite measures ~61s parallel on an

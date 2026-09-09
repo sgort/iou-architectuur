@@ -21,14 +21,21 @@ as a whole.
 
 ## What is modelled
 
-**Eleven of twelve phases**, as of v2026.09.1. Nine of them landed in that single
-release; R2.1 and R2.2 preceded it.
+**Twelve of twelve phases**, as of v2026.09.2. Nine landed in v2026.09.1, R2.1 and
+R2.2 preceded it, and R5.3 closed the ladder in v2026.09.2.
 
-!!! info "R5.3 is not in this release"
-    R5.3 — *(vervroegde) Ingebruikname / Oplevering* — was still unmodelled at
-    v2026.09.1 and was added to `acc` the following day. It is therefore **not** part
-    of the version this page documents. The RONL Business API's Faseladder reads
-    *eleven of twelve deelprocessen inzetbaar* against this release.
+!!! success "R5.3 lands where its neighbours said it would"
+    R5.3 — *(vervroegde) Ingebruikname / Oplevering* — was the one phase left
+    unmodelled for want of a design, so **R5.2 and R5.4 were built to step over it**:
+    R5.2's *Werk gereed?* exit and R5.4's entry criteria were fixed before the phase
+    between them existed. The sheet, dated 3 September 2026, enters and leaves exactly
+    where those two anticipated, which is the useful confirmation — the ladder's shape
+    was inferred correctly from a gap's edges.
+
+    Downstream, the
+    [RONL Business API's Faseladder](../../ronl-business-api/user-guide/infra-board.md)
+    reads *twelve of twelve deelprocessen inzetbaar* from its v2026.09.3, which is
+    how a phase modelled here becomes visible to a caseworker there.
 
 | Phase | Subject | Nodes | Flows | Lanes | Forms | Docs |
 |---|---|--:|--:|--:|--:|--:|
@@ -41,12 +48,13 @@ release; R2.1 and R2.2 preceded it.
 | R4.1 | Aanbestedingsproces | 25 | 27 | 7 | 17 | 7 |
 | R5.1 | Voorbereiding op uitvoering | 25 | 30 | 8 | 19 | 10 |
 | R5.2 | Directievoering en toezicht UAV | **56** | **67** | 7 | **36** | **11** |
+| R5.3 | (vervroegde) Ingebruikname / Oplevering | 15 | 14 | 3 | 7 | 6 |
 | R5.4 | Oplevering en onderhoudsperiode | 39 | 46 | 6 | 26 | 8 |
 | R6.1 | Projectdecharge | 28 | 32 | 6 | 21 | 4 |
 
 !!! note "Counted from the BPMN, not from the release notes"
-    Every figure above was derived by parsing the eleven `RipR*Process.bpmn` files at
-    the v2026.09.1 release commit — flow nodes (tasks, events and gateways),
+    Every figure above was derived by parsing the twelve `RipR*Process.bpmn` files at
+    the v2026.09.2 release commit — flow nodes (tasks, events and gateways),
     `sequenceFlow` elements, `lane` elements, distinct `camunda:formRef`/`formKey`
     values, and distinct `ronl:documentRef`/`ronl:signatureRef` values.
 
@@ -91,16 +99,48 @@ sequence*, each with its own remedy: an unlawful tender is set aside and rejecte
 terminating path, while an unclear tender prompts a request for clarification that
 loops back into the unit-price check.
 
-### One exit per phase, so the phase end stays detectable
+### One *forward* exit per phase, so progression stays detectable
 
-Every phase ends at a single end event, because the ladder's progression rule depends
-on a completion being observable. Two phases needed work to preserve that:
+The ladder's progression rule depends on a completion being observable, so **exactly
+one end event per phase names the phase it hands off to** — the ones whose labels
+carry a `→`. That holds for eleven of the twelve; R6.1 ends the ladder and so names
+no successor, closing at *Einde proces (project gedechargeerd)*.
+
+Phases may still end at several events: four do. The extra ones close parallel
+branches that carry no handover (*Klanteisen teruggekoppeld* in R2.2,
+*Inkoopstrategie bepaald* in R2.3) or terminate an instance that will not continue
+(*Inschrijving afgewezen* in R4.1).
+
+Two phases needed work to preserve the forward exit:
 
 - **R6.1's sheet draws two *Einde proces* markers**, one per closing action. They mean
   the same completion, so they are modelled as one end event behind a parallel join.
 - **R5.1's BO13.1 branch is a round trip, not an exit.** On *ja* the installation part
   is handed to Beheer en Onderhoud, which communicates the handover back, so the leg
   rejoins the document check and the phase keeps its single R5.2 exit.
+
+!!! warning "R5.3 is the exception, and it is deliberate"
+    All four of R5.3's end events name a destination, which no other phase does. Only
+    one advances the ladder — *oplevering areaal → R5.4*. The other three return to
+    **R5.2 *Start werk "buiten"***, including the *ja* on early commissioning: taking a
+    work into use early does not finish it, so the restpunten go back to the phase that
+    executes them. A reader counting arrows out of R5.3 sees three of four pointing
+    backwards, and that is the phase, not a modelling slip.
+
+### Mirror paths that never rejoin
+
+R5.3 is a single early choice — *oplevering* or *(vervroegde) ingebruikname* — opening
+two near-mirror branches: interne schouw, then schouw with the aannemer and
+toezichthouder, then vaststellen, then exit. They differ only in what they are called,
+which sjabloon they use, and where they leave to. **They are not joined**, because a
+join would assert that the two outcomes converge on one state and they do not.
+
+**There is no loop anywhere in the phase.** A rejected schouw does not re-run the
+schouw here; it exits to R5.2 so the restpunten are executed by the phase that owns
+execution. That is the same rule as *Rework loops belong to the phase that owns the
+decision*, applied in the direction that removes a loop rather than adding one — at 15
+nodes and 14 flows R5.3 is the smallest phase in the ladder, and it is small because
+the rework it triggers lives next door.
 
 ---
 

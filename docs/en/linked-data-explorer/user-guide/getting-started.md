@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Getting Started
 
 This guide walks you through the Linked Data Explorer for the first time, from opening the application to executing your first DMN chain.
@@ -23,13 +27,26 @@ The application has a narrow left sidebar with navigation icons, and a main cont
 
 | Icon | View |
 |---|---|
-| Search / query | SPARQL Query Editor |
-| GitBranch | Chain Builder (Orchestration) |
-| Flowchart | BPMN Modeler |
+| Search | SPARQL Query Editor |
+| GitBranch | Chain Builder (DMN Orchestration) |
+| Workflow | BPMN Modeler |
+| LayoutTemplate | Form Editor |
+| FileOutput | Document Composer |
+| ScrollText | RoPA Records |
+| Landmark | DSO Explorer |
 | ShieldCheck | DMN Validator |
-| Graph | Graph Visualisation |
-| HelpCircle | Help |
+| BadgeCheck | SHACL Validator |
+| Share2 | Graph Visualisation |
 | BookOpen | Changelog |
+
+**Settings** sits below the rail, pinned. The eleven view icons above it scroll
+on a short window rather than being pushed off the bottom edge — before
+v2026.09.2 they were, taking Settings with them, and a window shorter than the
+rail left both unreachable.
+
+!!! info "The in-app tutorial was removed in v2026.09.2"
+    A **HelpCircle** icon used to open a guided tutorial inside the application.
+    It is gone, and this page is where that walkthrough now lives.
 
 ---
 

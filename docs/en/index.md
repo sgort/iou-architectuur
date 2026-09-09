@@ -157,23 +157,23 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.09.0** · *September 2026*
+-   **✏️ CPSV Editor — v2026.09.2** · *September 2026*
 
     ---
 
-    **The gate widens, the tree settles, Vite is planned**
+    **Create React App is gone, and the branch floor is native**
 
-    The [supply-chain audit](contributing/supply-chain.md) now runs on *every* pull request — the old branch filter let a stacked pull request accumulate no checks at all, report as clean, and then block permanently once GitHub retargeted it. The gate also validates `renovate.json` now, because pinning without working automated updates decays into an unpatched tree. Deploys skip documentation-only changes, Renovate is capped below the staging ceiling it had been exhausting, and the merge method is enforced by repository settings rather than by remembering. A run of dependency majors — React 19.2.8, two testing-library majors — moved [not one test or coverage figure](cpsv-editor/developer/testing.md), which is the point: they were taken deliberately before the Create React App to Vite migration, whose four-phase plan is now written.
+    The Vite migration landed in four independently revertable phases, taking `npm audit` from 52 vulnerabilities to 10 and production builds from roughly 30 seconds to under two — with two traps the plan missed that would have *deployed green and broken*: Vite only exposes `VITE_`-prefixed variables, and `react-scripts` was where ESLint itself came from. The [P0–P7 testing roadmap is complete](cpsv-editor/developer/testing.md), 257 tests becoming 736 across 60 files plus two Playwright journeys against a live stack, and the [80% per-file branch floor](contributing/coverage-floor.md) is now enforced by the runner rather than a custom script — `DMNTab.jsx`, the largest file in the repository, went from 45.73% to 98.34%.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.09.1** · *September 2026*
+-   **🔍 Linked Data Explorer — v2026.09.2** · *September 2026*
 
     ---
 
-    **Nine phases in one release, and the typechecker that was never running**
+    **Twelve of twelve, and every gate now blocks**
 
-    The [RIP phase ladder](linked-data-explorer/features/rip-phase-ladder.md) goes from two modelled phases to eleven — R2.3 through R6.1, the densest of them carrying 56 nodes over 36 forms — each authored here and deployed to Operaton, where the [Infra-board](ronl-business-api/user-guide/infra-board.md) draws its diagrams from them. Alongside it, **fifteen type errors that had accumulated invisibly**: `build` strips types without checking, `lint` is ESLint and `test` is Vitest, so nothing in the repository ran `tsc` at all. A Typecheck step now runs in all four deployment workflows, Node is pinned to exact patches rather than majors, and per-file branch coverage clears 80% across both packages — the frontend rising from 65.67% to [90.62%](linked-data-explorer/developer/testing.md).
+    R5.3 closes the [RIP phase ladder](linked-data-explorer/features/rip-phase-ladder.md). It was the one phase left unmodelled for want of a design, so **R5.2 and R5.4 were built to step over it** — and the sheet lands exactly where those two said it would. Alongside it, three gates stop being advisory: [`check-supply-chain`](contributing/supply-chain.md) is blocking, the backend's 1140 tests now run **on the pull request** rather than only after the merge, and the [80% per-file branch floor](contributing/coverage-floor.md) is enforced by both runners. The floor then got margin — twelve files raised, branches 90.59% to [92.88%](linked-data-explorer/developer/testing.md), with **every new test mutation-checked**, which caught five of them asserting nothing at all.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

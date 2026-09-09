@@ -375,6 +375,8 @@ nav:
     - Code Standards: contributing/code-standards.md
     - Supply-Chain Pinning: contributing/supply-chain.md
     - Build Provenance: contributing/build-provenance.md
+    - Coverage Floor: contributing/coverage-floor.md
+    - CI Posture (slides): contributing/ci-posture-deck.md
 
 # Markdown extensions
 markdown_extensions:

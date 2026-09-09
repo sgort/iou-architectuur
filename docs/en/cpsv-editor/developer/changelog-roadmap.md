@@ -8,6 +8,61 @@ component: CPSV Editor
 
 ## Changelog
 
+### v2026.09.2 — The Branch Floor Goes Native (September 2026)
+
+> Measured inventory and commands: [Testing](testing.md). Cross-repository posture: [Coverage Floor](../../contributing/coverage-floor.md).
+
+**`DMNTab.jsx` was the last file below the per-file 80% branch floor, and the script carrying the exemptions is deleted.** The largest file in the repository at 1855 lines went from 45.73% to **98.34%** branch coverage (415/422), measured identically in isolation and in the full suite — which is the property that matters, because a per-file figure read only from a full run cannot tell whether another file's tests are propping it up. Four new suites cover the test-case batch runner, DRD parsing and the intermediate runner, the import and example lifecycles, and the validation panel. Reaching the later stages means walking the whole chain — upload, validate, deploy, evaluate — because each stage gates the next stage's controls.
+
+With nothing left to exempt, `scripts/check-branch-coverage.mjs` is gone and the policy is four lines of config: `thresholds: { branches: 80, perFile: true }`. **That the native threshold actually gates was proved by raising it to 99 and watching it name eight files** — a green run proves nothing about a check that might be silently inert.
+
+**Formatting is now checked in CI, not only on a developer's machine.** `check-format` was enforced by the pre-push hook alone, so the rule held locally and not on the shared branch. That gap is not theoretical: in the Linked Data Explorer a Prettier 3.7 → 3.9 bump changed how short union types are formatted, and five untouched files began failing `prettier --check` the moment it merged, with every CI check green. The symptom would have been the next person's `git push` failing on files they had never opened.
+
+The step goes in the **`audit` job**, not the deploy workflows — those carry `paths-ignore` for `docs/**` and `**/*.md`, deliberately, so a documentation change does not claim one of ten staging environments; a formatting check placed there would never see markdown, which is precisely what drifts, since `lint-staged` only formats `src/**` and `package.json` on commit. That job had no `npm ci` at all until now, because zizmor is an action, the Renovate validator runs from `npx`, and `check-supply-chain` is plain node. Prettier needs `node_modules`, and it has to be **this repository's** Prettier rather than a version named in the workflow — a second pinned version is a second thing to keep in step, reintroducing the drift the check exists to catch.
+
+**The four heavy tabs are lazy-loaded**, taking the entry chunk from 685.71 kB to **392.74 kB** (176.58 → 104.71 kB gzipped) and clearing both build warnings. The `lazy()` calls turned out to be the smaller half: a static re-export in the tabs barrel pins a module into the entry chunk even when `App` imports it dynamically, and measuring before designing showed it — with `ChangelogTab` left in the barrel, adding `lazy()` moved nothing at all. `DMNTab` needed more still, because it stays mounted while hidden so an uploaded file, deployment status and test-case results survive tab switches; it now renders once its tab has been visited and stays mounted thereafter, with each lazy tab getting its own Suspense boundary so one re-suspending cannot blank the always-mounted DMN subtree.
+
+**The unit suite no longer reaches TriplyDB**, which was making coverage depend on the machine. `useEditorState` fetches the RONL concept vocabularies on mount, so every test rendering `App` made a live request — and whether it came back before the test ended decided whether the effect's continuation ran at all. The same commit and the same tests measured `useEditorState.js` at 83.33% locally and 50% on CI, and the per-file floor read the local number while CI failed on the merge. **The floor was honest; the measurement it was pinned to was not.** `setupTests.js` now stubs the fetch suite-wide.
+
+**Each tab words its own RONL fetch failure.** One sentence was stored centrally and shown verbatim in two places, so the Vendor tab reported a failure to load *concepts* directly above its own "Loading vendors…" line. `useEditorState` now reports *that* the fetch failed rather than *how to say so* — a string becomes a boolean. Both existing tests were asserting the wrong thing; the Vendor test checked for a string the test itself invented and passed in as a prop, so it asserted that the component rendered whatever it was handed, matching the defect rather than catching it.
+
+**`PublishDialog` is mounted only while it is open.** It had been mounted permanently and hid itself with an early return, so its state survived every close — and three pieces of machinery existed only to undo by hand what unmounting does for free, two of them needing lint suppressions to pass.
+
+**The lazy-tab guard recognises both Babel majors' dynamic-import AST.** `no-eager-tabs.test.js` knew only `@babel/parser` v7's representation of `import()`, so under v8 it stopped recognising dynamic imports entirely — finding no lazy bindings and no stray imports, going blind to the property it exists to check. v7 emits a `CallExpression` with an `Import` callee; v8 an ESTree-aligned `ImportExpression`. Both shapes are now pinned with literal AST fixtures, because a parsing check can only ever exercise whichever parser is installed, which is exactly how the defect shipped.
+
+**Also in this release:** `importHandler` comes off the debt list at **100%** (132/132 branches) from zero unit tests; `ttlGenerator` from 60.49% to 81.66%; `PublishDialog`, `App` and `IKnowMappingTab` all clear the floor; the DMN request-body generator is pinned precisely; and `@babel/parser` v8 and `lucide-react` v1.34.0 land verified on the merged tree.
+
+---
+
+### v2026.09.1 — Create React App Is Gone (September 2026)
+
+> The migration's four phases, and what each proved: [Testing](testing.md#the-vite-migration).
+
+**The Vite migration completed in four phases, each independently revertable, in an order chosen so a working test suite exists at every point.** `react-scripts` provided both the build and the test runner, so swapping the build first would have removed the regression net and the thing being tested at the same moment — leaving no way to tell a migration defect from a configuration defect.
+
+**Phase 1 — Vitest alongside Jest.** Both runners reported the same 16 suites and 257 tests. Three files were renamed to `.jsx`, the only ones carrying JSX in a `.js` extension: Vite has never parsed JSX out of that extension and under Vite 8 there is no configuration escape hatch.
+
+**Phase 2 — Vite builds alongside Create React App.** Still additive: `react-scripts` owned the build and CI still published `build/`. The two toolchains genuinely coexist, since Create React App reads `public/index.html` and Vite a new root `index.html`. Output was compared rather than assumed — the same eleven public assets in both, one main chunk each within a kilobyte of the other. Two differences are deliberate: Vite does not publish sourcemaps, and an `apple-touch-icon` that has 404'd in both builds for as long as the template has existed was carried over verbatim rather than quietly fixed inside a toolchain migration.
+
+**Phase 3 — the atomic cutover.** The only phase that cannot be half-done: the build now emits `dist/` instead of `build/`, so the deploy workflows had to expect `dist/` in the same commit. `react-scripts` is gone and its dependency tree with it — **`npm audit` dropped from 52 vulnerabilities to 10**, and production builds from roughly 30 seconds to under two.
+
+!!! warning "Two things the plan did not cover, both of which would have deployed green and broken"
+    The workflows pass the backend URL through an `env` block, and **Vite only exposes `VITE_`-prefixed variables** — renaming the call sites alone would have left both environments talking to `localhost`. And `react-scripts` was where ESLint itself came from, so removing it would have broken the lint step that runs before the tests.
+
+**Phase 4 — the shims are gone.** Both transitional shims that carried the suite across the migration are removed, and the Vitest setup file folded back into one. Three corrections to the plan came from testing rather than reading: there were 45 `jest` call sites, not the 43 counted, because both counts came from a pattern that missed two wrapped across lines; and only one of three Renovate deferral rules was actually removable, the constraints having changed owner rather than disappeared.
+
+**ESLint 9 flat config, and `eslint-config-react-app` dropped.** It was carrying more than its rules: it pinned ESLint to 8, which is end-of-life; it pulled `babel-preset-react-app`, whose `@babel/plugin-transform-runtime@^7` was the last thing holding `@vitejs/plugin-react` at v5; and it contributed three Flow rules to a repository with no Flow. The rule set was chosen from measurement rather than a guess — a candidate config reported 100 errors, of which 63 were missing globals *in the candidate itself* rather than findings.
+
+**Every form control is now associated with its label.** 102 form controls had no `id` and one `htmlFor` between them, and 38 had **no accessible name at all** — no label association, no `aria-label`, not even a placeholder. In a government authoring tool that is a WCAG 1.3.1 and 4.1.2 gap independent of testing, and `eslint-config-react-app` never enabled the rule that would have flagged it. The codemod that fixed it introduced a real defect first: `VendorTab`'s access-type radios are nested inside their labels, and pairing them walked past a label's own radio to the next one, leaving the *Fair Use* label pointing at the *IAM Required* radio. That passed the lint rule, because a `htmlFor` did exist — only computing the accessible name at runtime caught it.
+
+**P5, P6 and P7 landed, completing the testing roadmap.** P5 gave every tab component, `PreviewPanel` and `PublishDialog` smoke coverage, moving `src/components` from 3.9% to 41%; P6 covered `DMNTab`'s validate → deploy → evaluate lifecycle, walking the real order because the interface enforces it; P7 added two Playwright journeys against a live stack. See [Testing](testing.md) for the measured inventory.
+
+**The Changelog tab shows the build id** — see [Build Provenance](../../contributing/build-provenance.md). Version headings come from `package.json` and are bumped by hand, so they identify a release but not a build of it. The tab now shows the commit SHA and workflow run number beneath the heading, reading `local build` when nothing was injected.
+
+**`check-supply-chain` shipped**, the preflight zizmor cannot be: zizmor validates that a pin *has the shape* of a 40-character SHA but cannot confirm it is the right one, so a wrong or hostile digest carrying a plausible version comment passes zizmor, Prettier and human review alike. It resolves every digest against the GitHub API and compares the register with the workflows — and a fix in the same release taught it that an action can legitimately be pinned at **two** digests mid-upgrade, a case neither visible nor reproducible in this repository. See [Supply-Chain Pinning](../../contributing/supply-chain.md).
+
+---
+
 ### v2026.09.0 — The Gate Widens, the Tree Settles, Vite is Planned (September 2026)
 
 > Cross-repository treatment of the gate: [Supply-Chain Pinning](../../contributing/supply-chain.md).
@@ -411,14 +466,18 @@ Initial release. React + Tailwind CSS web application. Five-tab interface: Servi
 | `renovate.json` validated inside the audit gate | v2026.09.0 |
 | Deploys skip documentation-only changes | v2026.09.0 |
 | Merge method enforced by repository settings | v2026.09.0 |
+| Create React App → Vite migration (four phases) | v2026.09.1 |
+| [`check-supply-chain`](../../contributing/supply-chain.md) — pin truth and register agreement | v2026.09.1 |
+| [Build id in the Changelog tab](../../contributing/build-provenance.md) | v2026.09.1 |
+| Test phases P5, P6 and P7 — the roadmap complete | v2026.09.1 |
+| Every form control associated with its label (WCAG 1.3.1 / 4.1.2) | v2026.09.1 |
+| [Per-file 80% branch floor](../../contributing/coverage-floor.md), natively enforced | v2026.09.2 |
+| Formatting checked in CI, not only on a developer's machine | v2026.09.2 |
+| The four heavy tabs lazy-loaded — entry chunk 685.71 → 392.74 kB | v2026.09.2 |
 
 ---
 
 ### Planned
-
-**Create React App → Vite migration (2026 Q3, plan written)**
-
-Create React App was deprecated in February 2025 and receives no new features, no performance work and no active security updates. Four phases, ordered so a working test suite exists at every point: Vitest alongside Jest, then Vite alongside CRA, then an atomic cutover, then cleanup. The acceptance criterion is the existing [P0–P4 suite](testing.md) passing under Vitest and the built site behaving identically — deliberately not "does it build", since a Vite build pointed at the wrong output directory succeeds and publishes nothing. Two dependency majors, Tailwind v4 and TypeScript v7, are held until this lands and unblock themselves when it does.
 
 **Phase B — RPP Deep Integration (2026 Q1–Q2)**
 

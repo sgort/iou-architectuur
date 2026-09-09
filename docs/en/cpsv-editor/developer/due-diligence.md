@@ -102,10 +102,10 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 19, Create React App (deprecated — see below), Tailwind CSS, Lucide icons |
+| Frontend | React 19, Vite, Tailwind CSS, Lucide icons |
 | State management | React hooks (`useEditorState`, `useArrayHandlers`), no external state library |
 | Build & lint | CRA, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
-| Testing | Jest via `react-scripts test`, `@testing-library/react` — 257 tests, 16 suites ([Testing](testing.md)) |
+| Testing | Vitest, `@testing-library/react`, Playwright — 736 tests across 60 files, plus 2 end-to-end journeys ([Testing](testing.md)) |
 | TTL parsing | Custom hand-written parser (no RDF library dependency) |
 | DMN parsing | Browser DOMParser (XML) |
 | External APIs | TriplyDB REST + SPARQL, Operaton REST (Camunda-compatible), RONL SPARQL vocabulary |
@@ -133,7 +133,7 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 
 - **Separation opportunity.** The four domains (editor, vendor, publishing, DMN) are loosely coupled via the shared editor state. A modular architecture — whether as separate routes/lazy-loaded modules within the SPA, or as independent micro-frontends sharing a TTL data contract — would improve maintainability and allow independent release cycles.
 
-- **Create React App.** The React team officially deprecated CRA on February 14, 2025. It continues to work in maintenance mode (a final version was published with React 19 support), but it will not receive new features, performance improvements, or active security updates. The React team recommends migrating to a framework (Next.js, React Router) or a modern build tool (Vite, Parcel, Rsbuild). Since the Linked Data Explorer already uses Vite, migrating the CPSV Editor to Vite would align the tooling across the RONL ecosystem and remove the dependency on an unmaintained build tool. The P0–P4 test phases were deliberately written first and are now green, so the migration has a regression net: re-running the existing suite under Vitest is the check that it changed nothing. See [Testing](testing.md) for the sequencing.
+- **Create React App — resolved.** This review recommended migrating off CRA, deprecated by the React team on 14 February 2025 and receiving no new features, performance work or active security updates. That **migrated to Vite in v2026.09.1**, in four independently revertable phases with the P0–P4 suite as the regression net exactly as proposed here. `npm audit` dropped from 52 vulnerabilities to 10 and production builds from roughly 30 seconds to under two. See [The Vite migration](testing.md#the-vite-migration).
 
 ---
 

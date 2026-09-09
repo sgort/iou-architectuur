@@ -8,6 +8,47 @@ component: Linked Data Explorer
 
 ## Changelog
 
+### v2026.09.2 — Twelve of Twelve, and Every Gate Now Blocks (September 2026)
+
+> The ladder in full: [RIP Phase Ladder](../features/rip-phase-ladder.md). Measured suites: [Testing](testing.md). Cross-repository posture: [Coverage Floor](../../contributing/coverage-floor.md).
+
+**R5.3 closes the Flevoland ladder.** *(vervroegde) Ingebruikname / Oplevering* is modelled as `RipR53Process` — 15 nodes, 14 flows, 3 lanes, 7 forms and 6 documents — and it was the one phase left unmodelled for want of a design, so R5.2 and R5.4 were built to step over it. **The sheet lands exactly where those two said it would**, which is the useful confirmation: the ladder's shape was inferred correctly from its neighbours' entry and exit criteria before the middle existed.
+
+The phase is a single early choice — *oplevering* or *(vervroegde) ingebruikname* — opening two near-mirror paths that never rejoin, differing only in what they are called, which sjabloon they use, and where they leave to. **There is no loop anywhere in the phase**: a rejected schouw sends its restpunten back to R5.2 rather than round again here.
+
+**`check-supply-chain` is now a blocking check.** `continue-on-error: true` is removed from the audit job's pin-truth step, so a register that no longer describes the workflows fails the gate. What it was waiting on is resolved rather than abandoned: Renovate rewrites workflow pins and their version comments together and never touches `SECURITY-PIPELINE.md`, so every action bump would fail the register half — and blocking on that would fail a required check on routine dependency updates, *which is how gates get resented and then bypassed*. The answer was to **update the register on the bump's own branch** before merging, so the check is green on the pull request rather than only on `acc` afterwards. That habit was exercised twice — on the `checkout` v7 and `setup-node` v7 bumps — before the promotion.
+
+Both exercises are worth recording because the check behaved exactly as designed: **pin truth passed and only the register was stale.** Renovate's digest and its rewritten comment agreed with each other and with GitHub; what had drifted was the document claiming to describe them. That is the drift this check exists to catch, and it caught it on the branch rather than after the merge.
+
+**The backend runs its tests on a pull request.** `azure-backend-acc.yml` triggered on `push` alone, so 1140 backend tests ran only *after* a merge and a backend pull request reached `acc` with `audit` as its only check. The `pull_request` trigger arrives with six deploy-side steps gated on the event, **arranged as per-step conditions rather than a job split** so the check name stays stable and no ruleset entry changes. Closes #46.
+
+**The per-file 80% branch floor is enforced natively**, in `jest.config.js` and `vite.config.ts`. Against a package *average* the threshold is inert — backend sits at 92.22% and frontend at 90.59%, and one file falling to 40% barely moves either.
+
+**And then it was given room to breathe.** The floor landed measured-clean but with no slack: `ChainBuilder/TestCasePanel.tsx` sat at exactly 80.00% and thirteen more files between 80 and 85, so the first uncovered branch added to any of them would have turned CI red on an unrelated change. Twelve files raised, package branches **90.59% → 92.88%**, files under 85% from fourteen to one, tests 1042 → 1073. **No production code changed** — test files only.
+
+!!! important "Every new test was mutation-checked, and five were asserting nothing"
+    A test written against code that already exists passes on its first run, which
+    proves nothing about whether it *can* fail. Each new test had the branch it
+    targets deliberately broken and had to fail before being kept.
+
+    Four of the five share a shape worth knowing on any React codebase: an
+    assertion that *"nothing happened"* stays true when the handler **throws**
+    partway through, because React reports a throw inside a click handler on
+    `window`'s `error` event rather than rejecting the click. See
+    [Raising coverage without writing hollow tests](../../contributing/coverage-floor.md#raising-coverage-without-writing-hollow-tests).
+
+**Every pull request is audited, not only those targeting `acc` or `main`.** The audit triggered on `pull_request` filtered to those branches, so a stacked pull request based on a feature branch matched no trigger and accumulated no audit at all — **while still reporting `mergeStateStatus=CLEAN` with zero checks**, which reads as ready and is not. The moment its parent merged and GitHub retargeted it, the required audit was missing and the pull request blocked permanently, because a retarget emits no `pull_request` event. Closing and reopening was the only way out, and it was needed **four times in one session** on 2 September.
+
+**The changelog identifies the build, not just the release** — see [Build Provenance](../../contributing/build-provenance.md). The commit SHA says what was built; the run number distinguishes two builds of identical code, which is what makes the pair a build id rather than a code id. With nothing injected it reads `local build`: never blank, and never resembling a deployed artifact when it is not one.
+
+**Getting Started is removed.** The Tutorial view, its tests and the 596 lines of `tutorial.json` behind it are deleted, along with `ViewMode.TUTORIAL` and the four view-mode guards that kept other panels hidden while it was showing. It is kept in one commit with the icon-rail fix deliberately, **because the second is what makes the first safe to reason about**: the rail was already losing icons off the bottom, so removing one only moved the threshold rather than fixing it.
+
+**Dependency updates were verified on a scratch branch off `acc` rather than trusting the pull request's own green tick**, which had run against a tree two merges stale. `npm ci`, lint, the full suite, build, typecheck and `check-format` all clean. The backend workflow ran no tests on a pull request at that point, so a green tick there said nothing about whether a dependency broke anything — the gap this same release closed.
+
+**Prettier is kept off Semgrep Guardian's scratch files.** Guardian writes a `.semgrep/` directory into the working tree, one per directory it scans, and `check-format` failed on the `guardian.yml` inside them. `.gitignore` already excluded them so they never reach a commit; `.prettierignore` did not, so a clean tree still reported two style violations in files nobody authored.
+
+---
+
 ### v2026.09.1 — Nine Phases, and the Typechecker That Was Never Running (September 2026)
 
 > The ladder as a whole: [RIP Phase Ladder](../features/rip-phase-ladder.md). Measured suites: [Testing](testing.md).

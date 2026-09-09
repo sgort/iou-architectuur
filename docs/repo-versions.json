@@ -1,5 +1,5 @@
 {
-  "docs_built": "2026-09-07",
+  "docs_built": "2026-09-09",
   "repositories": [
     {
       "name": "RONL Business API",
@@ -22,20 +22,20 @@
     {
       "name": "CPSV Editor",
       "icon": "✏️",
-      "version": "v2026.09.0",
+      "version": "v2026.09.2",
       "environment": "prod",
-      "commit": "8f81bd2...",
-      "commit_date": "2026-09-04",
-      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/8f81bd2f25e424aa10dc5def1ef40cc0bc3fccd8"
+      "commit": "bbda389...",
+      "commit_date": "2026-09-09",
+      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/bbda3897b7a21290eb575e9dbaa8f96636f25929"
     },
     {
       "name": "Linked Data Explorer",
       "icon": "🔍",
-      "version": "v2026.09.1",
-      "environment": "acc",
-      "commit": "69bba13...",
-      "commit_date": "2026-09-02",
-      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/69bba1304a28969ff6f1458771d24838fe7fc7e2"
+      "version": "v2026.09.2",
+      "environment": "prod",
+      "commit": "007b350...",
+      "commit_date": "2026-09-09",
+      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/007b35003ae3af5f4552624948d124c95efbc665"
     },
     {
       "name": "CPRMV",
