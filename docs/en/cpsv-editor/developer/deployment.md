@@ -95,7 +95,7 @@ including for the repository owner.
 
 ## Azure Static Web Apps
 
-The application is deployed as a static site. No server-side rendering is involved. The build output is the `build/` directory produced by `npm run build` (Create React App).
+The application is deployed as a static site. No server-side rendering is involved. The build output is the `dist/` directory produced by `npm run build` (Vite). It was `build/` under Create React App until v2026.09.1 — the deploy workflows and the build changed in the same commit, because that rename cannot be half-applied.
 
 There is no `staticwebapp.config.json` in the repository. Routing and CORS
 therefore fall back to the Static Web Apps defaults, and the absence of that

@@ -157,13 +157,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.09.0** · *September 2026*
+-   **✏️ CPSV Editor — v2026.09.2** · *September 2026*
 
     ---
 
-    **The gate widens, the tree settles, Vite is planned**
+    **Create React App is gone, and the branch floor is native**
 
-    The [supply-chain audit](contributing/supply-chain.md) now runs on *every* pull request — the old branch filter let a stacked pull request accumulate no checks at all, report as clean, and then block permanently once GitHub retargeted it. The gate also validates `renovate.json` now, because pinning without working automated updates decays into an unpatched tree. Deploys skip documentation-only changes, Renovate is capped below the staging ceiling it had been exhausting, and the merge method is enforced by repository settings rather than by remembering. A run of dependency majors — React 19.2.8, two testing-library majors — moved [not one test or coverage figure](cpsv-editor/developer/testing.md), which is the point: they were taken deliberately before the Create React App to Vite migration, whose four-phase plan is now written.
+    The Vite migration landed in four independently revertable phases, taking `npm audit` from 52 vulnerabilities to 10 and production builds from roughly 30 seconds to under two — with two traps the plan missed that would have *deployed green and broken*: Vite only exposes `VITE_`-prefixed variables, and `react-scripts` was where ESLint itself came from. The [P0–P7 testing roadmap is complete](cpsv-editor/developer/testing.md), 257 tests becoming 736 across 60 files plus two Playwright journeys against a live stack, and the [80% per-file branch floor](contributing/coverage-floor.md) is now enforced by the runner rather than a custom script — `DMNTab.jsx`, the largest file in the repository, went from 45.73% to 98.34%.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 

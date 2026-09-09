@@ -12,7 +12,7 @@ component: CPSV Editor
 [![Deployed on Azure Static Web Apps](https://img.shields.io/badge/Azure-Static_Web_Apps-blue?logo=microsoft-azure)](https://ttl.open-regels.nl)
 [![TypeScript](https://img.shields.io/badge/TypeScript-4.9-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19.2-61dafb?logo=react)](https://react.dev/)
-[![Create React App](https://img.shields.io/badge/Create_React_App-5.0-09D3AC?logo=createreactapp)](https://create-react-app.dev/)
+[![Vite](https://img.shields.io/badge/Vite-7B4AEE?logo=vite&logoColor=white)](https://vite.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38bdf8?logo=tailwindcss)](https://tailwindcss.com/)
 [![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=node.js)](https://nodejs.org/)
 ![License](https://img.shields.io/badge/License-EUPL--1.2-yellow.svg)
