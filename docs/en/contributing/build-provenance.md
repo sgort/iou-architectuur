@@ -206,13 +206,20 @@ branch, `github.sha` is the real commit. Observed:
 
 ## Known gaps
 
-- **Production has now run once, in one application.** All six workflow files carry
-  the `env:` block. The Linked Data Explorer promoted v2026.09.2 to `main` on
-  9 September 2026 and its production frontend workflow ran green, so the values it
-  injects are `github.sha` `007b350` and `github.run_number` **39** — a changelog
-  reading *`build 007b350 · #39`*. That is **derived from the run, not read off the
-  running application**, which is the glance still worth taking. The other two
-  applications' production workflows remain wired and unexercised.
+- **Production has now run in two of the three.** All six workflow files carry the
+  `env:` block. Both applications promoted v2026.09.2 to `main` on 9 September 2026 and
+  both production workflows ran green:
+
+    | | Commit | Run | Changelog should read |
+    |---|---|--:|---|
+    | CPSV Editor (*Deploy PROD*) | `bbda389` | 88 | `build bbda389 · #88` |
+    | Linked Data Explorer | `007b350` | 39 | `build 007b350 · #39` |
+
+    Those strings are **derived from the workflow runs, not read off the running
+    applications** — which is the glance still worth taking, and the whole point of the
+    feature is that it takes one glance. **RONL Business API's production workflow last
+    ran on 17 July 2026**, before this feature existed, so it stays wired and unexercised
+    until its next promotion.
 - **Backend versions are unaffected.** The line describes the frontend bundle being
   viewed; backends ship their versions separately.
 
