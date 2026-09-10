@@ -19,7 +19,7 @@ scope: cross-cutting
 
 ## Half-configured counts as untracked
 
-## The same feature, three implementations
+## The same feature, four implementations
 
 ## Two implementation decisions worth keeping
 
@@ -27,4 +27,4 @@ scope: cross-cutting
 
 ## Known gaps
 
-## Adding this to a fourth application
+## Adding this to another application
