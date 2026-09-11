@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # DSO → DMN Import
 
 The CPSV Editor can receive a decision model directly from the Linked Data Explorer through a deep-link handoff. When a user discovers a *toepasbare regel* (applicable rule) in the DSO (Digitaal Stelsel Omgevingswet) browser of the Linked Data Explorer and chooses to turn it into a service definition, the Explorer opens the editor with the DMN already loaded — no manual download and re-upload required.
@@ -43,7 +47,7 @@ A `consumedRef` guard ensures the import runs only once, even under React Strict
 The handoff only *prefills* the editor — nothing is published automatically. From here you continue exactly as with a manually uploaded DMN:
 
 - Review and complete the Service, Organization, and Legal tabs.
-- Deploy the DMN to Operaton and test it (see [DMN Workflow](../user-guide/dmn-workflow.md)).
+- Deploy the DMN to Operaton and test it (see [The DMN Tab](../user-guide/dmn-tab.md)).
 - Publish to TriplyDB when ready (see [TriplyDB Publishing](triplydb-publishing.md)).
 
 If `dmnId` is missing, or the backend returns an error or an empty document, the editor reports the problem through the message banner and you can still upload the DMN manually.

@@ -3,19 +3,19 @@ scope: cross-cutting
 verified:
   date: 2026-09-11
   against:
+    CPSV Editor: "f5bae6a"
     Linked Data Explorer: "be6bc54"
 ---
 
 # The Coverage Floor
 
-!!! info "Re-verified for the Linked Data Explorer on 11 September 2026 — the rest waits for its own sync"
-    Every Linked Data Explorer claim on this page was re-checked against `be6bc54`,
-    the commit that published v2026.09.4, which is what the header's stamp records.
-    **CPSV Editor claims were not**, and are re-checked in its own sync, which
-    follows this one. **RONL Business API claims are left as they stood and may be
-    stale** — the latest check of any of them was against `04e38c8` on 9 September
-    2026, and not every claim was re-checked then. They are to be verified with the
-    next RONL Business API release sync.
+!!! info "Re-verified for the CPSV Editor and the Linked Data Explorer on 11 September 2026"
+    Every CPSV Editor and Linked Data Explorer claim on this page was re-checked
+    against `f5bae6a` and `be6bc54` — the commits that published v2026.09.4 of each —
+    which is what the header's stamp records. **RONL Business API claims are left as
+    they stood and may be stale** — the latest check of any of them was against
+    `04e38c8` on 9 September 2026, and not every claim was re-checked then. They are
+    to be verified with the next RONL Business API release sync.
 
 *A per-file 80% branch-coverage floor, and what it took to enforce it in three
 repositories*
@@ -65,7 +65,7 @@ functions floor at the same number would have failed **31 files**:
 `public-site/TopBar.tsx` is the illustration: **100% branches, 66% functions**.
 The two measure different things and are not interchangeable.
 
-The asymmetry runs both ways. In the CPSV Editor, `ConceptsTab.jsx` reads 80.56%
+The asymmetry runs both ways. In the CPSV Editor, `ConceptsTab.jsx` reads 80.55%
 on branches but **71.62% on statements and 63.33% on functions**, and `App.jsx`
 reads 81.48% / 71.65% / **53.70%** — the uncovered code there is largely
 branch-free, whole handlers no test calls, so a branch floor steps straight over
@@ -261,7 +261,7 @@ All three were measured clean before enforcing. That word hides a lot:
 | RONL Business API backend | — | comfortable |
 | Linked Data Explorer backend | 38 of 44 | `sparql.service.ts` 82.85% |
 | Linked Data Explorer frontend | 68 of 78 | `ChainBuilder/TestCasePanel.tsx` exactly 80.00% — **since raised to 100%** |
-| CPSV Editor | 41 | `useDsoImport.js` 80.39% |
+| CPSV Editor | 32 of 41 | `useDsoImport.js` 80.39% |
 
 *"Files measured" counts files carrying at least one branch* — 68 of the 78 in
 the Linked Data Explorer's frontend report, counted from `coverage-final.json`
@@ -276,7 +276,8 @@ moved. That backend row said **49** until 11 September 2026, copied from the com
 `jest.config.js` carries — *"measured clean when this landed — 49 files"* — and 49
 is neither 38 nor the 44 files the report contains at all. It is the same class of
 figure as the frontend's 64: quoted from a record rather than recounted under the
-rule this table states.
+rule this table states. The CPSV Editor's row said **41**, which is the number of files
+in its report; 32 of them carry a branch. Its lowest file has not moved.
 
 !!! bug "This table named a file that does not exist, and the error travelled"
     Until 9 September 2026 the Linked Data Explorer row here read
@@ -318,7 +319,7 @@ three diverge most:
 
 | Repository | Tests on a pull request |
 |---|---|
-| CPSV Editor | ✅ both Static Web Apps workflows run `npm run test:ci` on `push` **and** `pull_request` |
+| CPSV Editor | ✅ both Static Web Apps workflows run `npm run test:ci` on `push` **and** `pull_request` — run, though not required; see below |
 | Linked Data Explorer | ✅ backend and frontend, acc workflows — run, though not required; see below |
 | RONL Business API | ⚠️ **frontend, pa-demo and public-site only** |
 
@@ -336,9 +337,9 @@ defect sit on a pushed branch for days — no pull request ever ran the test tha
 caught it.
 
 !!! note "Running before the merge is not the same as blocking it"
-    The Linked Data Explorer's rulesets require two checks, `audit` and `scan`.
-    The workflows that run the suites, and so enforce the floor, are not among
-    them. A pull request that drops a file below 80% therefore turns its checks red
+    The CPSV Editor's and the Linked Data Explorer's rulesets require two checks,
+    `audit` and `scan`. The workflows that run the suites, and so enforce the
+    floor, are not among them. A pull request that drops a file below 80% therefore turns its checks red
     and **stops the deploy**, and the merge button stays available. That is a
     deliberate gap rather than an oversight only if someone decided it; making the
     test checks required is one ruleset change, provided each can report on every

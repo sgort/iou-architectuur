@@ -1,38 +1,59 @@
-# DMN Workflow
+---
+component: CPSV Editor
+---
+
+# Van DMN naar linked data
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
     Raadpleeg de <a href="/cpsv-editor/user-guide/dmn-workflow/">Engelse versie</a> voor de huidige inhoud.
+    De dia's zelf zijn Engelstalig.
 
 ---
 
 **Status:** Concept  
 **Engelstalige bron:** `cpsv-editor/user-guide/dmn-workflow.md`
 
----
-
-## Prerequisites
-
----
-
-## Step 1: Upload the DMN file
+!!! abstract "Downloaden"
+    [DMN to Linked Data Workflow — presentatie (PDF, 208 KB)](../../assets/downloads/dmn-to-linked-data-workflow.pdf)
 
 ---
 
-## Step 2: Configure the API endpoint
+## The result, and the two caveats that stay with it
 
 ---
 
-## Step 3: Deploy to Operaton
+## The nine stages
 
 ---
 
-## Step 4: Test the decision
+## Three passes, side by side
 
 ---
 
-## Step 5: Export TTL with DMN metadata
+## What kept going wrong
 
 ---
 
-## Tips
+## Where a person decides
+
+---
+
+## What is still open, and who owns it
+
+---
+
+## Two ideas worth keeping
+
+---
+
+## Why the testing is evidence
+
+---
+
+## Where to look in the repository
+
+---
+
+## Related pages
+
