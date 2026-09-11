@@ -167,13 +167,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.09.2** · *September 2026*
+-   **🔍 Linked Data Explorer — v2026.09.4** · *September 2026*
 
     ---
 
-    **Twelve of twelve, and every gate now blocks**
+    **Semgrep gates both branches, and the lockfile finally moves**
 
-    R5.3 closes the [RIP phase ladder](linked-data-explorer/features/rip-phase-ladder.md). It was the one phase left unmodelled for want of a design, so **R5.2 and R5.4 were built to step over it** — and the sheet lands exactly where those two said it would. Alongside it, three gates stop being advisory: [`check-supply-chain`](contributing/supply-chain.md) is blocking, the backend's 1140 tests now run **on the pull request** rather than only after the merge, and the [80% per-file branch floor](contributing/coverage-floor.md) is enforced by both runners. The floor then got margin — twelve files raised, branches 90.59% to [92.88%](linked-data-explorer/developer/testing.md), with **every new test mutation-checked**, which caught five of them asserting nothing at all.
+    Semgrep Code and Supply Chain now scan every pull request and are [required on `acc` and `main`](contributing/supply-chain.md#7-the-other-supply-chain-the-npm-tree), so the application reaches acceptance and production only through a scan of the exact commit being deployed — covering the npm tree that `check-supply-chain` never could. The first scan also showed that **Renovate maintains dependencies, not the tree**: lock-file maintenance had been enabled for a fortnight and never run, starved behind open pull requests. One forced refresh moved 338 packages and closed 63 of 66 Supply Chain findings; majors now wait for approval so it keeps its slot, and a lockfile-only change is built, tested and deployed like any other. The triage fixed three latent defects on the way, among them [wildcard CORS that a sibling route could have inherited](linked-data-explorer/developer/ropa-records.md#public-route-v1ropapublic).
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

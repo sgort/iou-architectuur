@@ -42,6 +42,7 @@ packages/frontend/src/
 │   ├── exportService.ts           JSON + BPMN 2.0 export logic
 │   ├── exportFormats.ts           export format definitions
 │   ├── bpmnTemplates.ts           default BPMN XML templates
+│   ├── ronlAttributes.ts          ronl:* process attributes — escaped on write, decoded on read
 │   └── constants.ts               sample queries, preset endpoints
 ├── types/
 │   ├── index.ts                   core TypeScript interfaces

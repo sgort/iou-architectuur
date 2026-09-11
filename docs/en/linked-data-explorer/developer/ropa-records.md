@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # RoPA Records Implementation
 
 The RoPA Records feature implements GDPR Article 30 record-keeping for deployed process bundles. It adds two PostgreSQL tables, a transactional service layer, authenticated asset routes, a CORS-open public endpoint, a full LDE editor UI, and a standalone static public site.
@@ -15,6 +19,8 @@ packages/backend/src/
 ├── routes/
 │   ├── ropa.routes.ts              # Authenticated asset routes (/v1/assets/ropa)
 │   └── ropa.public.routes.ts       # Public CORS-open route (/v1/ropa/public)
+├── utils/
+│   └── publicPaths.ts              # Which paths get wildcard CORS — isPublicPath()
 └── types/
     └── ropa.types.ts               # RopaRecord, RopaPersonalDataField, PublicRopaRecord
 
@@ -144,10 +150,13 @@ Registered separately in `routes/index.ts` as `router.use('/v1/ropa/public', rop
 |---|---|---|
 | `GET` | `/v1/ropa/public` | List active records — `?organisation=flevoland` filters by `controller_name ILIKE '%flevoland%'` |
 
-The public route applies `cors({ origin: '*', methods: ['GET', 'OPTIONS'] })` at the route level. However, the global CORS middleware in `index.ts` evaluates origins before route handlers are reached. The solution is a path-aware middleware in `index.ts` that bypasses the origin whitelist for `/v1/ropa/public`:
+The public route applies `cors({ origin: '*', methods: ['GET', 'OPTIONS'] })` at the route level. However, the global CORS middleware in `index.ts` evaluates origins before route handlers are reached, so `index.ts` decides per path which policy applies:
+
 ```typescript
 app.use((req, res, next) => {
-  if (req.path.startsWith('/v1/ropa/public')) {
+  if (isPublicPath(req.path)) {
+    // Wildcard by design, for the public read-only mounts only -- see utils/publicPaths.ts.
+    // nosemgrep: javascript.express.web.cors-permissive-express.cors-permissive-express
     cors({ origin: '*', methods: ['GET', 'OPTIONS'] })(req, res, next);
   } else {
     cors(corsOptions)(req, res, next);
@@ -155,7 +164,27 @@ app.use((req, res, next) => {
 });
 ```
 
-The same pattern applies to the preflight `app.options('*', ...)` handler.
+The same decision is made in the preflight `app.options('*', ...)` handler.
+
+**There are two public mounts, not one**, both listed in `utils/publicPaths.ts`: `/v1/ropa/public` for this register, and `/v1/bundles/public`, which the RONL Business API's caseworker dashboard reads. Both serve deliberately public, read-only data shaped for publication — `listPublicRopa` returns active records only and strips controller and DPO contacts — and the backend performs no inbound authentication, so these endpoints are already readable by anything that is not a browser. Wildcard CORS extends that to browser scripts on other origins, which is the point.
+
+```typescript
+const PUBLIC_MOUNTS = ['/v1/ropa/public', '/v1/bundles/public'];
+
+export const isPublicPath = (path: string) =>
+  PUBLIC_MOUNTS.some((mount) => path === mount || path.startsWith(`${mount}/`));
+```
+
+!!! warning "A mount or a path below it — never a sibling that shares the prefix"
+    Until v2026.09.3 this was `req.path.startsWith('/v1/ropa/public')`. That also
+    matches **`/v1/ropa/publications`**, so any future route whose name merely began
+    with `public` would have inherited wildcard CORS instead of the credentialed
+    allowlist — without anyone deciding it should. The match is now exact-or-below,
+    and `publicPaths.test.ts` asserts the sibling case falls through.
+
+The `nosemgrep` on each wildcard line names the one rule it suppresses and sits
+beside its reason, so the decision is visible in review rather than held as
+dashboard state.
 
 ---
 

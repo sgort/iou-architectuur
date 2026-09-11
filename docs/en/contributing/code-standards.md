@@ -1,8 +1,21 @@
 ---
 scope: cross-cutting
+verified:
+  date: 2026-09-11
+  against:
+    Linked Data Explorer: "be6bc54"
 ---
 
 # Code Standards
+
+!!! info "Re-verified for the Linked Data Explorer on 11 September 2026 — the rest waits for its own sync"
+    Every Linked Data Explorer claim on this page was re-checked against `be6bc54`,
+    the commit that published v2026.09.4, which is what the header's stamp records.
+    **CPSV Editor claims were not**, and are re-checked in its own sync, which
+    follows this one. **RONL Business API claims are left as they stood and may be
+    stale** — the latest check of any of them was against `04e38c8` on 9 September
+    2026, and not every claim was re-checked then. They are to be verified with the
+    next RONL Business API release sync.
 
 This page covers three application repositories — CPSV Editor (`ttl-editor`), Linked
 Data Explorer, and RONL Business API — that share a common tooling convention:
@@ -69,7 +82,10 @@ nor `pre-push` invokes `npm test` anywhere. A passing hook is not evidence your 
 didn't break a test — only CI, or running the suite yourself, tells you that. Since
 August 2026 CI closes that gap on the way in as well as on the way out: in CPSV Editor
 and RONL Business API a failing check now blocks the *merge*, not just the deploy — see
-[Enforcement](#enforcement-what-blocks-a-merge) below.
+[Enforcement](#enforcement-what-blocks-a-merge) below. In the Linked Data Explorer the
+suites **run** on every pull request, but the checks its rulesets **require** are
+`audit` and `scan` — so a red test stops the deploy and shows on the pull request,
+and does not by itself block the merge.
 
 ---
 
@@ -94,17 +110,22 @@ The frontend's performance budget runs separately because it asserts wall-clock 
 which means nothing while 133 test files compete for cores — see
 [The performance budget](../ronl-business-api/developer/testing/overview.md#the-performance-budget).
 
-**Linked Data Explorer** — **seven** workflows on `acc`: six deployment workflows plus
-the supply-chain `audit` gate added in v2026.08.7. Both backend and both frontend
-workflows run lint and then the suite before building. The two `ropa-site` workflows run
-neither, and correctly so: that package is a static `index.html` plus a
-`staticwebapp.config.json`, with no build and no test script to run.
+**Linked Data Explorer** — **eight** workflows: six deployment workflows, the
+supply-chain `audit` gate added in v2026.08.7, and the Semgrep `scan` added in
+v2026.09.3 (see [Supply-Chain Pinning — the npm tree](supply-chain.md#7-the-other-supply-chain-the-npm-tree)).
+Both backend and both frontend workflows run lint and then the suite before building.
+The two `ropa-site` workflows run neither, and correctly so: that package is a static
+`index.html` plus a `staticwebapp.config.json`, with no build and no test script to run.
 
 Unlike the other two, **the Linked Data Explorer's CI does deploy its backend** — the
 backend workflows end in `azure/webapps-deploy`, where RONL Business API's end in an
-uploaded artifact that a developer deploys by hand. Its backend workflows trigger on
-push only, though, so no pull request runs the backend suite; a break surfaces on `acc`
-after merge, where `npm test` gates the deploy step.
+uploaded artifact that a developer deploys by hand. **Since v2026.09.2 the backend's
+acceptance workflow also triggers on `pull_request`**, with its six deploy-side steps
+gated on the event, so a pull request runs the backend suite before the merge rather
+than `acc` discovering a break afterwards. The production backend workflow stays
+push-only on purpose: it declares the protected `production` environment, and a
+pull-request trigger there would put a human approval *in front of* the tests meant to
+inform it.
 
 Since v2026.09.1 all four of its deployment workflows also run a **Typecheck** step.
 That closed a real hole rather than adding ceremony: **fifteen type errors had
@@ -134,6 +155,32 @@ because `packages/frontend/**` is a real boundary there; the CPSV Editor is a si
 package with no such boundary, so copying that pattern would be the obvious move and
 the wrong one.
 
+**An allowlist has to name the files every package shares, too.** Until v2026.09.4 the
+Linked Data Explorer's filters named each workflow's own package and nothing else, so a
+change to the root `package-lock.json` alone — Renovate's lock-file maintenance, above
+all — was built, tested and deployed by nothing. The root `package.json` and
+`package-lock.json` are now in all four backend and frontend filters, acceptance and
+production.
+
+**A workflow's own file in its `paths:` list is a trigger.** Each Linked Data Explorer
+filter names its workflow file alongside its package, which is correct — a change to how
+a thing deploys should redeploy it — but it means a sweep across workflow files, such as
+a pinning pass, redeploys every package whose workflow it touched, whether or not the
+package changed. Predict what a merge will deploy from the whole list, not the entry that
+looks like the package.
+
+!!! warning "A skip marker in a commit message turns every gate off"
+    GitHub Actions skips all `push` and `pull_request` workflows for a commit whose
+    message contains `[skip ci]`, `[ci skip]`, `[no ci]`, `[skip actions]` or
+    `[actions skip]` — **anywhere in the message, including in prose that is only
+    discussing them**. A skipped required check reports nothing rather than failing,
+    so the symptom is a pull request that can never become mergeable and has no red
+    run to explain why. Describe the markers in words in a commit message; they are
+    safe in a file. The Linked Data Explorer composes merge commits from the pull
+    request **title** with a **blank** body, so a marker quoted in a pull request
+    description cannot reach its merge commit — check that repository setting before
+    relying on it anywhere else.
+
 None of this replaces running the suite yourself before opening a merge request — and a
 green local run is weaker evidence than it looks. RONL Business API's first gated run
 failed on test files that had been latently broken for weeks: ts-jest caches type
@@ -157,7 +204,13 @@ is rejected outright** in all three repositories, including for releases and inc
 for the repository owner. Linked Data Explorer adopted the same ruleset in v2026.08.7;
 all three are named `acc supply-chain gate` and carry zero bypass actors. They are not
 identical in shape, though: only the Linked Data Explorer's also blocks branch deletion
-and non-fast-forward pushes.
+and non-fast-forward pushes, and since v2026.09.3 it requires `scan` alongside
+`audit`.
+
+**The Linked Data Explorer is also the one repository whose `main` is gated.** Its
+`main promotion gate` ruleset mirrors the `acc` one — the same four rules, `audit` and
+`scan` required, zero bypass actors — so a promotion pull request is held to the same
+checks as the pull requests it carries.
 
 Merge strategy is enforced by repository settings rather than by convention: all three
 disable squash and rebase merges, leaving merge commits only, with
@@ -183,13 +236,12 @@ not hypothetical: five keys used as JSON comments in the Linked Data Explorer's
 configuration were rejected as invalid and Renovate stopped opening pull requests, with
 nothing in CI noticing.
 
-The rollout is not identical across the three. RONL Business API and — since
-v2026.09.0 — the CPSV Editor have taken the v7 action majors; the Linked Data Explorer
-remains on v4 and carries one `actions/checkout` at v3.7.0, all pinned by digest but
-pinned to older majors. **No `main` branch is gated**: the rulesets target
-`refs/heads/acc` everywhere, so the gate protects the acceptance path only. The CPSV
-Editor is the only repository whose `main` even carries the four artifacts, and
-carrying them is not the same as enforcing them.
+The rollout is not identical across the three. All three are now on the v7 action
+majors — RONL Business API first, the CPSV Editor since v2026.09.0, and the Linked Data
+Explorer since v2026.09.2, which retired its last `actions/checkout` at v3.7.0 on the
+way. **Only the Linked Data Explorer gates `main`**, with a `main promotion gate`
+ruleset that requires the same checks as its `acc` one; in the other two the rulesets
+target `refs/heads/acc` alone, so the gate protects the acceptance path only there.
 
 [Supply-Chain Pinning](supply-chain.md) covers the mechanism, the measured results
 (16 findings to zero in the CPSV Editor, 49 in RONL Business API, 40 in the Linked Data

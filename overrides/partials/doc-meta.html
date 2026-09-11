@@ -31,6 +31,37 @@
 
   The component version and docs_built date both come from
   docs/repo-versions.json, loaded into config.extra by hooks/repo_versions.py.
+
+  Two further facts, each optional:
+
+    build (component mode) — repo-versions.json may record, per component,
+      the frontend build that was serving the recorded environment:
+      "build 007b350 · #39". It is a different fact from the version: a new
+      build can reach an environment with no release bump, and a reader can
+      compare this string with the one the running application prints.
+
+    verified (cross-cutting mode) — a page may declare which commit of each
+      component its claims were last re-checked against:
+
+        verified:
+          date: 2026-09-09
+          against:
+            CPSV Editor: bbda389
+            Linked Data Explorer: 007b350
+
+      Each SHA links to the commit in the component's ci_repo — GitHub for the
+      three applications — where the deploy runs it triggered are listed. The
+      GitLab mirror carries the same SHAs but shows none of the runs, and lags.
+
+      The stamp is per page on purpose. A sync re-verifies only the pages it
+      touches, so a site-wide list of current builds would assert
+      verification that never happened. It is keyed on commits, not build
+      ids, because deploy workflows are path-filtered: most of what a
+      contributing page describes (workflows, SECURITY-PIPELINE.md, runner
+      configs) changes without producing a new frontend build at all.
+      A component appears only if its claims on that page were re-checked on
+      that date. /iou-document-patch writes the stamp and checks it for
+      staleness; nothing here does, so the build stays offline.
 -#}
 {#- An archived page describes an older release on purpose, and says so in its
    own banner. Showing the component's CURRENT version here would contradict
@@ -73,7 +104,24 @@
         </span>
       {%- endif %}
     </span>
+    {%- if repo.build and repo.build.sha %}
+      <span class="doc-meta__fact doc-meta__build"
+            title="Frontend build serving {{ (repo.environment or '') | upper }} at the recorded commit — compare with the build line in the application's changelog">
+        <span class="md-icon">
+          {% include ".icons/material/package-variant-closed.svg" %}
+        </span>
+        {%- set build_label %}build {{ repo.build.sha }}{% if repo.build.run %} · #{{ repo.build.run }}{% endif %}{% endset %}
+        {%- if repo.build.run_url %}
+          <a class="doc-meta__commit" href="{{ repo.build.run_url }}"
+             title="The deploy run that produced this build"><code>{{ build_label }}</code></a>
+        {%- else %}
+          <code>{{ build_label }}</code>
+        {%- endif %}
+      </span>
+    {%- endif %}
   {% elif is_cross_cutting %}
+    {%- set verified = page.meta.verified if page.meta.verified is mapping else none %}
+    {%- set stamped = verified and verified.against is mapping and verified.against %}
     {#- The site is bilingual, and mkdocs-static-i18n sets theme.language per
        locale build (reconfigure_material: true). These two strings are not in
        Material's own translation catalogue, so they are switched here rather
@@ -85,9 +133,33 @@
         {% include ".icons/material/sitemap-outline.svg" %}
       </span>
       {{ "Geldt voor alle componenten" if is_nl else "Applies to all components" }}
-      {%- if config.extra.docs_built %}
+      {#- On a stamped page the stamp replaces docs_built rather than joining it.
+         docs_built is site-wide: it says a sync happened somewhere, not that this
+         page was checked. Beside a stamp it is the weaker date of the two, and
+         when they coincide it is the same date twice. Unstamped pages keep it —
+         there it is the only date that applies. -#}
+      {%- if config.extra.docs_built and not stamped %}
         <code>{{ "docs gebouwd" if is_nl else "docs built" }} {{ config.extra.docs_built }}</code>
       {%- endif %}
     </span>
+    {%- if stamped %}
+      <span class="doc-meta__fact doc-meta__verified">
+        <span class="md-icon" title="{{ 'De beweringen op deze pagina zijn op deze datum opnieuw gecontroleerd tegen deze commits' if is_nl else 'The claims on this page were last re-checked against these commits, on this date' }}">
+          {% include ".icons/material/check-decagram-outline.svg" %}
+        </span>
+        {{ "geverifieerd" if is_nl else "verified" }}
+        {%- if verified.date %} {{ verified.date }}{% endif %}
+        {{ "tegen" if is_nl else "against" }}
+        {%- for name, sha in verified.against.items() %}
+          {%- set target = config.extra.repo_versions.get(name) %}
+          {%- if target and target.commit_base %}
+            <a class="doc-meta__commit" href="{{ target.commit_base }}{{ sha }}"
+               title="{{ name }} — commit {{ sha }}, with the deploy runs it triggered"><code>{{ target.icon }}&nbsp;{{ sha }}</code></a>
+          {%- else %}
+            <code class="doc-meta__commit" title="{{ name }} — commit {{ sha }}">{{ name }}&nbsp;{{ sha }}</code>
+          {%- endif %}
+        {%- endfor %}
+      </span>
+    {%- endif %}
   {% endif %}
 </aside>

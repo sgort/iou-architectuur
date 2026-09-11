@@ -139,11 +139,91 @@ alike, including placeholders. It is deliberately opt-in: untouched pages keep
 Material's default rendering, with the dates at the bottom of the page. Over
 successive syncs the header spreads only as far as pages actually get revised.
 
+#### The `verified` stamp — cross-cutting pages
+
+A cross-cutting page may also say which commit of each component its claims were
+last re-checked against. The header renders it as *"verified 2026-09-09 against
+✏️ bbda389 · 🔍 007b350 · ⚙️ 04e38c8"*, each SHA linking to the commit in the
+component's `ci_repo` — **GitHub** for the three applications, where the deploy
+runs it triggered are listed; not the GitLab mirror, which has the same SHAs but
+lags and shows no runs.
+On a stamped page it replaces the site-wide *docs built* date, which only says a
+sync happened somewhere:
+
+```yaml
+---
+scope: cross-cutting
+verified:
+  date: 2026-09-09
+  against:
+    CPSV Editor: "bbda389"
+    Linked Data Explorer: "007b350"
+    RONL Business API: "04e38c8"
+---
+```
+
+Rules — each one exists because the stamp is only worth something if it is true:
+
+- **Write a component into the stamp only if you re-checked that component's
+  claims *on this page*, today.** Touching a page is not re-checking it. Where
+  you verified two components and not the third, the stamp names two. An old or
+  partial stamp is information; a refreshed one that was not earned is a lie
+  with a link on it.
+- **The SHA is the commit you verified against** — the fetched
+  `origin/<branch-of-record>` head, or the promoted `main` commit if that is
+  what you read. Never the commit the docs happen to record in
+  `repo-versions.json`, unless that is genuinely what you checked.
+- **Prefer a SHA that triggered a deploy run on GitHub**, so the reader can follow
+  it to a build. A commit that changed only CI configuration (`renovate.json`,
+  `SECURITY-PIPELINE.md`, a non-deploy workflow) triggers none, because deploy
+  workflows are path-filtered. If the head you read is one of those, stamp the most
+  recent commit that did deploy — **but only if no CI-relevant commit sits between
+  the two**; otherwise stamp the head and accept the script's warning.
+- **Quote every SHA.** YAML parses an unquoted all-digit SHA as an integer, and
+  one with a leading zero as octal: `0123456` becomes `42798`. The value is
+  gone before the template sees it.
+- **One date per page.** Components verified on other dates stay out of the
+  stamp rather than borrowing this one.
+- **Commits, not build ids.** Deploy workflows are path-filtered — in the Linked
+  Data Explorer and RONL Business API the frontend build fires only on frontend
+  paths — so most of what a contributing page describes (workflows,
+  `SECURITY-PIPELINE.md`, runner configs) changes without producing a new build.
+- **NL placeholders carry no stamp.** They contain no claims to have verified.
+
+The site build never checks a stamp — it stays offline. `scripts/stamp-staleness.py`
+does, in Stage 2e and Stage 4.
+
+#### The `build` field — component pages
+
+`repo-versions.json` may carry a `build` object per component, which the header
+renders after the version and environment badge — *"v2026.09.2 PROD · build
+007b350 · #39"*:
+
+```json
+"build": {
+  "sha": "007b350",
+  "run": 39,
+  "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/34339996841"
+}
+```
+
+`run_url` is the Actions run's `html_url`; the header links the build id there,
+and the staleness script checks the run carries that SHA and run number. Each
+component also records `ci_repo` — the repository its deploys run in, GitHub or
+GitLab — which is where every commit link on the site points.
+
+It is the **frontend build that was serving the recorded environment when the
+recorded commit was current** — a different fact from `version`, because a new
+build can reach ACC or PROD without a release bump, and the reader can compare
+this string with the build line the running application prints. See Stage 2c for
+how to derive it. Omit it for components with no build id (Norm Editor, CPRMV).
+
 Supporting infrastructure (already in place — do not rebuild it):
 
 | File | Role |
 |---|---|
-| `hooks/repo_versions.py` | `on_config` hook loading `repo-versions.json` into `config.extra.repo_versions` |
+| `hooks/repo_versions.py` | `on_config` hook loading `repo-versions.json` into `config.extra.repo_versions`, deriving each component's `commit_base` from its `repo_url` so stamps can link any commit |
+| `scripts/stamp-staleness.py` (in this skill) | Reports, per stamped page and component, the CI-relevant commits on the branch of record since the stamp; exits 1 on a malformed stamp |
 | `overrides/partials/doc-meta.html` | Renders the header |
 | `overrides/main.html` | `content` block override — renders the header first, suppresses the bottom `source-file.html` for opted-in pages |
 | `docs/stylesheets/extra.css` | `.doc-meta*` rules |
@@ -371,6 +451,23 @@ command; `docs_built` = today; keep the existing environment/repo_url base) and
 ask the user to confirm each field. The user is the authority on version,
 environment, and the exact commit that was deployed.
 
+**Also derive the `build` field** for components that have a build id (CPSV
+Editor, Linked Data Explorer, RONL Business API). It is the latest successful
+*frontend deploy* push run on the environment's branch whose commit is the
+recorded commit **or an ancestor of it**:
+
+```bash
+gh api "repos/sgort/<repo>/actions/runs?branch=<main|acc>&event=push&status=success&per_page=40" \
+  --jq '.workflow_runs[] | select(.name|test("Frontend|PROD|static";"i"))
+        | "\(.name) | #\(.run_number) | \(.head_sha[0:7]) | \(.html_url)"'
+```
+
+Expect the build's SHA to differ from the recorded commit sometimes, and record
+it anyway: the frontend workflow is path-filtered, so a commit that touched only
+the backend or CI produces no build, and the environment keeps serving the older
+one. Two workflows can share an environment branch (the CPSV Editor's acc and
+prod Static Web Apps files) — pick the one that deploys the recorded environment.
+
 ### Stage 2d — Testing documentation
 
 **Every component gets a `developer/testing.md` page.** A great deal of work
@@ -504,6 +601,27 @@ consequences:
     routing in Stage 2 make such a release look thin. If most changelog entries
     are typed `ci`, `chore` or `docs`, this stage is the main event.
 
+#### Start from the stamps
+
+Before reading any page, run the stamp report. It needs the clones fetched
+(Stage 0 does that; or pass `--fetch`):
+
+```bash
+python .claude/skills/iou-document-patch/scripts/stamp-staleness.py
+```
+
+For every stamped cross-cutting page it lists, per component, the commits on the
+branch of record that touched CI-relevant paths since the stamp — workflows,
+hooks, `SECURITY-PIPELINE.md`, `renovate.json`, runner and lint configs. Those
+commit subjects are the first evidence for the table below: a page with commits
+against it is a page to re-read against source, and the subjects usually say
+which claim moved (`docs: record that scan gates acc, in the three places that
+claimed otherwise` is a page going stale in its own words).
+
+Zero commits since a stamp means no CI-relevant path changed, **not** that the
+page is right — it may have been wrong when stamped. And an unstamped page has no
+baseline at all: read it in full.
+
 #### The page-by-page staleness table
 
 | Page | Goes stale when |
@@ -632,6 +750,11 @@ Work in this order so a failure leaves the docs in an obvious half-state:
     `component:` front matter — the metadata header renders one component's
     version, which would be wrong on a page about all of them.
 
+    **Then update each re-checked page's `verified` stamp** — today's date, and
+    the commit you read for each component whose claims on that page you
+    re-checked (see *The `verified` stamp* above). A page you edited without
+    re-checking a component keeps that component's old entry, or none.
+
 8. **Front matter** — add `component: <Name>` to **every** *component* page
    created or edited in this patch, EN and NL, placeholders included (see
    *Per-page metadata header*). Easiest as one sweep at the end over the file
@@ -642,8 +765,8 @@ Work in this order so a failure leaves the docs in an obvious half-state:
    rather than leaving the file untouched — a silent no-op is indistinguishable
    from a forgotten step on the next run.
 10. **`repo-versions.json`** — set the component's `version`/`commit`/
-    `commit_date`/`environment`/`repo_url` and the top-level `docs_built` to the
-    user-confirmed values.
+    `commit_date`/`environment`/`repo_url`, its `build` where it has one, and
+    the top-level `docs_built` to the user-confirmed values.
 
 ## Stage 4 — Verify & report
 
@@ -699,6 +822,18 @@ Work in this order so a failure leaves the docs in an obvious half-state:
 
    Every hit must be re-verified against the source, not against your memory of
    having just edited nearby.
+
+   Then re-run the stamp report. Every component you re-checked on a page must
+   now show **0 CI-relevant commits since** its stamp, and the script must exit 0
+   — a non-zero exit is a malformed stamp (unquoted SHA, unknown component,
+   unresolvable commit) or a recorded `build` contradicting its GitHub run.
+   Report every warning: *triggered no successful deploy run* means the stamp
+   cannot be followed to a build; *not on any origin/\* branch* means the header
+   link 404s until that commit is pushed.
+
+   ```
+   python .claude/skills/iou-document-patch/scripts/stamp-staleness.py
+   ```
 
 6. **Anchors and nav** — cross-references between contributing pages are
    deep-linked more often than component pages are. A non-strict `mkdocs build`
@@ -786,6 +921,14 @@ Distinguish two cases, because they need different fixes: an entry merely
 the second kind.
 
 ## Guardrails
+
+- **Splice by index, never with a string replacement.** `String.prototype.replace`
+  with a *string* as its second argument expands `$&`, `$'`, `` $` `` and `$1` in the
+  text being inserted. On 11 September 2026 a changelog entry that *quoted* `$'` —
+  it described exactly that bug in the Linked Data Explorer's BPMN modeler — pasted
+  the rest of the document into itself, taking the page from 1,240 lines to 3,739.
+  Slice at `indexOf` and concatenate, or pass a function (`() => text`), and compare
+  line counts before and after every splice.
 
 - **Staged, not one-shot.** Always present the Stage 2 plan and stop for
   approval before any edit.

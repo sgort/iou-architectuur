@@ -1,5 +1,5 @@
 {
-  "docs_built": "2026-09-09",
+  "docs_built": "2026-09-11",
   "repositories": [
     {
       "name": "RONL Business API",
@@ -8,7 +8,13 @@
       "environment": "acc",
       "commit": "66940d9...",
       "commit_date": "2026-09-04",
-      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/66940d9997a8eb9f917f35b0bd34d0729b5f2204"
+      "build": {
+        "sha": "66940d9",
+        "run": 266,
+        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/33920287857"
+      },
+      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/66940d9997a8eb9f917f35b0bd34d0729b5f2204",
+      "ci_repo": "https://github.com/sgort/ronl-business-api"
     },
     {
       "name": "Norm Editor",
@@ -17,7 +23,8 @@
       "environment": "prod",
       "commit": "46e44c8...",
       "commit_date": "2026-09-01",
-      "repo_url": "https://git.open-regels.nl/regels/editor/-/commit/46e44c8e9f1f0e47a28659831e5743bcf4088647"
+      "repo_url": "https://git.open-regels.nl/regels/editor/-/commit/46e44c8e9f1f0e47a28659831e5743bcf4088647",
+      "ci_repo": "https://git.open-regels.nl/regels/editor"
     },
     {
       "name": "CPSV Editor",
@@ -26,16 +33,28 @@
       "environment": "prod",
       "commit": "bbda389...",
       "commit_date": "2026-09-09",
-      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/bbda3897b7a21290eb575e9dbaa8f96636f25929"
+      "build": {
+        "sha": "bbda389",
+        "run": 88,
+        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/34338371693"
+      },
+      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/bbda3897b7a21290eb575e9dbaa8f96636f25929",
+      "ci_repo": "https://github.com/sgort/ttl-editor"
     },
     {
       "name": "Linked Data Explorer",
       "icon": "🔍",
-      "version": "v2026.09.2",
+      "version": "v2026.09.4",
       "environment": "prod",
-      "commit": "007b350...",
-      "commit_date": "2026-09-09",
-      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/007b35003ae3af5f4552624948d124c95efbc665"
+      "commit": "be6bc54...",
+      "commit_date": "2026-09-11",
+      "build": {
+        "sha": "be6bc54",
+        "run": 44,
+        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/34613327287"
+      },
+      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/be6bc541e95790397dcb94f57839a3015b28f321",
+      "ci_repo": "https://github.com/sgort/linked-data-explorer"
     },
     {
       "name": "CPRMV",
@@ -44,7 +63,8 @@
       "environment": "prod",
       "commit": "d614539...",
       "commit_date": "2026-06-13",
-      "repo_url": "https://git.open-regels.nl/standards/cprmv/-/commit/d61453970000e505b778ed95a36fbdf9ff85f555"
+      "repo_url": "https://git.open-regels.nl/standards/cprmv/-/commit/d61453970000e505b778ed95a36fbdf9ff85f555",
+      "ci_repo": "https://git.open-regels.nl/standards/cprmv"
     }
   ]
 }
