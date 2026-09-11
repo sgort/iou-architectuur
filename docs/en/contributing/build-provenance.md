@@ -1,5 +1,10 @@
 ---
 scope: cross-cutting
+verified:
+  date: 2026-09-09
+  against:
+    CPSV Editor: "bbda389"
+    Linked Data Explorer: "007b350"
 ---
 
 # Build Provenance

@@ -434,3 +434,31 @@ button:focus {
   font-size: 0.9em;
   white-space: nowrap;
 }
+
+/* The two optional facts. `.doc-meta__build` (component pages) is the
+   frontend build that was serving the recorded environment;
+   `.doc-meta__verified` (cross-cutting pages) names the commit of each
+   component the page was last re-checked against. Both are subordinate to
+   the version or scope fact beside them, so they keep the lighter default
+   colour and normal weight. */
+.doc-meta__build code,
+.doc-meta__verified code {
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
+.doc-meta__verified {
+  flex-wrap: wrap;
+  row-gap: 0.2rem;
+}
+
+.doc-meta__commit,
+.doc-meta__commit:visited {
+  color: inherit;
+  text-decoration: none;
+}
+
+.doc-meta__commit:hover code,
+.doc-meta__commit:focus-visible code {
+  color: var(--md-accent-fg-color);
+}
