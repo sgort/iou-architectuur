@@ -94,6 +94,7 @@ hooks:
 # Navigation structure
 nav:
   - Home: index.md
+  - IOU Architecture (slides): iou-architecture-deck.md
   
   - ⚙️ RONL Business API:
     - Overview: ronl-business-api/index.md
