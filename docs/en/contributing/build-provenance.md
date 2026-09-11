@@ -3,17 +3,18 @@ scope: cross-cutting
 verified:
   date: 2026-09-11
   against:
+    CPSV Editor: "f5bae6a"
     Linked Data Explorer: "be6bc54"
 ---
 
 # Build Provenance
 
-!!! info "Re-verified for the Linked Data Explorer on 11 September 2026 — the rest waits for its own sync"
-    Every Linked Data Explorer claim on this page was re-checked against `be6bc54`,
-    the commit that published v2026.09.4, which is what the header's stamp records.
-    **CPSV Editor claims were not**, and are re-checked in its own sync, which
-    follows this one. **RONL Business API claims are left as they stood and may be
-    stale** — they are to be verified with the next RONL Business API release sync.
+!!! info "Re-verified for the CPSV Editor and the Linked Data Explorer on 11 September 2026"
+    Every CPSV Editor and Linked Data Explorer claim on this page was re-checked
+    against `f5bae6a` and `be6bc54` — the commits that published v2026.09.4 of each —
+    which is what the header's stamp records. **RONL Business API claims, both
+    columns, are left as they stood and may be stale** — they are to be verified with
+    the next RONL Business API release sync.
 
 *Answering "which build am I looking at?" from inside the running app*
 
@@ -94,7 +95,7 @@ The module and its tests ported unchanged. Everything else had to be re-derived 
 | Surface | changelog tab | lazily-loaded changelog drawer | site footer — no changelog | changelog full page |
 | **Who builds** | **Oryx**, in the deploy container | **the runner** | **the runner** | **Oryx**, in the deploy container |
 | **`env:` goes on** | **deploy step** | **build step** | **build step** | **deploy step** |
-| String lands in | main bundle | lazy chunk `ChangelogPanelContent-*.js` | main `index-*.js` | main `index-*.js` |
+| String lands in | lazy chunk `ChangelogTab-*.js` | lazy chunk `ChangelogPanelContent-*.js` | main `index-*.js` | main `index-*.js` |
 
 The **Surface** row was called *Changelog UI* while every adopter had a changelog.
 The public site has none: it is a citizen-facing site whose foot already carried its
@@ -201,6 +202,16 @@ in a `ChangelogPanelContent-*.js` chunk; grepping only `index.js` returns nothin
 and looks exactly like failure. Confirm the chunk hash changes between the two
 builds — if it does not, the second build did not run.
 
+**The CPSV Editor joined it in v2026.09.2**, when its four heaviest tabs were
+lazy-loaded to cut the entry chunk from 685.71 to 392.74 kB. `ChangelogTab` is one of
+them and the only importer of the build-info module, so the string moved out of the main
+bundle into `ChangelogTab-*.js` — and this page's comparison table went on saying *main
+bundle* for two releases, because nothing about a correct build id changed. Confirmed on
+11 September 2026 with a marker build of v2026.09.4: the injected SHA and run number
+appear in `dist/assets/ChangelogTab-*.js` and nowhere else. **A code-splitting change
+elsewhere in the app moves where to grep**, which is one more reason to grep all of
+`dist/`.
+
 **Grep for the injected values, not the rendered label.** `build 570fd98 · #412` is
 assembled at runtime from `` `build ${shortSha} · #${run}` ``, so that string is in no
 artifact, however correct the build. What ships is the **full** SHA and the run
@@ -252,6 +263,10 @@ from "the values reached the artifact".
     |---|---|--:|---|
     | CPSV Editor (*Deploy PROD*) | `bbda389` | 88 | `build bbda389 · #88` |
     | Linked Data Explorer | `007b350` | 39 | `build 007b350 · #39` |
+
+    The CPSV Editor has promoted twice more since, both on 11 September: v2026.09.3 as
+    `build f7e127a · #92` and v2026.09.4 as **`build f5bae6a · #94`**, each from
+    *Deploy PROD (white-sky)*.
 
     The Linked Data Explorer has promoted twice more since, both on 11 September:
     v2026.09.3 as `build 35a44f8 · #41` and v2026.09.4 as **`build be6bc54 · #44`**,

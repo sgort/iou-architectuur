@@ -3,19 +3,19 @@ scope: cross-cutting
 verified:
   date: 2026-09-11
   against:
+    CPSV Editor: "f5bae6a"
     Linked Data Explorer: "be6bc54"
 ---
 
 # Code Standards
 
-!!! info "Re-verified for the Linked Data Explorer on 11 September 2026 — the rest waits for its own sync"
-    Every Linked Data Explorer claim on this page was re-checked against `be6bc54`,
-    the commit that published v2026.09.4, which is what the header's stamp records.
-    **CPSV Editor claims were not**, and are re-checked in its own sync, which
-    follows this one. **RONL Business API claims are left as they stood and may be
-    stale** — the latest check of any of them was against `04e38c8` on 9 September
-    2026, and not every claim was re-checked then. They are to be verified with the
-    next RONL Business API release sync.
+!!! info "Re-verified for the CPSV Editor and the Linked Data Explorer on 11 September 2026"
+    Every CPSV Editor and Linked Data Explorer claim on this page was re-checked
+    against `f5bae6a` and `be6bc54` — the commits that published v2026.09.4 of each —
+    which is what the header's stamp records. **RONL Business API claims are left as
+    they stood and may be stale** — the latest check of any of them was against
+    `04e38c8` on 9 September 2026, and not every claim was re-checked then. They are
+    to be verified with the next RONL Business API release sync.
 
 This page covers three application repositories — CPSV Editor (`ttl-editor`), Linked
 Data Explorer, and RONL Business API — that share a common tooling convention:
@@ -80,12 +80,12 @@ formatting on push.
 **None of the three repositories' git hooks run the test suite.** Neither `pre-commit`
 nor `pre-push` invokes `npm test` anywhere. A passing hook is not evidence your change
 didn't break a test — only CI, or running the suite yourself, tells you that. Since
-August 2026 CI closes that gap on the way in as well as on the way out: in CPSV Editor
-and RONL Business API a failing check now blocks the *merge*, not just the deploy — see
-[Enforcement](#enforcement-what-blocks-a-merge) below. In the Linked Data Explorer the
-suites **run** on every pull request, but the checks its rulesets **require** are
-`audit` and `scan` — so a red test stops the deploy and shows on the pull request,
-and does not by itself block the merge.
+August 2026 CI closes that gap on the way in as well as on the way out: in RONL
+Business API a failing check now blocks the *merge*, not just the deploy — see
+[Enforcement](#enforcement-what-blocks-a-merge) below. In the CPSV Editor and the Linked
+Data Explorer the suites **run** on every pull request, but the checks their rulesets
+**require** are `audit` and `scan` — so a red test stops the deploy and shows on the
+pull request, and does not by itself block the merge.
 
 ---
 
@@ -134,9 +134,10 @@ accumulated invisibly, because nothing in the repository ran `tsc` at all.** `bu
 ESLint; `test` is Vitest. None of the three typechecks, so a type error could reach
 `acc` and deploy. A `typecheck` script now exists at the root and in both workspaces.
 
-**CPSV Editor** — three workflows: two Azure Static Web Apps workflows, `acc` and `main`
+**CPSV Editor** — four workflows: two Azure Static Web Apps workflows, `acc` and `main`
 alike, running `npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy action,
-plus the supply-chain `audit`. Since v2026.09.2 that `audit` job also runs
+plus the supply-chain `audit` and, since v2026.09.3, the Semgrep `scan` (see
+[Supply-Chain Pinning — the npm tree](supply-chain.md#7-the-other-supply-chain-the-npm-tree)). Since v2026.09.2 that `audit` job also runs
 `npm run check-format` and `npm run check-supply-chain` — and it gained its first
 `npm ci` to do so, everything in it having previously run from `npx` or plain node. Since v2026.09.0 the deploy workflows are named
 **`Deploy ACC (orange-beach)`** and **`Deploy PROD (white-sky)`**; both were previously
@@ -204,13 +205,17 @@ is rejected outright** in all three repositories, including for releases and inc
 for the repository owner. Linked Data Explorer adopted the same ruleset in v2026.08.7;
 all three are named `acc supply-chain gate` and carry zero bypass actors. They are not
 identical in shape, though: only the Linked Data Explorer's also blocks branch deletion
-and non-fast-forward pushes, and since v2026.09.3 it requires `scan` alongside
-`audit`.
+and non-fast-forward pushes, and since v2026.09.3 the CPSV Editor's and the Linked Data
+Explorer's both require `scan` alongside `audit`.
 
 **The Linked Data Explorer is also the one repository whose `main` is gated.** Its
 `main promotion gate` ruleset mirrors the `acc` one — the same four rules, `audit` and
 `scan` required, zero bypass actors — so a promotion pull request is held to the same
-checks as the pull requests it carries.
+checks as the pull requests it carries. The CPSV Editor's `main` requires a pull
+request but no status checks — **decided and kept**, not overlooked
+([ttl-editor#131](https://github.com/sgort/ttl-editor/issues/131)): `main` is promoted
+from `acc`, whose commits already passed `audit` and `scan`. See
+[Supply-Chain Pinning](supply-chain.md#adoption-status) for the argument on both sides.
 
 Merge strategy is enforced by repository settings rather than by convention: all three
 disable squash and rebase merges, leaving merge commits only, with
@@ -241,7 +246,8 @@ majors — RONL Business API first, the CPSV Editor since v2026.09.0, and the Li
 Explorer since v2026.09.2, which retired its last `actions/checkout` at v3.7.0 on the
 way. **Only the Linked Data Explorer gates `main`**, with a `main promotion gate`
 ruleset that requires the same checks as its `acc` one; in the other two the rulesets
-target `refs/heads/acc` alone, so the gate protects the acceptance path only there.
+target `refs/heads/acc` alone, so the gate protects the acceptance path only there — by
+decision in the CPSV Editor, whose `main` requires a pull request and no checks.
 
 [Supply-Chain Pinning](supply-chain.md) covers the mechanism, the measured results
 (16 findings to zero in the CPSV Editor, 49 in RONL Business API, 40 in the Linked Data

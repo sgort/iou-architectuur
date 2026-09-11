@@ -237,6 +237,18 @@ shape. Each distinct citation URI now gets a minted, deduplicated stub:
 The `cprmv:id` falls back to the URI itself — there is no other identifier
 available for an external resource this graph does not otherwise describe.
 
+**No stub is minted for a rule the document already emits.** When a citation
+points at a rule the same export publishes in its own Rules section, that subject
+is already typed `cprmv:Rule` there with a real `cprmv:id`, and a stub would
+assert a second, contradictory one — the URI. Observed rather than hypothesised:
+twelve of the normenbrief export's 216 `cprmv:Rule` subjects carried two
+`cprmv:id` values before the fix. The generator collects the rule URIs its Rules
+section will emit, using that section's own emission condition, and skips the stub
+for any citation among them. A citation to a rule this graph does *not* otherwise
+describe still gets its stub, or `cprmv:isBasedOn` would point at an untyped
+subject and fail `sh:class`. `ttlGenerator.citationStub.test.js` asserts both
+directions.
+
 No new SHACL shapes were needed: cell resources are ordinary `cprmv:Rule`
 instances composed with the existing `cprmv:hasPart`, so the recursion is
 covered by shapes that already exist.

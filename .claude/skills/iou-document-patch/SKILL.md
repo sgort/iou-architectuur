@@ -923,8 +923,10 @@ the second kind.
 ## Guardrails
 
 - **Splice by index, never with a string replacement.** `String.prototype.replace`
-  with a *string* as its second argument expands `$&`, `$'`, `` $` `` and `$1` in the
-  text being inserted. On 11 September 2026 a changelog entry that *quoted* `$'` —
+  with a *string* as its second argument expands `$&`, `$'`, `` $` `` and a dollar sign followed by a
+  digit in the text being inserted. (That last one is spelled out on purpose: this
+  skill's own loader substitutes a literal dollar-digit with an argument, which is the
+  same class of bug a third time.) On 11 September 2026 a changelog entry that *quoted* `$'` —
   it described exactly that bug in the Linked Data Explorer's BPMN modeler — pasted
   the rest of the document into itself, taking the page from 1,240 lines to 3,739.
   Slice at `indexOf` and concatenate, or pass a function (`() => text`), and compare

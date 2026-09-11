@@ -157,13 +157,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.09.2** · *September 2026*
+-   **✏️ CPSV Editor — v2026.09.4** · *September 2026*
 
     ---
 
-    **Create React App is gone, and the branch floor is native**
+    **Semgrep in the gate, and the scan reads zero**
 
-    The Vite migration landed in four independently revertable phases, taking `npm audit` from 52 vulnerabilities to 10 and production builds from roughly 30 seconds to under two — with two traps the plan missed that would have *deployed green and broken*: Vite only exposes `VITE_`-prefixed variables, and `react-scripts` was where ESLint itself came from. The [P0–P7 testing roadmap is complete](cpsv-editor/developer/testing.md), 257 tests becoming 736 across 60 files plus two Playwright journeys against a live stack, and the [80% per-file branch floor](contributing/coverage-floor.md) is now enforced by the runner rather than a custom script — `DMNTab.jsx`, the largest file in the repository, went from 45.73% to 98.34%.
+    Semgrep Code and Supply Chain now scan every pull request and are a [required check on `acc`](contributing/supply-chain.md#7-the-other-supply-chain-the-npm-tree) — the half of the supply chain `check-supply-chain` could never see. The last seven findings were not waiting on an upstream release, as first thought: each had a fix inside its declared range, and **lock-file maintenance had never been turned on**. It now runs every week, and its first refresh took the scan on `acc` to **0**. Two latent parser defects are fixed where they live — iKnow mapping configs can no longer write to `Object.prototype` or compile a pattern that hangs the browser — the TTL export stops asserting a second `cprmv:id` on rules it already publishes, and two example models arrive with 121- and 62-case suites. The [test suite](cpsv-editor/developer/testing.md) stands at 751 tests and three end-to-end journeys.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
