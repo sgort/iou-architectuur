@@ -17,6 +17,8 @@ scope: cross-cutting
 
 ## Why in-repo rather than org-level
 
+## The GitLab mirror
+
 ## Adoption status
 
 ## The concrete risk
@@ -30,3 +32,7 @@ scope: cross-cutting
 ## Evidence it works — and a cautionary tale
 
 ## Replicating this in the next repository
+
+## 6. `check-supply-chain` — the preflight zizmor cannot be
+
+## 7. The other supply chain: the npm tree

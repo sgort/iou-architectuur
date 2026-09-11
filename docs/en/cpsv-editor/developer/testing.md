@@ -14,17 +14,19 @@ The testing roadmap that ran from P0 to P7 is **complete**: every phase has
 landed, and the per-file 80% branch floor is enforced natively by the runner.
 
 !!! info "Figures on this page are measured, not estimated"
-    Every count and percentage below was produced by running the suite against
-    **v2026.09.2** on **9 September 2026** on `main` at `bbda389` — the full run
-    and each scoped script individually, after a clean `npm ci`. The two
-    end-to-end journeys were run against a live Linked Data Explorer backend and
-    Operaton engine. Rerun the commands in
-    [Running the tests](#running-the-tests) to reproduce them.
+    Every unit count and percentage below was produced by running the suite
+    against **v2026.09.4** on **11 September 2026** at `f5bae6a` on `main` — the
+    full run and each scoped script individually, in a clean export of that
+    commit after `npm ci`, under Node 22. The three **end-to-end journeys** were
+    run with `E2E_BASE_URL` against the **acceptance deployment**, which serves the
+    same tree as production (`a1dc182`, identical to `f5bae6a`) — 3 passed in 9.3 s.
+    Rerun the commands in [Running the tests](#running-the-tests) to reproduce
+    them.
 
-**At a glance:** 60 files · **736 tests** · all passing · ~54 s for a full run
-with coverage, plus **2 end-to-end journeys** run separately.
+**At a glance:** 61 files · **751 tests** · all passing · ~33 s for a full run
+with coverage, plus **3 end-to-end journeys** run separately.
 
-Coverage: **89.89% statements · 87.39% branches · 78.46% functions · 90.61%
+Coverage: **90.00% statements · 87.95% branches · 78.47% functions · 90.71%
 lines**, with every file at or above the 80% branch floor.
 
 !!! danger "Measure after `npm ci`, never after `npm install`"
@@ -45,20 +47,20 @@ from the repository root after `npm ci`.
 
 | Command | Scope | Suites | Tests |
 |---|---|---:|---:|
-| `npm run test:ci` | Everything, once, with coverage | 60 | 736 |
-| `npm test` | Everything, interactive watch mode | 60 | 736 |
-| `npm run test:generator` | TTL generator regression tests | 7 | 111 |
+| `npm run test:ci` | Everything, once, with coverage | 61 | 751 |
+| `npm test` | Everything, interactive watch mode | 61 | 751 |
+| `npm run test:generator` | TTL generator regression tests | 8 | 119 |
 | `npm run test:roundtrip` | TTL round-trip tests (P1) | 1 | 9 |
-| `npm run test:p2` | Pure-logic utilities (P2) | 8 | 184 |
+| `npm run test:p2` | Pure-logic utilities (P2) | 8 | 191 |
 | `npm run test:p3` | State hooks (P3) | 3 | 33 |
 | `npm run test:p4` | Network-touching utilities (P4) | 2 | 40 |
 | `npm run test:p5` | Tab components, PreviewPanel, PublishDialog (P5) | 23 | 181 |
 | `npm run test:p6` | `DMNTab`'s full lifecycle (P6) | 6 | 96 |
-| `npm run test:e2e` | Playwright journeys (P7) — **needs a live stack** | 2 | 2 |
+| `npm run test:e2e` | Playwright journeys (P7) — **needs a live stack** | 3 | 3 |
 
 Each scoped script has a `:watch` counterpart. The phase scripts overlap
 deliberately — a file can belong to more than one phase — so their counts do
-not sum to 736.
+not sum to 751.
 
 ### End-to-end journeys need a live stack
 
@@ -191,9 +193,14 @@ Test files are colocated with the source they cover (`foo.js` →
 | File | Tests | Style | Covers |
 |---|---:|---|---|
 | `src/parseTTL.roundtrip.test.js` | 9 | Real fixtures, no mocks | Parses a real reference export, regenerates TTL from the parsed state, then parses again — comparing business fields between the two parses rather than diffing against the original file's formatting |
+| `src/utils/ttlGenerator.sections.test.js` | 29 | Pure unit | The skeleton the others sit in: `generate()` assembles a dozen optional sections, each behind its own condition — service identifier and sector, organisation logo, legal resource, temporal rules |
+| `src/utils/ttlGenerator.uris.test.js` | 26 | Pure unit | The URI and date helpers every emitter shares — legal-resource and ruleset URIs, `cprmvValidFrom`, rules-derived dates, CPRMV rule subject URIs. A wrong one does not throw; it publishes a graph that parses and points at the wrong resources |
+| `src/utils/ttlGenerator.entities.test.js` | 23 | Pure unit | Parameters, cost, output and the vendor service — above all that an empty field produces **no triple**, never a triple with an empty literal |
+| `src/utils/ttlGenerator.dmn.test.js` | 11 | Pure unit | The DMN section for a model uploaded in this editor — deployment, test and validation history, each optional and each its own predicate |
 | `src/utils/ttlGenerator.cellGrounding.test.js` | 12 | Pure unit | Per-cell `cprmv:Rule` emission, concept dedup, nested `hasPart` for compound cells, and the SHACL-conformance rules — see [Cell-Level Legislative Grounding](cell-level-grounding.md) |
 | `src/utils/ttlGenerator.versionTarget.test.js` | 7 | Pure unit | The CPRMV version selector — namespace and shape differences between the `0.4.1` and `0.3.2` targets |
 | `src/utils/ttlGenerator.dateAxis.test.js` | 3 | Pure unit | Rules-derived consolidation dates and duplicate-path rule URIs |
+| `src/utils/ttlGenerator.citationStub.test.js` | 8 | Pure unit + the real export | The typed stub minted for a `cprmv:isBasedOn` citation — and **no** stub for a rule the same document already publishes, which asserted a second, contradictory `cprmv:id`. Half the file regenerates the real SZW normenbrief export and checks no subject carries two ids |
 | `src/utils/ttlHelpers.test.js` | 32 | Pure unit | All ten TTL string/URI helpers — escaping, sanitising (filenames, `ruleIdPath`, IRIs), formatting. `sanitizeIri` is checked for idempotence and for leaving structural URI characters (`/`, `:`, `#`, `?`) intact |
 
 Round-trip fixtures are the real reference exports in `examples/` —
@@ -211,7 +218,7 @@ it.
 |---|---:|---|---|
 | `src/utils/dmnHelpers.test.js` | 54 | Real DOM parsing (jsdom `DOMParser`) | Primary-decision-key extraction (root detection, `p_*` constant skipping, multi-root tie-breaking), rule and cell extraction, `validateDMNData`, concept generation, `evaluateTestCaseExpectation`, `extractOutputsFromDMN` |
 | `src/utils/validators.test.js` | 29 | Pure unit | All eight exports: the six per-section validators, the `validateForm` aggregation across every section including array fields, and the `isValidDate` helper |
-| `src/utils/iknowParser.test.js` | 24 | Real DOM parsing | Both iKnow XML export formats, format auto-detection, the field-map helper, the dot-path value extractor, and `applyMapping` including filters and transforms |
+| `src/utils/iknowParser.test.js` | 31 | Real DOM parsing | Both iKnow XML export formats, format auto-detection, the field-map helper, the dot-path value extractor, and `applyMapping` including filters and transforms — plus the two guards: prototype path segments are neither read nor written, and a nested-quantifier or over-long transform pattern throws |
 | `src/utils/cprmvImport.test.js` | 13 | Pure unit | `flattenCprmvRules` — sub-clause folding, namespace variants (0.4.1 slash, 0.3.0 `contains`, legacy flat arrays), multi-entry input, malformed input tolerance, id uniqueness |
 | `src/utils/ronlHelper.test.js` | 5 | `global.fetch` mock | The two SPARQL functions that query the RONL vocabulary through the shared backend proxy |
 
@@ -276,12 +283,42 @@ the branch that requires an uploaded file, so the error it raises can never fire
 
 ### End-to-end journeys (P7)
 
-Two Playwright specs, run against a live stack rather than mocks.
+Three Playwright specs, run against a live stack rather than mocks. Measured on
+11 September 2026 against the acceptance deployment, with the preflight confirming its
+backend and the Operaton engine before anything was driven:
+
+```bash
+E2E_BASE_URL=https://acc.cpsv-editor.open-regels.nl \
+E2E_BACKEND_URL=https://acc.backend.linkeddata.open-regels.nl \
+E2E_OPERATON_URL=https://operaton.open-regels.nl \
+npx playwright test --reporter=list
+#   3 passed (9.3s) — authoring 3.1 s, normbedragen 3.2 s, round-trip 2.0 s
+```
+
+`--reporter=list` rather than `npm run test:e2e`, which opens the HTML report when it
+finishes — fine at a desk, a hang in anything scripted.
 
 | Spec | What it proves |
 |---|---|
 | `e2e/authoring-journey.spec.js` | The application can create a service: empty form → real deploy → real evaluation → exported TTL |
 | `e2e/round-trip-journey.spec.js` | It can read an existing one back: import a full TTL, swap its decision model, deploy, evaluate, download and check what was written |
+| `e2e/normbedragen-journey.spec.js` | One deployment answers repeatedly: a chained DRD deployed once, evaluated with four request bodies that differ only in the peildatum, then exported. Added in v2026.09.3 with the 2026-H2 bijstandsnormen |
+
+!!! danger "`E2E_BASE_URL` points the journeys at a deployed build — and at production's engine"
+    Since v2026.09.3 `E2E_BASE_URL` drives the journeys against an already-deployed
+    app instead of a local dev server, and drops the `webServer` block so none is
+    started. **The journeys are not read-only**: each clicks *Deploy to Operaton*
+    and leaves a deployment behind, and the fixtures use real decision keys.
+    `.env.acceptance` and `.env.production` name **the same engine**,
+    `https://operaton.open-regels.nl`, so a run against acceptance deploys a real
+    version of those keys into the engine production evaluates against — and
+    Operaton versions a duplicate key rather than rejecting it, so a consumer that
+    evaluates *by key* then answers from the test fixture. Only a local stack,
+    `.env.development`'s `localhost:8081`, is free of that.
+
+    The app also calls the backend it was **built** against: `E2E_BACKEND_URL`
+    redirects the preflight probe, not the application. Driving a deployed build
+    means driving its stack.
 
 Both assert **values rather than status codes** — zorgtoeslag 1150 and a specific
 annotation string — because a decision table that stopped matching would still
@@ -300,20 +337,21 @@ so the journey is not blocked, and the threshold is documented rather than dodge
 
 ## Coverage
 
-Measured with `npm run test:ci` against v2026.09.2 on 9 September 2026, after a
-clean `npm ci`.
+Measured with `npm run test:ci` against v2026.09.4 on 11 September 2026, in a
+clean export after `npm ci`.
 
-**Overall: 89.89% statements · 87.39% branches · 78.46% functions · 90.61%
+**Overall: 90.00% statements · 87.95% branches · 78.47% functions · 90.71%
 lines** — against 54.75% / 40.88% / 38.68% / 55.57% at v2026.09.0. The jump is
-P5, P6 and the branch-floor work landing together.
+P5, P6 and the branch-floor work landing together; v2026.09.3's two parser guards
+moved `src/utils` a little further.
 
 | Area | Statements | Branches | Functions | Lines |
 |---|---:|---:|---:|---:|
 | `src/hooks` | 99.33% | 83.60% | 100% | 100% |
-| `src/utils` | 94.76% | 86.74% | 98.43% | 95.63% |
+| `src/utils` | 95.07% | 88.06% | 98.47% | 95.94% |
 | `src/config` | 92.15% | 82.35% | 75.00% | 91.83% |
 | `src/components` | 84.41% | **88.65%** | 85.71% | 87.50% |
-| `src` (App, index) | 84.56% | 81.70% | 58.62% | 85.63% |
+| `src` (App, index) | 84.21% | 81.70% | 56.89% | 85.27% |
 
 `src/components` was at **4.05% branches** three releases ago. That is the P5 and
 P6 work.
@@ -337,7 +375,7 @@ repositories reached it.
 !!! note "What the branch column does not see"
     A branch floor steps straight over branch-free code. `ConceptsTab.jsx` reads
     80.55% on branches but **71.62% statements and 63.33% functions**;
-    `App.jsx` reads 81.48% / 72.44% / **55.55%**. The uncovered code there is
+    `App.jsx` reads 81.48% / 71.65% / **53.70%**. The uncovered code there is
     largely whole handlers no test calls. That asymmetry is why a functions floor
     is [a separate decision](../../contributing/coverage-floor.md#a-functions-floor-is-a-separate-decision)
     rather than a free companion setting.
@@ -389,10 +427,10 @@ question, deliberately left open.
 ## Adding tests
 
 - **Colocate.** `foo.js` → `foo.test.js`, next to the source.
-- **Split by concern, not by file size.** `ttlGenerator.js` already has three
-  separate test files (`dateAxis`, `versionTarget`, `cellGrounding`) rather
-  than one large one — easier to review, and easier to see what is covered at
-  a glance.
+- **Split by concern, not by file size.** `ttlGenerator.js` has eight separate
+  test files — `sections`, `uris`, `entities`, `dmn`, `cellGrounding`,
+  `versionTarget`, `dateAxis`, `citationStub` — rather than one large one:
+  easier to review, and easier to see what is covered at a glance.
 - **Add a script pair per phase.** Each new phase gets
   `test:<phase>` and `test:<phase>:watch` in `package.json`, using a
   `--testPathPattern` regex naming the files it covers, mirroring the existing

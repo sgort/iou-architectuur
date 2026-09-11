@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # DSO → DMN Import
 
 This guide explains what happens when you arrive in the CPSV Editor from a Linked Data Explorer DSO deep-link, and how to continue from there. For the architecture, see the [DSO → DMN Import feature page](../features/dso-import.md).
@@ -23,7 +27,7 @@ The address bar is cleaned automatically, so refreshing the page will **not** re
 
 1. **Review the prefilled tabs.** Check the Service identifier and title, and confirm the Organization. Fill in the **Legal** tab with the governing BWB/CVDR resource — this drives the `cpsv:implements` links on the decision rules.
 2. **Review the DMN.** The syntactic validation panel runs automatically. Resolve any errors in your DMN authoring tool if needed.
-3. **Deploy and test.** Deploy to Operaton and run a single evaluate or test cases — see [DMN Workflow](dmn-workflow.md) and [DMN Testing](dmn-testing.md).
+3. **Deploy and test.** Deploy to Operaton and run a single evaluate or test cases — see [The DMN Tab](dmn-tab.md) and [DMN Testing](dmn-testing.md).
 4. **Publish.** Open the publish dialog, review the advisory SHACL result, and publish to TriplyDB — see [Publishing to TriplyDB](publishing-to-triplydb.md).
 
 ---

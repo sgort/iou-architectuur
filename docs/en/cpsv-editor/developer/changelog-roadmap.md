@@ -8,6 +8,55 @@ component: CPSV Editor
 
 ## Changelog
 
+### v2026.09.4 — The Lockfile Moves, and the Scan Reads Zero (September 2026)
+
+> The mechanism across repositories: [Supply-Chain Pinning — the npm tree](../../contributing/supply-chain.md#7-the-other-supply-chain-the-npm-tree).
+
+**The transitive dependency tree is refreshed every week.** Renovate only ever proposes packages a manifest names; lock-file maintenance, which refreshes everything else in `package-lock.json`, is off by default and **had never been turned on here**. That was the whole explanation for the seven Supply Chain findings v2026.09.3 left open — each had a fixed version inside its declared range, and nothing had ever moved them. It now runs on Monday mornings with `prPriority: 10`, and major updates wait in the Dependency Dashboard for approval so they cannot crowd it out — the lesson the Linked Data Explorer learned first. Security fixes are exempt, so one that happens to be a major version never waits on a click.
+
+**The first refresh took the scan to zero.** It changed 202 entries in `package-lock.json` — 68 moved, 87 added, 47 removed — every one within a range `package.json` already declared, so the manifest is untouched. It closed the last seven Semgrep Supply Chain findings: every copy of `brace-expansion` 1.x to 1.1.18, `picomatch` 2.x to 2.3.2, and `postcss-selector-parser` to 6.1.4. **The scan on `acc` reports 0.** The only dependency of the application itself that moved is `lucide-react`, to 1.35.0.
+
+Three packages behind Vite and jsdom moved *back* a patch version — `rolldown` to 1.2.6, `@oxc-project/types` to 0.147.0, `@csstools/css-color-parser` to 4.2.1. That is the 14-day cooldown working as designed: the newer versions had arrived through a local install on 4 September, were 8 to 11 days old when the refresh ran, and so it resolved each to the newest version past the cooldown.
+
+!!! warning "npm 10 cannot perform that refresh"
+    npm 10.9.4, bundled with Node 22, crashes in its resolver on this dependency
+    tree — `Cannot read properties of null (reading 'edgesOut')` — on both a fresh
+    resolution and `npm update`. npm 11 resolves the same tree cleanly. `npm ci` is
+    unaffected, because it only installs from the lockfile, and so is CI, which runs
+    Node 24. The failure lands only on a workstation running Node 22 that tries to
+    add or update a package, which is why the README now says to use **Node 24 /
+    npm 11**.
+
+---
+
+### v2026.09.3 — Semgrep in the Gate, and Two Hardened Parsers (September 2026)
+
+**Semgrep scans dependencies and code in CI, on a ref rather than a laptop.** The three controls this repository already gated on — build provenance, supply-chain pinning, the coverage floor — say nothing about the packages in `package-lock.json`. `check-supply-chain` verifies GitHub Actions pins and does not look at npm at all. Renovate had been doing the remediation and nothing was verifying it. The new `scan` job runs Semgrep Code and Supply Chain on every pull request and every push to `acc` and `main`, and is a **required check on `acc`**, alongside `audit`.
+
+The second reason is the one that prompted it: **a scan run by hand is pinned to whatever happens to be checked out**, and nothing in its output names the commit. A triage run that way reported 36 findings against a tree 51 commits behind `acc`; the real number on the branch head was 17, Renovate having already closed the other 19. A scan in CI cannot make that mistake.
+
+It is a separate workflow rather than a step in the existing `audit` job, so promotion to a required check was a ruleset change rather than a file change; and it runs with `--no-suppress-errors`, because the default prints *"there were errors during analysis but Semgrep will succeed"* and exits 0 — which is exactly how a broken local install went unnoticed.
+
+**Two scoping rules for the scan**, each for a reason worth keeping:
+
+- **`/examples/` is out, with its leading slash.** Root `examples/` is reference material — three findings came from a standalone documentation artifact and an archived demo of an unrelated project — while `public/examples/` is served at runtime and stays scanned. A bare `examples/` matches a directory of that name at any depth and **silently dropped a served file from the scan**, caught only by diffing the scanned file lists; the finding counts agreed either way.
+- **Test files are out of Code scanning.** Four of sixteen findings were test files tripping two rules — reading a fixture means `path.resolve`, asserting on generated text means a RegExp built from a variable — and the set grows with every test that does either. Secrets scanning keeps its own ignore list and still covers them. Semgrep has no per-rule path setting, so the narrower fix would have meant forking two registry rules to maintain against upstream drift.
+
+**Two latent parser defects, fixed where they live rather than where they are currently called from** — see [Vendor Integration](../features/vendor-integration.md#iknow-integration):
+
+- **iKnow replace-transform patterns are bounded before they compile.** `applyTransform` compiled a mapping config's `transform.pattern` straight into a RegExp. A pattern shaped like `(a+)+` can run effectively forever on a non-matching subject of a few dozen characters — on the main thread, in the browser. A quantified group containing a quantifier is now refused, and so is any pattern over 200 characters, a backstop precisely because the first check is a heuristic. **Rejection throws** rather than skipping the transform, because silently wrong output is worse than a visible configuration error.
+- **iKnow mapping paths refuse prototype segments.** `setNestedValue` creates missing objects as it walks, so a target field of `__proto__.polluted` wrote straight to `Object.prototype`. Neither function was reachable — every production call site passes a bundled config — but that is a property of today's wiring, not of the functions, and the mapping tab already parses a user-supplied config into its editing state.
+
+**No stub `cprmv:id` over a rule the document already publishes.** A citation target of `cprmv:isBasedOn` gets a minimal typed stub so it satisfies `sh:class cprmv:Rule` — but when the target is a rule the same document emits in its own Rules section, the stub asserted a second, contradictory `cprmv:id`. Observed rather than hypothesised: twelve of the normenbrief export's 216 `cprmv:Rule` subjects carried two. See [Cell-Level Grounding](cell-level-grounding.md).
+
+**Two new example models, each with a live test suite.** *PW Normbedragen* gains the second-half-2026 bijstandsnormen — all twenty amounts from the CPRMV norms API rather than a transcription, closing a hole where any peildatum in 2026-H2 answered with a null bedrag — with 80 cells grounded in the norms this project publishes and a 121-case suite. *Den Haag ALO*, the third pass in the Amsterdam / SZW series, turns a nine-decision DRD written against an object model, which no DMN engine can evaluate, into a deployable model with a 62-case suite. Publishing it exposed a gap no test had: nothing named the RechtOpALO decision as a case's own decision, so the published vocabulary omitted the model's central intermediate concept — three cases that do took the suite to 65. The whole route, across all three passes, is on [DMN to Linked Data Workflow](../user-guide/dmn-workflow.md).
+
+**E2E journeys can drive an already-deployed build.** `E2E_BASE_URL` points them at a deployed app instead of a local dev server, and drops the `webServer` block so none is started. **Both deployed environments share one Operaton engine**, so a run against acceptance deploys real decision versions into the engine production evaluates against — see [Testing](testing.md#end-to-end-journeys-p7). A third journey, `normbedragen-journey`, drives one chained deployment through four evaluations.
+
+**Two example files recovered from the GitLab mirror**, where they had existed on no GitHub branch at all — the recovery that preceded [reconciling the mirror](../../contributing/supply-chain.md#the-gitlab-mirror).
+
+---
+
 ### v2026.09.2 — The Branch Floor Goes Native (September 2026)
 
 > Measured inventory and commands: [Testing](testing.md). Cross-repository posture: [Coverage Floor](../../contributing/coverage-floor.md).
@@ -163,7 +212,7 @@ The step goes in the **`audit` job**, not the deploy workflows — those carry `
 
 **The DMN tab's Base URL follows `REACT_APP_OPERATON_URL` in development.** `apiConfig.baseUrl` now reads that variable, falling back to the production instance, instead of hardcoding the shared Operaton URL — without it, local development silently pointed at the shared ACC/PROD engine rather than a local Docker container.
 
-**Amsterdam HvA reference DMN: deploy blockers, FEEL fixes and a 100-case MC/DC suite.** The `HvA_full_dmn_export.dmn` reference export was brought to a deployable, evaluable state, and the fixes double as standing guidance for DMN authors — see the [DMN Workflow](../user-guide/dmn-workflow.md) tips and [DMN Testing](../user-guide/dmn-testing.md) troubleshooting. Deployment was blocked by a missing `camunda:historyTimeToLive` and 48 unescaped `&` characters in `knowledgeSource` URLs. Evaluation was blocked by multi-word FEEL bare names — Operaton's feel-scala engine consumes only the first word and throws `FEEL/SCALA-01008` — and by `<dmn:output>` elements declaring only `label` and no `name`, which makes evaluation throw a blank, unlogged exception. Malformed rule cells (`not -` on boolean columns, `not(null) -` on string columns, bare `and`-joined comparisons, and an unparenthesised `not "met partner"`) were rewritten, and two decisions that defaulted to `hitPolicy="UNIQUE"` while carrying a wildcard default rule were corrected to `FIRST`. A test suite now covers every one of the 99 rules across all 25 decisions with one empirically-verified case each (100 cases, run live), and `extract-legal-sources.py` resolves each decision's `authorityRequirement` → `knowledgeSource` links against the annotation registry — 97 of 99 resolve cleanly across 14 source documents and 23 distinct JuriConnect citations.
+**Amsterdam HvA reference DMN: deploy blockers, FEEL fixes and a 100-case MC/DC suite.** The `HvA_full_dmn_export.dmn` reference export was brought to a deployable, evaluable state, and the fixes double as standing guidance for DMN authors — see the [DMN Tab](../user-guide/dmn-tab.md) tips and [DMN Testing](../user-guide/dmn-testing.md) troubleshooting. Deployment was blocked by a missing `camunda:historyTimeToLive` and 48 unescaped `&` characters in `knowledgeSource` URLs. Evaluation was blocked by multi-word FEEL bare names — Operaton's feel-scala engine consumes only the first word and throws `FEEL/SCALA-01008` — and by `<dmn:output>` elements declaring only `label` and no `name`, which makes evaluation throw a blank, unlogged exception. Malformed rule cells (`not -` on boolean columns, `not(null) -` on string columns, bare `and`-joined comparisons, and an unparenthesised `not "met partner"`) were rewritten, and two decisions that defaulted to `hitPolicy="UNIQUE"` while carrying a wildcard default rule were corrected to `FIRST`. A test suite now covers every one of the 99 rules across all 25 decisions with one empirically-verified case each (100 cases, run live), and `extract-legal-sources.py` resolves each decision's `authorityRequirement` → `knowledgeSource` links against the annotation registry — 97 of 99 resolve cleanly across 14 source documents and 23 distinct JuriConnect citations.
 
 ---
 
@@ -474,6 +523,9 @@ Initial release. React + Tailwind CSS web application. Five-tab interface: Servi
 | [Per-file 80% branch floor](../../contributing/coverage-floor.md), natively enforced | v2026.09.2 |
 | Formatting checked in CI, not only on a developer's machine | v2026.09.2 |
 | The four heavy tabs lazy-loaded — entry chunk 685.71 → 392.74 kB | v2026.09.2 |
+| [Semgrep Code and Supply Chain](../../contributing/supply-chain.md#7-the-other-supply-chain-the-npm-tree), a required check on `acc` | v2026.09.3 |
+| E2E journeys against an already-deployed build (`E2E_BASE_URL`) | v2026.09.3 |
+| Weekly lock-file maintenance, with majors behind approval — Supply Chain findings at 0 | v2026.09.4 |
 
 ---
 

@@ -3,19 +3,19 @@ scope: cross-cutting
 verified:
   date: 2026-09-11
   against:
+    CPSV Editor: "f5bae6a"
     Linked Data Explorer: "be6bc54"
 ---
 
 # Supply-Chain Pinning
 
-!!! info "Re-verified for the Linked Data Explorer on 11 September 2026 — the rest waits for its own sync"
-    Every Linked Data Explorer claim on this page was re-checked against `be6bc54`,
-    the commit that published v2026.09.4, which is what the header's stamp records.
-    **CPSV Editor claims were not**, and are re-checked in its own sync, which
-    follows this one. **RONL Business API claims are left as they stood and may be
-    stale** — the latest check of any of them was against `04e38c8` on 9 September
-    2026, and not every claim was re-checked then. They are to be verified with the
-    next RONL Business API release sync.
+!!! info "Re-verified for the CPSV Editor and the Linked Data Explorer on 11 September 2026"
+    Every CPSV Editor and Linked Data Explorer claim on this page was re-checked
+    against `f5bae6a` and `be6bc54` — the commits that published v2026.09.4 of each —
+    which is what the header's stamp records. **RONL Business API claims are left as
+    they stood and may be stale** — the latest check of any of them was against
+    `04e38c8` on 9 September 2026, and not every claim was re-checked then. They are
+    to be verified with the next RONL Business API release sync.
 
 Nothing a pipeline downloads or executes may float. No `latest`, no empty
 versions — a hash, digest or verified checksum wherever one exists.
@@ -51,15 +51,8 @@ problem rather than solving it).
     Actions and contain no `.gitlab-ci.yml`, so "extend the policy to GitLab" is
     vacuous for them: their entire attack surface is the GitHub workflows.
 
-    The corollary is that **the mirror is outside every gate on this page.** It is
-    pushed by hand, so each merge leaves it behind until the next push, and nothing
-    compares it with GitHub. On 11 September 2026 the Linked Data Explorer's mirror
-    had `main` in sync and `acc` two commits behind. A mirror nothing checks is
-    not a backup; it is a second place for content to be. Compare with
-    `git ls-remote` against both remotes at each release — it needs no clone — and
-    before pushing a mirror, check `git merge-base --is-ancestor`: an ancestor
-    means a fast-forward, anything else means the mirror holds commits GitHub has
-    never seen.
+    The corollary is that **the mirror is outside every gate on this page** — see
+    [The GitLab mirror](#the-gitlab-mirror).
 
     **The Norm Editor is the exception, and it is not covered by this page.** Its
     pipeline *is* GitLab CI, it builds and pushes its own Docker images to Azure
@@ -71,6 +64,78 @@ problem rather than solving it).
     the table below.
 
 ---
+
+## The GitLab mirror
+
+Every gate on this page runs on GitHub Actions, and the applications are mirrored by hand
+to the open-regels.nl GitLab instance. **The mirror is outside all of them.** Each merge
+leaves it behind until the next push, and nothing compares it with GitHub — so a mirror
+nothing checks is not a backup; it is a second place for content to be.
+
+On 11 September 2026, by `git ls-remote` against both remotes:
+
+| Repository | `acc` | `main` |
+|---|---|---|
+| CPSV Editor | ✅ `a1dc182` on both | ✅ `f5bae6a` on both |
+| Linked Data Explorer | ⚠️ GitLab two commits behind | ✅ `be6bc54` on both |
+
+A tick is *synced at the last check*, not *kept in sync*.
+
+### Behind is not the same as diverged
+
+One command separates the two cases before anything is pushed:
+
+```bash
+git merge-base --is-ancestor gitlab/<branch> origin/<branch>
+```
+
+An ancestor means a fast-forward, and reconciliation is one push. Anything else means the
+mirror holds commits GitHub has never seen. Commit counts alone do not tell the two
+apart — *"253 behind"* and *"18 ahead and 306 behind"* both read as *stale*. And push the
+**remote-tracking** ref, not the local branch, which drifts:
+
+```bash
+git push gitlab origin/acc:refs/heads/acc
+git push gitlab origin/main:refs/heads/main
+```
+
+### What the CPSV Editor's divergence turned out to be
+
+The CPSV Editor's GitLab `main` had not moved since **4 March 2026** while GitHub moved on,
+and it carried **18 commits GitHub had never seen**. By the repository's own record,
+seventeen were cross-remote merges with no content of their own. The trees disagreed by
+more than that: files existed on GitLab and on no GitHub branch at all — most of them
+Create React App leftovers the Vite migration had removed on purpose, and **two example
+TTLs that existed nowhere on GitHub**, neither on `main` nor on `acc`. They had been
+committed with a CI-skip marker, which is how they came to be on one remote and not the
+other without anything noticing.
+
+**Compare trees, not commit counts.** Eighteen commits ahead was almost entirely noise;
+filtering `git diff --name-status origin/main gitlab/main` to additions is what found the
+two files that mattered. Check each result against *every* branch on the other remote,
+not just the matching one.
+
+The reconciliation, in the order that keeps content safe on both remotes:
+
+1. **Land the missing content on GitHub** — v2026.09.3 recovered the two files by
+   cherry-picking the commit that restores them, not by merging a branch based on the
+   stale remote.
+2. **Push `acc` to the mirror first**, so the files exist on GitLab outside the branch
+   about to be overwritten.
+3. **Archive the ref being replaced** — `archive/gitlab-main-2026-09-09` still holds
+   `15a7d17` on the mirror, so the operation is reversible.
+4. **Reset with `--force-with-lease=main:<old-sha>`**, naming the SHA, so the push refuses
+   if anything moved underneath. Before it, confirm every file about to disappear has a
+   successor.
+
+!!! warning "A skip marker in a commit message switches every gate off"
+    GitHub Actions honours `[skip ci]`, `[ci skip]`, `[no ci]`, `[skip actions]` and
+    `[actions skip]` **anywhere in a commit message**, including in prose that only
+    discusses them. That is how the two files bypassed every check, and it is a signal
+    that something skipped review rather than a convenience for documentation — use
+    `paths-ignore` to express *"this change does not need a deploy"* without switching
+    the gates off. See [Code Standards](code-standards.md#ci) for why the symptom is
+    silence rather than red.
 
 ## Adoption status
 
@@ -86,16 +151,16 @@ within the same week, and Linked Data Explorer in v2026.08.7 — taking its
 findings from **40 to 0** across twenty action references in six deployment
 workflows. All three rulesets are named `acc supply-chain gate`, target
 `refs/heads/acc`, are `active`, and carry **zero bypass actors**; each requires a
-pull request and a passing `audit` check. The Linked Data Explorer's has also
-required `scan` — the Semgrep job in [section 7](#7-the-other-supply-chain-the-npm-tree)
-— since v2026.09.3.
+pull request and a passing `audit` check. The CPSV Editor's and the Linked Data
+Explorer's have also required `scan` — the Semgrep job in
+[section 7](#7-the-other-supply-chain-the-npm-tree) — since v2026.09.3.
 
 Adoption is not uniform, and the differences are worth knowing rather than
 flattening:
 
 | | CPSV Editor | RONL Business API | Linked Data Explorer |
 |---|---|---|---|
-| Action references pinned | 11 / 11 | 30 / 30 | 24 / 24 |
+| Action references pinned | 12 / 12 | 30 / 30 | 24 / 24 |
 | Action majors | **v7** (since v2026.09.0) | **v7** | **v7** (since v2026.09.2) |
 | Blocks deletion / non-fast-forward | no | no | **yes** |
 | Merge method restricted *in the ruleset* | no — repository setting only | **yes** | **yes** |
@@ -129,7 +194,16 @@ ruleset back after writing it**; the create response's shape does not show the
 defaults it filled in.
 
 For the other two, the rulesets target `refs/heads/acc` only, so `main` is not
-covered by the guarantees an `acc` pull request gets.
+covered by the guarantees an `acc` pull request gets. In the CPSV Editor that is a
+decision rather than a gap: its `main` requires a pull request but no status checks,
+weighed and kept on 11 September 2026
+([ttl-editor#131](https://github.com/sgort/ttl-editor/issues/131)). The argument against
+it stands, and is worth keeping in view — the promotion pull request is the one carrying
+changes into production, and *"already checked on `acc`"* is true of the commits, not of
+the merge. If it is revisited, `audit` and `scan` are the two that could be required:
+both trigger on every pull request, so neither can go missing on any base. The deploy
+check cannot, as things stand — its `paths-ignore` means a documentation-only promotion
+never triggers it, and a required check that never reports wedges the pull request.
 
 The rulesets are also not identical in shape, which the table's last two rows
 record. Only the Linked Data Explorer's blocks branch deletion and
@@ -139,8 +213,10 @@ repository-level setting alone — see
 [Merge method](#the-merge-method-is-a-setting-not-a-rule). All three reach the
 same place; only two are belt *and* braces.
 
-Ruleset shapes verified with `gh api repos/<repo>/rulesets` on 4 September 2026;
-pin counts and majors read from the workflow files at CPSV Editor v2026.09.0.
+Ruleset shapes re-verified with `gh api repos/<repo>/rulesets` on 11 September 2026
+for the CPSV Editor and the Linked Data Explorer, and on 4 September 2026 for RONL
+Business API; pin counts and majors read from the workflow files at v2026.09.4 of the
+first two.
 
 **This documentation repository is a known gap, deliberately deferred.** Its
 `requirements.txt` uses `>=` floors for five of six packages and its workflow
@@ -355,14 +431,18 @@ the number at which the same collision happens rather than removing it.
 | Dependency | Held | Reason |
 |---|---|---|
 | `Azure/static-web-apps-deploy` | Entirely | Renovate's `github-tags` datasource resolves `@v1` to the 2021 **tag** while the workflows pin the **branch**, so a routine-looking digest update would silently revert the production deploy step to 3.5-year-old code — and the cooldown offers no protection whatsoever, the target commit being years old |
-| `tailwindcss` | Major only | v4 moves its PostCSS plugin into a separate package and requires the configuration rewritten. Doing that under Create React App is throwaway work, because the Vite setup replaces the PostCSS wiring rather than porting it. Left enabled, Renovate re-opened the same failing pull request every cycle — holding a staging slot each time |
-| `typescript` | Major only | `react-scripts@5.0.1` peer-requires `typescript "^3.2.1 \|\| ^4"`, so npm cannot resolve v7 at all. The pull request shipped a `package.json` bump with **no lockfile**, because Renovate's lockfile generation failed against that peer constraint. The out-of-sync lockfile was the symptom; `react-scripts` is the cause, and nothing inside the pull request could fix it — `--legacy-peer-deps` would force through a real incompatibility rather than resolve it |
+| `tailwindcss` | Major only | **Still held after the Vite migration, for a different reason.** It originally blamed `react-scripts`, and v4 now resolves cleanly. What blocks it is `postcss.config.js` declaring `tailwindcss` as a PostCSS plugin — v4 moved that plugin into `@tailwindcss/postcss`, which is what the failing pull request could not compile. Under Vite the idiomatic setup is the `@tailwindcss/vite` plugin rather than a ported PostCSS pipeline, so it is a piece of work with its own acceptance run, and the rule is removed as part of it |
+| `eslint` | Major only | eslint 10 **resolves and passes** — npm prints *"ERESOLVE overriding peer dependency"* and installs anyway — while three plugins run outside their declared peer range (`eslint-plugin-react` caps at `^9.7`, `jsx-a11y` and `import` at `^9`). A green build is not evidence here, which is exactly why it needs a rule. Re-checked when `eslint-plugin-react` names `^10` in its peers |
 
-Two properties make those last two exemptions honest rather than convenient.
-Only the **major** is held, so minor and patch updates keep flowing. And each
-rule is written to be *removed* by a specific future event — the Vite migration,
-which deletes `react-scripts` and unblocks both — rather than left as an
-open-ended exception nobody revisits.
+Two properties make these exemptions honest rather than convenient. Only the **major**
+is held, so minor and patch updates keep flowing. And each rule is written to be
+*removed* by a specific future event rather than left as an open-ended exception nobody
+revisits. **One already has been**: `typescript` was held because `react-scripts`
+peer-required `^3.2.1 || ^4`, so Renovate could not even generate a lockfile for v7 — and
+the rule went with `react-scripts` in the Vite migration, exactly as it said it would.
+`tailwindcss` is the instructive case the other way: its original reason went too, and
+it stayed held **for a new reason, written down as a new reason** rather than left
+standing on a stale one.
 
 ### 5. The `acc` ruleset — what makes it *enforcement*
 
@@ -371,8 +451,8 @@ gate. In all three adopting repositories the ruleset is named **`acc
 supply-chain gate`**, targets `refs/heads/acc`, and is `active` with **zero
 bypass actors**:
 
-- `required_status_checks` → context **`audit`** — and, in the Linked Data
-  Explorer since v2026.09.3, **`scan`** as well
+- `required_status_checks` → context **`audit`** — and, in the CPSV Editor and
+  the Linked Data Explorer since v2026.09.3, **`scan`** as well
 - `pull_request` → `required_approving_review_count: 0`
 
 The Linked Data Explorer also has a twin, `main promotion gate`, on `main` — see
@@ -505,16 +585,18 @@ there is not evidence the gap is closed.
 
 **zizmor validates pin _format_, never pin _truth_.** A wrong or hostile digest
 with a plausible `# v7.0.1` comment passes zizmor, Prettier and human review
-alike. Nothing currently re-checks that a digest resolves to the tag it claims.
+alike. Nothing re-checked that a digest resolves to the tag it claims — until
+`check-supply-chain`, below.
 
 **The register drifts — and has.** Renovate updates workflow pins and never
 touches `SECURITY-PIPELINE.md`, and nothing checks that the two agree. This was
 written as a prediction in August 2026 and was true within a week: as of
-v2026.09.0 the CPSV Editor's register still lists `actions/checkout` at
+v2026.09.0 the CPSV Editor's register still listed `actions/checkout` at
 `a37ce91…` (v3.7.0) and `actions/setup-node` at `49933ea…` (v4.4.0), while the
 workflows had moved to `3d3c42e…` (v7.0.1) and `820762…` (v7.0.0). Its
 `node-version: '20'` exception was likewise stale the moment the workflows took
-Node 24.
+Node 24. The register has since been reconciled, and `check-supply-chain` now fails the
+audit if it drifts again.
 
 !!! warning "Where the digests on this page come from"
     The pins quoted here are read from the **workflow files**, not from any
@@ -741,7 +823,7 @@ workflow, required in the rulesets.
 | Repository | Semgrep `scan` | Required on | Lock-file maintenance |
 |---|---|---|---|
 | **Linked Data Explorer** | ✅ since v2026.09.3 | **`acc` and `main`** | ✅ with a slot kept for it |
-| CPSV Editor | *recorded with its own sync, which follows this one* | | |
+| **CPSV Editor** | ✅ since v2026.09.3 — the pilot | **`acc`** — `main` ungated by decision | ✅ since v2026.09.4 |
 | RONL Business API | *not recorded — verify with the next RONL Business API release sync* | | |
 
 ### The workflow, as the Linked Data Explorer runs it
@@ -796,6 +878,66 @@ Four decisions in the file are worth keeping when it is copied:
     matches both — `.gitignore` syntax matches a directory of that name at any
     depth — and would drop served files from the scan while the total stays
     plausible. **Check the set of files scanned, not the count.**
+
+### The CPSV Editor, which piloted it
+
+The CPSV Editor adopted the same workflow first, in v2026.09.3, and it is **required on
+`acc` only**. Its `main` requires a pull request and no status checks at all — decided
+and kept rather than overlooked, because `main` is promoted from `acc`, whose commits
+already passed `audit` and `scan`
+([ttl-editor#131](https://github.com/sgort/ttl-editor/issues/131)). A single package, it
+needed neither of the Linked Data Explorer's filter fixes: its deploy workflows use
+`paths-ignore` for documentation only, so a lockfile change already builds and deploys,
+and it has no group rules to multiply a refresh into three pull requests.
+
+**The finding count is not the measure.** The triage that produced the gate
+([ttl-editor#112](https://github.com/sgort/ttl-editor/issues/112)) opened at **36
+findings and closed at 0**, and by the repository's own record almost none of that
+movement was vulnerabilities being fixed:
+
+| Findings | What moved the number |
+|--:|---|
+| 36 | Scanned by hand against a local checkout **51 commits behind `acc`** |
+| 17 | The real figure on the branch head — Renovate had already closed the other 19 |
+| 14 | `/examples/` excluded — reference material, not application code |
+| 16 | A new test file arrived carrying two more |
+| 12 | Test files taken out of Code scanning |
+| 11 | After a fix, a suppression, and one finding that got worse first |
+| 7 | CI honours dashboard triage; a local `--dry-run` does not |
+| **0** | **The lockfile refreshed for the first time** (v2026.09.4) |
+
+Three lessons from that trajectory transfer beyond this repository:
+
+- **A scan run by hand is pinned to whatever is checked out**, and nothing in its output
+  names the commit. The first figure described a tree that was not the branch head. A
+  scan in CI cannot make that mistake — which, more than any individual finding, is what
+  the gate buys.
+- **"The finding will go away" is a prediction, not a plan.** Fixes justified partly on
+  retiring a finding did not all retire it — a rule that matches the *shape* of a loop
+  fired twice after one of them. Verify after, not before.
+- **The last seven were never going to close on their own.** They were first written off
+  as needing an upstream release, but each had a fixed version inside its declared range;
+  nothing had moved them because **lock-file maintenance had never been turned on**. It
+  was checked before any configuration changed — an in-range refresh and a scan in a
+  scratch worktree predicted 7 → 0 — and the first real refresh delivered exactly that.
+
+Two scoping rules, each with a reason worth keeping: **`/examples/` is ignored with its
+leading slash**, because `public/examples/` is served and an unanchored rule dropped a
+served file from the scan while the counts agreed; and **test files are out of Code
+scanning but not Secrets scanning**, which keeps its own ignore list — a hardcoded
+credential in a test is the one finding class genuinely worth having there. Semgrep has no
+per-rule path setting, so the narrower fix would have meant forking two registry rules.
+
+!!! warning "npm 10 cannot perform that refresh on this tree"
+    npm 10.9.4, bundled with Node 22, crashes in its resolver — `Cannot read properties
+    of null (reading 'edgesOut')` — on both a fresh resolution and `npm update`. npm 11
+    resolves the same tree cleanly. `npm ci` and CI (Node 24) are unaffected, so it
+    surfaces only on a Node 22 workstation adding or updating a package. The repository's
+    README says to use **Node 24 / npm 11**, and why.
+
+**A pull request from a fork cannot pass the scan**, since secrets are not passed to fork
+runs. The repository has one fork; the cost is accepted knowingly and tracked in
+[ttl-editor#128](https://github.com/sgort/ttl-editor/issues/128).
 
 ### Suppressions live in the code
 
@@ -891,10 +1033,10 @@ necessary is the useful part:
 
 ### What making it required costs
 
-- **semgrep.dev is now in the merge path.** Both of the Linked Data Explorer's
-  rulesets require `scan` and carry **zero bypass actors**, so if semgrep.dev is
-  unreachable or `SEMGREP_APP_TOKEN` is revoked, merges to `acc` *and* `main` stop
-  until a ruleset is edited. `check-supply-chain` accepted an analogous risk for
+- **semgrep.dev is now in the merge path.** The rulesets that require `scan` carry
+  **zero bypass actors**, so if semgrep.dev is unreachable or `SEMGREP_APP_TOKEN` is
+  revoked, merges stop until a ruleset is edited — to `acc` in both repositories, and to
+  `main` in the Linked Data Explorer. `check-supply-chain` accepted an analogous risk for
   the GitHub API — but the GitHub API is a dependency of the platform anyway, and
   semgrep.dev is not. It is a genuinely new class of outage.
 - **A pull request from a fork cannot pass.** Secrets are not passed to fork runs,

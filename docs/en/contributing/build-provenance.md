@@ -3,17 +3,18 @@ scope: cross-cutting
 verified:
   date: 2026-09-11
   against:
+    CPSV Editor: "f5bae6a"
     Linked Data Explorer: "be6bc54"
 ---
 
 # Build Provenance
 
-!!! info "Re-verified for the Linked Data Explorer on 11 September 2026 — the rest waits for its own sync"
-    Every Linked Data Explorer claim on this page was re-checked against `be6bc54`,
-    the commit that published v2026.09.4, which is what the header's stamp records.
-    **CPSV Editor claims were not**, and are re-checked in its own sync, which
-    follows this one. **RONL Business API claims are left as they stood and may be
-    stale** — they are to be verified with the next RONL Business API release sync.
+!!! info "Re-verified for the CPSV Editor and the Linked Data Explorer on 11 September 2026"
+    Every CPSV Editor and Linked Data Explorer claim on this page was re-checked
+    against `f5bae6a` and `be6bc54` — the commits that published v2026.09.4 of each —
+    which is what the header's stamp records. **RONL Business API claims, both
+    columns, are left as they stood and may be stale** — they are to be verified with
+    the next RONL Business API release sync.
 
 *Answering "which build am I looking at?" from inside the running app*
 
@@ -32,7 +33,8 @@ Three cases where a version string cannot answer that:
 - **A release can be rebuilt** after a workflow change, a dependency resolution
   difference, or a re-run of a failed job — same source, different artifact.
 
-Shipped across the three applications in September 2026.
+Shipped across three applications in September 2026, and to a fourth — the RONL
+public site — on 10 September 2026.
 
 ---
 
@@ -80,32 +82,44 @@ rule the panel renders `build  · #`.
 
 ---
 
-## The same feature, three implementations
+## The same feature, four implementations
 
 The module and its tests ported unchanged. Everything else had to be re-derived per
-repository.
+**deployable**, which is not the same as per repository — see the fourth column.
 
-| | CPSV Editor | RONL Business API | Linked Data Explorer |
-|---|---|---|---|
-| Language | JavaScript | TypeScript | TypeScript |
-| Tests | 5 | 8 | 8 |
-| Monorepo | no | yes (`packages/frontend`) | yes (`packages/frontend`) |
-| Changelog UI | tab | lazily-loaded drawer | full page |
-| **Who builds** | **Oryx**, in the deploy container | **the runner** | **Oryx**, in the deploy container |
-| **`env:` goes on** | **deploy step** | **build step** | **deploy step** |
-| String lands in | main bundle | lazy chunk `ChangelogPanelContent-*.js` | main `index-*.js` |
+| | CPSV Editor | RONL Business API (frontend) | RONL Business API (public site) | Linked Data Explorer |
+|---|---|---|---|---|
+| Language | JavaScript | TypeScript | TypeScript | TypeScript |
+| Tests | 5 | 8 | 8, plus 4 on the footer | 8 |
+| Monorepo | no | yes (`packages/frontend`) | yes (`packages/public-site`) | yes (`packages/frontend`) |
+| Surface | changelog tab | lazily-loaded changelog drawer | site footer — no changelog | changelog full page |
+| **Who builds** | **Oryx**, in the deploy container | **the runner** | **the runner** | **Oryx**, in the deploy container |
+| **`env:` goes on** | **deploy step** | **build step** | **build step** | **deploy step** |
+| String lands in | lazy chunk `ChangelogTab-*.js` | lazy chunk `ChangelogPanelContent-*.js` | main `index-*.js` | main `index-*.js` |
+
+The **Surface** row was called *Changelog UI* while every adopter had a changelog.
+The public site has none: it is a citizen-facing site whose foot already carried its
+origin and version, so the build id joins them on that line rather than acquiring a
+panel of its own. Step 4 of the checklist below — match the existing layout — is what
+decides this, and it is why the module ports but the markup never does.
 
 ### Where the `env:` block goes, and why it moves
 
 This is the single most important difference, and getting it wrong produces a change
 that **passes every test and puts nothing in the artifact**.
 
-The rule is not per-repository preference — it follows directly from *who runs the
-build*:
+The rule is not per-repository preference, and it is not per-repository at all — it
+follows directly from *who runs the build*, which is a property of a **workflow**.
+RONL Business API is the proof: its frontend and its public site live in one
+repository, are built by two separate pairs of workflows, and could perfectly well
+have answered this question differently. They do not, but nothing about sharing a
+repository guaranteed that. Read `skip_app_build` in the workflow you are editing;
+do not infer it from a sibling package.
 
-**Where the runner builds, the variables go on the build step.** RONL Business API
-runs `npm run build:acc` as its own step and passes `skip_app_build: true` to the
-Static Web Apps action, which then only uploads `dist/`:
+**Where the runner builds, the variables go on the build step.** Both RONL Business
+API packages run `npm run build:acc` as a step of their own and pass
+`skip_app_build: true` to the Static Web Apps action, which then only uploads
+`dist/`:
 
 ```yaml
 - name: Build frontend for ACC
@@ -188,6 +202,23 @@ in a `ChangelogPanelContent-*.js` chunk; grepping only `index.js` returns nothin
 and looks exactly like failure. Confirm the chunk hash changes between the two
 builds — if it does not, the second build did not run.
 
+**The CPSV Editor joined it in v2026.09.2**, when its four heaviest tabs were
+lazy-loaded to cut the entry chunk from 685.71 to 392.74 kB. `ChangelogTab` is one of
+them and the only importer of the build-info module, so the string moved out of the main
+bundle into `ChangelogTab-*.js` — and this page's comparison table went on saying *main
+bundle* for two releases, because nothing about a correct build id changed. Confirmed on
+11 September 2026 with a marker build of v2026.09.4: the injected SHA and run number
+appear in `dist/assets/ChangelogTab-*.js` and nowhere else. **A code-splitting change
+elsewhere in the app moves where to grep**, which is one more reason to grep all of
+`dist/`.
+
+**Grep for the injected values, not the rendered label.** `build 570fd98 · #412` is
+assembled at runtime from `` `build ${shortSha} · #${run}` ``, so that string is in no
+artifact, however correct the build. What ships is the **full** SHA and the run
+number as two separate literals, next to the template. Searching for the label a
+user would read returns nothing on a perfectly good build and looks exactly like the
+failure this check exists to catch.
+
 **Check the exit code, not a grep of the output.** Grepping for `PASS`/`FAIL` misses
 failure modes the chosen pattern does not match. A command either succeeded or it
 did not, and no pattern can filter that away. Watch the same trap in shell chains: a
@@ -210,21 +241,32 @@ branch, `github.sha` is the real commit. Observed:
 
 | | Preview (synthesised) | After merge (real commit) |
 |---|---|---|
-| RONL Business API | `build 1224298 · #265` | `build 66940d9 · #266` |
+| RONL Business API (frontend) | `build 1224298 · #265` | `build 66940d9 · #266` |
+| RONL Business API (public site) | `build 34002e8 · #76` | `build 0068444 · #77` |
 | Linked Data Explorer | `build b669689 · #186` | `build 9db0ab3 · #188` |
+
+The public-site pair was **read out of the deployed bundles**, not derived from the
+workflow runs: fetch the page, follow its `/assets/index-*.js`, and the two injected
+literals sit next to the template that renders them. That is worth doing once per
+adopter, because it is the only check that distinguishes "the workflow ran green"
+from "the values reached the artifact".
 
 ---
 
 ## Known gaps
 
-- **Production has now run in two of the three.** All six workflow files carry the
-  `env:` block. Both applications promoted v2026.09.2 to `main` on 9 September 2026 and
+- **Production has now run in two of the four.** All eight workflow files carry the
+  `env:` block. Two applications promoted v2026.09.2 to `main` on 9 September 2026 and
   both production workflows ran green:
 
     | | Commit | Run | Changelog should read |
     |---|---|--:|---|
     | CPSV Editor (*Deploy PROD*) | `bbda389` | 88 | `build bbda389 · #88` |
     | Linked Data Explorer | `007b350` | 39 | `build 007b350 · #39` |
+
+    The CPSV Editor has promoted twice more since, both on 11 September: v2026.09.3 as
+    `build f7e127a · #92` and v2026.09.4 as **`build f5bae6a · #94`**, each from
+    *Deploy PROD (white-sky)*.
 
     The Linked Data Explorer has promoted twice more since, both on 11 September:
     v2026.09.3 as `build 35a44f8 · #41` and v2026.09.4 as **`build be6bc54 · #44`**,
@@ -235,15 +277,20 @@ branch, `github.sha` is the real commit. Observed:
 
     Those strings are **derived from the workflow runs, not read off the running
     applications** — which is the glance still worth taking, and the whole point of the
-    feature is that it takes one glance. **RONL Business API's production workflow last
-    ran on 17 July 2026**, before this feature existed, so it stays wired and unexercised
-    until its next promotion.
+    feature is that it takes one glance. **RONL Business API's frontend production
+    workflow last ran on 17 July 2026**, before this feature existed, and **its public
+    site has never had a production run at all**. Both stay wired and unexercised until
+    their next promotion.
 - **Backend versions are unaffected.** The line describes the frontend bundle being
   viewed; backends ship their versions separately.
 
 ---
 
-## Adding this to a fourth application
+## Adding this to another application
+
+The fourth adopter, the RONL public site, followed these six steps exactly as they
+were written here and needed no deviation. Step 2 was again the one that decided
+everything, and step 4 was the one that produced a visibly different result.
 
 1. **Confirm the bundler first.** `VITE_` and `import.meta.env` are Vite-specific.
 2. **Find out who builds** — the runner, or a container the deploy action owns. This

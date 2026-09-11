@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # Vendor Integration
 
 Government reference implementations of decision models are open-source and validated by the responsible authority. Commercial vendors build their own implementations on top of these reference models, offering enterprise support, SLAs, and additional capabilities. The Vendor tab lets service owners document these vendor implementations and their certification status as part of the service's Linked Data record.
@@ -17,6 +21,13 @@ Each vendor implementation is modelled as a `ronl:VendorService`, linked to the 
 iKnow is a legislative analysis and knowledge management platform. The iKnow integration allows field mappings from iKnow XML exports to CPSV-AP properties to be configured and saved, then used to import actual iKnow data files.
 
 The integration works in two modes. In **Configure** mode, an example XML file is uploaded and each XML field is mapped to the corresponding CPSV-AP property for each editor section (Service, Legal, Rules, Parameters, CPRMV). The configuration is saved as a reusable JSON file. In **Import** mode, the actual iKnow data file is uploaded, the saved configuration is selected, and the mapped data is previewed before importing into the editor.
+
+A mapping configuration is data the editor *executes* — its field paths are walked and its replace-transform patterns are compiled — so two kinds of configuration are neutralised:
+
+- **Field paths containing `__proto__`, `constructor` or `prototype`** are not walked at all: reading one yields nothing, and writing one does nothing. A path is walked segment by segment, creating missing objects on the way, so without the check a target field such as `__proto__.polluted` would write to every object in the application.
+- **Transform patterns that can run away.** A quantified group that itself contains a quantifier — `(\d+)+` — is refused, because on a non-matching value it can take effectively forever on the browser's main thread; a literal such as `(\+)+` is allowed. Patterns over 200 characters are refused too, as a backstop, because that first check is deliberately narrow and will not catch every such construction.
+
+A refused pattern **raises an error rather than skipping the transform**, so a bad configuration is visible instead of producing quietly wrong import data. Today every configuration applied comes from the bundled `iknow-mappings/`; the checks exist because nothing in these functions depends on that staying true.
 
 ---
 

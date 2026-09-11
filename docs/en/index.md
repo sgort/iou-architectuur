@@ -157,13 +157,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.09.2** · *September 2026*
+-   **✏️ CPSV Editor — v2026.09.4** · *September 2026*
 
     ---
 
-    **Create React App is gone, and the branch floor is native**
+    **Semgrep in the gate, and the scan reads zero**
 
-    The Vite migration landed in four independently revertable phases, taking `npm audit` from 52 vulnerabilities to 10 and production builds from roughly 30 seconds to under two — with two traps the plan missed that would have *deployed green and broken*: Vite only exposes `VITE_`-prefixed variables, and `react-scripts` was where ESLint itself came from. The [P0–P7 testing roadmap is complete](cpsv-editor/developer/testing.md), 257 tests becoming 736 across 60 files plus two Playwright journeys against a live stack, and the [80% per-file branch floor](contributing/coverage-floor.md) is now enforced by the runner rather than a custom script — `DMNTab.jsx`, the largest file in the repository, went from 45.73% to 98.34%.
+    Semgrep Code and Supply Chain now scan every pull request and are a [required check on `acc`](contributing/supply-chain.md#7-the-other-supply-chain-the-npm-tree) — the half of the supply chain `check-supply-chain` could never see. The last seven findings were not waiting on an upstream release, as first thought: each had a fix inside its declared range, and **lock-file maintenance had never been turned on**. It now runs every week, and its first refresh took the scan on `acc` to **0**. Two latent parser defects are fixed where they live — iKnow mapping configs can no longer write to `Object.prototype` or compile a pattern that hangs the browser — the TTL export stops asserting a second `cprmv:id` on rules it already publishes, and two example models arrive with 121- and 65-case suites, and the route they took has [its own guide](cpsv-editor/user-guide/dmn-workflow.md). The [test suite](cpsv-editor/developer/testing.md) stands at 751 tests and three end-to-end journeys.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
@@ -191,19 +191,19 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 ---
 
-### 📘 How this documentation is maintained
+### 🎞️ Slide decks
 
-Components differ in how fast they change, so they are documented to different depths.
+Four topics also exist as slide decks. Each has a page showing every slide with its
+text, next to the prose it summarises, and the PDF to download.
 
-| Component | Cadence | User Guides |
-|---|---|---|
-| **RONL Business API** | Short-cycle, co-designed with users | Landing page and a brief page per board on ACC; full guides when a board reaches PROD |
-| **CPSV Editor** | Release-tagged | Full |
-| **Linked Data Explorer** | Release-tagged | Full |
-| **Norm Editor** | Release-tagged | Full |
-| **CPRMV API** | Spec-driven | Full |
+| Deck | Where | Slides | What it covers | As of | PDF |
+|---|---|--:|---|---|---|
+| [IOU Architecture](iou-architecture-deck.md) | Site-wide | 25 | The whole ecosystem, from quoted legal text to the decision the citizen sees — the four boards and the public knowledge base, then how it is built and safeguarded. Slides in Dutch | 30 Aug 2026 | [1.0 MB](assets/downloads/iou-architecture-deck.pdf) |
+| [DMN to Linked Data Workflow](cpsv-editor/user-guide/dmn-workflow.md) | CPSV Editor · User Guide | 8 | From a legal body's DMN export to a tested decision service published as linked data — Amsterdam, SZW and Den Haag | 11 Sep 2026 | [208 KB](assets/downloads/dmn-to-linked-data-workflow.pdf) |
+| [DSO Viewer APIs](linked-data-explorer/features/dso-viewer-apis-deck.md) | Linked Data Explorer · Features | 12 | How the DSO Viewer talks to the Digitaal Stelsel Omgevingswet — the proxy, the five upstream APIs, and what each tab calls | 24 Aug 2026 | [121 KB](assets/downloads/dso-viewer-apis-deck.pdf) |
+| [CI Posture Across Repos](contributing/ci-posture-deck.md) | Contributing | 5 | The four CI controls on the CPSV Editor and the Linked Data Explorer, and the delivery decision they lead to | 11 Sep 2026 | [127 KB](assets/downloads/ci-posture-across-repos-deck.pdf) |
 
-Features, Developer Docs and References follow the same pattern for every component.
+A deck is a snapshot of its date, and each page states what it was checked against.
 
 ---
 

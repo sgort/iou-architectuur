@@ -94,6 +94,7 @@ hooks:
 # Navigation structure
 nav:
   - Home: index.md
+  - IOU Architecture (slides): iou-architecture-deck.md
   
   - ⚙️ RONL Business API:
     - Overview: ronl-business-api/index.md
@@ -238,7 +239,8 @@ nav:
       - Getting Started: cpsv-editor/user-guide/getting-started.md
       - Filling In the Tabs: cpsv-editor/user-guide/filling-in-the-tabs.md
       - Import & Export TTL: cpsv-editor/user-guide/import-export-ttl.md
-      - DMN Workflow: cpsv-editor/user-guide/dmn-workflow.md
+      - DMN to Linked Data Workflow: cpsv-editor/user-guide/dmn-workflow.md
+      - DMN Tab: cpsv-editor/user-guide/dmn-tab.md
       - DMN Testing: cpsv-editor/user-guide/dmn-testing.md
       - DSO → DMN Import: cpsv-editor/user-guide/dso-import.md
       - Publishing to TriplyDB: cpsv-editor/user-guide/publishing-to-triplydb.md
