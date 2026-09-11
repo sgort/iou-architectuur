@@ -573,7 +573,7 @@ A central `errorHandler.ts` middleware catches unhandled errors and returns stan
 
 **HTTP headers** — [Helmet](https://helmetjs.github.io/) is configured to set comprehensive security headers on all responses, including `Content-Security-Policy`, `X-Content-Type-Options`, `X-Frame-Options`, and `Strict-Transport-Security`.
 
-**CORS** — only origins listed in `CORS_ORIGIN` are permitted. In production this is restricted to `https://linkeddata.open-regels.nl` and `https://cpsv.open-regels.nl`. All other origins receive a CORS rejection.
+**CORS** — only origins listed in `CORS_ORIGIN` are permitted. In production this is restricted to `https://linkeddata.open-regels.nl` and `https://cpsv.open-regels.nl`. All other origins receive a CORS rejection — **except on the two public read-only mounts**, `/v1/ropa/public` and `/v1/bundles/public`, which answer any origin for `GET` and `OPTIONS` by design. `isPublicPath` matches those mounts or a path below them, never a sibling route that shares the prefix; see [RoPA Records — the public routes](ropa-records.md#public-route-v1ropapublic).
 
 **Input validation** — type checking is applied to all request inputs. Variable names, DMN identifiers, and SPARQL endpoint URLs are validated before any service call is made. Request body size is limited to 10 MB.
 

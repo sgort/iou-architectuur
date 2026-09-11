@@ -1,14 +1,21 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-09
+  date: 2026-09-11
   against:
-    CPSV Editor: "bbda389"
-    Linked Data Explorer: "007b350"
-    RONL Business API: "04e38c8"
+    Linked Data Explorer: "be6bc54"
 ---
 
 # The Coverage Floor
+
+!!! info "Re-verified for the Linked Data Explorer on 11 September 2026 — the rest waits for its own sync"
+    Every Linked Data Explorer claim on this page was re-checked against `be6bc54`,
+    the commit that published v2026.09.4, which is what the header's stamp records.
+    **CPSV Editor claims were not**, and are re-checked in its own sync, which
+    follows this one. **RONL Business API claims are left as they stood and may be
+    stale** — the latest check of any of them was against `04e38c8` on 9 September
+    2026, and not every claim was re-checked then. They are to be verified with the
+    next RONL Business API release sync.
 
 *A per-file 80% branch-coverage floor, and what it took to enforce it in three
 repositories*
@@ -252,7 +259,7 @@ All three were measured clean before enforcing. That word hides a lot:
 | | Files measured | Lowest branch coverage |
 |---|--:|---|
 | RONL Business API backend | — | comfortable |
-| Linked Data Explorer backend | 49 | `sparql.service.ts` 82.85% |
+| Linked Data Explorer backend | 38 of 44 | `sparql.service.ts` 82.85% |
 | Linked Data Explorer frontend | 68 of 78 | `ChainBuilder/TestCasePanel.tsx` exactly 80.00% — **since raised to 100%** |
 | CPSV Editor | 41 | `useDsoImport.js` 80.39% |
 
@@ -261,6 +268,15 @@ the Linked Data Explorer's frontend report, counted from `coverage-final.json`
 rather than from the printed table, which elides rows. A file with no branches
 cannot fail a branch threshold, so including it inflates the denominator without
 telling you anything.
+
+The Linked Data Explorer rows were re-measured at v2026.09.4. The frontend reads
+**69 of 78**, one more file carrying a branch, with `GraphView.tsx` at 82.26% the
+only one under 85%. The backend reads **38 of 44**, and its lowest file has not
+moved. That backend row said **49** until 11 September 2026, copied from the comment
+`jest.config.js` carries — *"measured clean when this landed — 49 files"* — and 49
+is neither 38 nor the 44 files the report contains at all. It is the same class of
+figure as the frontend's 64: quoted from a record rather than recounted under the
+rule this table states.
 
 !!! bug "This table named a file that does not exist, and the error travelled"
     Until 9 September 2026 the Linked Data Explorer row here read
@@ -303,7 +319,7 @@ three diverge most:
 | Repository | Tests on a pull request |
 |---|---|
 | CPSV Editor | ✅ both Static Web Apps workflows run `npm run test:ci` on `push` **and** `pull_request` |
-| Linked Data Explorer | ✅ backend and frontend, acc workflows |
+| Linked Data Explorer | ✅ backend and frontend, acc workflows — run, though not required; see below |
 | RONL Business API | ⚠️ **frontend, pa-demo and public-site only** |
 
 **RONL Business API's backend workflow triggers on `push` alone**
@@ -314,9 +330,20 @@ branch that caused it. **The floor is real in four of its five workspaces and
 retrospective in the fifth.**
 
 The Linked Data Explorer had the same gap and **closed it in v2026.09.2**: its
-1140 backend tests now run on the pull request rather than only after the merge.
-It is the worked example, because it had already let a genuine defect sit on a
-pushed branch for days — no pull request ever ran the test that caught it.
+backend suite — 1151 tests at v2026.09.4 — now runs on the pull request rather than
+only after the merge. It is the worked example, because it had already let a genuine
+defect sit on a pushed branch for days — no pull request ever ran the test that
+caught it.
+
+!!! note "Running before the merge is not the same as blocking it"
+    The Linked Data Explorer's rulesets require two checks, `audit` and `scan`.
+    The workflows that run the suites, and so enforce the floor, are not among
+    them. A pull request that drops a file below 80% therefore turns its checks red
+    and **stops the deploy**, and the merge button stays available. That is a
+    deliberate gap rather than an oversight only if someone decided it; making the
+    test checks required is one ruleset change, provided each can report on every
+    pull request — a path-filtered workflow that never runs would wedge the pull
+    request instead.
 
 !!! warning "The fix is not identical, and the difference matters before copying one into the other"
     The Linked Data Explorer's backend workflow **deploys to Azure**, so its

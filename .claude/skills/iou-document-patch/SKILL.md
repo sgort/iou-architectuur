@@ -922,6 +922,14 @@ the second kind.
 
 ## Guardrails
 
+- **Splice by index, never with a string replacement.** `String.prototype.replace`
+  with a *string* as its second argument expands `$&`, `$'`, `` $` `` and `$1` in the
+  text being inserted. On 11 September 2026 a changelog entry that *quoted* `$'` —
+  it described exactly that bug in the Linked Data Explorer's BPMN modeler — pasted
+  the rest of the document into itself, taking the page from 1,240 lines to 3,739.
+  Slice at `indexOf` and concatenate, or pass a function (`() => text`), and compare
+  line counts before and after every splice.
+
 - **Staged, not one-shot.** Always present the Stage 2 plan and stop for
   approval before any edit.
 - **Fetch this repository first, and branch from `origin/acc`.** A stale docs

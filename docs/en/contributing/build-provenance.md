@@ -1,13 +1,19 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-09
+  date: 2026-09-11
   against:
-    CPSV Editor: "bbda389"
-    Linked Data Explorer: "007b350"
+    Linked Data Explorer: "be6bc54"
 ---
 
 # Build Provenance
+
+!!! info "Re-verified for the Linked Data Explorer on 11 September 2026 — the rest waits for its own sync"
+    Every Linked Data Explorer claim on this page was re-checked against `be6bc54`,
+    the commit that published v2026.09.4, which is what the header's stamp records.
+    **CPSV Editor claims were not**, and are re-checked in its own sync, which
+    follows this one. **RONL Business API claims are left as they stood and may be
+    stale** — they are to be verified with the next RONL Business API release sync.
 
 *Answering "which build am I looking at?" from inside the running app*
 
@@ -219,6 +225,13 @@ branch, `github.sha` is the real commit. Observed:
     |---|---|--:|---|
     | CPSV Editor (*Deploy PROD*) | `bbda389` | 88 | `build bbda389 · #88` |
     | Linked Data Explorer | `007b350` | 39 | `build 007b350 · #39` |
+
+    The Linked Data Explorer has promoted twice more since, both on 11 September:
+    v2026.09.3 as `build 35a44f8 · #41` and v2026.09.4 as **`build be6bc54 · #44`**,
+    each from *Deploy Frontend to Production*. The gaps in the run numbers are the
+    pull-request runs of the same workflow, which build previews rather than
+    production. v2026.09.4 is also the first promotion under the widened `paths:`
+    filter, where a change to the root lockfile alone redeploys the frontend.
 
     Those strings are **derived from the workflow runs, not read off the running
     applications** — which is the glance still worth taking, and the whole point of the
