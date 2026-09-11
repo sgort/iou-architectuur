@@ -6,6 +6,9 @@ component: CPSV Editor
 
 This guide walks through uploading, deploying, testing, and exporting a DMN decision model in the editor's DMN tab, as part of a service definition.
 
+!!! tip "Looking for the whole route from a legal body's export to a published service?"
+    This page covers the tab itself. [DMN to Linked Data Workflow](dmn-workflow.md) describes the nine-stage process the tab is one part of — receiving a DMN export, deciding how to derive a runnable model from it, testing it rule by rule and publishing it as linked data — as run for Amsterdam, SZW and Den Haag.
+
 ---
 
 ## Prerequisites
@@ -113,6 +116,8 @@ The DMN section is appended after the core service metadata.
 ## Authoring pitfalls
 
 Bringing a real, tool-exported DMN (Amsterdam's 25-decision HvA model) to a deployable and evaluable state surfaced a set of defects that a syntactically valid file can still carry. They are worth checking in any DMN produced by an authoring tool rather than hand-written.
+
+These are the checks that concern the editor directly. The full defect catalogue from all three passes — including the ones only a test suite or a published file reveals — is in [DMN to Linked Data Workflow — what kept going wrong](dmn-workflow.md#what-kept-going-wrong).
 
 **Blocking deployment:**
 
