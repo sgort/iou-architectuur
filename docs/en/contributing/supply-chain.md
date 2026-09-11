@@ -1,8 +1,21 @@
 ---
 scope: cross-cutting
+verified:
+  date: 2026-09-11
+  against:
+    Linked Data Explorer: "be6bc54"
 ---
 
 # Supply-Chain Pinning
+
+!!! info "Re-verified for the Linked Data Explorer on 11 September 2026 — the rest waits for its own sync"
+    Every Linked Data Explorer claim on this page was re-checked against `be6bc54`,
+    the commit that published v2026.09.4, which is what the header's stamp records.
+    **CPSV Editor claims were not**, and are re-checked in its own sync, which
+    follows this one. **RONL Business API claims are left as they stood and may be
+    stale** — the latest check of any of them was against `04e38c8` on 9 September
+    2026, and not every claim was re-checked then. They are to be verified with the
+    next RONL Business API release sync.
 
 Nothing a pipeline downloads or executes may float. No `latest`, no empty
 versions — a hash, digest or verified checksum wherever one exists.
@@ -19,9 +32,10 @@ four files are copied into the next one.
 
 `github.com/ictu` already enforces hash-pinned GitHub Actions at the
 organisation level. The IOU repositories are not in that organisation — they
-live under `github.com/sgort`, with the
-[open-regels.nl GitLab instance](https://git.open-regels.nl) as the code host —
-so they inherit none of that enforcement.
+live under `github.com/sgort`, where their pull requests, issues and every gate on
+this page run, and are mirrored to the
+[open-regels.nl GitLab instance](https://git.open-regels.nl) — so they inherit none
+of that enforcement.
 
 The recorded decision is to build the controls **inside each repository**, where
 they travel with the code regardless of which remote hosts it, rather than
@@ -32,10 +46,20 @@ deploy undiagnosable between the two), and forking the actions into an IOU-owned
 namespace (disproportionate for a handful of actions, and it relocates the trust
 problem rather than solving it).
 
-!!! note "GitLab hosts code only — for the repositories on this page"
+!!! note "GitLab holds a mirror only — for the repositories on this page"
     The three application repositories covered here run all their CI/CD on GitHub
     Actions and contain no `.gitlab-ci.yml`, so "extend the policy to GitLab" is
     vacuous for them: their entire attack surface is the GitHub workflows.
+
+    The corollary is that **the mirror is outside every gate on this page.** It is
+    pushed by hand, so each merge leaves it behind until the next push, and nothing
+    compares it with GitHub. On 11 September 2026 the Linked Data Explorer's mirror
+    had `main` in sync and `acc` two commits behind. A mirror nothing checks is
+    not a backup; it is a second place for content to be. Compare with
+    `git ls-remote` against both remotes at each release — it needs no clone — and
+    before pushing a mirror, check `git merge-base --is-ancestor`: an ancestor
+    means a fast-forward, anything else means the mirror holds commits GitHub has
+    never seen.
 
     **The Norm Editor is the exception, and it is not covered by this page.** Its
     pipeline *is* GitLab CI, it builds and pushes its own Docker images to Azure
@@ -54,7 +78,7 @@ problem rather than solving it).
 |---|:---:|:---:|:---:|:---:|
 | **CPSV Editor** (`ttl-editor`) — pilot | ✅ | ✅ | ✅ | ✅ `acc supply-chain gate` |
 | **RONL Business API** | ✅ | ✅ | ✅ | ✅ `acc supply-chain gate` |
-| **Linked Data Explorer** | ✅ | ✅ | ✅ | ✅ `acc supply-chain gate` |
+| **Linked Data Explorer** | ✅ | ✅ | ✅ | ✅ `acc supply-chain gate`, and `main promotion gate` on `main` |
 | **IOU Architecture Docs** (this site) | ❌ | ❌ | ❌ | ❌ |
 
 The CPSV Editor is the pilot, adopted in v2026.08.2; RONL Business API followed
@@ -62,15 +86,17 @@ within the same week, and Linked Data Explorer in v2026.08.7 — taking its
 findings from **40 to 0** across twenty action references in six deployment
 workflows. All three rulesets are named `acc supply-chain gate`, target
 `refs/heads/acc`, are `active`, and carry **zero bypass actors**; each requires a
-pull request and a passing `audit` check.
+pull request and a passing `audit` check. The Linked Data Explorer's has also
+required `scan` — the Semgrep job in [section 7](#7-the-other-supply-chain-the-npm-tree)
+— since v2026.09.3.
 
 Adoption is not uniform, and the differences are worth knowing rather than
 flattening:
 
 | | CPSV Editor | RONL Business API | Linked Data Explorer |
 |---|---|---|---|
-| Action references pinned | 11 / 11 | 30 / 30 | 23 / 23 |
-| Action majors | **v7** (since v2026.09.0) | **v7** | v4 (one v3) |
+| Action references pinned | 11 / 11 | 30 / 30 | 24 / 24 |
+| Action majors | **v7** (since v2026.09.0) | **v7** | **v7** (since v2026.09.2) |
 | Blocks deletion / non-fast-forward | no | no | **yes** |
 | Merge method restricted *in the ruleset* | no — repository setting only | **yes** | **yes** |
 | `skip_app_build` | not set | **set on all six deploy steps** | not set |
@@ -87,12 +113,23 @@ out is more useful written down than quietly dropped.
 Two consequences follow from that table. **Where `skip_app_build` is not set,
 Oryx builds the production bundle inside the floating vendor container**, so
 lockfile integrity covers only what is tested — true for the CPSV Editor and the
-Linked Data Explorer, but not for RONL Business API. And **the gate is enforced
-on `acc` only, in every repository**: the ruleset targets `refs/heads/acc`
-everywhere, so a production deploy is not covered by the guarantees an `acc`
-pull request gets. The CPSV Editor is the only one that even carries the four
-artifacts on `main` — but carrying the files is not the same as enforcing them,
-and nothing enforces them there.
+Linked Data Explorer, but not for RONL Business API.
+
+**The Linked Data Explorer gates `main` as well.** Its `main promotion gate`
+ruleset, created on 9 September 2026 before the first promotion pull request was
+opened, mirrors the `acc` one — deletion and non-fast-forward blocked, a pull
+request with merge commits only, `audit` and `scan` required, zero bypass actors.
+So on that repository a production deploy gets the same guarantees as an `acc`
+pull request. The two rulesets differ in exactly one parameter, deliberately:
+`require_extra_approval_for_unattributed_changes` is `true` on `acc` and
+`false` on `main`, where GitHub's default of `true` — stored when the parameter
+was *omitted* from the create call — would have required an approval no
+single-maintainer repository can give, and deadlocked the promotion. **Read a
+ruleset back after writing it**; the create response's shape does not show the
+defaults it filled in.
+
+For the other two, the rulesets target `refs/heads/acc` only, so `main` is not
+covered by the guarantees an `acc` pull request gets.
 
 The rulesets are also not identical in shape, which the table's last two rows
 record. Only the Linked Data Explorer's blocks branch deletion and
@@ -290,10 +327,10 @@ under a cooldown:
   researchers time to find problems before adoption.
 - **`internalChecksFilter: "strict"`** — suppresses the pull request entirely
   until the age is genuinely met, rather than raising one that fails a check.
-- **`vulnerabilityAlerts` with `minimumReleaseAge: null`** — the fast route for
-  security advisories.
 - **`prConcurrentLimit: 5`** — a cap on how many dependency pull requests are
   open at once.
+- **`vulnerabilityAlerts` with `minimumReleaseAge: null`** — the fast route for
+  security advisories.
 
 That last rule is the one most cooldown policies omit, and its absence is why
 people disable such policies mid-incident: **without it the cooldown would delay
@@ -334,8 +371,12 @@ gate. In all three adopting repositories the ruleset is named **`acc
 supply-chain gate`**, targets `refs/heads/acc`, and is `active` with **zero
 bypass actors**:
 
-- `required_status_checks` → context **`audit`**
+- `required_status_checks` → context **`audit`** — and, in the Linked Data
+  Explorer since v2026.09.3, **`scan`** as well
 - `pull_request` → `required_approving_review_count: 0`
+
+The Linked Data Explorer also has a twin, `main promotion gate`, on `main` — see
+[Adoption status](#adoption-status).
 
 Both rules are needed *together*. Requiring the check alone would still let a
 direct push to `acc` bypass the gate entirely.
@@ -680,3 +721,184 @@ a workflow comment cannot. Rows are now matched by digest and versions compared 
 the leading token. Neither bug was visible in the repository that wrote the
 script, which pins every action once and annotates nothing — the same shape as the
 defect the script exists to catch.
+
+---
+
+## 7. The other supply chain: the npm tree
+
+Everything above verifies **GitHub Actions**. zizmor checks that each `uses:` names
+a digest, `check-supply-chain` checks that the digest is the version its comment
+claims, and the register checks the two agree. None of them says anything about
+the packages in `package-lock.json` — and neither does the coverage floor. Until
+September 2026, npm dependency vulnerabilities across these repositories were
+remediated by Renovate and verified by nobody: a bot being trusted rather than a
+gate being enforced, and the difference only shows on the day the bot is wrong or
+stalled.
+
+The second half is a **Semgrep** scan — Code and Supply Chain — as its own
+workflow, required in the rulesets.
+
+| Repository | Semgrep `scan` | Required on | Lock-file maintenance |
+|---|---|---|---|
+| **Linked Data Explorer** | ✅ since v2026.09.3 | **`acc` and `main`** | ✅ with a slot kept for it |
+| CPSV Editor | *recorded with its own sync, which follows this one* | | |
+| RONL Business API | *not recorded — verify with the next RONL Business API release sync* | | |
+
+### The workflow, as the Linked Data Explorer runs it
+
+| | |
+|---|---|
+| Workflow | `.github/workflows/semgrep.yml` |
+| Job / check context | `scan` |
+| Trigger | `pull_request` with **no** branch or paths filter; `push` on `acc` and `main` |
+| Scanner | `semgrep==1.176.1`, installed into a venv and registered in `SECURITY-PIPELINE.md` |
+| Auth | `SEMGREP_APP_TOKEN` repository secret |
+| Scope | One job for all three workspaces — they resolve through the single root `package-lock.json`, so there is no per-workspace fan-out to keep in step |
+
+It triggers exactly as the `audit` does, and for the same reason: a required check
+that a pull request can avoid by its base branch or by the paths it touches is a
+check that goes missing, and a missing required check blocks the pull request
+permanently. **Audit widely, deploy narrowly** applies to this job as much as to
+`zizmor.yml`.
+
+Four decisions in the file are worth keeping when it is copied:
+
+- **A separate workflow, not a step in the `audit` job.** `audit` is already
+  required, so a step there would have blocked from the day it merged. A separate
+  workflow reports on every pull request and gates nothing until its job is added
+  to a ruleset — which makes promotion a ruleset change, reversible without
+  touching the file. The Linked Data Explorer ran it as a reporting check while
+  the first baseline was triaged, and required it the same day.
+- **The token is not optional.** Semgrep Supply Chain resolves only on an
+  authenticated scan. An unauthenticated run gets the open-source SAST rules and
+  no Supply Chain at all — the entire reason the job exists.
+- **`--no-suppress-errors`.** By default `semgrep ci` reports errors during
+  analysis and still exits 0, so a scanner that cannot run reads as a clean scan.
+  In CI, a tool that cannot run is a failure.
+- **Only superseded pull-request runs are cancelled** —
+  `cancel-in-progress: ${{ github.event_name == 'pull_request' }}`. The acceptance
+  and audit workflows cancel unconditionally and the production ones never do;
+  this one needs a third policy, because a push run on `acc` or `main` writes the Semgrep Cloud baseline, and cancelling one
+  leaves the dashboard describing a scan that never finished, with nothing queued
+  to correct it.
+
+!!! warning "A `.semgrepignore` replaces Semgrep's default ignore list — it does not extend it"
+    The defaults exclude `test/` and `tests/`. The Linked Data Explorer's first
+    `.semgrepignore` listed only what it meant to add, and so **silently brought 16
+    test files back into scope**. The finding count came out exactly as predicted
+    either way, because none of those files happened to trip a rule — only diffing
+    the scanned file sets showed it. The file now restates `test/` and `tests/`
+    explicitly.
+
+    The same file ignores `/examples/` **with its leading slash**. The root
+    `examples/` is reference material; `packages/frontend/public/examples/` is
+    served, because Vite copies `public/` into the build. An unanchored `examples/`
+    matches both — `.gitignore` syntax matches a directory of that name at any
+    depth — and would drop served files from the scan while the total stays
+    plausible. **Check the set of files scanned, not the count.**
+
+### Suppressions live in the code
+
+By the repository's own CI posture record, the Linked Data Explorer's first scan
+found 76 findings after the ignore file, none blocking, and the day closed at four. Every false positive among them now carries
+a `nosemgrep` **naming the single rule, on the single line, with the reason directly
+above it** — eight in all:
+
+| Rule | Count | Why it is a false positive |
+|---|--:|---|
+| `cors-permissive-express` | 4 | The two deliberately public, read-only mounts — see [RoPA Records — the public routes](../linked-data-explorer/developer/ropa-records.md#public-route-v1ropapublic) |
+| `detect-non-literal-regexp` | 3 | The interpolated attribute name is a closed TypeScript union, so it is a compile-time literal, never data |
+| `insecure-object-assign` | 1 | Its only caller passes a fixed timestamp field, and the data is the user's own |
+
+None lives in the Semgrep dashboard. A `nosemgrep` travels with the line, is
+visible in review, and survives the Semgrep project being recreated; a dashboard
+ignore is platform state nobody reading the file can see, lost with the project.
+Use the dashboard only where the file cannot carry a comment — JSON, for instance.
+
+Each comment also says **when it stops being true**. `insecure-object-assign` is
+safe because of its current caller, not because of the line, so its comment ends
+by naming the change that would make it unsafe: `updateTestCase` receiving
+imported or URL-supplied data. A suppression that states only why it is fine
+today reads as settled long after it has stopped being so.
+
+The one Code finding left is a true positive — the Tailwind Play CDN running from a
+third-party origin in the production frontend
+([linked-data-explorer#96](https://github.com/sgort/linked-data-explorer/issues/96))
+— and it will clear because the script is removed, not because anything is
+suppressed.
+
+!!! note "Reachability is decided in CI, not on a laptop"
+    The repository's CI posture record reports that a local dry run classed every
+    one of the first 66 Supply Chain findings as unreachable, while the CI scan of
+    the same tree classed **5 as reachable — all HIGH** — 23 as undetermined and 38
+    as unreachable. Why the two disagreed was not established. What follows from
+    it is: a local `--dry-run` is fine for Code findings and for checking what an
+    ignore file excludes, and **not** for deciding whether a Supply Chain finding
+    matters.
+
+### Renovate maintains dependencies, not the tree
+
+Renovate proposes updates to the packages a manifest **names**. The transitive tree
+underneath moves only through `lockFileMaintenance`, which the recommended preset
+leaves off. The Linked Data Explorer's first scan found `rollup` at 4.55.1 from
+January, although 4.59.0 had been out since February, because two failures had
+stacked:
+
+- **Lock-file maintenance was not enabled until 29 August 2026.** Before that,
+  nothing refreshed a transitive dependency at all.
+- **Once enabled, it was starved.** It is eligible only inside its Monday
+  schedule, and `prConcurrentLimit: 5` was full of open updates, so it sat in the
+  Dependency Dashboard as rate-limited and never opened a pull request.
+
+Forced by hand, **one refresh moved 338 packages and closed 63 of 66 Supply Chain
+findings**, including all five reachable ones — every fix inside a range the
+manifests already declared, none published within the 14-day cooldown. The three
+left are held by a tilde range in `express` and by a major version of
+`@tiptap/core`, and no refresh can close them.
+
+Keeping it running took four changes, and the order in which they proved
+necessary is the useful part:
+
+1. **The root `package-lock.json` and `package.json` are in all four deploy
+   workflows' `paths:` filters**, acceptance and production. Before, a
+   lockfile-only change — lock-file maintenance above all — was built, tested and
+   deployed by nothing: every filter named its own package, and the one file all
+   three workspaces share was in none of them. The first two pull requests after
+   the change ran both applications' suites where the old filters would have run
+   one.
+2. **The per-workspace group rules list every update type except
+   `lockFileMaintenance`**, so one refresh is one pull request rather than three
+   identical ones. Lock-file maintenance's own default is no group; the rules
+   were overriding it.
+3. **Lock-file maintenance has `prPriority: 10`** — which turned out to be the
+   weaker half. Priority orders branches eligible *in the same run*; it never
+   holds a slot free for a branch that becomes eligible on Monday.
+4. **Major updates need Dependency Dashboard approval**, and that is what keeps
+   the slot. The queue competing with the refresh was almost entirely majors,
+   which nobody merges on autopilot anyway; behind approval they wait as
+   checkboxes and hold no slot. `vulnerabilityAlerts` sets
+   `dependencyDashboardApproval: false` explicitly, so **a security fix that
+   happens to be a major version never waits on a click**.
+
+!!! warning "Widening a deploy filter costs staging environments — check the plan first"
+    Every lockfile pull request now takes a Static Web Apps preview environment on
+    the acceptance app. The Linked Data Explorer can afford it: its frontend apps
+    are on the Standard plan, ten environments each, and `prConcurrentLimit: 5`
+    leaves five for people. On a plan with fewer slots the same change reproduces
+    the collision described under
+    [`renovate.json`](#4-renovatejson-keeping-the-pins-alive). **Size the Renovate cap
+    against the slots, not the other way round.**
+
+### What making it required costs
+
+- **semgrep.dev is now in the merge path.** Both of the Linked Data Explorer's
+  rulesets require `scan` and carry **zero bypass actors**, so if semgrep.dev is
+  unreachable or `SEMGREP_APP_TOKEN` is revoked, merges to `acc` *and* `main` stop
+  until a ruleset is edited. `check-supply-chain` accepted an analogous risk for
+  the GitHub API — but the GitHub API is a dependency of the platform anyway, and
+  semgrep.dev is not. It is a genuinely new class of outage.
+- **A pull request from a fork cannot pass.** Secrets are not passed to fork runs,
+  so `semgrep ci` cannot start and `--no-suppress-errors` fails the step — which,
+  for a required check, blocks the merge. Accept that knowingly, or solve it,
+  before requiring the scan in a repository that takes outside contributions.
+

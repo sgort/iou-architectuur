@@ -15,11 +15,11 @@ repository and every session. They come from three marketplaces: Anthropic's
 
 | Plugin | Version | What it contributes |
 |---|---|---|
-| [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.24.0 | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
+| [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.24.20 | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
 | [`superpowers`](https://github.com/obra/superpowers) | 6.3.0 | The brainstorm → plan → execute structure for multi-step work, and a TDD skills library |
 | [`understand-anything`](https://github.com/Lum1104/Understand-Anything) | 2.7.6 | Builds a navigable knowledge graph of a codebase — architecture, domains, guided tours, diff analysis |
-| `github` | `85cce0381e78` | The official GitHub MCP server: issues, pull requests, reviews, repository search |
-| `semgrep` | 2.1.5 | Scans generated code for security findings — SAST, secrets, and supply-chain |
+| `github` | `f2cc019c16eb` | The official GitHub MCP server: issues, pull requests, reviews, repository search |
+| `semgrep` | 2.2.0 | Scans generated code for security findings — SAST, secrets, and supply-chain |
 | `typescript-lsp` | 1.0.0 | TypeScript/JavaScript language server: go-to-definition, find references, error checking |
 
 !!! note "Versions in that table are a snapshot, not a contract"
@@ -32,6 +32,10 @@ repository and every session. They come from three marketplaces: Anthropic's
     `85cce0381e78`). Treat the **set** of plugins as the durable claim and the
     version column as the dated observation it is.
 
+    **Re-read on 11 September 2026**, and three of six had moved again:
+    `claude-mem` 13.24.0 → 13.24.20, `semgrep` 2.1.5 → 2.2.0, and `github`
+    `85cce0381e78` → `f2cc019c16eb`. The set and every scope were unchanged.
+
 !!! warning "Enabled is not the same as reachable"
     Both MCP-backed plugins can be enabled and still fail to connect in a given
     session — `github` on a malformed authorization header, `semgrep` on a cached
@@ -41,7 +45,8 @@ repository and every session. They come from three marketplaces: Anthropic's
 
     This is not a one-off: the `github` plugin failed to connect again on
     4 September 2026, with the same malformed-authorization-header error, and the
-    v2026.09.0 documentation sync used `gh api` throughout instead. A capability
+    v2026.09.0 documentation sync used `gh api` throughout instead. It failed the
+    same way on 11 September 2026, and that day's sync did the same. A capability
     you can only reach half the time is one you should have a fallback for.
 
 Two notes on that table, because both are easy to get wrong:

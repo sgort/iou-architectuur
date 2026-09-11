@@ -12,17 +12,19 @@ before that the repository had no test files at all and `npm test` exited 1 with
 
 !!! info "Figures on this page are measured, not estimated"
     Every count, command and coverage percentage below was produced by running
-    the suites against **v2026.09.2** on **9 September 2026**, at `007b350` on
-    `main` — the promoted commit — after a clean `npm ci`. Rerun the commands in
+    the suites against **v2026.09.4** on **11 September 2026**, at `be6bc54` on
+    `main` — the promoted commit — in a clean export of that commit after
+    `npm ci`, under Node 22 (CI pins Node 24; `npm ci` installs from the
+    lockfile, so the tree is identical). Rerun the commands in
     [Running the tests](#running-the-tests) to reproduce them.
 
-**At a glance:** 119 test files · **2213 tests** · all passing · backend 98.56%
-statements, frontend 94.75%.
+**At a glance:** 121 test files · **2242 tests** · all passing · backend 98.57%
+statements, frontend 94.76%.
 
 | Package | Runner | Files | Tests | Statements | Branches | Functions | Lines |
 |---|---|---:|---:|---:|---:|---:|---:|
-| `packages/backend` | Jest + ts-jest | 51 | 1140 | 98.56% | 92.22% | 97.15% | 99.05% |
-| `packages/frontend` | Vitest + RTL | 68 | 1073 | 94.75% | 92.88% | 91.74% | 95.71% |
+| `packages/backend` | Jest + ts-jest | 52 | 1151 | 98.57% | 92.96% | 97.17% | 99.05% |
+| `packages/frontend` | Vitest + RTL | 69 | 1091 | 94.76% | 92.88% | 91.78% | 95.72% |
 
 **The frontend nearly doubled, and then was given margin.** v2026.09.1 raised
 per-file branch coverage above 80% across both packages: the frontend gained
@@ -37,6 +39,16 @@ rather than new behaviour. See
 [The per-file branch floor](#the-per-file-branch-floor). The rest of the delta is
 ordinary work in the same release, minus the nine tests deleted with the Tutorial
 component.
+
+**v2026.09.3 added a test file to each package**, both for defects the first
+Semgrep triage found rather than for coverage. `publicPaths.test.ts` asserts that
+wildcard CORS reaches the two public mounts and paths below them, and **never a
+sibling that shares the prefix** — `/v1/ropa/publications`, `/v1/ropa/public-admin`
+and `/v1/bundles/publicity` must all fall through to the allowlist.
+`ronlAttributes.test.ts` pins the escaping of BPMN process metadata, including the
+`$'` value that `String.replace` used to expand into the rest of the document.
+Across v2026.09.3 and v2026.09.4 together, backend branches moved 92.22% →
+**92.96%**; the frontend's held at 92.88%.
 
 Two jsdom limitations had to be worked around to reach the d3 drag and zoom
 paths, and they are the kind that make a branch look untestable when it is not:
@@ -63,9 +75,9 @@ both workspaces with `--workspaces --if-present`.
 
 | Command | Scope | Files | Tests |
 |---|---|---:|---:|
-| `npm test` | Both packages | 119 | 2213 |
-| `npm test -w packages/backend` | Backend only (Jest, with coverage) | 51 | 1140 |
-| `npm test -w packages/frontend` | Frontend only (Vitest, with coverage) | 68 | 1073 |
+| `npm test` | Both packages | 121 | 2242 |
+| `npm test -w packages/backend` | Backend only (Jest, with coverage) | 52 | 1151 |
+| `npm test -w packages/frontend` | Frontend only (Vitest, with coverage) | 69 | 1091 |
 
 Both packages' `test` scripts include coverage by default, so a plain run always
 produces a report. Watch modes are `test:watch` in either package; the backend
@@ -175,9 +187,9 @@ headline number honest.
 
 | Area | Tests | Covers |
 |---|---:|---|
-| `src/services` | 620 | Every service: operaton, sparql, dso, norms, edocs, ropa, vendor, assets, template, triplydb, orchestration, shacl-validation, dmn-validation, externalTaskWorker |
+| `src/services` | 626 | Every service: operaton, sparql, dso, norms, edocs, ropa, vendor, assets, template, triplydb, orchestration, shacl-validation, dmn-validation, externalTaskWorker |
 | `src/routes` | 389 | Every route module plus `routes/index` and `routes/registry`, each mounted in isolation (a fresh `express()` app per file, not the full `index.ts`) with the service layer mocked and supertest driving requests |
-| `src/utils` | 85 | `etag`, `errors`, `logger`, `rootViews`, `config` |
+| `src/utils` | 96 | `etag`, `errors`, `logger`, `rootViews`, `config`, `publicPaths` |
 | `src/db` | 22 | `pool`, `migrate` |
 | `src/middleware` | 9 | `error.middleware`, `version.middleware` |
 | `src/example-fixture-parity.test.ts` | 4 | Every file in a mirrored RIP bundle is byte-identical to its twin — `examples/organizations/flevoland/rip-phase-2x/` against `e2e-fixtures/flevoland/`. Bundles opt in through `MIRRORED_BUNDLES` |
@@ -215,7 +227,7 @@ a DOM. Uses `@testing-library/react`, `jest-dom`, `user-event`, `jsdom` and
 | `src/components` (top level) | 149 | `ShaclValidator` 37, `DmnValidator` 30, `ResultsTable` 26, `GraphView` 23, `OrganizationCard` 12, `Changelog` 11, `OrganizationsView` 10 |
 | `src/services` | 142 | All 11 service modules — `msw` for the network-calling ones, jsdom `localStorage` for the two storage modules, raw `fetch` mocking for `sparqlService`'s CORS-proxy fallback |
 | `components/BpmnModeler` | 134 | `bpmn-js` and the properties panel mocked outright via a small fake modeler class built in a `vi.hoisted` block |
-| `src/utils` | 80 | Pure logic: `exportFormats`, `exampleVersions`, `testData`, `logoResolver` |
+| `src/utils` | 98 | Pure logic: `exportFormats`, `exampleVersions`, `testData`, `logoResolver`, `ronlAttributes` |
 | `components/DsoExplorer` | 64 | The largest single component file; `dsoService` mocked via `vi.mock` + `vi.importActual` so the pure URL/URN helpers stay real |
 | `components/FormEditor` | 58 | `@bpmn-io/form-js` mocked — exercising the real library would mean mounting a full canvas editor |
 | `components/RopaEditor` | 43 | Record fields, legal-basis SPARQL lookup, hydrate-from-linked-forms, the BPMN `ronl:ropaRef` tab, confirm-gated status transitions |
@@ -225,7 +237,8 @@ a DOM. Uses `@testing-library/react`, `jest-dom`, `user-event`, `jsdom` and
 !!! note "These are the runner's own per-file counts, summed"
     Every row above was derived from Vitest's default reporter — the
     `(N tests)` it prints beside each file — grouped by directory. The rows
-    therefore sum to exactly 1073.
+    therefore sum to exactly 1091. The backend table is the same, from Jest's
+    `--json` report, and sums to 1151.
 
     **The previous revision of this table did not.** Its rows summed to 573
     against a stated total of 1020, because they had been gathered per area at
@@ -284,8 +297,8 @@ files between 80 and 85. The first uncovered branch added to any of them would
 have turned CI red on an unrelated change — which is how a floor stops being read
 as a floor and starts being read as an obstacle.
 
-v2026.09.2 raised twelve files. Of the 68 frontend files carrying at least one
-branch, **one is now below 85%**: `GraphView.tsx` at 82.26%. Its eleven remaining
+v2026.09.2 raised twelve files. Of the frontend files carrying at least one
+branch — 69 of 78 at v2026.09.4 — **one is below 85%**: `GraphView.tsx` at 82.26%. Its eleven remaining
 uncovered branches are all inside d3's force-simulation tick and drag handlers —
 `d.x || 0` position fallbacks, `if (!event.active)` drag guards — which need a
 running simulation and synthesised drag events to reach. That is a d3 harness,

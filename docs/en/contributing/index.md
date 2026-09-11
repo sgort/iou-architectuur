@@ -33,17 +33,34 @@ All reports will be handled with discretion and care.
 
 ## Repositories
 
-Each component of the IOU Architecture ecosystem lives in its own repository on the
-[open-regels.nl GitLab instance](https://git.open-regels.nl).
+Each component of the IOU Architecture ecosystem lives in its own repository — but
+not all on the same host, and for the application repositories the difference
+decides where a contribution lands.
 
-| Component | Repository | Issues |
-|---|---|---|
-| IOU Architecture Docs | [showcases/iou-architectuur](https://git.open-regels.nl/showcases/iou-architectuur) | [Issues](https://git.open-regels.nl/showcases/iou-architectuur/-/issues) |
-| RONL Business API | [hosting/ronl-business-api](https://git.open-regels.nl/hosting/ronl-business-api) | [Issues](https://git.open-regels.nl/hosting/ronl-business-api/-/issues) |
-| Norm Editor | [regels/editor](https://git.open-regels.nl/regels/editor) | [Issues](https://git.open-regels.nl/regels/editor/-/issues) |
-| CPSV Editor | [showcases/ttl-editor](https://git.open-regels.nl/showcases/ttl-editor) | [Issues](https://git.open-regels.nl/showcases/ttl-editor/-/issues) |
-| Linked Data Explorer | [hosting/linked-data-explorer](https://git.open-regels.nl/hosting/linked-data-explorer) | [Issues](https://git.open-regels.nl/hosting/linked-data-explorer/-/issues) |
-| CPRMV API | [standards/cprmv](https://git.open-regels.nl/standards/cprmv) | [Issues](https://git.open-regels.nl/standards/cprmv/-/issues) |
+| Component | Developed on | Mirror | Issues |
+|---|---|---|---|
+| IOU Architecture Docs | [sgort/iou-architectuur](https://github.com/sgort/iou-architectuur) — pull requests | [showcases/iou-architectuur](https://git.open-regels.nl/showcases/iou-architectuur) | [Issues](https://git.open-regels.nl/showcases/iou-architectuur/-/issues) — kept on GitLab |
+| RONL Business API ¹ | [hosting/ronl-business-api](https://git.open-regels.nl/hosting/ronl-business-api) | — | [Issues](https://git.open-regels.nl/hosting/ronl-business-api/-/issues) |
+| Norm Editor | [regels/editor](https://git.open-regels.nl/regels/editor) — GitLab CI | — | [Issues](https://git.open-regels.nl/regels/editor/-/issues) |
+| CPSV Editor | [sgort/ttl-editor](https://github.com/sgort/ttl-editor) — GitHub Actions | [showcases/ttl-editor](https://git.open-regels.nl/showcases/ttl-editor) | [Issues](https://github.com/sgort/ttl-editor/issues) |
+| Linked Data Explorer | [sgort/linked-data-explorer](https://github.com/sgort/linked-data-explorer) — GitHub Actions | [hosting/linked-data-explorer](https://git.open-regels.nl/hosting/linked-data-explorer) | [Issues](https://github.com/sgort/linked-data-explorer/issues) |
+| CPRMV API | [standards/cprmv](https://git.open-regels.nl/standards/cprmv) — GitLab CI | — | [Issues](https://git.open-regels.nl/standards/cprmv/-/issues) |
+
+**The CPSV Editor and the Linked Data Explorer are developed on GitHub** — pull
+requests, issues, and every CI gate described under
+[Code Standards](code-standards.md) and [Supply-Chain Pinning](supply-chain.md) run
+there — and are mirrored by hand to the
+[open-regels.nl GitLab instance](https://git.open-regels.nl). Open issues and pull
+requests on GitHub; the mirror has no CI and runs none of those gates. On 11
+September 2026 their GitHub trackers held 12 and 10 issues, the GitLab ones 1 and 2.
+This site is split differently: its pull requests are on GitHub, while its issue
+tracker is on GitLab — 57 issues there, none on GitHub. The Norm Editor and the CPRMV API are developed on
+GitLab, where their pipelines run.
+
+¹ **RONL Business API's row is unchanged and may be stale.** The same evidence points
+the same way for it — its GitHub tracker held 30 issues and its GitLab one none — but
+its row is to be verified and rewritten with the next RONL Business API release sync,
+together with the rest of its claims on these pages.
 
 For component-specific development setup, refer to each component's Developer Docs:
 

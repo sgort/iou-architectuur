@@ -8,6 +8,45 @@ component: Linked Data Explorer
 
 ## Changelog
 
+### v2026.09.4 — The Lockfile Gets a Slot, and a Build (September 2026)
+
+> The mechanism behind this release, across repositories: [Supply-Chain Pinning — the npm tree](../../contributing/supply-chain.md#7-the-other-supply-chain-the-npm-tree). Measured suites: [Testing](testing.md).
+
+**Lockfile-only changes are built, tested and deployed.** The root `package-lock.json` and `package.json` now trigger the backend and frontend workflows in acceptance and production. Before, a change to the lockfile alone — Renovate's lock-file maintenance above all — was built, tested and deployed by nothing: every deploy workflow was path-filtered to its own package, and the one file all three workspaces share appeared in none of those filters. The 338-package refresh in v2026.09.3 reached acceptance **only because an unrelated change happened to follow it**. The first two pull requests after the change showed it working in both directions: a frontend-only dependency bump ran the backend's tests, and a backend-only bump ran the frontend build — each testing the application its shared lockfile could move.
+
+**Major updates wait for approval, so the lockfile refresh gets a slot.** Lock-file maintenance is eligible only inside its Monday schedule, while ordinary updates are eligible any day, so they filled every free slot in Renovate's concurrency limit of five first. Giving lock-file maintenance `prPriority: 10` was **not enough on its own**: priority orders branches eligible in the same run, and never keeps a slot free for a later one. What did was putting major updates behind Dependency Dashboard approval — the queue competing with the refresh was almost entirely majors (`npm` 12 and two workspace major groups), which are never merged on autopilot anyway. Behind approval they wait as checkboxes and hold no slot. **Security fixes are exempt**: `vulnerabilityAlerts` sets `dependencyDashboardApproval: false` explicitly, so one that happens to be a major version never waits on a click.
+
+One refresh now arrives as **one** pull request. The per-workspace group rules had caught lock-file maintenance too and split each refresh into three identical ones; they now list every update type except `lockFileMaintenance`.
+
+**The last Semgrep false positive is suppressed in the code, not the dashboard.** An `Object.assign` in test-case storage was flagged as a prototype-pollution risk; its only caller passes a fixed timestamp field, and the data is the user's own. The `nosemgrep` now sits on the line with its reason, and says **when it would stop being true** — if `updateTestCase` ever receives imported or URL-supplied data. Every Code suppression in the repository now lives in source. One open Code finding remains, and it is a true positive: the Tailwind Play CDN running from a third-party origin in the production frontend ([#96](https://github.com/sgort/linked-data-explorer/issues/96)).
+
+**Dependency updates**, each rebased onto the refreshed tree before merging and verified locally with lint, the full suite and the build: backend `axios` 1.20.0 and `@types/n3` 1.26.2; frontend `bpmn-js` 18.26.0, `@bpmn-io/properties-panel` 3.53.0, `camunda-bpmn-moddle` 7.0.2 and `@testing-library/react` 16.3.3.
+
+---
+
+### v2026.09.3 — Semgrep Gates Acceptance and Production (September 2026)
+
+**Semgrep Code and Supply Chain scan every pull request, and gate both `acc` and `main`.** One `scan` job covers all three workspaces through the single root lockfile, so there is no per-workspace fan-out to keep in step. Supply Chain covers what nothing else here did: `check-supply-chain` verifies GitHub Actions pins and says **nothing about `package-lock.json`**. Introduced as a reporting check, it became a required check in both rulesets the same day, once the first baseline had been triaged from **86 findings to 5, none blocking**. The application now reaches acceptance and production only through a scan of the exact commit being deployed.
+
+Four details worth keeping, the last of them found here:
+
+- **`--no-suppress-errors`.** By default `semgrep ci` reports errors during analysis and still exits 0 — a scanner that cannot run would read as a clean scan.
+- **Only pull-request runs are cancelled when superseded.** A push run on `acc` or `main` writes the Semgrep Cloud baseline, and cancelling one leaves the dashboard describing a scan that never finished.
+- **`/examples/` is ignored with a leading slash.** A root `examples/` holds reference material, while `packages/frontend/public/examples/` is served — an unanchored rule matches both.
+- **A `.semgrepignore` replaces Semgrep's default ignore list; it does not extend it.** The first version silently brought 16 test files back into scope. The finding count came out the same either way, because none of them happened to trip a rule — only diffing the scanned file sets showed it.
+
+**The transitive dependency tree refreshed for the first time since January.** Renovate maintains the dependencies a manifest names; the tree underneath moves only through lock-file maintenance, which the recommended preset leaves off. Here it had been enabled on 29 August and then **rate-limited behind open pull requests ever since**, so it had never run — `rollup` still sat at 4.55.1 from January although 4.59.0 was out in February. Forced by hand, one refresh moved **338 packages**, 82 of them runtime dependencies, every one inside a range the manifests already declared and none published within the 14-day cooldown. It closed **63 of 66** Semgrep Supply Chain findings, including all five classed as reachable, all HIGH. The three left are bound by a tilde range in `express` and by a major version of `@tiptap/core`, and no refresh can close them.
+
+**Hardening from the first triage** — three latent defects fixed where they live rather than where they are currently called from:
+
+- **Wildcard CORS matched on a bare path prefix.** Any future sibling route whose name began with `public` — `/v1/ropa/publications`, say — would have inherited wildcard CORS instead of the credentialed allowlist. `isPublicPath` now matches a public mount or a path below it, never a sibling. See [RoPA Records — the public routes](ropa-records.md#public-route-v1ropapublic).
+- **BPMN process metadata was written into the XML unescaped, through `String.replace`**, where `$1`, `$&` and `$'` are expanded: a value of `A$'B` wrote the rest of the document into the attribute. Values are now escaped on write and decoded on read in `ronlAttributes.ts`, whose attribute names are a closed TypeScript union.
+- **A DMN export failure logged the DMN id inside the console format string**, where a stray `%s` swallowed the very error the line exists to report. The id is now logged as data.
+
+Semgrep's ten application Code findings went to two; every remaining false positive carries a scoped `nosemgrep` naming the single rule, on the single line, with its reason.
+
+---
+
 ### v2026.09.2 — Twelve of Twelve, and Every Gate Now Blocks (September 2026)
 
 > The ladder in full: [RIP Phase Ladder](../features/rip-phase-ladder.md). Measured suites: [Testing](testing.md). Cross-repository posture: [Coverage Floor](../../contributing/coverage-floor.md).

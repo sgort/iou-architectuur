@@ -19,4 +19,8 @@ scope: cross-cutting
 
 ---
 
+## De metadatakop per pagina
+
+---
+
 ## Build & Deploy Pipeline

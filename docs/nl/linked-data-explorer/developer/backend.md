@@ -575,7 +575,7 @@ Een centrale `errorHandler.ts`-middleware vangt niet-afgevangen fouten op en ret
 
 **HTTP-headers** — [Helmet](https://helmetjs.github.io/) is geconfigureerd om uitgebreide beveiligingsheaders te zetten op alle responses, waaronder `Content-Security-Policy`, `X-Content-Type-Options`, `X-Frame-Options` en `Strict-Transport-Security`.
 
-**CORS** — alleen origins die in `CORS_ORIGIN` staan zijn toegestaan. In productie is dit beperkt tot `https://linkeddata.open-regels.nl` en `https://cpsv.open-regels.nl`. Alle andere origins ontvangen een CORS-afwijzing.
+**CORS** — alleen origins die in `CORS_ORIGIN` staan zijn toegestaan. In productie is dit beperkt tot `https://linkeddata.open-regels.nl` en `https://cpsv.open-regels.nl`. Alle andere origins ontvangen een CORS-afwijzing — **behalve op de twee openbare, alleen-lezen mounts**, `/v1/ropa/public` en `/v1/bundles/public`, die bewust elke origin toestaan voor `GET` en `OPTIONS`. `isPublicPath` herkent die mounts of een pad daaronder, nooit een zusterroute die alleen hetzelfde voorvoegsel deelt; zie [RoPA Records — de openbare routes](ropa-records.md#publieke-route).
 
 **Invoervalidatie** — typechecking wordt toegepast op alle request-inputs. Variabelennamen, DMN-identifiers en SPARQL-endpoint-URL's worden gevalideerd voordat een serviceaanroep wordt gedaan. De grootte van de request body is beperkt tot 10 MB.
 
