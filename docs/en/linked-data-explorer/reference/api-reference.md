@@ -181,7 +181,7 @@ Streams the deployed DMN XML for a single DMN, fetched from Operaton. The file i
 
 Deploys raw DMN XML to Operaton ad hoc, without requiring a pre-registered LDE norm identifier.
 
-Added in v2026.08.2 for the [CPSV Editor's DMN tab](../../cpsv-editor/user-guide/dmn-workflow.md#step-4-deploy-to-operaton), which holds an uploaded or generated DMN file that has no registry entry of its own. The browser cannot call Operaton's `/engine-rest/deployment/create` directly — CORS blocks it for a local dev origin — so the call is routed here and forwarded server-to-server. A thin wrapper around the same `operatonService.deployDrd()` the registry-backed deploy path uses.
+Added in v2026.08.2 for the [CPSV Editor's DMN tab](../../cpsv-editor/user-guide/dmn-tab.md#step-4-deploy-to-operaton), which holds an uploaded or generated DMN file that has no registry entry of its own. The browser cannot call Operaton's `/engine-rest/deployment/create` directly — CORS blocks it for a local dev origin — so the call is routed here and forwarded server-to-server. A thin wrapper around the same `operatonService.deployDrd()` the registry-backed deploy path uses.
 
 **Body:** the DMN XML plus a deployment name.
 

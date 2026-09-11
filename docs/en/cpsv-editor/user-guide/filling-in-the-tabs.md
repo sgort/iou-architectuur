@@ -133,7 +133,7 @@ CPRMV rules can be entered individually or imported in bulk via the **Import JSO
 
 ## DMN tab
 
-See the [DMN Workflow](dmn-workflow.md) and [DMN Testing](dmn-testing.md) user guides.
+See [The DMN Tab](dmn-tab.md) and [DMN Testing](dmn-testing.md) user guides.
 
 The DMN tab retains its state when you switch tabs — an uploaded DMN, its deployment status, and the full test-case run results survive a hop to the Concepts tab and back, so you don't lose work by navigating away (v1.10.4).
 

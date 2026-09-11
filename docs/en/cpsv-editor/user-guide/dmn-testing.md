@@ -169,6 +169,6 @@ Watch the browser console for extraction logs:
 
 **`DMN-01005 Invalid value ... for clause with type 'date'`** — A date input was sent as a plain string. Use a full ISO timestamp with `"type": "Date"` (see [Variable types](#variable-types)).
 
-**`FEEL/SCALA-01008`** — The DMN uses multi-word bare names in an input expression; Operaton's FEEL engine reads only the first word. The names must be flattened in the DMN itself — see the [authoring pitfalls](dmn-workflow.md#authoring-pitfalls).
+**`FEEL/SCALA-01008`** — The DMN uses multi-word bare names in an input expression; Operaton's FEEL engine reads only the first word. The names must be flattened in the DMN itself — see the [authoring pitfalls](dmn-tab.md#authoring-pitfalls).
 
 **Evaluation fails with a blank error and nothing in the log** — The decision's `<dmn:output>` declares a `label` but no `name`. Operaton needs `name` to serialise the result.

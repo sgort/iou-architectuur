@@ -1,13 +1,17 @@
-# DMN Workflow
+---
+component: CPSV Editor
+---
+
+# Het DMN-tabblad
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
-    Raadpleeg de <a href="/cpsv-editor/user-guide/dmn-workflow/">Engelse versie</a> voor de huidige inhoud.
+    Raadpleeg de <a href="/cpsv-editor/user-guide/dmn-tab/">Engelse versie</a> voor de huidige inhoud.
 
 ---
 
 **Status:** Concept  
-**Engelstalige bron:** `cpsv-editor/user-guide/dmn-workflow.md`
+**Engelstalige bron:** `cpsv-editor/user-guide/dmn-tab.md`
 
 ---
 

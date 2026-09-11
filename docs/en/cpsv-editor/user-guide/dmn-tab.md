@@ -2,9 +2,9 @@
 component: CPSV Editor
 ---
 
-# DMN Workflow
+# The DMN Tab
 
-This guide walks through uploading, deploying, testing, and exporting a DMN decision model as part of a service definition.
+This guide walks through uploading, deploying, testing, and exporting a DMN decision model in the editor's DMN tab, as part of a service definition.
 
 ---
 
