@@ -191,19 +191,18 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 ---
 
-### 📘 How this documentation is maintained
+### 🎞️ Slide decks
 
-Components differ in how fast they change, so they are documented to different depths.
+Three topics also exist as slide decks. Each has a page showing every slide with its
+text, next to the prose it summarises, and the PDF to download.
 
-| Component | Cadence | User Guides |
-|---|---|---|
-| **RONL Business API** | Short-cycle, co-designed with users | Landing page and a brief page per board on ACC; full guides when a board reaches PROD |
-| **CPSV Editor** | Release-tagged | Full |
-| **Linked Data Explorer** | Release-tagged | Full |
-| **Norm Editor** | Release-tagged | Full |
-| **CPRMV API** | Spec-driven | Full |
+| Deck | Where | Slides | What it covers | As of | PDF |
+|---|---|--:|---|---|---|
+| [CI Posture Across Repos](contributing/ci-posture-deck.md) | Contributing | 5 | The four CI controls on the CPSV Editor and the Linked Data Explorer, and the delivery decision they lead to | 11 Sep 2026 | [127 KB](assets/downloads/ci-posture-across-repos-deck.pdf) |
+| [DMN to Linked Data Workflow](cpsv-editor/user-guide/dmn-workflow.md) | CPSV Editor · User Guide | 8 | From a legal body's DMN export to a tested decision service published as linked data — Amsterdam, SZW and Den Haag | 11 Sep 2026 | [208 KB](assets/downloads/dmn-to-linked-data-workflow.pdf) |
+| [DSO Viewer APIs](linked-data-explorer/features/dso-viewer-apis-deck.md) | Linked Data Explorer · Features | 12 | How the DSO Viewer talks to the Digitaal Stelsel Omgevingswet — the proxy, the five upstream APIs, and what each tab calls | 24 Aug 2026 | [121 KB](assets/downloads/dso-viewer-apis-deck.pdf) |
 
-Features, Developer Docs and References follow the same pattern for every component.
+A deck is a snapshot of its date, and each page states what it was checked against.
 
 ---
 
