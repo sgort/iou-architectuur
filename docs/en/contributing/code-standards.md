@@ -1,21 +1,24 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-11
+  date: 2026-09-12
   against:
     CPSV Editor: "f5bae6a"
     Linked Data Explorer: "be6bc54"
+    RONL Business API: "311d732"
 ---
 
 # Code Standards
 
-!!! info "Re-verified for the CPSV Editor and the Linked Data Explorer on 11 September 2026"
-    Every CPSV Editor and Linked Data Explorer claim on this page was re-checked
-    against `f5bae6a` and `be6bc54` — the commits that published v2026.09.4 of each —
-    which is what the header's stamp records. **RONL Business API claims are left as
-    they stood and may be stale** — the latest check of any of them was against
-    `04e38c8` on 9 September 2026, and not every claim was re-checked then. They are
-    to be verified with the next RONL Business API release sync.
+!!! info "Re-verified for all three applications on 12 September 2026"
+    Every claim on this page was re-checked against `f5bae6a`, `be6bc54` and
+    `311d732` — the commits that published v2026.09.4 of the first two and v2026.09.7
+    of the RONL Business API. Rulesets were read from the API per branch rather than
+    from prose, and workflow and pin counts were derived by listing the files.
+
+    **The RONL Business API's claims were the stale ones**, and this sync is where they
+    were earned back: it closed ten of eleven cross-repository alignment items on 12
+    September 2026, and several sentences on this page described the state before that.
 
 This page covers three application repositories — CPSV Editor (`ttl-editor`), Linked
 Data Explorer, and RONL Business API — that share a common tooling convention:
@@ -79,13 +82,15 @@ formatting on push.
 
 **None of the three repositories' git hooks run the test suite.** Neither `pre-commit`
 nor `pre-push` invokes `npm test` anywhere. A passing hook is not evidence your change
-didn't break a test — only CI, or running the suite yourself, tells you that. Since
-August 2026 CI closes that gap on the way in as well as on the way out: in RONL
-Business API a failing check now blocks the *merge*, not just the deploy — see
-[Enforcement](#enforcement-what-blocks-a-merge) below. In the CPSV Editor and the Linked
-Data Explorer the suites **run** on every pull request, but the checks their rulesets
-**require** are `audit` and `scan` — so a red test stops the deploy and shows on the
-pull request, and does not by itself block the merge.
+didn't break a test — only CI, or running the suite yourself, tells you that.
+
+**And a red test does not block a merge in any of the three.** Since August 2026 the
+suites run on every pull request, so a failure shows there and stops the deploy — but no
+ruleset names a test workflow as a required check. What the rulesets require is `audit`
+in all three, and `scan` in the CPSV Editor and the Linked Data Explorer; see
+[Enforcement](#enforcement-what-blocks-a-merge) below. In the RONL Business API that is
+not an oversight: every deploy workflow on `main` is push-only, and a required check that
+never reports on a pull request wedges it permanently.
 
 ---
 
@@ -96,8 +101,9 @@ and a failing test blocks the deploy. That has only been true since 20 August 20
 before then CI and the hooks left the same gap, and RONL Business API's public-site
 package had the only real test gate anywhere.
 
-**RONL Business API** — **nine** workflows: an acc/prod pair for each of **four**
-packages, plus the supply-chain `audit`:
+**RONL Business API** — **ten** workflows: an acc/prod pair for each of **four**
+deployable packages, plus the supply-chain `audit` and, since v2026.09.7, the Semgrep
+`scan`:
 
 | Workflow pair | Lint | Type-check | Tests | Notes |
 |---|:---:|:---:|:---:|---|
@@ -109,6 +115,18 @@ packages, plus the supply-chain `audit`:
 The frontend's performance budget runs separately because it asserts wall-clock time,
 which means nothing while 133 test files compete for cores — see
 [The performance budget](../ronl-business-api/developer/testing/overview.md#the-performance-budget).
+
+Two changes in v2026.09.6 and v2026.09.7 are worth reading off that table rather than
+inferring from it. **`@ronl/pa-cockpit` has no workflow of its own**, being a library
+rather than a deployable, so its 476 tests ran nowhere in CI; both frontend workflows now
+run its suite first, because the frontend imports it. And **the backend pair now triggers
+on `pull_request` as well as `push`**
+([#87](https://github.com/sgort/ronl-business-api/issues/87)), so its 2008 tests run
+before the merge rather than after it. That needed no per-step event guards, unlike the
+Linked Data Explorer's equivalent change below: the backend workflow ends at an uploaded
+artifact and has no deploy step to gate. Both filters gained `package-lock.json` and
+`package.json`, because every workspace resolves through them and a lockfile-only change
+was built and tested by nothing.
 
 **Linked Data Explorer** — **eight** workflows: six deployment workflows, the
 supply-chain `audit` gate added in v2026.08.7, and the Semgrep `scan` added in
@@ -203,19 +221,37 @@ Both rules are needed together — requiring the status check alone would still 
 direct push to `acc` sail past it. The practical effect is that **`git push origin acc`
 is rejected outright** in all three repositories, including for releases and including
 for the repository owner. Linked Data Explorer adopted the same ruleset in v2026.08.7;
-all three are named `acc supply-chain gate` and carry zero bypass actors. They are not
-identical in shape, though: only the Linked Data Explorer's also blocks branch deletion
-and non-fast-forward pushes, and since v2026.09.3 the CPSV Editor's and the Linked Data
-Explorer's both require `scan` alongside `audit`.
+all three are named `acc supply-chain gate` and carry zero bypass actors.
 
-**The Linked Data Explorer is also the one repository whose `main` is gated.** Its
-`main promotion gate` ruleset mirrors the `acc` one — the same four rules, `audit` and
-`scan` required, zero bypass actors — so a promotion pull request is held to the same
-checks as the pull requests it carries. The CPSV Editor's `main` requires a pull
-request but no status checks — **decided and kept**, not overlooked
+They are not identical in shape. Read per branch from the API on 12 September 2026:
+
+| | `acc` | `main` |
+|---|---|---|
+| CPSV Editor | pull request, `audit`, `scan` | a pull request, no status checks |
+| Linked Data Explorer | pull request, `audit`, `scan`, deletion, non-fast-forward | the same four |
+| RONL Business API | pull request, `audit`, deletion, non-fast-forward | the same four |
+
+**Two of the three now gate `main`.** The Linked Data Explorer's `main promotion gate`
+came first, on 9 September 2026; the RONL Business API created its own on 12 September,
+before the promotion pull request was opened, replacing a classic protection under which
+an administrator could push to `main` directly — so the branch that deploys production
+had been the *less* protected of its two. Both mirror their `acc` ruleset and differ from
+it in exactly one parameter, deliberately:
+`require_extra_approval_for_unattributed_changes` is `true` on `acc` and `false` on
+`main`, because a promotion carries commits under several author identities against a
+ruleset requiring zero approvals, and the flag would demand an approval nobody can give.
+
+The CPSV Editor's `main` requires a pull request but no status checks — **decided and
+kept**, not overlooked
 ([ttl-editor#131](https://github.com/sgort/ttl-editor/issues/131)): `main` is promoted
 from `acc`, whose commits already passed `audit` and `scan`. See
 [Supply-Chain Pinning](supply-chain.md#adoption-status) for the argument on both sides.
+
+**`scan` is required in two of the three.** The RONL Business API's runs on every pull
+request and is deliberately not a required check while the baseline from its first
+authenticated scan is triaged — a gate required before its baseline is triaged is a gate
+that gets bypassed in its first week, and promoting it later is a ruleset edit that
+touches no file.
 
 Merge strategy is enforced by repository settings rather than by convention: all three
 disable squash and rebase merges, leaving merge commits only, with
@@ -234,6 +270,14 @@ maintaining the digests under a 14-day cooldown with a no-cooldown lane for secu
 advisories. What *cannot* be pinned is written down in each repository's
 `SECURITY-PIPELINE.md` rather than glossed over.
 
+Two Renovate settings joined that list in September 2026, and they matter more than they
+look. **Lock-file maintenance** is what moves the transitive tree at all — Renovate
+maintains the dependencies you name, not what they resolve to, and `config:recommended`
+leaves it disabled; all three repositories now run it on a weekly schedule. And **majors
+sit behind Dependency Dashboard approval** rather than a global approval flag, so the
+concurrent-pull-request limit is spent on the updates that can actually merge. See
+[Supply-Chain Pinning — Renovate maintains dependencies, not the tree](supply-chain.md#renovate-maintains-dependencies-not-the-tree).
+
 Since v2026.09.0 the CPSV Editor's `audit` job also validates `renovate.json` with
 `--strict` — pinning without working automated updates decays into an unpatched tree, so
 a Renovate that has silently stopped running is itself a supply-chain failure. That is
@@ -244,15 +288,13 @@ nothing in CI noticing.
 The rollout is not identical across the three. All three are now on the v7 action
 majors — RONL Business API first, the CPSV Editor since v2026.09.0, and the Linked Data
 Explorer since v2026.09.2, which retired its last `actions/checkout` at v3.7.0 on the
-way. **Only the Linked Data Explorer gates `main`**, with a `main promotion gate`
-ruleset that requires the same checks as its `acc` one; in the other two the rulesets
-target `refs/heads/acc` alone, so the gate protects the acceptance path only there — by
-decision in the CPSV Editor, whose `main` requires a pull request and no checks.
+way. **The CPSV Editor is now the only one whose `main` is ungated**, by decision; the
+Linked Data Explorer and the RONL Business API both hold a promotion pull request to the
+same rules as the pull requests it carries.
 
-[Supply-Chain Pinning](supply-chain.md) covers the mechanism, the measured results
-(16 findings to zero in the CPSV Editor, 49 in RONL Business API, 40 in the Linked Data
-Explorer), what the gate deliberately does not protect, and the order to copy the four
-artifacts into the next repository.
+[Supply-Chain Pinning](supply-chain.md) covers the mechanism, what the gate deliberately
+does not protect, and the order to copy the four artifacts into the next repository. The
+[controls index](controls.md) is the one-page version of where each control holds.
 
 ---
 
@@ -314,16 +356,26 @@ threshold globs are **additive rather than overriding**, so a repository not yet
 than functions, the load cost of bringing a large file up, and how to prove a
 threshold actually bites rather than trusting a green run.
 
-**A floor only gates where the tests run before the merge**, and there the three
-still differ — RONL Business API's backend workflow triggers on `push` alone, so its
-2008 tests run only *after* a merge and its branch threshold gates nothing on a pull
-request ([ronl-business-api#87](https://github.com/sgort/ronl-business-api/issues/87)).
+**A floor only gates where the tests run before the merge**, and as of 12 September 2026
+all three do. The RONL Business API's backend workflow triggered on `push` alone until
+v2026.09.7, so its 2008 tests ran only *after* a merge and its branch threshold gated
+nothing on a pull request; the trigger closed that
+([#87](https://github.com/sgort/ronl-business-api/issues/87)) and proved itself
+immediately, when an `axios` 1.18 security bump broke the backend build on the pull
+request rather than on `acc`.
 
 `@ronl/shared` is deliberately outside this: it has no test script and needs none,
-being types plus two seed modules with no functions and no branches. That exemption has
+being types plus constant data with no functions and no branches. That exemption has
 a consequence worth knowing — **executable logic placed in the shared package is
 unmeasurable by construction**, which is why a branching helper was moved out of it in
-v2026.09.4 rather than left where a passing test run concealed the gap.
+v2026.09.4 rather than left where a passing test run concealed the gap. That move was
+caught by hand, by someone who happened to look, and **v2026.09.7 replaced the
+convention with a check**
+([#84](https://github.com/sgort/ronl-business-api/issues/84)): `check-shared` runs in
+the `audit` job and fails on a function, a class, a conditional or a loop anywhere in the
+package. It uses the TypeScript compiler API rather than a pattern over text, because an
+arrow in an interface is a type and the same syntax assigned to a const is logic, and no
+regex separates them.
 
 
 ---
