@@ -376,9 +376,12 @@ nav:
       - Technology Stack: contributing/doc-architecture/technology-stack.md
     - Controls at a Glance: contributing/controls.md
     - Code Standards: contributing/code-standards.md
+    - Branch Protection: contributing/branch-protection.md
     - Supply-Chain Pinning: contributing/supply-chain.md
-    - Build Provenance: contributing/build-provenance.md
+    - Dependency Scanning: contributing/dependency-scanning.md
     - Coverage Floor: contributing/coverage-floor.md
+    - Build Provenance: contributing/build-provenance.md
+    - The GitLab Mirror: contributing/the-gitlab-mirror.md
     - CI Posture (slides): contributing/ci-posture-deck.md
 
 # Markdown extensions

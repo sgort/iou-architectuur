@@ -130,7 +130,7 @@ was built and tested by nothing.
 
 **Linked Data Explorer** — **eight** workflows: six deployment workflows, the
 supply-chain `audit` gate added in v2026.08.7, and the Semgrep `scan` added in
-v2026.09.3 (see [Supply-Chain Pinning — the npm tree](supply-chain.md#7-the-other-supply-chain-the-npm-tree)).
+v2026.09.3 (see [Supply-Chain Pinning — the npm tree](dependency-scanning.md)).
 Both backend and both frontend workflows run lint and then the suite before building.
 The two `ropa-site` workflows run neither, and correctly so: that package is a static
 `index.html` plus a `staticwebapp.config.json`, with no build and no test script to run.
@@ -155,7 +155,7 @@ ESLint; `test` is Vitest. None of the three typechecks, so a type error could re
 **CPSV Editor** — four workflows: two Azure Static Web Apps workflows, `acc` and `main`
 alike, running `npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy action,
 plus the supply-chain `audit` and, since v2026.09.3, the Semgrep `scan` (see
-[Supply-Chain Pinning — the npm tree](supply-chain.md#7-the-other-supply-chain-the-npm-tree)). Since v2026.09.2 that `audit` job also runs
+[Supply-Chain Pinning — the npm tree](dependency-scanning.md)). Since v2026.09.2 that `audit` job also runs
 `npm run check-format` and `npm run check-supply-chain` — and it gained its first
 `npm ci` to do so, everything in it having previously run from `npx` or plain node. Since v2026.09.0 the deploy workflows are named
 **`Deploy ACC (orange-beach)`** and **`Deploy PROD (white-sky)`**; both were previously
@@ -206,58 +206,14 @@ failed on test files that had been latently broken for weeks: ts-jest caches typ
 diagnostics per file, so a warm local cache kept skipping the check that CI, starting
 cold, performed immediately. Clearing the cache reproduced it at once.
 
-### Enforcement: what blocks a *merge*
+### What blocks a merge
 
-Running a check and being able to block on it are different things, and until August
-2026 these repositories only did the first. **All three** now carry a branch ruleset
-named `acc supply-chain gate`, active on `refs/heads/acc` with **no bypass actors**.
-All three share the two rules that matter:
-
-- `required_status_checks` → the `audit` context must pass
-- `pull_request` → a pull request is required (0 approvals; these repositories have a
-  single maintainer, and GitHub does not permit self-approval)
-
-Both rules are needed together — requiring the status check alone would still let a
-direct push to `acc` sail past it. The practical effect is that **`git push origin acc`
-is rejected outright** in all three repositories, including for releases and including
-for the repository owner. Linked Data Explorer adopted the same ruleset in v2026.08.7;
-all three are named `acc supply-chain gate` and carry zero bypass actors.
-
-They are not identical in shape. Read per branch from the API on 12 September 2026:
-
-| | `acc` | `main` |
-|---|---|---|
-| CPSV Editor | pull request, `audit`, `scan` | a pull request, no status checks |
-| Linked Data Explorer | pull request, `audit`, `scan`, deletion, non-fast-forward | the same four |
-| RONL Business API | pull request, `audit`, deletion, non-fast-forward | the same four |
-
-**Two of the three now gate `main`.** The Linked Data Explorer's `main promotion gate`
-came first, on 9 September 2026; the RONL Business API created its own on 12 September,
-before the promotion pull request was opened, replacing a classic protection under which
-an administrator could push to `main` directly — so the branch that deploys production
-had been the *less* protected of its two. Both mirror their `acc` ruleset and differ from
-it in exactly one parameter, deliberately:
-`require_extra_approval_for_unattributed_changes` is `true` on `acc` and `false` on
-`main`, because a promotion carries commits under several author identities against a
-ruleset requiring zero approvals, and the flag would demand an approval nobody can give.
-
-The CPSV Editor's `main` requires a pull request but no status checks — **decided and
-kept**, not overlooked
-([ttl-editor#131](https://github.com/sgort/ttl-editor/issues/131)): `main` is promoted
-from `acc`, whose commits already passed `audit` and `scan`. See
-[Supply-Chain Pinning](supply-chain.md#adoption-status) for the argument on both sides.
-
-**`scan` is required in two of the three.** The RONL Business API's runs on every pull
-request and is deliberately not a required check while the baseline from its first
-authenticated scan is triaged — a gate required before its baseline is triaged is a gate
-that gets bypassed in its first week, and promoting it later is a ruleset edit that
-touches no file.
-
-Merge strategy is enforced by repository settings rather than by convention: all three
-disable squash and rebase merges, leaving merge commits only, with
-`delete_branch_on_merge` enabled. Both alternatives rewrite commit hashes — rebase
-deceptively so, since it preserves the commit count — and a changelog entry that cites
-commits by SHA is orphaned either way.
+Running a check and being able to block on it are different things. Which checks each
+branch **requires**, what the rulesets carry beyond them, and how merge method is
+enforced are on [Branch Protection](branch-protection.md). The short version, because it
+is the fact most often got wrong: the suites run on every pull request in all three
+repositories and **no ruleset names them**, so a red test stops the deploy and does not
+by itself block the merge.
 
 ### Supply-chain hardening
 
@@ -276,7 +232,7 @@ maintains the dependencies you name, not what they resolve to, and `config:recom
 leaves it disabled; all three repositories now run it on a weekly schedule. And **majors
 sit behind Dependency Dashboard approval** rather than a global approval flag, so the
 concurrent-pull-request limit is spent on the updates that can actually merge. See
-[Supply-Chain Pinning — Renovate maintains dependencies, not the tree](supply-chain.md#renovate-maintains-dependencies-not-the-tree).
+[Supply-Chain Pinning — Renovate maintains dependencies, not the tree](dependency-scanning.md#renovate-maintains-dependencies-not-the-tree).
 
 Since v2026.09.0 the CPSV Editor's `audit` job also validates `renovate.json` with
 `--strict` — pinning without working automated updates decays into an unpatched tree, so

@@ -58,7 +58,7 @@ September 2026, and the issue numbers its changelog cites are GitHub's.
 
 Since 12 September 2026 each of the three checks its mirror at every release, with
 `scripts/check-mirror.sh` called from `/bump-release`. It reports and never pushes — see
-[Supply-Chain Pinning — the GitLab mirror](supply-chain.md#the-gitlab-mirror).
+[Supply-Chain Pinning — the GitLab mirror](the-gitlab-mirror.md).
 This site is split differently: its pull requests are on GitHub, while its issue
 tracker is on GitLab — 57 issues there, none on GitHub. The Norm Editor and the CPRMV API are developed on
 GitLab, where their pipelines run.

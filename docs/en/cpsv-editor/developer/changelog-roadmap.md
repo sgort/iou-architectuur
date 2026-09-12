@@ -10,7 +10,7 @@ component: CPSV Editor
 
 ### v2026.09.4 — The Lockfile Moves, and the Scan Reads Zero (September 2026)
 
-> The mechanism across repositories: [Supply-Chain Pinning — the npm tree](../../contributing/supply-chain.md#7-the-other-supply-chain-the-npm-tree).
+> The mechanism across repositories: [Supply-Chain Pinning — the npm tree](../../contributing/dependency-scanning.md).
 
 **The transitive dependency tree is refreshed every week.** Renovate only ever proposes packages a manifest names; lock-file maintenance, which refreshes everything else in `package-lock.json`, is off by default and **had never been turned on here**. That was the whole explanation for the seven Supply Chain findings v2026.09.3 left open — each had a fixed version inside its declared range, and nothing had ever moved them. It now runs on Monday mornings with `prPriority: 10`, and major updates wait in the Dependency Dashboard for approval so they cannot crowd it out — the lesson the Linked Data Explorer learned first. Security fixes are exempt, so one that happens to be a major version never waits on a click.
 
@@ -53,7 +53,7 @@ It is a separate workflow rather than a step in the existing `audit` job, so pro
 
 **E2E journeys can drive an already-deployed build.** `E2E_BASE_URL` points them at a deployed app instead of a local dev server, and drops the `webServer` block so none is started. **Both deployed environments share one Operaton engine**, so a run against acceptance deploys real decision versions into the engine production evaluates against — see [Testing](testing.md#end-to-end-journeys-p7). A third journey, `normbedragen-journey`, drives one chained deployment through four evaluations.
 
-**Two example files recovered from the GitLab mirror**, where they had existed on no GitHub branch at all — the recovery that preceded [reconciling the mirror](../../contributing/supply-chain.md#the-gitlab-mirror).
+**Two example files recovered from the GitLab mirror**, where they had existed on no GitHub branch at all — the recovery that preceded [reconciling the mirror](../../contributing/the-gitlab-mirror.md).
 
 ---
 
@@ -523,7 +523,7 @@ Initial release. React + Tailwind CSS web application. Five-tab interface: Servi
 | [Per-file 80% branch floor](../../contributing/coverage-floor.md), natively enforced | v2026.09.2 |
 | Formatting checked in CI, not only on a developer's machine | v2026.09.2 |
 | The four heavy tabs lazy-loaded — entry chunk 685.71 → 392.74 kB | v2026.09.2 |
-| [Semgrep Code and Supply Chain](../../contributing/supply-chain.md#7-the-other-supply-chain-the-npm-tree), a required check on `acc` | v2026.09.3 |
+| [Semgrep Code and Supply Chain](../../contributing/dependency-scanning.md), a required check on `acc` | v2026.09.3 |
 | E2E journeys against an already-deployed build (`E2E_BASE_URL`) | v2026.09.3 |
 | Weekly lock-file maintenance, with majors behind approval — Supply Chain findings at 0 | v2026.09.4 |
 
