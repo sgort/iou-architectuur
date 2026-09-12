@@ -19,6 +19,22 @@ against `acc` at `15dfbf9` with a full local stack running. This is the first
 pass in which all three were run together rather than described from
 configuration.
 
+!!! warning "Not re-run on 12 September — still the 30 August figures"
+    The unit suites were re-measured against `main` at `311d732` (v2026.09.7);
+    the Playwright suites were **not**. Every count in this page's tables dates
+    from 30 August and is repeated here unchanged rather than re-derived — a
+    measured number is worth more stale than a guess is fresh.
+
+    What *was* re-checked at `311d732` is the inventory, straight from the spec
+    tree, and it is unchanged: ten specs in `packages/frontend/e2e/`
+    (`caseworker-journey`, `infra-board-journey`, `login-redirect`,
+    `pa-live-authoring`, `pa-mock-journey`, `protected-route`, `rip-r21-journey`,
+    `smoke`, `tenant-isolation`, `zorgtoeslag-journey`), one
+    `packages/pa-demo/e2e/plato-demo.spec.ts`, one
+    `packages/public-site/e2e/publiek.spec.ts` — and the workflow wiring is
+    unchanged with it: the pa-demo spec runs in `azure-pa-demo-acc.yml` and only
+    there, and no workflow runs the other two.
+
 !!! warning "Count these with the runner, never with `grep`"
     A static count of `test(` across the frontend specs gives **23**. The runner
     reports **27**. `login-redirect.spec.ts` alone declares one `test(` and runs
@@ -149,7 +165,11 @@ Covered on [Public site suite](public-site.md#playwright-suite) — six tests
 including three axe-core accessibility scans, and the one suite here that
 starts its own dev server.
 
-Its figures date from 19 August and were **not** re-run for v2026.08.23.
+Its own tests were last counted on 30 August; the timing and pass figures on
+[Public site suite](public-site.md#playwright-suite) date from 19 August and
+were re-run neither for v2026.08.23 nor for v2026.09.7. The package's unit
+suite has grown since (31 files, 225 tests on 12 September), so the six E2E
+tests are an inventory figure, not a fresh result.
 
 ---
 

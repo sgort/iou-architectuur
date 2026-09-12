@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # CI/CD
 
 !!! info "Documentatie in ontwikkeling"
@@ -15,7 +19,23 @@
 
 ---
 
+## The two scanning workflows
+
+---
+
+## Node runtime
+
+---
+
+## What each pipeline runs
+
+---
+
 ## Path filters
+
+---
+
+## Concurrency
 
 ---
 
@@ -23,11 +43,7 @@
 
 ---
 
-## Backend deployment pipeline
-
----
-
-## Frontend deployment pipeline
+## Pull-request previews
 
 ---
 
@@ -35,4 +51,8 @@
 
 ---
 
-## Rolling back a deployment
+## Rolling back
+
+---
+
+## Related

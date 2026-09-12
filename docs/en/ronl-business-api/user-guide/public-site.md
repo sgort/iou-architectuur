@@ -33,9 +33,20 @@ The top navigation also has **Data dictionary** and **Provenance**, alongside an
 
 The footer's "Accountability" column links to the **Accessibility statement (WCAG 2.1 AA)** and **Open data & API**.
 
+## Which build you are looking at
+
+The foot of every page ends with a small monospace line naming the site, the release, and the build it was made from. On production on 12 September 2026 it read:
+
+```
+publiek.open-regels.nl · v2026.09.6 · build 04840ed · #2
+```
+
+The address is the environment you are actually on — the acceptance copy shows its own address there. The `v…` is the release. `build …` is the first seven characters of the commit the site was built from, and the `#…` after it is the number of the deployment run, which is what tells two builds of the same release apart. Hovering the build shows the full commit hash, so it can be copied into a bug report. A copy of the site that did not come from a deployment reads `local build` instead.
+
 ---
 
-!!! warning "Acceptance environment only"
-    The public site currently runs on the acceptance environment at
-    `acc.publiek.open-regels.nl` (v2026.08.19). There is no production
-    deployment yet; a full guide follows when one exists.
+!!! info "Acceptance runs alongside production"
+    The site is live at `publiek.open-regels.nl`. An acceptance copy runs at
+    `acc.publiek.open-regels.nl`, where a release is tried before it is
+    promoted. The footer line above is how to tell which of the two you have
+    open.

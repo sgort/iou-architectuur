@@ -385,16 +385,13 @@ These endpoints require a valid JWT with the `caseworker` role. Tenant isolation
 | `GET` | `/v1/rip/phases/counts` | Bearer JWT (caseworker) | Per-phase `wip` / `gereed` counts |
 | `GET` | `/v1/rip/instances/:instanceId/documents` | Bearer JWT (caseworker) | The document templates bundled in the deployment for one instance, with its current process variables. Documents not yet produced return `null` |
 
-### Two failure modes an empty list would conflate
+### One failure mode, since the ladder closed
 
-`resolvePhaseKey` distinguishes them deliberately, because a caller must be able to tell *"no process deployed"* from *"deployed and idle"*:
+`resolvePhaseKey` answers `404 UNKNOWN_PHASE` for a `:code` the phase catalogue does not carry — a typo or a stale link, which is a client error.
 
-| Status | Code | Meaning |
-|---|---|---|
-| `404` | `UNKNOWN_PHASE` | The code is not in the phase catalogue at all |
-| `409` | `PHASE_NOT_MODELLED` | A known phase that has no process definition yet |
+There used to be a second. A known code with no process model yet answered `409 PHASE_NOT_MODELLED`, so that a caller could tell *"this phase has no process"* from *"this phase is deployed and currently idle"*. R5.3 completed the ladder and `processDefinitionKey` became required on `RipPhaseKey`, which makes that state unrepresentable rather than merely absent: the compiler rejects a catalogue entry without a key, so no input can reach the branch. It was deleted in v2026.09.7, along with three tests that had been reporting as skipped since the ladder closed.
 
-The engine is **not** consulted for either. A phase modelled here but absent from the target environment still answers `200` with an empty list — only `deployment-status` speaks to what is deployed where.
+The engine is **not** consulted. A phase in the catalogue but absent from the target environment still answers `200` with an empty list — only `deployment-status` speaks to what is deployed where.
 
 !!! note "`/phases/active` and `/phases/:code/active` do not collide"
     The literal route is two path segments and the parameterised one is three, so Express's own routing keeps them apart regardless of registration order. A test pins this for all four literal `/phases/*` routes: the tell-tale sign of the aggregate being swallowed would be a `404 UNKNOWN_PHASE` naming `code="active"`.

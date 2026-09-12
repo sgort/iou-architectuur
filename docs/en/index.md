@@ -137,13 +137,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.09.5** · *September 2026*
+-   **⚙️ RONL Business API — v2026.09.7** · *September 2026*
 
     ---
 
-    **Twelve of twelve phases, and diagrams the engine draws**
+    **The CI alignment closes, and production says which build it is**
 
-    The RIP ladder is complete — every phase from R2.1 to R6.1 is modelled and deployed, the endpoints no longer assume R2.1, and finishing one phase now readies a project for the next. The phase diagram is [parsed from the BPMN Operaton actually has deployed](ronl-business-api/reference/api-endpoints.md#rip-phases) rather than from a hand-kept copy, which is what had gone stale: deleting that copy revealed **38 nodes drawn invisible** across the twelve phases, rework loops rendered as coincident lines, and a finished phase coloured entirely white. R2.1 was the one phase where none of it could happen, which is why it survived every review. Along the way, 113 of the ladder's 201 user tasks turned out to be unreachable because the realm defined six of the 34 candidate groups the models address work to.
+    The last item of the alignment landed: `acc` and `main` now carry [the same ten workflows and the same branch rules](ronl-business-api/developer/cicd.md#required-checks-and-branch-rules), with `audit` the one required check on both and all **eight of its steps blocking**. One `.nvmrc` at 22.22.0 replaced eight workflows that were building the deployed artifact on Node 20 and shipping it to a Node 22 host, and `@ronl/shared` is now [held to declarations only](ronl-business-api/developer/shared-package.md#kept-declarations-only) by a check that asks the TypeScript parser rather than a regex. On the surfaces themselves, the [public site's footer](ronl-business-api/user-guide/public-site.md#which-build-you-are-looking-at) and the caseworker changelog panel now name the build as well as the release — which is how the promotion to production was confirmed by eye. And the [prerendered public pages](ronl-business-api/features/public-publication.md#prerendered-then-revalidated) stopped trusting their build-time snapshot, which had been publishing two retired services and a Diensten count of 14 beside the dashboard's 13.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

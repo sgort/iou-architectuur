@@ -1,6 +1,10 @@
+---
+component: RONL Business API
+---
+
 # Backend Development
 
-The backend is `packages/backend` (`@ronl/backend`) — a Node.js 20 Express application written in TypeScript.
+The backend is `packages/backend` (`@ronl/backend`) — a Node.js 22 Express application written in TypeScript. The repository pins the runtime in `.nvmrc` at `22.22.0`, and the root `engines.node` is `>=22`; both App Service plans run `NODE|22-lts`.
 
 ---
 

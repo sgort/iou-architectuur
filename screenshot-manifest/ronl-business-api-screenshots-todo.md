@@ -1,10 +1,36 @@
 # RONL Business API — screenshots to capture
 
 !!! success "Nothing outstanding"
-    Every screenshot this manifest calls for has been captured, including the two
-    the v2026.09.5 sync requested — both landed on 5 September 2026, the same day
-    they were asked for. The file is retained as the record of what each image
-    shows and why it was needed.
+    Every screenshot this manifest calls for has been captured. The 12 September 2026
+    review, for v2026.09.6 and v2026.09.7, asked for none; the two before it — requested
+    by the v2026.09.5 sync — landed on 5 September 2026, the same day they were asked
+    for. The file is retained as the record of what each image shows and why it was
+    needed.
+
+## Sync v2026.09.5 → v2026.09.7 — nothing to capture
+
+Reviewed on 12 September 2026 for **v2026.09.6** and **v2026.09.7**. Eleven of the
+nineteen commits are CI work, and the rest change what a view *says* rather than how it
+looks:
+
+- **The CI alignment** — the `acc` ruleset's two new rules, `check-supply-chain` blocking,
+  formatting in the `audit` job, Semgrep, Renovate's lock-file maintenance, `.nvmrc`, the
+  mirror check — is workflow YAML, `renovate.json`, a ruleset and two scripts. Nothing on
+  screen.
+- **The build id** now appears under the changelog heading and in the public site's footer.
+  It is one line of monospace text whose value differs per deployment, so a screenshot
+  would date instantly and prove nothing a quoted string does not. Both pages quote it.
+- **The prerendered seed fix** changes *when* the numbers on the public site are correct,
+  not what the page looks like. A capture of the wrong counts would be a capture of the
+  defect, which the docs describe rather than depict.
+- **The unmodelled-phase removal** deletes an error path that no input could reach any
+  more. The Faseladder already reads `12 / 12 deelprocessen inzetbaar`, and
+  `ronl-business-api-infra-board.png` was recaptured for exactly that in the last sync.
+- **`@ronl/pa-cockpit` running in CI** and the backend suite's pull-request trigger are
+  pipeline facts.
+
+`ronl-business-api-public-site.png` still shows the site accurately: the footer gained a
+build id, which sits below the fold of that capture and is quoted in the text beside it.
 
 ## Sync v2026.08.36 → v2026.09.5 — one NEW, one REPLACE (both captured)
 

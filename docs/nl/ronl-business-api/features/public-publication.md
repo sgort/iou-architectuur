@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Public Publication
 
 !!! info "Documentatie in ontwikkeling"
@@ -20,6 +24,10 @@
 ---
 
 ## Searching and browsing across it
+
+---
+
+## Prerendered, then revalidated
 
 ---
 

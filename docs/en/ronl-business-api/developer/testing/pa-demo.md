@@ -10,19 +10,24 @@ wired into CI.
 
 !!! info "Figures on this page are measured, not estimated"
     **19 files · 106 tests, all passing**, measured with
-    `npm run test:serial --workspace=@ronl/pa-demo` on 5 September 2026 against
-    `acc` at `66940d9` (v2026.09.5). Coverage **93.47 % statements ·
-    95.65 % branches · 85.00 % functions · 92.85 % lines** — branches up
-    8.70 points from v2026.08.33 under the per-file 80% floor adopted in
-    v2026.09.2.
+    `npm test --workspace=@ronl/pa-demo` on **12 September 2026** against `main`
+    at `311d732` (v2026.09.7): `Duration 10.37s`. Coverage **93.47 % statements ·
+    95.65 % branches · 85.00 % functions · 92.85 % lines** — every figure
+    reproduced to the decimal from the 5 September run, which is what to expect
+    from a package whose only changes since were its `index.html`, its social
+    card and its Vitest config. Branches stand 8.70 points above v2026.08.33
+    under the per-file 80% floor adopted in v2026.09.2 — a floor that
+    v2026.09.6 turned from a convention into a configured threshold here
+    (`thresholds: { branches: 80, perFile: true }`), and that this run passed
+    without naming a file.
 
 **At a glance:**
 
 | | |
 |---|---|
 | Runner | Vitest 4 + jsdom, coverage via v8 |
-| Files / tests | 19 / 104 |
-| Wall time | ~27 s serial |
+| Files / tests | 19 / 106 |
+| Wall time | 10.37 s |
 | Playwright | 11 tests in `e2e/plato-demo.spec.ts`, **runs in CI** |
 
 ---
@@ -132,11 +137,20 @@ real selectors, which would have opened exactly that hole.
 
 `packages/pa-demo/e2e/plato-demo.spec.ts` — **11 tests**, Chromium only.
 
+!!! note "Not re-run on 12 September 2026"
+    The spec file was confirmed present and unchanged at `311d732`, but the
+    suite itself was not executed in this pass: its last measurement stands at
+    **30 August 2026 — 11 passed, 14.7s**. See
+    [E2E & live smoke](e2e.md).
+
 This is the one Playwright suite in the repository that **runs in CI**, as a
-blocking step of `azure-pa-demo-acc.yml`, before the build. It is the only proof
-of two of the four no-Live layers: that the live toggle is actually hidden in a
-real browser's cascade, and that the page issues no network request at all. A
-source-text assertion that the suppressing CSS rule exists cannot show either.
+blocking step of `azure-pa-demo-acc.yml`, before the build — the acc workflow
+only; `azure-pa-demo-prod.yml` runs the unit tests and skips the E2E step.
+
+It is the only proof of two of the four no-Live layers: that the live toggle is
+actually hidden in a real browser's cascade, and that the page issues no network
+request at all. A source-text assertion that the suppressing CSS rule exists
+cannot show either.
 
 It needs no backend, database or Keycloak. Playwright starts its own dev server
 and that is the whole environment — which is why this suite could be wired into
