@@ -39,7 +39,7 @@ decides where a contribution lands.
 
 | Component | Developed on | Mirror | Issues |
 |---|---|---|---|
-| IOU Architecture Docs | [sgort/iou-architectuur](https://github.com/sgort/iou-architectuur) — pull requests | [showcases/iou-architectuur](https://git.open-regels.nl/showcases/iou-architectuur) | [Issues](https://git.open-regels.nl/showcases/iou-architectuur/-/issues) — kept on GitLab |
+| IOU Architecture Docs | [sgort/iou-architectuur](https://github.com/sgort/iou-architectuur) — GitHub Actions | [showcases/iou-architectuur](https://git.open-regels.nl/showcases/iou-architectuur) | [Issues](https://github.com/sgort/iou-architectuur/issues) |
 | RONL Business API | [sgort/ronl-business-api](https://github.com/sgort/ronl-business-api) — GitHub Actions | [hosting/ronl-business-api](https://git.open-regels.nl/hosting/ronl-business-api) | [Issues](https://github.com/sgort/ronl-business-api/issues) |
 | Norm Editor | [regels/editor](https://git.open-regels.nl/regels/editor) — GitLab CI | — | [Issues](https://git.open-regels.nl/regels/editor/-/issues) |
 | CPSV Editor | [sgort/ttl-editor](https://github.com/sgort/ttl-editor) — GitHub Actions | [showcases/ttl-editor](https://git.open-regels.nl/showcases/ttl-editor) | [Issues](https://github.com/sgort/ttl-editor/issues) |
@@ -56,12 +56,17 @@ September 2026 the CPSV Editor's and the Linked Data Explorer's GitHub trackers 
 and 10 issues, the GitLab ones 1 and 2; the RONL Business API's held 20 open issues on 12
 September 2026, and the issue numbers its changelog cites are GitHub's.
 
+**This site's issue tracker moved to GitHub on 12 September 2026**, so all four now keep
+issues and pull requests in the same place. The
+[GitLab tracker](https://git.open-regels.nl/showcases/iou-architectuur/-/issues) keeps the
+57 issues it held on 11 September and receives no new ones; open anything further on
+GitHub, beside the pull request that will close it. The split that preceded this — pull
+requests on one host, issues on the other — cost a decision its context every time.
+
 Since 12 September 2026 each of the three checks its mirror at every release, with
 `scripts/check-mirror.sh` called from `/bump-release`. It reports and never pushes — see
 [Supply-Chain Pinning — the GitLab mirror](the-gitlab-mirror.md).
-This site is split differently: its pull requests are on GitHub, while its issue
-tracker is on GitLab — 57 issues there, none on GitHub. The Norm Editor and the CPRMV API are developed on
-GitLab, where their pipelines run.
+The Norm Editor and the CPRMV API are developed on GitLab, where their pipelines run.
 
 For component-specific development setup, refer to each component's Developer Docs:
 
@@ -90,11 +95,17 @@ repository you're contributing to.
 
 Before starting any significant work, open an issue in the relevant repository to describe
 what you intend to do. This avoids duplicate effort and allows early feedback. For small
-corrections (typos, broken links, formatting) you can skip straight to a merge request.
+corrections (typos, broken links, formatting) you can skip straight to the pull or merge
+request.
+
+**Open it where the repository lives**, which the table above gives per component: the
+three applications and this site take issues and pull requests on **GitHub**; the Norm
+Editor and the CPRMV API take issues and merge requests on **GitLab**. The steps below are
+the same on both hosts — where they say *merge request*, read *pull request* on GitHub.
 
 ### 2. Fork the repository
 
-Fork the relevant repository to your own GitLab account or namespace.
+Fork the relevant repository to your own account or namespace on the host it lives on.
 
 ### 3. Create a feature branch
 
@@ -163,11 +174,13 @@ release cycle.
 
 [Read Code Standards →](code-standards.md)
 
-!!! warning "`acc` may be protected"
-    In CPSV Editor and RONL Business API, the `acc` branch requires a pull request and a
-    passing supply-chain `audit` check, with no bypass actors — a direct
-    `git push origin acc` is rejected. See
-    [Supply-Chain Pinning](supply-chain.md) for what the gate checks and why.
+!!! warning "`acc` is protected in all three applications"
+    In the CPSV Editor, the Linked Data Explorer and the RONL Business API, `acc` requires
+    a pull request and a passing `audit` check, with no bypass actors — a direct
+    `git push origin acc` is rejected. Two of the three require `scan` as well, and two
+    gate `main` on the same rules. See [Branch Protection](branch-protection.md) for what
+    each branch requires, and the [controls index](controls.md) for where every control
+    holds.
 
 ---
 
