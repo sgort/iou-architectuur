@@ -10,24 +10,32 @@ verified:
 
 # Controls at a Glance
 
-Five controls stand between a change and a deployment. Four run in CI; the fifth cannot run
-in CI at all and runs at each release instead. This page says **which control holds where**,
-and nothing else — every count, percentage and finding lives on the page that owns it, so
-there is one place to correct when a number moves.
+Seven pages stand between a change and a deployment: the five controls the
+[CI posture deck](ci-posture-deck.md) counts, plus the standards a change is held to on the
+way in and the branch rules that make any of it blocking. **One row here, one page** — and
+every count, percentage and finding lives on the page that owns it, so there is one place
+to correct when a number moves.
 
 ## What is enforced, where
 
-| # | Control | The question it answers | CPSV Editor | Linked Data Explorer | RONL Business API |
-|---|---|---|---|---|---|
-| 01 | [Build provenance](build-provenance.md) | Which build is this environment serving? | in place | in place | in place |
-| 02 | [Action pin truth](supply-chain.md#6-check-supply-chain-the-preflight-zizmor-cannot-be) | Is the pinned digest the version its comment claims? | required on `acc` | required on `acc` and `main` | required on `acc` and `main` |
-| 03 | [Code and dependency scan](supply-chain.md#7-the-other-supply-chain-the-npm-tree) | Is a known-vulnerable package or pattern shipping? | required on `acc` | required on `acc` and `main` | **runs, not required** |
-| 04 | [Coverage floor](coverage-floor.md) | Is every *file* tested, not just the package average? | enforced natively | enforced natively | enforced natively |
-| 05 | [Mirror check](supply-chain.md#the-gitlab-mirror) | Does the second copy still match the one the gates run on? | at each release | at each release | at each release |
+| Page | What it answers | CPSV Editor | Linked Data Explorer | RONL Business API |
+|---|---|---|---|---|
+| [Code Standards](code-standards.md) | Is it linted and formatted before it lands? | hooks · `check-format` in `audit` | hooks · `check-format` in `audit` | hooks · `check-format` in `audit` |
+| [Branch Protection](branch-protection.md) | What must pass before a merge can land? | `acc` gated; `main` ungated by decision | `acc` and `main` | `acc` and `main` |
+| [Supply-Chain Pinning](supply-chain.md) | Is the pinned digest the version its comment claims? | required on `acc` | required on `acc` and `main` | required on `acc` and `main` |
+| [Dependency Scanning](dependency-scanning.md) | Is a known-vulnerable package or pattern shipping? | required on `acc` | required on `acc` and `main` | **runs, not required** |
+| [Coverage Floor](coverage-floor.md) | Is every *file* tested, not just the package average? | enforced natively | enforced natively | enforced natively |
+| [Build Provenance](build-provenance.md) | Which build is this environment serving? | in place | in place | in place |
+| [The GitLab Mirror](the-gitlab-mirror.md) | Does the second copy still match the one the gates run on? | at each release | at each release | at each release |
 
 Read *required* strictly: it means the check is named in a branch ruleset, so the merge
 button stays disabled until it reports green. A control that is merely *in place* or *runs*
 does real work and blocks nothing by itself.
+
+The deck numbers five of these rows as its controls — build provenance 01, action pin truth
+02, the scan 03, the coverage floor 04 and the mirror check 05. The other two rows are not
+controls in that sense: **Code Standards** is what a change is held to before any of them
+run, and **Branch Protection** is what turns the rest from checks into gates.
 
 ## What the rulesets actually require
 
@@ -68,19 +76,20 @@ Three deliberate differences, each decided rather than drifted into:
 
 ## The fourth and fifth components
 
-The **Norm Editor** runs GitLab CI with its own hook directory and none of these five
-controls; see
+The **Norm Editor** runs GitLab CI with its own hook directory and none of the controls
+above; see
 [Code Standards](code-standards.md#the-norm-editor-is-shaped-differently). The **CPRMV API**
 is likewise outside this set. **This documentation repository** has a deliberately deferred
 gap of its own: version floors with `>=` and no lockfile, recorded in
 [Supply-Chain Pinning](supply-chain.md#what-this-does-not-protect).
 
-## The pages behind the table
+## One page owns each number
 
-| Page | What it owns |
-|---|---|
-| [Build Provenance](build-provenance.md) | The build id: how it is injected per application, which chunk it lands in, and how to confirm it by eye |
-| [Supply-Chain Pinning](supply-chain.md) | Pinning, the register and `check-supply-chain`; the npm tree and Semgrep; the GitLab mirror |
-| [Coverage Floor](coverage-floor.md) | The per-file 80% branch floor, the margins each repository actually has, and where a floor gates nothing |
-| [Code Standards](code-standards.md) | Linting, formatting, git hooks, the workflow inventory, and what blocks a merge |
-| [CI Posture Deck](ci-posture-deck.md) | The same five controls as an executive brief, and the delivery decision they lead to |
+Each page in the table above is the **only** place its figures live — the pin counts on
+Supply-Chain Pinning, the percentages on the Coverage Floor, the findings on Dependency
+Scanning, the run numbers on Build Provenance, the drift on The GitLab Mirror. This page
+carries enforcement states and no counts at all, so a figure that moves is corrected once
+rather than in two places that then disagree.
+
+The [CI Posture Deck](ci-posture-deck.md) is the executive-length version of the same five
+controls, and the decision they lead to.

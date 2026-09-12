@@ -65,10 +65,10 @@ precise than *Yes*:
 | Deck control | The question it answers | Documented in |
 |---|---|---|
 | 01 — Build provenance | Which build is this environment serving? | [Build Provenance](build-provenance.md) |
-| 02 — Action pin truth | Is the pinned digest the version its comment claims? | [Supply-Chain Pinning — `check-supply-chain`](supply-chain.md#6-check-supply-chain-the-preflight-zizmor-cannot-be) |
-| 03 — Code and dependency scan | Is a known-vulnerable package or pattern shipping? | [Supply-Chain Pinning — the npm tree](supply-chain.md#7-the-other-supply-chain-the-npm-tree) |
+| 02 — Action pin truth | Is the pinned digest the version its comment claims? | [Supply-Chain Pinning — `check-supply-chain`](supply-chain.md#check-supply-chain-the-preflight-zizmor-cannot-be) |
+| 03 — Code and dependency scan | Is a known-vulnerable package or pattern shipping? | [Supply-Chain Pinning — the npm tree](dependency-scanning.md) |
 | 04 — Test-coverage floor | Is every *file* tested, not just the package average? | [Coverage Floor](coverage-floor.md) |
-| 05 — Mirror check | Does the second copy still match the one the gates run on? | [Supply-Chain Pinning — the GitLab mirror](supply-chain.md#the-gitlab-mirror) |
+| 05 — Mirror check | Does the second copy still match the one the gates run on? | [Supply-Chain Pinning — the GitLab mirror](the-gitlab-mirror.md) |
 
 The [controls index](controls.md) carries the same five rows across all three applications.
 
@@ -107,9 +107,9 @@ All eight are recorded here in their own right:
 | Zero margin on the coverage floor | [Coverage Floor — raising coverage without writing hollow tests](coverage-floor.md#raising-coverage-without-writing-hollow-tests) |
 | Formatting checked on the shared branch | [Code Standards](code-standards.md) |
 | Production build ids confirmed once | [Build Provenance](build-provenance.md) |
-| Code and dependency scanning made blocking | [Supply-Chain Pinning — the npm tree](supply-chain.md#7-the-other-supply-chain-the-npm-tree) |
-| The dependency tree itself now refreshed | [Supply-Chain Pinning — Renovate maintains dependencies, not the tree](supply-chain.md#renovate-maintains-dependencies-not-the-tree) |
-| The second copy is checked at each release | [Supply-Chain Pinning — the GitLab mirror](supply-chain.md#the-gitlab-mirror) |
+| Code and dependency scanning made blocking | [Supply-Chain Pinning — the npm tree](dependency-scanning.md) |
+| The dependency tree itself now refreshed | [Supply-Chain Pinning — Renovate maintains dependencies, not the tree](dependency-scanning.md#renovate-maintains-dependencies-not-the-tree) |
+| The second copy is checked at each release | [Supply-Chain Pinning — the GitLab mirror](the-gitlab-mirror.md) |
 
 The last two are the ones that were not on the original review list: the dependency refresh
 and the mirror check both came out of the work the review triggered, which is the usual

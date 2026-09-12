@@ -10,7 +10,7 @@ component: Linked Data Explorer
 
 ### v2026.09.4 — The Lockfile Gets a Slot, and a Build (September 2026)
 
-> The mechanism behind this release, across repositories: [Supply-Chain Pinning — the npm tree](../../contributing/supply-chain.md#7-the-other-supply-chain-the-npm-tree). Measured suites: [Testing](testing.md).
+> The mechanism behind this release, across repositories: [Supply-Chain Pinning — the npm tree](../../contributing/dependency-scanning.md). Measured suites: [Testing](testing.md).
 
 **Lockfile-only changes are built, tested and deployed.** The root `package-lock.json` and `package.json` now trigger the backend and frontend workflows in acceptance and production. Before, a change to the lockfile alone — Renovate's lock-file maintenance above all — was built, tested and deployed by nothing: every deploy workflow was path-filtered to its own package, and the one file all three workspaces share appeared in none of those filters. The 338-package refresh in v2026.09.3 reached acceptance **only because an unrelated change happened to follow it**. The first two pull requests after the change showed it working in both directions: a frontend-only dependency bump ran the backend's tests, and a backend-only bump ran the frontend build — each testing the application its shared lockfile could move.
 
