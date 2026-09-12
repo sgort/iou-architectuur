@@ -62,9 +62,9 @@ precisely the test.
 
 The assistant operates inside a set of recorded boundaries: things it will not do
 unprompted, and approvals it will not infer from an earlier one. `~/.claude/CLAUDE.md`
-is the authority for the full set — **eleven rules** as of 9 September 2026 — and is not
-reproduced here in full, because a copy would drift. The set has grown twice since the
-2026-08-19 consolidation and will grow again; treat any count on this page as a
+is the authority for the full set — **twelve rules** as of 12 September 2026 — and is not
+reproduced here in full, because a copy would drift. The set has grown three times since
+the 2026-08-19 consolidation and will grow again; treat any count on this page as a
 snapshot, and the file as the authority. The boundaries most visible to a day-to-day
 contributor:
 
@@ -83,6 +83,12 @@ contributor:
 - **Never merge or force-push a shared branch unasked.** Committing on a working
   branch when asked is fine; integrating that branch into another is a separate
   decision the contributor makes explicitly, every time.
+- **Housekeeping after a merge includes the GitLab mirror.** Added on 12 September
+  2026, this is the one boundary that *grants* something rather than withholding it:
+  asking for housekeeping authorises the fast-forward push that reconciles the mirror,
+  because nothing else keeps it current. It is fenced — fast-forward only, never a
+  force, and only in the repositories where the `gitlab` remote is a mirror with no
+  pipeline of its own. A diverged mirror is reported, not forced into line.
 - **Create a branch before implementing.** Integration branches (`acc`, `main`) are
   not worked on directly — direct changes there are hard to isolate and review.
 - **No Claude attribution in any artifact.** Originally scoped to commit trailers,

@@ -1,20 +1,20 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-11
+  date: 2026-09-12
   against:
     CPSV Editor: "f5bae6a"
     Linked Data Explorer: "be6bc54"
+    RONL Business API: "311d732"
 ---
 
 # Build Provenance
 
-!!! info "Re-verified for the CPSV Editor and the Linked Data Explorer on 11 September 2026"
-    Every CPSV Editor and Linked Data Explorer claim on this page was re-checked
-    against `f5bae6a` and `be6bc54` — the commits that published v2026.09.4 of each —
-    which is what the header's stamp records. **RONL Business API claims, both
-    columns, are left as they stood and may be stale** — they are to be verified with
-    the next RONL Business API release sync.
+!!! info "Re-verified for all three applications on 12 September 2026"
+    Every claim on this page was re-checked against `f5bae6a`, `be6bc54` and
+    `311d732`. The RONL Business API's two columns were the unverified ones, and the
+    reason they could not be verified has now gone: **both of its surfaces reached
+    production on 12 September 2026**, so all four implementations have run there.
 
 *Answering "which build am I looking at?" from inside the running app*
 
@@ -34,7 +34,8 @@ Three cases where a version string cannot answer that:
   difference, or a re-run of a failed job — same source, different artifact.
 
 Shipped across three applications in September 2026, and to a fourth — the RONL
-public site — on 10 September 2026.
+public site — on 10 September 2026. All four have since been exercised in production,
+the last two on 12 September 2026.
 
 ---
 
@@ -255,7 +256,7 @@ from "the values reached the artifact".
 
 ## Known gaps
 
-- **Production has now run in two of the four.** All eight workflow files carry the
+- **Production has now run in all four.** All eight workflow files carry the
   `env:` block. Two applications promoted v2026.09.2 to `main` on 9 September 2026 and
   both production workflows ran green:
 
@@ -275,12 +276,32 @@ from "the values reached the artifact".
     production. v2026.09.4 is also the first promotion under the widened `paths:`
     filter, where a change to the root lockfile alone redeploys the frontend.
 
-    Those strings are **derived from the workflow runs, not read off the running
-    applications** — which is the glance still worth taking, and the whole point of the
-    feature is that it takes one glance. **RONL Business API's frontend production
-    workflow last ran on 17 July 2026**, before this feature existed, and **its public
-    site has never had a production run at all**. Both stay wired and unexercised until
-    their next promotion.
+    Of those four strings, two were **read off the running application** — the CPSV
+    Editor's `build bbda389 · #88` and the Linked Data Explorer's `build 007b350 · #39`,
+    both confirmed by eye on 9 September. The later ones are derived from the workflow
+    runs, which is the weaker check: it distinguishes *the workflow ran green* from
+    nothing at all, where a glance at the application distinguishes it from *the values
+    reached the artifact*.
+
+    **The RONL Business API closed its own gap on 12 September 2026.** Its frontend
+    production workflow had last run on 17 July, before this feature existed, and its
+    public site had never had a production run at all. Its promotion of v2026.09.6 that
+    morning exercised both at once, and both were confirmed by eye rather than inferred:
+
+    | | Commit | Run | Read on the running application |
+    |---|---|--:|---|
+    | RONL Business API (frontend) | `04840ed` | 12 | `build 04840ed · #12` in the caseworker changelog |
+    | RONL Business API (public site) | `04840ed` | 2 | `publiek.open-regels.nl · v2026.09.6 · build 04840ed · #2` in the footer |
+
+    Two details from that first run are worth carrying to the next adopter. **The same
+    commit produced two different run numbers**, 12 and 2, because the run number counts
+    executions of a workflow and not commits — which is exactly why the pair is a pair.
+    And **the public site's footer is client-rendered**, so grepping the prerendered HTML
+    for the string finds nothing and reads as failure; the check is the rendered page, or
+    the injected literals inside `/assets/index-*.js`.
+
+    The promotion of v2026.09.7 the same afternoon moved both on again, to run 13 and run
+    3 at `311d732`.
 - **Backend versions are unaffected.** The line describes the frontend bundle being
   viewed; backends ship their versions separately.
 

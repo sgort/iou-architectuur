@@ -14,6 +14,16 @@ A deployed BPMN workflow becomes a **process definition** in Operaton, identifie
 
 ---
 
+## A phase catalogue cannot name a process it does not have
+
+Where a sequence of phases is driven by one process per phase — as the RIP ladder is, with twelve — the mapping from phase code to process definition key lives in a single place that backend and frontend both read, so neither authors it separately.
+
+The process definition key on a catalogue entry is **required**. While the ladder was still being built it was optional, and a known phase with no process yet was a real state the platform had to answer for: a request naming one was refused with a status of its own, distinct from a request naming a phase that does not exist at all. Once every phase carried a process, that state stopped being reachable — and rather than leave a branch answering for something no input could produce, the field was made required. A phase with no deployed process is now a compile error rather than a runtime answer, which fixes the order of work: model and deploy the process, then add the catalogue entry.
+
+One failure mode is left, and it is a client error: a phase code the catalogue does not carry at all.
+
+---
+
 ## Starting an instance
 
 Starting a process creates a **process instance** — a running copy of the workflow, addressed by its own instance id. A start request carries:

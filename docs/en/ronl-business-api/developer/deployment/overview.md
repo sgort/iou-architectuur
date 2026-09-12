@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Deployment Overview
 
 RONL Business API uses a **hybrid deployment architecture**: stateless application components run on Azure managed services, while components requiring deep customisation or full control run in Docker on a VM.
@@ -85,13 +89,13 @@ Each component has its own deployment page:
 ```
 rg-ronl-acc
 ├── ronl-frontend-acc          (Static Web App)
-├── ronl-business-api-acc      (App Service, Node.js 20)
+├── ronl-business-api-acc      (App Service, Node.js 22)
 ├── ronl-postgres-acc          (PostgreSQL Flexible Server)
 └── ronl-redis-acc             (Cache for Redis)
 
 rg-ronl-prod
 ├── ronl-frontend-prod         (Static Web App)
-├── ronl-business-api-prod     (App Service, Node.js 20)
+├── ronl-business-api-prod     (App Service, Node.js 22)
 ├── ronl-postgres-prod         (PostgreSQL Flexible Server)
 └── ronl-redis-prod            (Cache for Redis)
 ```

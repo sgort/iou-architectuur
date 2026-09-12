@@ -35,7 +35,7 @@ The werkomgeving (`ronl.werkomgeving`, Province of Flevoland) presents four boar
   <figcaption>Open Regels Nederland — the public knowledge base</figcaption>
 </figure>
 
-This site is currently **ACC-only**, at `acc.publiek.open-regels.nl`.
+The site is live at `publiek.open-regels.nl`, with an acceptance copy at `acc.publiek.open-regels.nl`.
 
 ---
 
@@ -45,7 +45,8 @@ This site is currently **ACC-only**, at `acc.publiek.open-regels.nl`.
 
 It exists for showing the product: to a prospective province, to a colleague from another organisation, or to a room. Because it is the real cockpit rather than a mock-up, what a visitor clicks is what the product does. A role selector lets a visitor see how the same board changes for a narrower set of rights.
 
-This site is currently **ACC-only**, at `acc.plato.open-regels.nl`.
+It runs on both tiers: `acc.plato.open-regels.nl` on acceptance, and
+`plato.open-regels.nl` in production since 12 September 2026.
 
 ---
 

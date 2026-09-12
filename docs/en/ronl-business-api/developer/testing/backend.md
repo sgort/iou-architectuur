@@ -4,12 +4,29 @@ component: RONL Business API
 
 # Backend suite
 
-`packages/backend`, Jest with the `ts-jest` preset. **86 files · 2011 tests ·
-all passing · ~119s serially.** Coverage is on by default; see
-[Coverage](coverage.md#backend-by-area) for the per-area figures.
+`packages/backend`, Jest with the `ts-jest` preset. **86 files · 2008 tests ·
+all passing · nothing skipped · `Time: 32.45 s`.** Coverage is on by default;
+see [Coverage](coverage.md#backend-by-area) for the per-area figures.
 
-Measured on `acc` at `15dfbf9`, 30 August 2026, with Jest's own JSON reporter —
-not by grepping for `it(`, which miscounts parameterised and multi-line cases.
+Measured on **12 September 2026** on `main` at `311d732` (v2026.09.7) with
+`npm test --workspace=@ronl/backend` — not by grepping for `it(`, which
+miscounts parameterised and multi-line cases.
+
+!!! note "2011 → 2008, and nothing was lost"
+    The suite reported **2011** for several releases, of which 2008 ran and
+    **three were permanently skipped**. Those three guarded the
+    `PHASE_NOT_MODELLED` branch of the RIP phase model. v2026.09.7 made an
+    unmodelled phase unrepresentable (issue #85), the branch went, and the
+    three skipped cases went with it. The drop is a deletion of dead tests
+    rather than a regression — and with them gone, no workspace in this
+    repository skips anything.
+
+Both backend workflows run this suite as `npm test`, coverage included, so the
+per-file 80% branch floor in `jest.config.js` rides along with it rather than
+needing a coverage job of its own. Since v2026.09.7
+`azure-backend-acc.yml` also triggers on `pull_request`, so these 2008 tests
+run *before* a merge rather than only after one — see
+[Overview → CI](overview.md#ci).
 
 | Area | Files | Tests |
 |---|---:|---:|
@@ -20,7 +37,21 @@ not by grepping for `it(`, which miscounts parameterised and multi-line cases.
 | `src/utils` | 11 | 100 |
 | `src/mcp-servers` | 3 | 49 |
 | `src/middleware` | 2 | 24 |
+| `src/rip-swimlane` | 2 | not counted |
 | `src/auth` | 1 | 18 |
+
+!!! warning "The **Files** column is current; the **Tests** column is not"
+    The file counts were re-derived from the tree at `311d732` on 12 September
+    2026 and account for all 86 files. The test counts beside them were last
+    measured on 30 August at `15dfbf9`, and they sum to 1754 — well short of
+    today's 2008. The areas have grown since and the split was not re-generated
+    in this pass, so read the Tests column as showing *where the weight sits*,
+    not what each area holds today.
+
+    `src/rip-swimlane` is the area the table missed altogether:
+    `bpmn-swimlane.test.ts` and `doc-label.test.ts`, covering the derivation of
+    an Infra-board phase swimlane from deployed BPMN. Its tests have never been
+    counted here, which is part of why the column falls short.
 
 !!! info "ValidSign is 106 of those tests, across five files"
     The [signing feature](../validsign-signing.md) arrived in v2026.08.36 and is
@@ -59,6 +90,7 @@ directory.
 | `src/mcp-servers` | The standalone stdio MCP servers (`lde`, `triplydb`, `edocs`) — each mocks the MCP SDK to capture and drive its `ListTools`/`CallTool` handlers directly |
 | `src/middleware` | `tenant.middleware` and `audit.middleware` |
 | `src/auth` | `jwt.middleware` — token validation, role and assurance gates |
+| `src/rip-swimlane` | `bpmn-swimlane` and `doc-label` — parsing lanes, nodes and rework loops out of deployed BPMN so the Infra-board can draw a phase swimlane, against twelve real process fixtures |
 
 `src/utils` was rebuilt over the v2026.08.21 window, going from 5 files and 21
 tests to 8 and 73 — `config.test.ts` the largest single addition, with

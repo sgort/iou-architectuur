@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Processen
 
 !!! info "Documentatie in ontwikkeling"
@@ -12,6 +16,10 @@
 ---
 
 ## Process definitions and keys
+
+---
+
+## A phase catalogue cannot name a process it does not have
 
 ---
 

@@ -18,16 +18,29 @@ and the only board with its own end-to-end suite.
 `src/pa-monitoring` — the largest single area in the repository.
 **E2E: 2 specs · 7 tests**, still in the frontend package.
 
-Measured with `npm run test:serial --workspace=@ronl/pa-cockpit` on 5 September
-2026 against `acc` at `66940d9` (v2026.09.5): **476 of 476 passing**. Coverage
-**90.07 % statements · 88.52 % branches · 86.39 % functions · 91.33 % lines** —
-branches up 12.97 points from v2026.08.36 under the per-file 80% floor adopted
-in v2026.09.2.
+Measured with `npm test --workspace=@ronl/pa-cockpit` on **12 September 2026**
+against `main` at `311d732` (v2026.09.7): **476 of 476 passing**, `Duration
+27.68s`. Coverage **90.11 % statements · 88.52 % branches · 86.52 % functions ·
+91.33 % lines** — branches up 12.97 points from v2026.08.36 under the per-file
+80% floor adopted in v2026.09.2, which v2026.09.6 wrote into this package's
+`vitest.config.ts` as `thresholds: { branches: 80, perFile: true }`. The run
+passed it without naming a file.
+
+!!! warning "Until v2026.09.6, these 476 tests ran nowhere in CI"
+    `@ronl/pa-cockpit` is a library: it has no deploy workflow of its own, and
+    no other workflow ran its suite. The most heavily tested surface in the
+    product was therefore covered on developer machines and nowhere else, while
+    every deployable package had had a pipeline running its tests since
+    20 August. Both frontend workflows now run it, as a step placed **before**
+    the frontend's own — the frontend imports the package, so there is no point
+    testing the consumer while the library is broken. The pa-demo workflows
+    consume it too and watch `packages/pa-cockpit/**` in their path filters,
+    but run only pa-demo's own suite.
 
 !!! note "The backend and E2E figures above are older"
-    The package counts and coverage are from 5 September. The `src/pa-monitoring`
-    backend figure and the two E2E specs were last measured on 29–30 August and
-    were not re-run for this release.
+    The package counts and coverage are from 12 September 2026. The
+    `src/pa-monitoring` backend figure and the two E2E specs were last measured
+    on 29–30 August and were not re-run in this pass.
 
 ---
 

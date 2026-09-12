@@ -15,15 +15,15 @@ repository and every session. They come from three marketplaces: Anthropic's
 
 | Plugin | Version | What it contributes |
 |---|---|---|
-| [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.24.20 | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
+| [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.24.23 | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
 | [`superpowers`](https://github.com/obra/superpowers) | 6.3.0 | The brainstorm → plan → execute structure for multi-step work, and a TDD skills library |
 | [`understand-anything`](https://github.com/Lum1104/Understand-Anything) | 2.7.6 | Builds a navigable knowledge graph of a codebase — architecture, domains, guided tours, diff analysis |
-| `github` | `f2cc019c16eb` | The official GitHub MCP server: issues, pull requests, reviews, repository search |
+| `github` | `3deb821cb71c` | The official GitHub MCP server: issues, pull requests, reviews, repository search |
 | `semgrep` | 2.2.0 | Scans generated code for security findings — SAST, secrets, and supply-chain |
 | `typescript-lsp` | 1.0.0 | TypeScript/JavaScript language server: go-to-definition, find references, error checking |
 
 !!! note "Versions in that table are a snapshot, not a contract"
-    Read from `~/.claude/plugins/installed_plugins.json` on 5 September 2026,
+    Read from `~/.claude/plugins/installed_plugins.json` on 12 September 2026,
     and already moved twice while this page was being written. `claude-mem`'s
     marketplace is configured with `autoUpdate: true`, so its version advances
     on its own — it went 13.12.1 → 13.24.0 without anyone asking. The `github`
@@ -35,6 +35,10 @@ repository and every session. They come from three marketplaces: Anthropic's
     **Re-read on 11 September 2026**, and three of six had moved again:
     `claude-mem` 13.24.0 → 13.24.20, `semgrep` 2.1.5 → 2.2.0, and `github`
     `85cce0381e78` → `f2cc019c16eb`. The set and every scope were unchanged.
+
+    **Re-read again on 12 September 2026**: `claude-mem` 13.24.20 → 13.24.23 and
+    `github` `f2cc019c16eb` → `3deb821cb71c`. Six plugins, all enabled, every scope
+    unchanged — four re-reads, and the set has not moved once.
 
 !!! warning "Enabled is not the same as reachable"
     Both MCP-backed plugins can be enabled and still fail to connect in a given
