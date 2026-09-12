@@ -20,10 +20,10 @@ there is one place to correct when a number moves.
 | # | Control | The question it answers | CPSV Editor | Linked Data Explorer | RONL Business API |
 |---|---|---|---|---|---|
 | 01 | [Build provenance](build-provenance.md) | Which build is this environment serving? | in place | in place | in place |
-| 02 | [Action pin truth](supply-chain.md#6-check-supply-chain-the-preflight-zizmor-cannot-be) | Is the pinned digest the version its comment claims? | required on `acc` | required on `acc` and `main` | required on `acc` and `main` |
-| 03 | [Code and dependency scan](supply-chain.md#7-the-other-supply-chain-the-npm-tree) | Is a known-vulnerable package or pattern shipping? | required on `acc` | required on `acc` and `main` | **runs, not required** |
+| 02 | [Action pin truth](supply-chain.md) | Is the pinned digest the version its comment claims? | required on `acc` | required on `acc` and `main` | required on `acc` and `main` |
+| 03 | [Code and dependency scan](dependency-scanning.md) | Is a known-vulnerable package or pattern shipping? | required on `acc` | required on `acc` and `main` | **runs, not required** |
 | 04 | [Coverage floor](coverage-floor.md) | Is every *file* tested, not just the package average? | enforced natively | enforced natively | enforced natively |
-| 05 | [Mirror check](supply-chain.md#the-gitlab-mirror) | Does the second copy still match the one the gates run on? | at each release | at each release | at each release |
+| 05 | [Mirror check](the-gitlab-mirror.md) | Does the second copy still match the one the gates run on? | at each release | at each release | at each release |
 
 Read *required* strictly: it means the check is named in a branch ruleset, so the merge
 button stays disabled until it reports green. A control that is merely *in place* or *runs*
@@ -79,8 +79,14 @@ gap of its own: version floors with `>=` and no lockfile, recorded in
 
 | Page | What it owns |
 |---|---|
-| [Build Provenance](build-provenance.md) | The build id: how it is injected per application, which chunk it lands in, and how to confirm it by eye |
-| [Supply-Chain Pinning](supply-chain.md) | Pinning, the register and `check-supply-chain`; the npm tree and Semgrep; the GitLab mirror |
+| [Branch Protection](branch-protection.md) | The rulesets, the checks each branch requires, and the merge method |
+| [Supply-Chain Pinning](supply-chain.md) | Digest pinning, the zizmor gate, Renovate, the register, and `check-supply-chain` |
+| [Dependency Scanning](dependency-scanning.md) | Semgrep over the npm tree and the code: the workflow, the suppressions, and what requiring it costs |
 | [Coverage Floor](coverage-floor.md) | The per-file 80% branch floor, the margins each repository actually has, and where a floor gates nothing |
-| [Code Standards](code-standards.md) | Linting, formatting, git hooks, the workflow inventory, and what blocks a merge |
+| [Build Provenance](build-provenance.md) | The build id: how it is injected per application, which chunk it lands in, and how to confirm it by eye |
+| [The GitLab Mirror](the-gitlab-mirror.md) | The second copy, how far it drifts, and the release check that notices |
+| [Code Standards](code-standards.md) | Linting, formatting, git hooks and the workflow inventory |
 | [CI Posture Deck](ci-posture-deck.md) | The same five controls as an executive brief, and the delivery decision they lead to |
+
+Each row above is the **only** place its numbers live. The matrix at the top of this page
+carries enforcement states and no counts, so a figure that moves is corrected once.

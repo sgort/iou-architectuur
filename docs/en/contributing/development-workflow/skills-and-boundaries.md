@@ -103,7 +103,7 @@ contributor:
   gate is believed to be wrong, that is a decision to escalate, not a step to route
   around — and inspecting what a gate checks *after* disarming it is not diligence.
   This applies with particular force now that CI gates are
-  [genuinely blocking](../supply-chain.md#5-the-acc-ruleset-what-makes-it-enforcement).
+  [genuinely blocking](../branch-protection.md#what-makes-it-enforcement).
 - **A parallel-run test failure is not a finding until it fails in isolation.** Test
   runners execute files in parallel, so a failure that appears only in a full run may
   be contention or an order dependency rather than a defect. Re-run it on its own
