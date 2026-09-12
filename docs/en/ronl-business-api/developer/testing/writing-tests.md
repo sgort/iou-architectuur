@@ -12,14 +12,15 @@ suite was green and wrong.
 
 ## Conventions
 
-- **Colocate.** `foo.ts(x)` → `foo.test.ts(x)`, next to the source, in all three
-  packages — no `__tests__` or `tests/` directories.
+- **Colocate.** `foo.ts(x)` → `foo.test.ts(x)`, next to the source, in all five
+  tested packages — no `__tests__` or `tests/` directories.
 - **Backend**: mock at the service boundary (axios, pg-promise, the MCP SDK) and
   drive routes with supertest through a real `jwtMiddleware` test stub reading
   an `x-test-roles` header. Path aliases (`@utils/`, `@services/`, `@auth/`,
   `@middleware/`, `@routes/`, `@models/`, `@ronl/shared`) are mapped in
   `packages/backend/jest.config.js` and work inside test files.
-- **Frontend and public site**: default to the `node` Vitest environment and opt
+- **The four Vitest packages** (frontend, pa-cockpit, pa-demo, public site):
+  default to the `node` Vitest environment and opt
   into `jsdom` per file with `// @vitest-environment jsdom` only when a component
   or DOM-touching hook needs it. Mock at the network boundary with `msw`, not by
   stubbing `axios` methods directly. Use `vi.hoisted` for any mock referenced
@@ -36,10 +37,18 @@ suite was green and wrong.
   files compete for cores. Name such a spec `*.perf.test.ts`: the default run
   excludes them and `npm run test:perf` executes them without file parallelism,
   as its own CI step.
+- **Keep every file above 80% branches.** Since v2026.09.6 that floor is
+  configured **per file** in all five runner configs, so a thin new file does
+  not merely look thin: it exits `npm test` non-zero and names itself. It is a
+  branch floor only — the functions column carries no threshold, and adding one
+  at 80 today would fail 31 existing files.
 - **Update the counts on these pages** when work lands, from a real run
   (`--json --outputFile=…` for Jest, `--reporter=json --outputFile=…` for
   Vitest) rather than an estimate or a grep for `it(` / `test(` — both miscount
-  multi-line and parameterised cases.
+  multi-line and parameterised cases. For elapsed time quote Vitest's
+  `Duration` and Jest's `Time:`, never Vitest's aggregate `tests …s` line: it
+  sums per-worker time across parallel workers and reads several times longer
+  than anyone actually waited.
 
 ---
 

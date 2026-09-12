@@ -1,21 +1,25 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-11
+  date: 2026-09-12
   against:
     CPSV Editor: "f5bae6a"
     Linked Data Explorer: "be6bc54"
+    RONL Business API: "311d732"
 ---
 
 # Supply-Chain Pinning
 
-!!! info "Re-verified for the CPSV Editor and the Linked Data Explorer on 11 September 2026"
-    Every CPSV Editor and Linked Data Explorer claim on this page was re-checked
-    against `f5bae6a` and `be6bc54` — the commits that published v2026.09.4 of each —
-    which is what the header's stamp records. **RONL Business API claims are left as
-    they stood and may be stale** — the latest check of any of them was against
-    `04e38c8` on 9 September 2026, and not every claim was re-checked then. They are
-    to be verified with the next RONL Business API release sync.
+!!! info "Re-verified for all three applications on 12 September 2026"
+    Every claim on this page was re-checked against `f5bae6a`, `be6bc54` and
+    `311d732`. Pin counts were derived by listing `uses:` references on each `acc`
+    head, rulesets were read per branch from the API, and mirror state came from
+    `git ls-remote` against both remotes.
+
+    **The RONL Business API's row moved further than any other**: on 12 September 2026
+    it closed ten of eleven cross-repository alignment items, and five statements on
+    this page described the state before that. Where this page previously said its
+    claims were unverified, they now are.
 
 Nothing a pipeline downloads or executes may float. No `latest`, no empty
 versions — a hash, digest or verified checksum wherever one exists.
@@ -68,18 +72,36 @@ problem rather than solving it).
 ## The GitLab mirror
 
 Every gate on this page runs on GitHub Actions, and the applications are mirrored by hand
-to the open-regels.nl GitLab instance. **The mirror is outside all of them.** Each merge
-leaves it behind until the next push, and nothing compares it with GitHub — so a mirror
-nothing checks is not a backup; it is a second place for content to be.
+to the open-regels.nl GitLab instance. **The mirror is outside all of them**, and it stays
+outside: each merge leaves it behind until someone pushes.
 
-On 11 September 2026, by `git ls-remote` against both remotes:
+What changed on 12 September 2026 is that something now *notices*. A release-time check,
+`scripts/check-mirror.sh`, runs in all three repositories from step 8 of `/bump-release`
+and compares each remote-tracking ref with the mirror's. **It closes the observation half
+of the problem, not the drift.** It cannot run in CI, and that is a property of the mirror
+rather than a shortcoming of the check: the `gitlab` remote lives in `.git/config` and no
+tracked file names the host, so a runner has no such remote and no route to it. It also
+never pushes — it prints the exact command and stops, because writing to a shared remote
+is a decision for a person.
+
+Its output separates the two cases that a commit count cannot, and it prints the
+remote-tracking form rather than the local branch, which drifts. All four of its paths —
+match, behind, diverged, missing — were exercised against a scratch bare repository rather
+than assumed.
+
+On 12 September 2026, by `git ls-remote` against both remotes:
 
 | Repository | `acc` | `main` |
 |---|---|---|
-| CPSV Editor | ✅ `a1dc182` on both | ✅ `f5bae6a` on both |
-| Linked Data Explorer | ⚠️ GitLab two commits behind | ✅ `be6bc54` on both |
+| CPSV Editor | ✅ `f7fe80f` on both | ✅ `f5bae6a` on both |
+| Linked Data Explorer | ✅ `1babd54` on both | ✅ `be6bc54` on both |
+| RONL Business API | ✅ `28e1a9e` on both | ✅ `311d732` on both |
 
-A tick is *synced at the last check*, not *kept in sync*.
+A tick is *synced at the last check*, not *kept in sync*. The RONL Business API's mirror
+had never been audited before that day, and both branches turned out to be strict
+ancestors — `acc` eight commits behind and `main` one hundred and eighty-four — so two
+fast-forwards reconciled it. It then drifted three more times the same day, as each
+promotion pull request merged, which is the behaviour the check exists to surface.
 
 ### Behind is not the same as diverged
 
@@ -142,7 +164,7 @@ The reconciliation, in the order that keeps content safe on both remotes:
 | Repository | Pinned workflows | `audit` gate | Renovate | `acc` ruleset |
 |---|:---:|:---:|:---:|:---:|
 | **CPSV Editor** (`ttl-editor`) — pilot | ✅ | ✅ | ✅ | ✅ `acc supply-chain gate` |
-| **RONL Business API** | ✅ | ✅ | ✅ | ✅ `acc supply-chain gate` |
+| **RONL Business API** | ✅ | ✅ | ✅ | ✅ `acc supply-chain gate`, and `main promotion gate` on `main` |
 | **Linked Data Explorer** | ✅ | ✅ | ✅ | ✅ `acc supply-chain gate`, and `main promotion gate` on `main` |
 | **IOU Architecture Docs** (this site) | ❌ | ❌ | ❌ | ❌ |
 
@@ -160,9 +182,10 @@ flattening:
 
 | | CPSV Editor | RONL Business API | Linked Data Explorer |
 |---|---|---|---|
-| Action references pinned | 12 / 12 | 30 / 30 | 24 / 24 |
+| Action references pinned | 12 / 12 | 31 / 31 | 24 / 24 |
+| Workflows carrying them | 4 | 10 | 8 |
 | Action majors | **v7** (since v2026.09.0) | **v7** | **v7** (since v2026.09.2) |
-| Blocks deletion / non-fast-forward | no | no | **yes** |
+| Blocks deletion / non-fast-forward | no | **yes** (since v2026.09.7) | **yes** |
 | Merge method restricted *in the ruleset* | no — repository setting only | **yes** | **yes** |
 | `skip_app_build` | not set | **set on all six deploy steps** | not set |
 | Backend deployed by CI | n/a | **no** — script from a developer machine¹ | **yes** — `azure/webapps-deploy` |
@@ -180,9 +203,9 @@ Oryx builds the production bundle inside the floating vendor container**, so
 lockfile integrity covers only what is tested — true for the CPSV Editor and the
 Linked Data Explorer, but not for RONL Business API.
 
-**The Linked Data Explorer gates `main` as well.** Its `main promotion gate`
-ruleset, created on 9 September 2026 before the first promotion pull request was
-opened, mirrors the `acc` one — deletion and non-fast-forward blocked, a pull
+**Two of the three gate `main` as well.** The Linked Data Explorer's
+`main promotion gate` ruleset, created on 9 September 2026 before the first promotion
+pull request was opened, mirrors the `acc` one — deletion and non-fast-forward blocked, a pull
 request with merge commits only, `audit` and `scan` required, zero bypass actors.
 So on that repository a production deploy gets the same guarantees as an `acc`
 pull request. The two rulesets differ in exactly one parameter, deliberately:
@@ -193,9 +216,17 @@ single-maintainer repository can give, and deadlocked the promotion. **Read a
 ruleset back after writing it**; the create response's shape does not show the
 defaults it filled in.
 
-For the other two, the rulesets target `refs/heads/acc` only, so `main` is not
-covered by the guarantees an `acc` pull request gets. In the CPSV Editor that is a
-decision rather than a gap: its `main` requires a pull request but no status checks,
+The RONL Business API created its own `main promotion gate` on 12 September 2026, on
+the same pattern and for a sharper reason: until that day `main` carried only classic
+protection — a pull request required, **zero** required status checks,
+`allow_force_pushes` on and `enforce_admins` off — so the branch that deploys production
+was the *less* protected of its two. It requires `audit` and not `scan`, because every
+deploy workflow there is push-only and a required check that never reports on a pull
+request wedges it permanently.
+
+That leaves the CPSV Editor as the one repository whose ruleset targets
+`refs/heads/acc` only, so its `main` is not covered by the guarantees an `acc` pull
+request gets. That is a decision rather than a gap: its `main` requires a pull request but no status checks,
 weighed and kept on 11 September 2026
 ([ttl-editor#131](https://github.com/sgort/ttl-editor/issues/131)). The argument against
 it stands, and is worth keeping in view — the promotion pull request is the one carrying
@@ -206,17 +237,20 @@ check cannot, as things stand — its `paths-ignore` means a documentation-only 
 never triggers it, and a required check that never reports wedges the pull request.
 
 The rulesets are also not identical in shape, which the table's last two rows
-record. Only the Linked Data Explorer's blocks branch deletion and
-non-fast-forward pushes. And while all three end up allowing merge commits only,
+record. The CPSV Editor's is now the only one that does not block branch deletion and
+non-fast-forward pushes; the RONL Business API's `acc` gained both on 12 September 2026,
+a month after its `main` got them — two rulesets in one repository differing in a way
+nobody had decided. And while all three end up allowing merge commits only,
 two of them say so *in the ruleset* while the CPSV Editor relies on the
 repository-level setting alone — see
 [Merge method](#the-merge-method-is-a-setting-not-a-rule). All three reach the
 same place; only two are belt *and* braces.
 
-Ruleset shapes re-verified with `gh api repos/<repo>/rulesets` on 11 September 2026
-for the CPSV Editor and the Linked Data Explorer, and on 4 September 2026 for RONL
-Business API; pin counts and majors read from the workflow files at v2026.09.4 of the
-first two.
+Ruleset shapes re-verified on 12 September 2026 for all three, with
+`gh api repos/<owner>/<repo>/rules/branches/<branch>` — which reports the effective rules
+from every ruleset at once, where reading one ruleset, or the classic protection endpoint
+alone, gives the wrong answer. Pin counts were re-derived the same day by listing `uses:`
+references on each `acc` head.
 
 **This documentation repository is a known gap, deliberately deferred.** Its
 `requirements.txt` uses `>=` floors for five of six packages and its workflow
@@ -502,8 +536,9 @@ without it is one click from failing.
 
 ```
 push to a feature branch   → nothing runs (workflows trigger on acc/main only)
-open a PR against acc      → audit + Build and Deploy run
+open a PR against acc      → audit + scan + Build and Deploy run
 audit fails                → merge blocked by the ruleset
+scan fails                 → merge blocked, except in the RONL Business API
 audit passes               → merge allowed
 direct push to acc         → rejected: a pull request is required
 ```
@@ -563,25 +598,44 @@ performs its own install inside the container to produce the deployed bytes;
 where `skip_app_build` is set, the verified install is the one that produces
 them.
 
-**The Node version floats — in two of three repositories.** This was recorded as
+**The Node version floats — in one of three repositories now.** This was recorded as
 a general gap, "reachable in principle". The Linked Data Explorer reached it in
-v2026.09.1, which makes the remaining two a choice rather than a limitation:
+v2026.09.1 and the RONL Business API in v2026.09.7, which leaves the remaining one a
+choice rather than a limitation:
 
 | Repository | `node-version` in the deploy workflows |
 |---|---|
 | CPSV Editor | `'24'` — major only, so whichever 24.x patch is current at run time |
-| RONL Business API | `'20'` — major only (its audit job pins `'24'`) |
+| **RONL Business API** | **`.nvmrc` at `22.22.0`**, read by all eight deploy workflows through `node-version-file` |
 | **Linked Data Explorer** | **`20.20.2`** frontend, **`22.23.2`** backend, **`24.19.0`** audit — exact patches, with the `engines` floors raised to match |
 
 The Linked Data Explorer's pins landed alongside the workflow digest pins in the
 same release, which is the natural moment: the runtime is one more thing the
 pipeline downloads, and pinning the actions while leaving the interpreter
-floating is half the job. Neither of the other two has an `.nvmrc` or an
-`engines` field pinning a runtime.
+floating is half the job.
 
-Note that the CPSV Editor's audit job pins Node **24** for a different reason
-entirely — Renovate's `engines.node`, not supply-chain policy — so its presence
-there is not evidence the gap is closed.
+**The two solved it in different shapes, and the difference is the maintainable half.**
+One file that every workflow reads can be bumped once and, because Renovate's `node`
+manager parses `.nvmrc`, it stays maintained rather than hand-edited. Three literals in
+three workflows cannot: the Linked Data Explorer's own
+[#113](https://github.com/sgort/linked-data-explorer/issues/113) records exactly that —
+three hand-maintained pins with nothing keeping them in step. Prefer the file.
+
+The RONL Business API's case also shows what the gap actually costs. Both its App Service
+plans run `NODE|22-lts`, while eight workflows built the deployed artifact on Node 20 —
+so the artifact was built on one major and served by another, silently, until
+[#36](https://github.com/sgort/ronl-business-api/issues/36) closed. Its `engines.node`
+moved to `>=22` in the same change, because a floor of `>=20.13.0` permits precisely the
+mismatch being removed.
+
+**One deliberate exception in each.** The RONL Business API's `audit` job keeps a literal
+`'24'`, because its `renovate-config-validator` step needs Node 24 — `renovate` declares
+`engines.node ^24.11.0`, and npm accepts a mismatch with a warning rather than refusing,
+so the validator had been running unsupported and green. That pin is load-bearing and
+must not be swept into the shared file.
+
+The same is true of the CPSV Editor's audit job, which pins Node **24** for that reason
+and not as supply-chain policy — so its presence there is not evidence the gap is closed.
 
 **zizmor validates pin _format_, never pin _truth_.** A wrong or hostile digest
 with a plausible `# v7.0.1` comment passes zizmor, Prettier and human review
@@ -595,8 +649,8 @@ v2026.09.0 the CPSV Editor's register still listed `actions/checkout` at
 `a37ce91…` (v3.7.0) and `actions/setup-node` at `49933ea…` (v4.4.0), while the
 workflows had moved to `3d3c42e…` (v7.0.1) and `820762…` (v7.0.0). Its
 `node-version: '20'` exception was likewise stale the moment the workflows took
-Node 24. The register has since been reconciled, and `check-supply-chain` now fails the
-audit if it drifts again.
+Node 24. The register has since been reconciled in all three repositories, and
+`check-supply-chain` now fails the audit in each of them if it drifts again.
 
 !!! warning "Where the digests on this page come from"
     The pins quoted here are read from the **workflow files**, not from any
@@ -616,11 +670,20 @@ which **shipped in September 2026 and now runs in all three repositories** — s
     pin that step introduced was missing from the table entirely. **A count is as
     easy to falsify as a digest**, and neither the audit nor review catches it.
 
-    It was reconciled in v2026.08.34 and currently matches: 30 `uses:`
-    references across nine workflows, digests agreeing. That reconciliation was
-    manual and prompted by a docs review rather than by any check in the
-    repository — which is the argument for the preflight, not against it. Until
-    it exists, treat "the register matches the workflows" as an assumption.
+    It was reconciled in v2026.08.34 and matches today at **31 `uses:`
+    references across ten workflows**, digests agreeing — re-counted on 12 September
+    2026, the Semgrep workflow having added one reference since. That first
+    reconciliation was manual and prompted by a docs review rather than by any check
+    in the repository, which is the argument for the preflight rather than against it.
+    The preflight now exists and blocks in all three, so "the register matches the
+    workflows" is checked on every pull request rather than assumed.
+
+    One inconsistency survives inside that register, in prose rather than in the
+    table: its *Keeping this register true* section still quotes the old
+    `30 uses: references across 9 workflows` headline. The check reads the first
+    match in the file and so still binds on the real headline and stays green — but
+    two numbers in one document disagree, and that is worth fixing in the repository
+    rather than here.
 
 ---
 
@@ -737,19 +800,29 @@ still said ×8 **with every gate green**. That is the drift this catches.
 | Repository | State |
 |---|---|
 | CPSV Editor | ✅ blocking, in the `audit` job |
-| Linked Data Explorer | ✅ blocking |
-| RONL Business API | ⚠️ **non-blocking**, deliberately — see below |
+| Linked Data Explorer | ✅ blocking, since v2026.09.2 |
+| RONL Business API | ✅ blocking, since v2026.09.7 |
 
-**RONL Business API's is non-blocking for a stated reason, not out of caution.**
-Renovate rewrites workflow pins and never touches `SECURITY-PIPELINE.md`, so
-every action-bump pull request fails the register half until the register is
-updated by hand. Blocking on that would fail a required check on routine
-dependency updates — *which is how gates get resented and then bypassed*.
-Promoting it is tracked as
-[ronl-business-api#83](https://github.com/sgort/ronl-business-api/issues/83).
+**All three block.** The RONL Business API's ran non-blocking from adoption until 12
+September 2026, for a stated reason rather than out of caution: Renovate rewrites workflow
+pins and never touches `SECURITY-PIPELINE.md`, so every action-bump pull request fails the
+register half until the register is updated by hand, and blocking on that would fail a
+required check on routine dependency updates — *which is how gates get resented and then
+bypassed*.
 
-The Linked Data Explorer promoted its step to blocking in v2026.09.2 without
-waiting for a tool change, because the problem is a habit rather than a defect.
+What retired that argument was evidence, not a tool change
+([#83](https://github.com/sgort/ronl-business-api/issues/83)): its own `zizmor-action`
+v0.6.2 → v0.6.4 bump had the register fixed on Renovate's branch and the check green there
+before the merge, which is the habit below. The Linked Data Explorer had promoted its step
+on the same evidence in v2026.09.2.
+
+**The same pull request supplied the argument against waiting longer**, and it is the more
+interesting half. Before the register was fixed, the check reported a real finding — the
+workflow pinning v0.6.4 while the register recorded only v0.6.2 — while the step, the job
+and the checks list all read *success*. `continue-on-error` rewrites the step's reported
+conclusion as well as the job's, and the honest outcome is not exposed by the REST API at
+all, so nothing outside that one log knew. A check nobody can see fail is a check that has
+to be remembered, which is the condition the register drifted in to begin with.
 
 ### The habit the register depends on
 
@@ -764,9 +837,8 @@ agreement does not**, and a real Renovate pull request said so:
 ```
 
 The check is right and the register is stale — exactly the drift it exists to
-catch, caught on the branch rather than after the merge. So each repository’s
-`SECURITY-PIPELINE.md` records the rule — in RONL Business API’s case on `acc`,
-where it has not yet been promoted to `main`:
+catch, caught on the branch rather than after the merge. So each repository's
+`SECURITY-PIPELINE.md` records the rule:
 
 !!! tip "When a Renovate pull request bumps an action, update the register on that pull request's branch — before merging it"
     **Not afterwards.** The check runs on the pull request, so a register fixed
@@ -777,8 +849,8 @@ where it has not yet been promoted to `main`:
 The Linked Data Explorer exercised this twice — on the `checkout` v7.0.1 and
 `setup-node` v7.0.0 bumps — before promoting its step. In both, the register moved
 on the bump's own branch, the check went green there, and the pull request merged
-green. That is the evidence the promotion rested on, and it is what RONL Business
-API needs before #83 can close.
+green. That is the evidence its promotion rested on, and the RONL Business API's
+`zizmor-action` v0.6.4 bump supplied the same evidence there on 12 September 2026.
 
 !!! danger "If it proves flaky the answer is `--offline`, never `continue-on-error`"
     The known cost is a network call inside a required job. `--offline` drops the
@@ -824,7 +896,20 @@ workflow, required in the rulesets.
 |---|---|---|---|
 | **Linked Data Explorer** | ✅ since v2026.09.3 | **`acc` and `main`** | ✅ with a slot kept for it |
 | **CPSV Editor** | ✅ since v2026.09.3 — the pilot | **`acc`** — `main` ungated by decision | ✅ since v2026.09.4 |
-| RONL Business API | *not recorded — verify with the next RONL Business API release sync* | | |
+| **RONL Business API** | ✅ since v2026.09.7 | **nowhere yet** — it runs on every pull request and is deliberately not required | ✅ since v2026.09.7 |
+
+**The RONL Business API's `scan` is the one that runs without being required**, and the
+reason is worth keeping: its first authenticated scan reported a baseline far larger than
+either of the others — hundreds of Supply Chain findings across a monorepo's npm tree —
+and a gate required before its baseline is triaged is a gate that gets bypassed in its
+first week. Promotion is a ruleset edit, reversible and touching no file, which is also
+why nothing in its workflow will move when it happens. Marking the job non-blocking
+instead is the obvious alternative and the wrong tool, for the reason set out above:
+`continue-on-error` hides the finding rather than declining to act on it.
+
+Its lock-file maintenance landed in the same release and before any triage, deliberately:
+one refresh closed 63 of 66 Supply Chain findings in the Linked Data Explorer and took the
+CPSV Editor to zero, so triaging first would have been work thrown away.
 
 ### The workflow, as the Linked Data Explorer runs it
 

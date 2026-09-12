@@ -1,21 +1,23 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-11
+  date: 2026-09-12
   against:
     CPSV Editor: "f5bae6a"
     Linked Data Explorer: "be6bc54"
+    RONL Business API: "311d732"
 ---
 
 # The Coverage Floor
 
-!!! info "Re-verified for the CPSV Editor and the Linked Data Explorer on 11 September 2026"
-    Every CPSV Editor and Linked Data Explorer claim on this page was re-checked
-    against `f5bae6a` and `be6bc54` — the commits that published v2026.09.4 of each —
-    which is what the header's stamp records. **RONL Business API claims are left as
-    they stood and may be stale** — the latest check of any of them was against
-    `04e38c8` on 9 September 2026, and not every claim was re-checked then. They are
-    to be verified with the next RONL Business API release sync.
+!!! info "Re-verified for all three applications on 12 September 2026"
+    Every claim on this page was re-checked against `f5bae6a`, `be6bc54` and
+    `311d732`. The RONL Business API's figures were **measured rather than read**: all
+    five of its suites were run with coverage on the tree `main` `311d732` publishes,
+    which is byte-identical to `acc` `28e1a9e`.
+
+    Its one remaining weakness on this page — a backend floor that gated nothing before
+    a merge — closed in v2026.09.7.
 
 *A per-file 80% branch-coverage floor, and what it took to enforce it in three
 repositories*
@@ -258,10 +260,17 @@ All three were measured clean before enforcing. That word hides a lot:
 
 | | Files measured | Lowest branch coverage |
 |---|--:|---|
-| RONL Business API backend | — | comfortable |
+| RONL Business API backend | not derived | comfortable — 92.31% across the package |
 | Linked Data Explorer backend | 38 of 44 | `sparql.service.ts` 82.85% |
 | Linked Data Explorer frontend | 68 of 78 | `ChainBuilder/TestCasePanel.tsx` exactly 80.00% — **since raised to 100%** |
 | CPSV Editor | 32 of 41 | `useDsoImport.js` 80.39% |
+
+The RONL Business API's five workspaces were re-measured on 12 September 2026 and
+every one passes the per-file floor, with these package averages on branches: backend
+**92.31%**, frontend **89.78%**, `pa-cockpit` **88.52%**, `pa-demo` **95.65%**,
+`public-site` **96.41%**. A package average is the number this page exists to distrust,
+so read them only as *how much room the package has*, not as evidence any file is
+covered; the floor is what speaks per file, and it passed in all five runners.
 
 *"Files measured" counts files carrying at least one branch* — 68 of the 78 in
 the Linked Data Explorer's frontend report, counted from `coverage-final.json`
@@ -321,14 +330,21 @@ three diverge most:
 |---|---|
 | CPSV Editor | ✅ both Static Web Apps workflows run `npm run test:ci` on `push` **and** `pull_request` — run, though not required; see below |
 | Linked Data Explorer | ✅ backend and frontend, acc workflows — run, though not required; see below |
-| RONL Business API | ⚠️ **frontend, pa-demo and public-site only** |
+| RONL Business API | ✅ all five workspaces since v2026.09.7 — run, though not required; see below |
 
-**RONL Business API's backend workflow triggers on `push` alone**
-([ronl-business-api#87](https://github.com/sgort/ronl-business-api/issues/87)). Its
-2008 tests run only *after* a merge, so its backend branch threshold gates nothing
-on a pull request — it would fail on `acc`, after the fact, rather than on the
-branch that caused it. **The floor is real in four of its five workspaces and
-retrospective in the fifth.**
+**All three now run their suites before the merge.** The RONL Business API was the last
+to close that gap, and it had two halves. Its backend workflow triggered on `push`
+alone, so its 2008 tests ran only *after* a merge and its backend branch threshold
+gated nothing on a pull request
+([#87](https://github.com/sgort/ronl-business-api/issues/87)). And `@ronl/pa-cockpit`,
+a library with no deploy workflow of its own, **ran nowhere in CI at all** — its 476
+tests were measured only on a developer's machine; both frontend workflows now run its
+suite, placed before the frontend's own because the frontend imports it.
+
+The backend trigger proved itself on the pull request that carried it: an `axios` 1.18
+security bump broke the backend build there, with 1859 tests passing and one suite
+failing to compile on a widened header type. Before the trigger existed, that lands on
+`acc`.
 
 The Linked Data Explorer had the same gap and **closed it in v2026.09.2**: its
 backend suite — 1151 tests at v2026.09.4 — now runs on the pull request rather than
@@ -338,8 +354,9 @@ caught it.
 
 !!! note "Running before the merge is not the same as blocking it"
     The CPSV Editor's and the Linked Data Explorer's rulesets require two checks,
-    `audit` and `scan`. The workflows that run the suites, and so enforce the
-    floor, are not among them. A pull request that drops a file below 80% therefore turns its checks red
+    `audit` and `scan`; the RONL Business API's require `audit` alone. The workflows
+    that run the suites, and so enforce the floor, are not among them in any of the
+    three. A pull request that drops a file below 80% therefore turns its checks red
     and **stops the deploy**, and the merge button stays available. That is a
     deliberate gap rather than an oversight only if someone decided it; making the
     test checks required is one ruleset change, provided each can report on every
@@ -356,6 +373,28 @@ caught it.
     deployment zip and an uploaded artifact, with the real deploy a manual script
     run from a clean `acc`. Nothing in that job has an external side effect, so
     there is nothing to gate — the change is the trigger alone.
+
+!!! tip "A package outside the measurement is not covered — it is unmeasured"
+    `@ronl/shared` has no test runner, deliberately: it holds types, constant data and
+    re-exports, and there is nothing there to test. The consequence is sharper than an
+    exemption, though. A function placed in that package is not *under-tested*; it is
+    **outside the measurement entirely**, so no run fails and no reviewer sees a number
+    move. That happened once — v2026.09.4 moved a branching label helper out of the
+    package for exactly that reason, and it was caught by hand, by someone who happened
+    to look.
+
+    v2026.09.7 replaced the convention with a check
+    ([#84](https://github.com/sgort/ronl-business-api/issues/84)): `check-shared` fails
+    the `audit` job on a function, class, conditional or loop anywhere in the package.
+    It parses with the TypeScript compiler API rather than matching text, because an
+    arrow in an interface is a type and the same syntax assigned to a const is logic,
+    and no regular expression separates the two. It runs in `audit` rather than a
+    workspace suite because `audit` has no paths filter and is the required check — so
+    every pull request reaches it, including the one that first adds a function to a
+    package no filter yet watches.
+
+    The general rule this leaves: **where a package cannot be measured, enforce what
+    makes it unmeasurable** rather than measuring nothing and calling it covered.
 
 **Production workflows are deliberately excluded from that treatment**, on
 evidence rather than preference. In the Linked Data Explorer the `acceptance`

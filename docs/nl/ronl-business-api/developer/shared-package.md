@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Gedeeld pakket
 
 !!! info "Documentatie in ontwikkeling"
@@ -19,10 +23,8 @@
 
 ---
 
+## Kept declarations-only
+
+---
+
 ## Development workflow
-
-# Rebuild shared
-
-# tsx watch (backend) and Vite HMR (frontend) pick up the rebuilt types automatically
-
-# If they don't, restart npm run dev

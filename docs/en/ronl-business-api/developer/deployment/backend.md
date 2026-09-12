@@ -1,6 +1,10 @@
+---
+component: RONL Business API
+---
+
 # Backend Deployment (Azure App Service)
 
-The backend deploys to **Azure App Service** (Node.js 20) via GitHub Actions. There are two independent deployment targets: ACC and PROD. PROD requires a manual approval step.
+The backend deploys to **Azure App Service** (Node.js 22) via GitHub Actions. There are two independent deployment targets: ACC and PROD. PROD requires a manual approval step.
 
 ---
 
@@ -19,7 +23,7 @@ Both workflows follow the same build process:
 
 ```yaml
 1. Checkout code
-2. Setup Node.js 20
+2. Setup Node.js from .nvmrc (22.22.0)
 3. npm ci                          (install all workspace dependencies)
 4. Build shared package            (npm run build --workspace=@ronl/shared)
 5. Lint backend                    (npm run lint in packages/backend)
@@ -46,7 +50,7 @@ Both workflows follow the same build process:
 ## Azure App Service configuration
 
 **App name:** `ronl-business-api-acc` / `ronl-business-api-prod`  
-**Runtime:** Node.js 20  
+**Runtime:** `NODE|22-lts`  
 **Startup command:** `node dist/index.js`
 
 Azure App Settings (environment variables) are configured via CLI or the Azure Portal. Set the production values from `docs/deployment/environment-variables.md`:

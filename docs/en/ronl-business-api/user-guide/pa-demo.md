@@ -10,7 +10,8 @@ The PA-Cockpit demo is a showcase instance of the [PA-Cockpit](pa-cockpit.md) on
 a public website. It needs no account and no sign-in: anyone with the link can
 open the cockpit and work through it as if they were a provincial executive.
 
-It runs on **acceptance** at `acc.plato.open-regels.nl`.
+It runs on **acceptance** at `acc.plato.open-regels.nl` and, since 12 September 2026,
+in **production** at `plato.open-regels.nl`.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: PA-Cockpit demo running publicly at acc.plato.open-regels.nl with no sign-in](../../assets/screenshots/ronl-business-api-pa-demo-plato.png)

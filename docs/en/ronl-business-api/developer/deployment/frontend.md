@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Frontend (Azure Static Web Apps)
 
 The frontend is deployed to Azure Static Web Apps via GitHub Actions. Separate instances run for ACC and PROD environments.
@@ -75,7 +79,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version-file: .nvmrc
           cache: 'npm'
 
       - name: Install dependencies
@@ -175,7 +179,7 @@ git push origin acc
 The workflow automatically:
 
 1. Checks out code
-2. Sets up Node.js 20
+2. Sets up Node.js from `.nvmrc` (22.22.0)
 3. Installs dependencies (monorepo aware)
 4. Builds frontend with environment variables
 5. Outputs to `packages/frontend/dist/`

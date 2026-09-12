@@ -26,6 +26,16 @@ A single search spans every kind of published material at once, built from one f
 
 ---
 
+## Prerendered, then revalidated
+
+Each published page is built ahead of time with its content already embedded, so the first frame a visitor sees carries real material instead of a loading placeholder that grows in and shifts the page underneath them.
+
+That embedded copy is a snapshot taken when the site was last built, and the information it describes moves independently of deploys — so it is treated as a starting point rather than as the answer. A page paints the embedded copy immediately and asks the platform for the current version underneath it. The fetched answer replaces what is on screen only when it actually differs: an identical response changes nothing and causes no re-render, which is what preserves the absence of layout shift that prerendering exists for. When the request fails, whatever is already on screen stays.
+
+The behaviour exists because the alternative was tried. Trusting the embedded copy whenever it was present published a catalogue frozen at the last build: two services that had already been retired were still listed, and two counters stood at figures the authenticated working environment, reading the same API, disagreed with. Every prerendered content page revalidates now, not only the one where that was noticed.
+
+---
+
 ## Served separately from the authenticated surface
 
 A public surface is its own deployment, reachable at its own address, distinct from the signed-in working environment it draws its information from. It carries its own security headers restricting where its scripts and content may load from, and it reaches the platform only through the subset of endpoints deliberately left open to unauthenticated callers — see [API Design — Public versus authenticated surface](api-design.md#public-versus-authenticated-surface). It also accepts a small number of writes on that same public surface — such as an attachment or a message — subject to the stricter rate limit and proof-of-work check described in [Security & Compliance](security-compliance.md).
