@@ -382,6 +382,23 @@ the minute. Capping at five leaves five permanently available for human work.
 Deliberately *not* solved by paying for a higher tier: a bigger ceiling moves
 the number at which the same collision happens rather than removing it.
 
+#### The cooldown stops at the manifest
+
+`minimumReleaseAge` holds back the updates Renovate *proposes*. It does not reach the
+transitive tree, and Renovate's own
+[documentation](https://docs.renovatebot.com/key-concepts/minimum-release-age/) says why:
+for `lockFileMaintenance` it is *"not possible, as we delegate to the package manager to
+perform the required changes"*. All three repositories run lock-file maintenance weekly, and
+none sets a cooldown at the package-manager level — so **a weekly refresh can pull in a
+transitive version published that morning**, and so can any `npm install` a developer runs
+locally.
+
+Renovate's recommendation, and ICTU's guideline, is to configure the cooldown in the package
+manager as well — for npm, `min-release-age` in `.npmrc`. Whether the npm bundled with Node
+22, which two of the backends build on, supports that setting has **not been verified**, and
+should be before anyone relies on it. See
+[ICTU Dependency Guideline](ictu-dependency-guideline.md), recommendation R6.
+
 #### What is exempted, and why each exemption is written down
 
 | Dependency | Held | Reason |
@@ -466,16 +483,32 @@ performs its own install inside the container to produce the deployed bytes;
 where `skip_app_build` is set, the verified install is the one that produces
 them.
 
-**The Node version floats — in one of three repositories now.** This was recorded as
-a general gap, "reachable in principle". The Linked Data Explorer reached it in
-v2026.09.1 and the RONL Business API in v2026.09.7, which leaves the remaining one a
-choice rather than a limitation:
+And the install that produces the deployed bytes is not `npm ci`. Oryx runs
+`npm install`, which honours a lockfile that agrees with `package.json` and quietly
+re-resolves one that does not, where `npm ci` would fail. The CPSV Editor's matched its
+lockfile in the deploy run examined on 13 September 2026 — `up to date, audited 542
+packages` — which is the likely outcome rather than a guaranteed one.
 
-| Repository | `node-version` in the deploy workflows |
-|---|---|
-| CPSV Editor | `'24'` — major only, so whichever 24.x patch is current at run time |
-| **RONL Business API** | **`.nvmrc` at `22.22.0`**, read by all eight deploy workflows through `node-version-file` |
-| **Linked Data Explorer** | **`20.20.2`** frontend, **`22.23.2`** backend, **`24.19.0`** audit — exact patches, with the `engines` floors raised to match |
+**The Node version the tests run on is pinned in two of three repositories — the Node
+version that ships is pinned in one.** This was recorded as a general gap, "reachable in
+principle". The Linked Data Explorer pinned its workflows in v2026.09.1 and the RONL
+Business API in v2026.09.7. But `setup-node` decides only what the *runner* uses, and in two
+of the three the runner does not build what ships:
+
+| Repository | Tests run on | The shipped frontend is built on |
+|---|---|---|
+| CPSV Editor | `'24'` — major only, so whichever 24.x patch is current at run time | **Node 22.22.0, chosen by Oryx** inside the deploy container |
+| **RONL Business API** | **`.nvmrc` at `22.22.0`**, read by all eight deploy workflows through `node-version-file` | the same — built on the runner, uploaded with `skip_app_build: true` |
+| **Linked Data Explorer** | **`20.20.2`** frontend, **`22.23.2`** backend, **`24.19.0`** audit — exact patches, with the `engines` floors raised to match | **Node 22.22.0, chosen by Oryx** — not the `20.20.2` its tests ran on |
+
+The right-hand column is read from the deploy logs, not inferred from the workflow files.
+[Linked Data Explorer run 34612031473](https://github.com/sgort/linked-data-explorer/actions/runs/34612031473)
+ran `npm ci` on Node 20.20.2 for lint and tests, then its deploy step logged
+`Oryx Version: 0.2.20260109.4`, `Downloading and extracting 'nodejs' version '22.22.0'` and
+`Running 'npm install'`;
+[CPSV Editor run 34622800899](https://github.com/sgort/ttl-editor/actions/runs/34622800899)
+tested on Node 24 and shipped the same way. **Pinning the workflow's Node is necessary and,
+where Oryx builds, not sufficient** — the fix is the flag above, not a better pin.
 
 The Linked Data Explorer's pins landed alongside the workflow digest pins in the
 same release, which is the natural moment: the runtime is one more thing the
@@ -504,6 +537,32 @@ must not be swept into the shared file.
 
 The same is true of the CPSV Editor's audit job, which pins Node **24** for that reason
 and not as supply-chain policy — so its presence there is not evidence the gap is closed.
+
+**Four more things float, and none is a `uses:` reference for zizmor to see.** Checked on
+13 September 2026 at the `acc` commits the ICTU assessment read:
+
+- **The runner image.** Every job in all three — 6 in the CPSV Editor, 12 in the Linked Data
+  Explorer, 13 in the RONL Business API — runs on `ubuntu-latest`, which moves when GitHub
+  moves it. `ubuntu-24.04` names it.
+- **The App Service runtime.** Both backends are hosted on `NODE|22-lts`, which floats within
+  the major — the RONL Business API's recorded in
+  [#36](https://github.com/sgort/ronl-business-api/issues/36), the Linked Data Explorer's in
+  the assessment. Whether the platform allows an exact pin is not yet established.
+- **Container images.** The RONL Business API's local `docker-compose.yml` uses
+  `operaton/operaton:latest` and `alpine:latest`, and its Skosmos deployment uses
+  `quay.io/natlibfi/skosmos:latest`. Its other images carry versions — `postgres:16-alpine`,
+  `redis:7-alpine`, `keycloak:23.0` — and none carries a digest.
+- **The backend deploy package.** The Linked Data Explorer's backend workflows copy
+  `package.json` into the deploy directory **without `package-lock.json`** and run
+  `npm install --production --omit=dev` there, so the backend that ships re-resolves every
+  caret range at deploy time — after `npm ci` tested the locked tree. The RONL Business
+  API's deploy scripts do the same from a developer machine
+  ([#34](https://github.com/sgort/ronl-business-api/issues/34)).
+
+[ICTU Dependency Guideline](ictu-dependency-guideline.md) records these against the
+recommendations they miss, and
+[linked-data-explorer#119](https://github.com/sgort/linked-data-explorer/issues/119) tracks
+the work.
 
 **zizmor validates pin _format_, never pin _truth_.** A wrong or hostile digest
 with a plausible `# v7.0.1` comment passes zizmor, Prettier and human review

@@ -218,6 +218,11 @@ manifests already declared, none published within the 14-day cooldown. The three
 left are held by a tilde range in `express` and by a major version of
 `@tiptap/core`, and no refresh can close them.
 
+**That none fell inside the cooldown was the calendar, not the policy.** Renovate does not
+apply `minimumReleaseAge` to lock-file maintenance, because the package manager performs the
+update — so a weekly refresh can take a transitive version published that morning. See
+[the cooldown stops at the manifest](supply-chain.md#the-cooldown-stops-at-the-manifest).
+
 Keeping it running took four changes, and the order in which they proved
 necessary is the useful part:
 
@@ -250,6 +255,40 @@ necessary is the useful part:
     the collision described under
     [`renovate.json`](supply-chain.md#4-renovatejson-keeping-the-pins-alive). **Size the Renovate cap
     against the slots, not the other way round.**
+
+### What nothing watches between merges
+
+Semgrep runs on `push` and `pull_request` and on nothing else, and so does every other
+workflow: **not one workflow in any of the three repositories has a `schedule:` trigger.** A
+vulnerability published against a dependency the day after a merge is found by the next
+pull request that happens to run the scan — or by nothing, if none does.
+
+Dependabot *alerts* are the only continuous monitoring, and they watch the default branch,
+which is `acc` in all three. **Production deploys from `main`**, so a version that is still
+on `main` after `acc` has moved past it is watched by nobody. On 13 September 2026:
+
+| Repository | Open alerts | Dismissed with a reason | Oldest open since |
+|---|---|:-:|---|
+| CPSV Editor | 0 | 0 | — |
+| Linked Data Explorer | 3, all medium | 0 | 2 September 2026 |
+| RONL Business API | **154** — 2 critical, 54 high, 83 medium, 15 low | **0** | 29 August 2026 |
+
+ICTU's guideline asks for each finding to be mitigated **or explicitly accepted**. None has
+been dismissed with a reason in any of the three, so for now every open alert is neither.
+Read the RONL Business API's figure against its lock-file maintenance, which was enabled on
+12 September 2026 and has not yet had its first Monday run: in the other two, one refresh
+closed most of what a first scan found.
+
+Two further gaps belong with this one. **No release carries an SBOM**, so the dependencies of
+a version already in production cannot be re-analysed when a new advisory lands. And **every
+resolved package comes straight from the public registry** — 567 in the CPSV Editor's
+lockfile, 1,337 in the Linked Data Explorer's, 1,364 in the RONL Business API's, all from
+`registry.npmjs.org` — with no proxy in between and no provenance or signature check. That
+one is an ICTU infrastructure question before it is a repository one.
+
+Whether Semgrep Cloud re-evaluates a stored scan against advisories published after it ran is
+not established, so it is not counted here as monitoring. The scores these gaps earn against
+ICTU's guideline are on [ICTU Dependency Guideline](ictu-dependency-guideline.md).
 
 ### What making it required costs
 
