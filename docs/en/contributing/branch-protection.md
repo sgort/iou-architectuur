@@ -72,6 +72,33 @@ disable squash and rebase merges, leaving merge commits only, with
 deceptively so, since it preserves the commit count — and a changelog entry that cites
 commits by SHA is orphaned either way.
 
+## What no ruleset requires
+
+**No ruleset in any of the three requires a build or a test.** The builds and suites run on
+every pull request, and a red one stops the deploy — but the checks the rulesets name are
+`audit`, and `scan` in two of the three. A dependency pull request whose build fails can
+therefore be merged.
+
+That is not hypothetical. The RONL Business API's `axios` security update
+([#109](https://github.com/sgort/ronl-business-api/pull/109)) broke its backend build:
+`axios` 1.18 widened a header type, and one suite stopped compiling while 1,859 tests passed.
+It showed as a red check on the pull request — which is what running the suite before the
+merge buys — and with `audit` the only required check, nothing more: the pull request stayed
+mergeable until the fix landed in v2026.09.7.
+
+ICTU's guideline asks for the reverse — that **the entire pipeline** succeeds before an update
+merges — and for the transitive changes in a lockfile diff to be reviewed on a risk basis:
+new runtime packages, new origins, downgrades and licence changes. None of the three has
+tooling for that review yet.
+
+Requiring the build and test checks is one ruleset change per branch, with one constraint:
+a required check must report on every pull request, and a path-filtered workflow that never
+runs wedges it instead — see
+[Coverage Floor](coverage-floor.md#a-floor-only-gates-where-the-tests-run-before-the-merge).
+The scores are on [ICTU Dependency Guideline](ictu-dependency-guideline.md), recommendation
+R9, and the work is tracked in
+[linked-data-explorer#119](https://github.com/sgort/linked-data-explorer/issues/119).
+
 ## What makes it enforcement
 
 A workflow that runs but cannot block is advice. The ruleset converts it into a

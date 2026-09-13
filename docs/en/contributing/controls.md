@@ -83,11 +83,35 @@ is likewise outside this set. **This documentation repository** has a deliberate
 gap of its own: version floors with `>=` and no lockfile, recorded in
 [Supply-Chain Pinning](supply-chain.md#what-this-does-not-protect).
 
+## Measured against ICTU's guideline
+
+ICTU's eleven recommendations for dependency management ask more than the controls above
+deliver, and an assessment on 13 September 2026 says where. The scores live on
+[ICTU Dependency Guideline](ictu-dependency-guideline.md); this is where each recommendation
+is addressed, and what the controls do not yet reach:
+
+| Recommendations | Addressed on | Not yet reached |
+|---|---|---|
+| R1, R11 — vet before adding; re-check maintenance quarterly | nowhere yet | a written criterion and a scheduled review, in all three |
+| R2–R4 — no floating tags, exact pins, hash pins and `npm ci` | [Supply-Chain Pinning](supply-chain.md#what-this-does-not-protect) | the runner image, the App Service runtime, container images, and **the build that ships** in the CPSV Editor and the Explorer's frontend |
+| R5 — internal registry, verified origin | nowhere yet | an ICTU infrastructure question before a repository one |
+| R6 — a cooldown of at least 7 days | [Supply-Chain Pinning](supply-chain.md#the-cooldown-stops-at-the-manifest) | lock-file maintenance, which Renovate does not hold to the cooldown |
+| R7, R8 — assess majors; update on a schedule | [Dependency Scanning](dependency-scanning.md#renovate-maintains-dependencies-not-the-tree) | a rule to wait for a major's first patch release |
+| R9 — reviewed MR, whole pipeline green, no automerge | [Branch Protection](branch-protection.md#what-no-ruleset-requires) | no ruleset requires a build or a test |
+| R10 — daily audit, including released versions | [Dependency Scanning](dependency-scanning.md#what-nothing-watches-between-merges) | nothing runs on a schedule, and nothing watches `main` |
+
+The finding the assessment ranks first sits across two of those rows: in the CPSV Editor and
+the Linked Data Explorer's frontend, **the build that passed the tests is not the build that
+ships** — see [what ships is not what was tested](ictu-dependency-guideline.md#what-ships-is-not-what-was-tested).
+The work is tracked in
+[linked-data-explorer#119](https://github.com/sgort/linked-data-explorer/issues/119).
+
 ## One page owns each number
 
 Each page in the table above is the **only** place its figures live — the pin counts on
 Supply-Chain Pinning, the percentages on the Coverage Floor, the findings on Dependency
-Scanning, the run numbers on Build Provenance, the drift on The GitLab Mirror. This page
+Scanning, the run numbers on Build Provenance, the drift on The GitLab Mirror, and the scores
+against ICTU's guideline on ICTU Dependency Guideline. This page
 carries enforcement states and no counts at all, so a figure that moves is corrected once
 rather than in two places that then disagree.
 

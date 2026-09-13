@@ -382,6 +382,7 @@ nav:
     - Coverage Floor: contributing/coverage-floor.md
     - Build Provenance: contributing/build-provenance.md
     - The GitLab Mirror: contributing/the-gitlab-mirror.md
+    - ICTU Dependency Guideline: contributing/ictu-dependency-guideline.md
     - CI Posture (slides): contributing/ci-posture-deck.md
 
 # Markdown extensions
