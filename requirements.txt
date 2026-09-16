@@ -11,5 +11,9 @@ mkdocs-git-revision-date-localized-plugin>=1.2.0
 # Markdown extensions
 pymdown-extensions>=10.7
 
+# TRIAL (docs/openapi-render-trial): renders an OpenAPI document to
+# Material-native HTML at build time.
+neoteroi-mkdocs>=1.2.0
+
 # Pin working version
 click==8.2.1
