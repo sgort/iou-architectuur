@@ -34,32 +34,60 @@ Two configuration choices are deliberate and worth knowing before changing them:
   array being reordered in the stored document. Which environment a reader is
   pointed at is a presentation choice, and belongs in the page.
 
+!!! info "Rendering never depended on any of this"
+
+    `/v1/openapi.json` is a public mount served with
+    `Access-Control-Allow-Origin: *`, verified from a documentation origin on
+    16 September 2026. The reference above therefore renders from any origin and
+    always has. Only the **Test Request** control depends on the allowlist
+    described below — so if the reference ever fails to render, CORS on the
+    specification fetch is not the reason.
+
 !!! note "Test Request: what has to be true before it works"
 
-    Three things, in two repositories, and one of them is not ours:
+    Four things, in two repositories. Three are settled; one is an Azure app
+    setting that has not been made.
 
-    1. **The backend stops answering a disallowed origin with a 500** and
-       allowlists both documentation tiers —
-       `https://iou-architectuur.open-regels.nl` and
+    1. **The backend stops answering a disallowed origin with a 500.** Done —
+       `linked-data-explorer` PR #146, merged to `acc` as `ad26349` and deployed
+       on 16 September 2026. The CORS origin callback now returns
+       `callback(null, false)` instead of an `Error`, so an unlisted origin gets
+       an ordinary response with no CORS header rather than a server error.
+    2. **Both documentation tiers are in `CORS_ORIGIN` on the acceptance
+       backend** — `https://iou-architectuur.open-regels.nl` and
        `https://acc.iou-architectuur.open-regels.nl`, since the same page is
-       served from each — on the acceptance backend. Both are covered by
-       [linked-data-explorer#145](https://github.com/sgort/linked-data-explorer/issues/145)
-       and neither has landed yet, so the button still fails today.
-    2. **The site CSP names the backend.** Done: `connect-src` in
+       served from each. **Not done.** This is an Azure app setting on
+       `ronl-linkeddata-backend-acc`, not a code change, and it is the remaining
+       half of
+       [linked-data-explorer#145](https://github.com/sgort/linked-data-explorer/issues/145).
+       Until it lands the button still fails, and the browser console may still
+       read `Failed to fetch` — the cause has changed, not yet the outcome.
+    3. **The site CSP names the backend.** Done: `connect-src` in
        `staticwebapp.config.json` reads
        `'self' https://acc.backend.linkeddata.open-regels.nl`. This applies only
        to the deployed site — `mkdocs serve` sends no CSP at all, so on
        localhost the backend's CORS behaviour is the only thing in the way.
-    3. **The reference points at acceptance.** Done, via the `servers`
+    4. **The reference points at acceptance.** Done, via the `servers`
        override described above.
 
-    On the CORS behaviour, measured 16 September 2026: the backend allows
-    exactly one origin — its own frontend — and returns **HTTP 500**, not 403,
-    for every other `Origin` header. `https://linkeddata.open-regels.nl` → 200
-    with `Access-Control-Allow-Origin`; every other origin tried, including both
-    documentation tiers and `http://localhost:8000` → 500 with no CORS header. A
-    request with no `Origin` header at all (curl, server to server) returns 200.
-    The browser is told nothing useful and reports `Failed to fetch`.
+    Measured against the acceptance backend on 16 September 2026, after the fix
+    in step 1, varying only the `Origin` header on `GET /v1/health`:
+
+    | `Origin` sent | Status | `Access-Control-Allow-Origin` |
+    | --- | --- | --- |
+    | `https://acc.linkeddata.open-regels.nl` | 200 | echoed |
+    | `https://iou-architectuur.open-regels.nl` | 200 | absent *(was 500)* |
+    | `https://acc.iou-architectuur.open-regels.nl` | 200 | absent *(was 500)* |
+    | `http://localhost:8000` | 200 | absent *(was 500)* |
+    | *no `Origin` header* | 200 | n/a |
+
+    A preflight `OPTIONS` from an unlisted origin likewise returns 200 with no
+    CORS headers, where it used to return 500. A missing
+    `Access-Control-Allow-Origin` still makes the browser reject the response,
+    which is why step 2 is what actually unblocks the button.
+
+    **The production backend is unchanged** and still returns 500 for every
+    origin but its own frontend. That fix was deliberately not promoted.
 
     **Acceptance only is deliberate.** The specification declares no
     `securitySchemes` and no global `security`, so every operation is
