@@ -85,11 +85,6 @@ plugins:
       enable_creation_date: true
       type: timeago
 
-  # TRIAL (docs/openapi-render-trial): renders an OpenAPI document to
-  # Material-native HTML at build time via [OAD(...)].
-  - neoteroi.mkdocsoad:
-      use_pymdownx: true
-
 # Loads docs/repo-versions.json into config.extra so the per-page metadata
 # header (overrides/partials/doc-meta.html) can render the documented
 # component version server-side.
@@ -342,11 +337,7 @@ nav:
         - SHACL Validation Reference: linked-data-explorer/reference/shacl-validation-reference.md
         - API Reference: linked-data-explorer/reference/api-reference.md
         - API Stability: linked-data-explorer/reference/api-stability.md
-        # TRIAL (docs/openapi-render-trial) - remove before merging
-        - "Spec render A: neoteroi": linked-data-explorer/reference/api-spec-a-oad.md
-        - "Spec render C1: Redoc": linked-data-explorer/reference/api-spec-c-redoc.md
-        - "Spec render C2: Swagger UI": linked-data-explorer/reference/api-spec-c-swagger.md
-        - "Spec render C3: Scalar": linked-data-explorer/reference/api-spec-c-scalar.md
+        - API Specification: linked-data-explorer/reference/api-specification.md
         - RONL Ontology: linked-data-explorer/reference/ronl-ontology.md
 
   - 📜 CPRMV API:
@@ -441,9 +432,6 @@ markdown_extensions:
 # Extra CSS
 extra_css:
   - stylesheets/extra.css
-  # TRIAL (docs/openapi-render-trial): the OAD renderer ships no stylesheet of
-  # its own; this is the ~25 lines needed to make its output look native.
-  - stylesheets/oad-trial.css
 
 extra_javascript:
   - javascripts/doc-status.js
