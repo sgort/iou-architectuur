@@ -43,51 +43,39 @@ Two configuration choices are deliberate and worth knowing before changing them:
     described below — so if the reference ever fails to render, CORS on the
     specification fetch is not the reason.
 
-!!! note "Test Request: what has to be true before it works"
+!!! success "Test Request works against acceptance"
 
-    Four things, in two repositories. Three are settled; one is an Azure app
-    setting that has not been made.
+    Confirmed end to end on the deployed acceptance documentation site on
+    16 September 2026: `GET /health` from this page returned **200 OK** in 306 ms
+    from `https://acc.backend.linkeddata.open-regels.nl/v1`, reporting backend
+    build `ad26349` run 154.
 
-    1. **The backend stops answering a disallowed origin with a 500.** Done —
-       `linked-data-explorer` PR #146, merged to `acc` as `ad26349` and deployed
-       on 16 September 2026. The CORS origin callback now returns
-       `callback(null, false)` instead of an `Error`, so an unlisted origin gets
-       an ordinary response with no CORS header rather than a server error.
-    2. **Both documentation tiers are in `CORS_ORIGIN` on the acceptance
-       backend** — `https://iou-architectuur.open-regels.nl` and
-       `https://acc.iou-architectuur.open-regels.nl`, since the same page is
-       served from each. **Not done.** This is an Azure app setting on
-       `ronl-linkeddata-backend-acc`, not a code change, and it is the remaining
-       half of
-       [linked-data-explorer#145](https://github.com/sgort/linked-data-explorer/issues/145).
-       Until it lands the button still fails, and the browser console may still
-       read `Failed to fetch` — the cause has changed, not yet the outcome.
-    3. **The site CSP names the backend.** Done: `connect-src` in
-       `staticwebapp.config.json` reads
-       `'self' https://acc.backend.linkeddata.open-regels.nl`. This applies only
-       to the deployed site — `mkdocs serve` sends no CSP at all, so on
-       localhost the backend's CORS behaviour is the only thing in the way.
-    4. **The reference points at acceptance.** Done, via the `servers`
-       override described above.
+    Two changes made that possible, both on the backend side:
 
-    Measured against the acceptance backend on 16 September 2026, after the fix
-    in step 1, varying only the `Origin` header on `GET /v1/health`:
+    1. **A disallowed origin no longer answers 500.** `linked-data-explorer`
+       PR #146, merged as `ad26349`. The CORS origin callback returns
+       `callback(null, false)` rather than an `Error`, so an unlisted origin gets
+       an ordinary response with no CORS header instead of falling through to the
+       error handler.
+    2. **Both documentation tiers are allowlisted on the acceptance backend.**
+       `CORS_ORIGIN` on the `ronl-linkeddata-backend-acc` App Service now
+       includes `https://iou-architectuur.open-regels.nl` and
+       `https://acc.iou-architectuur.open-regels.nl`. Together with #146 this
+       closed [linked-data-explorer#145](https://github.com/sgort/linked-data-explorer/issues/145).
+
+    Measured against the acceptance backend after both landed, varying only the
+    `Origin` header on `GET /v1/health`:
 
     | `Origin` sent | Status | `Access-Control-Allow-Origin` |
     | --- | --- | --- |
+    | `https://iou-architectuur.open-regels.nl` | 200 | echoed |
+    | `https://acc.iou-architectuur.open-regels.nl` | 200 | echoed |
     | `https://acc.linkeddata.open-regels.nl` | 200 | echoed |
-    | `https://iou-architectuur.open-regels.nl` | 200 | absent *(was 500)* |
-    | `https://acc.iou-architectuur.open-regels.nl` | 200 | absent *(was 500)* |
-    | `http://localhost:8000` | 200 | absent *(was 500)* |
-    | *no `Origin` header* | 200 | n/a |
+    | `http://localhost:8000` | 200 | absent |
 
-    A preflight `OPTIONS` from an unlisted origin likewise returns 200 with no
-    CORS headers, where it used to return 500. A missing
-    `Access-Control-Allow-Origin` still makes the browser reject the response,
-    which is why step 2 is what actually unblocks the button.
-
-    **The production backend is unchanged** and still returns 500 for every
-    origin but its own frontend. That fix was deliberately not promoted.
+    **The production backend is unchanged** and still returns 500 to every origin
+    but its own frontend. That fix was deliberately not promoted, and this page
+    is pinned to acceptance through the `servers` override described above.
 
     **Acceptance only is deliberate.** The specification declares no
     `securitySchemes` and no global `security`, so every operation is
@@ -98,6 +86,26 @@ Two configuration choices are deliberate and worth knowing before changing them:
     button on a public documentation page is a different proposition from an
     endpoint someone has to write a request to reach, and production is left
     locked to its own frontend for that reason.
+
+!!! warning "The site's Content-Security-Policy is not enforced"
+
+    `staticwebapp.config.json` at the repository root declares a CSP, and
+    `connect-src` there names the acceptance backend. **That file is not applied
+    to either deployment.** Both pipelines publish with `app_location: "site"`,
+    Azure Static Web Apps reads `staticwebapp.config.json` from the app artifact
+    root, and `mkdocs build` never copies the file into `site/`.
+
+    Verified 16 September 2026: neither `iou-architectuur.open-regels.nl` nor
+    `acc.iou-architectuur.open-regels.nl` returns a `Content-Security-Policy` or
+    `X-Frame-Options` header, and both return `Referrer-Policy: same-origin`
+    where the file declares `strict-origin-when-cross-origin`.
+
+    So **Test Request reaches the backend because no CSP is enforced**, not
+    because the policy permits it. Nothing on this page depends on the CSP today.
+    Tracked as
+    [iou-architectuur#98](https://github.com/sgort/iou-architectuur/issues/98);
+    when the file is actually applied, `connect-src` already names the host and
+    this page should keep working unchanged.
 
 ---
 
