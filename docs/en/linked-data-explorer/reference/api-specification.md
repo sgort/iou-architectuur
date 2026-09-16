@@ -10,19 +10,32 @@ than as prose repeats it. For the narrative version — base URLs, the
 deprecation story for `/api/*`, worked response examples — see
 [API Reference](api-reference.md).
 
-!!! warning "Rendered from a beta specification"
+!!! warning "Rendered live, from a specification still being written"
 
-    The stored document is the **beta** specification served at
-    `/v1/openapi.json`, fetched on 16 September 2026. Work on a complete
-    specification is still underway, so descriptions and schemas here may be
-    thinner than the endpoints they document. The copy under
-    `docs/assets/openapi/` is kept faithful to what the backend serves; it is
-    never hand-edited to read better.
+    This page fetches `/v1/openapi.json` from the acceptance backend **on every
+    page load**. There is no stored copy: what you see is whatever the service
+    declares right now.
+
+    That is deliberate while
+    [linked-data-explorer#129](https://github.com/sgort/linked-data-explorer/issues/129)
+    is in progress. It covers roughly 66 route handlers against the 24 paths
+    described today, so the document will change often over the coming weeks and
+    a committed snapshot would be stale within days. Expect descriptions and
+    schemas to be thinner than the endpoints they document until that work
+    lands.
+
+    Live rendering does not cost the provenance: the banner below reports the
+    version and build the document was served by, read from `/v1/health` at the
+    same moment. What it does cost is reproducibility — this page cannot be
+    replayed as it looked last week — and it shows nothing if the backend is
+    unreachable. When the specification settles, a stored copy under
+    `docs/assets/openapi/` is the more durable arrangement: reviewable in a
+    diff, and immune to a backend deploy.
 
 **Renderer:** [Scalar](https://github.com/scalar/scalar)
 `@scalar/api-reference` 1.68.0, loaded from `cdn.jsdelivr.net` — the one
-external script host this site's CSP allows. The document itself is served from
-this origin, not fetched across the network.
+external script host this site's CSP names. The document is fetched from the
+acceptance backend at render time.
 
 Two configuration choices are deliberate and worth knowing before changing them:
 
@@ -34,14 +47,21 @@ Two configuration choices are deliberate and worth knowing before changing them:
   array being reordered in the stored document. Which environment a reader is
   pointed at is a presentation choice, and belongs in the page.
 
-!!! info "Rendering never depended on any of this"
+!!! info "What the render itself depends on"
 
-    `/v1/openapi.json` is a public mount served with
-    `Access-Control-Allow-Origin: *`, verified from a documentation origin on
-    16 September 2026. The reference above therefore renders from any origin and
-    always has. Only the **Test Request** control depends on the allowlist
-    described below — so if the reference ever fails to render, CORS on the
-    specification fetch is not the reason.
+    `/v1/openapi.json` is a **public mount** served with
+    `Access-Control-Allow-Origin: *` — verified from a documentation origin on
+    16 September 2026 — rather than through the `CORS_ORIGIN` allowlist that
+    governs every other route. So the fetch works from any origin, and it does
+    not depend on either documentation tier being allowlisted. **Test Request**
+    does; the render does not.
+
+    One consequence of rendering live: `connect-src` in the site's CSP is now
+    load-bearing for the page itself, not only for Test Request. It already
+    names `https://acc.backend.linkeddata.open-regels.nl`, so nothing needs
+    changing — but if that host is ever removed from the policy while the policy
+    is enforced, this page goes blank rather than merely losing a button. See
+    the note below on why the CSP is not enforced today.
 
 !!! success "Test Request works against acceptance"
 
@@ -100,18 +120,51 @@ Two configuration choices are deliberate and worth knowing before changing them:
     `X-Frame-Options` header, and both return `Referrer-Policy: same-origin`
     where the file declares `strict-origin-when-cross-origin`.
 
-    So **Test Request reaches the backend because no CSP is enforced**, not
-    because the policy permits it. Nothing on this page depends on the CSP today.
-    Tracked as
+    So **both the render and Test Request reach the backend because no CSP is
+    enforced**, not because the policy permits them. Tracked as
     [iou-architectuur#98](https://github.com/sgort/iou-architectuur/issues/98);
-    when the file is actually applied, `connect-src` already names the host and
-    this page should keep working unchanged.
+    when the file is actually applied, `connect-src` already names the host, so
+    this page should keep working unchanged. That entry stops being cosmetic the
+    moment the policy is switched on.
 
 ---
 
+<!--
+  Provenance banner. /v1/openapi.json carries no version of its own, so the
+  version and build are read from /v1/health, which reports both for the very
+  service that just served the document.
+
+  Unlike /v1/openapi.json — a public mount with wildcard CORS — /v1/health goes
+  through the CORS_ORIGIN allowlist. Both deployed documentation tiers are on
+  it; localhost is not, so under `mkdocs serve` this banner stays hidden. That
+  is intended: it degrades to nothing rather than to an error.
+-->
+<div id="lde-spec-provenance" hidden></div>
+
+<script>
+  (function () {
+    var el = document.getElementById('lde-spec-provenance');
+    if (!el || !window.fetch) { return; }
+    fetch('https://acc.backend.linkeddata.open-regels.nl/v1/health', {
+      headers: { accept: 'application/json' }
+    })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function (h) {
+        var build = h.build && h.build.label ? h.build.label : 'build not tracked';
+        el.textContent =
+          'Rendered from ' + (h.environment || 'unknown') +
+          ' · version ' + (h.version || 'unknown') +
+          ' · ' + build +
+          ' · read ' + new Date().toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
+        el.hidden = false;
+      })
+      .catch(function () { /* leave hidden — the reference itself still renders */ });
+  })();
+</script>
+
 <script
   id="api-reference"
-  data-url="/assets/openapi/linked-data-explorer.json"
+  data-url="https://acc.backend.linkeddata.open-regels.nl/v1/openapi.json"
   data-configuration='{"layout":"classic","withDefaultFonts":false,"hideDownloadButton":false,"showSidebar":true,"servers":[{"url":"https://acc.backend.linkeddata.open-regels.nl/v1","description":"Acceptance"}]}'>
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference@1.68.0/dist/browser/standalone.js"></script>

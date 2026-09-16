@@ -1,0 +1,22 @@
+/* Provenance banner on the Linked Data Explorer API Specification page.
+ *
+ * The page renders /v1/openapi.json live, so it has no committed version to
+ * cite; the banner carries the version and build read from /v1/health instead.
+ * It is populated by script and stays hidden when that fetch fails, so it must
+ * never reserve space or draw a border of its own when empty.
+ *
+ * Colours come from Material's custom properties, so both palettes are handled
+ * without a second rule.
+ */
+
+#lde-spec-provenance {
+  margin: 0 0 1.2em;
+  padding: 0.5em 0.8em;
+  border-left: 0.2rem solid var(--md-accent-fg-color);
+  background-color: var(--md-code-bg-color);
+  border-radius: 0.1rem;
+  color: var(--md-default-fg-color--light);
+  font-family: var(--md-code-font-family);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
