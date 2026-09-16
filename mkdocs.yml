@@ -375,6 +375,7 @@ nav:
       - Overview: contributing/doc-architecture/overview.md
       - Navigation Structure: contributing/doc-architecture/navigation.md
       - Technology Stack: contributing/doc-architecture/technology-stack.md
+      - OpenAPI Rendering: contributing/doc-architecture/openapi-rendering.md
     - Controls at a Glance: contributing/controls.md
     - Code Standards: contributing/code-standards.md
     - Branch Protection: contributing/branch-protection.md
