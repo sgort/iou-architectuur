@@ -15,7 +15,7 @@ component: CPSV Editor
 **Engelstalige bron:** `cpsv-editor/user-guide/dmn-workflow.md`
 
 !!! abstract "Downloaden"
-    [DMN to Linked Data Workflow — presentatie (PDF, 208 KB)](../../assets/downloads/dmn-to-linked-data-workflow.pdf)
+    [DMN to Linked Data Workflow — presentatie (PDF, 261 KB)](../../assets/downloads/dmn-to-linked-data-workflow.pdf)
 
 ---
 
@@ -48,6 +48,10 @@ component: CPSV Editor
 ---
 
 ## Why the testing is evidence
+
+---
+
+## Three questions for the standard
 
 ---
 
