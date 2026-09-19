@@ -35,18 +35,21 @@ Everything below is a consequence of those two lines.
 The document is fetched from the backend **on every page load**. There is no
 committed copy.
 
-That is deliberate while
+That was chosen on 16 September 2026, while
 [linked-data-explorer#129](https://github.com/sgort/linked-data-explorer/issues/129)
-is in progress: it covers roughly 66 route handlers against the 24 paths
-described today, so a snapshot would be stale within days, and every backend
-deploy would owe the documentation site a fetch, a commit, a build and a
-promotion.
+was describing the API route group by route group: the document went from 24 paths
+to 63 in three days, so a snapshot would have been stale within days, and every
+backend deploy would have owed the documentation site a fetch, a commit, a build and
+a promotion. #129 closed on 17 September, and every `/v1` route is now described —
+the backend's tests fail when one is not.
 
 The cost is **reproducibility**. The page cannot be replayed as it looked last
 week, and it shows nothing at all if the backend is unreachable. When the
-specification settles, a stored copy under `docs/assets/openapi/` becomes the
-better arrangement — reviewable in a diff, and immune to a backend deploy. The
-switch back is a one-line change to `data-url` plus the file.
+specification stops changing from one release to the next, a stored copy under
+`docs/assets/openapi/` becomes the better arrangement — reviewable in a diff, and
+immune to a backend deploy. #129 closing is a sign of that, not proof of it; the
+page stays live until releases stop moving the document. The switch back is a
+one-line change to `data-url` plus the file.
 
 ### Provenance comes from a second endpoint
 
@@ -100,8 +103,9 @@ deployed site.
 ### Test Request targets acceptance, deliberately
 
 Scalar's **Test Request** control issues a real request. It is pinned to the
-acceptance API, and the production backend still refuses every origin but its
-own frontend.
+acceptance API. The production backend allows only its own two frontends — the
+Linked Data Explorer's and the CPSV Editor's — so no documentation page can reach it
+from a browser.
 
 That split is a decision, not an accident. The specification declares no
 `securitySchemes` and no global `security`, so every operation is

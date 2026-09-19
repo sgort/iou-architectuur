@@ -56,6 +56,10 @@ TRIPLYDB_TIMEOUT=30000
 OPERATON_BASE_URL=http://localhost:8081/engine-rest
 OPERATON_TIMEOUT=10000
 
+# Outbound guard — admit http: and local endpoints (local Jena, a local Operaton).
+# Development only: never set on ACC or production.
+ALLOW_LOCAL_ENDPOINTS=true
+
 # Logging
 LOG_LEVEL=debug
 LOG_FORMAT=json
@@ -65,6 +69,10 @@ CHAIN_EXECUTION_TIMEOUT=5000
 MAX_CHAIN_DEPTH=10
 ENABLE_CACHING=false
 ```
+
+**Why `ALLOW_LOCAL_ENDPOINTS`.** Since v2026.09.5 the backend refuses any caller-supplied endpoint that is not `https:` or that points to an internal address — including `localhost`. That is right for ACC and production and wrong for a laptop, where the useful endpoints are local. `ALLOW_LOCAL_ENDPOINTS=true` admits them; it takes effect only for the exact value `true`. The frontend's **Local Jena** endpoint preset appears only in development builds for the same reason. See the [outbound guard](backend.md#outbound-guard).
+
+The backend's Jest setup, `scripts/jest-env.cjs`, pins `ALLOW_LOCAL_ENDPOINTS=false` and `TRIPLYDB_ALLOWED_HOSTS` to its production value before any module reads `.env`, so this setting in your `.env` does not change what the tests assert — without that pin, 46 outbound-guard tests failed on a machine configured for local Jena.
 
 ---
 
@@ -184,7 +192,7 @@ The table below summarises how the LDE stack differs between local development a
 | RoPA public endpoint | `http://localhost:3001/v1/ropa/public` | `https://acc.backend.linkeddata.open-regels.nl/v1/ropa/public` |
 | `ropa-site` API URL | `http://localhost:3001/v1/ropa/public` (hardcoded in `index.html`) | `https://acc.backend.linkeddata.open-regels.nl/v1/ropa/public` (hardcoded in `index.html`) |
 | `ropa-site` deployment | Open `index.html` directly or `npx serve .` | Azure Static Web Apps (`ropa-flevoland-acc`), deployed via GitHub Actions on push to `acc` with path filter `packages/ropa-site/**` |
-| CORS for public route | Path-aware middleware in `index.ts` bypasses `CORS_ORIGIN` whitelist | Same — `origin: '*'` for `/v1/ropa/public` regardless of `CORS_ORIGIN` env var |
+| CORS for public routes | Path-aware middleware in `middleware/cors.middleware.ts` bypasses the `CORS_ORIGIN` allowlist | Same — `origin: '*'` for the three public mounts, `/v1/ropa/public`, `/v1/bundles/public` and `/v1/openapi.json`, regardless of `CORS_ORIGIN` |
 | RoPA Editor | Available in LDE at `http://localhost:5173` under the ScrollText icon | Available at `https://acc.linkeddata.open-regels.nl` under the ScrollText icon |
 
 ---
@@ -220,14 +228,15 @@ If you bypass the check (e.g. running `nodemon` directly), the backend will stil
 
 ### Convenience scripts at the repo root
 
-Two scripts at the monorepo root let you start everything with one command:
+Three scripts at the monorepo root start the dev servers, and **each checks the installed dependencies against the lockfile first**:
 
 ```bash
-npm run dev:full       # backend (with check-docker.sh) and frontend in parallel
+npm run dev            # frontend only
 npm run dev:backend    # backend only, with the Docker check
+npm run dev:full       # backend (with the Docker check) and frontend in parallel
 ```
 
-Both chain through to the per-workspace `npm run dev` so the docker check still runs for the backend.
+`npm run deps:check` (`scripts/check-deps.sh`) compares what is installed with a snapshot of `package-lock.json` taken after the last install, and stops with the fix named — `npm ci` — when they differ. It exists because nothing else says so: `git merge --ff-only` brings in lockfile changes and installs nothing. On 14 September 2026 a routine fast-forward of `acc` left one workstation with 152 packages at a different version and 95 missing against what CI tests. `npm ci`, not `npm install`: install exactly the committed lockfile rather than re-resolve version ranges. The same check runs first in the pre-push hook. `dev:full` checks once and then starts both workspaces directly, so the backend still gets its Docker check.
 
 ### Per-terminal startup
 

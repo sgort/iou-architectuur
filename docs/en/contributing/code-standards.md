@@ -1,20 +1,23 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-12
+  date: 2026-09-19
   against:
-    CPSV Editor: "f5bae6a"
-    Linked Data Explorer: "be6bc54"
-    RONL Business API: "311d732"
+    CPSV Editor: "2723db1"
+    Linked Data Explorer: "ec4792f"
 ---
 
 # Code Standards
 
-!!! info "Re-verified for all three applications on 12 September 2026"
-    Every claim on this page was re-checked against `f5bae6a`, `be6bc54` and
-    `311d732` — the commits that published v2026.09.4 of the first two and v2026.09.7
-    of the RONL Business API. Rulesets were read from the API per branch rather than
-    from prose, and workflow and pin counts were derived by listing the files.
+!!! info "Verification status"
+    The **Linked Data Explorer**'s and **CPSV Editor**'s claims were re-checked on
+    **19 September 2026**, against `ec4792f` (LDE v2026.09.5) and `2723db1` (CPSV
+    v2026.09.6): rulesets read from the API per branch, workflow steps, filters and
+    pins read from the workflow files, and the merge-commit settings from each
+    repository. The **RONL Business API**'s claims were last re-checked on 12 September
+    2026, against `311d732`; the page stamp names only what was verified on its date.
+    The `pre-push` sentence below is the exception — it was read from all three
+    repositories' `.husky/pre-push` on 19 September.
 
     **The RONL Business API's claims were the stale ones**, and this sync is where they
     were earned back: it closed ten of eleven cross-repository alignment items on 12
@@ -76,9 +79,16 @@ formatting on push.
 
 - **`pre-commit`** runs `lint-staged`, formatting and linting only the files staged for
   that commit (via `prettier --write` and each affected workspace's `lint:fix`).
-- **`pre-push`** runs the full lint and format-check across the repository (RONL
-  Business API's `pre-push` also rebuilds the shared package and runs a type check
-  first, since its packages depend on it).
+- **`pre-push`** first checks the installed dependencies against the lockfile —
+  `npm run deps:check`, the first line of the hook in all three repositories since
+  mid-September 2026 — and stops with `npm ci` named when they differ. Only then does
+  it run the full lint and format-check across the repository (RONL Business API's
+  `pre-push` also rebuilds the shared package and runs a type check first, since its
+  packages depend on it). The dependency check is there because a fast-forward brings
+  lockfile changes in and installs nothing: on 14 September 2026 a RONL Business API
+  clone still had Prettier 3.8.1 installed after the lockfile moved to 3.9.6, and its
+  push failed `check-format` on seven correctly formatted files, with nothing in the
+  output pointing at the install.
 
 **None of the three repositories' git hooks run the test suite.** Neither `pre-commit`
 nor `pre-push` invokes `npm test` anywhere. A passing hook is not evidence your change
@@ -88,7 +98,7 @@ didn't break a test — only CI, or running the suite yourself, tells you that.
 suites run on every pull request, so a failure shows there and stops the deploy — but no
 ruleset names a test workflow as a required check. What the rulesets require is `audit`
 in all three, and `scan` in the CPSV Editor and the Linked Data Explorer; see
-[Enforcement](#enforcement-what-blocks-a-merge) below. In the RONL Business API that is
+[What blocks a merge](#what-blocks-a-merge) below. In the RONL Business API that is
 not an oversight: every deploy workflow on `main` is push-only, and a required check that
 never reports on a pull request wedges it permanently.
 
@@ -132,6 +142,11 @@ was built and tested by nothing.
 supply-chain `audit` gate added in v2026.08.7, and the Semgrep `scan` added in
 v2026.09.3 (see [Supply-Chain Pinning — the npm tree](dependency-scanning.md)).
 Both backend and both frontend workflows run lint and then the suite before building.
+**Since v2026.09.5 the backend workflows also lint the OpenAPI description** —
+`npm run lint:openapi`, Spectral against the NL API Design Rules 2.2.1 — straight after
+ESLint and before the typecheck, so a description that breaks a rule without a
+recorded exception stops the deploy. The routes are held to that description by the
+test step, which validates every response against it.
 The two `ropa-site` workflows run neither, and correctly so: that package is a static
 `index.html` plus a `staticwebapp.config.json`, with no build and no test script to run.
 
@@ -152,10 +167,15 @@ accumulated invisibly, because nothing in the repository ran `tsc` at all.** `bu
 ESLint; `test` is Vitest. None of the three typechecks, so a type error could reach
 `acc` and deploy. A `typecheck` script now exists at the root and in both workspaces.
 
-**CPSV Editor** — four workflows: two Azure Static Web Apps workflows, `acc` and `main`
+**CPSV Editor** — five workflows: two Azure Static Web Apps workflows, `acc` and `main`
 alike, running `npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy action,
-plus the supply-chain `audit` and, since v2026.09.3, the Semgrep `scan` (see
-[Supply-Chain Pinning — the npm tree](dependency-scanning.md)). Since v2026.09.2 that `audit` job also runs
+plus the supply-chain `audit`, since v2026.09.3 the Semgrep `scan` (see
+[Supply-Chain Pinning — the npm tree](dependency-scanning.md)), and since v2026.09.6
+`close-preview-environments.yml`. That last one holds the two jobs that delete a pull
+request's Static Web Apps preview when it closes. They used to sit in the deploy
+workflows, whose `paths-ignore` applies to the close event too — so a documentation-only
+pull request never started the workflow holding its close job, and its preview kept
+running on a public URL. The new workflow has no path filter at all. Since v2026.09.2 that `audit` job also runs
 `npm run check-format` and `npm run check-supply-chain` — and it gained its first
 `npm ci` to do so, everything in it having previously run from `npx` or plain node. Since v2026.09.0 the deploy workflows are named
 **`Deploy ACC (orange-beach)`** and **`Deploy PROD (white-sky)`**; both were previously

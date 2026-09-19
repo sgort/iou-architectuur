@@ -92,17 +92,18 @@ The modal also has a required **Board ownership** section (v1.9.9). It auto-dete
     Decision models referenced via `camunda:decisionRef` on `BusinessRuleTask` elements are **not** included in this deployment. DMNs reach Operaton through a separate path: they are published to TriplyDB by the [CPSV Editor](../../cpsv-editor/index.md) and deployed to Operaton from there. The BPMN process resolves `camunda:decisionRef` at runtime against whatever is already deployed — as long as the DMN key matches, no additional action is needed here.
  
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Deploy modal showing the bundle sections — BPMN file, subprocess BPMNs, form files — plus the required Board ownership section with the auto-detected board and an override control, the Operaton endpoint field pre-filled and a Deploy button at the bottom](../../assets/screenshots/linked-data-explorer-bpmn-deploy-modal.png)
+  ![Screenshot: Deploy modal showing the bundle sections — BPMN file, subprocess BPMNs, form files — plus the required Board ownership section with the auto-detected board and an override control, the line naming the Operaton it deploys to, and a Deploy button at the bottom](../../assets/screenshots/linked-data-explorer-bpmn-deploy-modal.png)
   <figcaption>Deploy modal showing the complete bundle and the Board ownership section before committing to Operaton</figcaption>
 </figure>
 
 1. Review the resource list. If a referenced form ID is shown as unmatched, open the Form Editor and save a form with that ID before deploying.
 2. Check the **Board ownership** section — accept the auto-detected board or override it. A board owner is required to deploy.
 3. Set the **Organization**. Since v2026.08.1 this is **required** — the deploy will not submit without one. It is sent to Operaton as the deployment's tenant-id, so a process deployed without it would be invisible to any tenant-scoped lookup made later.
-4. Confirm or edit the **Operaton endpoint** URL. It is pre-filled from the environment configuration.
-5. If your Operaton instance requires authentication, enter the **Username** and **Password**.
-6. Click **Deploy**. All resources are sent in one multipart request.
-7. On success, a deployment ID is shown and the Deploy button is disabled to prevent accidental re-deploy.
+4. Check the line **Deploys to …**, which names the Operaton the process will reach. You do not choose it here: the backend always deploys to its own configured Operaton, with its own credentials.
+5. Click **Deploy**. All resources are sent in one multipart request.
+6. On success, a deployment ID is shown and the Deploy button is disabled to prevent accidental re-deploy.
+
+If the result shows as a **warning** rather than a tick, the deployment succeeded but the process could not be recorded, and the message says why. It will not appear on the caseworker dashboard or the public site until you save it and deploy it again.
 
 Because the BPMN and all its forms land in the same Operaton deployment, `camunda:formRef` resolves correctly at runtime with no additional steps.
 

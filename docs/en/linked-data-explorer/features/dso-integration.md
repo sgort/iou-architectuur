@@ -15,8 +15,8 @@ A toggle in Settings selects between the **pre-production** and **production** D
     slides, and is downloadable as a PDF.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: DSO Explorer panel open in LDE with the three tabs visible at the top — Concepts, Works, Activities — the Activities tab active showing a list of activiteiten with omschrijving, validity dates, and rule-types-present badges, plus a date input and authority preset dropdown above the list](../../assets/screenshots/linked-data-explorer-dso-explorer-overview.png)
-  <figcaption>DSO Explorer with the Activities tab active and the Lelystad authority preset selected</figcaption>
+  ![Screenshot: DSO Explorer panel open in LDE with the three tabs visible at the top — Concepts, Works, Activities — the Activities tab active showing a list of activiteiten with omschrijving, validity dates, and rule-types-present badges, plus a date input and the Level and Authority dropdowns above the list](../../assets/screenshots/linked-data-explorer-dso-explorer-overview.png)
+  <figcaption>DSO Explorer with the Activities tab active and an authority selected by level</figcaption>
 </figure>
 
 ---
@@ -54,10 +54,32 @@ autocomplete for `application/json`), a `DSO_TIMEOUT` of 15 000 ms enforced wi
 `AbortController`, and HAL payloads returned **verbatim** inside LDE's `{ success, data }`
 envelope — the frontend unwraps `_embedded.*` and `_links.next` itself. Any non-2xx from DSO
 surfaces as a `502` from LDE carrying the upstream body, except an upstream `404`, which is
-passed through as a `404`.
+passed through as a `404`. Both are RFC 9457 problem-details responses, like every other LDE
+error.
 
-The per-endpoint parameters and the complete LDE-endpoint-to-DSO-call map live in the
-[API Reference — DSO Integration](../reference/api-reference.md#dso-integration).
+**Which DSO environment a call reaches** is decided per request: the `X-Dso-Env: prod` header,
+which the frontend sends, **or** the query parameter `?env=prod` selects production; anything
+else targets pre-production. Each environment uses its own base URLs and API key.
+
+Every `/v1/dso` route and the upstream call it makes:
+
+| LDE endpoint | Method | DSO API | Upstream call |
+|---|---|---|---|
+| `/v1/dso/begrippen` | GET | 1 Catalogus | `GET /begrippen` |
+| `/v1/dso/activiteiten` | GET | 2 RTR | `GET /activiteiten` |
+| `/v1/dso/activiteiten/{urn}` | GET | 2 RTR | `GET /activiteiten/{urn}` |
+| `/v1/dso/activiteiten/oin` | POST | 2 RTR | `POST /activiteiten/_zoek` (bestuursorgaan), every page up to 10 |
+| `/v1/dso/activiteiten/zoek` | POST | 2 RTR | `POST /activiteiten/_zoek` (date + geometry) |
+| `/v1/dso/werkzaamheden/zoek` | POST | 3 Zoekinterface | `POST /werkzaamheden/_zoek` |
+| `/v1/dso/werkzaamheden/suggereer` | POST | 3 Zoekinterface | `POST /werkzaamheden/_suggereer` |
+| `/v1/dso/werkzaamheden/{urn}` | GET | 4 Opvragen Werkzaamheden | `GET /werkzaamheden/{urn}` |
+| `/v1/dso/toepasbare-regels` | GET | 5 Uitvoeren Gegevens | `GET /toepasbareRegels` |
+| `/v1/dso/toepasbare-regels/{id}/sttr` | GET | 5 Uitvoeren Gegevens | `GET /toepasbareRegels/{id}/sttrBestand` |
+| `/v1/dso/toepasbare-regels/{id}/dmn` | GET | 5 Uitvoeren Gegevens | `GET /toepasbareRegels/{id}/sttrBestand` + DMN extraction |
+| `/v1/dso/toepasbare-regels/{id}/form-scaffold` | GET | 5 Uitvoeren Gegevens | `GET /toepasbareRegels/{id}/sttrBestand` + form-js scaffold |
+
+Request parameters and response shapes for each route are in the
+[API Specification](../reference/api-specification.md).
 
 ---
 
@@ -123,24 +145,40 @@ Browse the RTR (Registratie Toepasbare Regels) for activiteiten. The tab has two
 | Mode | Call | Paging |
 |---|---|---|
 | **By date** (default) | `GET /activiteiten?datum` — every activity valid on that date | 20 per page |
-| **By authority** (location preset) | `POST /activiteiten/_zoek` with `bestuursorgaan.oin` — that authority's complete set in one call | `pageSize=200`, so the name filter runs client-side |
+| **By authority** (Level + Authority) | `POST /activiteiten/_zoek` with `bestuursorgaan.oin` — every page fetched by the backend and combined into one list | Pages of 200, up to 10 (2,000 activities); the name filter runs client-side over the whole set |
 
-The **authority presets** — Lelystad, Flevoland, and, since v2026.08.0, Ede and Gelderland —
-filter by authority OIN (Organisatie-identificatienummer). The preset list carries the
-OIN-to-name mapping too, because the RTR only ever returns the authority code (`GM0995`),
-never a readable name.
+**Any authority, chosen by level** (v2026.09.5). Two dropdowns pick the authority whose
+activities to load: **Level** — gemeente, provincie, waterschap or rijk — and **Authority**
+within it. Options show the name without its level prefix, so typing jumps straight to it,
+and sort the way a reader expects — *'s-Hertogenbosch* under H. The list covers **342
+municipalities, 12 provinces, 21 water boards and 12 ministries**, each with its OIN
+(Organisatie-identificatienummer), generated from the government organisations register
+(organisaties.overheid.nl) by `npm run authorities:generate`; ended organisations and those
+without an OIN are left out. Until v2026.09.5 the tab offered four hardcoded authorities —
+Lelystad, Flevoland, Ede and Gelderland — so no other authority's activities could be browsed.
+
+The same list supplies the OIN-to-name mapping, because the RTR only ever returns the
+authority code (`GM0995`), never a readable name — so importing a form from any authority
+now gives it the register's name instead of a code.
+
+**Every page is fetched** (v2026.09.5). The by-authority load used to request a single page of
+200 and present it as the authority's whole set: Provincie Zuid-Holland has 838 activities on
+DSO pre-production, so its list was silently partial. The backend now fetches every page, up
+to 10, and returns one combined list; when an authority exceeds that cap, `page.size` stays
+below `page.totalElements`. Measured against DSO production on 19 September 2026, Zuid-Holland
+loaded 516 of 516.
 
 The date input above the list defaults to today; changing the date and clicking **Load** re-fetches the authority list valid on that date. Dates are entered as ISO (`YYYY-MM-DD`) and converted to the DSO's `dd-MM-yyyy` before being sent.
 
 A third mode exists in the backend but has no UI: `POST /v1/dso/activiteiten/zoek` also accepts
 a WGS84 point (`geometrie` + `crs=epsg:4326`) and is implemented and tested end to end. It is
-waiting on a map or point-selection feature — see
-[API Reference](../reference/api-reference.md#post-v1dsoactiviteitenzoek).
+waiting on a map or point-selection feature — see `POST /dso/activiteiten/zoek` in the
+[API Specification](../reference/api-specification.md).
 
-**Name search (v1.9.4).** Fixing a location loads that authority's full activity set in one call and reveals a search box that live-filters by name — so activities such as "Boom kappen of houtopstand vellen" are findable without walking the hierarchy.
+**Name search (v1.9.4).** Choosing an authority loads its full activity set and reveals a search box that live-filters by name — so activities such as "Boom kappen of houtopstand vellen" are findable without walking the hierarchy.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Activities tab showing the date input at the top with todays date, the authority preset dropdown showing Lelystad selected, a Load button next to it, and below a list of activiteiten cards each with omschrijving, validity period, and small badges indicating which rule types are present — Conclusie, Indieningsvereisten, Maatregelen](../../assets/screenshots/linked-data-explorer-dso-activities-list.png)
+  ![Screenshot: Activities tab showing the date input at the top with todays date, the Level and Authority dropdowns with gemeente Lelystad selected, a Load button next to it, and below a list of activiteiten cards each with omschrijving, validity period, and small badges indicating which rule types are present — Conclusie, Indieningsvereisten, Maatregelen](../../assets/screenshots/linked-data-explorer-dso-activities-list.png)
   <figcaption>Activities list filtered by Lelystad authority OIN</figcaption>
 </figure>
 

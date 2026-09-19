@@ -58,7 +58,7 @@ Een PublishDialog-component verzorgt het uploaden van de gegenereerde TTL-inhoud
 
 Bij het openen van de dialoog draait ook een **adviserende pre-publicatie SHACL-validatie** (`shaclHelper.js` → `POST /v1/shacl/validate`), met een gelaagd CPRMV 0.4.1 / CPSV-AP 3.2.0 / RONL-resultaat. Deze blokkeert publiceren nooit en valt terug op een neutrale amberstatus wanneer de backend onbereikbaar is. De validatie controleert de *opnieuw gegenereerde* output van de editor, die kan afwijken van een geïmporteerd bronbestand omdat import naar de 0.4.1-vocabulaire normaliseert.
 
-**Koppeling met kerneditor:** Laag. Gebruikt uitsluitend de gegenereerde TTL-string en dienst-/organisatie-identifiers voor graph-naamgeving. De Express-backend (`REACT_APP_BACKEND_URL`) wordt gedeeld met de Linked Data Explorer.
+**Koppeling met kerneditor:** Laag. Gebruikt uitsluitend de gegenereerde TTL-string en dienst-/organisatie-identifiers voor graph-naamgeving. De Express-backend (`VITE_BACKEND_URL`) wordt gedeeld met de Linked Data Explorer.
 
 ### 4 — DMN-integratie & Operaton-deployment
 

@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Asset Storage
 
 From v1.3.0, BPMN processes, form schemas, and document templates are persisted to PostgreSQL via the LDE backend. The frontend uses a **write-through cache with async hydration**: all reads are synchronous from `localStorage` (zero-latency UI), writes update `localStorage` immediately and then POST to the backend in the background, and on editor mount a `GET` hydration call replaces local non-readonly records with the authoritative server state.
@@ -97,7 +101,7 @@ CREATE TABLE form_schemas (
   name           TEXT        NOT NULL,
   description    TEXT,
   schema         JSONB       NOT NULL,
-  status         TEXT        DEFAULT 'wip',
+  status         TEXT        NOT NULL DEFAULT 'wip',  -- NOT NULL since v2026.09.5
   schema_version INTEGER     NOT NULL DEFAULT 1,
   language       VARCHAR(2),                  -- v1.6.0
   organization   VARCHAR(100),                 -- v1.6.0
@@ -123,7 +127,7 @@ CREATE TABLE document_templates (
   zones          JSONB       NOT NULL,
   bindings       JSONB       NOT NULL DEFAULT '[]',
   assets         JSONB       NOT NULL DEFAULT '[]',
-  status         TEXT        DEFAULT 'wip',
+  status         TEXT        NOT NULL DEFAULT 'wip',  -- NOT NULL since v2026.09.5
   language       VARCHAR(2),                  -- v1.6.0
   organization   VARCHAR(100),                 -- v1.6.0
   created_at     TIMESTAMPTZ NOT NULL,
@@ -141,6 +145,12 @@ CREATE INDEX idx_dt_organization ON document_templates (organization)
 ## Migrations
 
 Schema migrations run automatically on backend startup via `migrate()` in `src/db/migrate.ts`, called from `startServer()` in `src/index.ts`. The migration uses inline SQL with `CREATE TABLE IF NOT EXISTS` guards, making it idempotent and safe to run on every deploy.
+
+**`status` became `NOT NULL` in v2026.09.5.** `form_schemas.status` and `document_templates.status` defaulted to `'wip'` but were nullable, so a row written outside the upserts could reach the API as `status: null`, which the OpenAPI description forbids. The migration backfills any NULL and then sets the columns `NOT NULL`; both steps are safe to repeat on every start. Measured on 19 September 2026, no form on acceptance (253) or production (42) is without a status.
+
+**Input is validated before it reaches Postgres.** The four upserts, the deploy mark and the ROPA delete check their input first and answer `400 INVALID_INPUT` with a detail naming every field that failed, where a missing field, an unknown status or a malformed id used to come back as a 500. The checks follow the database's own constraints — presence where a column is `NOT NULL` with no fallback, type where a value is bound, and enum where a column has a `CHECK` — so form and document `status`, which has no `CHECK`, accepts any string. A blank or whitespace-only value is refused on the fields that identify or name a record: a ROPA record's title and `bpmnProcessId`, and the id, name and `bpmnProcessId` of processes, forms and documents. Other text fields may still be empty, so a ROPA draft can be saved while it is written.
+
+**Timestamps are ISO strings in every mapper.** `mapBpmn`, `mapForm` and `mapDocument` return `createdAt` and `updatedAt` as ISO strings, as `mapRopaRecord` already did. The wire format did not change — `res.json` already serialised the `Date` the same way — but the domain types now say `string` and match what the upserts receive.
 ```typescript
 // src/index.ts
 const startServer = async () => {
@@ -197,4 +207,4 @@ See [DB Type Layer](db-type-layer.md) for the full pattern description and guida
 - [Local Development](local-development.md) — PostgreSQL setup for local dev
 - [DB Type Layer](db-type-layer.md) — DB row types, domain types, and mapper pattern
 - [Deployment](deployment.md) — Azure provisioning and App Settings
-- [API Reference — Asset Storage](../reference/api-reference.md#asset-storage)
+- [API Specification](../reference/api-specification.md) — request and response shapes for every asset route

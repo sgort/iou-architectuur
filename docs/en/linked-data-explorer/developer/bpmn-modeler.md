@@ -311,7 +311,7 @@ Unmatched form refs (referenced in BPMN but not in localStorage) are passed to t
 
 ### API call
 
-On **Deploy**, `BpmnCanvas.tsx` sends a JSON body to the backend:
+On **Deploy**, `BpmnCanvas.tsx` sends one JSON request to the backend:
 
 ```typescript
 await fetch(`${API_BASE_URL}/api/dmns/process/deploy`, {
@@ -319,15 +319,21 @@ await fetch(`${API_BASE_URL}/api/dmns/process/deploy`, {
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     bpmnXml: xml,
-    deploymentName: processKey,   // from BPMN process/@id
-    forms,                        // [{ id, schema }]
-    subProcesses,                 // [{ filename, xml }]
-    operatonUrl,                  // from modal field
-    operatonUsername,
-    operatonPassword,
+    deploymentName: processKey,       // from BPMN process/@id
+    forms,                            // [{ id, schema }]
+    documents,                        // [{ id, template }]
+    subProcesses: subProcessXmls,     // [{ filename, xml }]
+    boardOwner,
+    organization: deployOrganization,
   }),
 });
 ```
+
+The request names **no Operaton target and no credentials**. Since v2026.09.5 the modal no longer offers an Operaton URL, username or password; it names the Operaton the backend deploys to instead.
+
+The call still uses the legacy `/api/dmns/...` alias, which the backend serves through the `/v1` handler with a `Deprecation` header.
+
+**The backend records the bundle in the same request.** The response's `data` carries `deploymentId` and a `bundleRecorded` flag, with `bundleRecordingError` when the write did not land. A deploy Operaton has accepted is a success either way — it cannot be undone — so a failed recording shows as a **warning**, saying the process will not appear on the dashboard or the public site until it is saved and deployed again. Before v2026.09.5 the browser made that write itself, as a second request that was unawaited, whose failure was swallowed, and which was skipped altogether when local storage held no matching identifier. An error response is read with `getProblemDetail()`, since errors are RFC 9457 problem details.
 
 ### Backend endpoint
 
@@ -337,7 +343,9 @@ await fetch(`${API_BASE_URL}/api/dmns/process/deploy`, {
 - Subprocess BPMNs: field name = the subprocess filename
 - Forms: field name = `${formId}.form`
 
-A custom Operaton URL in the request body causes `deployProcess()` to construct a new Axios client targeting that URL, with optional Basic Auth credentials, instead of using the default `OPERATON_BASE_URL` from the backend environment.
+Processes deploy **only to the configured Operaton**. `deployProcess()` always uses the shared client, built from `OPERATON_BASE_URL` and carrying `OPERATON_API_KEY`, so Operaton credentials stay on the backend. For older frontends, an `operatonUrl` equal to the configured one is still accepted; any other answers `400`, and `operatonUsername` and `operatonPassword` are ignored. All three fields are deprecated. Until v2026.09.5 a URL in the request body made the backend build a new client for that host, with optional Basic Auth — an Operaton target, and credentials for it, chosen by whoever sent the request.
+
+After Operaton accepts the deployment, the route finds the stored process by the id in the BPMN — or creates a minimal row when none exists — and stamps it as deployed, recording the Operaton actually used. Saving a process takes `bpmnProcessId` from the saved XML, so renaming the process id no longer leaves a stale value that makes the next deploy create a second row.
 
 ---
 

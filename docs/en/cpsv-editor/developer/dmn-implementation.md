@@ -81,7 +81,7 @@ const runBackendValidation = async (content) => {
   setIsValidating(true);
   try {
     const response = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/v1/dmns/validate`,
+      `${import.meta.env.VITE_BACKEND_URL}/v1/dmns/validate`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -342,10 +342,18 @@ hand a toepasbare-regel DMN straight into the editor via a deep-link:
 
 On mount (guarded by a `consumedRef` against StrictMode double-invoke) the hook:
 
-1. fetches the standalone DMN XML — `GET REACT_APP_BACKEND_URL/v1/dso/toepasbare-regels/{dmnId}/dmn` (`?env=prod` only when `env=prod`);
+1. fetches the standalone DMN XML — `GET VITE_BACKEND_URL/v1/dso/toepasbare-regels/{dmnId}/dmn` (`?env=prod` only when `env=prod`);
 2. prefills `dmnData` with `fileName: decision-{dmnId}.dmn`, the fetched XML, and the primary decision key — keeping the tab **interactive** (`isImported: false`, *not* the preserved mode);
 3. prefills the Service tab (title/identifier/description from the DSO activity) and Organization tab (from the resolved authority);
-4. strips the import params via `history.replaceState` so a refresh can't re-import.
+4. strips the import params via `history.replaceState` so a refresh can't re-import;
+5. makes the DMN tab active through **`openTab`**, the same handler the tab buttons use.
+
+That last step is the one v2026.09.6 fixed. `DMNTab` is **lazy**: `App.jsx` keeps a
+`visitedTabs` set and renders the tab's panel only once it is in it, and a tab is added
+only by `openTab`. The hook used to receive the raw `setActiveTab`, so an import made DMN
+the active tab without marking it visited — the tab was highlighted over an **empty
+panel** until the user clicked away and back. The hook now receives `openTab`, and the
+lazy-tab tests cover the deep link.
 
 Deploy + test + publish then run through the existing `DMNTab` / `PublishDialog` flow.
 `DMNTab` hydrates its internal uploaded-file/decision-key/test-body/validation state from
@@ -365,7 +373,7 @@ server-to-server.**
 **Deploy** — `handleDeployDMN` posts to:
 
 ```
-POST {REACT_APP_BACKEND_URL}/v1/dmns/deploy
+POST {VITE_BACKEND_URL}/v1/dmns/deploy
 ```
 
 **Evaluate** — Evaluate Decision, *Run intermediate tests* and *Run test
@@ -373,7 +381,7 @@ cases* all go through one shared helper, `evaluateViaBackend(decisionKey,
 bodyStr)`, forwarding the request body unchanged:
 
 ```
-POST {REACT_APP_BACKEND_URL}/v1/dmns/evaluate/{decisionKey}
+POST {VITE_BACKEND_URL}/v1/dmns/evaluate/{decisionKey}
 Content-Type: application/json
 Body: { "variables": { ... } }
 ```
@@ -381,18 +389,35 @@ Body: { "variables": { ... } }
 The backend calls Operaton's own `/engine-rest/deployment/create` and
 `/engine-rest/decision-definition/key/{decisionKey}/evaluate` on the editor's
 behalf. Both routes are documented from the backend side in the Linked Data
-Explorer's [API Reference](../../linked-data-explorer/reference/api-reference.md#post-v1dmnsdeploy)
+Explorer's [API Specification](../../linked-data-explorer/reference/api-specification.md)
 — note the evaluate route is a **raw passthrough** that returns Operaton's own
-JSON rather than the backend's usual `{success, data, error}` envelope, which is
+JSON rather than the backend's usual `{ success, data }` envelope, which is
 why the tab can read the response directly. Consequences in the tab:
 
 - The **Evaluation URL** preview in the API Configuration panel shows the
   backend URL actually called, not an Operaton URL.
 - `apiConfig.deploymentEndpoint` is removed — it no longer has a caller.
-- `apiConfig.baseUrl` reads `REACT_APP_OPERATON_URL`, falling back to the
-  production instance. It identifies the Operaton engine the backend should
-  target; without it, local development silently pointed at the shared
-  ACC/PROD engine instead of a local container.
+- `apiConfig.baseUrl` reads `VITE_OPERATON_URL`, falling back to
+  `https://operaton.open-regels.nl`. It no longer chooses where anything is
+  deployed or evaluated — the backend does, from its own configuration. What it
+  still decides is the evaluate URL stored as `dmnData.apiEndpoint`, which the TTL
+  generator publishes as `cprmv:implementedBy`. Evaluate, like deploy, goes
+  through the backend, via `evaluateViaBackend()`.
+
+### Reading the backend's error messages (v2026.09.6)
+
+Since v2026.09.5 the Linked Data Explorer backend answers every error it produces as an
+RFC 9457 problem-details response, with the reason in `detail`. The editor was still
+reading the older `error.message` envelope, so DMN validation, DMN deployment, SHACL
+validation and the TriplyDB service update fell back to generic text instead of the
+server's reason.
+
+`src/utils/problem.js` now exports `getProblemDetail(body, fallback)`, used by every one of
+those call sites — `DMNTab.jsx` for validation and deployment, `shaclHelper.js` and
+`triplydbHelper.js`. It reads `detail` first and still understands the two older shapes,
+`error.message` and a bare-string `error`, so the editor keeps working against a backend
+that has not been promoted yet. Each call site keeps its previous fallback text for a
+response that carries no reason at all.
 
 ---
 

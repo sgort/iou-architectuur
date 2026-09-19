@@ -63,20 +63,25 @@ External services do not need to be running locally. They are always accessed re
 ### Frontend (CPSV Editor)
 
 ```bash
-git clone https://github.com/sgort/cpsv-editor.git
-cd cpsv-editor
-npm install
+git clone https://github.com/sgort/ttl-editor.git
+cd ttl-editor
+npm ci
 npm start
 ```
 
-Opens at `http://localhost:3000`.
+Opens at `http://localhost:3000`. Use `npm ci`, not `npm install`: it installs exactly the
+committed lockfile instead of re-resolving version ranges. Since v2026.09.5 `npm start`
+runs `npm run deps:check` first, and refuses to start Vite — naming `npm ci` as the fix —
+when what is installed has fallen behind `package-lock.json`. A fast-forward brings
+lockfile changes in and installs nothing; on 14 September 2026 one workstation had 53
+packages at a different version and 86 missing.
 
 ### Shared backend
 
 ```bash
 git clone https://github.com/sgort/linked-data-explorer.git
 cd linked-data-explorer
-npm install
+npm ci
 npm run dev:backend
 ```
 
@@ -95,17 +100,26 @@ Opens at `http://localhost:5173`.
 
 ## Environment variables
 
-Set these in a `.env` file at the CPSV Editor repository root.
+Vite reads them per mode from the tracked `.env.development`, `.env.acceptance` and
+`.env.production` files, so local development needs no `.env` of its own; `.env.example`
+lists them. Only variables prefixed `VITE_` reach the browser — the `REACT_APP_` names
+from before the v2026.09.1 Vite migration are no longer read.
 
-| Variable | Purpose | Fallback when unset |
-|---|---|---|
-| `REACT_APP_BACKEND_URL` | The shared Linked Data Explorer backend — SPARQL proxy, TriplyDB publishing, and DMN validate/deploy/evaluate | — |
-| `REACT_APP_OPERATON_URL` | The Operaton engine the backend should target for DMN deploy and evaluate | The shared production instance |
+| Variable | Purpose | `.env.development` | Fallback when unset |
+|---|---|---|---|
+| `VITE_BACKEND_URL` | The shared Linked Data Explorer backend — SPARQL proxy, TriplyDB publishing, and DMN validate/deploy/evaluate | `http://localhost:3001` | `http://localhost:3001` |
+| `VITE_OPERATON_URL` | The Operaton base the DMN tab shows as its **Base URL**, and from which it builds the evaluate URL it **publishes** as `cprmv:implementedBy` | `http://localhost:8081` | `https://operaton.open-regels.nl` |
+| `VITE_BUILD_SHA`, `VITE_BUILD_RUN` | Build provenance, injected by the deploy workflows — see [Build Provenance](../../contributing/build-provenance.md) | — | local build |
 
-!!! warning "Set `REACT_APP_OPERATON_URL` when running a local engine"
-    Without it, the DMN tab's Base URL falls back to the shared production
-    Operaton instance — so local development would deploy to, and evaluate
-    against, shared infrastructure rather than your container.
+!!! warning "`VITE_OPERATON_URL` decides what a published DMN claims, not where it deploys"
+    Deploy and evaluate both go through the Linked Data Explorer backend, which
+    targets **its own** configured Operaton — so where a DMN lands in local
+    development is decided by the local backend's `OPERATON_BASE_URL`, not by this
+    variable. What this variable does decide is the evaluate endpoint the editor
+    records for the decision and writes into the TTL as `cprmv:implementedBy`.
+    Publishing from a local session therefore publishes a `localhost:8081`
+    endpoint. Publish from acceptance or production, whose `.env` files name the
+    shared engine.
 
 ---
 

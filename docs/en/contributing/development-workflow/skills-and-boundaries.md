@@ -62,8 +62,8 @@ precisely the test.
 
 The assistant operates inside a set of recorded boundaries: things it will not do
 unprompted, and approvals it will not infer from an earlier one. `~/.claude/CLAUDE.md`
-is the authority for the full set — **twelve rules** as of 12 September 2026 — and is not
-reproduced here in full, because a copy would drift. The set has grown three times since
+is the authority for the full set — **thirteen rules** as of 19 September 2026 — and is
+not reproduced here in full, because a copy would drift. The set has grown four times since
 the 2026-08-19 consolidation and will grow again; treat any count on this page as a
 snapshot, and the file as the authority. The boundaries most visible to a day-to-day
 contributor:
@@ -83,6 +83,17 @@ contributor:
 - **Never merge or force-push a shared branch unasked.** Committing on a working
   branch when asked is fine; integrating that branch into another is a separate
   decision the contributor makes explicitly, every time.
+- **`acc` and `main` change only through a pull request** — in `ronl-business-api`,
+  `linked-data-explorer` and `ttl-editor`. Recorded on 15 September 2026, after a skill
+  finishing a branch offered a local merge into `acc` as one of its options. Here no
+  approval given in a session unlocks another route: no merge, rebase, cherry-pick or
+  commit onto a local `acc` or `main` to integrate work, no push of new commits to
+  either, and no merging a pull request unless asked for that specific one. When a skill
+  offers to merge back locally, that option is left out. What stays allowed is only what
+  moves work a merged pull request already put on `origin` — the housekeeping
+  fast-forward of the local branches, and the fast-forward-only push of those heads to
+  the GitLab mirror. The rule names three repositories on purpose; this documentation
+  repository is not one of them.
 - **Housekeeping after a merge includes the GitLab mirror.** Added on 12 September
   2026, this is the one boundary that *grants* something rather than withholding it:
   asking for housekeeping authorises the fast-forward push that reconciles the mirror,

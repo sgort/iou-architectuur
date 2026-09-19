@@ -9,21 +9,21 @@ once a change (with or without a handoff package behind it) reaches Claude Code.
 
 ## The plugin set
 
-**Six** plugins are installed and enabled at **user level**, so they apply in every
-repository and every session. They come from three marketplaces: Anthropic's
-`claude-plugins-official`, `thedotmack` for `claude-mem`, and `understand-anything`.
+**Five** plugins are installed and enabled at **user level**, so they apply in every
+repository and every session. They come from two marketplaces: Anthropic's
+`claude-plugins-official`, and `thedotmack` for `claude-mem`.
 
 | Plugin | Version | What it contributes |
 |---|---|---|
-| [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.24.23 | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
+| [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.12.1 | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
 | [`superpowers`](https://github.com/obra/superpowers) | 6.3.0 | The brainstorm → plan → execute structure for multi-step work, and a TDD skills library |
-| [`understand-anything`](https://github.com/Lum1104/Understand-Anything) | 2.7.6 | Builds a navigable knowledge graph of a codebase — architecture, domains, guided tours, diff analysis |
-| `github` | `3deb821cb71c` | The official GitHub MCP server: issues, pull requests, reviews, repository search |
-| `semgrep` | 2.2.0 | Scans generated code for security findings — SAST, secrets, and supply-chain |
+| `github` | `c447c3207a42` | The official GitHub MCP server: issues, pull requests, reviews, repository search |
+| `semgrep` | 2.3.0 | Scans generated code for security findings — SAST, secrets, and supply-chain |
 | `typescript-lsp` | 1.0.0 | TypeScript/JavaScript language server: go-to-definition, find references, error checking |
 
 !!! note "Versions in that table are a snapshot, not a contract"
-    Read from `~/.claude/plugins/installed_plugins.json` on 12 September 2026,
+    The table shows the re-read of 19 September 2026, recorded last below. It was
+    first read from `~/.claude/plugins/installed_plugins.json` on 12 September 2026,
     and already moved twice while this page was being written. `claude-mem`'s
     marketplace is configured with `autoUpdate: true`, so its version advances
     on its own — it went 13.12.1 → 13.24.0 without anyone asking. The `github`
@@ -38,7 +38,15 @@ repository and every session. They come from three marketplaces: Anthropic's
 
     **Re-read again on 12 September 2026**: `claude-mem` 13.24.20 → 13.24.23 and
     `github` `f2cc019c16eb` → `3deb821cb71c`. Six plugins, all enabled, every scope
-    unchanged — four re-reads, and the set has not moved once.
+    unchanged — four re-reads, and the set had not moved once.
+
+    **Re-read on 19 September 2026, and the set moved for the first time.**
+    `understand-anything` is gone, and so is its marketplace from
+    `known_marketplaces.json`, leaving five plugins, all enabled, all at user scope.
+    `semgrep` moved 2.2.0 → 2.3.0 and `github` `3deb821cb71c` → `c447c3207a42`.
+    `claude-mem` now reads **13.12.1** — lower than the 13.24.23 recorded a week
+    earlier. That is what the file says; why is not established here. It is the
+    clearest case yet for treating the version column as an observation.
 
 !!! warning "Enabled is not the same as reachable"
     Both MCP-backed plugins can be enabled and still fail to connect in a given

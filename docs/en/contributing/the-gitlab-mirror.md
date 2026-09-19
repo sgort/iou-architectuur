@@ -1,11 +1,10 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-12
+  date: 2026-09-19
   against:
-    CPSV Editor: "f5bae6a"
-    Linked Data Explorer: "be6bc54"
-    RONL Business API: "311d732"
+    CPSV Editor: "2723db1"
+    Linked Data Explorer: "ec4792f"
 ---
 
 # The GitLab Mirror
@@ -20,8 +19,10 @@ applications are also mirrored by hand to the open-regels.nl GitLab instance, an
 until someone pushes.
 
 What changed on 12 September 2026 is that something now *notices*. A release-time check,
-`scripts/check-mirror.sh`, runs in all three repositories from step 8 of `/bump-release`
-and compares each remote-tracking ref with the mirror's. **It closes the observation half
+`scripts/check-mirror.sh`, runs in all three repositories from `/bump-release`, in the
+step that lands the release through a pull request — step 6 in the CPSV Editor, 7 in the
+Linked Data Explorer, 8 in the RONL Business API — and compares each remote-tracking ref
+with the mirror's. **It closes the observation half
 of the problem, not the drift.** It cannot run in CI, and that is a property of the mirror
 rather than a shortcoming of the check: the `gitlab` remote lives in `.git/config` and no
 tracked file names the host, so a runner has no such remote and no route to it. It also
@@ -40,6 +41,20 @@ On 12 September 2026, by `git ls-remote` against both remotes:
 | CPSV Editor | ✅ `f7fe80f` on both | ✅ `f5bae6a` on both |
 | Linked Data Explorer | ✅ `1babd54` on both | ✅ `be6bc54` on both |
 | RONL Business API | ✅ `28e1a9e` on both | ✅ `311d732` on both |
+
+Two were checked again on 19 September 2026, after their promotions that day, and both
+were in sync: the Linked Data Explorer with `acc` at `379cbab` and `main` at `ec4792f`,
+the CPSV Editor with `acc` at `a37bace` and `main` at `2723db1`.
+
+**The CPSV Editor's release procedure runs a second check straight after this one.**
+`npm run check-previews` (v2026.09.6) lists the Static Web Apps preview environments Azure
+actually has against the pull requests GitHub has open, and prints the exact
+`az staticwebapp environment delete` command for each orphan. It exists for the same
+reason as the mirror check: GitHub starts no workflow for a pull request with a merge
+conflict, so no close job ever runs for it, and eight previews on acceptance and
+production had outlived their pull requests unnoticed. Like `check-mirror` it runs on a
+workstation, finds its targets from the deploy workflows' own file names rather than
+hardcoding them, and never deletes anything itself.
 
 A tick is *synced at the last check*, not *kept in sync*. The RONL Business API's mirror
 had never been audited before that day, and both branches turned out to be strict

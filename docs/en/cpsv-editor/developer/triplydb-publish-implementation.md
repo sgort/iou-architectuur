@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # TriplyDB Publish Implementation
 
 ---
@@ -52,7 +56,7 @@ src/
 
 When the dialog opens (and via a **Validate now** button), `PublishDialog` calls
 `validateTtl(ttlContent)` from `src/utils/shaclHelper.js`, which POSTs the generated Turtle
-to `REACT_APP_BACKEND_URL/v1/shacl/validate` and returns a layered result
+to `VITE_BACKEND_URL/v1/shacl/validate` and returns a layered result
 (`{ valid, parseError, layers: { cprmv, 'cpsv-ap', 'ronl-custom' }, summary, unavailable? }`).
 
 It mirrors `DMNTab.runBackendValidation`: it **never throws**. An unreachable backend yields a

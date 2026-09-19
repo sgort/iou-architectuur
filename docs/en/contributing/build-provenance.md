@@ -1,20 +1,24 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-12
+  date: 2026-09-19
   against:
-    CPSV Editor: "f5bae6a"
-    Linked Data Explorer: "be6bc54"
-    RONL Business API: "311d732"
+    CPSV Editor: "2723db1"
+    Linked Data Explorer: "ec4792f"
 ---
 
 # Build Provenance
 
-!!! info "Re-verified for all three applications on 12 September 2026"
-    Every claim on this page was re-checked against `f5bae6a`, `be6bc54` and
-    `311d732`. The RONL Business API's two columns were the unverified ones, and the
-    reason they could not be verified has now gone: **both of its surfaces reached
-    production on 12 September 2026**, so all four implementations have run there.
+!!! info "Verification status"
+    The **Linked Data Explorer**'s and **CPSV Editor**'s claims were re-checked on
+    **19 September 2026**, against `ec4792f` (LDE v2026.09.5) and `2723db1` (CPSV
+    v2026.09.6). The **RONL Business API** columns were last re-checked on 12
+    September 2026, against `311d732`; the page stamp names only what was verified
+    on its date.
+    The RONL Business API's two columns had been the unverified ones until then, and
+    the reason they could not be verified went on 12 September: **both of its
+    surfaces reached production that day**, so all four implementations have run
+    there.
 
 *Answering "which build am I looking at?" from inside the running app*
 
@@ -267,7 +271,11 @@ from "the values reached the artifact".
 
     The CPSV Editor has promoted twice more since, both on 11 September: v2026.09.3 as
     `build f7e127a · #92` and v2026.09.4 as **`build f5bae6a · #94`**, each from
-    *Deploy PROD (white-sky)*.
+    *Deploy PROD (white-sky)*. Two more followed: v2026.09.5 on 15 September as
+    `build e1c482e · #97`, from the run, and v2026.09.6 on 19 September as
+    **`build 2723db1 · #100`** — read out of the deployed bundle, where the lazy
+    `ChangelogTab-*.js` chunk carries the full SHA and `100` as Vite emitted them,
+    template literals rather than quoted strings.
 
     The Linked Data Explorer has promoted twice more since, both on 11 September:
     v2026.09.3 as `build 35a44f8 · #41` and v2026.09.4 as **`build be6bc54 · #44`**,
@@ -275,6 +283,11 @@ from "the values reached the artifact".
     pull-request runs of the same workflow, which build previews rather than
     production. v2026.09.4 is also the first promotion under the widened `paths:`
     filter, where a change to the root lockfile alone redeploys the frontend.
+
+    Its v2026.09.5 promotion on 19 September 2026 is **`build ec4792f · #51`** — and
+    that one was read out of the deployed bundle rather than derived from the run: the
+    production `/assets/index-*.js` carries `"ec4792f09c289f8fee6c68da5184fd775a27ccc9"`
+    and `"51"` as the two injected literals.
 
     Of those four strings, two were **read off the running application** — the CPSV
     Editor's `build bbda389 · #88` and the Linked Data Explorer's `build 007b350 · #39`,
@@ -302,8 +315,18 @@ from "the values reached the artifact".
 
     The promotion of v2026.09.7 the same afternoon moved both on again, to run 13 and run
     3 at `311d732`.
-- **Backend versions are unaffected.** The line describes the frontend bundle being
-  viewed; backends ship their versions separately.
+- **The line describes the frontend bundle being viewed**, not the backend behind it.
+  A backend needs its own answer, and the Linked Data Explorer's backend has one since
+  v2026.09.5: `/v1/health` reports a `build` block with **the same shape and
+  semantics** as the frontend's `BuildInfo` — tracked only when both SHA and run are
+  present, `local build` otherwise, never affecting `status`. The identity travels in a
+  `deploy/build-info.json` both backend workflows write into the artifact, **not** in
+  an App Service setting, because settings persist across deploys and can describe a
+  build that is no longer the one running. The post-deploy check then waits until
+  `build.sha` equals the deployed commit, so a deploy that left the previous artifact
+  serving fails instead of passing. On 19 September 2026 production's backend reported
+  `build ec4792f · #19` — the same commit as its frontend, from a different workflow,
+  with a different run number, for the reason given above.
 
 ---
 

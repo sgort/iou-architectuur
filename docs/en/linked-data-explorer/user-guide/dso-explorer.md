@@ -46,11 +46,12 @@ The `functioneleStructuurRef` URI on each result is the pivot to the STTR file u
 Use this when you know which authority publishes the activity (e.g. gemeente Lelystad) and want to see what they have on a given date.
 
 1. Open the **Activities** tab.
-2. Pick an authority preset — **Lelystad**, **Flevoland**, **Ede** or **Gelderland**.
-   Ede (municipality) and Gelderland (province) were added in v2026.08.0. The same
-   preset list drives both this filter and the authority name shown when importing a form.
+2. Pick the **Level** — gemeente, provincie, waterschap or rijk — and then the **Authority**.
+   Every municipality, province, water board and ministry with an OIN is listed, and you
+   can type the name to jump to it. The same list supplies the authority name shown when
+   importing a form.
 3. The date input defaults to today; change it if you need a historical view.
-4. Click **Load**. The list refreshes with that authority's activiteiten valid on the selected date.
+4. Click **Load**. The list refreshes with **all** of that authority's activiteiten valid on the selected date — every page is fetched and combined, up to 2,000 activities.
 
 Each card shows badges for which rule types are present:
 
@@ -71,7 +72,7 @@ The badges tell you ahead of time which downstream LDE assets the activity can s
     re-opening the same activity fetches it all again.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Activities tab with the Lelystad preset selected, todays date shown in the date input, and a list of activity cards beneath — each card has the omschrijving, validity from-date, and small green pill badges for the rule types present, with the Bed & Breakfast starten card highlighted to show it has both Conclusie and Indieningsvereisten](../../assets/screenshots/linked-data-explorer-dso-activities-with-badges.png)
+  ![Screenshot: Activities tab with gemeente Lelystad selected in the Level and Authority dropdowns, todays date shown in the date input, and a list of activity cards beneath — each card has the omschrijving, validity from-date, and small green pill badges for the rule types present, with the Bed & Breakfast starten card highlighted to show it has both Conclusie and Indieningsvereisten](../../assets/screenshots/linked-data-explorer-dso-activities-with-badges.png)
   <figcaption>Activities filtered by Lelystad with rule-type badges</figcaption>
 </figure>
 
@@ -130,7 +131,7 @@ Use this to turn a DSO activity's *toepasbare regels* into LDE assets. Open the 
 
 **Some child activities show as long URNs instead of names.** Their individual name lookup failed or returned no omschrijving. The links still work — click through and the child's own detail panel will load.
 
-**Authority preset Load button gives an empty list.** Either the authority has no activities for that date, or the date is outside the validity windows of all activities. Try a recent date close to today.
+**Loading an authority gives an empty list.** Either the authority has no activities for that date, or the date is outside the validity windows of all activities. Try a recent date close to today.
 
 ---
 

@@ -110,6 +110,8 @@ needed neither of the Linked Data Explorer's filter fixes: its deploy workflows 
 `paths-ignore` for documentation only, so a lockfile change already builds and deploys,
 and it has no group rules to multiply a refresh into three pull requests.
 
+Its last four Code findings had been ignored in the Semgrep dashboard during that triage, where the reasoning was invisible from the code. v2026.09.5 answered them in the source instead: two prototype-pollution warnings in the iKnow parser's path helpers carry a suppression scoped to one rule on one line, with the reason and the condition under which it stops being true, and two `renovate.json` major-version holds now state their 14-day minimum release age themselves, because JSON cannot carry a suppression comment. By the release's own record, the full scan on `acc` after the merge reported 0 Code findings.
+
 **The finding count is not the measure.** The triage that produced the gate
 ([ttl-editor#112](https://github.com/sgort/ttl-editor/issues/112)) opened at **36
 findings and closed at 0**, and by the repository's own record almost none of that
@@ -183,11 +185,12 @@ by naming the change that would make it unsafe: `updateTestCase` receiving
 imported or URL-supplied data. A suppression that states only why it is fine
 today reads as settled long after it has stopped being so.
 
-The one Code finding left is a true positive — the Tailwind Play CDN running from a
-third-party origin in the production frontend
-([linked-data-explorer#96](https://github.com/sgort/linked-data-explorer/issues/96))
-— and it will clear because the script is removed, not because anything is
-suppressed.
+The one Code finding left after that pass was a true positive — the Tailwind Play CDN
+running from a third-party origin in the production frontend
+([linked-data-explorer#96](https://github.com/sgort/linked-data-explorer/issues/96)) —
+and this page said it would clear because the script was removed, not because anything
+was suppressed. That is how it went: v2026.09.5 builds Tailwind with the application,
+the script tag is gone, and #96 closed on 17 September 2026.
 
 !!! note "Reachability is decided in CI, not on a laptop"
     The repository's CI posture record reports that a local dry run classed every

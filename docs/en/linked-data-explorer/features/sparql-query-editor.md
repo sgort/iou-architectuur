@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # SPARQL Query Editor
 
 The SPARQL Query Editor lets you run SPARQL 1.1 queries against any configured endpoint and explore results as a table or an interactive force-directed graph.
@@ -24,6 +28,10 @@ A library of pre-built queries is available in the left panel, organised by topi
 ## Endpoint management
 
 The endpoint selector at the top of the view lets you switch between any configured TriplyDB dataset without reloading the page. Preset endpoints are pre-configured; additional endpoints can be added in the session. Endpoint selection applies to both the Query Editor and the Chain Builder — switching endpoints in one view updates the other.
+
+**Every query runs through the backend.** Whichever endpoint you choose, the editor sends the query to the Linked Data Explorer's own backend, which runs it and returns the results; the connection badge reads *Proxied via Backend*. Nothing is fetched from the endpoint by your browser, and no query passes through a third-party proxy. The backend checks the endpoint first: it must be an `https:` address, carry no username or password, and point to a public host. An endpoint that fails the check is refused with the reason shown, before any request is made.
+
+The **Local Jena** preset appears only in development builds, where a local endpoint can be reached. The default endpoint is DMN Discovery in every build.
 
 ---
 

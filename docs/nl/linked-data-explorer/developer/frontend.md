@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Frontend Architectuur
 
 !!! info "Documentatie in ontwikkeling"
@@ -24,6 +28,14 @@
 ---
 
 ## SPARQL service
+
+---
+
+## Styling
+
+---
+
+## Content-Security-Policy
 
 ---
 

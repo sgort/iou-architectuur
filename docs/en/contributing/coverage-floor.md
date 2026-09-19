@@ -263,7 +263,7 @@ All three were measured clean before enforcing. That word hides a lot:
 | RONL Business API backend | not derived | comfortable — 92.31% across the package |
 | Linked Data Explorer backend | 38 of 44 | `sparql.service.ts` 82.85% |
 | Linked Data Explorer frontend | 68 of 78 | `ChainBuilder/TestCasePanel.tsx` exactly 80.00% — **since raised to 100%** |
-| CPSV Editor | 32 of 41 | `useDsoImport.js` 80.39% |
+| CPSV Editor | 32 of 41 | `useDsoImport.js` 80.39% — **since raised to 92.15%** |
 
 The RONL Business API's five workspaces were re-measured on 12 September 2026 and
 every one passes the per-file floor, with these package averages on branches: backend

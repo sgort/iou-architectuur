@@ -1,6 +1,10 @@
+---
+component: Linked Data Explorer
+---
+
 # Running SPARQL Queries
 
-The SPARQL Query Editor lets you run queries directly against any configured TriplyDB endpoint and explore results as a table or interactive graph.
+The SPARQL Query Editor lets you run queries against any configured TriplyDB endpoint and explore results as a table or interactive graph. Queries are sent through the Linked Data Explorer's backend, which runs them against the endpoint you chose.
 
 ---
 
@@ -35,6 +39,8 @@ The endpoint selector at the top of the configuration panel shows the active Tri
 3. Click **Apply**.
 
 The active endpoint applies to both the Query Editor and the Chain Builder. Switching it reloads the DMN list in the Chain Builder.
+
+A custom endpoint must be an `https:` address on a public host, without a username or password in the URL. If it is not, the query is refused and the editor shows why — for example, that the address points to an internal network. The **Local Jena** preset for a Jena server on your own machine is only available when running the application locally in development.
 
 ---
 

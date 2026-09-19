@@ -8,7 +8,7 @@ A twelve-slide technical review of how the LDE DSO Viewer talks to the Digitaal 
 Omgevingswet: the proxy layer, the five upstream APIs, what each tab calls, and the loose ends
 that are still open. The slides summarise what the surrounding pages document in prose —
 [DSO Integration](dso-integration.md) for the architecture, the
-[API Reference](../reference/api-reference.md#dso-integration) for per-endpoint detail.
+[API Specification](../reference/api-specification.md) for per-endpoint detail.
 
 !!! abstract "Download"
     [DSO Viewer APIs Deck (PDF, 121 KB)](../../assets/downloads/dso-viewer-apis-deck.pdf)
@@ -101,6 +101,7 @@ that are still open. The slides summarise what the surrounding pages document in
 ## Related documentation
 
 - [DSO Integration](dso-integration.md) — the same material in prose, with screenshots
-- [API Reference — DSO Integration](../reference/api-reference.md#dso-integration) — per-endpoint parameters and the full endpoint map
+- [DSO Integration — the endpoint map](dso-integration.md#the-five-dso-apis-behind-the-viewer) — every `/v1/dso` route and the upstream call it makes
+- [API Specification](../reference/api-specification.md) — per-endpoint parameters and response shapes
 - [DSO Explorer user guide](../user-guide/dso-explorer.md) — the workflows these APIs support
 - [DSO Integration Phase Plan](dso-integration-phase-plan.md) — phase status and test anchors

@@ -10,7 +10,18 @@ The backend is a Node.js/Express TypeScript API. It sits between the React front
 
 ## API versioning
 
-All endpoints follow `/v1/*`. Legacy `/api/*` endpoints exist with `Deprecation` response headers for backward compatibility. The version is included in every response via the `API-Version` header, following Dutch Government API Design Rules API-20 and API-57.
+| Environment | Base URL |
+|---|---|
+| Production | `https://backend.linkeddata.open-regels.nl/v1` |
+| Acceptance | `https://acc.backend.linkeddata.open-regels.nl/v1` |
+
+All endpoints follow `/v1/*`. The release version is included in every response via the `API-Version` header — `API-Version: 2026.09.5` at the time of writing — following Dutch Government API Design Rules API-20 and API-57.
+
+**The contract is published.** `GET /v1/openapi.json` serves an OpenAPI 3.1 description of every `/v1` route, built from `packages/backend/openapi/openapi.yaml`. It is the reference for request and response shapes; the [API Specification](../reference/api-specification.md) page renders it. `/v1/openapi.json` is one of three public mounts served to any origin (see [Security](#security)), so any client can read it.
+
+**Legacy `/api/*` aliases** still answer for backward compatibility, and carry a `Deprecation` header and a `Link` header naming the `/v1` successor. They are to be removed in v2.0.0.
+
+**`GET /`**, outside `/v1`, returns API metadata and a directory of the current and legacy endpoint paths, including the `documentation` pointer to `/v1/openapi.json`.
 
 ---
 
@@ -22,21 +33,38 @@ All endpoints follow `/v1/*`. Legacy `/api/*` endpoints exist with `Deprecation`
 GET /v1/health
 ```
 
-Returns service health including TriplyDB and Operaton latency checks. Used by CI/CD pipelines and the frontend status indicator.
+Returns service health: TriplyDB and Operaton latency checks, the SHACL shape layers the validator loaded, and **which build is running**. Used by the deploy workflows' post-deployment verification and by the frontend status indicator. Production's response on 19 September 2026:
 
 ```json
 {
   "name": "Linked Data Explorer Backend",
-  "version": "0.4.0",
+  "version": "2026.09.5",
   "environment": "production",
+  "build": {
+    "sha": "ec4792f09c289f8fee6c68da5184fd775a27ccc9",
+    "shortSha": "ec4792f",
+    "run": "19",
+    "isTracked": true,
+    "label": "build ec4792f · #19"
+  },
   "status": "healthy",
-  "uptime": 3600,
   "services": {
-    "triplydb": { "status": "up", "latency": 145 },
-    "operaton": { "status": "up", "latency": 98 }
-  }
+    "triplydb": { "status": "up", "latency": 98 },
+    "operaton": { "status": "up", "latency": 105 }
+  },
+  "shacl": {
+    "complete": true,
+    "layers": {
+      "cpsv-ap": { "label": "CPSV-AP 3.2.0", "loaded": true },
+      "ronl-custom": { "label": "RONL Custom", "loaded": true },
+      "cprmv": { "label": "CPRMV 0.4.1", "loaded": true }
+    }
+  },
+  "documentation": "/v1/openapi.json"
 }
 ```
+
+`version` names the release; `build` names the commit and workflow run, read from the `deploy/build-info.json` the deploy workflow writes into the artifact. `build` is tracked only when both `sha` and `run` are present — a missing or malformed file reports a local build and never affects `status`. The deploy workflows wait until `build.sha` equals the commit they deployed and `shacl.complete` is `true` before they pass; see [Post-deployment verification](deployment.md#post-deployment-verification).
 
 ### DMN deploy and evaluate (v2026.08.2)
 
@@ -55,13 +83,13 @@ uploaded or generated file with no registry entry can still be deployed. It wrap
 
 `evaluate/:decisionKey` is a **raw passthrough**: it forwards Operaton's response
 byte-for-byte and status-for-status — the success array or the exception object —
-rather than the usual `{success, data, error}` envelope, because the calling tab
+rather than the usual `{ success, data }` envelope, because the calling tab
 reads Operaton's own JSON. `evaluateRaw()` also passes the request body through
 untouched, skipping the type inference `evaluateDecision()` applies for its
 different caller contract; the DMN tab already builds Operaton-shaped bodies, so
 re-wrapping would double-wrap them.
 
-See the [API Reference](../reference/api-reference.md#post-v1dmnsdeploy).
+Both are described in the [API Specification](../reference/api-specification.md).
 
 ### DMN discovery
 
@@ -119,19 +147,13 @@ Request body:
 }
 ```
 
-Executes the chain sequentially, flattening outputs into inputs between steps. Returns per-step results and combined final output.
+Executes the chain sequentially, flattening outputs into inputs between steps. Returns per-step results and combined final output. A chain that fails part-way answers with a problem-details error **and** keeps its partial result under `data`, so the steps that ran and their outputs are not lost.
 
 ```
-POST /v1/chains/execute/heusdenpas
+POST /v1/dmns/drd/deploy
 ```
 
-Convenience endpoint for the fixed three-step Heusdenpas chain with production test data. Target execution time: <1000ms. See [API Reference](../reference/api-reference.md) for the full request/response.
-
-```
-POST /v1/chains/export
-```
-
-Generates a DRD XML file from a chain and deploys it to Operaton. See [DRD Generation](drd-generation.md).
+Assembles deployed DMNs into a single DRD and deploys it to Operaton. See [DRD Generation](drd-generation.md).
 
 ### eDOCS
 
@@ -144,7 +166,7 @@ GET  /v1/edocs/workspaces/:workspaceId/documents
 
 Integrates with the OpenText eDOCS document management system. Used by the RIP Phase 1 process to create project workspaces and file documents. In stub mode (`EDOCS_STUB_MODE=true`, default) all methods return realistic fake responses so the process runs end-to-end before a live eDOCS server is available.
 
-See [eDOCS Integration](edocs-integration.md) and the [API Reference](../reference/api-reference.md#edocs) for request/response details.
+See [eDOCS Integration](edocs-integration.md), and the [API Specification](../reference/api-specification.md) for request and response details.
 
 ### TriplyDB proxy
 
@@ -161,7 +183,7 @@ Request body:
 }
 ```
 
-Proxies a SPARQL query to any TriplyDB endpoint, bypassing CORS restrictions. Used by the frontend Query Editor for dynamic endpoint support.
+Runs a SPARQL query against a caller-supplied endpoint. **Every query the frontend's Query Editor sends comes through here** — the editor no longer fetches endpoints from the browser, and its former `api.allorigins.win` fallback proxy is gone. The endpoint passes the [outbound guard](#outbound-guard) first: it must be `https:`, carry no credentials and resolve to a public address, or the route answers `400 INVALID_INPUT` before any request is made.
 
 ### Norms
 
@@ -428,7 +450,7 @@ POST   /v1/assets/documents
 DELETE /v1/assets/documents/:id
 ```
 
-Persists BPMN processes, form schemas, and document templates to PostgreSQL. All routes return `503 DB_NOT_CONFIGURED` when `DATABASE_URL` is absent. See [Asset Storage](asset-storage.md) for the service architecture and [API Reference](../reference/api-reference.md#asset-storage) for full request/response documentation.
+Persists BPMN processes, form schemas, and document templates to PostgreSQL. All routes return `503 DB_NOT_CONFIGURED` when `DATABASE_URL` is absent. The upserts, the deploy mark and the ROPA delete validate their input before it reaches Postgres and answer `400 INVALID_INPUT` with a detail naming every field that failed; the checks follow the database's own constraints, and a blank title, id or name is refused on the fields that identify a record. See [Asset Storage](asset-storage.md) for the service architecture and the [API Specification](../reference/api-specification.md) for request and response shapes.
 
 ---
 
@@ -542,7 +564,24 @@ Winston structured logging with JSON output. All service calls log at `[INFO]` l
 
 ## Error handling
 
-A central `errorHandler.ts` middleware catches unhandled errors and returns standardised JSON error responses with appropriate HTTP status codes. SPARQL and Operaton errors are wrapped with descriptive messages before being returned to the frontend. No sensitive data is included in error responses.
+Every error the API produces itself is an **RFC 9457 problem details** response, `application/problem+json`:
+
+```json
+{
+  "type": "about:blank",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "…",
+  "instance": "/v1/dmns",
+  "code": "INVALID_INPUT"
+}
+```
+
+`code` is an extension member and the field callers branch on — `INVALID_INPUT`, `MALFORMED_BODY`, `PAYLOAD_TOO_LARGE`, `DB_NOT_CONFIGURED` and so on. `type` is `about:blank`, because there is no documentation page per kind of problem and a URL that does not resolve would be worse than none. `instance` is the request path without its query string. Success responses are unchanged and keep `{ success: true, data }`.
+
+This replaced five different envelopes in v2026.09.5. `POST /v1/dmns/evaluate/:decisionKey` is the one exception: it passes Operaton's own errors through unchanged, because its caller reads Operaton's JSON.
+
+`middleware/error.middleware.ts` is the central handler. It answers a body that does not parse with **400 `MALFORMED_BODY`**, a body over the 10 MB limit with **413 `PAYLOAD_TOO_LARGE`** naming that limit, and other body-parser failures with the parser's own status as `INVALID_BODY` — recognising parser errors by type, so an arbitrary thrown error carrying a `status` property still answers 500 rather than choosing its own response. Stack traces and internal context never reach the client.
 
 ---
 
@@ -573,9 +612,18 @@ A central `errorHandler.ts` middleware catches unhandled errors and returns stan
 
 **HTTP headers** — [Helmet](https://helmetjs.github.io/) is configured to set comprehensive security headers on all responses, including `Content-Security-Policy`, `X-Content-Type-Options`, `X-Frame-Options`, and `Strict-Transport-Security`.
 
-**CORS** — only origins listed in `CORS_ORIGIN` are permitted. In production this is restricted to `https://linkeddata.open-regels.nl` and `https://cpsv.open-regels.nl`. All other origins receive a CORS rejection — **except on the two public read-only mounts**, `/v1/ropa/public` and `/v1/bundles/public`, which answer any origin for `GET` and `OPTIONS` by design. `isPublicPath` matches those mounts or a path below them, never a sibling route that shares the prefix; see [RoPA Records — the public routes](ropa-records.md#public-route-v1ropapublic).
+**CORS** — only origins listed in `CORS_ORIGIN` are permitted. In production this is restricted to `https://linkeddata.open-regels.nl` and `https://cpsv.open-regels.nl`; acceptance also admits both tiers of the IOU architecture documentation site. Any other origin gets an ordinary response with no `Access-Control-Allow-Origin` header, which the browser then refuses — **except on the three public read-only mounts**, `/v1/ropa/public`, `/v1/bundles/public` and `/v1/openapi.json`, which answer any origin for `GET` and `OPTIONS` by design. `isPublicPath` matches those mounts or a path below them, never a sibling route that shares the prefix; see [RoPA Records — the public routes](ropa-records.md#public-route-v1ropapublic).
 
-**Input validation** — type checking is applied to all request inputs. Variable names, DMN identifiers, and SPARQL endpoint URLs are validated before any service call is made. Request body size is limited to 10 MB.
+**Input validation** — request inputs are checked before any service call, and a failure answers `400 INVALID_INPUT` naming the fields at fault rather than surfacing as a 500 from a downstream system. Request body size is limited to 10 MB.
+
+<a id="outbound-guard"></a>**Outbound guard** — the backend never requests a host a caller named without checking it (v2026.09.5, [#142](https://github.com/sgort/linked-data-explorer/issues/142)). There are two layers:
+
+- **At the route**, `utils/outboundUrl.ts` checks every caller-supplied SPARQL endpoint — on `GET /norms`, the DMN reads, chain execution, the vendor reads, merged SHACL validation and `POST /triplydb/query` — and refuses it with `400 INVALID_INPUT` when it is not `https:`, carries credentials, or points to an internal address. Internal addresses are recognised in every textual IPv4 and IPv6 form, including IPv6 forms that embed an IPv4 address.
+- **At connect time**, `utils/outboundHttp.ts` provides the axios client every caller-chosen request uses. Its agents refuse a name that *resolves* to an internal address, redirects are re-checked, and it pins `proxy: false`, because axios otherwise honours `HTTP(S)_PROXY` with a tunnelling agent that skips the lookup.
+
+TriplyDB calls that forward the caller's token go only to `https:` hosts in `TRIPLYDB_ALLOWED_HOSTS`. Processes deploy only to the configured Operaton, through the shared client that carries `OPERATON_API_KEY` — a request can no longer name the Operaton URL or supply credentials. `ALLOW_LOCAL_ENDPOINTS=true` admits `http:` and local addresses for local development, and is never set on ACC or production.
+
+**CSP reports** — `POST /v1/csp-reports` receives the frontend's Content-Security-Policy violation reports in both formats (`application/csp-report` and `application/reports+json`, up to 64 KB) and logs one warning line per violation. It stores nothing.
 
 **Environment variables** — all sensitive configuration (TriplyDB endpoint URLs, Operaton API URLs, CORS origins, eDOCS credentials) is stored in environment variables and never hardcoded. eDOCS-specific variables: `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, `EDOCS_PASSWORD`, `EDOCS_STUB_MODE`.
 
@@ -592,7 +640,9 @@ The API follows the [Dutch Government API Design Rules](https://publicatie.centr
 | Rule   | Description                 | Implementation                         |
 | ------ | --------------------------- | -------------------------------------- |
 | API-20 | Major version in URI        | `/v1/*` endpoints                      |
-| API-57 | Version header in responses | `API-Version: 0.4.0` on every response |
+| API-57 | Version header in responses | `API-Version: <release>` on every response |
+| API-16 | Use OpenAPI for documentation | OpenAPI 3.1 description (v2026.09.5) |
+| API-51 | Publish the OpenAPI document at a standard location | `/v1/openapi.json` (v2026.09.5) |
 | API-05 | Use nouns for resources     | `dmns`, `chains`, `health`             |
 | API-54 | Plural/singular naming      | Correct usage throughout               |
 | API-48 | No trailing slashes         | Enforced in routing                    |
@@ -600,10 +650,5 @@ The API follows the [Dutch Government API Design Rules](https://publicatie.centr
 
 **Language note (API-04)** — technical endpoint names (`health`, `version`) follow international convention in English. Business resource names (`dmns`, `chains`) follow the source data. Dutch variable names (e.g., `geboortedatum`) are preserved as-is from the DMN definitions.
 
-**Planned:**
-
-| Rule           | Description                            | Target version |
-| -------------- | -------------------------------------- | -------------- |
-| API-16, API-51 | OpenAPI 3.0 spec at `/v1/openapi.json` | v0.5.0         |
-| API-02         | Standard error response format         | v0.5.0         |
+**Checked in CI.** `npm run lint:openapi` lints the published description with Spectral against the NL API Design Rules 2.2.1 in both backend deploy workflows. Errors follow the rules' problem-details requirements (`nlgov:problem-*`). Where the API departs from a rule, the exception is recorded per path in `openapi/.spectral.yaml` rather than switched off globally.
 | API-10         | Resource collections with pagination   | v1.0.0         |

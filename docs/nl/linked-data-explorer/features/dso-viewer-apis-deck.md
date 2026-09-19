@@ -105,6 +105,6 @@ aanroepen elk tabblad doet, en de openstaande punten. Zie
 ## Verwante pagina's
 
 - [DSO-integratie](dso-integration.md)
-- [API-referentie — DSO Integration](../reference/api-reference.md#dso-integration)
+- [API Specification](../reference/api-specification.md)
 - [DSO Explorer-handleiding](../user-guide/dso-explorer.md)
 - [DSO-integratie fasenplan](dso-integration-phase-plan.md)

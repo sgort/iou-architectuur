@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Using the SHACL Validator
 
 This guide explains how to validate CPSV-AP Turtle files against the CPSV-AP and RONL SHACL shapes before publishing them to TriplyDB.
@@ -51,8 +55,9 @@ Validation calls `POST /v1/shacl/validate` (file-local) or `POST /v1/shacl/valid
 
 The top of each card shows either:
 
-- 🟢 **Valid** — no errors (warnings and info may still be present)
-- 🔴 **Invalid** — one or more errors detected
+- 🟢 **Valid** — every shape layer ran and found no errors (warnings and info may still be present)
+- 🟠 **Not validated** — no errors, but one or more shape layers did not load, so the file was not fully checked. The line beside it says how many, for example *1 of 3 shape layers not loaded*
+- 🔴 **Invalid** — one or more errors detected, or the file did not parse
 
 Alongside the badge, count pills show the total number of errors (E), warnings (W), and informational messages (I).
 
@@ -62,7 +67,7 @@ Below the summary, two collapsible layer rows show the per-layer status:
 
 - A green ✓ and **OK** means the layer evaluated the data and found no issues.
 - A coloured badge (e.g. **2E**) means issues were found — click the row to expand them.
-- **Not loaded** means no shape files are present for that layer, so it was not evaluated. This is distinct from OK.
+- **Not loaded** means no shape files are present for that layer, so it was not evaluated. This is distinct from OK, and it is why a file with no errors can still read **Not validated** rather than Valid. If you see it on acceptance or production, the shape files are missing from that deployment — report it rather than treating the file as checked.
 
 ### Issue rows
 

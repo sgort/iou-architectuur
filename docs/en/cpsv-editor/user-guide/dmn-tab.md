@@ -66,8 +66,8 @@ The **Base URL** identifies the Operaton engine to deploy to and evaluate agains
 
 The **Evaluation URL** preview below it shows the URL the editor will actually call. Since v2026.08.0 that is a Linked Data Explorer backend endpoint, not an Operaton one: the browser posts to the backend, and the backend calls Operaton server-to-server. Calling the engine directly from the browser is blocked by CORS, so this indirection is what makes deploy and evaluate work in local development.
 
-!!! tip "Pointing local development at a local engine"
-    Set `REACT_APP_OPERATON_URL` in your `.env` to target a local Operaton container. Without it the Base URL falls back to the shared production instance — so a local dev session would otherwise deploy to, and evaluate against, shared infrastructure.
+!!! tip "What the Base URL does"
+    The **Base URL** does not decide where the model is deployed or evaluated — the Linked Data Explorer backend does that, using its own Operaton. It decides the evaluate endpoint recorded for the decision and published with it as `cprmv:implementedBy`. It comes from `VITE_OPERATON_URL`, which is `localhost:8081` in local development, so publish from acceptance or production rather than from a local session.
 
 ---
 

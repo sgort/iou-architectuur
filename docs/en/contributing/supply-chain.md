@@ -1,20 +1,21 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-12
+  date: 2026-09-19
   against:
-    CPSV Editor: "f5bae6a"
-    Linked Data Explorer: "be6bc54"
-    RONL Business API: "311d732"
+    CPSV Editor: "2723db1"
+    Linked Data Explorer: "ec4792f"
 ---
 
 # Supply-Chain Pinning
 
-!!! info "Re-verified for all three applications on 12 September 2026"
-    Every claim on this page was re-checked against `f5bae6a`, `be6bc54` and
-    `311d732`. Pin counts were derived by listing `uses:` references on each `acc`
-    head, rulesets were read per branch from the API, and mirror state came from
-    `git ls-remote` against both remotes.
+!!! info "Verification status"
+    The **Linked Data Explorer**'s and **CPSV Editor**'s claims were re-checked on
+    **19 September 2026**, against `ec4792f` and `2723db1`: every `uses:` reference
+    listed and counted, rulesets read from the API, and `renovate.json` read rule by
+    rule. The **RONL Business API**'s claims were last re-checked on 12 September
+    2026, against `311d732`, by the same method; the page stamp names only what was
+    verified on its date.
 
     **The RONL Business API's row moved further than any other**: on 12 September 2026
     it closed ten of eleven cross-repository alignment items, and five statements on
@@ -66,7 +67,7 @@ problem rather than solving it).
     vacuous for them: their entire attack surface is the GitHub workflows.
 
     The corollary is that **the mirror is outside every gate on this page** — see
-    [The GitLab mirror](#the-gitlab-mirror).
+    [The GitLab Mirror](the-gitlab-mirror.md).
 
     **The Norm Editor is the exception, and it is not covered by this page.** Its
     pipeline *is* GitLab CI, it builds and pushes its own Docker images to Azure
@@ -94,8 +95,8 @@ findings from **40 to 0** across twenty action references in six deployment
 workflows. All three rulesets are named `acc supply-chain gate`, target
 `refs/heads/acc`, are `active`, and carry **zero bypass actors**; each requires a
 pull request and a passing `audit` check. The CPSV Editor's and the Linked Data
-Explorer's have also required `scan` — the Semgrep job in
-[section 7](#7-the-other-supply-chain-the-npm-tree) — since v2026.09.3.
+Explorer's have also required `scan` — the Semgrep job described in
+[Dependency Scanning](dependency-scanning.md) — since v2026.09.3.
 
 Adoption is not uniform, and the differences are worth knowing rather than
 flattening:
@@ -103,7 +104,7 @@ flattening:
 | | CPSV Editor | RONL Business API | Linked Data Explorer |
 |---|---|---|---|
 | Action references pinned | 12 / 12 | 31 / 31 | 24 / 24 |
-| Workflows carrying them | 4 | 10 | 8 |
+| Workflows carrying them | 5 | 10 | 8 |
 | Action majors | **v7** (since v2026.09.0) | **v7** | **v7** (since v2026.09.2) |
 | Blocks deletion / non-fast-forward | no | **yes** (since v2026.09.7) | **yes** |
 | Merge method restricted *in the ruleset* | no — repository setting only | **yes** | **yes** |
@@ -163,7 +164,7 @@ a month after its `main` got them — two rulesets in one repository differing i
 nobody had decided. And while all three end up allowing merge commits only,
 two of them say so *in the ruleset* while the CPSV Editor relies on the
 repository-level setting alone — see
-[Merge method](#the-merge-method-is-a-setting-not-a-rule). All three reach the
+[Merge method](branch-protection.md#the-merge-method-is-a-setting-not-a-rule). All three reach the
 same place; only two are belt *and* braces.
 
 Ruleset shapes re-verified on 12 September 2026 for all three, with
@@ -334,9 +335,20 @@ choices:
 | `--strict` | Also fails on configuration Renovate would silently auto-migrate. That is how `baseBranches`, renamed upstream to `baseBranchPatterns`, was caught rather than living on as a deprecated key that still "worked" |
 | No filename argument | Passing one switches the validator into *global config* mode, which applies different rules than the repository config the file actually is — it validates happily and tells you nothing useful |
 
-The tool version is pinned inline like everything else here, and — like the
-zizmor version — Renovate does **not** maintain it: it is an `npx` argument,
-not a manifest entry, so it is bumped by hand.
+The tool version is pinned inline like everything else here, and Renovate does
+**not** maintain it: it is an `npx` argument, not a manifest entry, so it is bumped
+by hand.
+
+**The zizmor version is the opposite case**, although this page and all three
+repositories' own records described it the same way until mid-September 2026. It is
+the `version:` input of `zizmorcore/zizmor-action` — `1.29.0` in the Linked Data
+Explorer — and Renovate's github-actions manager maps that input to the Docker image
+`ghcr.io/zizmorcore/zizmor`, so Renovate **does** maintain it. It normally moves in
+the same *github actions* group pull request as the action bump it depends on, and it
+has to: the action only runs zizmor versions in its own digest table, so zizmor
+1.30.1 needs zizmor-action v0.6.4. The two clear the cooldown separately, though, so
+a group branch can carry the image update alone for a while — and the audit fails
+until the action catches up. That failure is correct, not a flake.
 
 A `Set up Node 24` step precedes both. Renovate declares
 `engines.node ^24.11.0` while the runner defaults to Node 22; npm accepts that
@@ -363,6 +375,20 @@ under a cooldown:
   open at once.
 - **`vulnerabilityAlerts` with `minimumReleaseAge: null`** — the fast route for
   security advisories.
+
+Three rules followed from the RONL Business API's fixes of 14 September. The Linked
+Data Explorer carries all three since v2026.09.5; the CPSV Editor carries the first,
+since its own v2026.09.5:
+
+- **Lock-file maintenance is exempt from the pull-request limits** —
+  `prConcurrentLimit: 0` and `prHourlyLimit: 0` on its rule alone. Holding majors
+  behind approval was meant to keep a slot free for it, and could not: the concurrent
+  count includes every open Renovate pull request, security ones included.
+- **Minor updates of pre-1.0 packages wait for approval, like majors.** Semver gives
+  `0.x` no compatibility promise, but Renovate classifies 0.4 → 0.5 as minor.
+- **`engines` floors are widened, not bumped.** `rangeStrategy: "bump"` had rewritten
+  `engines.node` to the newest release three times; the floor is a minimum the
+  repository chooses, not a version to chase.
 
 That last rule is the one most cooldown policies omit, and its absence is why
 people disable such policies mid-incident: **without it the cooldown would delay
@@ -586,7 +612,7 @@ Node 24. The register has since been reconciled in all three repositories, and
 
 Those last two gaps were the motivation for the `check-supply-chain` preflight,
 which **shipped in September 2026 and now runs in all three repositories** — see
-[below](#6-check-supply-chain-the-preflight-zizmor-cannot-be).
+[below](#check-supply-chain-the-preflight-zizmor-cannot-be).
 
 !!! warning "It drifted, was caught by a documentation review, and was reconciled by hand"
     Between the v7 action upgrades and 30 August 2026, RONL Business API's
