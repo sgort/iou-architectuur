@@ -3,6 +3,7 @@ scope: cross-cutting
 verified:
   date: 2026-09-19
   against:
+    CPSV Editor: "2723db1"
     Linked Data Explorer: "ec4792f"
 ---
 
@@ -44,8 +45,8 @@ run, and **Branch Protection** is what turns the rest from checks into gates.
 | **RONL Business API** | pull request · `audit` · no deletion · no force-push | the same four |
 
 Read from the API on 12 September 2026 with `gh api repos/<owner>/<repo>/rules/branches/<branch>`,
-which reports the effective rules from every ruleset at once; the Linked Data Explorer's row
-was read again on 19 September 2026, unchanged. Two things this table does not
+which reports the effective rules from every ruleset at once; the Linked Data Explorer's and
+CPSV Editor's rows were read again on 19 September 2026, unchanged. Two things this table does not
 say, and both matter:
 
 - **The test suites are not in it.** They run on every pull request in all three

@@ -3,16 +3,18 @@ scope: cross-cutting
 verified:
   date: 2026-09-19
   against:
+    CPSV Editor: "2723db1"
     Linked Data Explorer: "ec4792f"
 ---
 
 # Build Provenance
 
 !!! info "Verification status"
-    The **Linked Data Explorer**'s claims were re-checked on **19 September 2026**
-    against `ec4792f`, the v2026.09.5 promotion. The **CPSV Editor** and **RONL
-    Business API** columns were last re-checked on 12 September 2026, against
-    `f5bae6a` and `311d732`; the page stamp names only what was verified on its date.
+    The **Linked Data Explorer**'s and **CPSV Editor**'s claims were re-checked on
+    **19 September 2026**, against `ec4792f` (LDE v2026.09.5) and `2723db1` (CPSV
+    v2026.09.6). The **RONL Business API** columns were last re-checked on 12
+    September 2026, against `311d732`; the page stamp names only what was verified
+    on its date.
     The RONL Business API's two columns had been the unverified ones until then, and
     the reason they could not be verified went on 12 September: **both of its
     surfaces reached production that day**, so all four implementations have run
@@ -269,7 +271,11 @@ from "the values reached the artifact".
 
     The CPSV Editor has promoted twice more since, both on 11 September: v2026.09.3 as
     `build f7e127a · #92` and v2026.09.4 as **`build f5bae6a · #94`**, each from
-    *Deploy PROD (white-sky)*.
+    *Deploy PROD (white-sky)*. Two more followed: v2026.09.5 on 15 September as
+    `build e1c482e · #97`, from the run, and v2026.09.6 on 19 September as
+    **`build 2723db1 · #100`** — read out of the deployed bundle, where the lazy
+    `ChangelogTab-*.js` chunk carries the full SHA and `100` as Vite emitted them,
+    template literals rather than quoted strings.
 
     The Linked Data Explorer has promoted twice more since, both on 11 September:
     v2026.09.3 as `build 35a44f8 · #41` and v2026.09.4 as **`build be6bc54 · #44`**,

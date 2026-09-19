@@ -3,6 +3,7 @@ scope: cross-cutting
 verified:
   date: 2026-09-19
   against:
+    CPSV Editor: "2723db1"
     Linked Data Explorer: "ec4792f"
 ---
 
@@ -41,8 +42,19 @@ On 12 September 2026, by `git ls-remote` against both remotes:
 | Linked Data Explorer | ✅ `1babd54` on both | ✅ `be6bc54` on both |
 | RONL Business API | ✅ `28e1a9e` on both | ✅ `311d732` on both |
 
-The Linked Data Explorer was checked again on 19 September 2026, after its v2026.09.5
-promotion: `acc` at `379cbab` and `main` at `ec4792f` on both remotes.
+Two were checked again on 19 September 2026, after their promotions that day, and both
+were in sync: the Linked Data Explorer with `acc` at `379cbab` and `main` at `ec4792f`,
+the CPSV Editor with `acc` at `a37bace` and `main` at `2723db1`.
+
+**The CPSV Editor's release procedure runs a second check straight after this one.**
+`npm run check-previews` (v2026.09.6) lists the Static Web Apps preview environments Azure
+actually has against the pull requests GitHub has open, and prints the exact
+`az staticwebapp environment delete` command for each orphan. It exists for the same
+reason as the mirror check: GitHub starts no workflow for a pull request with a merge
+conflict, so no close job ever runs for it, and eight previews on acceptance and
+production had outlived their pull requests unnoticed. Like `check-mirror` it runs on a
+workstation, finds its targets from the deploy workflows' own file names rather than
+hardcoding them, and never deletes anything itself.
 
 A tick is *synced at the last check*, not *kept in sync*. The RONL Business API's mirror
 had never been audited before that day, and both branches turned out to be strict

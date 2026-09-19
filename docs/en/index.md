@@ -157,13 +157,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.09.4** · *September 2026*
+-   **✏️ CPSV Editor — v2026.09.6** · *September 2026*
 
     ---
 
-    **Semgrep in the gate, and the scan reads zero**
+    **The error says why again, and previews stop outliving their pull requests**
 
-    Semgrep Code and Supply Chain now scan every pull request and are a [required check on `acc`](contributing/dependency-scanning.md) — the half of the supply chain `check-supply-chain` could never see. The last seven findings were not waiting on an upstream release, as first thought: each had a fix inside its declared range, and **lock-file maintenance had never been turned on**. It now runs every week, and its first refresh took the scan on `acc` to **0**. Two latent parser defects are fixed where they live — iKnow mapping configs can no longer write to `Object.prototype` or compile a pattern that hangs the browser — the TTL export stops asserting a second `cprmv:id` on rules it already publishes, and two example models arrive with 121- and 65-case suites, and the route they took has [its own guide](cpsv-editor/user-guide/dmn-workflow.md). The [test suite](cpsv-editor/developer/testing.md) stands at 751 tests and three end-to-end journeys.
+    The Linked Data Explorer backend now answers every error as RFC 9457 problem details, and the editor [reads them](cpsv-editor/developer/dmn-implementation.md#reading-the-backends-error-messages-v2026096) — so DMN validation, deployment, SHACL validation and the TriplyDB service update show the server's reason again instead of generic text. A DSO import opens the DMN tab with the model in it, where it used to highlight the tab over an empty panel. Preview environments close from a workflow with no path filter, and each release lists any that were orphaned anyway. `npm start` and every push now check the install against the lockfile first, and the last four Semgrep findings are answered in the source rather than the dashboard. The [suite](cpsv-editor/developer/testing.md) stands at 763 tests and three end-to-end journeys, all passing.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 

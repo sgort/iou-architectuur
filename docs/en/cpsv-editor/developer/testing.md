@@ -7,7 +7,7 @@ component: CPSV Editor
 The CPSV Editor's automated test suite runs on **Vitest**, and covers the
 pure-logic core the editor depends on — TTL generation and parsing, DMN XML
 handling, validators, the iKnow import mapping — plus the state hooks, the
-network-boundary utilities, every tab component, and two end-to-end journeys
+network-boundary utilities, every tab component, and three end-to-end journeys
 driven against a live stack.
 
 The testing roadmap that ran from P0 to P7 is **complete**: every phase has
@@ -15,18 +15,21 @@ landed, and the per-file 80% branch floor is enforced natively by the runner.
 
 !!! info "Figures on this page are measured, not estimated"
     Every unit count and percentage below was produced by running the suite
-    against **v2026.09.4** on **11 September 2026** at `f5bae6a` on `main` — the
-    full run and each scoped script individually, in a clean export of that
-    commit after `npm ci`, under Node 22. The three **end-to-end journeys** were
-    run with `E2E_BASE_URL` against the **acceptance deployment**, which serves the
-    same tree as production (`a1dc182`, identical to `f5bae6a`) — 3 passed in 9.3 s.
+    against **v2026.09.6** on **19 September 2026** at `2723db1` on `main` — the
+    full run and each scoped script individually, in a clean clone of that
+    commit after `npm ci`, under Node 24.14.1. The three **end-to-end journeys**
+    were run locally against a live stack — this editor's dev server, the Linked
+    Data Explorer backend on `:3001` and Operaton on `:8081` — and **3 passed in
+    14.0 s**, with Playwright 1.62.1. That stack was running while the unit suite
+    was measured, which is the likeliest reason for the slower wall-clock time
+    below.
     Rerun the commands in [Running the tests](#running-the-tests) to reproduce
     them.
 
-**At a glance:** 61 files · **751 tests** · all passing · ~33 s for a full run
-with coverage, plus **3 end-to-end journeys** run separately.
+**At a glance:** 62 files · **763 tests** · all passing · 84 s for a full run
+with coverage on this measurement, plus **3 end-to-end journeys** run separately.
 
-Coverage: **90.00% statements · 87.95% branches · 78.47% functions · 90.71%
+Coverage: **90.10% statements · 88.23% branches · 78.71% functions · 90.76%
 lines**, with every file at or above the 80% branch floor.
 
 !!! danger "Measure after `npm ci`, never after `npm install`"
@@ -47,20 +50,20 @@ from the repository root after `npm ci`.
 
 | Command | Scope | Suites | Tests |
 |---|---|---:|---:|
-| `npm run test:ci` | Everything, once, with coverage | 61 | 751 |
-| `npm test` | Everything, interactive watch mode | 61 | 751 |
+| `npm run test:ci` | Everything, once, with coverage | 62 | 763 |
+| `npm test` | Everything, interactive watch mode | 62 | 763 |
 | `npm run test:generator` | TTL generator regression tests | 8 | 119 |
 | `npm run test:roundtrip` | TTL round-trip tests (P1) | 1 | 9 |
 | `npm run test:p2` | Pure-logic utilities (P2) | 8 | 191 |
 | `npm run test:p3` | State hooks (P3) | 3 | 33 |
-| `npm run test:p4` | Network-touching utilities (P4) | 2 | 40 |
+| `npm run test:p4` | Network-touching utilities (P4) | 2 | 42 |
 | `npm run test:p5` | Tab components, PreviewPanel, PublishDialog (P5) | 23 | 181 |
-| `npm run test:p6` | `DMNTab`'s full lifecycle (P6) | 6 | 96 |
+| `npm run test:p6` | `DMNTab`'s full lifecycle (P6) | 6 | 98 |
 | `npm run test:e2e` | Playwright journeys (P7) — **needs a live stack** | 3 | 3 |
 
 Each scoped script has a `:watch` counterpart. The phase scripts overlap
 deliberately — a file can belong to more than one phase — so their counts do
-not sum to 751.
+not sum to 763.
 
 ### End-to-end journeys need a live stack
 
@@ -121,10 +124,15 @@ Husky installs two hooks:
 | Hook | Runs |
 |---|---|
 | `pre-commit` | `npx lint-staged` |
-| `pre-push` | `npm run lint` then `npm run check-format` |
+| `pre-push` | `npm run deps:check`, then `npm run lint`, then `npm run check-format` |
+
+`deps:check` runs first since v2026.09.5: a clone whose install has fallen behind
+the lockfile stops there with `npm ci` named, instead of failing lint or the
+format check on the wrong tool versions. `npm start` runs the same check before
+Vite starts.
 
 !!! important "The hooks do not run the tests"
-    `pre-push` gates on lint and formatting only, so nothing client-side stops
+    `pre-push` gates on the install, lint and formatting only, so nothing client-side stops
     a push that breaks the suite — run `npm run test:ci` yourself before
     pushing. Since 20 August 2026 the deploy pipelines do run it, and since
     v2026.08.2 a branch ruleset means a failing pull request cannot be merged
@@ -141,13 +149,27 @@ Husky installs two hooks:
 
 ### CI
 
-Three workflows run in this repository.
+Five workflows run in this repository.
 
 | Workflow | Job | Runs |
 |---|---|---|
 | **Deploy ACC (orange-beach)** | `build_and_deploy_job` | `npm ci` → `npm run lint` → `npm run test:ci` → deploy to acceptance |
 | **Deploy PROD (white-sky)** | `build_and_deploy_job` | The same sequence, deploying production |
 | **Supply-chain audit** (`zizmor.yml`) | `audit` | zizmor 1.29.0, `renovate-config-validator --strict`, `npm run check-format`, and `npm run check-supply-chain` |
+| **Semgrep** (`semgrep.yml`) | `scan` | Semgrep Code and Supply Chain — see [Dependency Scanning](../../contributing/dependency-scanning.md) |
+| **Close preview environments** | `close_acc_preview`, `close_prod_preview` | Deletes a pull request's Static Web Apps preview when it closes — no tests, but see below |
+
+**Preview environments close from a workflow with no path filter** (v2026.09.6). The
+close jobs used to live in the deploy workflows, whose `paths-ignore` applies to the
+close event too, so a pull request that changed only documentation never started the
+workflow holding its close job, and its preview kept running. Four previews on ACC and
+four on PROD had been left that way, each serving a public URL with old code and
+holding one of the ten slots the Static Web Apps Standard plan allows. The close jobs
+now trigger on every pull-request close for `acc` and `main`; closing an environment
+that was never created succeeds and does nothing. GitHub starts no workflow at all for
+a pull request with a merge conflict, so the release procedure also runs
+`npm run check-previews`, which lists orphaned previews and prints the exact delete
+command without running it.
 
 The two deploy workflows run lint and then the full suite before the deploy
 action, and a failure blocks the deploy. Until 20 August 2026 neither ran
@@ -226,16 +248,22 @@ it.
 
 | File | Tests | Style | Covers |
 |---|---:|---|---|
-| `src/hooks/useArrayHandlers.test.js` | 13 | `renderHook` + a `useState` harness | Array CRUD handlers, the four default-item factories, and the pre-configured wrapper hooks. New ids continue from the highest existing id, not the array length |
-| `src/hooks/useDsoImport.test.js` | 8 | `renderHook` + fetch mock + real `window.history` | The DSO → DMN deep-link import: no-op paths, params stripped before the fetch resolves, error branches, and the full success path prefilling three tabs |
-| `src/hooks/useEditorState.test.js` | 7 | `renderHook` + mocked `ronlHelper` | Initial defaults, the mount effects, and `clearAllData` — including its documented exception that TriplyDB config is *not* cleared |
+| `src/hooks/useArrayHandlers.test.js` | 15 | `renderHook` + a `useState` harness | Array CRUD handlers, the four default-item factories, and the pre-configured wrapper hooks. New ids continue from the highest existing id, not the array length |
+| `src/hooks/useDsoImport.test.js` | 9 | `renderHook` + fetch mock + real `window.history` | The DSO → DMN deep-link import: no-op paths, params stripped before the fetch resolves, error branches, and the full success path prefilling three tabs |
+| `src/hooks/useEditorState.test.js` | 9 | `renderHook` + mocked `ronlHelper` | Initial defaults, the mount effects, and `clearAllData` — including its documented exception that TriplyDB config is *not* cleared |
 
 ### Network-boundary utilities (P4)
 
 | File | Tests | Style | Covers |
 |---|---:|---|---|
-| `src/utils/triplydbHelper.test.js` | 37 | `global.fetch` mock + real `File`/`FormData`/`Blob` | All ten exports: graph-IRI construction, config validation, the three publish paths (including the `@prefix` → `PREFIX` conversion and `INSERT DATA`/`GRAPH` wrapping asserted against the posted body), logo upload, connection testing across every HTTP status branch, and the three `localStorage`-backed config functions |
-| `src/utils/shaclHelper.test.js` | 3 | `global.fetch` mock | `validateTtl` — success, a parsed-but-invalid backend response, and the distinct `unavailable` shape on network failure. SHACL validation is advisory and must never block publishing |
+| `src/utils/triplydbHelper.test.js` | 38 | `global.fetch` mock + real `File`/`FormData`/`Blob` | All ten exports: graph-IRI construction, config validation, the three publish paths (including the `@prefix` → `PREFIX` conversion and `INSERT DATA`/`GRAPH` wrapping asserted against the posted body), logo upload, connection testing across every HTTP status branch, and the three `localStorage`-backed config functions |
+| `src/utils/shaclHelper.test.js` | 4 | `global.fetch` mock | `validateTtl` — success, a parsed-but-invalid backend response, and the distinct `unavailable` shape on network failure. SHACL validation is advisory and must never block publishing |
+
+`src/utils/problem.test.js` (7 tests, v2026.09.6) belongs with these, though no phase
+script names it: it pins `getProblemDetail`, which reads the backend's RFC 9457 `detail`
+first and still understands the older `error.message` and bare-string `error` shapes.
+`src/App.lazyTabs.test.jsx` (5 tests) covers the lazy tabs, including the DSO deep link
+that used to leave the DMN tab highlighted over an empty panel.
 
 These use a plain `global.fetch` mock rather than `msw`. Every function here
 is a single self-contained fetch call rather than a multi-request flow, so the
@@ -247,7 +275,7 @@ tests.
 
 | File | Tests | Covers |
 |---|---:|---|
-| `src/App.test.js` | 1 | Renders `<App />` and asserts on the real header. Replaces CRA's stock "learn react link" stub, which asserted text this app never rendered and had kept `test:ci` red since the project was scaffolded |
+| `src/App.test.jsx` | 1 | Renders `<App />` and asserts on the real header. Replaces CRA's stock "learn react link" stub, which asserted text this app never rendered and had kept `test:ci` red since the project was scaffolded |
 
 ---
 
@@ -337,24 +365,29 @@ so the journey is not blocked, and the threshold is documented rather than dodge
 
 ## Coverage
 
-Measured with `npm run test:ci` against v2026.09.4 on 11 September 2026, in a
-clean export after `npm ci`.
+Measured with `npm run test:ci` against v2026.09.6 on 19 September 2026, in a
+clean clone after `npm ci`.
 
-**Overall: 90.00% statements · 87.95% branches · 78.47% functions · 90.71%
+**Overall: 90.10% statements · 88.23% branches · 78.71% functions · 90.76%
 lines** — against 54.75% / 40.88% / 38.68% / 55.57% at v2026.09.0. The jump is
 P5, P6 and the branch-floor work landing together; v2026.09.3's two parser guards
 moved `src/utils` a little further.
 
 | Area | Statements | Branches | Functions | Lines |
 |---|---:|---:|---:|---:|
-| `src/hooks` | 99.33% | 83.60% | 100% | 100% |
-| `src/utils` | 95.07% | 88.06% | 98.47% | 95.94% |
+| `src/hooks` | 100% | 93.44% | 100% | 100% |
+| `src/utils` | 94.80% | 88.06% | 97.98% | 95.62% |
 | `src/config` | 92.15% | 82.35% | 75.00% | 91.83% |
-| `src/components` | 84.41% | **88.65%** | 85.71% | 87.50% |
-| `src` (App, index) | 84.21% | 81.70% | 56.89% | 85.27% |
+| `src/components` | 84.41% | 88.65% | 85.71% | 87.50% |
+| `src/components/tabs` | 84.46% | **92.18%** | 65.93% | 84.67% |
+| `src` (App, index) | 84.56% | 82.22% | 58.62% | 85.63% |
 
-`src/components` was at **4.05% branches** three releases ago. That is the P5 and
-P6 work.
+The rows are the runner's own per-directory figures, so `src/components` counts only the
+files directly in that folder — the dialogs and panels — and the tabs have a row of their
+own. That split is where the functions gap is: the tabs are well branched and thinly
+exercised as whole handlers.
+
+`src/components` was at **4.05% branches** before the P5 and P6 work landed.
 
 ### Every file clears the 80% branch floor
 
@@ -363,19 +396,20 @@ so this is a gate rather than a report. See
 [The Coverage Floor](../../contributing/coverage-floor.md) for how the three
 repositories reached it.
 
-`DMNTab.jsx`, the largest file in the repository at 1855 lines, is now the
-**best-covered component** at 98.34% branches, from 45.73% one release earlier.
+`DMNTab.jsx`, the largest file in the repository, is the **best-covered component**
+at 98.32% branches, from 45.73% at v2026.09.1.
 
-!!! warning "Three files sit one branch above the floor"
-    `useDsoImport.js` 80.39%, `ConceptsTab.jsx` 80.55% and `ChangelogTab.jsx`
-    80.70%. Thresholds pass at `>= 80`, and the ratchet that used to absorb a
-    slip is gone, so **a single added `?.` or `||` default in any of them turns
-    CI red** on an otherwise unrelated change.
+!!! warning "Two files sit one branch above the floor"
+    `ConceptsTab.jsx` 80.55% and `ChangelogTab.jsx` 80.70%. Thresholds pass at
+    `>= 80`, and the ratchet that used to absorb a slip is gone, so **a single
+    added `?.` or `||` default in either turns CI red** on an otherwise
+    unrelated change. `useDsoImport.js` was the third until v2026.09.6, when the
+    deep-link fix's tests took it from 80.39% to 92.15%.
 
 !!! note "What the branch column does not see"
     A branch floor steps straight over branch-free code. `ConceptsTab.jsx` reads
     80.55% on branches but **71.62% statements and 63.33% functions**;
-    `App.jsx` reads 81.48% / 71.65% / **53.70%**. The uncovered code there is
+    `App.jsx` reads 83.33% / 72.44% / **55.55%**. The uncovered code there is
     largely whole handlers no test calls. That asymmetry is why a functions floor
     is [a separate decision](../../contributing/coverage-floor.md#a-functions-floor-is-a-separate-decision)
     rather than a free companion setting.

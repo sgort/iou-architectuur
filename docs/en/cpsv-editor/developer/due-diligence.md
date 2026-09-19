@@ -56,7 +56,7 @@ A PublishDialog component handles uploading the generated TTL content to a Tripl
 
 When the dialog opens it also runs an **advisory pre-publish SHACL validation** (`shaclHelper.js` → `POST /v1/shacl/validate`), rendering a layered CPRMV 0.4.1 / CPSV-AP 3.2.0 / RONL result. It never blocks publishing and degrades to a neutral amber state when the backend is unreachable. It validates the editor's *regenerated* output, which can differ from an imported source file because import normalises legacy terms to the 0.4.1 vocabulary.
 
-**Coupling to core editor:** Low. Consumes only the generated TTL string and service/organization identifiers for graph naming. The Express backend (`REACT_APP_BACKEND_URL`) is shared with the Linked Data Explorer.
+**Coupling to core editor:** Low. Consumes only the generated TTL string and service/organization identifiers for graph naming. The Express backend (`VITE_BACKEND_URL`) is shared with the Linked Data Explorer.
 
 ### 4 — DMN Integration & Operaton Deployment
 

@@ -3,18 +3,19 @@ scope: cross-cutting
 verified:
   date: 2026-09-19
   against:
+    CPSV Editor: "2723db1"
     Linked Data Explorer: "ec4792f"
 ---
 
 # Code Standards
 
 !!! info "Verification status"
-    The **Linked Data Explorer**'s claims were re-checked on **19 September 2026**
-    against `ec4792f`, its v2026.09.5 promotion: rulesets read from the API per
-    branch, workflow steps, `paths:` filters and pins read from the workflow files,
-    and the merge-commit setting from the repository. The **CPSV Editor** and **RONL
-    Business API** claims were last re-checked on 12 September 2026, against
-    `f5bae6a` and `311d732`; the page stamp names only what was verified on its date.
+    The **Linked Data Explorer**'s and **CPSV Editor**'s claims were re-checked on
+    **19 September 2026**, against `ec4792f` (LDE v2026.09.5) and `2723db1` (CPSV
+    v2026.09.6): rulesets read from the API per branch, workflow steps, filters and
+    pins read from the workflow files, and the merge-commit settings from each
+    repository. The **RONL Business API**'s claims were last re-checked on 12 September
+    2026, against `311d732`; the page stamp names only what was verified on its date.
     The `pre-push` sentence below is the exception — it was read from all three
     repositories' `.husky/pre-push` on 19 September.
 
@@ -166,10 +167,15 @@ accumulated invisibly, because nothing in the repository ran `tsc` at all.** `bu
 ESLint; `test` is Vitest. None of the three typechecks, so a type error could reach
 `acc` and deploy. A `typecheck` script now exists at the root and in both workspaces.
 
-**CPSV Editor** — four workflows: two Azure Static Web Apps workflows, `acc` and `main`
+**CPSV Editor** — five workflows: two Azure Static Web Apps workflows, `acc` and `main`
 alike, running `npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy action,
-plus the supply-chain `audit` and, since v2026.09.3, the Semgrep `scan` (see
-[Supply-Chain Pinning — the npm tree](dependency-scanning.md)). Since v2026.09.2 that `audit` job also runs
+plus the supply-chain `audit`, since v2026.09.3 the Semgrep `scan` (see
+[Supply-Chain Pinning — the npm tree](dependency-scanning.md)), and since v2026.09.6
+`close-preview-environments.yml`. That last one holds the two jobs that delete a pull
+request's Static Web Apps preview when it closes. They used to sit in the deploy
+workflows, whose `paths-ignore` applies to the close event too — so a documentation-only
+pull request never started the workflow holding its close job, and its preview kept
+running on a public URL. The new workflow has no path filter at all. Since v2026.09.2 that `audit` job also runs
 `npm run check-format` and `npm run check-supply-chain` — and it gained its first
 `npm ci` to do so, everything in it having previously run from `npx` or plain node. Since v2026.09.0 the deploy workflows are named
 **`Deploy ACC (orange-beach)`** and **`Deploy PROD (white-sky)`**; both were previously

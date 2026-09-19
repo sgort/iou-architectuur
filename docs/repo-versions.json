@@ -29,16 +29,16 @@
     {
       "name": "CPSV Editor",
       "icon": "✏️",
-      "version": "v2026.09.4",
+      "version": "v2026.09.6",
       "environment": "prod",
-      "commit": "f5bae6a...",
-      "commit_date": "2026-09-11",
+      "commit": "2723db1...",
+      "commit_date": "2026-09-19",
       "build": {
-        "sha": "f5bae6a",
-        "run": 94,
-        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/34623600889"
+        "sha": "2723db1",
+        "run": 100,
+        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/35447454898"
       },
-      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/f5bae6ad5e33ad7784cb4188588b4b798c27fb09",
+      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/2723db19fbdbb1c68d5d62a4faa94cf1b7e611d6",
       "ci_repo": "https://github.com/sgort/ttl-editor"
     },
     {

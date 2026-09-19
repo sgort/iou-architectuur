@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # Local Development
 
 !!! info "Documentatie in ontwikkeling"
@@ -45,6 +49,6 @@
 
 # 3. Monitor the GitHub Actions workflow
 
-# https://github.com/sgort/cpsv-editor/actions
+# https://github.com/sgort/ttl-editor/actions
 
 # 4. Verify the ACC deployment

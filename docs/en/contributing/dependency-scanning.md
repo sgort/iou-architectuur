@@ -110,6 +110,8 @@ needed neither of the Linked Data Explorer's filter fixes: its deploy workflows 
 `paths-ignore` for documentation only, so a lockfile change already builds and deploys,
 and it has no group rules to multiply a refresh into three pull requests.
 
+Its last four Code findings had been ignored in the Semgrep dashboard during that triage, where the reasoning was invisible from the code. v2026.09.5 answered them in the source instead: two prototype-pollution warnings in the iKnow parser's path helpers carry a suppression scoped to one rule on one line, with the reason and the condition under which it stops being true, and two `renovate.json` major-version holds now state their 14-day minimum release age themselves, because JSON cannot carry a suppression comment. By the release's own record, the full scan on `acc` after the merge reported 0 Code findings.
+
 **The finding count is not the measure.** The triage that produced the gate
 ([ttl-editor#112](https://github.com/sgort/ttl-editor/issues/112)) opened at **36
 findings and closed at 0**, and by the repository's own record almost none of that

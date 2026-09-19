@@ -3,18 +3,19 @@ scope: cross-cutting
 verified:
   date: 2026-09-19
   against:
+    CPSV Editor: "2723db1"
     Linked Data Explorer: "ec4792f"
 ---
 
 # Supply-Chain Pinning
 
 !!! info "Verification status"
-    The **Linked Data Explorer**'s claims were re-checked on **19 September 2026**
-    against `ec4792f`, its v2026.09.5 promotion: 24 of 24 `uses:` references pinned
-    across its eight workflows, both rulesets read from the API, and `renovate.json`
-    read rule by rule. The **CPSV Editor** and **RONL Business API** claims were last
-    re-checked on 12 September 2026, against `f5bae6a` and `311d732`, by the same
-    method; the page stamp names only what was verified on its date.
+    The **Linked Data Explorer**'s and **CPSV Editor**'s claims were re-checked on
+    **19 September 2026**, against `ec4792f` and `2723db1`: every `uses:` reference
+    listed and counted, rulesets read from the API, and `renovate.json` read rule by
+    rule. The **RONL Business API**'s claims were last re-checked on 12 September
+    2026, against `311d732`, by the same method; the page stamp names only what was
+    verified on its date.
 
     **The RONL Business API's row moved further than any other**: on 12 September 2026
     it closed ten of eleven cross-repository alignment items, and five statements on
@@ -103,7 +104,7 @@ flattening:
 | | CPSV Editor | RONL Business API | Linked Data Explorer |
 |---|---|---|---|
 | Action references pinned | 12 / 12 | 31 / 31 | 24 / 24 |
-| Workflows carrying them | 4 | 10 | 8 |
+| Workflows carrying them | 5 | 10 | 8 |
 | Action majors | **v7** (since v2026.09.0) | **v7** | **v7** (since v2026.09.2) |
 | Blocks deletion / non-fast-forward | no | **yes** (since v2026.09.7) | **yes** |
 | Merge method restricted *in the ruleset* | no — repository setting only | **yes** | **yes** |
@@ -375,8 +376,9 @@ under a cooldown:
 - **`vulnerabilityAlerts` with `minimumReleaseAge: null`** — the fast route for
   security advisories.
 
-The Linked Data Explorer added three rules in v2026.09.5, carried over from the RONL
-Business API's fixes of 14 September:
+Three rules followed from the RONL Business API's fixes of 14 September. The Linked
+Data Explorer carries all three since v2026.09.5; the CPSV Editor carries the first,
+since its own v2026.09.5:
 
 - **Lock-file maintenance is exempt from the pull-request limits** —
   `prConcurrentLimit: 0` and `prHourlyLimit: 0` on its rule alone. Holding majors

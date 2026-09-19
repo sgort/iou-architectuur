@@ -8,6 +8,34 @@ component: CPSV Editor
 
 ## Changelog
 
+### v2026.09.6 — The Error Says Why Again, and Previews Stop Outliving Their Pull Requests (September 2026)
+
+> Measured suites: [Testing](testing.md). The backend change this answers: [Linked Data Explorer v2026.09.5](../../linked-data-explorer/developer/changelog-roadmap.md).
+
+**The editor shows the Linked Data Explorer backend's reasons again.** The backend now answers every error as an RFC 9457 problem-details response, with the reason in `detail`. The editor was still reading the older `error.message` envelope, so DMN validation, DMN deployment, SHACL validation and the TriplyDB service update all fell back to generic text instead of saying what was wrong. A shared `getProblemDetail()` in `src/utils/problem.js` now reads `detail` first and still understands the two older shapes — `error.message` and a bare-string `error` — so the editor keeps working against a backend that has not been promoted yet. Each call site keeps its previous fallback for a response that carries no reason. See [Reading the backend's error messages](dmn-implementation.md#reading-the-backends-error-messages-v2026096).
+
+**The DMN tab renders when a DSO import opens it.** The DMN tab is lazy: it renders only once visited, and a visit was recorded only by the tab button's own handler. The DSO import hook was handed the raw `setActiveTab`, so an import from the Linked Data Explorer made DMN the active tab **without marking it visited** — the tab was highlighted over an empty panel until the user clicked away and back. The hook now receives `openTab`, the same handler the buttons use, and the lazy-tab tests cover the deep link.
+
+**Preview environments close from a workflow with no path filter.** Four Static Web Apps previews were still running on acceptance for pull requests closed days or weeks earlier, and four more on production, each serving a public URL with old code and holding one of the ten slots the Standard plan allows. One was left by the deploy workflows' own path filter, which applies to the close event too: a pull request that changed only documentation never started the workflow holding its close job. Both close jobs now live in `close-preview-environments.yml`, which runs on every pull-request close for `acc` and `main`. The other three were pull requests with a merge conflict, for which GitHub starts no workflow at all — so the release procedure now also runs `npm run check-previews`, which lists the environments Azure has against the pull requests GitHub has open and prints the exact delete command for each orphan. Like the mirror check, it never deletes anything itself.
+
+---
+
+### v2026.09.5 — The Install Is Checked Before It Is Trusted (September 2026)
+
+> The mechanism across repositories: [Code Standards — git hooks](../../contributing/code-standards.md). Measured suites: [Testing](testing.md).
+
+**A stale install stops the dev server and the push.** Nothing told a developer that `node_modules` had fallen behind the lockfile: a fast-forward merge brings in lockfile changes and installs nothing. Measured on a workstation on 14 September, 53 packages were installed at a different version from the one the lockfile named, and 86 were missing. `npm start` now runs `npm run deps:check` first — the check the RONL Business API and Linked Data Explorer use — and so does the pre-push hook, before lint and the format check. When stale it names `npm ci`, not `npm install`, so the committed lockfile is installed exactly. It caught exactly that on its first day, stopping a push of the GitLab mirror after this release's dependency updates until `npm ci` had run.
+
+**The last four Semgrep findings are answered in the source.** Every full scan since 11 September had shown four Code findings that were ignored in the Semgrep dashboard, where the reasoning was invisible from the code. Two were prototype-pollution warnings in the iKnow parser's path helpers, which only read and refuse `__proto__`, `constructor` and `prototype` before walking a path; each now carries a suppression scoped to that one rule on that one line, with the reason and the condition under which it stops being true. The other two flagged the `tailwindcss` and `eslint` major-version holds in `renovate.json` for lacking a minimum release age — they inherit the repository-wide 14 days, but the rule checks each package rule on its own and JSON cannot carry a suppression comment, so both holds now state the 14 days themselves. The full scan on `acc` after the merge reported **0 Code findings**.
+
+**Lock-file maintenance no longer waits for a pull-request slot.** It is only eligible inside its Monday window, so it cannot wait for a slot to free, and holding majors for approval could not keep one free: Renovate's concurrency count includes every open Renovate pull request, security fixes included. The lock-file maintenance rule now sets `prConcurrentLimit` and `prHourlyLimit` to `0`, which Renovate reads as no limit for that branch alone. Its first scheduled run moved six packages, all within declared ranges and past the 14-day cooldown.
+
+**Each release checks the GitLab mirror.** `npm run check-mirror` compares the mirror with GitHub and tells *behind* from *diverged* — which a commit count cannot, and which this repository learned the hard way when its GitLab `main` once held commits GitHub had never seen. It runs on a workstation, where the push happens, and prints the fast-forward command rather than running it.
+
+**The supply-chain register follows zizmor.** `zizmor-action` moved to v0.6.3, with its register row moved on the same branch so the required audit stayed green. The register now also says what it had got wrong: Renovate **does** maintain zizmor's own version, mapping the action's `version` input to the `ghcr.io/zizmorcore/zizmor` image — and the zizmor-action bump has to merge first, because the action only runs zizmor versions in its own digest table. `lucide-react` moved to 1.38.0, the only runtime dependency that changed.
+
+---
+
 ### v2026.09.4 — The Lockfile Moves, and the Scan Reads Zero (September 2026)
 
 > The mechanism across repositories: [Supply-Chain Pinning — the npm tree](../../contributing/dependency-scanning.md).

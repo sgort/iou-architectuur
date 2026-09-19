@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # Getting Started
 
 ---
@@ -16,9 +20,9 @@
 ## Local installation
 
 ```bash
-git clone https://github.com/sgort/cpsv-editor.git
-cd cpsv-editor
-npm install
+git clone https://github.com/sgort/ttl-editor.git
+cd ttl-editor
+npm ci
 npm start
 ```
 

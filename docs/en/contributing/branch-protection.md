@@ -3,6 +3,7 @@ scope: cross-cutting
 verified:
   date: 2026-09-19
   against:
+    CPSV Editor: "2723db1"
     Linked Data Explorer: "ec4792f"
 ---
 
@@ -20,8 +21,10 @@ the [Coverage Floor](coverage-floor.md) — and the
 The Linked Data Explorer's rulesets were read again from the API on 19 September 2026,
 after its v2026.09.5 promotion, and are unchanged: both require a pull request, `audit`
 and `scan`, block deletion and non-fast-forward, allow merge commits only, and carry zero
-bypass actors. The CPSV Editor's and RONL Business API's were last read on 12 September
-2026.
+bypass actors. The CPSV Editor's were read the same day, after its v2026.09.6 promotion,
+and are unchanged too: one ruleset, on `acc`, requiring a pull request, `audit` and
+`scan`, with zero bypass actors, and classic protection on `main` requiring a pull request
+and no status checks. The RONL Business API's were last read on 12 September 2026.
 
 ## What blocks a merge
 
