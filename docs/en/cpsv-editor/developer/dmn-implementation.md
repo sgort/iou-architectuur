@@ -381,9 +381,9 @@ Body: { "variables": { ... } }
 The backend calls Operaton's own `/engine-rest/deployment/create` and
 `/engine-rest/decision-definition/key/{decisionKey}/evaluate` on the editor's
 behalf. Both routes are documented from the backend side in the Linked Data
-Explorer's [API Reference](../../linked-data-explorer/reference/api-reference.md#post-v1dmnsdeploy)
+Explorer's [API Specification](../../linked-data-explorer/reference/api-specification.md)
 — note the evaluate route is a **raw passthrough** that returns Operaton's own
-JSON rather than the backend's usual `{success, data, error}` envelope, which is
+JSON rather than the backend's usual `{ success, data }` envelope, which is
 why the tab can read the response directly. Consequences in the tab:
 
 - The **Evaluation URL** preview in the API Configuration panel shows the

@@ -1,6 +1,10 @@
+---
+component: Linked Data Explorer
+---
+
 # Architecture
 
-The Linked Data Explorer is a monorepo with two packages: a React frontend SPA and a Node.js/Express backend API. The frontend renders in the browser; the backend handles SPARQL queries, Operaton calls, and chain orchestration.
+The Linked Data Explorer is a monorepo with three workspaces under `packages/`: a React frontend SPA, a Node.js/Express backend API, and `ropa-site`, the static public site for the register of processing activities. The frontend renders in the browser; the backend handles SPARQL queries, Operaton calls, and chain orchestration.
 
 ---
 
@@ -15,7 +19,7 @@ Browser
             └── REST API ────► Operaton (DMN execution engine)
 ```
 
-The frontend never calls TriplyDB or Operaton directly in production. All calls go through the backend, which handles authentication, CORS, caching, and variable orchestration. In local development, the frontend can also use a CORS proxy fallback for public SPARQL endpoints.
+The frontend does not call TriplyDB or Operaton itself. Queries, deployments and chain execution all go through the backend, which handles authentication, CORS, caching, variable orchestration — and, since v2026.09.5, the [outbound guard](backend.md#outbound-guard) that checks every host a caller names. That includes the SPARQL Query Editor, which until v2026.09.5 fetched the chosen endpoint straight from the browser and fell back to the third-party `api.allorigins.win` proxy; both paths are gone. The one thing the browser still loads from TriplyDB directly is organisation logo images, which the frontend's Content-Security-Policy admits in `img-src`.
 
 ---
 
@@ -65,25 +69,34 @@ The backend is a structured Express application following the Dutch Government A
 
 ```
 src/
-├── index.ts              entry point, server startup
-├── routes/
-│   ├── index.ts          registers all route groups
-│   ├── dmn.routes.ts     GET /v1/dmns, /v1/dmns/chains, /v1/dmns/semantic-equivalences
-│   ├── chain.routes.ts   POST /v1/chains/execute, POST /v1/chains/export
-│   ├── triplydb.routes.ts POST /v1/triplydb/query
-│   └── health.routes.ts  GET /v1/health
-├── services/
-│   ├── sparql.service.ts       SPARQL queries against TriplyDB
-│   ├── operaton.service.ts     Operaton REST API calls
-│   ├── orchestration.service.ts chain execution and variable mapping
-│   └── triplydb.service.ts     direct TriplyDB proxy (dynamic endpoints)
+├── index.ts              entry point: middleware, route mounting, server startup
+├── routes/               one file per route group, mounted under /v1 by routes/index.ts
+│   ├── registry.ts       the route topology, described once (the root page reads it)
+│   ├── health · openapi · dmn · chain · template · process · shacl · norms
+│   ├── triplydb · vendor · dso · edocs · cache · cspReports
+│   └── assets · assets.public · ropa · ropa.public
+├── services/             one per external system or domain: sparql, operaton,
+│                         orchestration, triplydb, dso, edocs, vendor, norms, template,
+│                         dmn-validation, shacl-validation, assets, ropa, externalTaskWorker
+├── db/                   pg pool, idempotent migrations, row mappers
+├── openapi/              document.ts serves the built description; testing/ holds the
+│                         helpers that validate route responses against it
 ├── middleware/
-│   ├── cors.ts
-│   └── errorHandler.ts
+│   ├── cors.middleware.ts      allowlist, plus wildcard for the three public mounts
+│   ├── error.middleware.ts     central RFC 9457 problem-details handler
+│   └── version.middleware.ts   API-Version header
 └── utils/
-    ├── logger.ts         Winston structured logging
-    └── config.ts         environment config with validation
+    ├── outboundUrl.ts    route-level checks on caller-supplied endpoints
+    ├── outboundHttp.ts   the guarded axios client for caller-chosen hosts
+    ├── problem.ts        builds problem-details responses
+    ├── validation.ts     body validators for the asset and ROPA upserts
+    ├── publicPaths.ts    the three mounts served to any origin
+    ├── buildInfo.ts      reads deploy/build-info.json for /v1/health
+    ├── config.ts         environment configuration
+    └── logger.ts         Winston structured logging
 ```
+
+The request and response shapes of every route are in the [API Specification](../reference/api-specification.md), built from `packages/backend/openapi/openapi.yaml`.
 
 Legacy `/api/*` routes exist with deprecation headers for backward compatibility. All new work uses `/v1/*`.
 

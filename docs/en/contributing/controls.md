@@ -1,11 +1,9 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-12
+  date: 2026-09-19
   against:
-    CPSV Editor: "f5bae6a"
-    Linked Data Explorer: "be6bc54"
-    RONL Business API: "311d732"
+    Linked Data Explorer: "ec4792f"
 ---
 
 # Controls at a Glance
@@ -25,7 +23,7 @@ to correct when a number moves.
 | [Supply-Chain Pinning](supply-chain.md) | Is the pinned digest the version its comment claims? | required on `acc` | required on `acc` and `main` | required on `acc` and `main` |
 | [Dependency Scanning](dependency-scanning.md) | Is a known-vulnerable package or pattern shipping? | required on `acc` | required on `acc` and `main` | **runs, not required** |
 | [Coverage Floor](coverage-floor.md) | Is every *file* tested, not just the package average? | enforced natively | enforced natively | enforced natively |
-| [Build Provenance](build-provenance.md) | Which build is this environment serving? | in place | in place | in place |
+| [Build Provenance](build-provenance.md) | Which build is this environment serving? | in place | in place — frontend and backend | in place |
 | [The GitLab Mirror](the-gitlab-mirror.md) | Does the second copy still match the one the gates run on? | at each release | at each release | at each release |
 
 Read *required* strictly: it means the check is named in a branch ruleset, so the merge
@@ -46,7 +44,8 @@ run, and **Branch Protection** is what turns the rest from checks into gates.
 | **RONL Business API** | pull request · `audit` · no deletion · no force-push | the same four |
 
 Read from the API on 12 September 2026 with `gh api repos/<owner>/<repo>/rules/branches/<branch>`,
-which reports the effective rules from every ruleset at once. Two things this table does not
+which reports the effective rules from every ruleset at once; the Linked Data Explorer's row
+was read again on 19 September 2026, unchanged. Two things this table does not
 say, and both matter:
 
 - **The test suites are not in it.** They run on every pull request in all three

@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # eDOCS Integration
 
 The LDE backend integrates with **OpenText eDOCS** — the document management system used by Province of Flevoland — to automatically file process documents into project workspaces as part of the RIP Phase 1 workflow.
@@ -147,4 +151,4 @@ The document number matches the `documentNumber` field returned by `POST /v1/edo
  
 ## REST endpoints
  
-See [API Reference — eDOCS](../reference/api-reference.md#edocs) for full request and response documentation of all four `/v1/edocs` endpoints.
+See the [API Specification](../reference/api-specification.md) for full request and response documentation of all four `/v1/edocs` endpoints.

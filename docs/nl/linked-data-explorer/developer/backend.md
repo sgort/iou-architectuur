@@ -8,9 +8,22 @@ De backend is een Node.js/Express TypeScript-API. Het staat tussen de React-fron
 
 ---
 
+<a id="api-versioning"></a>
+
 ## API-versiebeheer
 
-Alle endpoints volgen `/v1/*`. Legacy-endpoints `/api/*` bestaan met `Deprecation`-responseheaders voor achterwaartse compatibiliteit. De versie wordt in elke respons opgenomen via de `API-Version`-header, conform de Nederlandse API Design Rules API-20 en API-57 van de Overheid.
+| Omgeving | Basis-URL |
+|---|---|
+| Productie | `https://backend.linkeddata.open-regels.nl/v1` |
+| Acceptatie | `https://acc.backend.linkeddata.open-regels.nl/v1` |
+
+Alle endpoints volgen `/v1/*`. De releaseversie wordt in elke respons opgenomen via de `API-Version`-header — `API-Version: 2026.09.5` op het moment van schrijven — conform de Nederlandse API Design Rules API-20 en API-57 van de Overheid.
+
+**Het contract is gepubliceerd.** `GET /v1/openapi.json` levert een OpenAPI 3.1-beschrijving van elke `/v1`-route, gebouwd uit `packages/backend/openapi/openapi.yaml`. Het is de referentie voor de vorm van requests en responses; de pagina [API Specification](../reference/api-specification.md) toont hem. `/v1/openapi.json` is een van de drie openbare mounts die aan elke origin worden geleverd (zie [Beveiliging](#beveiliging)), dus elke client kan hem lezen.
+
+**Legacy-aliassen `/api/*`** werken nog voor achterwaartse compatibiliteit en sturen een `Deprecation`-header en een `Link`-header die de `/v1`-opvolger noemt. Ze verdwijnen in v2.0.0.
+
+**`GET /`**, buiten `/v1`, retourneert API-metadata en een overzicht van de huidige en legacy-endpointpaden, inclusief de `documentation`-verwijzing naar `/v1/openapi.json`.
 
 ---
 
@@ -22,21 +35,38 @@ Alle endpoints volgen `/v1/*`. Legacy-endpoints `/api/*` bestaan met `Deprecatio
 GET /v1/health
 ```
 
-Retourneert servicehealth inclusief latency-checks van TriplyDB en Operaton. Gebruikt door CI/CD-pipelines en de statusindicator van de frontend.
+Retourneert servicehealth: latency-checks van TriplyDB en Operaton, de SHACL-shapelagen die de validator heeft geladen, en **welke build draait**. Gebruikt door de verificatie na deployment in de deployworkflows en door de statusindicator van de frontend. De respons van productie op 19 september 2026:
 
 ```json
 {
   "name": "Linked Data Explorer Backend",
-  "version": "0.4.0",
+  "version": "2026.09.5",
   "environment": "production",
+  "build": {
+    "sha": "ec4792f09c289f8fee6c68da5184fd775a27ccc9",
+    "shortSha": "ec4792f",
+    "run": "19",
+    "isTracked": true,
+    "label": "build ec4792f · #19"
+  },
   "status": "healthy",
-  "uptime": 3600,
   "services": {
-    "triplydb": { "status": "up", "latency": 145 },
-    "operaton": { "status": "up", "latency": 98 }
-  }
+    "triplydb": { "status": "up", "latency": 98 },
+    "operaton": { "status": "up", "latency": 105 }
+  },
+  "shacl": {
+    "complete": true,
+    "layers": {
+      "cpsv-ap": { "label": "CPSV-AP 3.2.0", "loaded": true },
+      "ronl-custom": { "label": "RONL Custom", "loaded": true },
+      "cprmv": { "label": "CPRMV 0.4.1", "loaded": true }
+    }
+  },
+  "documentation": "/v1/openapi.json"
 }
 ```
+
+`version` noemt de release; `build` noemt de commit en de workflowrun, gelezen uit het `deploy/build-info.json` dat de deployworkflow in het artefact schrijft. `build` geldt alleen als getrackt wanneer zowel `sha` als `run` aanwezig zijn — een ontbrekend of onleesbaar bestand meldt een lokale build en heeft nooit invloed op `status`. De deployworkflows wachten tot `build.sha` gelijk is aan de gedeployde commit en `shacl.complete` `true` is voordat ze slagen; zie [Post-deployment verification](deployment.md#post-deployment-verification).
 
 ### DMN deployen en evalueren (v2026.08.2)
 
@@ -58,13 +88,13 @@ registratie-entry gedeployed kan worden. De route is een dunne wrapper om
 `evaluate/:decisionKey` is een **ruwe passthrough**: het antwoord van Operaton
 wordt byte-voor-byte en met dezelfde statuscode doorgegeven — de success-array of
 het exception-object — en dus *niet* in de gebruikelijke
-`{success, data, error}`-envelope, omdat de aanroepende tab de JSON van Operaton
+`{ success, data }`-envelope, omdat de aanroepende tab de JSON van Operaton
 zelf leest. `evaluateRaw()` geeft ook de request-body ongewijzigd door en slaat
 de type-inferentie over die `evaluateDecision()` voor zijn eigen (andere)
 aanroepcontract toepast; de DMN-tab stelt de body al in Operaton-vorm samen, dus
 opnieuw inpakken zou die dubbel verpakken.
 
-Zie de [API Reference](../reference/api-reference.md) — de Engelstalige pagina bevat de volledige endpointbeschrijving.
+Beide routes zijn beschreven in de [API Specification](../reference/api-specification.md).
 
 ### DMN-discovery
 
@@ -122,19 +152,13 @@ Request body:
 }
 ```
 
-Voert de keten sequentieel uit, met flattening van outputs naar inputs tussen stappen. Retourneert resultaten per stap en de gecombineerde eindoutput.
+Voert de keten sequentieel uit, met flattening van outputs naar inputs tussen stappen. Retourneert resultaten per stap en de gecombineerde eindoutput. Een keten die halverwege faalt antwoordt met een problem-details-fout **en** behoudt het gedeeltelijke resultaat onder `data`, zodat de uitgevoerde stappen en hun outputs niet verloren gaan.
 
 ```
-POST /v1/chains/execute/heusdenpas
+POST /v1/dmns/drd/deploy
 ```
 
-Convenience-endpoint voor de vaste driestaps-Heusdenpasketen met productie-testdata. Doel-uitvoeringstijd: <1000ms. Zie [API Reference](../reference/api-reference.md) voor het volledige request/response.
-
-```
-POST /v1/chains/export
-```
-
-Genereert een DRD XML-bestand vanuit een keten en deployt het naar Operaton. Zie [DRD-generatie](drd-generation.md).
+Voegt gedeployde DMN's samen tot één DRD en deployt die naar Operaton. Zie [DRD-generatie](drd-generation.md).
 
 ### eDOCS
 
@@ -147,7 +171,7 @@ GET  /v1/edocs/workspaces/:workspaceId/documents
 
 Integreert met het OpenText eDOCS-documentmanagementsysteem. Gebruikt door het RIP Fase 1-proces om project-workspaces aan te maken en documenten te dossieren. In stub-modus (`EDOCS_STUB_MODE=true`, default) retourneren alle methoden realistische nepresponses zodat het proces end-to-end draait voordat een live eDOCS-server beschikbaar is.
 
-Zie [eDOCS-integratie](edocs-integration.md) en de [API Reference](../reference/api-reference.md#edocs) voor request-/responsedetails.
+Zie [eDOCS-integratie](edocs-integration.md), en de [API Specification](../reference/api-specification.md) voor request- en responsedetails.
 
 ### TriplyDB-proxy
 
@@ -164,7 +188,7 @@ Request body:
 }
 ```
 
-Proxyt een SPARQL-query naar een willekeurig TriplyDB-endpoint, om CORS-restricties te omzeilen. Gebruikt door de Query Editor in de frontend voor dynamische endpoint-ondersteuning.
+Voert een SPARQL-query uit tegen een door de aanroeper opgegeven endpoint. **Elke query die de Query Editor van de frontend verstuurt gaat hierlangs** — de editor haalt endpoints niet langer vanuit de browser op, en de vroegere fallback-proxy `api.allorigins.win` is verdwenen. Het endpoint passeert eerst de [uitgaande controle](#outbound-guard): het moet `https:` zijn, geen credentials bevatten en naar een openbaar adres verwijzen, anders antwoordt de route `400 INVALID_INPUT` voordat er een request wordt gedaan.
 
 ### Normen
 
@@ -432,7 +456,7 @@ POST   /v1/assets/documents
 DELETE /v1/assets/documents/:id
 ```
 
-Persisteert BPMN-processen, formulierschema's en documenttemplates naar PostgreSQL. Alle routes retourneren `503 DB_NOT_CONFIGURED` wanneer `DATABASE_URL` ontbreekt. Zie [Asset-opslag](asset-storage.md) voor de service-architectuur en [API Reference](../reference/api-reference.md#asset-storage) voor volledige request-/responsedocumentatie.
+Persisteert BPMN-processen, formulierschema's en documenttemplates naar PostgreSQL. Alle routes retourneren `503 DB_NOT_CONFIGURED` wanneer `DATABASE_URL` ontbreekt. De upserts, de deploymarkering en het verwijderen van een ROPA-record valideren hun invoer voordat die Postgres bereikt, en antwoorden `400 INVALID_INPUT` met een detail dat elk afgekeurd veld noemt; de controles volgen de eigen constraints van de database, en een lege titel, id of naam wordt geweigerd op de velden die een record identificeren. Zie [Asset-opslag](asset-storage.md) voor de service-architectuur en de [API Specification](../reference/api-specification.md) voor de vorm van requests en responses.
 
 ---
 
@@ -544,7 +568,24 @@ Gestructureerde logging met Winston en JSON-output. Alle serviceaanroepen loggen
 
 ## Foutafhandeling
 
-Een centrale `errorHandler.ts`-middleware vangt niet-afgevangen fouten op en retourneert gestandaardiseerde JSON-foutresponses met passende HTTP-statuscodes. SPARQL- en Operaton-fouten worden omhuld met beschrijvende berichten voordat zij worden teruggegeven aan de frontend. Geen gevoelige data is opgenomen in foutresponses.
+Elke fout die de API zelf produceert is een **RFC 9457 problem details**-respons, `application/problem+json`:
+
+```json
+{
+  "type": "about:blank",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "…",
+  "instance": "/v1/dmns",
+  "code": "INVALID_INPUT"
+}
+```
+
+`code` is een extension member en het veld waarop aanroepers vertakken — `INVALID_INPUT`, `MALFORMED_BODY`, `PAYLOAD_TOO_LARGE`, `DB_NOT_CONFIGURED` enzovoort. `type` is `about:blank`, omdat er geen documentatiepagina per soort probleem bestaat en een URL die nergens heen wijst slechter zou zijn dan geen. `instance` is het requestpad zonder querystring. Succesresponses zijn ongewijzigd en houden `{ success: true, data }`.
+
+Dit verving in v2026.09.5 vijf verschillende envelopes. `POST /v1/dmns/evaluate/:decisionKey` is de enige uitzondering: die geeft de eigen fouten van Operaton ongewijzigd door, omdat de aanroeper de JSON van Operaton leest.
+
+`middleware/error.middleware.ts` is de centrale handler. Een body die niet te parsen is krijgt **400 `MALFORMED_BODY`**, een body boven de limiet van 10 MB **413 `PAYLOAD_TOO_LARGE`** met die limiet in het detail, en andere body-parserfouten de eigen status van de parser als `INVALID_BODY` — parserfouten worden herkend aan hun type, zodat een willekeurige fout met een `status`-eigenschap nog steeds 500 geeft in plaats van zelf een respons te kiezen. Stack traces en interne context bereiken de client nooit.
 
 ---
 
@@ -575,9 +616,18 @@ Een centrale `errorHandler.ts`-middleware vangt niet-afgevangen fouten op en ret
 
 **HTTP-headers** — [Helmet](https://helmetjs.github.io/) is geconfigureerd om uitgebreide beveiligingsheaders te zetten op alle responses, waaronder `Content-Security-Policy`, `X-Content-Type-Options`, `X-Frame-Options` en `Strict-Transport-Security`.
 
-**CORS** — alleen origins die in `CORS_ORIGIN` staan zijn toegestaan. In productie is dit beperkt tot `https://linkeddata.open-regels.nl` en `https://cpsv.open-regels.nl`. Alle andere origins ontvangen een CORS-afwijzing — **behalve op de twee openbare, alleen-lezen mounts**, `/v1/ropa/public` en `/v1/bundles/public`, die bewust elke origin toestaan voor `GET` en `OPTIONS`. `isPublicPath` herkent die mounts of een pad daaronder, nooit een zusterroute die alleen hetzelfde voorvoegsel deelt; zie [RoPA Records — de openbare routes](ropa-records.md#publieke-route).
+**CORS** — alleen origins die in `CORS_ORIGIN` staan zijn toegestaan. In productie is dit beperkt tot `https://linkeddata.open-regels.nl` en `https://cpsv.open-regels.nl`; acceptatie laat daarnaast beide omgevingen van de IOU-architectuurdocumentatie toe. Elke andere origin krijgt een gewone respons zonder `Access-Control-Allow-Origin`-header, die de browser vervolgens weigert — **behalve op de drie openbare, alleen-lezen mounts**, `/v1/ropa/public`, `/v1/bundles/public` en `/v1/openapi.json`, die bewust elke origin toestaan voor `GET` en `OPTIONS`. `isPublicPath` herkent die mounts of een pad daaronder, nooit een zusterroute die alleen hetzelfde voorvoegsel deelt; zie [RoPA Records — de openbare routes](ropa-records.md#publieke-route).
 
-**Invoervalidatie** — typechecking wordt toegepast op alle request-inputs. Variabelennamen, DMN-identifiers en SPARQL-endpoint-URL's worden gevalideerd voordat een serviceaanroep wordt gedaan. De grootte van de request body is beperkt tot 10 MB.
+**Invoervalidatie** — request-inputs worden gecontroleerd voordat een serviceaanroep wordt gedaan, en een afgekeurde invoer antwoordt `400 INVALID_INPUT` met de betrokken velden, in plaats van als 500 terug te komen uit een achterliggend systeem. De grootte van de request body is beperkt tot 10 MB.
+
+<a id="outbound-guard"></a>**Uitgaande controle** — de backend vraagt nooit een host op die een aanroeper noemde zonder die te controleren (v2026.09.5, [#142](https://github.com/sgort/linked-data-explorer/issues/142)). Er zijn twee lagen:
+
+- **Bij de route** controleert `utils/outboundUrl.ts` elk door de aanroeper opgegeven SPARQL-endpoint — op `GET /norms`, de DMN-leesroutes, ketenuitvoering, de vendor-leesroutes, samengevoegde SHACL-validatie en `POST /triplydb/query` — en weigert het met `400 INVALID_INPUT` wanneer het geen `https:` is, credentials bevat of naar een intern adres verwijst. Interne adressen worden herkend in elke tekstuele IPv4- en IPv6-vorm, ook de IPv6-vormen waarin een IPv4-adres is opgenomen.
+- **Bij het verbinden** levert `utils/outboundHttp.ts` de axios-client die elk request naar een door de aanroeper gekozen host gebruikt. De agents weigeren een naam die naar een intern adres *resolvet*, redirects worden opnieuw gecontroleerd, en de client zet `proxy: false`, omdat axios anders `HTTP(S)_PROXY` volgt met een tunnelagent die de controle overslaat.
+
+TriplyDB-aanroepen die het token van de aanroeper doorsturen gaan alleen naar `https:`-hosts in `TRIPLYDB_ALLOWED_HOSTS`. Processen worden alleen naar de geconfigureerde Operaton gedeployd, via de gedeelde client met `OPERATON_API_KEY` — een request kan de Operaton-URL niet meer opgeven en geen credentials meesturen. `ALLOW_LOCAL_ENDPOINTS=true` laat `http:` en lokale adressen toe voor lokale ontwikkeling, en staat nooit aan op ACC of productie.
+
+**CSP-rapporten** — `POST /v1/csp-reports` ontvangt de Content-Security-Policy-schendingsrapporten van de frontend in beide formaten (`application/csp-report` en `application/reports+json`, tot 64 KB) en logt per schending één waarschuwingsregel. Er wordt niets opgeslagen.
 
 **Omgevingsvariabelen** — alle gevoelige configuratie (TriplyDB-endpoint-URL's, Operaton API-URL's, CORS-origins, eDOCS-credentials) wordt opgeslagen in omgevingsvariabelen en nooit hardcoded. eDOCS-specifieke variabelen: `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, `EDOCS_PASSWORD`, `EDOCS_STUB_MODE`.
 
@@ -594,7 +644,9 @@ De API volgt de [Nederlandse API Design Rules van de Overheid](https://publicati
 | Regel  | Beschrijving                                    | Implementatie                          |
 | ------ | ----------------------------------------------- | -------------------------------------- |
 | API-20 | Major versie in URI                             | `/v1/*`-endpoints                      |
-| API-57 | Versieheader in responses                       | `API-Version: 0.4.0` op elke respons   |
+| API-57 | Versieheader in responses                       | `API-Version: <release>` op elke respons |
+| API-16 | Gebruik OpenAPI voor documentatie               | OpenAPI 3.1-beschrijving (v2026.09.5)  |
+| API-51 | Publiceer het OpenAPI-document op een vaste plek | `/v1/openapi.json` (v2026.09.5)       |
 | API-05 | Gebruik zelfstandige naamwoorden voor resources | `dmns`, `chains`, `health`             |
 | API-54 | Meervoud/enkelvoud-naamgeving                   | Correct gebruik overal                 |
 | API-48 | Geen trailing slashes                           | Afgedwongen in routing                 |
@@ -602,10 +654,5 @@ De API volgt de [Nederlandse API Design Rules van de Overheid](https://publicati
 
 **Taalnotitie (API-04)** — technische endpoint-namen (`health`, `version`) volgen internationale conventie in het Engels. Business-resource-namen (`dmns`, `chains`) volgen de brondata. Nederlandse variabelennamen (bijv. `geboortedatum`) worden zoals zij zijn behouden vanuit de DMN-definities.
 
-**Gepland:**
-
-| Regel          | Beschrijving                            | Doelversie     |
-| -------------- | --------------------------------------- | -------------- |
-| API-16, API-51 | OpenAPI 3.0-spec op `/v1/openapi.json`  | v0.5.0         |
-| API-02         | Standaard foutresponse-formaat          | v0.5.0         |
+**Gecontroleerd in CI.** `npm run lint:openapi` lint de gepubliceerde beschrijving met Spectral tegen de NL API Design Rules 2.2.1 in beide backend-deployworkflows. Fouten volgen de problem-details-eisen van de regels (`nlgov:problem-*`). Waar de API van een regel afwijkt, is de uitzondering per pad vastgelegd in `openapi/.spectral.yaml` in plaats van globaal uitgezet.
 | API-10         | Resource-collecties met paginering      | v1.0.0         |

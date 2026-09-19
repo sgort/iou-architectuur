@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # PostgreSQL Deployment
 
 The LDE backend requires a dedicated PostgreSQL Flexible Server for each environment. This is separate from the RONL Business API's `ronl-postgres-prod` instance — see [Infrastructure decisions](#infrastructure-decisions) for the rationale.
@@ -164,4 +168,4 @@ The LDE uses its own dedicated PostgreSQL Flexible Server rather than sharing th
 - [Asset Storage](asset-storage.md) — write-through cache and hydration architecture
 - [Local Development — PostgreSQL setup](local-development.md#postgresql-setup-local)
 - [Backend Architecture](backend.md)
-- [API Reference — Asset Storage](../reference/api-reference.md#asset-storage)
+- [API Specification](../reference/api-specification.md) — request and response shapes for every asset route

@@ -12,19 +12,33 @@ before that the repository had no test files at all and `npm test` exited 1 with
 
 !!! info "Figures on this page are measured, not estimated"
     Every count, command and coverage percentage below was produced by running
-    the suites against **v2026.09.4** on **11 September 2026**, at `be6bc54` on
-    `main` — the promoted commit — in a clean export of that commit after
-    `npm ci`, under Node 22 (CI pins Node 24; `npm ci` installs from the
-    lockfile, so the tree is identical). Rerun the commands in
+    the suites against **v2026.09.5** on **19 September 2026**, at `ec4792f` on
+    `main` — the promoted commit — in a clean clone of that commit after
+    `npm ci`, under Node 24.14.1. CI pins Node 22.23.2 for the backend and
+    20.20.2 for the frontend; `npm ci` installs from the lockfile, so the
+    dependency tree is identical. Rerun the commands in
     [Running the tests](#running-the-tests) to reproduce them.
 
-**At a glance:** 121 test files · **2242 tests** · all passing · backend 98.57%
-statements, frontend 94.76%.
+**At a glance:** 136 test files · **2821 tests** · all passing · backend 98.39%
+statements, frontend 95.10%.
 
 | Package | Runner | Files | Tests | Statements | Branches | Functions | Lines |
 |---|---|---:|---:|---:|---:|---:|---:|
-| `packages/backend` | Jest + ts-jest | 52 | 1151 | 98.57% | 92.96% | 97.17% | 99.05% |
-| `packages/frontend` | Vitest + RTL | 69 | 1091 | 94.76% | 92.88% | 91.78% | 95.72% |
+| `packages/backend` | Jest + ts-jest | 63 | 1649 | 98.39% | 92.41% | 97.26% | 99.05% |
+| `packages/frontend` | Vitest + RTL | 73 | 1172 | 95.10% | 93.26% | 92.56% | 96.09% |
+
+**v2026.09.5 added 579 tests, 498 of them in the backend**, almost all of them
+new code under test rather than margin on old. The outbound guard alone brought
+82 — `outboundUrl.test.ts` 62 and `outboundHttp.test.ts` 20. `src/openapi` is a
+new area of 38 tests across four files, and the route suites grew by validating
+every response against the published OpenAPI document. Problem details,
+build provenance and the extracted CORS middleware each gained their own file.
+Backend branches moved 92.96% → **92.41%**: the release added a great deal of
+branching code, and the per-file floor, not the package average, is what holds
+each file to account. The frontend added 81 tests and four files — among them
+`vite/cspPlugin.test.ts` for the Content-Security-Policy generator and
+`src/data/dsoAuthorities.test.ts` for the generated authority list — and moved
+branches 92.88% → **93.26%**.
 
 **The frontend nearly doubled, and then was given margin.** v2026.09.1 raised
 per-file branch coverage above 80% across both packages: the frontend gained
@@ -75,9 +89,15 @@ both workspaces with `--workspaces --if-present`.
 
 | Command | Scope | Files | Tests |
 |---|---|---:|---:|
-| `npm test` | Both packages | 121 | 2242 |
-| `npm test -w packages/backend` | Backend only (Jest, with coverage) | 52 | 1151 |
-| `npm test -w packages/frontend` | Frontend only (Vitest, with coverage) | 69 | 1091 |
+| `npm test` | Both packages | 136 | 2821 |
+| `npm test -w packages/backend` | Backend only (Jest, with coverage) | 63 | 1649 |
+| `npm test -w packages/frontend` | Frontend only (Vitest, with coverage) | 73 | 1172 |
+| `npm run test:contract -w packages/backend` | `src/openapi` and `src/routes`, without coverage | 27 | 734 |
+
+`test:contract` is a **subset** of the backend run, not an addition to it: every
+route suite, plus the OpenAPI tests, with coverage switched off — 21.9 seconds
+against 59.8 for the full backend suite. It is the fast loop while editing
+`openapi.yaml` or a route.
 
 Both packages' `test` scripts include coverage by default, so a plain run always
 produces a report. Watch modes are `test:watch` in either package; the backend
@@ -100,7 +120,13 @@ npm run test:watch -w packages/backend
 | Command | Backend | Frontend |
 |---|---|---|
 | `npm run lint` | ✅ runs | ✅ runs |
+| `npm run typecheck` | ✅ runs | ✅ runs |
 | `npm run check-format` | ✅ runs | ✅ runs |
+| `npm run lint:openapi` | ✅ runs | – |
+
+`lint:openapi` builds `openapi/openapi.json` from `openapi/openapi.yaml` and lints
+it with Spectral against the NL API Design Rules 2.2.1. All four passed at
+`ec4792f`.
 
 Both root commands fan out over both packages. The backend checks
 `src/**/*.ts`; the frontend checks the whole package.
@@ -127,7 +153,12 @@ Both root commands fan out over both packages. The backend checks
 | Hook | Runs | Scope |
 |---|---|---|
 | `pre-commit` | `npx lint-staged` | Staged files only — Prettier `--write` then ESLint `--fix`, per package with that package's own config |
-| `pre-push` | `npm run lint`, then `npm run check-format` | Both packages in full |
+| `pre-push` | `npm run deps:check`, then `npm run lint`, then `npm run check-format` | Both packages in full |
+
+`deps:check` runs first, since v2026.09.5, so a clone whose install has fallen
+behind the lockfile stops there with `npm ci` named — instead of failing lint or
+the format check on the wrong tool versions, with nothing in the output saying
+why.
 
 `lint-staged` matches `packages/frontend/**/*.{js,jsx,ts,tsx,json,css,md}` and
 `packages/backend/src/**/*.ts`. The backend glob mirrors exactly what its
@@ -147,11 +178,11 @@ rewriting files the other never checks.
 
 Four of the six Azure workflows run the suites, and a failure blocks the deploy:
 
-| Workflow | Lint | **Tests** | Build | Deploy |
-|---|:---:|:---:|:---:|:---:|
-| `azure-backend-acc` / `-production` | ✅ | **✅** | ✅ | ✅ |
-| `azure-frontend-acc` / `-production` | ✅ | **✅** | ✅ | ✅ |
-| `azure-ropa-site-acc` / `-prod` | – | – | – | ✅ |
+| Workflow | Lint | Typecheck | OpenAPI lint | **Tests** | Build | Deploy |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| `azure-backend-acc` / `-production` | ✅ | ✅ | ✅ | **✅** | ✅ | ✅ |
+| `azure-frontend-acc` / `-production` | ✅ | ✅ | – | **✅** | ✅ | ✅ |
+| `azure-ropa-site-acc` / `-prod` | – | – | – | – | – | ✅ |
 
 The two `ropa-site` workflows run nothing, correctly: `packages/ropa-site` is a
 static `index.html` plus a `staticwebapp.config.json`, with no build and no test
@@ -185,13 +216,14 @@ that is where the only lockfile lives.
 rather than being omitted from the report — a deliberate choice that keeps the
 headline number honest.
 
-| Area | Tests | Covers |
-|---|---:|---|
-| `src/services` | 626 | Every service: operaton, sparql, dso, norms, edocs, ropa, vendor, assets, template, triplydb, orchestration, shacl-validation, dmn-validation, externalTaskWorker |
-| `src/routes` | 389 | Every route module plus `routes/index` and `routes/registry`, each mounted in isolation (a fresh `express()` app per file, not the full `index.ts`) with the service layer mocked and supertest driving requests |
-| `src/utils` | 96 | `etag`, `errors`, `logger`, `rootViews`, `config`, `publicPaths` |
-| `src/db` | 22 | `pool`, `migrate` |
-| `src/middleware` | 9 | `error.middleware`, `version.middleware` |
+| Area | Files | Tests | Covers |
+|---|---:|---:|---|
+| `src/routes` | 23 | 696 | Every route module plus `routes/index` and `routes/registry`, each mounted in isolation (a fresh `express()` app per file, not the full `index.ts`) with the service layer mocked and supertest driving requests — and each response validated against the OpenAPI document |
+| `src/services` | 18 | 646 | Every service: operaton, sparql, dso, norms, edocs, ropa, vendor, assets, template, triplydb, orchestration, shacl-validation, dmn-validation, externalTaskWorker |
+| `src/utils` | 10 | 202 | `outboundUrl` 62, `config` 27, `errors` 23, `outboundHttp` 20, `rootViews` 13, `publicPaths` 13, `buildInfo` 12, `etag` 11, `logger` 11, `problem` 10 |
+| `src/openapi` | 4 | 38 | The conformance helpers routes are checked with (16), route-to-operation matching (10), the served document (9), and the coverage rule that fails when a `/v1` route is undocumented (3) |
+| `src/middleware` | 3 | 33 | `error.middleware` 22, `cors.middleware` 8, `version.middleware` 3 |
+| `src/db` | 3 | 25 | `mappers` 15, `migrate` 7, `pool` 3 |
 | `src/example-fixture-parity.test.ts` | 4 | Every file in a mirrored RIP bundle is byte-identical to its twin — `examples/organizations/flevoland/rip-phase-2x/` against `e2e-fixtures/flevoland/`. Bundles opt in through `MIRRORED_BUNDLES` |
 | `src/e2e-fixtures.test.ts` | 5 | The `e2e-fixtures/` bundle consumed by the RONL Business API's E2E suite — manifest parses, every declared file exists, each BPMN's process id matches its `processDefinitionKey`, each shell's `calledElement` references resolve, and every process keeps its artifacts after its flow elements |
 
@@ -207,8 +239,13 @@ Techniques worth knowing before adding tests here:
 - **ESM-only dependencies** (`@rdfjs/dataset`, `rdf-validate-shacl`) are stubbed,
   so the SHACL suite exercises layer loading and issue mapping rather than the
   RDF libraries themselves.
-- A few defensive outermost `catch` blocks are left deliberately uncovered —
-  `health.routes.ts` sits at 89.74% for this reason.
+- A few defensive outermost `catch` blocks are left deliberately uncovered.
+  `health.routes.ts`, the example this page used to give at 89.74%, now reads
+  100% statements.
+- **The outbound-guard tests pin their own environment.** `scripts/jest-env.cjs`
+  sets `ALLOW_LOCAL_ENDPOINTS=false` and `TRIPLYDB_ALLOWED_HOSTS` before any
+  module reads `.env`; dotenv never overrides a variable that is already set.
+  Without that, a developer configured for local Jena saw 46 of them fail.
 
 ---
 
@@ -222,23 +259,26 @@ a DOM. Uses `@testing-library/react`, `jest-dom`, `user-event`, `jsdom` and
 
 | Area | Tests | Notes |
 |---|---:|---|
-| `components/ChainBuilder` | 184 | First `@dnd-kit`-coupled area. The hooks render fine with no `DndContext` wrapper — dnd-kit's context hooks fall back to sane defaults |
+| `components/ChainBuilder` | 185 | First `@dnd-kit`-coupled area. The hooks render fine with no `DndContext` wrapper — dnd-kit's context hooks fall back to sane defaults |
 | `components/DocumentComposer` | 167 | The heaviest area, coupling `@tiptap/react` and `@dnd-kit`. Real ProseMirror runs under jsdom once `Range.getClientRects`/`getBoundingClientRect` and `document.elementFromPoint` are polyfilled |
-| `src/components` (top level) | 149 | `ShaclValidator` 37, `DmnValidator` 30, `ResultsTable` 26, `GraphView` 23, `OrganizationCard` 12, `Changelog` 11, `OrganizationsView` 10 |
-| `src/services` | 142 | All 11 service modules — `msw` for the network-calling ones, jsdom `localStorage` for the two storage modules, raw `fetch` mocking for `sparqlService`'s CORS-proxy fallback |
-| `components/BpmnModeler` | 134 | `bpmn-js` and the properties panel mocked outright via a small fake modeler class built in a `vi.hoisted` block |
-| `src/utils` | 98 | Pure logic: `exportFormats`, `exampleVersions`, `testData`, `logoResolver`, `ronlAttributes` |
-| `components/DsoExplorer` | 64 | The largest single component file; `dsoService` mocked via `vi.mock` + `vi.importActual` so the pure URL/URN helpers stay real |
+| `components/BpmnModeler` | 154 | `bpmn-js` and the properties panel mocked outright via a small fake modeler class built in a `vi.hoisted` block |
+| `src/components` (top level) | 153 | `ShaclValidator` 40, `DmnValidator` 30, `ResultsTable` 26, `GraphView` 23, `OrganizationCard` 12, `Changelog` 11, `OrganizationsView` 11 |
+| `src/services` | 147 | All 11 service modules — `msw` for the network-calling ones, jsdom `localStorage` for the two storage modules. `sparqlService` is tested against the backend route only; its browser-direct path and CORS-proxy fallback were removed in v2026.09.5 |
+| `src/utils` | 106 | Pure logic: `exportFormats`, `exampleVersions`, `testData`, `logoResolver`, `ronlAttributes` |
+| `components/DsoExplorer` | 68 | The largest single component file; `dsoService` mocked via `vi.mock` + `vi.importActual` so the pure URL/URN helpers stay real |
 | `components/FormEditor` | 58 | `@bpmn-io/form-js` mocked — exercising the real library would mean mounting a full canvas editor |
-| `components/RopaEditor` | 43 | Record fields, legal-basis SPARQL lookup, hydrate-from-linked-forms, the BPMN `ronl:ropaRef` tab, confirm-gated status transitions |
-| `src/App.test.tsx` | 26 | `App.tsx` renders 11 feature components as inspectable stubs, isolating the orchestrator's own state machine. Includes the regression test for the error overlay, which is asserted on the view that raises it |
+| `components/RopaEditor` | 45 | Record fields, legal-basis SPARQL lookup, hydrate-from-linked-forms, the BPMN `ronl:ropaRef` tab, confirm-gated status transitions |
+| `src/App.test.tsx` | 33 | `App.tsx` renders 11 feature components as inspectable stubs, isolating the orchestrator's own state machine. Includes the regression test for the error overlay, which is asserted on the view that raises it |
 | `components/common` | 26 | Toolbar, language and organisation selectors |
+| `src/data` | 21 | `dsoAuthorities` — the authority list generated from the government organisations register: levels, OINs, and type-ahead-friendly names |
+| `vite/cspPlugin.test.ts` | 9 | The build-time Content-Security-Policy generator, including the build failing on a missing or invalid API URL |
 
 !!! note "These are the runner's own per-file counts, summed"
     Every row above was derived from Vitest's default reporter — the
     `(N tests)` it prints beside each file — grouped by directory. The rows
-    therefore sum to exactly 1091. The backend table is the same, from Jest's
-    `--json` report, and sums to 1151.
+    therefore sum to exactly 1172. The backend table is the same, from Jest's
+    `--json` report, and sums to 1649 — 1640 in the six areas above, plus the
+    two fixture files (9).
 
     **The previous revision of this table did not.** Its rows summed to 573
     against a stated total of 1020, because they had been gathered per area at
@@ -281,7 +321,7 @@ Since v2026.09.2 both runners enforce **80% branch coverage per file**, natively
 `vite.config.ts` takes `thresholds: { branches: 80, perFile: true }`.
 
 `perFile` is the mechanism, not a detail. Against a package *average* the
-threshold is inert — the frontend sits at 92.88% and the backend at 92.22%, so a
+threshold is inert — the frontend sits at 93.26% and the backend at 92.41%, so a
 single file dropping to 40% would barely move either. Branches specifically,
 because statement and line coverage largely restate *"was this file imported"*,
 while an uncovered branch is a decision no test has ever checked.
@@ -298,13 +338,20 @@ have turned CI red on an unrelated change — which is how a floor stops being r
 as a floor and starts being read as an obstacle.
 
 v2026.09.2 raised twelve files. Of the frontend files carrying at least one
-branch — 69 of 78 at v2026.09.4 — **one is below 85%**: `GraphView.tsx` at 82.26%. Its eleven remaining
+branch — 71 of 80 at v2026.09.5 — **one is below 85%**: `GraphView.tsx` at 82.26%. Its eleven remaining
 uncovered branches are all inside d3's force-simulation tick and drag handlers —
 `d.x || 0` position fallbacks, `if (!event.active)` drag guards — which need a
 running simulation and synthesised drag events to reach. That is a d3 harness,
 not a test of this component. The config comment says so, so that whoever next
 turns this red knows the answer is to test their new branch rather than lower the
 floor.
+
+**The backend's margin is the thinner one now.** Of its 54 instrumented files, 48
+carry a branch, and three sit between the floor and 85%:
+`services/sparql.service.ts` at 82.86%, `utils/outboundHttp.ts` at 83.33% and
+`services/dmn-validation.service.ts` at 84.98%. `outboundHttp.ts` is new in
+v2026.09.5 — the connect-time half of the outbound guard — so it is the file
+where the next uncovered branch is most likely to land.
 
 ### Every new test was mutation-checked
 
@@ -324,9 +371,9 @@ test sees no state change and passes — for the wrong reason. See
 
 ## Defects the tests found
 
-Six real problems surfaced from writing tests rather than from use. A seventh,
-at the end, is the reverse case — one the suite was well placed to catch and
-did not.
+Six real problems surfaced from writing tests rather than from use. The two at
+the end are the reverse case — one a test locked in, and one the suite was well
+placed to catch and did not.
 
 **`tsconfig.eslint.json` excluded every test file from linting.** It extended
 `tsconfig.json` without overriding its `exclude` of `**/*.test.ts`, so ESLint's
@@ -372,6 +419,23 @@ returned a `<parsererror>` document in which nothing was findable under any
 lookup, masking the real defect underneath. Fixed on 20 August 2026 with a
 `findProcessElement` helper matching on local name across namespaces, and the
 fixture made well-formed.
+
+### The one a test locked in
+
+**The SHACL validator passed every file it had not checked, and a unit test
+required it to.** Production reported every file *Valid · All checks passed* with
+all three shape layers *Not loaded*, while acceptance found the same file invalid
+with 25 errors. The production deploy workflow had never copied the shapes into
+the package, and the service computed `valid` from errors alone — so a layer that
+never loaded, and therefore reported no errors, counted as a pass. A test
+asserted exactly that: missing shapes, zero errors, `valid: true`. It was green
+for the wrong reason, and it would have stayed green through any fix that kept
+the behaviour. v2026.09.5 made `valid` require every layer to have loaded, and
+the test now asserts the opposite.
+
+A test that pins today's behaviour is worth only as much as the behaviour. Before
+locking one in, ask what the output *should* be when the input is missing — not
+what it happens to be.
 
 ### The one the tests missed
 

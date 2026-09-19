@@ -40,15 +40,14 @@ component: Linked Data Explorer
   })();
 </script>
 
-Fetched live from the acceptance API, so it changes as the service does —
-descriptions and schemas are still thin in places while
-[linked-data-explorer#129](https://github.com/sgort/linked-data-explorer/issues/129)
-is in progress. **Test Request** calls acceptance and never production, on
+Fetched live from the acceptance API, so it always shows what the service
+declares right now. Every `/v1` route is described — the backend's tests fail
+when one is not. **Test Request** calls acceptance and never production, on
 purpose.
 
-For base URLs, the deprecation story for `/api/*` and worked response examples,
-see [API Reference](api-reference.md). For how this page is wired and what it
-depends on at run time, see
+For base URLs, the `/api/*` legacy aliases and the error format, see
+[Backend Architecture](../developer/backend.md#api-versioning). For how this
+page is wired and what it depends on at run time, see
 [OpenAPI Rendering](../../contributing/doc-architecture/openapi-rendering.md).
 
 <script

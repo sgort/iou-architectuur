@@ -167,13 +167,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.09.4** · *September 2026*
+-   **🔍 Linked Data Explorer — v2026.09.5** · *September 2026*
 
     ---
 
-    **Semgrep gates both branches, and the lockfile finally moves**
+    **The API describes itself, and stops fetching whatever it is told**
 
-    Semgrep Code and Supply Chain now scan every pull request and are [required on `acc` and `main`](contributing/dependency-scanning.md), so the application reaches acceptance and production only through a scan of the exact commit being deployed — covering the npm tree that `check-supply-chain` never could. The first scan also showed that **Renovate maintains dependencies, not the tree**: lock-file maintenance had been enabled for a fortnight and never run, starved behind open pull requests. One forced refresh moved 338 packages and closed 63 of 66 Supply Chain findings; majors now wait for approval so it keeps its slot, and a lockfile-only change is built, tested and deployed like any other. The triage fixed three latent defects on the way, among them [wildcard CORS that a sibling route could have inherited](linked-data-explorer/developer/ropa-records.md#public-route-v1ropapublic).
+    `/v1/openapi.json` now serves a complete OpenAPI 3.1 description — 63 paths, linted against the NL API Design Rules in CI, every route response validated against it — and the [API Specification](linked-data-explorer/reference/api-specification.md) renders it live. Every error is RFC 9457 problem details, and a malformed body or a bad field is a `400` instead of a `500`. Before this release the production backend would request any host a caller named; now every caller-supplied endpoint must be public `https:`, processes deploy only to the configured Operaton, and the SPARQL editor goes through the backend instead of a third-party proxy. The frontend gains a report-only Content-Security-Policy and builds Tailwind instead of loading it from a CDN, the DSO Explorer reaches any authority by level, and the SHACL validator no longer passes a file it never checked. The release was [verified on both environments](linked-data-explorer/developer/deployment.md#post-deployment-verification), and the [suites](linked-data-explorer/developer/testing.md) stand at 2821 tests.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

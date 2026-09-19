@@ -183,11 +183,12 @@ by naming the change that would make it unsafe: `updateTestCase` receiving
 imported or URL-supplied data. A suppression that states only why it is fine
 today reads as settled long after it has stopped being so.
 
-The one Code finding left is a true positive — the Tailwind Play CDN running from a
-third-party origin in the production frontend
-([linked-data-explorer#96](https://github.com/sgort/linked-data-explorer/issues/96))
-— and it will clear because the script is removed, not because anything is
-suppressed.
+The one Code finding left after that pass was a true positive — the Tailwind Play CDN
+running from a third-party origin in the production frontend
+([linked-data-explorer#96](https://github.com/sgort/linked-data-explorer/issues/96)) —
+and this page said it would clear because the script was removed, not because anything
+was suppressed. That is how it went: v2026.09.5 builds Tailwind with the application,
+the script tag is gone, and #96 closed on 17 September 2026.
 
 !!! note "Reachability is decided in CI, not on a laptop"
     The repository's CI posture record reports that a local dry run classed every

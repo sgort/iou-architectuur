@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # SHACL Validator
 
 The SHACL Validator lets you validate one or more CPSV-AP Turtle files against the canonical **CPSV-AP 3.2.0** shapes, the **CPRMV 0.4.1** shapes, and the **RONL Custom** shapes before publishing them to TriplyDB. It is accessible from the badge-check icon in the sidebar.
@@ -45,9 +49,15 @@ Results are grouped into three layers (v1.9.5 added the CPRMV layer). Each layer
 | CPRMV 0.4.1 | CPRMV SHACL shapes (`shapes/cprmv/0.4.1/cprmv.shacl.ttl`) | The CPRMV rule-management model — `RuleSet`, `Rule`, `RuleMethod` and their required properties. Added in v1.9.5; v1.9.8 added `ParameterWaardeShape` (mandatory `skos:notation`/`skos:prefLabel`) and `TemporalRuleShape`. See the [SHACL Validation Reference](../reference/shacl-validation-reference.md#parameter-and-temporal-rule-shapes-v198). |
 | RONL Custom | RONL-authored shapes | RONL publishing invariants on top of CPSV-AP — at most one `foaf:homepage` / `dct:identifier` / `cv:spatial` per organisation, and at most one `dct:title` / `dct:description` per language on a rule. |
 
-A file is **valid** when no layer produces an error. Warnings and informational messages are advisory.
+A file is **valid** only when every shape layer loaded **and** no layer produces an error. Warnings and informational messages are advisory. Each file gets one of three verdicts:
 
-A layer is shown as **Not loaded** (rather than OK) when no shape files are present for it — so an unvendored layer never displays a misleading green check. For the complete specification of the shapes and codes, see the [SHACL Validation Reference](../reference/shacl-validation-reference.md).
+| Verdict | Meaning |
+|---|---|
+| **Valid** (green) | Every layer ran, and none reported an error |
+| **Not validated** (amber) | No errors, but at least one layer did not load — shown as *N of M shape layers not loaded*. Nothing was checked against that layer, so the file is not called valid |
+| **Invalid** (red) | At least one error, or the Turtle did not parse |
+
+A layer is shown as **Not loaded** (rather than OK) when no shape files are present for it — so an unvendored layer never displays a misleading green check, and since v2026.09.5 it cannot make the whole file look valid either. Before that, a file checked against no layers at all was reported *Valid · All checks passed*: production did exactly that, because its deployment had never shipped the shape files, while acceptance found the same file invalid with 25 errors. For the complete specification of the shapes and codes, see the [SHACL Validation Reference](../reference/shacl-validation-reference.md).
 
 !!! note "Full issue text (v1.9.7)"
     Long issue messages and focus-node locations are no longer truncated with an ellipsis — they wrap in full and the complete text is also available on hover (title tooltip). The backend's earlier 60-character cap on the offending values reported for cardinality (`maxCount` / `uniqueLang`) violations has been removed, so the full value appears in the message.

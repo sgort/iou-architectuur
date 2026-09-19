@@ -164,7 +164,7 @@ The **Deploy** button in the Modeler toolbar opens a deploy modal that collects 
 3. All `.form` files whose `id` matches a `camunda:formRef` found anywhere in the bundle
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Deploy modal showing the bundled resources list — main BPMN, two subprocess BPMNs, and three .form files — with the Operaton endpoint field and Deploy button](../../assets/screenshots/linked-data-explorer-bpmn-deploy-modal.png)
+  ![Screenshot: Deploy modal showing the bundled resources list — main BPMN, two subprocess BPMNs, and three .form files — with the line naming the Operaton it deploys to, and the Deploy button](../../assets/screenshots/linked-data-explorer-bpmn-deploy-modal.png)
   <figcaption>Deploy modal listing the complete bundle before sending to Operaton</figcaption>
 </figure>
 
@@ -173,11 +173,11 @@ All resources are sent in a single multipart `POST` to Operaton. Because the BPM
 The modal provides:
 
 - **Board ownership** *(required, v1.9.9)* — the owning board, auto-detected from the process's candidate groups (infra/rip → Infra-board, caseworker/hr → Caseworker) and overridable. The choice is stamped onto the deployed BPMN as a process-level `camunda:property boardOwner`, persisted on the `process_definitions` record (`board_owner` column), and exposed via `/bundles/public` for downstream consumers (ronl-business-api Procesbibliotheek and archive split)
-- **Operaton endpoint** — pre-filled from `VITE_OPERATON_BASE_URL`, editable per deployment
-- **Username / Password** — optional HTTP Basic Auth for instances that require it
+- **Operaton target** — *named, not chosen* (v2026.09.5). A line reading *Deploys to …* says which Operaton the process will reach. The backend always deploys to its own configured Operaton with its own credentials, so the modal no longer offers an endpoint URL, username or password — whoever opened the modal could previously point a deployment, and credentials for it, at any host
 - **Resource list** — shows exactly what will be included before you commit
 - **Organization** *(required, v2026.08.1)* — the deploy will not submit without one. It is sent to Operaton as its native **tenant-id** (`POST /deployment/create`'s `tenant-id` field), closing the gap where a process could be deployed with no tenant at all and stay invisible to every tenant-scoped lookup made against it afterwards
 - **Deploy button** — disabled after a successful deployment to prevent accidental re-deploy
+- **Recording result** *(v2026.09.5)* — the backend records the deployed process in the same request, so it appears on the caseworker dashboard and the public site. If that record could not be written, the result shows as a **warning** rather than a tick: the deployment itself succeeded and cannot be undone, but the process will not appear on the dashboard or the public site until it is saved and deployed again. Before v2026.09.5 the browser made that write separately and silently dropped its failures, so a deploy could report success while the process stayed invisible everywhere
 
 If a `camunda:formRef` references a form ID that is not found in `localStorage`, it is listed as an unmatched reference. The deployment still proceeds, but that form will not resolve at runtime.
 

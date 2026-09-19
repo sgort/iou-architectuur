@@ -96,10 +96,12 @@ router.post('/validate', async (req: Request, res: Response) => {
   const { content } = req.body as { content?: string };
 
   if (!content || typeof content !== 'string') {
-    return res.status(400).json({
-      success: false,
-      error: { code: 'INVALID_REQUEST', message: '...' },
+    sendProblem(res, req, {
+      status: 400,
+      code: 'INVALID_REQUEST',
+      detail: 'Request body must contain a "content" field with the DMN XML as a string.',
     });
+    return;
   }
 
   const result = await dmnValidationService.validateDmnContent(content);

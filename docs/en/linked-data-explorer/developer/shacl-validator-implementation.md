@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # SHACL Validator Implementation
 
 ---
@@ -92,10 +96,12 @@ ShaclValidator
 router.post('/validate', async (req: Request, res: Response) => {
   const { content } = req.body as { content?: string };
   if (!content || typeof content !== 'string') {
-    return res.status(400).json({
-      success: false,
-      error: { code: 'INVALID_REQUEST', message: '...' },
+    sendProblem(res, req, {
+      status: 400,
+      code: 'INVALID_REQUEST',
+      detail: 'Request body must contain a "content" field with the Turtle as a string.',
     });
+    return;
   }
   const data = await shaclValidationService.validateFile(content);
   res.json({ success: true, data, timestamp: new Date().toISOString() });
@@ -147,7 +153,13 @@ const LAYER_SPECS: LayerSpec[] = [
 ];
 ```
 
-`SHAPES_ROOT` resolves to `packages/backend/shapes`. The CPSV-AP layer loads the single combined SHACL file vendored from SEMIC; the RONL layer loads every `*.ttl` under `shapes/ronl/`. A layer whose files are absent loads as `{ loaded: false }` rather than failing.
+`SHAPES_ROOT` resolves to `packages/backend/shapes`. The CPSV-AP layer loads the single combined SHACL file vendored from SEMIC; the RONL layer loads every `*.ttl` under `shapes/ronl/`. A layer whose files are absent loads as `{ loaded: false }` rather than failing — but it no longer lets a file pass. The result carries `complete`, true only when every shape layer loaded, and `valid` requires it:
+
+```typescript
+valid: parseError === null && summary.errors === 0 && complete
+```
+
+Until v2026.09.5, `valid` was computed from errors alone. A layer that did not load reports no errors, so with nothing loaded every file passed — which is exactly what production did: the production deploy workflow never copied `packages/backend/shapes` into the package, and the validator reported every file *Valid · All checks passed* with all three layers *Not loaded*, while acceptance found the same file invalid with 25 errors. Both faults are fixed, and `/v1/health` reports the loaded layers as `shacl.complete`, which the deploy workflows now wait for.
 
 !!! note
     The `shapes/` directory is not part of the TypeScript build output. The deploy workflow copies it into the deployment package (`cp -r shapes deploy/`); without that step the shapes are missing at runtime.

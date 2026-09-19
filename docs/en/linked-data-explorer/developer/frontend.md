@@ -117,7 +117,23 @@ The Chain Composer uses `@dnd-kit/core` for drag detection and `@dnd-kit/sortabl
 
 ## SPARQL service
 
-`sparqlService.ts` handles query execution via the backend proxy endpoint (`/v1/triplydb/query`). For direct SPARQL endpoints in development, it includes a CORS fallback. Result parsing handles both standard `application/sparql-results+json` and variations in binding formats.
+`sparqlService.ts` sends **every** query through the backend, `POST /v1/triplydb/query`, whatever endpoint the user chose. Until v2026.09.5 it fetched the typed endpoint straight from the browser and fell back to the third-party `api.allorigins.win` proxy when CORS refused; both paths are gone, so no query passes through a third party, the backend's [outbound guard](backend.md#outbound-guard) applies to every one, and the Content-Security-Policy's `connect-src` can name a single origin. When the backend refuses an endpoint, its problem-details `detail` is shown to the user; a non-JSON error page, such as a proxy's HTML 502, shows as `Query failed (502).` rather than a JSON parse error. Result parsing handles both standard `application/sparql-results+json` and variations in binding formats.
+
+The connection badge always reads *Proxied via Backend*. The **Local Jena** endpoint preset is offered only in development builds, the only place the backend admits local endpoints, and the default endpoint is chosen by URL rather than by list position, so it stays DMN Discovery in every build.
+
+---
+
+## Styling
+
+Tailwind CSS 3.4 is **built with the application**, through PostCSS and autoprefixer, from an entry stylesheet imported in `main.tsx` and a content scan over `index.html` and the source. Until v2026.09.5, `index.html` loaded the Tailwind Play CDN on every page load in acceptance and production — third-party JavaScript executing in the application's origin, on an unversioned URL that cannot be pinned with an integrity hash. v3 was kept deliberately, so every class means exactly what the CDN served. An unused import map naming six packages on `esm.sh` was removed at the same time.
+
+The inline `<style>` block that used to sit in `index.html` lives in `src/index.css`, so the Content-Security-Policy needs no `'unsafe-inline'` for `<style>` elements. The error banner's fade-down and the Settings panel's slide-in are two keyframes in `tailwind.config.js`, which `motion-reduce` turns off.
+
+---
+
+## Content-Security-Policy
+
+`vite/cspPlugin.ts` writes `staticwebapp.config.json` into the build output during `build:acc` and `build:prod`, where Azure Static Web Apps reads it. The policy is served as `Content-Security-Policy-Report-Only`, built from the same `VITE_API_BASE_URL` the app uses, so each environment's `connect-src` names that environment's backend. Every allowed source is there because something in the built app needs it: Google Fonts for the Inter typeface, TriplyDB's assets API for organisation logos in `img-src`, and `data:` for the BPMN icon font and diagram images. Violations are reported to the backend's `POST /v1/csp-reports`. See [Deployment](deployment.md#staticwebappconfigjson-is-generated-not-committed) for how it is shipped.
 
 ---
 
@@ -144,6 +160,6 @@ All environment variables are prefixed `VITE_` and read at build time:
 | Variable | Default (development) | Description |
 |---|---|---|
 | `VITE_API_BASE_URL` | `http://localhost:3001` | Backend API base URL |
-| `VITE_OPERATON_BASE_URL` | `https://operaton.open-regels.nl/engine-rest` | Operaton REST base URL |
+| `VITE_OPERATON_BASE_URL` | `http://localhost:8081/engine-rest` | **Display only.** Names the Operaton the BPMN deploy modal deploys to, and the Cockpit link in exported instructions. The backend's `OPERATON_BASE_URL` decides where a process actually deploys. |
 
-Build targets: `npm run build` (production), `npm run build:acc` (acceptance), `npm run dev` (development).
+Build targets: `npm run build:prod` (production), `npm run build:acc` (acceptance), `npm run dev` (development). The deploy workflows use `build:acc` and `build:prod`; each mode reads its own `.env.<mode>` file.
