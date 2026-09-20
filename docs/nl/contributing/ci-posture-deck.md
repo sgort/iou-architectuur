@@ -25,6 +25,27 @@ rapid prototyping.
 !!! abstract "Downloaden"
     [CI Posture Across Repos — presentatie (PDF, 138 KB)](../../assets/downloads/ci-posture-across-repos-deck.pdf)
 
+!!! warning "De situatie is sinds deze export veranderd — lees de dia's als de stand van 12 september 2026"
+    Op **19 september 2026** is in alle drie de repositories een reeks
+    toeleveringsketen-aanpassingen op `acc` geland, ná de export van deze presentatie. De
+    dia's en hun beschrijvingen zijn onveranderd gelaten, omdat een transcriptie die van
+    haar bron afwijkt erger is dan een gedateerde. Vier uitspraken kloppen niet meer:
+
+    - **Vereiste checks.** De dia's noemen `audit` en `scan` als vereist op `acc`. Alle
+      drie de `acc`-rulesets vereisen nu ook de build- en deploy-checks, dus een rode
+      testsuite blokkeert de merge — zie
+      [Branchbeveiliging](branch-protection.md).
+    - **Reikwijdte.** De presentatie behandelt twee applicaties; de `scan` van de RONL
+      Business API is inmiddels ook op `acc` vereist, dus op dat punt zijn het er drie.
+    - **Wat er wordt uitgeleverd.** In beide applicaties is de geteste build nu ook de
+      uitgeleverde build; de bouw gebeurt op de runner in plaats van in een
+      leverancierscontainer.
+    - **De statusvoetnoot.** De genoemde commits zijn de koppen van 12 september. De
+      huidige `acc`-koppen zijn `1868087` en `0e7733e`.
+
+    De gevraagde beslissing verandert hier niet door: de leveringspijplijn onder het
+    prototypingspoor bestaat nog steeds niet.
+
 !!! note "Deze versie telt vijf controles, de vorige vier"
     De vijfde is een **spiegelcontrole** die bij elke release draait en niet in CI kán
     draaien: de `gitlab`-remote staat in `.git/config` en geen enkel bestand in de

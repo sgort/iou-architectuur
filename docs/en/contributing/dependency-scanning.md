@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-12
+  date: 2026-09-20
   against:
-    CPSV Editor: "f5bae6a"
-    Linked Data Explorer: "be6bc54"
-    RONL Business API: "311d732"
+    CPSV Editor: "1868087"
+    Linked Data Explorer: "0e7733e"
+    RONL Business API: "6ca80f2"
 ---
 
 # Dependency Scanning
@@ -30,21 +30,23 @@ workflow, required in the rulesets.
 |---|---|---|---|
 | **Linked Data Explorer** | ✅ since v2026.09.3 | **`acc` and `main`** | ✅ with a slot kept for it |
 | **CPSV Editor** | ✅ since v2026.09.3 — the pilot | **`acc`** — `main` ungated by decision | ✅ since v2026.09.4 |
-| **RONL Business API** | ✅ since v2026.09.7 | **nowhere yet** — it runs on every pull request and is deliberately not required | ✅ since v2026.09.7 |
+| **RONL Business API** | ✅ since v2026.09.7 | **`acc`** since 19 September 2026 — `main` still requires `audit` alone | ✅ since v2026.09.7 |
 
-**The RONL Business API's `scan` is the one that runs without being required**, and the
-reason is worth keeping: its first authenticated scan reported a baseline far larger than
-either of the others — hundreds of Supply Chain findings across a monorepo's npm tree —
-and a gate required before its baseline is triaged is a gate that gets bypassed in its
-first week. Promotion is a ruleset edit, reversible and touching no file, which is also
-why nothing in its workflow will move when it happens. Marking the job non-blocking
-instead is the obvious alternative and the wrong tool, for the reason set out under
+**The RONL Business API's `scan` ran without being required for a fortnight**, and the
+reason is worth keeping because it is the pattern to copy: its first authenticated scan
+reported a baseline far larger than either of the others — hundreds of Supply Chain
+findings across a monorepo's npm tree — and a gate required before its baseline is triaged
+is a gate that gets bypassed in its first week. The triage finished and the promotion, as
+predicted, was a ruleset edit that touched no file; nothing in the workflow moved.
+Marking the job non-blocking instead would have been the obvious alternative and the wrong
+tool, for the reason set out under
 [where `check-supply-chain` blocks](supply-chain.md#where-it-runs-and-where-it-blocks):
 `continue-on-error` hides the finding rather than declining to act on it.
 
 Its lock-file maintenance landed in the same release and before any triage, deliberately:
 one refresh closed 63 of 66 Supply Chain findings in the Linked Data Explorer and took the
-CPSV Editor to zero, so triaging first would have been work thrown away.
+CPSV Editor to zero, so triaging first would have been work thrown away. Its own first
+refresh bore that out — see [the alert counts](#what-nothing-watches-between-merges) below.
 
 ### The workflow, as the Linked Data Explorer runs it
 
@@ -268,26 +270,32 @@ pull request that happens to run the scan — or by nothing, if none does.
 
 Dependabot *alerts* are the only continuous monitoring, and they watch the default branch,
 which is `acc` in all three. **Production deploys from `main`**, so a version that is still
-on `main` after `acc` has moved past it is watched by nobody. On 13 September 2026:
+on `main` after `acc` has moved past it is watched by nobody. Read from the API on
+20 September 2026, with the 13 September figures beside them:
 
-| Repository | Open alerts | Dismissed with a reason | Oldest open since |
-|---|---|:-:|---|
-| CPSV Editor | 0 | 0 | — |
-| Linked Data Explorer | 3, all medium | 0 | 2 September 2026 |
-| RONL Business API | **154** — 2 critical, 54 high, 83 medium, 15 low | **0** | 29 August 2026 |
+| Repository | Open alerts | On 13 September | Dismissed with a reason |
+|---|:-:|:-:|:-:|
+| CPSV Editor | **0** | 0 | 0 |
+| Linked Data Explorer | **3** | 3, all medium | 0 |
+| RONL Business API | **8** | **154** — 2 critical, 54 high, 83 medium, 15 low | 0 |
+
+**The RONL Business API's drop is what lock-file maintenance does on its first run.** It
+was enabled on 12 September 2026 and had not yet had a Monday; the refresh that followed
+took 154 alerts to single figures without a line of application code changing, exactly as
+it had in the other two. The reading to take from it is not that the number is small now
+but that **nothing had ever refreshed the transitive tree** — Renovate maintains the
+packages a manifest names, and the alerts were almost all beneath them.
 
 ICTU's guideline asks for each finding to be mitigated **or explicitly accepted**. None has
-been dismissed with a reason in any of the three, so for now every open alert is neither.
-Read the RONL Business API's figure against its lock-file maintenance, which was enabled on
-12 September 2026 and has not yet had its first Monday run: in the other two, one refresh
-closed most of what a first scan found.
+been dismissed with a reason in any of the three, so every open alert is still neither.
 
 Two further gaps belong with this one. **No release carries an SBOM**, so the dependencies of
 a version already in production cannot be re-analysed when a new advisory lands. And **every
 resolved package comes straight from the public registry** — 567 in the CPSV Editor's
-lockfile, 1,337 in the Linked Data Explorer's, 1,364 in the RONL Business API's, all from
-`registry.npmjs.org` — with no proxy in between and no provenance or signature check. That
-one is an ICTU infrastructure question before it is a repository one.
+lockfile, 1,484 in the Linked Data Explorer's, 1,394 in the RONL Business API's, all from
+`registry.npmjs.org` — with no proxy in between and no provenance or signature check. (The
+only entries resolving elsewhere are the workspace links each monorepo makes to its own
+packages.) That one is an ICTU infrastructure question before it is a repository one.
 
 Whether Semgrep Cloud re-evaluates a stored scan against advisories published after it ran is
 not established, so it is not counted here as monitoring. The scores these gaps earn against
@@ -297,8 +305,9 @@ ICTU's guideline are on [ICTU Dependency Guideline](ictu-dependency-guideline.md
 
 - **semgrep.dev is now in the merge path.** The rulesets that require `scan` carry
   **zero bypass actors**, so if semgrep.dev is unreachable or `SEMGREP_APP_TOKEN` is
-  revoked, merges stop until a ruleset is edited — to `acc` in both repositories, and to
-  `main` in the Linked Data Explorer. `check-supply-chain` accepted an analogous risk for
+  revoked, merges stop until a ruleset is edited — on `acc` in **all three** repositories
+  since 19 September 2026, and on `main` in the Linked Data Explorer.
+  `check-supply-chain` accepted an analogous risk for
   the GitHub API — but the GitHub API is a dependency of the platform anyway, and
   semgrep.dev is not. It is a genuinely new class of outage.
 - **A pull request from a fork cannot pass.** Secrets are not passed to fork runs,

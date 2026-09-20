@@ -1,11 +1,94 @@
 # RONL Business API — screenshots to capture
 
 !!! success "Nothing outstanding"
-    Every screenshot this manifest calls for has been captured. The 12 September 2026
+    `ronl-business-api-public-site-processen.png`, requested by the
+    v2026.09.7 → v2026.09.9 sync, was captured the same day, 20 September 2026,
+    and lands in the same commit as the pages that reference it. `mkdocs build
+    --strict` passes with no warnings.
+
+    Everything requested before this sync has been captured. The 12 September 2026
     review, for v2026.09.6 and v2026.09.7, asked for none; the two before it — requested
     by the v2026.09.5 sync — landed on 5 September 2026, the same day they were asked
     for. The file is retained as the record of what each image shows and why it was
     needed.
+
+## Sync v2026.09.7 → v2026.09.9 — one NEW, one declined
+
+Reviewed on 20 September 2026 for **v2026.09.8** and **v2026.09.9**. Most of the
+thirty-two commits are CI, dependency and callback work with no surface at all;
+two changes are visible, and only one of them earns a figure.
+
+| # | Status | File | Embedding page | What it must show | Trigger |
+|---|---|---|---|---|---|
+| 7 | ✅ captured 20 Sep 2026 | `ronl-business-api-public-site-processen.png` | `user-guide/public-site.md` | The **public process library listing** at `publiek.open-regels.nl`, with **several processes visible** and each one carrying its **status label** (`example` / `wip` / `e2e`) beside its name. The listing view, not a detail page — the label appearing in the list is the whole point | v2026.09.9 |
+
+### Why this one is worth capturing
+
+It is the only genuinely new piece of visible interface in the gap, and it
+carries two claims at once that prose states less convincingly than an image
+does. First, the library **is no longer empty**: until v2026.09.9 it filtered on
+a status value the underlying catalogue cannot hold, so production listed
+nothing at all — a reader who remembers an empty page needs to see a populated
+one. Second, the status label now sits **in the listing**, not only on a
+process's own page, which is exactly the kind of "where on the screen" claim a
+screenshot settles and a sentence does not.
+
+### Capture notes
+
+- **Capture from production**, `https://publiek.open-regels.nl`, not from a dev
+  server or from acceptance. Production is the tier that showed nothing before,
+  and the page carries no environment badge, so an acceptance capture would be
+  indistinguishable and would understate the fix.
+- **Show the listing with more than one row**, so the labels read as a column of
+  states rather than as a one-off badge.
+- **Mixed status values are better than uniform ones** if the data offers them —
+  the point is that the label distinguishes, so two identical labels prove less
+  than two different ones.
+- Use the site's **English** setting, via the NL/EN toggle, to match
+  `ronl-business-api-public-site.png` on the same page.
+- Match the framing and width of `ronl-business-api-public-site.png`, which sits
+  directly above it on the page.
+- No sign-in is needed. This is a public, unauthenticated surface, so it does not
+  need to be handed to the maintainer the way the board captures did.
+
+### Declined, with the reason rather than silence
+
+**The R2.1 start fields** (v2026.09.8) — *R2.1 starten* on the Infra-board phase
+page now asks for **Projectnummer** and **Projectnaam** before it will start a
+process. This was considered and **is not requested**, for three reasons taken
+together rather than any one of them alone:
+
+- The interface is **two labelled text inputs above a button**. There is nothing
+  spatial, no state to disambiguate, and no layout a reader could misconstrue —
+  `user-guide/infra-board.md` names both fields, says both are required, and
+  says the button stays disabled until they are filled. An image would restate
+  that and add nothing.
+- It sits **behind sign-in** on acceptance, so capturing it costs a maintainer's
+  authenticated session — a real price, worth paying for something prose cannot
+  carry, and not for this.
+- `user-guide/infra-board.md` already carries **two figures** for a page that is
+  ACC-brief by convention. A third, of a form, would outweigh the text around
+  it.
+
+If it is ever added, the state worth showing is the button **disabled with one
+field filled**, since the disabled-until-both-filled behaviour is the only part
+of it a reader could be surprised by.
+
+**Everything else in these two releases is invisible.** The ValidSign callback
+now accepts `Basic` as well as `Bearer`; `deps:check` parses the lockfile rather
+than comparing mtimes; `.nvmrc`, `.npmrc`, `ubuntu-24.04`, the `changes` jobs and
+the five new required checks are workflow YAML and a ruleset. The board's live
+rows refreshing on tab-focus (v2026.09.8) is a *timing* change — the same rows,
+sooner — and a still image cannot show "without a page reload".
+
+**Nothing needs a REPLACE.** `ronl-business-api-public-site.png` shows the
+landing page with its combined search and five source cards, none of which
+moved; the process library is a section reached *from* it.
+`ronl-business-api-infra-board.png` shows the board overview, while the start
+fields are on a phase detail page; and `ronl-business-api-rip-phase-swimlane.png`
+is untouched by either release.
+
+---
 
 ## Sync v2026.09.5 → v2026.09.7 — nothing to capture
 

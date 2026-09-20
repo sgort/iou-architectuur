@@ -1,24 +1,26 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-19
+  date: 2026-09-20
   against:
-    CPSV Editor: "2723db1"
-    Linked Data Explorer: "ec4792f"
+    CPSV Editor: "1868087"
+    Linked Data Explorer: "0e7733e"
+    RONL Business API: "6ca80f2"
 ---
 
 # Build Provenance
 
 !!! info "Verification status"
-    The **Linked Data Explorer**'s and **CPSV Editor**'s claims were re-checked on
-    **19 September 2026**, against `ec4792f` (LDE v2026.09.5) and `2723db1` (CPSV
-    v2026.09.6). The **RONL Business API** columns were last re-checked on 12
-    September 2026, against `311d732`; the page stamp names only what was verified
-    on its date.
-    The RONL Business API's two columns had been the unverified ones until then, and
-    the reason they could not be verified went on 12 September: **both of its
-    surfaces reached production that day**, so all four implementations have run
-    there.
+    All four implementations were re-checked on **20 September 2026**, against
+    `1868087`, `0e7733e` and `6ca80f2`, by reading every workflow that carries the
+    `env:` block — eight files, unchanged in number.
+
+    **The two columns that used to be the odd ones out no longer are.** Until
+    19 September 2026 the CPSV Editor and the Linked Data Explorer handed their build
+    to a vendor container, which put their `env:` block on a different step from the
+    RONL Business API's. All four now build on the runner, so the rule below has one
+    answer rather than two — and the reasoning that produced two is kept, because it
+    is what a repository adopting Static Web Apps will meet by default.
 
 *Answering "which build am I looking at?" from inside the running app*
 
@@ -80,10 +82,16 @@ empty string rather than `undefined` in some build configurations — without th
 rule the panel renders `build  · #`.
 
 !!! danger "Never derive the SHA from git at build time"
-    No `git rev-parse` in a build script. In two of the three applications the build
-    runs inside a container where neither `git` nor `.git` is guaranteed to exist,
-    and **a build id that silently fails to resolve is worse than none — it lies.**
-    The values are passed in from the workflow, where they are always available.
+    No `git rev-parse` in a build script. **A build id that silently fails to resolve is
+    worse than none — it lies.** The values are passed in from the workflow, where they
+    are always available.
+
+    This began as a necessity: until 19 September 2026 two of the applications built
+    inside a vendor container where neither `git` nor `.git` was guaranteed to exist. All
+    four now build on the runner, where `.git` is present — and **the rule stays
+    regardless**, because one source for the build id is the property worth keeping, not
+    the container that forced it. The CPSV Editor's workflow says exactly that in a
+    comment beside the `env:` block.
 
 ---
 
@@ -98,8 +106,8 @@ The module and its tests ported unchanged. Everything else had to be re-derived 
 | Tests | 5 | 8 | 8, plus 4 on the footer | 8 |
 | Monorepo | no | yes (`packages/frontend`) | yes (`packages/public-site`) | yes (`packages/frontend`) |
 | Surface | changelog tab | lazily-loaded changelog drawer | site footer — no changelog | changelog full page |
-| **Who builds** | **Oryx**, in the deploy container | **the runner** | **the runner** | **Oryx**, in the deploy container |
-| **`env:` goes on** | **deploy step** | **build step** | **build step** | **deploy step** |
+| **Who builds** | **the runner** (Oryx, until 19 Sep 2026) | **the runner** | **the runner** | **the runner** (Oryx, until 19 Sep 2026) |
+| **`env:` goes on** | **build step** (deploy step, until 19 Sep 2026) | **build step** | **build step** | **build step** (deploy step, until 19 Sep 2026) |
 | String lands in | lazy chunk `ChangelogTab-*.js` | lazy chunk `ChangelogPanelContent-*.js` | main `index-*.js` | main `index-*.js` |
 
 The **Surface** row was called *Changelog UI* while every adopter had a changelog.
@@ -121,8 +129,8 @@ have answered this question differently. They do not, but nothing about sharing 
 repository guaranteed that. Read `skip_app_build` in the workflow you are editing;
 do not infer it from a sibling package.
 
-**Where the runner builds, the variables go on the build step.** Both RONL Business
-API packages run `npm run build:acc` as a step of their own and pass
+**Where the runner builds, the variables go on the build step** — which, since
+19 September 2026, is all four. Each runs its build as a step of its own and passes
 `skip_app_build: true` to the Static Web Apps action, which then only uploads
 `dist/`:
 
@@ -135,9 +143,12 @@ API packages run `npm run build:acc` as a step of their own and pass
   run: npm run build:acc
 ```
 
-**Where Oryx builds, they go on the deploy step.** The CPSV Editor and the Linked
-Data Explorer have no build step at all — the Static Web Apps action builds inside
-its own container, and forwards the runner's environment into it:
+**Where Oryx builds, they go on the deploy step instead.** No workflow in these
+repositories is in this shape any more — `app_build_command` appears nowhere in any of
+the three — but it is the default a new Static Web Apps workflow arrives in, and it is
+what the CPSV Editor and the Linked Data Explorer looked like until 19 September 2026.
+There is no build step at all; the action builds inside its own container and forwards
+the runner's environment into it:
 
 ```yaml
 - name: Build And Deploy
@@ -155,12 +166,17 @@ Whether Oryx forwards the runner's environment into its container **could not be
 answered locally**. It was settled by a deployed preview.
 
 !!! note "`skip_app_build` is the tell, and it is the same flag that governs pinning"
-    A repository that sets `skip_app_build: true` builds on the runner; one that
+    A workflow that sets `skip_app_build: true` builds on the runner; one that
     does not hands the build to Oryx. That single flag decides which step the `env:`
     block belongs on — and it is the same flag that decides whether lockfile
     integrity covers what ships or only what is tested. See
     [Supply-Chain Pinning](supply-chain.md#what-this-does-not-protect), where it
     appears for the second reason.
+
+    Read it in **the workflow you are editing**, not in a sibling and not in this page:
+    the Linked Data Explorer sets it in both frontend workflows and in neither
+    `ropa-site` workflow, which is correct — that package is static files with no build
+    and so no `env:` block to place.
 
 ### Vite specifics
 

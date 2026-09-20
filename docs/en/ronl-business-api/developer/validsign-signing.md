@@ -9,7 +9,15 @@ A project leader signs a RIP phase-exit approval without leaving the Infra-board
 The feature is **opt-in from the process model**: it activates on a user task that carries `ronl:signatureRef`, and returns nothing for a task without it — which is every ordinary task.
 
 !!! info "Verified against source"
-    Measured and read on `acc` at `15dfbf9`, 30 August 2026 (v2026.08.36).
+    Read on `main` at `10bcf8b`, 20 September 2026 (v2026.09.9). The feature
+    itself arrived in v2026.08.36; the callback's authentication was corrected
+    against a live platform in v2026.09.8.
+
+!!! success "Acceptance signs for real"
+    Acceptance has been **live since 14 September 2026** — a real ceremony
+    signed, callbacks accepted, and the evidence email received. The account
+    below of what the callback accepts is written from that signing, not from
+    the specification.
 
 ---
 
@@ -59,12 +67,12 @@ The ValidSign licence is **production-only — there is no sandbox tenant, and t
 | `GET /v1/validsign/task/:taskId/spec` | main | JWT |
 | `POST /v1/validsign/task/:taskId/package` | main | JWT |
 | `GET /v1/validsign/task/:taskId/status` | main | JWT |
-| `POST /v1/validsign/callback` | **pre-auth** | shared secret |
+| `POST /v1/validsign/callback` | **pre-auth** | shared key, in any of five forms |
 | `GET`+`POST /v1/validsign/stub/ceremony/:packageId` | **pre-auth** | capability URL (stub only) |
 
 Two of the five sit **outside** JWT middleware, and neither is an oversight:
 
-- **The callback** is posted by ValidSign's cloud, which has no bearer token. It is verified by a shared secret header instead.
+- **The callback** is posted by ValidSign's cloud, which holds no Keycloak token. It is verified against a shared key instead — see [What the callback accepts](#what-the-callback-accepts).
 - **The stub ceremony** loads in an iframe, and an iframe cannot carry a bearer token.
 
 ### The ceremony URL is a capability
@@ -91,15 +99,45 @@ ValidSign completes  ─┬─►  POST /callback   ─┐
 
 **The poller is not belt-and-braces.** ValidSign's cloud cannot reach a developer's localhost, so during local work the callback never arrives at all. It sweeps process instances awaiting a signature on `VALIDSIGN_POLL_INTERVAL_MS` (default 15s) and drives completion through the same path the webhook uses.
 
-!!! warning "The callback header name is not confirmed with ValidSign"
-    The route expects **`x-validsign-secret`**. OneSpan-derived platforms — and
-    ValidSign is the EU-branded OneSpan Sign — conventionally use a different
-    header. If it is the latter, **every callback 401s silently**, because the
-    poller completes the task anyway and the process looks healthy.
+### What the callback accepts
 
-    The tell: a completion with no matching callback log line means the webhook
-    never landed and the poller did the work. Worth checking before assuming the
-    webhook is wired.
+The route is registered with ValidSign under security type **Bearer token**.
+What ValidSign actually sends is `Authorization: Basic <key>`, with the key raw
+rather than base64-encoded. Both are accepted, along with three further forms,
+all compared in constant time against `VALIDSIGN_CALLBACK_SECRET`:
+
+| Credential | Logged as |
+|---|---|
+| `Authorization: Basic <key>` | `basic-raw` — **what ValidSign sends** |
+| `Authorization: Basic base64(<key>)` | `basic-base64` |
+| `Authorization: Basic base64(name:key)` | `basic-base64-pair` |
+| `Authorization: Bearer <key>` | `bearer` |
+| `x-validsign-secret: <key>` | `x-validsign-secret` |
+
+The scheme is matched case-insensitively. A value that merely *contains* the
+key, a wrong key in any form, and any other scheme such as `Digest` are all
+still `401`.
+
+`"ValidSign callback received"` records **which** form matched, so the check can
+be narrowed to the one ValidSign genuinely uses once that has been observed long
+enough. A rejection logs which credential forms arrived and never their values:
+header names and the `Authorization` scheme only, with a scheme-less value
+logged as `(no scheme)` because it could be the key itself. An accepted callback
+always answers `200`, including for an event it does nothing with.
+
+!!! note "This was found because a rejection says enough to diagnose it"
+    Until v2026.09.8 the route read only `x-validsign-secret`, so **every real
+    callback was a `401`** — invisibly, because the poller completes the
+    signature anyway and the process looks healthy. The first live acceptance
+    signing rejected all six callbacks for package `a2beacfa` and logged
+    `authorization:Basic`; the poller finished seven seconds later. That one log
+    line is what identified the scheme, and it is why the log names the form
+    rather than the value.
+
+    The tell, if this ever regresses: a completion with **no matching callback
+    log line** means the webhook never landed and the poller did the work.
+    Nothing is lost when a callback fails — signing still works, about fifteen
+    seconds slower.
 
 ---
 
@@ -176,7 +214,7 @@ See [Testing](testing/overview.md) for the measured suite figures.
 | `VALIDSIGN_API_KEY` | *(empty)* | Account-wide; required in live mode |
 | `VALIDSIGN_SENDER_EMAIL` | *(empty)* | Package sender |
 | `VALIDSIGN_STUB_MODE` | `true` | Stub unless explicitly disabled |
-| `VALIDSIGN_CALLBACK_SECRET` | *(empty)* | Verifies the webhook |
+| `VALIDSIGN_CALLBACK_SECRET` | *(empty)* | Verifies the webhook. Must equal the callback key **registered with ValidSign**, and is matched against all five credential forms above |
 | `VALIDSIGN_LIVE_TIERS` | *(empty)* | Allowlist of tiers permitted to sign for real |
 | `VALIDSIGN_POLL_INTERVAL_MS` | `15000` | Poller sweep interval |
 

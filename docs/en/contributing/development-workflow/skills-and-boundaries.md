@@ -1,5 +1,11 @@
 ---
 scope: cross-cutting
+verified:
+  date: 2026-09-20
+  against:
+    CPSV Editor: "1868087"
+    Linked Data Explorer: "0e7733e"
+    RONL Business API: "6ca80f2"
 ---
 
 # Skills & Boundaries
@@ -94,12 +100,30 @@ contributor:
   fast-forward of the local branches, and the fast-forward-only push of those heads to
   the GitLab mirror. The rule names three repositories on purpose; this documentation
   repository is not one of them.
-- **Housekeeping after a merge includes the GitLab mirror.** Added on 12 September
+- **Housekeeping after a merge includes the GitLab mirror.** Added on 11 September
   2026, this is the one boundary that *grants* something rather than withholding it:
   asking for housekeeping authorises the fast-forward push that reconciles the mirror,
   because nothing else keeps it current. It is fenced — fast-forward only, never a
   force, and only in the repositories where the `gitlab` remote is a mirror with no
   pipeline of its own. A diverged mirror is reported, not forced into line.
+
+    **Housekeeping has exactly two triggers**, and is never done in the middle of other
+    work: after pull requests are merged and promoted, and when setting up a fresh
+    checkout. On a fresh setup, a step with nothing to act on is reported as such rather
+    than skipped silently.
+
+    **It gained a sixth step on 14 September 2026, and it is the one worth knowing.** A
+    fast-forward brings a moved `package-lock.json` in and installs nothing, so a clean
+    housekeeping pass can leave the dev servers running against an old tree — on the
+    morning that produced the rule, one repository was 152 packages out of date and 95
+    missing, another 53 and 86. The step checks the install against the lockfile on the
+    branch left checked out, via `npm run deps:check` where the repository defines it,
+    and then **hands the contributor `npm ci` rather than running it**: `npm ci` deletes
+    `node_modules` first, which would take down any dev server running from it, and that
+    collides with the boundary above. `npm ci`, not `npm install` — the latter
+    re-resolves version ranges instead of installing what the lockfile records. This is
+    the same check `pre-push` runs first in all three repositories; see
+    [Code Standards — Git hooks](../code-standards.md#git-hooks).
 - **Create a branch before implementing.** Integration branches (`acc`, `main`) are
   not worked on directly — direct changes there are hard to isolate and review.
 - **No Claude attribution in any artifact.** Originally scoped to commit trailers,

@@ -28,7 +28,9 @@ Because an entry is derived from the deployment itself, it stays tied to what is
 
 ## Public and internal exposure
 
-A process definition can be attributed to the surface that owns it, and only definitions owned by a public-facing surface — or carrying no such attribution at all — are exposed on the library's public, read-only view; others stay restricted to internal use. A lifecycle status gates visibility the same way: a definition still in progress is held back from the public view by default, independently of who owns it.
+A process definition can be attributed to the surface that owns it, and only definitions owned by a public-facing surface — or carrying no such attribution at all — are exposed on the library's public, read-only view; others stay restricted to internal use. Which surfaces count as public-facing is configuration rather than code, so the public boundary can be widened to another board without changing the implementation.
+
+**Ownership is the whole of that decision.** A definition's lifecycle status does not gate public visibility, and deliberately so: the status vocabulary describes how far along a deployment is, not whether it may be seen, and treating it as a visibility rule meant a library that showed nothing at all. The status is instead *published* — an entry carries its status label on the listing and in search results, not only on its own detail page — so a reader sees that a process is an example or still in progress rather than being shown nothing and left to infer it.
 
 Within that public boundary, the library is reachable in more than one place at once — inside an otherwise authenticated working environment, and on a public site with no login — both reading the same underlying data; see [Public Publication](public-publication.md).
 

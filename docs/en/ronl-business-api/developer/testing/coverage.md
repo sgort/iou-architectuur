@@ -4,18 +4,37 @@ component: RONL Business API
 
 # Coverage
 
-Measured on **12 September 2026** against **v2026.09.7**, on `main` at
-`311d732` — the same tree as `acc` at `28e1a9e`, byte for byte — after a clean
-`npm ci` on Node 22. Each package was measured by its own `npm test`, run one
+Measured on **20 September 2026** against **v2026.09.9**, on `main` at
+`10bcf8b`, after a clean `npm ci` in a separate clone on **Node 24.14.1 /
+npm 11.11.0**. Each package was measured by its own `npm test`, run one
 workspace at a time; all five of those scripts collect coverage already.
 
 | Package | Statements | Branches | Functions | Lines | Δ branches since v2026.08.36 |
 |---|---:|---:|---:|---:|---|
-| Backend | 98.43% | 92.31% | 97.28% | 98.86% | +2.30 |
-| Frontend | 93.19% | 89.78% | 87.88% | 94.03% | **+9.45** |
-| pa-cockpit | 90.11% | 88.52% | 86.52% | 91.33% | **+12.97** |
+| Backend | 98.37% | 92.35% | 97.29% | 98.79% | +2.34 |
+| Frontend | 93.23% | 89.92% | 87.96% | 94.06% | **+9.59** |
+| pa-cockpit | 90.07% | 88.52% | 86.39% | 91.33% | **+12.97** |
 | pa-demo | 93.47% | 95.65% | 85.00% | 92.85% | **+8.70** |
-| Public site | 95.79% | 96.41% | 94.87% | 96.28% | **+26.02** |
+| Public site | 95.82% | 96.45% | 94.89% | 96.33% | **+26.06** |
+
+!!! info "The repository-wide figure, and why it is not an average of that column"
+    Across all five workspaces together: **95.08% statements · 90.86% branches ·
+    90.49% functions · 95.84% lines**.
+
+    Those come from **summing the covered and total counts** across the five
+    `coverage-summary.json` reports and dividing once — 12923/13591 statements,
+    8119/8936 branches, 2987/3301 functions, 11740/12249 lines — not from
+    averaging the five percentages in the table. Averaging the column would
+    weight pa-demo's 92 statements exactly as heavily as the backend's 5977 and
+    give a repository-wide branch figure of 92.58% instead of 90.86%: nearly two
+    points of pure arithmetic error, in the flattering direction. The
+    denominators differ by two orders of magnitude here, so the distinction is
+    not academic.
+
+    The frontend contributes its **serial** branch count (3408/3790) for the
+    reason given on [Overview](overview.md#a-parallel-failure-is-not-a-finding);
+    its parallel run, one test short, gives 3407 and moves the repository-wide
+    branch figure to 90.85%.
 
 !!! note "Every package moved, and branches moved most"
     v2026.09.2 extended the backend-only coverage campaign to all five
@@ -30,24 +49,55 @@ workspace at a time; all five of those scripts collect coverage already.
     is two releases further on, and has moved only in decimals since; what
     changed is set out below.
 
-!!! success "The floor is now a gate, and it is per file"
+!!! success "The floor is a gate, and it is per file"
     It used to be a convention held by review, with no threshold configured
-    anywhere. v2026.09.6 configured it in **all five** runner configs: a glob
-    key `'./src/**/*.ts': { branches: 80 }` in
-    `packages/backend/jest.config.js`, and
-    `thresholds: { branches: 80, perFile: true }` in the four Vitest configs. A
-    file below the line now exits the run non-zero and names that file, locally
+    anywhere. v2026.09.6 configured it in **all five** runner configs, and the
+    two runners express the same rule differently:
+
+    | Workspace | Config | How the per-file floor is written |
+    |---|---|---|
+    | `backend` | `jest.config.js` | `coverageThreshold: { './src/**/*.ts': { branches: 80 } }` |
+    | `frontend` | `vite.config.ts` | `coverage.thresholds: { branches: 80, perFile: true }` |
+    | `pa-cockpit` | `vitest.config.ts` | `coverage.thresholds: { branches: 80, perFile: true }` |
+    | `pa-demo` | `vite.config.ts` | `coverage.thresholds: { branches: 80, perFile: true }` |
+    | `public-site` | `vite.config.ts` | `coverage.thresholds: { branches: 80, perFile: true }` |
+
+    The Jest form is a **glob key rather than `global`**: Jest applies a glob
+    threshold to each matching file individually, which is what makes it a
+    per-file floor and not a package average. Vitest needs `perFile: true`
+    alongside the number to say the same thing. Get either detail wrong and the
+    threshold silently becomes an average, which is the one thing it exists not
+    to be.
+
+    A file below the line exits the run non-zero and names that file, locally
     and in CI alike — `npm test` already collects coverage in every workspace,
     so nothing needed a separate coverage job. **All five passed on
-    12 September 2026, and no file was named.**
+    20 September 2026 and no file was named**, and scanning every file entry in
+    the five `coverage-summary.json` reports confirms it independently: **zero
+    files below 80% branches**, out of 88 in backend, 111 in frontend, 38 in
+    pa-cockpit, 16 in pa-demo and 43 in public-site.
 
     Per file is the whole point: against a package average, one file falling to
     40% barely moves 92%, and the regression the floor exists to catch would
-    pass. Branches only is equally deliberate — the configs record that a
-    functions floor at 80 would fail 31 files today (frontend 11, pa-cockpit
-    10, pa-demo 7, public-site 3; backend happens to be 0), so the symmetry is
-    a trap for whoever adds `functions: 80` on the assumption that it is free.
+    pass. **Branches only is equally deliberate.** Measured the same way on
+    20 September, a functions floor at 80 would fail **26 files** — frontend 10,
+    pa-cockpit 8, pa-demo 5, public-site 3, backend 0 — so the symmetry is a
+    trap for whoever adds `functions: 80` on the assumption that it is free.
+
+    `public-site/src/components/TopBar.tsx` is the example the configs
+    themselves reach for, and it still holds: **100% branches, 66.66%
+    functions**. The two metrics are not interchangeable, and a file can be
+    exemplary on one while failing the other.
+
     See [Coverage Floor](../../../contributing/coverage-floor.md).
+
+!!! note "The configs' own comments say 31, not 26"
+    All five runner configs carry a comment claiming a functions floor would
+    fail 31 files (frontend 11, pa-cockpit 10, pa-demo 7, public-site 3,
+    backend 0). Re-derived from the 20 September reports the figure is **26**,
+    distributed as above. The comments were accurate when written and have not
+    been updated since; the number here is the measured one. Where the two
+    disagree, re-run the suites rather than trusting either.
 
 !!! note "The frontend row is not comparable to v2026.08.23"
     The Public Affairs cockpit was extracted into `packages/pa-cockpit` in this
@@ -62,17 +112,30 @@ figures previously spanned a byte-identical copy of the cockpit with
 package is now a thin host adapter over `@ronl/pa-cockpit`. There is nothing
 left to exclude — see [pa-demo by area](#pa-demo-by-area) below.
 
-**What moved between 5 and 12 September** is small, and what changed underneath
-is short enough to list. pa-demo reproduced all four figures to the decimal, its
-`src/` tree untouched. pa-cockpit held its statements and branches and moved
-0.13 of a point on functions with no source change at all — the ordinary
-run-to-run noise described below. The backend rose a few hundredths on three
-measures, consistent with the unreachable `PHASE_NOT_MODELLED` branch being
-deleted along with the three tests that skipped over it. The public site is the
-only real move: its sole source change in the window was a new `buildInfo`
-module with its own test file, and statements and branches each gave up about
-half a point while functions and lines gained — which is what adding a small
-covered module with few branches does to a small package's averages.
+**What moved between 12 and 20 September** is small, and `git diff --stat
+311d732 10bcf8b -- packages/` accounts for all of it.
+
+- **pa-demo and pa-cockpit reproduced all four figures to the decimal** except
+  pa-cockpit's functions, 0.13 of a point down. Neither package had a single
+  `src/` change in the window — only `package.json` — so both rows are a
+  straight repeat measurement, and the pa-cockpit move is the ordinary
+  run-to-run noise described below rather than a regression.
+- **The backend gained 20 tests without gaining a file** (2008 → 2028, still
+  86). Almost all of that is `routes/validsign.routes.test.ts`, which grew by
+  173 lines alongside a 73-line change to the route it covers; `lde.service`,
+  `operaton.service`, `search.service` and `config` moved too. Statements and
+  lines each gave up a few hundredths while branches rose 0.04 — which is what
+  adding branch cases to an already well-covered file does.
+- **The frontend gained 11 tests, also without a new file** (1103 → 1114, still
+  110), spread across `InfraCommandPalette`, `PhaseDetail`,
+  `InfraBoardDashboard`, `infra-board.data` and `infra.api`. Every measure rose
+  slightly; branches moved most, 89.78% → 89.92%.
+- **The public site is the only package that gained a file** (31 → 32, 225 →
+  231 tests): `src/components/StatusTag.test.tsx`, arriving with the
+  `StatusTag.tsx` it covers, plus new cases in `Results.test.tsx`. The new
+  component is at **100% on all four measures**, which is why a package this
+  small gained on all four rather than trading one against another — the
+  opposite of what `buildInfo` did to it in the previous window.
 
 !!! warning "The last two decimals are noise"
     Frontend coverage is **not deterministic**. Six runs at the same commit,
@@ -102,11 +165,11 @@ used to be measured there. pa-demo is the outlier in the other direction (see
 
 | Package | Statements → branches | Gap | Was, v2026.08.36 |
 |---|---|---:|---:|
-| Backend | 98.43 → 92.31 | 6.1 | 7.5 |
-| Frontend | 93.19 → 89.78 | 3.4 | 8.0 |
-| pa-cockpit | 90.11 → 88.52 | 1.6 | 10.6 |
+| Backend | 98.37 → 92.35 | 6.0 | 7.5 |
+| Frontend | 93.23 → 89.92 | 3.3 | 8.0 |
+| pa-cockpit | 90.07 → 88.52 | 1.6 | 10.6 |
 | pa-demo | 93.47 → 95.65 | **−2.2** | 4.4 |
-| Public site | 95.79 → 96.41 | **−0.6** | 16.4 |
+| Public site | 95.82 → 96.45 | **−0.6** | 16.4 |
 
 Every gap narrowed, and two went **negative** — branches now sit above
 statements. That is what a campaign aimed at branch edges produces once it
@@ -124,33 +187,37 @@ per-file rather than silently absent.
 
 ## Backend by area
 
-These are the rows Jest prints, verbatim, so each can be matched against the
-output of `npm test --workspace=@ronl/backend -- --coverageReporters=text`.
 Sub-directories report separately rather than rolling up into their parent, and
-istanbul truncates to two decimals rather than rounding.
+istanbul truncates to two decimals rather than rounding. Match these against
+`npm test --workspace=@ronl/backend -- --coverageReporters=text`.
 
-!!! note "The package totals above are from 12 September; these rows are not"
-    They were last derived for v2026.09.5 on 5 September 2026 and were not
-    re-generated in this pass. The backend moved a few hundredths in between,
-    and `src/rip-swimlane` — which the per-area tables have never carried — is
-    missing from this one as well. Read the rows for *where* the weak spots
-    are, not for their size to two decimals.
+**Re-derived on 20 September 2026** from the run's own
+`coverage/coverage-summary.json`, grouped per directory the way istanbul's text
+reporter groups them. The rows reconcile to the package total in the table at
+the top of this page, which is the check that they are current.
 
-| Area | Statements | Branches | Functions | Lines |
-|---|---:|---:|---:|---:|
-| `mcp-servers/edocs` | 100 | 100 | 100 | 100 |
-| `mcp-servers/triplydb` | 100 | 90.9 | 100 | 100 |
-| `middleware` | 100 | 95.83 | 92.3 | 100 |
-| `utils` | 100 | 100 | 100 | 100 |
-| `routes` | 99.55 | 93.86 | 100 | 99.53 |
-| `services/llm` | 99.02 | 92.3 | 100 | 98.95 |
-| `services` | 98.87 | 91.26 | 98.13 | 99.24 |
-| `pa-monitoring` | 98.32 | 88.01 | 94.82 | 98.37 |
-| `pa-monitoring/sources` | 97.07 | 88.6 | 92.2 | 98.1 |
-| `media-aggregator` | 96.96 | 92.26 | 98.21 | 98.26 |
-| `services/mcp` | 96.33 | 100 | 93.9 | 97.84 |
-| `mcp-servers/lde` | 96.07 | 82.14 | 100 | 97.95 |
-| `auth` | 88.88 | 85.71 | 84.61 | 88.05 |
+| Area | Files | Statements | Branches | Functions | Lines |
+|---|---:|---:|---:|---:|---:|
+| `mcp-servers/edocs` | 1 | 100 | 100 | 100 | 100 |
+| `mcp-servers/triplydb` | 1 | 100 | 90.9 | 100 | 100 |
+| `middleware` | 2 | 100 | 95.91 | 92.3 | 100 |
+| `services/document` | 4 | 100 | 100 | 100 | 100 |
+| `rip-swimlane` | 2 | 99.3 | 98.52 | 96 | 100 |
+| `routes` | 15 | 99.14 | 94.65 | 100 | 99.11 |
+| `services/llm` | 4 | 99.02 | 92.3 | 100 | 98.95 |
+| `services` | 15 | 98.77 | 91.4 | 98.47 | 99.25 |
+| `utils` | 10 | 98.47 | 98.66 | 100 | 98.3 |
+| `pa-monitoring` | 10 | 98.38 | 88.1 | 95.93 | 98.53 |
+| `pa-monitoring/sources` | 6 | 97.58 | 91.57 | 93.24 | 98.5 |
+| `media-aggregator` | 10 | 96.96 | 92.26 | 98.21 | 98.26 |
+| `services/mcp` | 6 | 96.33 | 100 | 93.9 | 97.84 |
+| `mcp-servers/lde` | 1 | 96.07 | 82.14 | 100 | 97.95 |
+| `auth` | 1 | 88.23 | 82.75 | 86.66 | 89.61 |
+
+Two rows are new to this table rather than newly measured. **`rip-swimlane`**
+had never appeared here at all — the area that derives an Infra-board phase
+swimlane from deployed BPMN, and it enters at 99.3% statements. **`services/document`**
+is likewise a first appearance, at 100 across the board.
 
 !!! success "`utils/` is no longer the exception"
     Through v2026.08.20 this table's lowest row by a wide margin was `utils/`
@@ -159,50 +226,67 @@ istanbul truncates to two decimals rather than rounding.
     `validateConfig` on import, and `logger.ts` was mocked in every test that
     touched it.
 
-    Both are now closed. Every file in `utils/` — `altcha`, `config`, `env`,
-    `errors`, `logger`, `operaton-variables`, `slug`, `tls-bootstrap` — reports
-    **100 / 100 / 100 / 100**. `tls-bootstrap.ts` was also at 0% and is now
-    fully covered. The area that was the standing excuse is now the best in the
-    package.
+    Both are closed. Of the ten source files in `utils/` on 20 September, nine
+    report **100 / 100 / 100 / 100** — `altcha`, `client-ip`, `dutch-datetime`,
+    `env`, `errors`, `logger`, `operaton-variables`, `slug`, `tls-bootstrap`.
+    The tenth is `config.ts` at 93.75% statements and **98.26% branches**
+    (113 of 115), which is what pulls the area row off 100 and is comfortably
+    the largest branch surface in the area. `tls-bootstrap.ts` was also at 0%
+    and is now fully covered. The area that was the standing excuse is now
+    among the best in the package.
 
-`auth/` is now the lowest row, at 88.88% statements — the uncovered lines are
-`jwt.middleware.ts:23-33`.
+`auth/` is the lowest row, at 88.23% statements and **82.75% branches** — one
+file, `jwt.middleware.ts`, and the only area in the backend within three points
+of the 80% branch floor.
 
 ---
 
 ## Frontend by area
 
-| Area | Statements | Branches | Functions | Lines |
-|---|---:|---:|---:|---:|
-| `src/hooks` | 100 | 75 | 100 | 100 |
-| `src/pages/infra-board` | 99.64 | 97.2 | 100 | 100 |
-| `src/components/WooDashboard` | 97.68 | 89.56 | 98.52 | 97.85 |
-| `src/components/…/regelsimulatie` | 97.66 | 81.43 | 95.18 | 98.15 |
-| `src/pages/woo` | 96.55 | 84.12 | 94.44 | 98.01 |
-| `src/services` | 93.48 | 81.14 | 96.55 | 94.02 |
-| `src/components/InfraBoardDashboard` | 90.96 | 84.54 | 87.87 | 91.68 |
-| `src/` (root files) | 88.23 | 72.22 | 60 | 88.23 |
-| `src/pages/public-affairs-v2` | 86.67 | 69.69 | 83.83 | 90.28 |
-| `src/components` | 86.45 | 70.11 | 94.73 | 90.62 |
-| `src/components/CaseworkerDashboard` | 86.33 | 81.37 | 84.53 | 88.19 |
-| `src/components/PADashboardV2` | 84.77 | 73.2 | 81.87 | 87.41 |
-| `src/components/…/dossierbeheer` | 81.35 | 89.12 | 77.96 | 82.89 |
-| `src/components/CaseworkerDashboardV2` | 81.27 | 74.57 | 72.51 | 81.96 |
-| `src/pages` | 72.4 | 69.87 | 61.56 | 73.43 |
-| `src/utils` | 66.66 | 50 | 100 | 100 |
+**Re-derived on 20 September 2026**, from the serial run's
+`coverage/coverage-summary.json`. The rows reconcile to the 93.23 / 89.92 /
+87.96 / 94.06 package total above.
 
-These rows were last derived for v2026.09.5 on 5 September 2026 and were not
-re-generated on 12 September; the package total above was. The frontend gained
-0.08 of a point on statements in between, so the rows remain a good map of
-where the depth is missing and a poor source for a decimal.
+| Area | Files | Statements | Branches | Functions | Lines |
+|---|---:|---:|---:|---:|---:|
+| `src/` (root files) | 1 | 100 | 100 | 100 | 100 |
+| `src/components/…/regelsimulatie/__helpers__` | 1 | 100 | 100 | 100 | 100 |
+| `src/components/LoginChoice` | 2 | 100 | 100 | 100 | 100 |
+| `src/components/PADashboardV2` | 2 | 100 | 100 | 100 | 100 |
+| `src/hooks` | 1 | 100 | 100 | 100 | 100 |
+| `src/pages/caseworker-v2` | 1 | 100 | 100 | 100 | 100 |
+| `src/pages/login-choice` | 1 | 100 | 100 | 100 | 100 |
+| `src/types` | 1 | 100 | 100 | 100 | 100 |
+| `src/utils` | 2 | 100 | 100 | 100 | 100 |
+| `src/pages/infra-board` | 6 | 99.6 | 97.7 | 100 | 99.49 |
+| `src/components/…/regelsimulatie` | 8 | 98.33 | 88.59 | 96.38 | 98.89 |
+| `src/components/WooDashboard` | 12 | 98.26 | 94.78 | 98.52 | 98.57 |
+| `src/components` | 6 | 97.6 | 93.1 | 98.24 | 100 |
+| `src/services` | 7 | 97.53 | 89.26 | 97.27 | 97.69 |
+| `src/pages/woo` | 2 | 96.55 | 84.12 | 94.44 | 98.01 |
+| `src/components/InfraBoardDashboard` | 13 | 94.05 | 88.47 | 90.2 | 95.11 |
+| `src/components/CaseworkerDashboardV2` | 8 | 92.46 | 92.28 | 82.44 | 93.1 |
+| `src/components/CaseworkerDashboard` | 26 | 90.16 | 89.33 | 86.08 | 91.67 |
+| `src/pages` | 11 | 83.33 | 87.47 | 73.06 | 84.09 |
 
-Two rows moved substantially in the v2026.09.5 window:
-`src/pages/public-affairs-v2` from 67.83% to **86.67%**, and
-`src/components/…/dossierbeheer` from 79.29% to **81.35%** — both from the PA
-cockpit work. `src/services` rose from 93.01% to 93.48%.
+!!! note "This table no longer carries the cockpit's rows"
+    Earlier versions listed `src/pages/public-affairs-v2`,
+    `src/components/PADashboardV2/dossierbeheer` and a large
+    `src/components/PADashboardV2` here. Those directories live in
+    **`packages/pa-cockpit`** since the extraction and are measured by that
+    package's own suite — see [pa-cockpit by area](#pa-cockpit-by-area) below.
+    The two-file `src/components/PADashboardV2` that remains in the frontend is
+    what stayed behind, and it is at 100.
+
+    The other reason the shape changed: several areas that were middling are
+    now at 100, and the old `src/utils` row of 66.66% statements / 50% branches
+    is gone entirely. Nothing in the frontend is below the 80% branch floor.
 
 `src/pages` is the lowest of the top-level areas because it is where the
-largest, most-recently-added containers live. Per-board detail is on the board
+largest, most-recently-added containers live — and at 73.06% functions it is
+also where most of the 26 files that a functions floor would fail are
+concentrated. Its branches, at 87.47%, are comfortably clear of the floor;
+this is a functions gap, not a branch gap. Per-board detail is on the board
 pages: [Caseworker](dashboards/caseworker.md),
 [PA cockpit](dashboards/pa-cockpit.md),
 [Infra-board](dashboards/infra-board.md),
@@ -210,22 +294,54 @@ pages: [Caseworker](dashboards/caseworker.md),
 
 ---
 
+## pa-cockpit by area
+
+**Re-derived on 20 September 2026.** These rows reconcile to the 90.07 / 88.52 /
+86.39 / 91.33 package total above.
+
+| Area | Files | Statements | Branches | Functions | Lines |
+|---|---:|---:|---:|---:|---:|
+| `src/` (root files) | 2 | 100 | 100 | 100 | 100 |
+| `src/modes` | 1 | 95.65 | 100 | 100 | 95 |
+| `src/services` | 3 | 94.54 | 84.98 | 98.19 | 95.28 |
+| `src/components/PADashboardV2` | 10 | 91.88 | 89.44 | 86.3 | 93.73 |
+| `src/pages/public-affairs-v2` | 13 | 90.35 | 88.2 | 86.4 | 92.08 |
+| `src/pages` | 1 | 86.87 | 95.57 | 79.03 | 86.76 |
+| `src/components/PADashboardV2/dossierbeheer` | 8 | 81.35 | 89.12 | 77.96 | 82.89 |
+
+`dossierbeheer` is the lowest area on statements and the lowest on functions,
+but at 89.12% branches it clears the floor by nine points — the same pattern as
+the frontend's `src/pages`. This package holds 8 of the 26 files that an 80%
+functions floor would fail.
+
+---
+
 ## Public site by area
 
-| Area | Statements | Branches | Functions | Lines |
-|---|---:|---:|---:|---:|
-| `src/components` | 96.77 | 100 | 96.15 | 96.66 |
-| `src/lib` | 84.9 | 73.17 | 88.88 | 86.2 |
-| `src/pages` | 82 | 61.51 | 79.06 | 84.26 |
+**Re-derived on 20 September 2026.** These rows reconcile to the 95.82 / 96.45 /
+94.89 / 96.33 package total above.
 
-!!! warning "These three rows are pre-campaign and do not match the total"
-    They were last derived for v2026.08.20 on 22 August 2026 and have not been
-    re-generated since — not on 5 September, and not on 12 September. They
-    predate the coverage campaign that took this package's branches from 70.39%
-    to 96.41%, which is why rows of 61.51% and 73.17% sit under a package total
-    of 96.41%. The total is measured; these are history. Re-run
-    `npm test --workspace=@ronl/public-site` with a text reporter before
-    quoting any of them.
+| Area | Files | Statements | Branches | Functions | Lines |
+|---|---:|---:|---:|---:|---:|
+| `src/` (root files) | 1 | 100 | 100 | 100 | 100 |
+| `src/i18n` | 3 | 100 | 100 | 100 | 100 |
+| `src/pages/herkomst` | 8 | 100 | 97.05 | 100 | 100 |
+| `src/components` | 13 | 97.14 | 100 | 96.29 | 97.05 |
+| `src/pages` | 10 | 95.21 | 97.55 | 91.39 | 95.65 |
+| `src/lib` | 8 | 93.85 | 91.11 | 97.36 | 94.68 |
+
+!!! success "The pre-campaign rows are gone, and the difference is the point"
+    This table used to carry three rows derived on 22 August 2026 —
+    `src/components` 96.77, `src/lib` 84.9 / **73.17 branches**, `src/pages` 82 /
+    **61.51 branches** — which sat visibly below a package total of 96.41% and
+    carried a warning saying so. They are now re-measured: `src/lib` branches
+    have gone **73.17 → 91.11**, and `src/pages` branches **61.51 → 97.55**.
+    Nothing in the package is below the 80% branch floor, and `src/components`
+    is at 100% branches outright.
+
+    The whole-tree `src/pages` row covers the ten files directly in that
+    directory; the eight-file `herkomst/` provenance explorer reports as its own
+    row, at 100% statements.
 
 See [Public site suite](public-site.md) for what these files are and what is
 deliberately not covered.
@@ -234,21 +350,25 @@ deliberately not covered.
 
 ## pa-demo by area
 
-| Area | Statements | Branches | Functions | Lines |
-|---|---:|---:|---:|---:|
-| **All files** | **93.47** | **95.65** | **85.00** | **92.85** |
-| `src/demo` | 95.91 | 84.61 | 100 | 97.72 |
-| `src/demo/changelog` | 100 | 87.50 | 100 | 100 |
-| `src/demo/shims` | 75.00 | 100 | 44.44 | 75.00 |
-| `src/` (root) | 75.00 | 100 | 50.00 | 75.00 |
+**Re-derived on 20 September 2026**, and every row below now reconciles to the
+**All files** row rather than predating it.
 
-!!! note "The **All files** row is measured; the per-area rows below it are not"
-    The package total was re-measured against v2026.09.7 on 12 September 2026,
-    reproducing the 5 September figures to the decimal.
-    The per-area rows were last derived on 30 August and have not been
-    re-generated, so they will not sum to the new total — v2026.09.2's coverage
-    campaign added tests across the package. Treat the per-area breakdown as
-    indicative of *where* the gaps are, not of their current size.
+| Area | Files | Statements | Branches | Functions | Lines |
+|---|---:|---:|---:|---:|---:|
+| **All files** | **16** | **93.47** | **95.65** | **85.00** | **92.85** |
+| `src/demo` | 8 | 100 | 100 | 100 | 100 |
+| `src/demo/changelog` | 2 | 100 | 87.50 | 100 | 100 |
+| `src/` (root) | 2 | 75.00 | 100 | 50.00 | 75.00 |
+| `src/demo/shims` | 4 | 75.00 | 100 | 44.44 | 75.00 |
+
+!!! note "`src/demo` reached 100 across the board"
+    The rows that used to sit here were derived on 30 August and did not sum to
+    the total — v2026.09.2's campaign had added tests across the package after
+    they were taken. Re-measured, `src/demo` is at **100 / 100 / 100 / 100**
+    where it previously read 95.91 / 84.61, and the package's remaining gaps are
+    entirely in the two rows at 75%, both of which are at **100% branches**.
+    This package contributes 5 of the 26 files an 80% functions floor would
+    fail, and none at all to a branch floor.
 
 **The `src/vendor/**` exclusion is gone, because the vendored tree is.** Until
 v2026.08.28 this package held a byte-identical copy of the cockpit — 39 files

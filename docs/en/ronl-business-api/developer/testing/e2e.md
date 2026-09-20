@@ -19,13 +19,14 @@ against `acc` at `15dfbf9` with a full local stack running. This is the first
 pass in which all three were run together rather than described from
 configuration.
 
-!!! warning "Not re-run on 12 September — still the 30 August figures"
-    The unit suites were re-measured against `main` at `311d732` (v2026.09.7);
+!!! warning "Not re-run on 20 September — still the 30 August figures"
+    The unit suites were re-measured against `main` at `10bcf8b` (v2026.09.9);
     the Playwright suites were **not**. Every count in this page's tables dates
     from 30 August and is repeated here unchanged rather than re-derived — a
-    measured number is worth more stale than a guess is fresh.
+    measured number is worth more stale than a guess is fresh. Two of the three
+    suites need services this pass deliberately did not start.
 
-    What *was* re-checked at `311d732` is the inventory, straight from the spec
+    What *was* re-checked at `10bcf8b` is the inventory, straight from the spec
     tree, and it is unchanged: ten specs in `packages/frontend/e2e/`
     (`caseworker-journey`, `infra-board-journey`, `login-redirect`,
     `pa-live-authoring`, `pa-mock-journey`, `protected-route`, `rip-r21-journey`,
@@ -34,6 +35,39 @@ configuration.
     `packages/public-site/e2e/publiek.spec.ts` — and the workflow wiring is
     unchanged with it: the pa-demo spec runs in `azure-pa-demo-acc.yml` and only
     there, and no workflow runs the other two.
+
+    The three `playwright.config.ts` files were also re-read at `10bcf8b` — see
+    [What each suite needs running](#what-each-suite-needs-running), which is
+    current as of 20 September even though the counts above are not.
+
+### What each suite needs running
+
+The `webServer` block is declared **per config, not per spec**, so it applies to
+every spec under that directory. This is the table to check before running
+anything locally — it is what separates a suite you can start cold from one that
+will fail its preconditions.
+
+| Config | Declares `webServer`? | What must already be up |
+|---|---|---|
+| `packages/frontend/e2e/playwright.config.ts` | **No — none at all** | **Three services**: the frontend on `:5173`, the backend on `:3002`, and the sibling **Linked Data Explorer** backend on `:3001` — plus `docker compose up -d` behind them |
+| `packages/pa-demo/e2e/playwright.config.ts` | **Yes**, conditionally — `npm run dev` on `:5176` | Nothing. No backend, database or Keycloak; plato issues no network requests at all |
+| `packages/public-site/e2e/playwright.config.ts` | **Yes**, conditionally — `npm run dev` on `:5175` | **The backend**, on whatever `VITE_API_URL` points at. The config starts the site but not the API, and these specs hit real search results |
+
+Three things follow from that table:
+
+- **The frontend suite is the one that needs a human.** Its `globalSetup` probes
+  all three URLs before any test runs and throws *"E2E preconditions not met —
+  the dev stack must already be running"* naming whichever is down, rather than
+  failing later with a confusing connection error. It starts nothing itself,
+  which is exactly why it is not in CI.
+- **"Starts its own server" is not the same as "self-contained."** public-site
+  declares a `webServer` and still needs the backend; pa-demo declares one and
+  needs nothing. Only pa-demo is genuinely cold-startable, which is why it is
+  the suite that runs in CI.
+- **Both conditional configs skip the server entirely when `E2E_BASE_URL` is
+  set**, pointing `baseURL` at a deployed site instead — the post-deploy
+  verification path against ACC. `reuseExistingServer` is on outside CI, so a
+  dev server you already have running is attached to rather than duplicated.
 
 !!! warning "Count these with the runner, never with `grep`"
     A static count of `test(` across the frontend specs gives **23**. The runner
@@ -86,16 +120,69 @@ flakes, nothing skipped.
 | `tenant-isolation.spec.ts` | 1 | Tenant scoping |
 | `smoke.spec.ts` | 1 | Boot and render |
 
+!!! danger "`rip-r21-journey.spec.ts` cannot currently pass — [issue #165](https://github.com/sgort/ronl-business-api/issues/165)"
+    Established by reading the source at `10bcf8b` on 20 September 2026, **not**
+    by running it. The spec clicks the R2.1 start button without filling the two
+    fields that v2026.09.8 made required, so it fails on actionability rather
+    than on an assertion.
+
+    The spec navigates to the phase and clicks straight through
+    (`rip-r21-journey.spec.ts:539-546`):
+
+    ```ts
+    await page.locator('.v2-rail button', { hasText: 'R2.1' }).first().click();
+    await expect(page.getByRole('button', { name: /R2\.1 starten/ })).toBeVisible();
+    // …
+    await page.getByRole('button', { name: /R2\.1 starten/ }).click();
+    ```
+
+    Nothing is filled first — the file's only `.fill()` is inside the
+    `fillField()` helper that works form-js task forms *after* the process has
+    started, and the strings "Projectnummer" and "Projectnaam" do not appear in
+    it at all. The button it reaches is the fallback start in
+    `PhaseDetail.tsx:599-605`:
+
+    ```tsx
+    disabled={submitting || !newProjectReady}
+    ```
+
+    ```tsx
+    const newProjectReady = newProjectNumber.trim() !== '' && newProjectName.trim() !== '';
+    ```
+
+    both fields being `required` inputs initialised to `''`.
+
+    **The `toBeVisible()` assertion on line 541 still passes** — a disabled
+    button is visible. It is the `.click()` on line 546 that waits for the
+    element to become enabled, never gets it, and times out; the
+    `waitForResponse` on `/process/RipR21Process/start` opened just above it
+    never resolves either, so the run cannot reach the `businessKey` assertion.
+
+    That this is the *fallback* button rather than the other
+    `R2.1 starten` on the page is pinned down three ways: `RIP_PHASES[0].code`
+    is `'R2.1'`, so `isFirstPhase` is true; line 557 asserts a banner matching
+    `/R2\.1 gestart/`, which only the fallback branch renders; and the spec's own
+    skip message still reasons that "a fallback-started R2.1 carries no project
+    number", a statement `handleFallbackStart` made obsolete when it began
+    posting `projectNumber` and `projectName`. Even on the other branch the
+    button is `disabled={!canStart || selected.size === 0 || submitting}` and
+    the spec selects no checkbox, so it cannot pass either way.
+
+    **This is a spec that was not updated alongside its component, not a
+    regression in the component.** The fix is to fill both fields before the
+    click.
+
 The R2.1 journey is the one to watch after a signing change. Because the
 approval task carries `ronl:signatureRef`, the board renders the
 [signing panel](../validsign-signing.md) where a form used to be — and the
 journey previously drove every task by filling a form, so it failed on the last
 one reporting that a form never rendered. A true statement about a task that no
-longer has one.
+longer has one. Issue #165 is the same failure mode one step earlier in the
+journey: the UI grew a precondition and the spec did not hear about it.
 
 It also carries a `test.skip(true, reason)` **inside** the test body, which
 skips the run when its preconditions are not met and logs the reason first. It
-did not skip in this measurement.
+did not skip in the 30 August measurement.
 
 ### Coverage per board
 
@@ -129,12 +216,28 @@ board and belong to none.
 backend and frontend dev servers, and a sibling `linked-data-explorer` repo's
 backend on `:3001` — the last is required for the Procesbibliotheek journey.
 
-`e2e/global-setup.ts` checks all of these before any test runs and fails fast
-with the exact start commands if one is down. **It does not start anything
-itself**, which is why *this* suite is not wired into CI: there is no human to
-start the stack on a runner. The PA-demo suite has no such dependency and does
-run in CI — the difference is the stack, not the tooling. See
+`e2e/global-setup.ts`, re-read at `10bcf8b`, probes exactly three URLs before
+any test runs — `http://localhost:5173`, `http://localhost:3002/v1/health` and
+`http://localhost:3001/v1/health` — and throws with each missing one named:
+
+```text
+E2E preconditions not met — the dev stack must already be running.
+- Frontend not reachable at http://localhost:5173
+- Backend not reachable at http://localhost:3002/v1/health
+- LDE backend not reachable at http://localhost:3001/v1/health
+```
+
+**It does not start anything itself**, and `playwright.config.ts` declares no
+`webServer`, which is why *this* suite is not wired into CI: there is no human
+to start the stack on a runner. The PA-demo suite has no such dependency and
+does run in CI — the difference is the stack, not the tooling. See
 [Overview → Roadmap](overview.md#roadmap) for what closing that would take.
+
+The probe deliberately builds its own `AbortController` rather than using
+`AbortSignal.timeout()`: the latter did not always clean up its internal timer
+before the fetch settled, crashing Node on Windows with a libuv
+`UV_HANDLE_CLOSING` assertion during process exit. That crash used to be listed
+as a blocker for putting this suite in CI and no longer is.
 
 ### Getting JSON output
 
@@ -167,9 +270,10 @@ starts its own dev server.
 
 Its own tests were last counted on 30 August; the timing and pass figures on
 [Public site suite](public-site.md#playwright-suite) date from 19 August and
-were re-run neither for v2026.08.23 nor for v2026.09.7. The package's unit
-suite has grown since (31 files, 225 tests on 12 September), so the six E2E
-tests are an inventory figure, not a fresh result.
+were re-run for none of v2026.08.23, v2026.09.7 or v2026.09.9. The package's
+unit suite has grown twice since (**32 files, 231 tests on 20 September 2026**,
+up from 31 and 225), so the six E2E tests are an inventory figure, not a fresh
+result.
 
 ---
 

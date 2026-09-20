@@ -65,11 +65,14 @@ on:
       - acc
     paths:
       - 'packages/frontend/**'
+      - 'packages/shared/**'
+      - 'packages/pa-cockpit/**'
       - '.github/workflows/azure-frontend-acc.yml'
+      - '.nvmrc'
 
 jobs:
   build_and_deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: Build and Deploy to ACC
     steps:
       - uses: actions/checkout@v3
@@ -179,7 +182,7 @@ git push origin acc
 The workflow automatically:
 
 1. Checks out code
-2. Sets up Node.js from `.nvmrc` (22.22.0)
+2. Sets up Node.js from `.nvmrc` (22.23.2)
 3. Installs dependencies (monorepo aware)
 4. Builds frontend with environment variables
 5. Outputs to `packages/frontend/dist/`

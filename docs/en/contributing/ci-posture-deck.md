@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-12
+  date: 2026-09-20
   against:
-    CPSV Editor: "f5bae6a"
-    Linked Data Explorer: "be6bc54"
-    RONL Business API: "311d732"
+    CPSV Editor: "1868087"
+    Linked Data Explorer: "0e7733e"
+    RONL Business API: "6ca80f2"
 ---
 
 # CI Posture Across Repos — Slide Deck
@@ -28,6 +28,27 @@ which is a different question and the one a decision needs answered.
     read from the API, thresholds from the config that declares them and mirror state from
     `ls-remote` against both remotes. This page re-checked those claims independently — see
     [Verified against the repositories](#verified-against-the-repositories).
+
+!!! warning "The posture has moved since this export — read the slides as of 12 September 2026"
+    A batch of supply-chain work landed on all three `acc` branches on **19 September
+    2026**, after this deck was exported. The slides and their descriptions below are
+    left exactly as the PDF states them, because a transcription that drifts from its
+    source is worse than a dated one. Four of their claims are now out of date:
+
+    - **Required checks.** The slides say `audit` and `scan` are required on `acc`. All
+      three `acc` rulesets now also require the build and deploy checks, so a red test
+      suite blocks the merge — see
+      [Branch Protection](branch-protection.md#what-the-rulesets-still-do-not-require).
+    - **Scope.** The deck covers two applications and notes the RONL Business API runs
+      the same five controls out of scope. Its `scan` is now required on `acc` too, so
+      the three are aligned on that control rather than two of three.
+    - **What ships.** Slide 4's clean-up argument predates the move to building on the
+      runner; in both applications the tested build is now the shipped build.
+    - **The status footnote.** Its commits, `f5bae6a`/`be6bc54` and `f7fe80f`/`daa4816`,
+      are the 12 September heads. The current `acc` heads are `1868087` and `0e7733e`.
+
+    The decision the deck asks for is unaffected: the delivery pipeline below the
+    prototyping track still does not exist.
 
 !!! note "This export counts five controls, where the last one counted four"
     A release-time **mirror check** joins the four CI controls. It is not a CI gate and
@@ -160,22 +181,30 @@ release now notices.
 
 ## Verified against the repositories
 
-The deck's status claims were re-checked on **12 September 2026** rather than taken on trust:
+The deck's status claims were re-checked on **12 September 2026** rather than taken on
+trust, and re-read against the current `acc` heads on **20 September 2026**:
 
 - **The rulesets were read from the API**, per branch, with
   `gh api repos/<owner>/<repo>/rules/branches/<branch>`, which reports the effective rules
-  from every ruleset at once rather than one ruleset in isolation:
+  from every ruleset at once rather than one ruleset in isolation. As they stand today:
 
     | | `acc` | `main` |
     |---|---|---|
-    | CPSV Editor | pull request, `audit` + `scan` | no ruleset rules — a pull request only, by decision ([#131](https://github.com/sgort/ttl-editor/issues/131)) |
-    | Linked Data Explorer | pull request, `audit` + `scan`, deletion, non-fast-forward | the same four |
-    | RONL Business API | pull request, `audit`, deletion, non-fast-forward | the same four |
+    | CPSV Editor | pull request, `audit`, `scan`, `Build and deploy ACC` | no ruleset rules — a pull request only, by decision ([#131](https://github.com/sgort/ttl-editor/issues/131)) |
+    | Linked Data Explorer | pull request, `audit`, `scan`, `deploy`, `Build and Deploy Frontend`, `Build and Deploy ROPA Site`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward |
+    | RONL Business API | pull request, `audit`, `scan`, `build`, `Build and Deploy ACC Frontend`, `Build and Deploy ACC PA Demo`, `Build and Deploy ACC Public Site`, deletion, non-fast-forward | pull request, `audit`, deletion, non-fast-forward |
+
+    On 12 September, when the deck was exported, the `acc` rows read `audit` + `scan` for
+    the first two and `audit` alone for the third, and each `main` mirrored its `acc`.
+    The build checks and the RONL Business API's `scan` were added on 19 September, to
+    `acc` only.
 
 - **The pin counts were re-derived** by counting `uses:` references on each `acc` head rather
-  than read from a register: the CPSV Editor 12 of 12 across four workflows, the Linked Data
-  Explorer 24 of 24 across eight, the RONL Business API 31 of 31 across ten. All are fully
-  digest-pinned.
+  than read from a register: the CPSV Editor 12 of 12, the Linked Data Explorer 24 of 24
+  across eight workflows, the RONL Business API 31 of 31 across ten. All are fully
+  digest-pinned. The CPSV Editor's twelve sat across **four** workflows when the deck was
+  exported and now sit across **five** — the count is unchanged, but v2026.09.6 moved its
+  two preview-closing steps into a workflow of their own.
 - **`acc` and `main` carry the same code in both applications the deck covers.** The deck's
   footnote says exactly that, and the promotion commits it names — `f5bae6a` and `be6bc54` —
   are the ones this page is stamped against.

@@ -1,19 +1,19 @@
 {
-  "docs_built": "2026-09-19",
+  "docs_built": "2026-09-20",
   "repositories": [
     {
       "name": "RONL Business API",
       "icon": "⚙️",
-      "version": "v2026.09.7",
+      "version": "v2026.09.9",
       "environment": "prod",
-      "commit": "311d732...",
-      "commit_date": "2026-09-12",
+      "commit": "10bcf8b...",
+      "commit_date": "2026-09-19",
       "build": {
-        "sha": "311d732",
-        "run": 13,
-        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/34705485594"
+        "sha": "10bcf8b",
+        "run": 14,
+        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/35467550376"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/311d73228d147f5f16abb62e0c5a89b1b62efa65",
+      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/10bcf8b4ca3f6cc1610611fa3bc9ffb0250736ff",
       "ci_repo": "https://github.com/sgort/ronl-business-api"
     },
     {
