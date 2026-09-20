@@ -1,26 +1,28 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-19
+  date: 2026-09-20
   against:
-    CPSV Editor: "2723db1"
-    Linked Data Explorer: "ec4792f"
+    CPSV Editor: "1868087"
+    Linked Data Explorer: "0e7733e"
+    RONL Business API: "6ca80f2"
 ---
 
 # Supply-Chain Pinning
 
 !!! info "Verification status"
-    The **Linked Data Explorer**'s and **CPSV Editor**'s claims were re-checked on
-    **19 September 2026**, against `ec4792f` and `2723db1`: every `uses:` reference
-    listed and counted, rulesets read from the API, and `renovate.json` read rule by
-    rule. The **RONL Business API**'s claims were last re-checked on 12 September
-    2026, against `311d732`, by the same method; the page stamp names only what was
-    verified on its date.
+    All three repositories' claims were re-checked on **20 September 2026**, against
+    `1868087`, `0e7733e` and `6ca80f2`: every `uses:` reference listed and counted,
+    rulesets read from the API, `.nvmrc`, `.npmrc` and every `runs-on:` read from the
+    workflow files, and `renovate.json` read rule by rule.
 
-    **The RONL Business API's row moved further than any other**: on 12 September 2026
-    it closed ten of eleven cross-repository alignment items, and five statements on
-    this page described the state before that. Where this page previously said its
-    claims were unverified, they now are.
+    **A batch of supply-chain work landed on all three `acc` branches on 19 September
+    2026**, and it falsified more of this page than any previous release: the static
+    web apps are now built on the runner, every repository names its Node version once
+    and exactly, every job runs on a pinned runner image, a package-manager cooldown
+    exists, and the build checks are required on `acc`. The superseded reasoning is
+    kept below rather than deleted — it explains why the fixes are shaped the way they
+    are — but it is marked as history wherever it appears.
 
 Nothing a pipeline downloads or executes may float. No `latest`, no empty
 versions — a hash, digest or verified checksum wherever one exists.
@@ -94,9 +96,11 @@ within the same week, and Linked Data Explorer in v2026.08.7 — taking its
 findings from **40 to 0** across twenty action references in six deployment
 workflows. All three rulesets are named `acc supply-chain gate`, target
 `refs/heads/acc`, are `active`, and carry **zero bypass actors**; each requires a
-pull request and a passing `audit` check. The CPSV Editor's and the Linked Data
-Explorer's have also required `scan` — the Semgrep job described in
-[Dependency Scanning](dependency-scanning.md) — since v2026.09.3.
+pull request, a passing `audit` check, a passing `scan` — the Semgrep job described in
+[Dependency Scanning](dependency-scanning.md), required in the CPSV Editor and the
+Linked Data Explorer since v2026.09.3 and in the RONL Business API since 19 September
+2026 — and, since that same date, each repository's build and deploy checks. The full
+per-branch list is on [Branch Protection](branch-protection.md#what-blocks-a-merge).
 
 Adoption is not uniform, and the differences are worth knowing rather than
 flattening:
@@ -108,7 +112,7 @@ flattening:
 | Action majors | **v7** (since v2026.09.0) | **v7** | **v7** (since v2026.09.2) |
 | Blocks deletion / non-fast-forward | no | **yes** (since v2026.09.7) | **yes** |
 | Merge method restricted *in the ruleset* | no — repository setting only | **yes** | **yes** |
-| `skip_app_build` | not set | **set on all six deploy steps** | not set |
+| `skip_app_build` | **set on both deploy steps** | **set on all six deploy steps** | **set on both frontend deploy steps** |
 | Backend deployed by CI | n/a | **no** — script from a developer machine¹ | **yes** — `azure/webapps-deploy` |
 
 ¹ Not for want of trying, and **not for the reason long assumed**. The standing
@@ -119,17 +123,20 @@ federated credential. Tested against a real failed run in v2026.08.34, that was
 diagnosed. Worth stating, because a plausible-sounding cause that has been ruled
 out is more useful written down than quietly dropped.
 
-Two consequences follow from that table. **Where `skip_app_build` is not set,
-Oryx builds the production bundle inside the floating vendor container**, so
-lockfile integrity covers only what is tested — true for the CPSV Editor and the
-Linked Data Explorer, but not for RONL Business API.
+**All three now set `skip_app_build`, and the row above is the one that moved on
+19 September 2026.** Until then the CPSV Editor and the Linked Data Explorer set it
+nowhere, and the consequence was the sharpest gap on this page: where the flag is unset,
+Oryx builds the production bundle inside the floating vendor container, so lockfile
+integrity covers only what is tested. The RONL Business API had already closed it; the
+other two followed. The two `ropa-site` workflows are the remaining exception and
+correctly so — that package is a static `index.html` plus a `staticwebapp.config.json`,
+with nothing to build.
 
 **Two of the three gate `main` as well.** The Linked Data Explorer's
-`main promotion gate` ruleset, created on 9 September 2026 before the first promotion
-pull request was opened, mirrors the `acc` one — deletion and non-fast-forward blocked, a pull
-request with merge commits only, `audit` and `scan` required, zero bypass actors.
-So on that repository a production deploy gets the same guarantees as an `acc`
-pull request. The two rulesets differ in exactly one parameter, deliberately:
+`main promotion gate` ruleset was created on 9 September 2026, before the first promotion
+pull request was opened: deletion and non-fast-forward blocked, a pull request with merge
+commits only, `audit` and `scan` required, zero bypass actors. It mirrored the `acc`
+ruleset exactly, save for one parameter, deliberately:
 `require_extra_approval_for_unattributed_changes` is `true` on `acc` and
 `false` on `main`, where GitHub's default of `true` — stored when the parameter
 was *omitted* from the create call — would have required an approval no
@@ -137,13 +144,23 @@ single-maintainer repository can give, and deadlocked the promotion. **Read a
 ruleset back after writing it**; the create response's shape does not show the
 defaults it filled in.
 
+**That mirroring ended on 19 September 2026.** The build and deploy checks were added to
+`acc` and not to `main`, so `acc` now requires strictly more in both repositories, and a
+promotion pull request is held to less than the pull requests it carries. That is
+deliberate rather than an oversight: the production deploy workflows kept their
+trigger-level path filters, and a required check that never reports wedges a pull request
+permanently — see
+[how a path-filtered workflow became requireable](branch-protection.md#how-a-path-filtered-workflow-became-requireable).
+
 The RONL Business API created its own `main promotion gate` on 12 September 2026, on
 the same pattern and for a sharper reason: until that day `main` carried only classic
 protection — a pull request required, **zero** required status checks,
 `allow_force_pushes` on and `enforce_admins` off — so the branch that deploys production
-was the *less* protected of its two. It requires `audit` and not `scan`, because every
-deploy workflow there is push-only and a required check that never reports on a pull
-request wedges it permanently.
+was the *less* protected of its two. It requires `audit` and **still not `scan`**, which
+its `acc` ruleset has required since 19 September 2026. The original reason — that every
+deploy workflow there was push-only, and a required check that never reports on a pull
+request wedges it permanently — now holds only for the `*-prod` pair; its four `*-acc`
+workflows do trigger on `pull_request`, and their checks are required.
 
 That leaves the CPSV Editor as the one repository whose ruleset targets
 `refs/heads/acc` only, so its `main` is not covered by the guarantees an `acc` pull
@@ -152,10 +169,15 @@ weighed and kept on 11 September 2026
 ([ttl-editor#131](https://github.com/sgort/ttl-editor/issues/131)). The argument against
 it stands, and is worth keeping in view — the promotion pull request is the one carrying
 changes into production, and *"already checked on `acc`"* is true of the commits, not of
-the merge. If it is revisited, `audit` and `scan` are the two that could be required:
-both trigger on every pull request, so neither can go missing on any base. The deploy
-check cannot, as things stand — its `paths-ignore` means a documentation-only promotion
-never triggers it, and a required check that never reports wedges the pull request.
+the merge. If it is revisited, `audit` and `scan` are the two that could be required
+today: both trigger on every pull request, so neither can go missing on any base. The
+deploy check cannot, as `main` stands — `Deploy PROD (white-sky)` keeps `paths-ignore`
+on its `pull_request` trigger, so a documentation-only promotion never starts it, and a
+required check that never reports wedges the pull request. **That constraint is no longer
+structural, only unapplied**: the `changes`-job pattern that made the `acc` deploy checks
+requireable on 19 September 2026 would work here too, and was simply not extended to the
+production workflows. See
+[how a path-filtered workflow became requireable](branch-protection.md#how-a-path-filtered-workflow-became-requireable).
 
 The rulesets are also not identical in shape, which the table's last two rows
 record. The CPSV Editor's is now the only one that does not block branch deletion and
@@ -167,7 +189,7 @@ repository-level setting alone — see
 [Merge method](branch-protection.md#the-merge-method-is-a-setting-not-a-rule). All three reach the
 same place; only two are belt *and* braces.
 
-Ruleset shapes re-verified on 12 September 2026 for all three, with
+Ruleset shapes re-verified on 20 September 2026 for all three, with
 `gh api repos/<owner>/<repo>/rules/branches/<branch>` — which reports the effective rules
 from every ruleset at once, where reading one ruleset, or the classic protection endpoint
 alone, gives the wrong answer. Pin counts were re-derived the same day by listing `uses:`
@@ -414,16 +436,29 @@ the number at which the same collision happens rather than removing it.
 transitive tree, and Renovate's own
 [documentation](https://docs.renovatebot.com/key-concepts/minimum-release-age/) says why:
 for `lockFileMaintenance` it is *"not possible, as we delegate to the package manager to
-perform the required changes"*. All three repositories run lock-file maintenance weekly, and
-none sets a cooldown at the package-manager level — so **a weekly refresh can pull in a
-transitive version published that morning**, and so can any `npm install` a developer runs
-locally.
+perform the required changes"*. All three repositories run lock-file maintenance weekly, so
+until 19 September 2026 **a weekly refresh could pull in a transitive version published
+that morning**, and so could any `npm install` a developer ran locally.
 
 Renovate's recommendation, and ICTU's guideline, is to configure the cooldown in the package
-manager as well — for npm, `min-release-age` in `.npmrc`. Whether the npm bundled with Node
-22, which two of the backends build on, supports that setting has **not been verified**, and
-should be before anyone relies on it. See
-[ICTU Dependency Guideline](ictu-dependency-guideline.md), recommendation R6.
+manager as well — for npm, `min-release-age` in `.npmrc`. **All three repositories now carry
+a root `.npmrc` setting `min-release-age=14`**, matching the 14 days `minimumReleaseAge`
+already holds Renovate to. Renovate reads it, and for its own update pull requests applies
+whichever cutoff is stricter.
+
+What it covers is narrower than it looks, and each limit was measured rather than assumed:
+
+| Limit | Consequence |
+|---|---|
+| **`npm ci` ignores it by design** ([npm/cli#9281](https://github.com/npm/cli/issues/9281)) | CI only ever runs `npm ci`, so **CI cannot fail on the cooldown** — and cannot enforce it either. The setting governs `npm install`, `npm update` and lock-file maintenance |
+| **npm older than 11.10 ignores it silently** | No warning, no error, no effect. Whether a repository is covered therefore depends on which npm its Node bundles |
+| **Node 22.23.2 bundles npm 10.9.8** | So the **Linked Data Explorer and the RONL Business API are not covered by their own setting** on a machine following `.nvmrc` |
+| **Node 24.20.0 bundles npm 11.19** | So the **CPSV Editor is** covered |
+| `scripts/check-deps.sh` warns on npm below 11.10 | At every dev-server start and every push, in all three — the gap is surfaced rather than left to be discovered |
+
+The cooldown may be skipped for an urgent security fix, as the guideline allows: set the
+flag to zero days on that one command line, never in the file, and say why in the pull
+request. See [ICTU Dependency Guideline](ictu-dependency-guideline.md), recommendation R6.
 
 #### What is exempted, and why each exemption is written down
 
@@ -449,8 +484,9 @@ standing on a stale one.
 push to a feature branch   → nothing runs (workflows trigger on acc/main only)
 open a PR against acc      → audit + scan + Build and Deploy run
 audit fails                → merge blocked by the ruleset
-scan fails                 → merge blocked, except in the RONL Business API
-audit passes               → merge allowed
+scan fails                 → merge blocked, in all three since 19 Sep 2026
+build or tests fail        → merge blocked on acc, in all three since 19 Sep 2026
+all required checks pass   → merge allowed
 direct push to acc         → rejected: a pull request is required
 ```
 
@@ -476,77 +512,85 @@ that claims total coverage produces a permanent unfixable finding at the first
 audit, and the predictable response is to weaken the gate — so the register is
 what allows the gate to stay strict *honestly*.
 
-**The Static Web Apps container cannot be pinned**, and in the pilot it builds
-what ships. `Azure/static-web-apps-deploy` is a three-line wrapper whose
+**The Static Web Apps container still cannot be pinned** — what changed on 19 September
+2026 is that it no longer builds what ships, only uploads it.
+`Azure/static-web-apps-deploy` is a three-line wrapper whose
 `action.yml` declares `runs: using: docker, image: "Dockerfile"`, and that
 Dockerfile is `FROM mcr.microsoft.com/appsvc/staticappsclient:stable`. Pinning
 the action makes the wrapper immutable and leaves the payload floating.
 Unreachable from our side; it would require Microsoft publishing digest-pinned
 image references, or IOU forking the action.
 
-!!! warning "How badly this bites depends on one flag, and the three repositories differ"
-    **CPSV Editor and Linked Data Explorer set `skip_app_build` nowhere.** Oryx
-    therefore runs *inside* that floating image and builds the production bundle
-    there, making the image the **build toolchain that produces the deployed
-    artifact**, not merely an upload step.
+!!! success "One flag decided how badly this bit, and all three now set it"
+    **`skip_app_build: true` points `app_location` at an already-built `dist/`**, so the
+    container uploads an artifact the pipeline built itself on a pinned `setup-node` via
+    `npm ci`. The RONL Business API set it on all six of its deploy steps first; the CPSV
+    Editor and the Linked Data Explorer followed on 19 September 2026, each adding an
+    explicit build step to their workflows. (References to the action carrying
+    `action: 'close'` build nothing and are unaffected.)
 
-    **RONL Business API sets `skip_app_build: true` on all six deploy steps**,
-    pointing `app_location` at an already-built `dist/`. The container uploads an
-    artifact the pipeline built on pinned `setup-node` via `npm ci`. (Its other
-    three references to the action are `action: 'close'` steps, which build
-    nothing.)
+    **Until then, the CPSV Editor and the Linked Data Explorer set it nowhere**, and the
+    consequence is worth keeping on record because it is the failure mode any repository
+    adopting Static Web Apps inherits by default: Oryx ran *inside* the floating image and
+    built the production bundle there, making the image the **build toolchain that
+    produced the deployed artifact**, not merely an upload step. Lockfile integrity
+    covered only what was tested, in two of the three — the majority position was the
+    weaker one.
 
-    So for RBA's three static sites, lockfile integrity covers **what ships**;
-    for the other two it covers only what is tested. The difference is one flag,
-    and it is worth preserving deliberately as the rollout continues — the
-    majority position is currently the weaker one.
+    The two `ropa-site` workflows still do not set the flag. That is correct: the package
+    is static files with no build, so there is no install for Oryx to re-resolve.
 
-**`npm ci` integrity covers what is tested, not necessarily what is shipped.**
-`package-lock.json` carries a `sha512` per package and `npm ci` verifies it. In
-the CPSV Editor and the Linked Data Explorer that install feeds lint and the
-unit tests only, because Oryx
-performs its own install inside the container to produce the deployed bytes;
-where `skip_app_build` is set, the verified install is the one that produces
-them.
+**`npm ci` integrity now covers what ships.** `package-lock.json` carries a `sha512` per
+package and `npm ci` verifies it; where `skip_app_build` is set, the verified install is
+the one that produces the deployed bytes, and since 19 September 2026 that is every
+deployable in all three repositories.
 
-And the install that produces the deployed bytes is not `npm ci`. Oryx runs
-`npm install`, which honours a lockfile that agrees with `package.json` and quietly
-re-resolves one that does not, where `npm ci` would fail. The CPSV Editor's matched its
-lockfile in the deploy run examined on 13 September 2026 — `up to date, audited 542
-packages` — which is the likely outcome rather than a guaranteed one.
+!!! note "What it looked like when it did not — and how to recognise it"
+    The install that produced the deployed bytes was not `npm ci`. Oryx ran
+    `npm install`, which honours a lockfile that agrees with `package.json` and quietly
+    re-resolves one that does not, where `npm ci` would fail. The CPSV Editor's matched its
+    lockfile in the deploy run examined on 13 September 2026 — `up to date, audited 542
+    packages` — which was the likely outcome rather than a guaranteed one.
 
-**The Node version the tests run on is pinned in two of three repositories — the Node
-version that ships is pinned in one.** This was recorded as a general gap, "reachable in
-principle". The Linked Data Explorer pinned its workflows in v2026.09.1 and the RONL
-Business API in v2026.09.7. But `setup-node` decides only what the *runner* uses, and in two
-of the three the runner does not build what ships:
+    The tell in a deploy log is a line reading `Oryx Version: …` followed by
+    `Downloading and extracting 'nodejs' version '…'` and `Running 'npm install'`. If
+    those appear, the artifact was not built by the job that tested it, whatever the
+    workflow file says about `setup-node`.
 
-| Repository | Tests run on | The shipped frontend is built on |
-|---|---|---|
-| CPSV Editor | `'24'` — major only, so whichever 24.x patch is current at run time | **Node 22.22.0, chosen by Oryx** inside the deploy container |
-| **RONL Business API** | **`.nvmrc` at `22.22.0`**, read by all eight deploy workflows through `node-version-file` | the same — built on the runner, uploaded with `skip_app_build: true` |
-| **Linked Data Explorer** | **`20.20.2`** frontend, **`22.23.2`** backend, **`24.19.0`** audit — exact patches, with the `engines` floors raised to match | **Node 22.22.0, chosen by Oryx** — not the `20.20.2` its tests ran on |
+**Each repository now names its Node version once, exactly, in a file every deploy
+workflow reads.** This was a general gap until 19 September 2026, and it had two halves:
+the version the tests ran on, and the version that shipped. Both are closed.
 
-The right-hand column is read from the deploy logs, not inferred from the workflow files.
-[Linked Data Explorer run 34612031473](https://github.com/sgort/linked-data-explorer/actions/runs/34612031473)
-ran `npm ci` on Node 20.20.2 for lint and tests, then its deploy step logged
-`Oryx Version: 0.2.20260109.4`, `Downloading and extracting 'nodejs' version '22.22.0'` and
-`Running 'npm install'`;
-[CPSV Editor run 34622800899](https://github.com/sgort/ttl-editor/actions/runs/34622800899)
-tested on Node 24 and shipped the same way. **Pinning the workflow's Node is necessary and,
-where Oryx builds, not sufficient** — the fix is the flag above, not a better pin.
+| Repository | `.nvmrc` | Read by | The shipped bundle is built on |
+|---|---|---|---|
+| **CPSV Editor** | **`24.20.0`** | both Static Web Apps workflows, via `node-version-file` | the same — built on the runner, uploaded with `skip_app_build: true` |
+| **Linked Data Explorer** | **`22.23.2`** | all six deploy workflows | the same |
+| **RONL Business API** | **`22.23.2`** | all eight deploy workflows | the same |
 
-The Linked Data Explorer's pins landed alongside the workflow digest pins in the
-same release, which is the natural moment: the runtime is one more thing the
-pipeline downloads, and pinning the actions while leaving the interpreter
-floating is half the job.
+`setup-node` decides only what the *runner* uses, so the pin is worth having only once
+the runner is what builds. Both halves landed together, which is the right order: pinning
+the interpreter while a vendor container re-chose it would have been ceremony.
 
-**The two solved it in different shapes, and the difference is the maintainable half.**
-One file that every workflow reads can be bumped once and, because Renovate's `node`
-manager parses `.nvmrc`, it stays maintained rather than hand-edited. Three literals in
-three workflows cannot: the Linked Data Explorer's own
-[#113](https://github.com/sgort/linked-data-explorer/issues/113) records exactly that —
-three hand-maintained pins with nothing keeping them in step. Prefer the file.
+!!! note "What the pins were before, and why the shape changed"
+    The CPSV Editor read a bare `'24'` — a major, so whichever 24.x patch was current at
+    run time — governing lint and tests only, while Oryx built the shipped bundle on a
+    Node it chose itself (22.22.0, in run 34622800899). The Linked Data Explorer carried
+    **three** exact literals in three workflow files — `20.20.2` frontend, `22.23.2`
+    backend, `24.19.0` audit — with nothing keeping them in step, which its own
+    [#113](https://github.com/sgort/linked-data-explorer/issues/113) recorded; its
+    frontend shipped on Oryx's 22.22.0 rather than the 20.20.2 its tests ran on
+    ([run 34612031473](https://github.com/sgort/linked-data-explorer/actions/runs/34612031473)).
+    The RONL Business API was first to the file, at `22.22.0`, since bumped to `22.23.2`.
+
+    **One file beats three literals**, and that is the maintainable half rather than a
+    stylistic preference: Renovate's `node` manager parses `.nvmrc`, so the file stays
+    current as a reviewed pull request, where hand-written literals rot silently and
+    separately. Prefer the file.
+
+    One trap came with it. A `paths:` filter that does not name `.nvmrc` means a Node bump
+    builds and deploys **nothing** — the version changes and no artifact moves. Every
+    deploy workflow's filter in all three repositories now lists `.nvmrc` for exactly that
+    reason.
 
 The RONL Business API's case also shows what the gap actually costs. Both its App Service
 plans run `NODE|22-lts`, while eight workflows built the deployed artifact on Node 20 —
@@ -555,21 +599,18 @@ so the artifact was built on one major and served by another, silently, until
 moved to `>=22` in the same change, because a floor of `>=20.13.0` permits precisely the
 mismatch being removed.
 
-**One deliberate exception in each.** The RONL Business API's `audit` job keeps a literal
-`'24'`, because its `renovate-config-validator` step needs Node 24 — `renovate` declares
-`engines.node ^24.11.0`, and npm accepts a mismatch with a warning rather than refusing,
-so the validator had been running unsupported and green. That pin is load-bearing and
-must not be swept into the shared file.
+**One deliberate exception in each, and it is not the shared file.** Every `zizmor.yml`
+sets its own `node-version: '24.20.0'` — an exact literal, deliberately separate from
+`.nvmrc` — because its `renovate-config-validator` step needs Node 24 whatever the
+application runs on. `renovate` declares `engines.node ^24.11.0`, and npm accepts a
+mismatch with a warning rather than refusing, so the validator had been running
+unsupported and green. That pin is load-bearing and must not be swept into the shared
+file; in the CPSV Editor it happens to equal `.nvmrc` today, which is coincidence rather
+than coupling. Renovate's `node` manager maintains both.
 
-The same is true of the CPSV Editor's audit job, which pins Node **24** for that reason
-and not as supply-chain policy — so its presence there is not evidence the gap is closed.
+**Two things still float, and neither is a `uses:` reference for zizmor to see.** Checked
+on 20 September 2026 at each repository's `acc` head:
 
-**Four more things float, and none is a `uses:` reference for zizmor to see.** Checked on
-13 September 2026 at the `acc` commits the ICTU assessment read:
-
-- **The runner image.** Every job in all three — 6 in the CPSV Editor, 12 in the Linked Data
-  Explorer, 13 in the RONL Business API — runs on `ubuntu-latest`, which moves when GitHub
-  moves it. `ubuntu-24.04` names it.
 - **The App Service runtime.** Both backends are hosted on `NODE|22-lts`, which floats within
   the major — the RONL Business API's recorded in
   [#36](https://github.com/sgort/ronl-business-api/issues/36), the Linked Data Explorer's in
@@ -578,12 +619,28 @@ and not as supply-chain policy — so its presence there is not evidence the gap
   `operaton/operaton:latest` and `alpine:latest`, and its Skosmos deployment uses
   `quay.io/natlibfi/skosmos:latest`. Its other images carry versions — `postgres:16-alpine`,
   `redis:7-alpine`, `keycloak:23.0` — and none carries a digest.
-- **The backend deploy package.** The Linked Data Explorer's backend workflows copy
-  `package.json` into the deploy directory **without `package-lock.json`** and run
-  `npm install --production --omit=dev` there, so the backend that ships re-resolves every
-  caret range at deploy time — after `npm ci` tested the locked tree. The RONL Business
-  API's deploy scripts do the same from a developer machine
-  ([#34](https://github.com/sgort/ronl-business-api/issues/34)).
+
+Two more were on that list until 19 September 2026 and are now closed:
+
+- **The runner image**, which ran on `ubuntu-latest` in every job — 6 in the CPSV Editor,
+  12 in the Linked Data Explorer, 13 in the RONL Business API — and moved whenever GitHub
+  moved it. **Every job in all three now names `ubuntu-24.04`**: 7, 15 and 17 jobs
+  respectively, the counts having grown with the `changes` jobs that made the build checks
+  requireable. The only surviving `ubuntu-latest` string in any of them is a comment in
+  `semgrep.yml` explaining why its Python install needs a venv.
+- **The Linked Data Explorer's backend deploy package**, which copied `package.json` into
+  the deploy directory **without `package-lock.json`** and ran
+  `npm install --production --omit=dev` there, so the backend that shipped re-resolved
+  every caret range at deploy time — after `npm ci` had tested the locked tree. Both
+  backend workflows now stage the package and run
+  `npm ci --omit=dev --workspace=@linked-data-explorer/backend --no-audit --no-fund`
+  against the workspace root's lockfile, which is the only lockfile there is.
+
+**The RONL Business API's backend is the one that did not move.** Its deploy scripts still
+install from a developer machine without the lockfile
+([#34](https://github.com/sgort/ronl-business-api/issues/34)), and its own `.npmrc` records
+a second reason the cooldown does not reach it: npm reads a project `.npmrc` only from the
+project root, and that install runs in a separate `deploy/` folder.
 
 [ICTU Dependency Guideline](ictu-dependency-guideline.md) records these against the
 recommendations they miss, and

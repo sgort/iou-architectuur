@@ -1,5 +1,11 @@
 ---
 scope: cross-cutting
+verified:
+  date: 2026-09-20
+  against:
+    CPSV Editor: "1868087"
+    Linked Data Explorer: "0e7733e"
+    RONL Business API: "6ca80f2"
 ---
 
 # Contributing to IOU Architecture
@@ -176,11 +182,15 @@ release cycle.
 
 !!! warning "`acc` is protected in all three applications"
     In the CPSV Editor, the Linked Data Explorer and the RONL Business API, `acc` requires
-    a pull request and a passing `audit` check, with no bypass actors — a direct
-    `git push origin acc` is rejected. Two of the three require `scan` as well, and two
-    gate `main` on the same rules. See [Branch Protection](branch-protection.md) for what
-    each branch requires, and the [controls index](controls.md) for where every control
-    holds.
+    a pull request with no bypass actors — a direct `git push origin acc` is rejected —
+    plus a passing `audit`, a passing `scan`, and, since 19 September 2026, that
+    repository's build and deploy checks. In practice that means **a merge request whose
+    tests fail cannot be merged into `acc`**.
+
+    Two of the three also gate `main`, but with **fewer** checks than `acc`, not the same
+    ones: no `main` requires a build or a test anywhere. See
+    [Branch Protection](branch-protection.md) for what each branch requires, and the
+    [controls index](controls.md) for where every control holds.
 
 ---
 

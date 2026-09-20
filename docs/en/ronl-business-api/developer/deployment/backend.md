@@ -23,7 +23,7 @@ Both workflows follow the same build process:
 
 ```yaml
 1. Checkout code
-2. Setup Node.js from .nvmrc (22.22.0)
+2. Setup Node.js from .nvmrc (22.23.2)
 3. npm ci                          (install all workspace dependencies)
 4. Build shared package            (npm run build --workspace=@ronl/shared)
 5. Lint backend                    (npm run lint in packages/backend)

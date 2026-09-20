@@ -90,6 +90,7 @@ plugins:
 # component version server-side.
 hooks:
   - hooks/repo_versions.py
+  - hooks/kpi_charts.py
 
 # Navigation structure
 nav:

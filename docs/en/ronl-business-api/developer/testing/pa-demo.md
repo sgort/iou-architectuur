@@ -10,16 +10,22 @@ wired into CI.
 
 !!! info "Figures on this page are measured, not estimated"
     **19 files · 106 tests, all passing**, measured with
-    `npm test --workspace=@ronl/pa-demo` on **12 September 2026** against `main`
-    at `311d732` (v2026.09.7): `Duration 10.37s`. Coverage **93.47 % statements ·
-    95.65 % branches · 85.00 % functions · 92.85 % lines** — every figure
-    reproduced to the decimal from the 5 September run, which is what to expect
-    from a package whose only changes since were its `index.html`, its social
-    card and its Vitest config. Branches stand 8.70 points above v2026.08.33
-    under the per-file 80% floor adopted in v2026.09.2 — a floor that
-    v2026.09.6 turned from a convention into a configured threshold here
+    `npm test --workspace=@ronl/pa-demo` on **20 September 2026** against `main`
+    at `10bcf8b` (v2026.09.9), after a clean `npm ci` in a separate clone on
+    Node 24.14.1 / npm 11.11.0: `Duration 8.57s`. Coverage **93.47 % statements ·
+    95.65 % branches · 85.00 % functions · 92.85 % lines** — **all four
+    reproduced to the decimal** for the third release running, which is exactly
+    what to expect from a package whose `src/` tree has not changed since
+    v2026.09.5: `git diff 311d732 10bcf8b -- packages/pa-demo/` touches nothing
+    but `package.json`. Branches stand 8.70 points above v2026.08.33 under the
+    per-file 80% floor adopted in v2026.09.2 — a floor that v2026.09.6 turned
+    from a convention into a configured threshold here
     (`thresholds: { branches: 80, perFile: true }`), and that this run passed
     without naming a file.
+
+    A repeat measurement reproducing to the decimal is the useful kind of
+    boring: it is the check that the harness, not the package, is what changed
+    when a figure moves elsewhere.
 
 **At a glance:**
 
@@ -27,7 +33,7 @@ wired into CI.
 |---|---|
 | Runner | Vitest 4 + jsdom, coverage via v8 |
 | Files / tests | 19 / 106 |
-| Wall time | 10.37 s |
+| Wall time | 8.57 s |
 | Playwright | 11 tests in `e2e/plato-demo.spec.ts`, **runs in CI** |
 
 ---
@@ -137,8 +143,8 @@ real selectors, which would have opened exactly that hole.
 
 `packages/pa-demo/e2e/plato-demo.spec.ts` — **11 tests**, Chromium only.
 
-!!! note "Not re-run on 12 September 2026"
-    The spec file was confirmed present and unchanged at `311d732`, but the
+!!! note "Not re-run on 20 September 2026"
+    The spec file was confirmed present and unchanged at `10bcf8b`, but the
     suite itself was not executed in this pass: its last measurement stands at
     **30 August 2026 — 11 passed, 14.7s**. See
     [E2E & live smoke](e2e.md).
@@ -146,6 +152,13 @@ real selectors, which would have opened exactly that hole.
 This is the one Playwright suite in the repository that **runs in CI**, as a
 blocking step of `azure-pa-demo-acc.yml`, before the build — the acc workflow
 only; `azure-pa-demo-prod.yml` runs the unit tests and skips the E2E step.
+
+Since **19 September 2026** that workflow's job is also a **required status
+check** on `acc`, listed in the ruleset as `Build and Deploy ACC PA Demo`, so
+this is the one end-to-end suite in the repository that can block a merge. Its
+`playwright.config.ts` is also the only one of the three that is genuinely
+cold-startable: it declares a `webServer` and needs no backend, database or
+Keycloak behind it.
 
 It is the only proof of two of the four no-Live layers: that the live toggle is
 actually hidden in a real browser's cascade, and that the page issues no network

@@ -6,12 +6,16 @@ component: RONL Business API
 
 RONL Business API runs **ten GitHub Actions workflows**: an
 acceptance/production pair for each of four packages, plus two scanning
-workflows — the supply-chain `audit` gate and a Semgrep `scan`. All run on
-`ubuntu-latest`.
+workflows — the supply-chain `audit` gate and a Semgrep `scan`. Every one of
+the **seventeen jobs** across them names `ubuntu-24.04`, never `ubuntu-latest`:
+that label is one GitHub moves to a new Ubuntu release on its own schedule, so
+pinning it means a change of OS release arrives as a diff here rather than
+silently. The label pins the *release*, not the image — GitHub rebuilds the
+image about weekly, and a hosted runner cannot pin it by digest.
 
 !!! info "`acc` and `main` carry the same ten workflows"
-    Verified against `main` at `311d732` on 12 September 2026; `acc` at
-    `28e1a9e` has a byte-identical tree. `main` was once four workflows behind
+    Verified against `main` at `10bcf8b` on 20 September 2026 (v2026.09.9);
+    `acc` at `6ca80f2` has a byte-identical tree. `main` was once four workflows behind
     and carried none of the pinning or gating described below — closing that gap
     was a CI-alignment programme that finished in v2026.09.7, and `main` now has
     its own `main promotion gate` ruleset. Where the two branches still differ,
@@ -78,8 +82,8 @@ every pull request regardless of what it touched.
 | # | Step | What it does |
 |---|---|---|
 | 1 | Checkout | `persist-credentials: false` |
-| 2 | Set up Node 24 | For the config validator only — see [Node runtime](#node-runtime) |
-| 3 | Run zizmor | Workflow static analysis, with zizmor itself pinned to `1.29.0` |
+| 2 | Set up Node `24.20.0` | For the config validator only — see [Node runtime](#node-runtime) |
+| 3 | Run zizmor | Workflow static analysis, with zizmor itself pinned to `1.29.0` — maintained by Renovate, which maps the action to the image `ghcr.io/zizmorcore/zizmor`, not bumped by hand |
 | 4 | Validate `renovate.json` | `renovate-config-validator --strict` |
 | 5 | `npm ci` | So the three steps below run *this* repository's tooling rather than a version named in the workflow |
 | 6 | `npm run check-format` | Prettier, via the root script the pre-push hook also runs |
@@ -101,7 +105,7 @@ Step 6 is in this job rather than in a deploy workflow for the same reason step 
 is: `audit` has no paths filter and is the required check, so a
 documentation-only pull request reaches it too.
 
-### `scan` — Semgrep, and not required
+### `scan` — Semgrep, required on `acc`
 
 `semgrep.yml` runs Semgrep Code and Supply Chain across the whole monorepo in a
 single job. All six workspaces resolve through the one root `package-lock.json`,
@@ -112,8 +116,11 @@ It covers what `check-supply-chain` structurally cannot: that step verifies
 GitHub Actions digest pins resolve to the versions their comments claim, and
 says nothing at all about the packages in the lockfile.
 
-`scan` is deliberately **not** a required status check while its baseline is
-triaged. Promoting it is a ruleset change, not a change to this file.
+`scan` **is** a required status check on `acc`, promoted once its baseline had
+been triaged — a workflow that runs but cannot block is advice, not a gate.
+That promotion was a ruleset change, not a change to this file. It is not
+required on `main`; see [Required checks and branch
+rules](#required-checks-and-branch-rules).
 
 Its concurrency group is the one deliberate divergence from every other workflow
 here: pull-request runs cancel, pushes to `acc` and `main` do not. Those pushes
@@ -129,13 +136,59 @@ v2026.09.7 eight workflows asked for `node-version: '20'` — building the
 deployed artifact on a major the host does not run.
 
 - The **eight deploy workflows** read `node-version-file: .nvmrc`.
-- `.nvmrc` carries an exact `22.22.0`.
-- The root `engines.node` is `>=22`.
-- `zizmor.yml` keeps a literal `'24'`, deliberately: its
-  `renovate-config-validator` step needs Node 24, because `renovate` declares
-  `engines.node ^24.11.0`. npm accepts that mismatch with an `EBADENGINE`
-  warning rather than refusing, which is how the validator ran unsupported and
-  green.
+- `.nvmrc` carries an exact `22.23.2`.
+- The root `engines.node` is `>=22`, and `engines.npm` is `>=10.0.0`.
+- `zizmor.yml` names an exact `'24.20.0'`, deliberately on a different major:
+  its `renovate-config-validator` step needs Node 24, because `renovate`
+  declares `engines.node ^24.11.0`. npm accepts that mismatch with an
+  `EBADENGINE` warning rather than refusing, which is how the validator once
+  ran unsupported and green. Pointing it at `.nvmrc` instead would run it on
+  Node 22, which `renovate` does not support.
+
+!!! note "`engines` is a floor, not the runtime — and Renovate no longer raises it"
+    Renovate's `rangeStrategy bump` applies to `engines` as well as to
+    dependencies, and it once raised `engines.node` to `>=22.23.2` and
+    `engines.npm` to `>=10.9.9` — a floor **no Node 22 release satisfies**,
+    since 22.23.2 bundles npm 10.9.8. Nothing enforces `engines` here, so a
+    raised floor produces `EBADENGINE` warnings on a slightly older toolchain
+    and drifts the root away from `packages/backend` and App Service's
+    `NODE|22-lts`. `engines` now uses `rangeStrategy widen`, which leaves a
+    range untouched when the new version already satisfies it: `>=22` stays
+    `>=22`, and the exact runtime stays where it belongs, in `.nvmrc`.
+
+`.nvmrc` is also in every deploy workflow's **path filter**, which it was not
+until v2026.09.9 — see [Path filters](#path-filters).
+
+---
+
+## The package-manager cooldown
+
+Renovate holds an update for fourteen days before proposing it, but that covers
+only the updates *Renovate* proposes. Lock-file maintenance hands the refresh to
+npm, which is where the transitive tree actually moves, and Renovate's own
+documentation says its cooldown cannot apply there.
+
+A root `.npmrc` closes that gap:
+
+```ini
+min-release-age=14
+```
+
+npm itself will then not resolve a version published less than fourteen days
+ago. Four properties of it were measured rather than assumed, and each one
+matters:
+
+| Context | Behaviour |
+|---|---|
+| npm **11.10 or newer** | Honours it on `install` and `update` |
+| `npm ci` | **Ignores it on purpose** — so CI, which only ever runs `npm ci`, cannot fail on it |
+| npm **10.9.8** (bundled with Node 22.23.2) | Ignores it *without a warning* — which is why `scripts/check-deps.sh` warns when npm is older than 11.10 |
+| The backend deploy | Not covered: it installs in its own `deploy/` folder, and npm reads a project `.npmrc` only from the project root |
+
+An urgent security fix may skip the cooldown, as the guideline allows — set the
+flag to zero on that one command line, never in the file, and say why in the
+pull request. Renovate's security pull requests already do this themselves,
+retrying without the cutoff when npm answers `ETARGET`.
 
 ---
 
@@ -212,23 +265,77 @@ request regardless of base.
 
 ## Path filters
 
-Workflows trigger only when relevant files change. The filters are mirrored onto
-both `push` and `pull_request`:
+Workflows trigger only when relevant files change. On `push` that is an
+ordinary `paths:` filter on the trigger; on `pull_request` it is **not**, and
+the next section explains why.
 
 | Workflow | Paths |
 |---|---|
-| `azure-backend-*` | `packages/backend/**`, `packages/shared/**`, `package-lock.json`, `package.json`, own file |
-| `azure-frontend-*` | `packages/frontend/**`, `packages/shared/**`, `packages/pa-cockpit/**`, own file |
-| `azure-pa-demo-*` | `packages/pa-demo/**`, `packages/shared/**`, `packages/pa-cockpit/**`, own file |
-| `azure-publicsite-*` | `packages/public-site/**`, own file |
+| `azure-backend-*` | `packages/backend/**`, `packages/shared/**`, `package-lock.json`, `package.json`, `.nvmrc`, own file |
+| `azure-frontend-*` | `packages/frontend/**`, `packages/shared/**`, `packages/pa-cockpit/**`, `.nvmrc`, own file |
+| `azure-pa-demo-*` | `packages/pa-demo/**`, `packages/shared/**`, `packages/pa-cockpit/**`, `.nvmrc`, own file |
+| `azure-publicsite-*` | `packages/public-site/**`, `.nvmrc`, own file |
 | `zizmor.yml`, `semgrep.yml` | **none, deliberately** — both scanners must run on every pull request |
+
+`.nvmrc` is in all eight deploy filters since v2026.09.9, and its absence was a
+real hole rather than an oversight to tidy: `.nvmrc` sets the Node version every
+one of these workflows builds, tests and ships on, so a Node bump used to build
+nothing, test nothing and deploy nothing — and the new version then reached the
+next unrelated deploy untested. Each pattern was checked to match `.nvmrc` at
+the repository root only.
+
+### Why the `pull_request` filter moved into a job
+
+This is the part worth copying into another repository, because the reasoning is
+not obvious from either half on its own.
+
+**A required status check must report on every pull request.** GitHub waits for
+a check it has been told to require. It does not reason about relevance.
+
+**A workflow whose trigger filters it out never starts, and so reports
+nothing.** A `paths:` filter on `pull_request` is evaluated before the run
+exists. There is no skipped run, no neutral conclusion, no check at all — so a
+required build check would leave every pull request that does not touch its
+paths waiting forever, unmergeable.
+
+**A job skipped by its own `if:` reports success.** That is the escape: the
+workflow starts, the expensive job does not run, and the check reports green.
+
+So each of the four ACC deploy workflows now:
+
+1. drops `paths:` from its `pull_request` trigger entirely — it starts on every
+   pull request to `acc`;
+2. runs a small `changes` job first, which asks the GitHub API for the pull
+   request's files and matches them against **one regular expression mirroring
+   the push filter** (renames counted under both names, as GitHub's own filter
+   does);
+3. gates the build and close jobs on that job's `relevant` output.
+
+The gate is deliberately fail-safe. The jobs run when `changes` says *relevant*
+**and** when `changes` did not succeed at all, so a failed API lookup means a
+full build rather than a free pass. The push trigger keeps its own `paths:`
+filter — nothing is required on a push, so none of this applies there.
+
+!!! warning "Required checks match by job *name*"
+    The ruleset names `Build and Deploy ACC Frontend`, not the workflow or the
+    job id. Renaming one of those jobs silently detaches the requirement, so the
+    rename and the ruleset change belong in the same pull request.
 
 The root lockfile and manifest are in the **backend** filters only. Every
 workspace resolves through them, so a hoisted dependency can move under any of
 them and a lockfile-only change would otherwise be built and tested by nothing.
-Widening the other three filters the same way is not safe: each of those claims
-a Static Web Apps staging environment, against a Free-plan ceiling of three that
-five open pull requests have already exhausted twice.
+Widening the other three filters the same way is a decision of its own: each of
+those claims a Static Web Apps staging environment on every pull request that
+matches, and widening them would make every lockfile-only pull request claim
+three previews.
+
+!!! note "The plan ceiling is not what it was when this rule was written"
+    The frontend app was on the **Free** plan, three staging environments, when
+    five open pull requests exhausted it on 28 August 2026. Read from Azure on
+    15 September 2026, all three *acceptance* apps are **Standard** — ten
+    environments — and it is the *production* frontend that is Free. The
+    argument for keeping the filters narrow is now about what a lockfile-only
+    change should legitimately deploy, not about running out of room.
 
 `packages/pa-cockpit/**` appears in two filters because both the frontend and
 the demo consume that package; a cockpit change that triggered neither would
@@ -290,9 +397,9 @@ feature/*  →  PR to acc  →  audit + path-matched deploys  →  merge  →  m
              ACC deploys                                          PROD deploys
 ```
 
-A pull request is **required** to land on either branch, and the `audit` check
-must pass — a repository ruleset enforces both on `acc` and on `main`. A direct
-push is rejected. Squash and rebase merging are disabled repo-wide, because
+A pull request is **required** to land on either branch, and its required
+checks must pass — a repository ruleset enforces both on `acc` and on `main`. A
+direct push is rejected. Squash and rebase merging are disabled repo-wide, because
 changelog entries name commits by SHA and both alternatives rewrite those
 hashes.
 
@@ -303,15 +410,24 @@ Releases therefore land through a pull request rather than a local fast-forward.
 | | `acc` | `main` |
 |---|---|---|
 | Ruleset | `acc supply-chain gate` | `main promotion gate` |
-| Required status checks | `audit` | `audit` |
+| Required status checks | `audit`, `scan`, and the four build checks | `audit` |
 | Pull request | Required, 0 approvals, merge method `merge` only | Required, 0 approvals, merge method `merge` only |
 | `deletion` | Blocked | Blocked |
 | `non_fast_forward` | Blocked | Blocked |
 
-`audit` is the only required check on either branch. `scan` runs on every pull
-request and gates nothing.
+The four build checks on `acc` are `build` (the backend), **Build and Deploy ACC
+Frontend**, **Build and Deploy ACC PA Demo** and **Build and Deploy ACC Public
+Site**. They were promoted together with `scan` once each of their workflows
+could report on every pull request — see [Why the `pull_request` filter moved
+into a job](#why-the-pull_request-filter-moved-into-a-job).
 
-The two rulesets differ in exactly one parameter, deliberately:
+`main` stays on `audit` alone, and that makes it the weaker branch in this one
+respect. It is deliberate: **none of the production workflows has a
+`pull_request` trigger at all**, so there is no build check there to require.
+Every commit reaching `main` is promoted from `acc`, where the full set has
+already reported on its own pull request.
+
+The two rulesets differ in one further parameter, deliberately:
 `require_extra_approval_for_unattributed_changes` is `true` on `acc` and
 `false` on `main`, because the promotion that created `main` carried commits
 under three author identities against a ruleset requiring zero approvals — the
@@ -339,9 +455,18 @@ Each preview deploys to its own Static Web Apps staging environment.
     so every preview talks to the one shared acceptance backend and is refused.
     **A preview demonstrates that static pages render; nothing more.**
 
-There is a three-environment ceiling per app. Before the `pull_request` path
-filters were mirrored from the `push` triggers, a one-file change redeployed all
-three sites, and five open pull requests exhausted the quota.
+There is a staging-environment ceiling per app, and it was hit: when the three
+frontends were on the Free plan, three environments each, a one-file change
+redeployed all three sites and five open pull requests exhausted the quota on
+28 August 2026. Two things have changed since. The acceptance apps are now on
+**Standard**, ten environments each, and the filtering that stops an unrelated
+pull request claiming a preview no longer sits on the `pull_request` trigger —
+it is the `changes` job described under [Path filters](#path-filters).
+
+A dependency pull request is not automatically preview-free, which
+`renovate.json` once claimed: only lockfile-only and root-only ones are. One
+editing `packages/pa-cockpit/**` holds a preview on **both** `frontend-acc` and
+`pa-demo-acc`, since both workflows consume that package.
 
 ---
 
@@ -360,8 +485,9 @@ profile: Azure Portal → App Service → Overview → *Get publish profile*, th
 update the GitHub secret with the file contents.
 
 `GITHUB_TOKEN` is **read-only by default**, with `pull-requests: write` granted
-only to the six jobs that comment on pull requests and `permissions: {}` on the
-three that only tear down a preview.
+only to the six jobs that comment on pull requests, `pull-requests: read` on the
+four `changes` jobs that look up a pull request's changed files, and
+`permissions: {}` on the three that only tear down a preview.
 
 ---
 

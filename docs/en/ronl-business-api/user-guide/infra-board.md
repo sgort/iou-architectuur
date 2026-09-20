@@ -27,6 +27,34 @@ One number is deliberately absent: **R5.4 shows `—` rather than a Klaar figure
   <figcaption>Infra-board — portfolio steering for infrastructure projects</figcaption>
 </figure>
 
+## Starting a project on a phase
+
+Starting R2.1 from its phase page asks you for two things first: a
+**Projectnummer** and a **Projectnaam**. Both are required — the *R2.1 starten*
+button stays disabled until each holds something more than spaces — and both are
+trimmed before they are sent.
+
+Naming it here is what makes the project recognisable everywhere at once. The
+number and name travel with the process from the moment it starts, so the
+portfolio, the command palette and the phase page's WIP and Gereed tables all
+show the project rather than a placeholder. The intake form that follows asks
+for the same two fields and **opens already filled in with what you typed**, so
+nothing is entered twice.
+
+!!! note "A project started some other way is named by its state, not by a dash"
+    An instance started outside this screen has no number or name until its
+    intake form is submitted. Rather than showing a dash, the board says what it
+    actually is: *"Nieuw R2.1-project · intake open"* for a nameless R2.1
+    instance, shown next to the first characters of its instance id, and *"RIP
+    R2.x project"* for one that has moved past R2.1.
+
+**The board notices a project started elsewhere.** If an instance is started
+outside the board — by a script, or by someone else — the live rows pick it up
+when you come back to the tab, and when you switch between Mijn dag, Portfolio
+and Beheer. A page reload is no longer needed for it to appear.
+
+---
+
 ## Signing a phase-exit approval
 
 Some approval tasks are signed rather than merely ticked. Where a task carries a

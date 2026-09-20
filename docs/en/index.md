@@ -137,13 +137,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.09.7** · *September 2026*
+-   **⚙️ RONL Business API — v2026.09.9** · *September 2026*
 
     ---
 
-    **The CI alignment closes, and production says which build it is**
+    **Every deployed process shows, and a red suite now blocks the merge**
 
-    The last item of the alignment landed: `acc` and `main` now carry [the same ten workflows and the same branch rules](ronl-business-api/developer/cicd.md#required-checks-and-branch-rules), with `audit` the one required check on both and all **eight of its steps blocking**. One `.nvmrc` at 22.22.0 replaced eight workflows that were building the deployed artifact on Node 20 and shipping it to a Node 22 host, and `@ronl/shared` is now [held to declarations only](ronl-business-api/developer/shared-package.md#kept-declarations-only) by a check that asks the TypeScript parser rather than a regex. On the surfaces themselves, the [public site's footer](ronl-business-api/user-guide/public-site.md#which-build-you-are-looking-at) and the caseworker changelog panel now name the build as well as the release — which is how the promotion to production was confirmed by eye. And the [prerendered public pages](ronl-business-api/features/public-publication.md#prerendered-then-revalidated) stopped trusting their build-time snapshot, which had been publishing two retired services and a Diensten count of 14 beside the dashboard's 13.
+    The [public process library](ronl-business-api/features/procesbibliotheek.md) had been filtering on a status value the source database cannot hold, so production showed nothing at all; visibility now follows board ownership, the status is displayed rather than hidden, and the escape hatch that had been standing in for it is gone. In CI, the build and test checks [became required on `acc`](ronl-business-api/developer/cicd.md) — which took a mechanism as well as a ruleset, since a workflow filtered out at its trigger never reports the check it owes. A 14-day package-manager cooldown, every job on `ubuntu-24.04` and `.nvmrc` at 22.23.2 closed three more of [ICTU's recommendations](contributing/ictu-dependency-guideline.md). Before that, v2026.09.8 [accepted ValidSign's callbacks](ronl-business-api/developer/validsign-signing.md) in the form ValidSign actually sends — the first live signing showed every one being rejected — and a new R2.1 project [is now named when it starts](ronl-business-api/user-guide/infra-board.md) instead of appearing as a dash.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

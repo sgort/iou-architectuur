@@ -1,27 +1,24 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-19
+  date: 2026-09-20
   against:
-    CPSV Editor: "2723db1"
-    Linked Data Explorer: "ec4792f"
+    CPSV Editor: "1868087"
+    Linked Data Explorer: "0e7733e"
+    RONL Business API: "6ca80f2"
 ---
 
 # Code Standards
 
 !!! info "Verification status"
-    The **Linked Data Explorer**'s and **CPSV Editor**'s claims were re-checked on
-    **19 September 2026**, against `ec4792f` (LDE v2026.09.5) and `2723db1` (CPSV
-    v2026.09.6): rulesets read from the API per branch, workflow steps, filters and
-    pins read from the workflow files, and the merge-commit settings from each
-    repository. The **RONL Business API**'s claims were last re-checked on 12 September
-    2026, against `311d732`; the page stamp names only what was verified on its date.
-    The `pre-push` sentence below is the exception — it was read from all three
-    repositories' `.husky/pre-push` on 19 September.
+    All three repositories' claims were re-checked on **20 September 2026**, against
+    `1868087`, `0e7733e` and `6ca80f2`: rulesets read from the API per ruleset, workflow
+    files enumerated and their steps, triggers, filters, runners and pins read from
+    source, both hook files read from each repository, and the merge-commit settings read
+    from each repository.
 
-    **The RONL Business API's claims were the stale ones**, and this sync is where they
-    were earned back: it closed ten of eleven cross-repository alignment items on 12
-    September 2026, and several sentences on this page described the state before that.
+    **What moved is the merge gate.** Until 19 September 2026 this page said, correctly,
+    that a red test blocked no merge anywhere. On `acc` it now does, in all three.
 
 This page covers three application repositories — CPSV Editor (`ttl-editor`), Linked
 Data Explorer, and RONL Business API — that share a common tooling convention:
@@ -94,13 +91,33 @@ formatting on push.
 nor `pre-push` invokes `npm test` anywhere. A passing hook is not evidence your change
 didn't break a test — only CI, or running the suite yourself, tells you that.
 
-**And a red test does not block a merge in any of the three.** Since August 2026 the
-suites run on every pull request, so a failure shows there and stops the deploy — but no
-ruleset names a test workflow as a required check. What the rulesets require is `audit`
-in all three, and `scan` in the CPSV Editor and the Linked Data Explorer; see
-[What blocks a merge](#what-blocks-a-merge) below. In the RONL Business API that is
-not an oversight: every deploy workflow on `main` is push-only, and a required check that
-never reports on a pull request wedges it permanently.
+**And since 19 September 2026 a red test does block a merge to `acc`, in all three.**
+The suites had run on every pull request since August 2026, so a failure showed there and
+stopped the deploy, but no ruleset named a test workflow as a required check. The build
+and deploy checks are now required on `acc` — and each of those jobs runs the linter, the
+type check where one exists and the unit suites before it builds, so requiring the job
+requires the suite. On `main` nothing has changed: a red test still stops the deploy
+without blocking the promotion. See [What blocks a merge](#what-blocks-a-merge) below.
+
+!!! danger "Git hooks silently do not run in a git worktree"
+    All three repositories install Husky, which sets `core.hooksPath` to **`.husky/_`** —
+    a **relative** path, holding generated shims that are **not tracked in git**. Only
+    `.husky/pre-commit` and `.husky/pre-push` are in the tree.
+
+    A `git worktree` created from any of these repositories therefore has the config
+    pointing at a `.husky/_` directory that does not exist in it. Git does not warn about
+    a missing hooks path: it finds no hook and runs none. **Every commit and every push
+    from that worktree skips `lint-staged`, `deps:check`, lint and `check-format`
+    entirely**, and the first sign is CI failing on something a hook would have caught
+    locally — or, worse, nothing failing at all, because the formatting check lives in a
+    workflow the branch did not touch.
+
+    Recorded as [ttl-editor#159](https://github.com/sgort/ttl-editor/issues/159), and true
+    in all three. Working in a worktree means running `npm run lint`,
+    `npm run check-format` and `npm run deps:check` by hand before pushing, or running
+    `npm install` in the worktree so `prepare` regenerates `.husky/_`. This is also why
+    the assistant's working rules forbid `--no-verify` and hook edits outright — a gate
+    that can vanish this quietly is one nobody should be disarming deliberately as well.
 
 ---
 
@@ -168,8 +185,11 @@ ESLint; `test` is Vitest. None of the three typechecks, so a type error could re
 `acc` and deploy. A `typecheck` script now exists at the root and in both workspaces.
 
 **CPSV Editor** — five workflows: two Azure Static Web Apps workflows, `acc` and `main`
-alike, running `npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy action,
-plus the supply-chain `audit`, since v2026.09.3 the Semgrep `scan` (see
+alike, running `npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy action
+— and, since 19 September 2026, a `Build` step of their own that runs `npm run build` on
+the runner and asserts `dist/index.html` exists before the deploy action uploads it with
+`skip_app_build: true` — plus the supply-chain `audit`, since v2026.09.3 the Semgrep
+`scan` (see
 [Supply-Chain Pinning — the npm tree](dependency-scanning.md)), and since v2026.09.6
 `close-preview-environments.yml`. That last one holds the two jobs that delete a pull
 request's Static Web Apps preview when it closes. They used to sit in the deploy
@@ -186,7 +206,13 @@ and reading which API token it used. Renaming a job renames the check it reports
 is why it was done before any deploy check is made required.
 
 Those two workflows also skip documentation-only changes, via `paths-ignore` on
-`docs/**`, `.claude/**` and `**/*.md`. The direction is deliberate: an allowlist
+`docs/**`, `.claude/**` and `**/*.md` — on their `push` trigger. Since 19 September 2026
+`Deploy ACC (orange-beach)` carries **no path filter on `pull_request`**: its check is
+required on `acc`, and a workflow filtered out at its trigger reports nothing, so the
+same pattern moved into a `changes` job that skips the build instead. `Deploy PROD
+(white-sky)` keeps the filter on both triggers, its check not being required. See
+[how a path-filtered workflow became requireable](branch-protection.md#how-a-path-filtered-workflow-became-requireable).
+The direction of the filter itself is deliberate: an allowlist
 (`paths:`) would mean enumerating every path that affects the build, and anything
 forgotten from such a list *silently skips a deploy* — a worse failure than one
 unnecessary preview. RONL Business API and Linked Data Explorer can use `paths:`
@@ -207,6 +233,12 @@ a thing deploys should redeploy it — but it means a sweep across workflow file
 a pinning pass, redeploys every package whose workflow it touched, whether or not the
 package changed. Predict what a merge will deploy from the whole list, not the entry that
 looks like the package.
+
+**And `.nvmrc` belongs in every one of them.** Since 19 September 2026 each repository
+names its Node version once, in `.nvmrc`, read through `node-version-file`. A filter that
+does not list that file means a Node bump builds and deploys **nothing** — the version
+moves and no artifact does. Every deploy workflow's filter in all three repositories now
+names it.
 
 !!! warning "A skip marker in a commit message turns every gate off"
     GitHub Actions skips all `push` and `pull_request` workflows for a commit whose
@@ -231,9 +263,10 @@ cold, performed immediately. Clearing the cache reproduced it at once.
 Running a check and being able to block on it are different things. Which checks each
 branch **requires**, what the rulesets carry beyond them, and how merge method is
 enforced are on [Branch Protection](branch-protection.md). The short version, because it
-is the fact most often got wrong: the suites run on every pull request in all three
-repositories and **no ruleset names them**, so a red test stops the deploy and does not
-by itself block the merge.
+is the fact most often got wrong — and because it reversed on 19 September 2026: on
+`acc`, every repository now requires `audit`, `scan` and its build and deploy checks, so
+a red test blocks the merge. On `main` no repository requires a build or a test, and the
+CPSV Editor's `main` requires no status check at all.
 
 ### Supply-chain hardening
 
@@ -243,8 +276,12 @@ adopted a common set of pipeline controls: every `uses:` reference pinned to a c
 digest rather than a tag, `permissions: contents: read` as the workflow default,
 `persist-credentials: false` on checkout, a blocking zizmor `audit` job, and Renovate
 maintaining the digests under a 14-day cooldown with a no-cooldown lane for security
-advisories. What *cannot* be pinned is written down in each repository's
-`SECURITY-PIPELINE.md` rather than glossed over.
+advisories. Since 19 September 2026 three more joined the set: **every job pinned to
+`ubuntu-24.04`** rather than `ubuntu-latest`, **one exact `.nvmrc`** per repository read
+by every deploy workflow, and a root **`.npmrc` setting `min-release-age=14`**, the
+package-manager half of the cooldown Renovate already applies to its own proposals. What
+*cannot* be pinned is written down in each repository's `SECURITY-PIPELINE.md` rather
+than glossed over.
 
 Two Renovate settings joined that list in September 2026, and they matter more than they
 look. **Lock-file maintenance** is what moves the transitive tree at all — Renovate

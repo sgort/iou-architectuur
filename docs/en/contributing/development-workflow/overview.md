@@ -1,5 +1,11 @@
 ---
 scope: cross-cutting
+verified:
+  date: 2026-09-20
+  against:
+    CPSV Editor: "1868087"
+    Linked Data Explorer: "0e7733e"
+    RONL Business API: "6ca80f2"
 ---
 
 # Development Workflow
@@ -34,12 +40,17 @@ first, then the minimum code needed to make it pass.
 A release is cut with `/bump-release`, a command defined per repository — each component
 keeps its own version, tailored to its own changelog format.
 
-**A release lands through a pull request, not a local fast-forward.** Where a
-[supply-chain gate](../supply-chain.md) is in place — CPSV Editor and RONL Business API
-today — the `acc` branch requires a pull request and a passing `audit` check with no
-bypass actors, so the older flow of merging `acc` locally and pushing it is rejected
-outright: a locally created bump commit has never been through CI. Merging the pull
-request *is* the push, and triggers the acceptance deploy.
+**A release lands through a pull request, not a local fast-forward.** The
+[supply-chain gate](../supply-chain.md) is in place in all three application
+repositories — the CPSV Editor and the RONL Business API from August 2026, the Linked
+Data Explorer since v2026.08.7 — so `acc` requires a pull request with no bypass actors,
+and the older flow of merging `acc` locally and pushing it is rejected outright: a
+locally created bump commit has never been through CI. Merging the pull request *is* the
+push, and triggers the acceptance deploy.
+
+Since 19 September 2026 that pull request must also pass the build and deploy checks, not
+only `audit` and `scan` — so a release whose suite is red cannot be merged. Expect the
+release pull request to sit until CI is green rather than to be waved through.
 
 A release pull request is **merged, never squashed and never rebased** — the changelog
 entry cites each commit by SHA, and both alternatives rewrite those hashes. Squashing

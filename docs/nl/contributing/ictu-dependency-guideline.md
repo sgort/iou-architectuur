@@ -17,11 +17,19 @@ scope: cross-cutting
 
 ## De elf aanbevelingen
 
+## Voortgang
+
 ## Scores
 
-## Wat er wordt uitgerold is niet wat is getest
+## Wat er deze week is veranderd
 
-## Het werk, en waar het begint
+## Hoe de eerdere weken zijn gereconstrueerd
+
+## De eerst gerangschikte bevinding, en hoe die is opgelost
+
+## Het werk, en wat er nog openstaat
+
+## Wat de richtlijn niet meet
 
 ## Wat is geverifieerd
 

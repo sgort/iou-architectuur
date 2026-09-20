@@ -18,6 +18,8 @@ Nothing on a public surface depends on who is asking. There is no sign-in step t
 
 A public surface federates more than one kind of material into a single place: announcements, news, products and services, a [regelcatalogus](regelcatalogus.md) of rules and the services they implement, and a [procesbibliotheek](procesbibliotheek.md) of process definitions. Each kind keeps its own shape, but all of it is reachable from one search.
 
+Material that is not finished is published with that fact attached rather than withheld. A process definition carries its lifecycle status as a visible label wherever it appears — in a listing, in a search result, and on its own page — so a reader can tell an example or a work in progress from a settled one without needing to open it.
+
 ---
 
 ## Searching and browsing across it

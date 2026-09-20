@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Environment Variables
 
 ---
@@ -147,6 +151,12 @@
 | `ENABLE_TENANT_ISOLATION` | No | `true` | Enforce per-tenant data isolation |
 | `DEFAULT_MAX_PROCESS_INSTANCES` | No | `1000` | Max active instances per tenant |
 | `RONL_SPARQL_ENDPOINT` | No | `https://api.triplydb.com/...` | Override the default RONL TriplyDB SPARQL endpoint used by the Regelcatalogus service |
+
+### Public surface
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `PUBLIC_PROCESS_BOARDS` | No | `caseworker` | Comma-separated list of `boardOwner` values whose process bundles are exposed on the public process library and its search. Bundles carrying no owner at all are always public. Widen it (e.g. `caseworker,infra-board`) to publish another board's bundles. A bundle's **status label plays no part in this** — see [Procesbibliotheek](../features/procesbibliotheek.md#public-and-internal-exposure) |
 
 ---
 

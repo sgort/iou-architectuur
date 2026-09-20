@@ -1,10 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-19
+  date: 2026-09-20
   against:
-    CPSV Editor: "2723db1"
-    Linked Data Explorer: "ec4792f"
+    CPSV Editor: "1868087"
+    Linked Data Explorer: "0e7733e"
+    RONL Business API: "6ca80f2"
 ---
 
 # The GitLab Mirror
@@ -45,6 +46,12 @@ On 12 September 2026, by `git ls-remote` against both remotes:
 Two were checked again on 19 September 2026, after their promotions that day, and both
 were in sync: the Linked Data Explorer with `acc` at `379cbab` and `main` at `ec4792f`,
 the CPSV Editor with `acc` at `a37bace` and `main` at `2723db1`.
+
+**The check itself was re-read from all three repositories on 20 September 2026** and is
+unchanged — the supply-chain work that landed on 19 September touched CI and left this
+control alone, which is the point of it being the one that runs outside CI. The mirror
+state itself is not re-asserted here for that date; a tick in the table above is always
+*synced at the last check*.
 
 **The CPSV Editor's release procedure runs a second check straight after this one.**
 `npm run check-previews` (v2026.09.6) lists the Static Web Apps preview environments Azure

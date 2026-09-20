@@ -1,23 +1,27 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-12
+  date: 2026-09-20
   against:
-    CPSV Editor: "f5bae6a"
-    Linked Data Explorer: "be6bc54"
-    RONL Business API: "311d732"
+    CPSV Editor: "1868087"
+    Linked Data Explorer: "0e7733e"
+    RONL Business API: "6ca80f2"
 ---
 
 # The Coverage Floor
 
-!!! info "Re-verified for all three applications on 12 September 2026"
-    Every claim on this page was re-checked against `f5bae6a`, `be6bc54` and
-    `311d732`. The RONL Business API's figures were **measured rather than read**: all
-    five of its suites were run with coverage on the tree `main` `311d732` publishes,
-    which is byte-identical to `acc` `28e1a9e`.
+!!! info "What was re-checked on 20 September 2026, and what was not"
+    The **CI and ruleset claims** on this page were re-checked against `1868087`,
+    `0e7733e` and `6ca80f2`: which workflows run the suites, on which triggers, and
+    which checks each branch requires. That is what moved — the floor became blocking
+    on `acc` in all three on 19 September 2026.
 
-    Its one remaining weakness on this page — a backend floor that gated nothing before
-    a merge — closed in v2026.09.7.
+    **The percentages and file counts below were not re-measured on that date.** They
+    were measured on 12 September 2026 against `f5bae6a`, `be6bc54` and `311d732`, the
+    RONL Business API's by running all five suites with coverage rather than reading a
+    record. Nothing in the 19 September work touches application code, so they should
+    still hold — but they are a dated measurement, and this note is the honest version
+    of that.
 
 *A per-file 80% branch-coverage floor, and what it took to enforce it in three
 repositories*
@@ -66,6 +70,13 @@ functions floor at the same number would have failed **31 files**:
 
 `public-site/TopBar.tsx` is the illustration: **100% branches, 66% functions**.
 The two measure different things and are not interchangeable.
+
+That count is the one taken when the floor landed, and it is the count the five
+runner configs still carry in their comments. Re-measured at v2026.09.9 on
+20 September 2026 it is **26** — the work since has closed five of them, without
+anyone setting out to. The current figure, per workspace, is on the application's
+own [coverage page](../ronl-business-api/developer/testing/coverage.md); where the
+two disagree, the measured one wins.
 
 The asymmetry runs both ways. In the CPSV Editor, `ConceptsTab.jsx` reads 80.55%
 on branches but **71.62% on statements and 63.33% on functions**, and `App.jsx`
@@ -328,9 +339,9 @@ three diverge most:
 
 | Repository | Tests on a pull request |
 |---|---|
-| CPSV Editor | ✅ both Static Web Apps workflows run `npm run test:ci` on `push` **and** `pull_request` — run, though not required; see below |
-| Linked Data Explorer | ✅ backend and frontend, acc workflows — run, though not required; see below |
-| RONL Business API | ✅ all five workspaces since v2026.09.7 — run, though not required; see below |
+| CPSV Editor | ✅ both Static Web Apps workflows run `npm run test:ci` on `push` **and** `pull_request` — and the `acc` one is a required check since 19 September 2026 |
+| Linked Data Explorer | ✅ backend and frontend, acc workflows — all three `acc` deploy checks required since 19 September 2026 |
+| RONL Business API | ✅ all five workspaces since v2026.09.7 — the four `acc` build and deploy checks required since 19 September 2026 |
 
 **All three now run their suites before the merge.** The RONL Business API was the last
 to close that gap, and it had two halves. Its backend workflow triggered on `push`
@@ -352,16 +363,25 @@ only after the merge. It is the worked example, because it had already let a gen
 defect sit on a pushed branch for days — no pull request ever ran the test that
 caught it.
 
-!!! note "Running before the merge is not the same as blocking it"
-    The CPSV Editor's and the Linked Data Explorer's rulesets require two checks,
-    `audit` and `scan`; the RONL Business API's require `audit` alone. The workflows
-    that run the suites, and so enforce the floor, are not among them in any of the
-    three. A pull request that drops a file below 80% therefore turns its checks red
-    and **stops the deploy**, and the merge button stays available. That is a
-    deliberate gap rather than an oversight only if someone decided it; making the
-    test checks required is one ruleset change, provided each can report on every
-    pull request — a path-filtered workflow that never runs would wedge the pull
-    request instead.
+!!! success "Running before the merge became blocking it, on 19 September 2026"
+    The floor is now enforced at the merge on `acc` in all three. Each repository's
+    `acc` ruleset requires the build and deploy checks alongside `audit` and `scan`,
+    and those jobs run the suites — coverage thresholds included — before they build.
+    A pull request that drops a file below 80% turns a **required** check red, and the
+    merge button goes with it.
+
+    Until that date this said the opposite, correctly: the workflows that enforce the
+    floor were named by no ruleset, so a sub-80% file stopped the deploy and left the
+    merge button available. The obstacle was mechanical rather than political — a
+    required check must report on every pull request, and these workflows were filtered
+    at their trigger, so a pull request touching nothing they watched reported nothing
+    and would have hung forever. Moving the filter into a `changes` job, whose skip
+    *reports success*, is what made the ruleset edit possible; see
+    [how a path-filtered workflow became requireable](branch-protection.md#how-a-path-filtered-workflow-became-requireable).
+
+    **On `main` the old sentence still stands.** No `main` ruleset in any of the three
+    names a build or a test, so a promotion carrying a coverage regression is stopped by
+    the deploy, not by the merge.
 
 !!! warning "The fix is not identical, and the difference matters before copying one into the other"
     The Linked Data Explorer's backend workflow **deploys to Azure**, so its

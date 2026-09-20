@@ -134,7 +134,31 @@ Open `http://localhost:5173` in your browser. You will be redirected to Keycloak
     without the other makes it easy to verify the frontend and miss the demo.
 
 !!! note "Dependency preflight"
-    `deps:check` compares `package-lock.json`'s modification time against the `node_modules/.package-lock.json` install marker npm writes after every `npm install`. If the lockfile is newer — e.g. after a `git pull` that changed dependencies — it fails fast with an explicit "run `npm install`" message instead of letting the servers start and crash mid-boot with a confusing `MODULE_NOT_FOUND`. It's advisory only; it never runs `npm install` on its own.
+    `deps:check` compares the installed tree against `package-lock.json` — it
+    *parses* both files and compares them, ignoring only this repository's own
+    package version numbers, so a release bump no longer trips it and line
+    endings no longer matter. If a third-party package has been added, removed
+    or moved since the last install, it fails fast instead of letting the
+    servers start and crash mid-boot with a confusing `MODULE_NOT_FOUND`.
+
+    **The remedy it names is `npm ci`, not `npm install`.** The committed
+    lockfile is the source of truth: `npm ci` installs exactly what it records
+    and never rewrites it, while `npm install` re-resolves caret ranges with no
+    package-manager cooldown. It is advisory only — it never installs anything
+    on its own, and it warns before you run it that `npm ci` removes
+    `node_modules` first, so any dev server running from it goes down.
+
+    It also warns when npm is older than **11.10**, because the 14-day
+    `min-release-age` cooldown in the root `.npmrc` is ignored without a warning
+    below that version — and npm 10.9.8, the version Node 22.23.2 bundles, is
+    such a version.
+
+    The same check runs **first in the pre-push hook**, not only here. A push
+    does not start a dev server, so without it a clone that had not been
+    reinstalled since the lockfile moved went straight into lint and
+    `check-format` on the wrong tool versions — which is exactly what happened
+    on 14 September 2026, when a stale Prettier 3.8.1 failed `check-format` on
+    seven correctly formatted files with nothing saying why.
 
 ---
 

@@ -1,0 +1,496 @@
+# Weekly assessment of the three applications against ICTU's eleven
+# dependency recommendations. One record, several renderings: the tables and
+# the charts on contributing/ictu-dependency-guideline.md are all generated
+# from this file by hooks/kpi_charts.py.
+#
+# Scale: 0 absent or contradicted · 1 incidental only · 2 partly met, large
+# gaps · 3 mostly met, a clear gap · 4 met, a small gap · 5 fully met, and
+# enforced rather than intended.
+#
+# kind: measured      scored against the repositories on that date
+# kind: reconstructed scored afterwards from the commits that were on `acc`
+#                     that day — the shape of the curve is reliable, an
+#                     individual cell is worth about ±1
+#
+# `heads` names the last commit on each repository's `acc` that day, which is
+# what was read. `changes` records every cell that moved and why, so the chart
+# can be read without opening the repositories.
+
+recommendations:
+  - id: R1
+    group: Adding
+    short: Vet maintenance before adding
+  - id: R2
+    group: Specifying
+    short: No unpinned tags
+  - id: R3
+    short: Highest precision, no ranges
+  - id: R4
+    short: Hash pins, lockfile, `npm ci`
+  - id: R5
+    short: Internal registry; verified origin
+  - id: R6
+    group: Updating
+    short: Cooldown of at least 7 days
+  - id: R7
+    short: Assess majors; wait for a patch
+  - id: R8
+    short: Periodic, tool-driven updates
+  - id: R9
+    short: Reviewed MR, whole pipeline, no automerge
+  - id: R10
+    group: Monitoring
+    short: Daily audit, including releases
+  - id: R11
+    short: Quarterly maintenance check
+
+components:
+  - key: TTL
+    name: CPSV Editor
+    repo: https://github.com/sgort/ttl-editor
+  - key: LDE
+    name: Linked Data Explorer
+    repo: https://github.com/sgort/linked-data-explorer
+  - key: RBA
+    name: RONL Business API
+    repo: https://github.com/sgort/ronl-business-api
+
+assessments:
+  - date: 2026-08-16
+    kind: reconstructed
+    heads:
+      TTL: 41b3f20
+      LDE: e5758ce
+      RBA: b4de8fb
+    note: >-
+      The starting point, before any of this work. No Renovate, no pinned
+      action digests, no audit gate, no protection on `acc`: what each
+      repository had was a committed lockfile and, in the RONL Business API,
+      an install that used it.
+    scores:
+      TTL: [1, 1, 2, 1, 0, 0, 1, 0, 1, 0, 0]
+      LDE: [1, 1, 2, 1, 0, 0, 1, 0, 1, 0, 0]
+      RBA: [1, 1, 2, 2, 0, 0, 1, 0, 1, 0, 0]
+
+  - date: 2026-08-23
+    kind: reconstructed
+    heads:
+      TTL: 4228e05
+      LDE: 17546ec
+      RBA: 57ce4c2
+    note: >-
+      The week the test gates were added, on 20 August. It is the largest
+      quality change of the whole period and the guideline barely registers
+      it: ICTU measures how dependencies are managed, not how well the code
+      is tested.
+    scores:
+      TTL: [1, 1, 2, 2, 0, 0, 1, 0, 1, 0, 0]
+      LDE: [1, 1, 2, 1, 0, 0, 1, 0, 1, 0, 0]
+      RBA: [1, 1, 2, 2, 0, 0, 1, 0, 1, 0, 0]
+    changes:
+      - component: TTL
+        recommendation: R4
+        from: 1
+        to: 2
+        why: CI went from running nothing of its own to `npm ci` plus the tests.
+
+  - date: 2026-08-30
+    kind: reconstructed
+    heads:
+      TTL: 197b7d2
+      LDE: 234a9ac
+      RBA: 15dfbf9
+    note: >-
+      The supply-chain week: Renovate onboarded with a 14-day cooldown,
+      every action pinned by digest, zizmor added, and rulesets created on
+      `acc` on 28 and 29 August. Thirty-seven of the period's points land
+      here.
+    scores:
+      TTL: [1, 2, 2, 3, 0, 3, 2, 2, 2, 2, 1]
+      LDE: [1, 2, 2, 2, 0, 3, 2, 2, 2, 2, 1]
+      RBA: [2, 2, 2, 3, 0, 3, 3, 2, 2, 1, 1]
+    changes:
+      - component: RBA
+        recommendation: R1
+        from: 1
+        to: 2
+        why: A design note of 25 August states that the work adds no new dependencies.
+      - component: TTL
+        recommendation: R2
+        from: 1
+        to: 2
+        why: Every `uses:` in every workflow pinned to a 40-character commit digest.
+      - component: LDE
+        recommendation: R2
+        from: 1
+        to: 2
+        why: Every `uses:` in every workflow pinned to a 40-character commit digest.
+      - component: RBA
+        recommendation: R2
+        from: 1
+        to: 2
+        why: Every `uses:` in every workflow pinned to a 40-character commit digest.
+      - component: TTL
+        recommendation: R4
+        from: 2
+        to: 3
+        why: The digest pins are enforced by the `audit` check, which zizmor fails on an unpinned action.
+      - component: LDE
+        recommendation: R4
+        from: 1
+        to: 2
+        why: CI installs with `npm ci`, though the deploys still build elsewhere.
+      - component: RBA
+        recommendation: R4
+        from: 2
+        to: 3
+        why: The digest pins are enforced by the `audit` check.
+      - component: TTL
+        recommendation: R6
+        from: 0
+        to: 3
+        why: Renovate onboarded with `minimumReleaseAge` of 14 days and strict internal checks, bypassed only for security advisories.
+      - component: LDE
+        recommendation: R6
+        from: 0
+        to: 3
+        why: Renovate onboarded with `minimumReleaseAge` of 14 days and strict internal checks, bypassed only for security advisories.
+      - component: RBA
+        recommendation: R6
+        from: 0
+        to: 3
+        why: Renovate onboarded with `minimumReleaseAge` of 14 days and strict internal checks, bypassed only for security advisories.
+      - component: TTL
+        recommendation: R7
+        from: 1
+        to: 2
+        why: Majors arrive as their own pull request for review, but nothing holds them back yet.
+      - component: LDE
+        recommendation: R7
+        from: 1
+        to: 2
+        why: Majors arrive as their own pull request for review, but nothing holds them back yet.
+      - component: RBA
+        recommendation: R7
+        from: 1
+        to: 3
+        why: A repository-wide `dependencyDashboardApproval` holds every update, majors included, until someone approves it.
+      - component: TTL
+        recommendation: R8
+        from: 0
+        to: 2
+        why: The first Renovate pull requests merged — four in the preceding month.
+      - component: LDE
+        recommendation: R8
+        from: 0
+        to: 2
+        why: The first Renovate pull requests merged — five in the preceding month.
+      - component: RBA
+        recommendation: R8
+        from: 0
+        to: 2
+        why: The first Renovate pull requests merged.
+      - component: TTL
+        recommendation: R9
+        from: 1
+        to: 2
+        why: A ruleset on `acc` requires a pull request and the `audit` check.
+      - component: LDE
+        recommendation: R9
+        from: 1
+        to: 2
+        why: A ruleset on `acc` requires a pull request and the `audit` check.
+      - component: RBA
+        recommendation: R9
+        from: 1
+        to: 2
+        why: A ruleset on `acc` requires a pull request and the `audit` check.
+      - component: TTL
+        recommendation: R10
+        from: 0
+        to: 2
+        why: Dependabot alerts are on, so advisories arrive, but nothing audits on a schedule.
+      - component: LDE
+        recommendation: R10
+        from: 0
+        to: 2
+        why: Dependabot alerts are on, so advisories arrive, but nothing audits on a schedule.
+      - component: RBA
+        recommendation: R10
+        from: 0
+        to: 1
+        why: Alerts arrive, but the backlog is large and untriaged.
+      - component: TTL
+        recommendation: R11
+        from: 0
+        to: 1
+        why: Renovate's Dependency Dashboard gives a standing view of what is behind.
+      - component: LDE
+        recommendation: R11
+        from: 0
+        to: 1
+        why: Renovate's Dependency Dashboard gives a standing view of what is behind.
+      - component: RBA
+        recommendation: R11
+        from: 0
+        to: 1
+        why: Renovate's Dependency Dashboard gives a standing view of what is behind.
+
+  - date: 2026-09-06
+    kind: reconstructed
+    heads:
+      TTL: d4c1b91
+      LDE: 9db0ab3
+      RBA: 66940d9
+    note: >-
+      A quiet week in which the update cadence established itself. The RONL
+      Business API stays flat because its blanket approval setting was still
+      holding every pull request.
+    scores:
+      TTL: [1, 2, 2, 3, 0, 3, 3, 4, 2, 2, 1]
+      LDE: [1, 2, 2, 2, 0, 3, 2, 3, 2, 2, 1]
+      RBA: [2, 2, 2, 3, 0, 3, 3, 2, 2, 1, 1]
+    changes:
+      - component: TTL
+        recommendation: R7
+        from: 2
+        to: 3
+        why: Tailwind CSS 4 and ESLint 10 deferred in `renovate.json` with written reasons.
+      - component: TTL
+        recommendation: R8
+        from: 2
+        to: 4
+        why: Sixteen Renovate pull requests merged in the preceding month, most of them that week.
+      - component: LDE
+        recommendation: R8
+        from: 2
+        to: 3
+        why: Ten Renovate pull requests merged in the preceding month.
+
+  - date: 2026-09-13
+    kind: measured
+    heads:
+      TTL: f7fe80f
+      LDE: 1babd54
+      RBA: 28e1a9e
+    note: >-
+      The published assessment, and the only point scored against the
+      repositories on the day rather than afterwards.
+    scores:
+      TTL: [1, 2, 2, 3, 0, 3, 4, 5, 3, 2, 1]
+      LDE: [1, 2, 2, 2, 0, 3, 3, 4, 3, 2, 1]
+      RBA: [2, 2, 2, 3, 0, 3, 3, 3, 2, 1, 1]
+    changes:
+      - component: TTL
+        recommendation: R7
+        from: 3
+        to: 4
+        why: Majors wait for approval on the Dependency Dashboard, on top of the written deferrals.
+      - component: LDE
+        recommendation: R7
+        from: 2
+        to: 3
+        why: Majors wait for approval on the Dependency Dashboard.
+      - component: TTL
+        recommendation: R8
+        from: 4
+        to: 5
+        why: Lock-file maintenance refreshes the transitive tree on a schedule, so updates no longer depend on a manifest change.
+      - component: LDE
+        recommendation: R8
+        from: 3
+        to: 4
+        why: Seventeen Renovate pull requests merged in the preceding month, with lock-file maintenance enabled.
+      - component: RBA
+        recommendation: R8
+        from: 2
+        to: 3
+        why: The blanket approval setting was lifted on 12 September and updates started flowing again.
+      - component: TTL
+        recommendation: R9
+        from: 2
+        to: 3
+        why: The Semgrep `scan` check became required on `acc` alongside `audit`.
+      - component: LDE
+        recommendation: R9
+        from: 2
+        to: 3
+        why: The Semgrep `scan` check became required on `acc`, and a ruleset now protects `main`.
+
+  - date: 2026-09-20
+    kind: measured
+    heads:
+      TTL: 1868087
+      LDE: 0e7733e
+      RBA: 6ca80f2
+    note: >-
+      One week of concentrated work on the assessment's own findings: what
+      ships is now built by the same install that passed the tests, the
+      cooldown reaches npm itself, and a red suite blocks a merge to `acc` in
+      all three.
+    scores:
+      TTL: [1, 4, 3, 4, 0, 4, 4, 5, 4, 2, 1]
+      LDE: [1, 3, 3, 4, 0, 4, 4, 4, 4, 2, 1]
+      RBA: [2, 3, 2, 3, 0, 4, 3, 4, 3, 2, 1]
+    changes:
+      - component: TTL
+        recommendation: R2
+        from: 2
+        to: 4
+        why: >-
+          Every job moved to `ubuntu-24.04`, the app is built on the runner and
+          uploaded with `skip_app_build: true`, and `node-version: '24'` — a
+          major only — became the exact `24.20.0`. What is left unpinned is the
+          upload container, which no longer chooses a toolchain.
+      - component: LDE
+        recommendation: R2
+        from: 2
+        to: 3
+        why: >-
+          All 15 jobs on `ubuntu-24.04`, both frontends built on the runner with
+          `skip_app_build: true`, and three drifting Node literals replaced by
+          one exact `.nvmrc` at 22.23.2, closing #113.
+      - component: RBA
+        recommendation: R2
+        from: 2
+        to: 3
+        why: >-
+          All 16 jobs on `ubuntu-24.04` and the last floating `node-version: '24'`
+          pinned to 24.20.0. Held at 3 because its container images — Skosmos,
+          Operaton, Postgres, Keycloak, Redis — still carry tags, not digests.
+      - component: TTL
+        recommendation: R3
+        from: 2
+        to: 3
+        why: >-
+          No deploy path re-resolves a version range any more: the shipped bundle
+          comes from the runner's `npm ci`. The manifest's 30 caret ranges are
+          why it is not higher.
+      - component: LDE
+        recommendation: R3
+        from: 2
+        to: 3
+        why: >-
+          The backend deploys with `npm ci --omit=dev` from the root lockfile and
+          the frontends are built on the runner, so no install re-resolves a
+          range. The manifests still hold 77 caret ranges.
+      - component: TTL
+        recommendation: R4
+        from: 3
+        to: 4
+        why: >-
+          The one weak row is closed — the bundle that ships is the one `npm ci`
+          produced on the runner. `pip install semgrep==1.176.1` and
+          `npx --package renovate@44.50.3` resolve without hashes, which keeps it
+          off 5.
+      - component: LDE
+        recommendation: R4
+        from: 2
+        to: 4
+        why: >-
+          Both weak rows are closed: the backend installs 349 packages with
+          `npm ci --omit=dev` against the root lockfile's integrity hashes, and
+          the frontend ships what the runner built.
+      - component: TTL
+        recommendation: R6
+        from: 3
+        to: 4
+        why: >-
+          A root `.npmrc` sets `min-release-age=14`, so the cooldown reaches npm
+          itself and not only Renovate's proposals — including the lock-file
+          refresh Renovate cannot hold back. On Node 24.20.0 its npm 11.19
+          honours the setting.
+      - component: LDE
+        recommendation: R6
+        from: 3
+        to: 4
+        why: >-
+          The same `.npmrc` cooldown. Node 22.23.2 bundles npm 10.9.8, which
+          ignores the setting silently, so `scripts/check-deps.sh` warns below
+          npm 11.10.
+      - component: RBA
+        recommendation: R6
+        from: 3
+        to: 4
+        why: >-
+          The same `.npmrc` cooldown, with the same npm-version caveat. It does
+          not reach the backend deploy, which installs in its own `deploy/`
+          folder — counted against R3 and R4 rather than three times.
+      - component: LDE
+        recommendation: R7
+        from: 3
+        to: 4
+        why: >-
+          Minor updates of pre-1.0 packages now wait for approval, with the four
+          packages named and the failure it prevents cited. That written
+          assessment is what R7 asks for.
+      - component: RBA
+        recommendation: R8
+        from: 3
+        to: 4
+        why: >-
+          Twenty Renovate pull requests merged in 30 days, against seven a week
+          earlier, and the first lock-file refresh merged on 14 September.
+      - component: TTL
+        recommendation: R9
+        from: 3
+        to: 4
+        why: >-
+          `Build and deploy ACC` — which runs lint, the suites with coverage and
+          the build — is now a required check on `acc`.
+      - component: LDE
+        recommendation: R9
+        from: 3
+        to: 4
+        why: >-
+          `deploy`, `Build and Deploy Frontend` and `Build and Deploy ROPA Site`
+          are required on `acc`, and both patterns match the lockfile, so a
+          dependency pull request really does run them.
+      - component: RBA
+        recommendation: R9
+        from: 2
+        to: 3
+        why: >-
+          `scan`, `build` and the three ACC deploy checks became required on
+          `acc`. Not 4: the three Static Web App filters do not match
+          `package-lock.json`, so a lock-file refresh skips them — and a skipped
+          check reports success.
+      - component: RBA
+        recommendation: R10
+        from: 1
+        to: 2
+        why: >-
+          Open Dependabot alerts fell from 154 to 8 when the first lock-file
+          refresh landed. None is dismissed with a reason, and nothing audits on
+          a schedule, so it goes no higher.
+
+# The test work of the same period, which the guideline above barely scores.
+# Counted from the tree at each weekly commit: files whose name ends in
+# `.test.*` or `.spec.*`, end-to-end specs under an `e2e/` directory, the
+# workflows that run a suite, and the runner configs that carry a per-file
+# coverage floor.
+tests:
+  - date: 2026-08-16
+    TTL: {files: 15, e2e: 0, ci: 0, workflows: 2, floor: false}
+    LDE: {files: 107, e2e: 0, ci: 0, workflows: 6, floor: false}
+    RBA: {files: 235, e2e: 7, ci: 2, workflows: 6, floor: false}
+  - date: 2026-08-23
+    TTL: {files: 16, e2e: 0, ci: 2, workflows: 2, floor: false}
+    LDE: {files: 110, e2e: 0, ci: 4, workflows: 6, floor: false}
+    RBA: {files: 245, e2e: 9, ci: 6, workflows: 6, floor: false}
+  - date: 2026-08-30
+    TTL: {files: 16, e2e: 0, ci: 2, workflows: 3, floor: false}
+    LDE: {files: 111, e2e: 0, ci: 4, workflows: 7, floor: false}
+    RBA: {files: 291, e2e: 12, ci: 8, workflows: 9, floor: false}
+  - date: 2026-09-06
+    TTL: {files: 36, e2e: 2, ci: 2, workflows: 3, floor: false}
+    LDE: {files: 120, e2e: 0, ci: 4, workflows: 7, floor: false}
+    RBA: {files: 301, e2e: 12, ci: 8, workflows: 9, floor: false}
+  - date: 2026-09-13
+    TTL: {files: 64, e2e: 3, ci: 2, workflows: 4, floor: true}
+    LDE: {files: 121, e2e: 0, ci: 4, workflows: 8, floor: true}
+    RBA: {files: 302, e2e: 12, ci: 8, workflows: 10, floor: true}
+  - date: 2026-09-20
+    TTL: {files: 65, e2e: 3, ci: 2, workflows: 5, floor: true}
+    LDE: {files: 137, e2e: 0, ci: 4, workflows: 8, floor: true}
+    RBA: {files: 303, e2e: 12, ci: 8, workflows: 10, floor: true}

@@ -1,5 +1,11 @@
 ---
 scope: cross-cutting
+verified:
+  date: 2026-09-20
+  against:
+    CPSV Editor: "1868087"
+    Linked Data Explorer: "0e7733e"
+    RONL Business API: "6ca80f2"
 ---
 
 # Technology Stack
@@ -101,16 +107,26 @@ mean.
 A contributing page makes claims about repository configuration — workflows,
 `SECURITY-PIPELINE.md`, `renovate.json`, runner configs and their thresholds. **Most
 changes to those produce no new build.** Every frontend deploy workflow is
-path-filtered, as read on 11 September 2026:
+path-filtered, as read on 20 September 2026:
 
 | Repository | The frontend build fires on | Does not fire on |
 |---|---|---|
-| Linked Data Explorer | `packages/frontend/**`, its own workflow file, and the root `package.json` / `package-lock.json` | Other workflows, `SECURITY-PIPELINE.md`, `renovate.json`, backend runner config |
-| RONL Business API | `packages/frontend`, `shared` and `pa-cockpit`, and its own workflow file | The same |
+| Linked Data Explorer | `packages/frontend/**`, its own workflow file, the root `package.json` / `package-lock.json`, and `.nvmrc` | Other workflows, `SECURITY-PIPELINE.md`, `renovate.json`, backend runner config |
+| RONL Business API | `packages/frontend/**`, `packages/shared/**` and `packages/pa-cockpit/**`, its own workflow file, and `.nvmrc` | The same |
 | CPSV Editor | Everything except `docs/**`, `.claude/**` and `**/*.md` | `SECURITY-PIPELINE.md` and every other Markdown record |
 
 So a build id is silent about exactly the changes that falsify these pages. The
 commit on the branch of record is not: it moves with every change.
+
+Two refinements, both from 19 September 2026. **`.nvmrc` joined every filter**, because
+a Node bump that is not in the list changes the version and deploys nothing. And **the
+filters above are now the `push` filters**: on the `acc` workflows whose checks became
+required, the `pull_request` trigger carries no path filter at all, the same pattern
+having moved into a `changes` job that skips the build rather than never starting it.
+A pull request therefore *starts* these workflows whatever it touches, while still
+building — and so producing a new build id — only when it touches something relevant.
+The premise of this section is unchanged: see
+[how a path-filtered workflow became requireable](../branch-protection.md#how-a-path-filtered-workflow-became-requireable).
 
 ### What a stamp promises
 

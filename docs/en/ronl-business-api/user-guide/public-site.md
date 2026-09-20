@@ -23,7 +23,28 @@ A single search box queries all five sources at once — announcements, news, pr
 | News | National news from the Dutch central government. |
 | Products & Services | Permits, notifications and grants for residents and businesses. |
 | Rule catalogue | Public services and the rules used to execute them, including validity dates and source. |
-| Process library | How an application moves through the organisation, step by step. |
+| Process library | How an application moves through the organisation, step by step. Each process carries a status label — see below. |
+
+### Every deployed process, with its status on it
+
+The process library lists **every process deployed to a public-facing board**,
+whatever state it is in, and each one shows its status — `example`, `wip` or
+`e2e` — beside its name. The label appears in the listing and in search results,
+not only on a process's own page, so you can see at a glance that something is a
+worked example or still in progress without opening it.
+
+The label is always written out as text rather than signalled by colour alone.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: the public process library listing, each process showing its status label beside its name](../../assets/screenshots/ronl-business-api-public-site-processen.png)
+  <figcaption>The process library — every deployed process, each with its status label</figcaption>
+</figure>
+
+!!! note "If you looked here before September 2026 and found it empty"
+    You were not missing anything and nothing was hidden from you: production
+    listed **no processes at all**. The library had been filtering on a status
+    value the underlying catalogue cannot hold, so nothing ever passed it. It
+    now filters on which board owns a process and nothing else.
 
 ## Further sections
 
