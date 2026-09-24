@@ -89,3 +89,6 @@ $RECYCLE.BIN/
 .Trash-*
 
 flatten_directory.sh
+
+# Briefings handed to people outside the repo — working documents, not documentation
+*-briefing.md
