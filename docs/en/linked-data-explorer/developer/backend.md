@@ -15,7 +15,7 @@ The backend is a Node.js/Express TypeScript API. It sits between the React front
 | Production | `https://backend.linkeddata.open-regels.nl/v1` |
 | Acceptance | `https://acc.backend.linkeddata.open-regels.nl/v1` |
 
-All endpoints follow `/v1/*`. The release version is included in every response via the `API-Version` header — `API-Version: 2026.09.5` at the time of writing — following Dutch Government API Design Rules API-20 and API-57.
+All endpoints follow `/v1/*`. The release version is included in every response via the `API-Version` header — `API-Version: 2026.09.6` on acceptance and `2026.09.5` on production at the time of writing, since the two environments can be a release apart — following Dutch Government API Design Rules API-20 and API-57.
 
 **The contract is published.** `GET /v1/openapi.json` serves an OpenAPI 3.1 description of every `/v1` route, built from `packages/backend/openapi/openapi.yaml`. It is the reference for request and response shapes; the [API Specification](../reference/api-specification.md) page renders it. `/v1/openapi.json` is one of three public mounts served to any origin (see [Security](#security)), so any client can read it.
 
@@ -90,6 +90,21 @@ different caller contract; the DMN tab already builds Operaton-shaped bodies, so
 re-wrapping would double-wrap them.
 
 Both are described in the [API Specification](../reference/api-specification.md).
+
+### Deploy target (v2026.09.6)
+
+```
+GET /v1/dmns/process/deploy-target
+```
+
+Answers which Operaton the backend deploys BPMN processes to, as
+`{ operatonUrl }`. The deploy modal and the exported README ask this route
+instead of reading the frontend's build-time `VITE_OPERATON_BASE_URL`, which is
+**removed** — a build-time copy of the target can drift from the backend's
+configured `OPERATON_BASE_URL`, and only the backend's value decides where a
+process actually lands. The frontend caches a successful answer for the session;
+a failure is **not** cached, so the modal names the target as soon as the backend
+is reachable again.
 
 ### DMN discovery
 
@@ -606,6 +621,34 @@ This replaced five different envelopes in v2026.09.5. `POST /v1/dmns/evaluate/:d
 | TriplyDB round-trip latency              | 150–200ms |
 | Operaton per-DMN execution               | 80–120ms  |
 
+### Caching — one utility, a named registry
+
+Since v2026.09.6 the hand-rolled caches are replaced by one TTL utility
+(`utils/ttl-cache.ts`) whose instances **register themselves by name**. The cache
+routes therefore report and clear across every cache rather than a hardcoded
+list:
+
+| Route | Does |
+|---|---|
+| `GET /v1/cache/stats` | Cache age and entry count, per named cache. Expired entries are not counted |
+| `DELETE /v1/cache/clear` | Clears every registered cache |
+
+| Cache | TTL | Why |
+|---|---|---|
+| `dso-activiteit` | 5 minutes | Activity detail is the hottest DSO read — the DSO Explorer's child-activity fan-out calls it once per child and discards the names on every re-render |
+| DMN caches | 5 minutes | The existing per-endpoint SPARQL discovery caches |
+
+Entries that are never read again are now evicted rather than retained for the
+process lifetime; before v2026.09.6 an 8.7 MB annotation graph per municipality
+could sit in memory indefinitely. DSO activity data does change, so the staleness
+a five-minute TTL admits is deliberate and `DELETE /v1/cache/clear` is the escape
+hatch.
+
+The frontend keeps a separate, smaller cache for the activity dossier, keyed
+`env|datum|urn`. It stores the **promise** rather than the resolved value, so
+concurrent calls for one key dedupe, and it evicts on failure so one bad response
+cannot permanently block a retry.
+
 ---
 
 ## Security
@@ -620,6 +663,8 @@ This replaced five different envelopes in v2026.09.5. `POST /v1/dmns/evaluate/:d
 
 - **At the route**, `utils/outboundUrl.ts` checks every caller-supplied SPARQL endpoint — on `GET /norms`, the DMN reads, chain execution, the vendor reads, merged SHACL validation and `POST /triplydb/query` — and refuses it with `400 INVALID_INPUT` when it is not `https:`, carries credentials, or points to an internal address. Internal addresses are recognised in every textual IPv4 and IPv6 form, including IPv6 forms that embed an IPv4 address.
 - **At connect time**, `utils/outboundHttp.ts` provides the axios client every caller-chosen request uses. Its agents refuse a name that *resolves* to an internal address, redirects are re-checked, and it pins `proxy: false`, because axios otherwise honours `HTTP(S)_PROXY` with a tunnelling agent that skips the lookup.
+
+The connect-time layer was finished in v2026.09.6: the client now pins the http adapter and HTTP/1 on **every** request rather than relying on the default, and a refused redirect surfaces as `EOUTBOUNDREFUSED` instead of a generic connection error. The unreachable `::/128` and `::1/128` entries were dropped from the internal-address list, `test-connection` gained its own request schema with `apiToken` optional, and the credential-leak test now searches the whole call rather than part of it.
 
 TriplyDB calls that forward the caller's token go only to `https:` hosts in `TRIPLYDB_ALLOWED_HOSTS`. Processes deploy only to the configured Operaton, through the shared client that carries `OPERATON_API_KEY` — a request can no longer name the Operaton URL or supply credentials. `ALLOW_LOCAL_ENDPOINTS=true` admits `http:` and local addresses for local development, and is never set on ACC or production.
 

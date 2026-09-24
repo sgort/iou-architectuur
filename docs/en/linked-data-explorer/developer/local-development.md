@@ -203,10 +203,14 @@ The frontend reads environment variables via Vite. The `packages/frontend/.env.d
 
 ```env
 VITE_API_BASE_URL=http://localhost:3001
-VITE_OPERATON_BASE_URL=http://localhost:8081/engine-rest
+# CPSV Editor (DSO → DMN publish handoff). Run it on a non-3000 port locally,
+# since LDE's dev server also uses 3000.
+VITE_CPSV_EDITOR_URL=http://localhost:3002
 ```
 
-No changes needed for standard local development.
+No changes needed for standard local development. `VITE_OPERATON_BASE_URL` was removed in
+v2026.09.6 — the deploy modal asks the backend which Operaton it deploys to instead of reading
+a build-time copy of the value.
 
 ---
 

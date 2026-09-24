@@ -167,13 +167,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.09.5** · *September 2026*
+-   **🔍 Linked Data Explorer — v2026.09.6** · *September 2026*
 
     ---
 
-    **The API describes itself, and stops fetching whatever it is told**
+    **An activity's whole chain in one call, and a quality profile that shows its working**
 
-    `/v1/openapi.json` now serves a complete OpenAPI 3.1 description — 63 paths, linted against the NL API Design Rules in CI, every route response validated against it — and the [API Specification](linked-data-explorer/reference/api-specification.md) renders it live. Every error is RFC 9457 problem details, and a malformed body or a bad field is a `400` instead of a `500`. Before this release the production backend would request any host a caller named; now every caller-supplied endpoint must be public `https:`, processes deploy only to the configured Operaton, and the SPARQL editor goes through the backend instead of a third-party proxy. The frontend gains a report-only Content-Security-Policy and builds Tailwind instead of loading it from a CDN, the DSO Explorer reaches any authority by level, and the SHACL validator no longer passes a file it never checked. The release was [verified on both environments](linked-data-explorer/developer/deployment.md#post-deployment-verification), and the [suites](linked-data-explorer/developer/testing.md) stand at 2821 tests.
+    **On acceptance so far** — production is still serving v2026.09.5. A sixth DSO API joins the viewer, Omgevingsdocumenten Presenteren (Ozon), because an activity's chain runs through it: one call now assembles the legal source, its annotations and both rule sets into a single dossier, and scores how legible that chain is. The [Quality Profile tab](linked-data-explorer/features/dso-integration.md#activity-dossier-and-quality-profile) reports **two axes and no overall grade**, keeps Conclusie and Indieningsvereisten apart, says when a rule set is absent rather than showing zeros, and carries the evidence behind every number — down to each input's own question. A legal source now resolves per bestuurslaag, so national activities stop being refused for lacking a municipality they cannot have. The child-activity fan-out is capped at five in flight and cached for five minutes, the Flevoland Thuisbatterij bundle finally reaches the Modeler, and the deploy modal asks the backend which Operaton it deploys to. Node moved to one `.nvmrc` at 24.21.0 — and a probe now checks the native binding on the **deployed app**, after a green deploy left DMN validation broken for every user.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

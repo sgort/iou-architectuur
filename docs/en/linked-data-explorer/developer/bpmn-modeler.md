@@ -475,7 +475,11 @@ In all cases it first checks for `xmlns:ronl=` in the XML and injects the namesp
 
 ## Example process seeding
 
-On mount, `BpmnModeler.tsx` runs a versioned seed effect. For each example defined in `EXAMPLE_VERSIONS`, if the stored version is lower than the current version the file is re-fetched from `public/examples/` and the record is overwritten in `localStorage`. Example records carry `readonly: true` and are excluded from backend writes.
+On mount, `BpmnModeler.tsx` runs a versioned seed effect. For each example defined in `EXAMPLE_VERSIONS`, if the stored version is lower than the current version the file is re-fetched from `public/examples/` and the record is overwritten in `localStorage`.
+
+Seeded records carry `status: 'example'`, which is what the list badges key on. **They are not read-only.** Of the ten records the seed effect writes, exactly one — `wip_asylum_migration` — sets `readonly: true`; the other nine set `readonly: false`.
+
+That distinction is load-bearing, because `readonly` — not `status` — is what gates the backend write: `BpmnService.saveProcess` persists to `localStorage` first and then returns early for a readonly record without ever POSTing to `/v1/assets/bpmn`. So nine of the ten seeded examples *are* written to the backend when saved, and `hydrateFromServer` merges the readonly one back from local storage rather than from the server. A user's edit to a seeded example also survives only until the next version bump: the seed overwrites the stored record whenever `EXAMPLE_VERSIONS` moves past it.
 
 The current example processes and their roles:
 
@@ -486,7 +490,31 @@ The current example processes and their roles:
 | `example_awb_zorgtoeslag` | `shell` | `AwbZorgtoeslagProcess` | — |
 | `example_zorgtoeslag_provisional` | `subprocess` | `ZorgtoeslagProvisionalSubProcess` | `AwbZorgtoeslagProcess` |
 | `example_zorgtoeslag_final` | `subprocess` | `ZorgtoeslagFinalSubProcess` | `AwbZorgtoeslagProcess` |
+| `example_hr_capacity_nl` | `standalone` | `ManagementCapacityClaimProcess` | — |
+| `example_thuisbatterij_aanvraag` | `shell` | `ThuisbatterijSubsidieAanvraagProcess` | — |
+| `example_thuisbatterij_decision` | `subprocess` | `ThuisbatterijSubsidieDecisionSubProcess` | `ThuisbatterijSubsidieAanvraagProcess` |
 | `wip_asylum_migration` | `standalone` | `Process_Migratie_en_Asiel` | — |
+
+**The Thuisbatterij bundle joined the seed in v2026.09.6.** Its files sat in
+`public/examples/flevoland/` and stopped there — fetchable by URL, invisible in the app, with
+no entry in the version registry, no seeding block, no form definitions and no document
+template. It was the only bundle in `public/examples` with no way into the UI, which left
+deploying it a file-shuffling exercise rather than the Modeler flow kapvergunning and
+zorgtoeslag already have. Both records carry `organization: 'flevoland'`, and the decision
+subprocess declares `shellId` alongside `calledElement`.
+
+!!! warning "A tenanted process cannot see an untenanted DMN"
+    Operaton resolves a business rule task's `decisionRef` **inside the process instance's own
+    tenant**. A process deployed under tenant-id `flevoland` therefore cannot reach a DMN
+    deployed without one, and the engine refuses to instantiate it at all — surfacing as a 500
+    from process start and an unexplained *"De aanvraag kon niet worden ingediend"* on the ACC
+    citizen dashboard. Kapvergunning was broken this way; Thuisbatterij had the same defect one
+    step further in, pinned to a tenant id. `decisionRefTenantId="${null}"` points them back at
+    the shared untenanted DMNs.
+
+    `EXAMPLE_VERSIONS` was bumped for `example_awb_process`, `example_tree_felling`,
+    `example_awb_zorgtoeslag` and `example_zorgtoeslag_provisional` in the same change —
+    without the bump the seed skips re-saving, and every existing user keeps the broken copy.
 
 After the seed effect, a separate hydration effect runs `BpmnService.hydrateFromServer()` to merge any user-authored processes stored in PostgreSQL into the local list.
 
@@ -541,9 +569,9 @@ function applyRonlAttr(xml: string, attr: string, value: string | undefined): st
 
 ### Shell → subprocess atomic save
 
-After saving a shell, `handleSaveProcess` walks `processes` for subprocesses where `processRole === 'subprocess'` and `calledElement === shell.bpmnProcessId`. For each match, the shell's `language` and `organization` are applied to the subprocess XML (via `applyRonlAttr`) and to the in-memory `BpmnProcess` fields, then persisted via `BpmnService.saveProcess` in sequence. The propagation triggers on every shell save when the shell has either field set, regardless of whether the user touched the footer in this session — the architectural rule "shell wins" must hold across editing sessions.
+After saving a shell, `handleSaveProcess` walks `processes` for subprocesses where `processRole === 'subprocess'` and the record links back to this shell. The link is matched on **`shellId` where the record has one**, falling back to `calledElement === shell.bpmnProcessId` for records saved before `shellId` existed — two shell records can share a `bpmnProcessId` (an `e2e-fixtures` copy deliberately keeps a seeded example's production Operaton key), so matching on that string alone would cascade one shell's `language` and `organization` onto an unrelated shell's subprocess. For each match, the shell's `language` and `organization` are applied to the subprocess XML (via `applyRonlAttr`) and to the in-memory `BpmnProcess` fields, then persisted via `BpmnService.saveProcess` in sequence. The propagation triggers on every shell save when the shell has either field set, regardless of whether the user touched the footer in this session — the architectural rule "shell wins" must hold across editing sessions.
 
-Idempotent: subprocesses already aligned on both fields are skipped (no `updatedAt` bump, no backend write). Example subprocesses (`readonly: true`) are skipped. RoPA and DSO are NOT propagated — each subprocess has its own RoPA record and DSO context.
+Idempotent: subprocesses already aligned on both fields are skipped (no `updatedAt` bump, no backend write). Records marked `readonly` are skipped — which in practice means only `wip_asylum_migration`, since the seeded example subprocesses are **not** read-only and do receive the propagation. RoPA and DSO are NOT propagated — each subprocess has its own RoPA record and DSO context.
 
 ---
 

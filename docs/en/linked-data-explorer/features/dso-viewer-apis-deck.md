@@ -101,7 +101,7 @@ that are still open. The slides summarise what the surrounding pages document in
 ## Related documentation
 
 - [DSO Integration](dso-integration.md) — the same material in prose, with screenshots
-- [DSO Integration — the endpoint map](dso-integration.md#the-five-dso-apis-behind-the-viewer) — every `/v1/dso` route and the upstream call it makes
+- [DSO Integration — the endpoint map](dso-integration.md#the-six-dso-apis-behind-the-viewer) — every `/v1/dso` route and the upstream call it makes
 - [API Specification](../reference/api-specification.md) — per-endpoint parameters and response shapes
 - [DSO Explorer user guide](../user-guide/dso-explorer.md) — the workflows these APIs support
 - [DSO Integration Phase Plan](dso-integration-phase-plan.md) — phase status and test anchors
