@@ -92,3 +92,6 @@ flatten_directory.sh
 
 # Briefings handed to people outside the repo — working documents, not documentation
 *-briefing.md
+
+# Semgrep plugin session cache — an auth record, never a repository file
+.semgrep/
