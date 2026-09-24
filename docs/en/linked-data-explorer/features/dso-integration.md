@@ -11,9 +11,10 @@ The Linked Data Explorer integrates with the **Digitaal Stelsel Omgevingswet (DS
 A toggle in Settings selects between the **pre-production** and **production** DSO environments independently of the LDE environment.
 
 !!! tip "Prefer the short version?"
-    [DSO Viewer APIs — Slide Deck](dso-viewer-apis-deck.md) covers the same ground in twelve
-    slides, and is downloadable as a PDF. The deck is a snapshot of **24 August 2026**, so it
-    still shows five upstream APIs and three tabs; this page is the current account.
+    [DSO Viewer APIs — Slide Deck](dso-viewer-apis-deck.md) covers the same ground in thirteen
+    slides, and is downloadable as a PDF. It was re-exported on **24 September 2026** against
+    v2026.09.6, so it carries the sixth API, the fourth tab and the dossier — but it remains a
+    dated review, and this page is the account that is kept current.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: DSO Explorer panel open in LDE with the four tabs visible at the top — Concepts, Works, Activities, Quality Profile — the Activities tab active showing a list of activiteiten with omschrijving, validity dates, and rule-types-present badges, plus a date input and the Level and Authority dropdowns above the list](../../assets/screenshots/linked-data-explorer-dso-explorer-overview.png)
