@@ -116,11 +116,20 @@ jobs:
 
 **File:** `.github/workflows/azure-frontend-prod.yml`
 
-Same structure as ACC but with:
+Same build structure as ACC, but it is **not triggered by a branch at all**:
 
-- Branch: `main` or `prod`
-- PROD secrets (`PROD_KEYCLOAK_URL`, `PROD_API_URL`, `PROD_AZURE_SWA_TOKEN`)
-- Additional approval gate (manual approval before deployment)
+- Triggers: `workflow_call` and `workflow_dispatch` only. A push to `main`
+  starts `promote-to-production.yml`, which calls this workflow once the backend
+  deploy has succeeded or been skipped — see [How a promotion reaches
+  production](backend.md#how-a-promotion-reaches-production).
+- Secrets: `AZURE_STATIC_WEB_APPS_API_TOKEN_PROD`, passed explicitly by the
+  promotion (never `secrets: inherit`), plus `GITHUB_TOKEN`.
+- Build provenance: `VITE_BUILD_SHA` and `VITE_BUILD_RUN` are injected on the
+  build step, which is what the running application prints as
+  `build <sha> · #<run>`. A called workflow inherits the **caller's** run
+  number, so that `#` is the promotion's run number, not a per-app one.
+- **No approval gate.** The `production` environment carries no protection rule;
+  nothing pauses waiting for a reviewer.
 
 ---
 

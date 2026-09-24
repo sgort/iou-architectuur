@@ -46,6 +46,38 @@ The label is always written out as text rather than signalled by colour alone.
     value the underlying catalogue cannot hold, so nothing ever passed it. It
     now filters on which board owns a process and nothing else.
 
+## A rule's concepts, split into input and output
+
+Open a rule from the search results and scroll to its concepts. They are no
+longer one alphabetical row of chips. The heading still names the section and
+counts every concept of the service, and below it the chips are divided into two
+labelled groups, each carrying its own count:
+
+- **Invoer — gegevens die de regels nodig hebben.** The values the rules take in
+  before they can decide anything.
+- **Uitvoer — wat de regels bepalen.** What comes out: the entitlements, amounts
+  and decisions the rules arrive at.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: a rule's detail page on the public site, its concepts divided into Invoer and Uitvoer groups, each heading carrying its own count](../../assets/screenshots/ronl-business-api-public-site-begrippen-io.png)
+  <figcaption>Invoer and Uitvoer, on a rule's detail page</figcaption>
+</figure>
+
+Every chip still links out to the term in the shared vocabulary, exactly as
+before.
+
+!!! note "Some concepts sit in a third group, and that is not a fault"
+    The division comes from the knowledge graph. Where the graph does not say
+    which side a concept belongs to, the concept is shown in a group of its own
+    rather than dropped or guessed at — so nothing goes missing from the count.
+
+    Two other things are worth knowing if a page looks different from this one.
+    The grouping is **per service, not per rule**: where a service's rules all
+    hang off one decision model, a value reads as an output of the service even
+    if the particular rule you are reading consumes it. And a page served by a
+    tier that has not yet been updated shows the single undivided row it always
+    did.
+
 ## Further sections
 
 The top navigation also has **Data dictionary** and **Provenance**, alongside an **NL/EN** language toggle and a **Staff login** link across to the werkomgeving.

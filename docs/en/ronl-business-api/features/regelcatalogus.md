@@ -26,6 +26,29 @@ A catalogue can be browsed by kind — organisations, services, rules, or concep
 
 ---
 
+## Which values a rule consumes, and which it produces
+
+A concept is not simply attached to a service: it sits on one side of the rules
+or the other. Some concepts are the values the rules need in order to decide —
+*invoer* — and others are what the rules determine — *uitvoer*. The catalogue
+carries that distinction, so a reader can tell what a service asks for from what
+it answers.
+
+The distinction is read from the knowledge graph rather than inferred, and the
+graph states it two ways depending on how an export was produced: an older
+export as the variable's edge to the decision model, a newer one only as the
+input or output position in the variable's own identifier. Both are read, the
+edge first.
+
+Where the graph says nothing, a concept is shown as undirected rather than
+guessed at or dropped. And the attribution is **per service, not per rule**: a
+service's rules commonly hang off a single decision model, so a concept reads as
+an output of the service as a whole even where one rule within it plausibly
+consumes the value. The graph does not carry per-rule attribution, so neither
+does the catalogue.
+
+---
+
 ## Freshness and resilience
 
 Because entries are read live rather than stored, a catalogue caches what it reads for a short interval so that repeated browsing does not re-query the graph on every request. If the underlying graph is briefly unreachable, the catalogue keeps serving what it last read rather than showing nothing.

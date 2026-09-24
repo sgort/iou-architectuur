@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Regelcatalogus
 
 !!! info "Documentatie in ontwikkeling"
@@ -20,6 +24,10 @@
 ---
 
 ## Browsing and finding an entry
+
+---
+
+## Which values a rule consumes, and which it produces
 
 ---
 

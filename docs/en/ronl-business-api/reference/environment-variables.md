@@ -20,7 +20,22 @@ component: RONL Business API
 
 | Variable | Required | Description |
 |---|---|---|
-| `CORS_ORIGIN` | Yes | Comma-separated allowed origins (e.g. `https://mijn.open-regels.nl`) |
+| `CORS_ORIGIN` | Yes | Comma-separated allowed origins (e.g. `https://mijn.open-regels.nl`), matched by exact equality |
+| `CORS_PREVIEW_SLUGS` | No | Comma-separated Static Web Apps **app slugs** whose numbered preview environments may call this backend. Empty by default, and **ignored outright in production** |
+
+!!! note "`CORS_PREVIEW_SLUGS` holds slugs, not hostnames"
+    A pull-request preview gets an ephemeral origin, and there is a new one per
+    pull request, so it cannot be listed in `CORS_ORIGIN`. Azure derives a
+    preview hostname from the app's **stable slug**, so the pattern anchors on
+    the slug — a bare `*.azurestaticapps.net` pattern would let any Azure Static
+    Web App in the world make credentialed cross-origin requests to the tier.
+
+    Two properties are enforced in code rather than left to configuration. It is
+    never honoured in production, so a value that finds its way onto the
+    production App Service changes nothing about what production accepts. And
+    the guard reads the **deployment** environment, not `NODE_ENV`: acceptance
+    deliberately runs `NODE_ENV=production`, so keying on that would have
+    treated it as production and refused every preview.
 
 ### Keycloak / JWT
 
@@ -29,10 +44,28 @@ component: RONL Business API
 | `KEYCLOAK_URL` | Yes | Keycloak base URL (e.g. `https://keycloak.open-regels.nl`) |
 | `KEYCLOAK_REALM` | Yes | Realm name — always `ronl` |
 | `KEYCLOAK_CLIENT_ID` | Yes | Client ID — always `ronl-business-api` |
-| `KEYCLOAK_CLIENT_SECRET` | Yes (prod) | Client secret from Keycloak |
 | `JWT_ISSUER` | Yes | Full issuer URL: `https://keycloak.open-regels.nl/realms/ronl` |
 | `JWT_AUDIENCE` | Yes | Must match token `aud` claim — always `ronl-business-api` |
 | `TOKEN_CACHE_TTL` | No | `300` | JWKS cache TTL in seconds |
+
+!!! warning "There is no `KEYCLOAK_CLIENT_SECRET`"
+    `ronl-business-api` is a **public client**: the realm export gives it
+    `publicClient: true`, no secret and no service account. The setting existed
+    on `Config` until v2026.09.10, was populated from the environment, was
+    required in production — and was read by no code path. Requiring a value
+    nobody reads is how the production App Service came to hold the literal
+    `not-used`. It was removed rather than corrected.
+
+!!! note "An unfilled value fails the boot in production"
+    A non-empty check passes a placeholder, so the backend boots, `/v1/health`
+    reports healthy, and the breakage surfaces at first use. Since v2026.09.10 a
+    boot-time check rejects an unfilled value in production as well as an empty
+    one, and `ANTHROPIC_API_KEY` uses it — that key is genuinely consumed.
+
+    Matching is **anchored, never by substring**: `exchange-mechanism-2026`
+    contains `change-me`, and failing a boot over a legitimate secret would be a
+    worse failure than the one this prevents. Production only, because failing a
+    developer's boot over an unfilled `.env` would be hostile.
 
 ### Operaton
 
@@ -111,8 +144,19 @@ component: RONL Business API
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `RATE_LIMIT_WINDOW_MS` | No | `60000` | Rate limit window in ms |
-| `RATE_LIMIT_MAX_REQUESTS` | No | `100` | Max requests per window |
-| `RATE_LIMIT_PER_TENANT` | No | `false` | Scope limit per tenant+IP |
+| `RATE_LIMIT_MAX_REQUESTS` | No | `1000` | Max requests per window |
+| `RATE_LIMIT_PER_TENANT` | No | `true` | Scope limit per tenant+IP |
+
+!!! note "The limit buckets per client, which is why acceptance could raise it"
+    `TRUST_PROXY` is `true` on both deployed tiers, so the limiter buckets per
+    client rather than once per deployment. Acceptance runs
+    `RATE_LIMIT_MAX_REQUESTS=1000`, raised from 100 so a full end-to-end run
+    from one machine stops throttling in the PA cockpit specs, which spend about
+    twenty requests per authoring journey.
+
+    **Production should not follow automatically.** Per-client bucketing is what
+    makes a raise a convenience decision on acceptance; a tenfold ceiling per
+    client is a much weaker defence on a public tier.
 
 ### Logging
 
@@ -145,12 +189,24 @@ component: RONL Business API
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `ENABLE_SWAGGER` | No | `false` | Enable OpenAPI docs at `/v1/openapi.json` |
+| `ENABLE_SWAGGER` | No | `true` | Read into `Config` and **has no effect** — no OpenAPI surface is served at any path |
 | `ENABLE_METRICS` | No | `true` | Enable metrics endpoint |
 | `ENABLE_HEALTH_CHECKS` | No | `true` | Enable `/v1/health` endpoint |
 | `ENABLE_TENANT_ISOLATION` | No | `true` | Enforce per-tenant data isolation |
 | `DEFAULT_MAX_PROCESS_INSTANCES` | No | `1000` | Max active instances per tenant |
 | `RONL_SPARQL_ENDPOINT` | No | `https://api.triplydb.com/...` | Override the default RONL TriplyDB SPARQL endpoint used by the Regelcatalogus service |
+
+!!! warning "`ENABLE_SWAGGER` does nothing — the flag exists, the surface does not"
+    It is parsed into `Config` and defaults to `true`, and it is in
+    `.env.example`, so a reader will find it. Nothing reads it into a mount:
+    there is no Swagger, OpenAPI or Scalar dependency in the backend at all.
+
+    This is recorded rather than quietly dropped because the service advertised
+    documentation at `/v1/docs` from its initial commit until v2026.09.10 and
+    never served it — planned and not built, not a mount that regressed. Serving
+    real documentation for a service with 17 route groups and external consumers
+    remains worth doing; until something serves it, the root response says
+    nothing rather than pointing a consumer at a 404.
 
 ### Public surface
 
@@ -194,16 +250,40 @@ operaton      A   <VM_IP>
 
 ---
 
-## GitHub repository secrets
+## GitHub repository secrets and variables
 
-These secrets must be configured in the GitHub repository before any workflow can deploy:
+The **static sites** deploy with a token, which is a secret:
 
 | Secret name | Where to get it |
 |---|---|
-| `AZURE_WEBAPP_PUBLISH_PROFILE_ACC` | Azure Portal → App Service `ronl-business-api-acc` → Get publish profile |
-| `AZURE_WEBAPP_PUBLISH_PROFILE_PROD` | Azure Portal → App Service `ronl-business-api-prod` → Get publish profile |
 | `AZURE_STATIC_WEB_APPS_API_TOKEN_ACC` | Azure Portal → Static Web App ACC → Manage deployment token |
 | `AZURE_STATIC_WEB_APPS_API_TOKEN_PROD` | Azure Portal → Static Web App PROD → Manage deployment token |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN_PA_DEMO_ACC` / `_PROD` | Azure Portal → the PA-demo Static Web App → Manage deployment token |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN_PUBLIC_SITE_ACC` / `_PROD` | Azure Portal → the public-site Static Web App → Manage deployment token |
+
+The **backend** deploys over OIDC and therefore needs no secret at all. What it
+reads are repository *variables*:
+
+| Variable name | Value |
+|---|---|
+| `AZURE_CLIENT_ID_ACC` / `AZURE_CLIENT_ID_PROD` | The app registration with a federated credential for that App Service — one per tier, each scoped to its own |
+| `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` | The tenant and subscription the App Services live in |
+
+!!! warning "`AZURE_WEBAPP_PUBLISH_PROFILE_ACC` / `_PROD` are dead"
+    Those secrets date from March 2026 and nothing reads them. **SCM basic auth
+    is disabled on both App Services**, so a publish-profile deploy would be
+    rejected — which is why the backend authenticates with OIDC instead.
+
+!!! danger "Store a token with `scripts/set-secret.sh`, not by piping"
+    Piping a token straight out of the Azure CLI into `gh secret set` stores a
+    **trailing newline** — 120 bytes where the key is 119. Both halves are the
+    documented way to do their job; the composition is what goes wrong, and it
+    cost the public site its first production deploy. The failure named nothing:
+    every step passed, then *"An unknown exception has occurred"*.
+
+    A secret's value cannot be read back, so nothing can confirm or deny a stray
+    newline afterwards. The script strips whitespace, refuses an empty result,
+    and reports the byte count it stored.
 
 ---
 

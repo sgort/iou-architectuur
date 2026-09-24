@@ -19,11 +19,19 @@ component: RONL Business API
 
 ---
 
+## How a promotion reaches production
+
+---
+
 ## The two scanning workflows
 
 ---
 
 ## Node runtime
+
+---
+
+## The package-manager cooldown
 
 ---
 
@@ -47,7 +55,7 @@ component: RONL Business API
 
 ---
 
-## Required GitHub secrets
+## Required GitHub secrets and variables
 
 ---
 

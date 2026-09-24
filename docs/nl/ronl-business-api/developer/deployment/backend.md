@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Backend (Azure App Service)
 
 !!! info "Documentatie in ontwikkeling"
@@ -15,6 +19,10 @@
 
 ---
 
+## How a promotion reaches production
+
+---
+
 ## Build and deployment steps
 
 ---
@@ -23,22 +31,8 @@
 
 ---
 
-## Approving a PROD deployment
-
----
-
-## Post-deployment health check
-
-# Retries up to 5 times with 10-second intervals
-
-# Expected: 200
+## Post-deployment verification
 
 ---
 
 ## Manual deployment
-
-# Build
-
-# Prepare package (same structure as CI)
-
-# Deploy using Azure CLI

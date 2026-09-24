@@ -137,13 +137,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.09.9** · *September 2026*
+-   **⚙️ RONL Business API — v2026.09.11** · *September 2026*
 
     ---
 
-    **Every deployed process shows, and a red suite now blocks the merge**
+    **A promotion is one ordered run, and the backend finally deploys itself**
 
-    The [public process library](ronl-business-api/features/procesbibliotheek.md) had been filtering on a status value the source database cannot hold, so production showed nothing at all; visibility now follows board ownership, the status is displayed rather than hidden, and the escape hatch that had been standing in for it is gone. In CI, the build and test checks [became required on `acc`](ronl-business-api/developer/cicd.md) — which took a mechanism as well as a ruleset, since a workflow filtered out at its trigger never reports the check it owes. A 14-day package-manager cooldown, every job on `ubuntu-24.04` and `.nvmrc` at 22.23.2 closed three more of [ICTU's recommendations](contributing/ictu-dependency-guideline.md). Before that, v2026.09.8 [accepted ValidSign's callbacks](ronl-business-api/developer/validsign-signing.md) in the form ValidSign actually sends — the first live signing showed every one being rejected — and a new R2.1 project [is now named when it starts](ronl-business-api/user-guide/infra-board.md) instead of appearing as a dash.
+    A push to `main` used to fire four deploy workflows at once with nothing sequencing them, and the frontends reliably won — so a new site could call a backend that did not yet serve its routes, and the public site would prerender that 404 straight into its deployed output. [A single promotion workflow](ronl-business-api/developer/deployment/backend.md#how-a-promotion-reaches-production) now decides what changed, deploys the backend alone, and releases the three sites only once it is serving the promoted commit. The backend [deploys from CI at last](ronl-business-api/developer/cicd.md), over OIDC and installing from the lockfile rather than re-resolving every version range on a developer's machine — and it proves itself afterwards by polling `/v1/health` until the running build is the commit just shipped. Pull-request previews became [opt-in and useful in the same release](ronl-business-api/developer/cicd.md#pull-request-previews): one is created only when someone asks for it, eight that had leaked are now reported by a check, and a preview can reach the acceptance backend instead of only proving that static pages render. On the public site, a rule's concepts [now say which side of the rules they sit on](ronl-business-api/user-guide/public-site.md) — what the rules need, and what they determine.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

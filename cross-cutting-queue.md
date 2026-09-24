@@ -189,6 +189,238 @@ pass. Eleven of its commits are typed `ci` or `chore`.
     changes `.nvmrc` alone.
 
 
+### 24 September 2026 — RONL Business API v2026.09.9 → v2026.09.11
+
+Read at `origin/main` = `86af73e` (v2026.09.11, promoted 23 September). `origin/acc` is
+two commits further on with no version bump. Every fact below was checked against source
+at that commit — the workflow YAML, `scripts/promotion-targets.sh`, `SECURITY-PIPELINE.md`,
+`config.ts`, and the GitHub Actions and rulesets APIs — not against the prose it bears on,
+and not against the changelog's own wording.
+
+Twenty-eight commits across the two releases. Twenty-five have no component surface at
+all: this is a CI, deployment and supply-chain release, so the cross-cutting half is the
+larger one.
+
+1. **Production deployment is promotion-driven. A push to `main` no longer deploys
+   anything directly.**
+   Evidence: `promote-to-production.yml` at `86af73e` — `on: push: branches: [main]` with
+   **no `paths:` filter, deliberately** (*"a trigger filter would mean the decision is made
+   by not running at all"*), plus `workflow_dispatch` with `dry_run` defaulting to true.
+   Five jobs: `changes` → `backend` → `frontend` / `pa-demo` / `public-site` in parallel.
+   The four `azure-*-prod.yml` files now carry `workflow_call:` + `workflow_dispatch:` and
+   **no `push:`** — verified file by file.
+   The sites run on `contains(fromJSON('["success","skipped"]'), needs.backend.result)`: a
+   skipped backend and a successful one both mean production serves what they expect,
+   while `cancelled` or `failure` means nobody knows. Every job also carries
+   `needs.changes.result != 'success' || needs.changes.outputs.<t> == 'true'` with
+   `!cancelled()`, so a failed range lookup deploys everything rather than granting a free
+   pass.
+   **This is invisible in an Actions listing.** Reusable-workflow calls are jobs inside the
+   caller's run, so `86af73e` shows only Semgrep, Supply-chain audit and *Promote to
+   Production #2*. Run `35891822589` holds all four deploys, every one concluded `success`.
+   Bears on: `development-workflow/overview.md` (how a release lands — the pipeline's shape
+   changed), `branch-protection.md`, `controls.md`.
+
+2. **`controls.md`'s stated premise for "no `main` requires a build check" is now wrong for
+   this repository, though its conclusion holds.**
+   Evidence: `controls.md:73–76` reads *"The production deploy workflows kept their
+   trigger-level path filters, and a required check that never reports…"*. The RONL
+   Business API's four have **no trigger-level path filters at all** any more — the filters
+   moved into `scripts/promotion-targets.sh`. The conclusion (`main` requires `audit` alone)
+   is still right, for the older reason that none of the four ever had a `pull_request`
+   trigger. Correct the premise; do not disturb the conclusion.
+   Bears on: `controls.md`.
+
+3. **A control gap the source names itself: if the promotion workflow breaks, nothing
+   deploys, silently.**
+   Evidence, quoted from `promote-to-production.yml`'s header: *"CONSEQUENCE WORTH KNOWING:
+   the four deploy workflows no longer trigger on a push to main. If THIS workflow breaks,
+   nothing deploys — silently, because `main`'s ruleset requires only `audit` and these are
+   not required checks. The escape hatch is that all four keep `workflow_dispatch`."*
+   Confirmed against the ruleset: `main promotion gate` requires `audit` only
+   (`gh api repos/sgort/ronl-business-api/rulesets/23019967`).
+   Worth recording as a named residual risk rather than being discovered. Bears on:
+   `controls.md`, `branch-protection.md`.
+
+4. **`acc` is deliberately unchanged, and the reason is a ruleset constraint worth
+   documenting once.**
+   Evidence: the same header — *"ACC IS NOT CHANGED HERE… its workflows also carry the
+   `pull_request` trigger whose JOB NAMES the `acc supply-chain gate` ruleset requires by
+   name."* A reusable workflow's check renames every required context, so converting the
+   acceptance four would silently detach four required checks. Confirmed:
+   `acc supply-chain gate` requires `audit`, `scan`, `build`, `Build and Deploy ACC
+   Frontend`, `Build and Deploy ACC PA Demo`, `Build and Deploy ACC Public Site`.
+   **Do not describe `acc` as promotion-driven.** Bears on: `branch-protection.md`,
+   `code-standards.md`.
+
+5. **The RONL Business API's CI now deploys its backend — this falsifies a sentence built
+   around it being the one that does not.**
+   Evidence: `e3c7dd6`. `azure-backend-prod.yml` ends in `azure/login` (OIDC) →
+   `az webapp deploy` → a liveness loop → a `build.sha` verification loop;
+   `azure-backend-acc.yml` has the same four steps gated
+   `if: github.event_name != 'pull_request'`.
+   `code-standards.md:170–172` currently reads *"Unlike the other two, **the Linked Data
+   Explorer's CI does deploy its backend** — the backend workflows end in
+   `azure/webapps-deploy`, where RONL Business API's end in an uploaded artifact that a
+   developer deploys by hand."* Also `code-standards.md:137`, the table row *"Builds and
+   uploads a deployment artifact; it does not deploy"*.
+   Note the mechanism differs from the Linked Data Explorer's and the difference is
+   load-bearing: **SCM basic auth is disabled on both of these App Services**
+   (`basicPublishingCredentialsPolicies/scm` `allow=false`, measured 2026-09-20), so a
+   publish-profile deploy would be rejected. That also retires the v2026.08.34 conclusion
+   these pages inherited, *"OIDC is not needed"*.
+   Bears on: `code-standards.md`, `supply-chain.md`, `controls.md`.
+
+6. **`supply-chain.md`'s backend rows and its two open issues.**
+   Evidence: `supply-chain.md:116` — *"| Backend deployed by CI | n/a | **no** — script from
+   a developer machine¹ | **yes** — `azure/webapps-deploy` |"*, and `supply-chain.md:639–641`
+   — *"**The RONL Business API's backend is the one that did not move.** Its deploy scripts
+   still install from a developer machine without the lockfile ([#34])."*
+   Issues **#34 and #35 are both closed**. Upstream `SECURITY-PIPELINE.md` was rewritten in
+   this gap and now says: *"The CI workflows' 'Prepare deployment package' step used to
+   carry the same pattern; it now installs from the root lockfile in a staging copy,
+   filtered to the backend workspace with production dependencies only"*, and — the part
+   that must not be lost in the correction — ***"The scripts remain, and so does the
+   exception — narrowed… The exception closes when they are retired, not when the workflow
+   lands."***
+   Also `controls.md:103`, which lists *"the RONL Business API's hand-deployed backend"*
+   among what R2–R4 do not reach. That is now the break-glass path rather than the normal
+   one.
+   Bears on: `supply-chain.md`, `controls.md`, `ictu-dependency-guideline.md` (R2–R4).
+
+7. **Counted claims: workflows, jobs and pinned references all moved.**
+   Evidence, counted at `86af73e`: **11 workflow files, 22 jobs**, every `runs-on`
+   `ubuntu-24.04`, zero `ubuntu-latest` (counted file by file; previously 10 and 17).
+   Upstream `SECURITY-PIPELINE.md` now reads **"34 `uses:` references across 11 workflows,
+   all 34 digest-pinned"**, verified on `acc` at `65850f9`, 22 September 2026, with a new
+   row `azure/login (×2)` at `a641126d1b8aa4d1fa005f4f92df94a3a4c4c906` (v3.1.0, Renovate)
+   and `actions/checkout` moving from ×10 to ×11.
+   Pages that count this: `code-standards.md:131` (*"**ten** workflows"*),
+   `supply-chain.md:110` (*"31 / 31"*), `supply-chain.md:683–684` (*"**31 `uses:`
+   references across ten workflows**"*), `ci-posture-deck.md:204` (*"the RONL Business API
+   31 of 31 across ten"* — a deck transcript, so decide whether to re-state or date it),
+   and `ictu-dependency-guideline.md`'s job-count arithmetic.
+
+8. **The production path filters live in a script now, and it is runnable.**
+   Evidence: `scripts/promotion-targets.sh` at `86af73e`. Reads changed paths on stdin,
+   writes `<target>=true|false` per target, appends to `GITHUB_OUTPUT` when set. `--all` is
+   the fail-safe for the three cases that cannot produce a range: a `workflow_dispatch`
+   (no `before`), a first or force push (all-zero `before`), and a `before` the clone cannot
+   resolve. The diff is taken `--no-renames`, because with rename detection a file moved
+   *out of* `packages/backend/` would not deploy the backend it left.
+   Two design notes worth carrying: it is **a file rather than a `run:` block** so the
+   decision can be run locally against a real commit range, and
+   **`promote-to-production.yml` is in none of the four patterns** — each deploy workflow
+   lists itself so a change to it is exercised by running it, but the promotion runs on
+   every promotion already, so listing it would mean editing a comment in it redeployed all
+   four sites.
+   Bears on: `code-standards.md` (path filters and what each workflow runs),
+   `development-workflow/overview.md`.
+
+9. **Secrets in a called workflow: named, never inherited — and the publish-profile
+   secrets are dead.**
+   Evidence: `promote-to-production.yml` passes the backend **no secrets at all** (OIDC via
+   `vars.AZURE_CLIENT_ID_PROD`, `vars.AZURE_TENANT_ID`, `vars.AZURE_SUBSCRIPTION_ID` —
+   repository *variables*, which need no passing) and each site exactly its one Static Web
+   Apps token. Its comment: *"`secrets: inherit` would have handed each site workflow the
+   Keycloak VM's SSH key and the Semgrep token to deploy one static site."* Permissions are
+   granted on the call because a called workflow cannot hold more than its caller.
+   `AZURE_WEBAPP_PUBLISH_PROFILE_ACC` survives only inside a comment describing it as
+   *"The unused … secret from 2026-03-01"*. A least-privilege example worth having on a
+   cross-cutting page.
+   Bears on: `supply-chain.md` (least privilege), `code-standards.md`.
+
+10. **A supply-chain hazard documented upstream and on no page here: how a deploy
+    credential reaches CI is not checked.**
+    Evidence: the new `SECURITY-PIPELINE.md` section — piping an Azure token into
+    `gh secret set` stores a trailing newline, *"120 bytes where the key is 119. Both halves
+    are the documented way to do their job; the composition is what goes wrong. It cost the
+    public site's first production deploy on 12 September 2026, and the failure named
+    nothing."* A secret's value cannot be read back, so no check can confirm this after the
+    fact and none is proposed; `scripts/set-secret.sh` (`3636ecd`) removes the trap at the
+    point of use — stdin with a sentinel, whitespace stripped, empty refused, byte count
+    reported, value never echoed, never an argument, never written to a file.
+    Bears on: `supply-chain.md` (*"What the audit cannot see"*).
+
+11. **Preview environments: opt-in, and able to reach the acceptance backend.**
+    Evidence: `32ddf67` — a preview is created only when the pull request changed something
+    other than a manifest **and** carries the `preview` label; `labeled` is in the trigger
+    types. Both conditions gate the **deploy step, not the job**, because
+    `build_and_deploy_job` is the only place three packages are linted, type-checked,
+    tested and built on a pull request, and a skipped job reports success — gating the job
+    would have passed the required check having tested nothing. The two decisions fail safe
+    in opposite directions deliberately: the build filter errs towards building, the
+    preview decision withholds.
+    Evidence: `64d8f3f` — `CORS_ORIGIN` is matched by exact equality, so `origin` became a
+    function matching on the app's **stable slug** (`CORS_PREVIEW_SLUGS`); a
+    `*.azurestaticapps.net` pattern would have let any Azure Static Web App in the world
+    make credentialed cross-origin requests to the tier. Never honoured in production,
+    enforced in code, and keyed on the **deployment** environment rather than `NODE_ENV` —
+    acceptance deliberately runs `NODE_ENV=production`.
+    Evidence: `ae83054` — `scripts/check-previews.sh` reports previews that outlived their
+    pull request. GitHub does not run `pull_request` workflows while a pull request has a
+    merge conflict, closing included; eight previews leaked across three apps on
+    12 September and were still standing on 20 September. It finds apps by `repositoryUrl`
+    rather than by workflow filename, reads every subscription, proves the session with a
+    real ARM call rather than `az account show` (which reads cached state and succeeds
+    against a token that expired days ago), fails on a subscription it cannot read and on
+    finding no apps at all, and **never deletes**.
+    Bears on: `supply-chain.md`, `code-standards.md`, `controls.md`.
+
+12. **The release process gained a test step.**
+    Evidence: `2d1cf27`; the diff of `.claude/commands/bump-release.md` between `10bcf8b`
+    and `86af73e` (+81 lines). Step 6 now runs root `npm test` — *"step 4 edited source
+    files, and some tests read them… Lint and Prettier both read a `package.json` as data.
+    A test can read it as input, and then a version bump is a behaviour change."* Step 7's
+    report must now state format, lint and test clean with the suite's counts, *"because a
+    step nothing reports on is a step that gets skipped."* The failure that forced it is
+    named in the file: v2026.09.10 bumped `packages/pa-cockpit` for the first time while its
+    own scaffold test still asserted `toBe('1.0.0')`, and the release was committed, pushed
+    and opened as a pull request before anything said otherwise.
+    Bears on: `development-workflow/overview.md` (how a release lands).
+
+13. **`zizmor.yml`'s Node moved to `24.21.0`, and the cooldown produced its first measured
+    confirmation.**
+    Evidence: `417cd53`; `zizmor.yml` line 57 at `86af73e` reads `node-version: '24.21.0'`.
+    Deliberately not shared with `.nvmrc`, which stays `22.23.2` and which the App Service
+    plans match: `renovate@44.50.3` declares `engines.node ^24.11.0`, and npm accepts a
+    mismatch with `EBADENGINE` rather than refusing — so before that pin the validator ran
+    unsupported and green.
+    On the cooldown: `d7f6231` moved 62 packages and **every version it introduced was at
+    least 14 days old**, measured against the npm registry's own publish dates. Both commits
+    make the same methodological point, which belongs on a cross-cutting page:
+    ***the `renovate/stability-days` status is not evidence*** — it read *"Updates have not
+    met minimum release age requirement"* on branches that were in fact compliant, because
+    `lockFileMaintenance` is flagged rather than evaluated. Read the measurement.
+    Bears on: `supply-chain.md`, `dependency-scanning.md`, `ictu-dependency-guideline.md`
+    (R2–R4, and the `.nvmrc` / `zizmor` runtime rows — note this is the *opposite* movement
+    to the Linked Data Explorer's `.nvmrc` bump recorded above, so the two entries must be
+    reconciled rather than applied independently).
+
+14. **A plugin was uninstalled.**
+    Evidence: `da31955` removes the understand-anything plugin's leftovers —
+    `.understandignore`, a tracked file predating the ignore rule, and 736K of generated
+    artefacts — *"The plugin has been uninstalled locally, so nothing generates or reads
+    these files any more."*
+    **Do not write the page from this entry.** Re-derive from
+    `~/.claude/plugins/installed_plugins.json` and `~/.claude/settings.json` →
+    `enabledPlugins`, and re-count `grep -c '^## ' ~/.claude/CLAUDE.md` while there.
+    Bears on: `development-workflow/working-with-claude-code.md`,
+    `development-workflow/skills-and-boundaries.md`.
+
+15. **Tooling, not documentation: `stamp-staleness.py` cannot recognise a promotion run.**
+    Evidence: `.claude/skills/iou-document-patch/scripts/stamp-staleness.py` —
+    `DEPLOY_WORKFLOW = re.compile(r"deploy|static web apps", re.IGNORECASE)`, matched
+    against a run's **name**. *Promote to Production* matches neither. Two consequences,
+    both live now that this component's `build` points at run `35891822589`: `check_build`
+    emits the warning *"'Promote to Production' does not look like a deploy workflow"*
+    (a warning, not a problem — the four hard checks on sha, run number, event and
+    conclusion all pass, so the script still exits 0), and a future `verified:` stamp at a
+    promoted commit will warn *"triggered no successful deploy run on GitHub"* although
+    four deploys succeeded inside that run.
+    Not a claim on any page. Raise it with the weekly pass as a change to the skill.
+
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

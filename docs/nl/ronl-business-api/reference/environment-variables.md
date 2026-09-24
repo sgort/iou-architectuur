@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Omgevingsvariabelen
 
 !!! info "Documentatie in ontwikkeling"
@@ -49,7 +53,7 @@
 
 ---
 
-## GitHub repository secrets
+## GitHub repository secrets and variables
 
 ---
 

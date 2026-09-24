@@ -9,9 +9,45 @@ workspace package, imported by both the caseworker frontend and the public
 demo. It exists so that one cockpit renders in two applications without either
 one owning it.
 
-!!! info "Measured against `acc`"
-    87 source files, package version `1.0.0`, verified on `acc` at `1e7fb19`,
-    29 August 2026.
+!!! info "Measured against `main`"
+    89 source files — 46 source, 43 test — package version `2026.09.10`,
+    verified on `main` at `86af73e`, 23 September 2026.
+
+---
+
+## Its version is a release version, not a pin
+
+The package sat at `1.0.0` for 49 commits, on the reasoning that something
+compiled into two applications which carry their own CalVer needs no version of
+its own. That was overruled in v2026.09.9, and **v2026.09.10 is the first
+release that actually moved it** — a release that included a pa-cockpit change,
+which is exactly the case the rule predicted.
+
+The reasoning for the bump is worth keeping, because the pin's reasoning was not
+wrong so much as incomplete. The package is `private: true` and consumed as
+`"@ronl/pa-cockpit": "*"`, so its version **constrains nothing at install
+time**. What it does is record *which* pa-cockpit code a frontend or pa-demo
+release contains — for the lockfile, and for the SBOM, audit and provenance
+tooling that reads it. Pinned at `1.0.0` it said nothing, while
+`packages/shared` moved for a single devDependency range.
+
+So the rule is: **a release version, moved only by a release that includes a
+`packages/pa-cockpit/**` change, and left to lag at the last one that did.**
+
+!!! warning "The scaffold test pins the rule, not a literal"
+    `src/scaffold.test.ts` asserts the version *matches* a CalVer shape rather
+    than equalling a string. It used to assert `toBe('1.0.0')`, and when the
+    rule changed the command file was updated and this file was not — so the
+    first release to include a pa-cockpit change failed here rather than
+    shipping. Do not re-pin the assertion to a literal; that is the change this
+    test exists to catch.
+
+    It is also the reason `/bump-release` now runs the suite before it commits:
+    format, lint and type-check were all clean, and the release was committed,
+    pushed and opened as a pull request before anything said otherwise. Because
+    pa-cockpit has no deploy workflow of its own, its suite runs in CI only
+    inside **Build and Deploy ACC Frontend** — `audit`, `scan`, `build` and the
+    PA demo deploy were all green beside the one red check.
 
 ---
 
