@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # DSO-integratie
 
 !!! info "Documentatie in ontwikkeling"
@@ -11,13 +15,15 @@ LDE integreert met het Digitaal Stelsel Omgevingswet (DSO) zodat ontwerpers BPMN
 De presentatie [DSO Viewer APIs](dso-viewer-apis-deck.md) vat dit samen in twaalf dia's en is
 als PDF te downloaden.
 
-## De vijf DSO-API's achter de viewer
+## De zes DSO-API's achter de viewer
 
 De frontend benadert het DSO nooit rechtstreeks. Elk verzoek loopt via de LDE-backend, die de
-DSO-proxy op `/v1/dso` aanbiedt en de `x-api-key` server-side toevoegt. Vijf afzonderlijke
+DSO-proxy op `/v1/dso` aanbiedt en de `x-api-key` server-side toevoegt. Zes afzonderlijke
 DSO-API's voeden de viewer: Stelselcatalogus (begrippen), RTR Gegevens (activiteiten),
-Zoekinterface (zoeken naar werkzaamheden), Opvragen Werkzaamheden (versiedetail) en Toepasbare
-Regels Uitvoeren Gegevens (regelmetadata en STTR-bestanden).
+Zoekinterface (zoeken naar werkzaamheden), Opvragen Werkzaamheden (versiedetail), Toepasbare
+Regels Uitvoeren Gegevens (regelmetadata en STTR-bestanden) en Omgevingsdocumenten Presenteren
+(Ozon — regelingen, annotatiegrafiek en documentonderdelen achter het activiteitendossier,
+sinds v2026.09.6).
 
 ## DSO-omgevingsschakelaar
 
@@ -41,9 +47,9 @@ geometrie bestaat wel in de backend, maar wordt door geen enkel scherm gebruikt.
 ### Onderliggende activiteiten — één klik, `1 + N` verzoeken
 
 De RTR levert onderliggende activiteiten als kale links zonder omschrijving. Het detailpaneel
-haalt daarom elke onderliggende activiteit apart op — parallel, één verzoek per kind, bovenop
-het verzoek voor de activiteit zelf. Zonder cache en zonder limiet op het aantal gelijktijdige
-verzoeken.
+haalt daarom elke onderliggende activiteit apart op — één verzoek per kind, bovenop het
+verzoek voor de activiteit zelf. Sinds v2026.09.6 gaan er hooguit vijf tegelijk uit, zodat de
+namen in golven verschijnen, en cachet de backend het activiteitendetail vijf minuten.
 
 ## Toepasbare regels → LDE-assets (Fase 4)
 

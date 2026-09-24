@@ -63,13 +63,14 @@ The badges tell you ahead of time which downstream LDE assets the activity can s
 
 5. Click an activity card to open the detail panel.
 
-!!! note "Activities with many children take a moment to open"
+!!! note "Activities with many children fill in progressively"
     The RTR hands LDE only a list of links for an activity's child activities, with no names
-    attached, so the panel looks each child up individually — one request per child, fired in
-    parallel, on top of the request for the activity itself. Opening an activity with 23
-    children means 24 calls. Children whose lookup fails or that come back nameless are shown
-    as their raw URN instead of a name; they are still clickable. Nothing is cached, so
-    re-opening the same activity fetches it all again.
+    attached, so the panel looks each child up individually — one request per child, on top of
+    the request for the activity itself. Opening an activity with 23 children means 24 calls.
+    They go out five at a time rather than all at once, so the names appear in waves as each
+    child resolves. Children whose lookup fails or that come back nameless are shown as their
+    raw URN instead of a name; they are still clickable. The backend remembers each activity
+    for five minutes, so re-opening one you have just visited is quick.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: Activities tab with gemeente Lelystad selected in the Level and Authority dropdowns, todays date shown in the date input, and a list of activity cards beneath — each card has the omschrijving, validity from-date, and small green pill badges for the rule types present, with the Bed & Breakfast starten card highlighted to show it has both Conclusie and Indieningsvereisten](../../assets/screenshots/linked-data-explorer-dso-activities-with-badges.png)
@@ -121,6 +122,54 @@ Use this to turn a DSO activity's *toepasbare regels* into LDE assets. Open the 
 
 ---
 
+## Workflow 5 — Read an activity's quality profile
+
+Use this to see how legible a published activity's rules actually are — which decisions and
+inputs are named in words, which are GUIDs, and whether the reasoning can be recovered from
+what the authority published.
+
+1. Select an activity in the **Activities** tab (Workflow 2 or 3).
+2. Open the **Quality Profile** tab. The selection travels with you — the activity, the
+   validity date and the authority all stay as you left them.
+3. The first open fetches the dossier, which is the most expensive call the viewer makes: it
+   fans out across three DSO APIs. It is then remembered for as long as the tab is open, so
+   going back and forth is instant.
+
+**What you are reading.** Two separate figures, never one grade:
+
+- **Legibility** — how readable the rules are as they stand.
+- **Recoverability** — where they are not, how far the dossier could recover the reasoning
+  from the published material.
+
+There is deliberately no overall score. The point of the profile is to compare activities and
+authorities, and a single grade hides which of the two is weak.
+
+Each decision and input name is marked as **semantic** (it says what it is),
+**opaque-resolvable** (a GUID, but the dossier found what it refers to) or **opaque-dangling**
+(a GUID that resolves to nothing). Expand an item to see the evidence: its class, the input's
+own question text, and the article in the legal source it came from.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Quality Profile tab in Scorecard layout for a selected activity, showing the Conclusie and Indieningsvereisten rule sets in separate blocks with their own decision-naming and input-naming counts, a breakdown by naming class, and an expanded evidence row showing an input's question text and the legal-source article it came from](../../assets/screenshots/linked-data-explorer-dso-quality-profile-scorecard.png)
+  <figcaption>Scorecard layout — the two rule sets side by side, never summed</figcaption>
+</figure>
+
+!!! important "Conclusie and Indieningsvereisten are never added together"
+    They are always shown as two separate rule sets. If one is absent, the tab says so rather
+    than showing zeros — zeros would read as *"we measured it and there is nothing"*, which is
+    a different statement.
+
+4. **Compare** puts a second authority in its own column beside the first. **Clear compare**
+   sits next to **Dossier .md** while a comparison is active.
+5. **Dossier .md** downloads the whole dossier — legal source, annotations, decision criteria,
+   submission requirements and the profile — as a Markdown document you can circulate.
+
+The compact version of the same figures appears in the activity detail panel, summing both
+rule sets into one line each. That is a teaser pointing at this tab, not a score, and it only
+ever shows figures already fetched — selecting an activity never triggers the dossier call.
+
+---
+
 ## Common situations
 
 **An activity card has only Indieningsvereisten — no Conclusie.** That activity has questionnaire logic but no full decision model. You can still link it to a BPMN subprocess and generate a form scaffold from it, but there is no DMN to extract.
@@ -133,10 +182,14 @@ Use this to turn a DSO activity's *toepasbare regels* into LDE assets. Open the 
 
 **Loading an authority gives an empty list.** Either the authority has no activities for that date, or the date is outside the validity windows of all activities. Try a recent date close to today.
 
+**The Quality Profile tab says the activity groups others.** That activity is a taxonomy node: it carries no rules of its own, so its dossier is correctly empty. The tab lists its child activities as links — open one and you get that child's own profile. *Rijksmonumentenactiviteit*, for example, points at `RijksmonArchMonument` and `RijkmonMonument`, which each carry a Conclusie and Indieningsvereisten.
+
+**The profile shows a rule set as absent rather than as zero.** Nothing failed. The activity simply has no rules of that type published, and the tab distinguishes that from a rule set it measured and found empty.
+
 ---
 
 ## Related documentation
 
-- [DSO Integration](../features/dso-integration.md) — overview of the three APIs and what each enables
+- [DSO Integration](../features/dso-integration.md) — overview of the six APIs and what each enables
 - [DSO Integration Phase Plan](../features/dso-integration-phase-plan.md) — current phase status and test anchors
 - [BPMN Modeler — DSO activiteit linkage](../features/bpmn-modeler.md#dso-activiteit-linkage)

@@ -4,33 +4,44 @@ component: RONL Business API
 
 # Public site suite
 
-`packages/public-site`, Vitest with jsdom. **32 files · 231 tests · all
-passing · 15.67s.**
+`packages/public-site`, Vitest with jsdom. **32 files · 235 tests · all
+passing · 29.21s.**
 
 The public site is the auth-free search and rule-catalogue package. Measured on
-**20 September 2026** on `main` at `10bcf8b` (v2026.09.9) with
+**24 September 2026** on `main` at `86af73e` (v2026.09.11) with
 `npm test --workspace=@ronl/public-site`, coverage included, after a clean
 `npm ci` in a separate clone on Node 24.14.1 / npm 11.11.0. The suite has grown
 in every recent window — 30 files and 204 tests at v2026.09.5, 31 and 225 at
-v2026.09.7, **32 and 231 now** — the file added this time being
-`src/components/StatusTag.test.tsx`.
+v2026.09.7, 32 and 231 at v2026.09.9, **32 and 235 now**. This is the first of
+those windows to add no file: the four new tests are all in
+`src/pages/Detail.test.tsx`, which grew by 86 lines to **25 tests** alongside
+changes to `Detail.tsx`, `lib/api.ts` and both i18n dictionaries.
 
-Coverage is **95.82% statements · 96.45% branches · 94.89% functions · 96.33%
+Coverage is **95.92% statements · 96.31% branches · 95.07% functions · 96.41%
 lines**, and the package passes the per-file 80% branch floor that its
 `vite.config.ts` enforces rather than merely records: no file in it is below the
 line.
+
+!!! note "Three measures up, branches fractionally down"
+    Against v2026.09.9 — 95.82 / 96.45 / 94.89 / 96.33 — statements, functions
+    and lines each gained while branches gave up 0.14 of a point. `Detail.tsx`
+    is at 100% statements and 97.84% branches after the change, so nothing
+    regressed; what moved the package figure is `lib/api.ts`, which gained
+    branch surface it is not yet fully exercising (83.78% branches, its lowest
+    measure). This is the ordinary shape of adding a guarded code path and
+    testing its main case first.
 
 ---
 
 ## Inventory
 
-**Re-derived on 20 September 2026** from the run's own JSON output. Both numeric
+**Re-derived on 24 September 2026** from the run's own JSON output. Both numeric
 columns are from that run: the Files column accounts for all **32** files and
-the Tests column sums to **231**.
+the Tests column sums to **235**.
 
 | Area | Files | Tests | Covers |
 |---|---:|---:|---|
-| `src/pages` | 16 | 133 | Includes a full `herkomst/` provenance-explorer sub-area (`HerkomstExplorer`, `HerkomstTrace`, `HerkomstChip`, `HerkomstBackground`, `herkomstConcepts`, `herkomstData`, `herkomstScroll`, `herkomstTrail` — 8 files) plus the generic `SectionIndex` / `Regelcatalogus` / `Results` / `Detail` / `Woordenboek` / static pages |
+| `src/pages` | 16 | 137 | Includes a full `herkomst/` provenance-explorer sub-area (`HerkomstExplorer`, `HerkomstTrace`, `HerkomstChip`, `HerkomstBackground`, `herkomstConcepts`, `herkomstData`, `herkomstScroll`, `herkomstTrail` — 8 files) plus the generic `SectionIndex` / `Regelcatalogus` / `Results` / **`Detail` (25)** / `Woordenboek` / static pages |
 | `src/lib` | 7 | 46 | `slug` (kept identical to the backend's slugifier by design), `useQueryState` (URL-backed filters), `search` (`highlight()`), `api` (the typed `/v1/public/*` client), `sectionHits` (`mapToHits()`), `prerenderedData` (the seeded-render reader), `buildInfo` |
 | `src/components` | 4 | 22 | `chrome` (7), `Footer` (6), **`StatusTag` (5, new in v2026.09.9)**, `TechDetails` (4) |
 | `scripts/` | 2 | 21 | `prerender.test.ts` (11 — `escapeHtml`, `buildSitemap`, `injectIntoShell`), `check-bundle.test.ts` (10 — the build-time gate that fails if any auth or telemetry string ships in the bundle) |
@@ -41,9 +52,9 @@ the Tests column sums to **231**.
 !!! success "Both columns are current, and they sum"
     Earlier versions of this page carried a Files column from one date and a
     Tests column from 19 August that summed to 134 against a measured 225, with
-    a warning attached. Re-derived from the runner, the columns now agree: 32
-    files, 231 tests. The largest correction is `src/pages`, which was recorded
-    at 71 and actually holds **133**.
+    a warning attached. Re-derived from the runner, the columns agree: 32
+    files, **235** tests. The largest correction was `src/pages`, recorded at 71
+    and actually holding 133 in September; it is **137** now.
 
 !!! info "`StatusTag` is the file this release added"
     `src/components/StatusTag.test.tsx` arrived with the `StatusTag.tsx` it
@@ -62,13 +73,15 @@ the Tests column sums to **231**.
     palette, and it is the kind of regression a snapshot test would happily
     wave through.
 
-Per-area coverage was also re-derived on 20 September and now reconciles to the
+Per-area coverage was also re-derived on 24 September and reconciles to the
 package total — see [Coverage](coverage.md#public-site-by-area).
 
 The statement-to-branch gap this package was once known for is gone. It was the
 widest of the five at 16.4 points, 86.82% statements against 70.39% branches.
-Today branches sit **above** statements — 96.45% against 95.82% — which is
-what a campaign against a per-file *branch* floor looks like once it lands.
+Today branches sit **above** statements — 96.31% against 95.92% — which is
+what a campaign against a per-file *branch* floor looks like once it lands. The
+margin has narrowed from 0.63 of a point to 0.39, which is worth watching
+rather than acting on.
 
 ---
 
@@ -81,17 +94,17 @@ preservation, a deep link with pre-applied filters, keyboard-only navigation,
 and three axe-core accessibility scans (home, results, a detail page) asserting
 no critical or serious violations.
 
-!!! warning "These figures date from 19 August and were not re-run for v2026.09.9"
+!!! warning "These figures date from 19 August and were not re-run for v2026.09.11"
     **Measured 19 August 2026 against v2026.08.19: 6 tests, 6 passed, 0 failed,
     0 flaky, 0 skipped, 8.9s.**
 
-    They were not re-measured on 12 September 2026 and were **not re-measured on
-    20 September 2026 either** — running them needs a live backend, and this
-    pass deliberately ran nothing that required the stack. The package has
-    changed underneath them twice since, so take the six as an inventory figure
-    rather than as a result. What *was* re-checked is the inventory itself:
-    `e2e/publiek.spec.ts` is still the one spec, and it still runs in no
-    workflow. These remain the oldest figures on these pages.
+    They were not re-measured on 12 September, not on 20 September, and **not on
+    24 September 2026 either** — running them needs a live backend, and each of
+    those passes deliberately ran nothing that required the stack. The package
+    has changed underneath them three times since, so take the six as an
+    inventory figure rather than as a result. What *was* re-checked at `86af73e`
+    is the inventory itself: `e2e/publiek.spec.ts` is still the one spec, and it
+    still runs in no workflow. These remain the oldest figures on these pages.
 
 Unlike the frontend suite, Playwright starts its own dev server for this package
 — `playwright.config.ts` declares a `webServer` running `npm run dev` on
@@ -102,8 +115,10 @@ fail on timeouts without it.
 
 Setting `E2E_BASE_URL` skips starting the local server entirely and points
 `baseURL` at an already-deployed site instead, which is how the suite is used
-for post-deploy verification against ACC. Re-read from the config on
-20 September 2026.
+for post-deploy verification against ACC. Re-read from the config at `86af73e`
+on 24 September 2026 and unchanged: `webServer` on `:5175`, no `globalSetup` of
+any kind, and the backend dependency stated in the config's own header comment
+rather than checked before the run.
 
 ---
 

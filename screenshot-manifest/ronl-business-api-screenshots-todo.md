@@ -1,16 +1,73 @@
 # RONL Business API — screenshots to capture
 
-!!! success "Nothing outstanding"
-    `ronl-business-api-public-site-processen.png`, requested by the
-    v2026.09.7 → v2026.09.9 sync, was captured the same day, 20 September 2026,
-    and lands in the same commit as the pages that reference it. `mkdocs build
-    --strict` passes with no warnings.
+!!! warning "One outstanding — requested 24 September 2026"
+    `ronl-business-api-public-site-begrippen-io.png`, for v2026.09.11. The
+    `<figure markdown>` block that embeds it is already on
+    `user-guide/public-site.md`, so a non-strict `mkdocs build` will warn about
+    exactly this one missing image until it is captured. That is expected: the
+    reference is correct, and this file tracks the capture.
 
-    Everything requested before this sync has been captured. The 12 September 2026
-    review, for v2026.09.6 and v2026.09.7, asked for none; the two before it — requested
-    by the v2026.09.5 sync — landed on 5 September 2026, the same day they were asked
-    for. The file is retained as the record of what each image shows and why it was
-    needed.
+    Everything requested before this sync has been captured.
+    `ronl-business-api-public-site-processen.png`, requested by the
+    v2026.09.7 → v2026.09.9 sync, was captured the same day, 20 September 2026.
+    The 12 September 2026 review, for v2026.09.6 and v2026.09.7, asked for none;
+    the two before it — requested by the v2026.09.5 sync — landed on
+    5 September 2026, the same day they were asked for. The file is retained as
+    the record of what each image shows and why it was needed.
+
+## Sync v2026.09.9 → v2026.09.11 — one NEW, several declined
+
+Reviewed on 24 September 2026 for **v2026.09.10** and **v2026.09.11**. Of the
+twenty-eight commits across the two releases, twenty-five have no user-visible
+surface at all — they are CI, deployment, supply-chain and end-to-end-harness
+work. One change is visible, and it earns a figure.
+
+| # | Status | File | Embedding page | What it must show | Trigger |
+|---|---|---|---|---|---|
+| 8 | ⬜ **NEW** | `ronl-business-api-public-site-begrippen-io.png` | `user-guide/public-site.md` | A **rule's detail page** at `publiek.open-regels.nl`, scrolled to its concepts, with the chips **divided into two headed groups** — *Invoer — gegevens die de regels nodig hebben (n)* and *Uitvoer — wat de regels bepalen (n)* — each heading carrying its own count | v2026.09.11 |
+
+### Why this one is worth capturing
+
+The change is a *layout* claim, and layout is what a screenshot settles and a
+sentence does not. Before v2026.09.11 a rule's concepts were one alphabetical
+row of chips; now they are two labelled groups with counts. Prose can say that;
+it cannot show a reader what to look for, or that the section heading and its
+total are unchanged above the split.
+
+### Capture notes
+
+- **Pick a service with concepts on both sides.** A service whose concepts all
+  fall on one side renders a single group, which is exactly the state this
+  figure exists to distinguish from — and a reader comparing it with their own
+  screen would conclude the feature had not shipped.
+- **Capture from production**, `https://publiek.open-regels.nl`. Production was
+  promoted to v2026.09.11 on 23 September 2026, so it serves this. The page
+  carries no environment badge, so an acceptance capture cannot be told apart
+  afterwards.
+- **Include the section heading and its total**, not only the chips. The point
+  is that the total is unchanged and the chips beneath it are now divided.
+- Any concept the graph leaves undirected appears in a third group. That is
+  correct behaviour and does not disqualify a capture — but a frame without one
+  is the cleaner illustration.
+
+### Declined, and why
+
+These are recorded so the next review does not re-open them.
+
+| Change | Why no figure |
+|---|---|
+| The promotion workflow (`3bc93f1`) | An Actions run is not product UI. A screenshot of it dates on the next run and says less than the ordering diagram already on `deployment/backend.md`. |
+| The backend deploying over OIDC (`e3c7dd6`) | No surface. The one reader-visible artefact is `/v1/health`'s `build` block, which is a JSON payload and belongs in prose. |
+| Preview opt-in by label (`32ddf67`) | The control is a GitHub label on a pull request, not part of either application. |
+| `check-previews` / `set-secret.sh` (`ae83054`, `3636ecd`) | Terminal scripts. Their output is a list of names and a byte count. |
+| The process-instance attribute on `TakenInbox` (`91195ac`) | Invisible by design — a `data-` attribute added so an end-to-end helper can resolve its own instances. It changes no pixel. |
+| Everything in the end-to-end harness | Test infrastructure, covered by `developer/testing/e2e.md`. |
+
+**No REPLACE rows.** Nothing in this gap alters a view an existing screenshot
+shows: the public process listing, the four boards, the login and form captures
+and the PA demo frames are all unaffected.
+
+---
 
 ## Sync v2026.09.7 → v2026.09.9 — one NEW, one declined
 

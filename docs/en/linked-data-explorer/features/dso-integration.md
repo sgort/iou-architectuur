@@ -11,17 +11,19 @@ The Linked Data Explorer integrates with the **Digitaal Stelsel Omgevingswet (DS
 A toggle in Settings selects between the **pre-production** and **production** DSO environments independently of the LDE environment.
 
 !!! tip "Prefer the short version?"
-    [DSO Viewer APIs — Slide Deck](dso-viewer-apis-deck.md) covers the same ground in twelve
-    slides, and is downloadable as a PDF.
+    [DSO Viewer APIs — Slide Deck](dso-viewer-apis-deck.md) covers the same ground in thirteen
+    slides, and is downloadable as a PDF. It was re-exported on **24 September 2026** against
+    v2026.09.6, so it carries the sixth API, the fourth tab and the dossier — but it remains a
+    dated review, and this page is the account that is kept current.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: DSO Explorer panel open in LDE with the three tabs visible at the top — Concepts, Works, Activities — the Activities tab active showing a list of activiteiten with omschrijving, validity dates, and rule-types-present badges, plus a date input and the Level and Authority dropdowns above the list](../../assets/screenshots/linked-data-explorer-dso-explorer-overview.png)
+  ![Screenshot: DSO Explorer panel open in LDE with the four tabs visible at the top — Concepts, Works, Activities, Quality Profile — the Activities tab active showing a list of activiteiten with omschrijving, validity dates, and rule-types-present badges, plus a date input and the Level and Authority dropdowns above the list](../../assets/screenshots/linked-data-explorer-dso-explorer-overview.png)
   <figcaption>DSO Explorer with the Activities tab active and an authority selected by level</figcaption>
 </figure>
 
 ---
 
-## The five DSO APIs behind the viewer
+## The six DSO APIs behind the viewer
 
 The frontend never calls DSO directly. Every request goes through the LDE backend, which
 mounts its DSO proxy at `/v1/dso` and attaches the `x-api-key` credential server-side. That
@@ -33,7 +35,7 @@ DsoExplorer.tsx  →  dsoService.ts  →  LDE /v1/dso/*  →  dso.service.ts  �
    (component)      (frontend client)     (proxy route)      (backend service)
 ```
 
-Five separate upstream APIs back the viewer:
+Six separate upstream APIs back the viewer:
 
 | # | API | Path | What it backs in LDE |
 |---|---|---|---|
@@ -42,12 +44,21 @@ Five separate upstream APIs back the viewer:
 | 3 | **Zoekinterface** | `toepasbare-regels/api/zoekinterface/v2` | Works tab — werkzaamheden search and autocomplete |
 | 4 | **Opvragen Werkzaamheden** | `toepasbare-regels/api/opvragenwerkzaamheden/v1` | Works tab — versioned werkzaamheid detail |
 | 5 | **Toepasbare Regels Uitvoeren Gegevens** | `toepasbare-regels/api/toepasbareregelsuitvoerengegevens/v1` | Applicable Rules panel — rule metadata and STTR download |
+| 6 | **Omgevingsdocumenten Presenteren (Ozon)** | `omgevingsdocumenten/api/presenteren/v8` | Quality Profile tab — regelingen search, the regeltekst annotation graph, and document-component text behind the activity dossier |
 
 Pre-production base URLs are `service.pre.omgevingswet.overheid.nl/publiek/<path>`; production
 is the same path on `service.omgevingswet.overheid.nl`. Each base URL is overridable per
 environment (`DSO_CATALOGUE_BASE_URL`, `DSO_RTR_BASE_URL`, `DSO_ZOEKINTERFACE_BASE_URL`,
-`DSO_OPVRAGEN_WERKZAAMHEDEN_BASE_URL`, `DSO_UITVOEREN_GEGEVENS_BASE_URL`, each with a `_PROD`
-counterpart), and the two environments carry their own keys (`DSO_API_KEY` / `DSO_API_KEY_PROD`).
+`DSO_OPVRAGEN_WERKZAAMHEDEN_BASE_URL`, `DSO_UITVOEREN_GEGEVENS_BASE_URL`, `DSO_OZON_BASE_URL`,
+each with a `_PROD` counterpart), and the two environments carry their own keys
+(`DSO_API_KEY` / `DSO_API_KEY_PROD`) — the same pair authenticates against Ozon.
+
+**Ozon joined in v2026.09.6**, because the chain an activity hangs from spans it: the legal
+source, the annotations on that source, and the text of the document components they point at
+all live in Omgevingsdocumenten Presenteren, not in the RTR. Its client (`ozon.service.ts`,
+against v8.5.2) carries three quirks the rest of the surface does not — the full OGC
+`Content-Crs` value, a slash-to-underscore transform on `identificatie`, and
+environment-specific toepasbare-regel ids.
 
 Common to every call: `Accept: application/hal+json` (STTR downloads ask for `application/xml`,
 autocomplete for `application/json`), a `DSO_TIMEOUT` of 15 000 ms enforced with an
@@ -77,6 +88,18 @@ Every `/v1/dso` route and the upstream call it makes:
 | `/v1/dso/toepasbare-regels/{id}/sttr` | GET | 5 Uitvoeren Gegevens | `GET /toepasbareRegels/{id}/sttrBestand` |
 | `/v1/dso/toepasbare-regels/{id}/dmn` | GET | 5 Uitvoeren Gegevens | `GET /toepasbareRegels/{id}/sttrBestand` + DMN extraction |
 | `/v1/dso/toepasbare-regels/{id}/form-scaffold` | GET | 5 Uitvoeren Gegevens | `GET /toepasbareRegels/{id}/sttrBestand` + form-js scaffold |
+| `/v1/dso/regelingen/zoek` | POST | 6 Ozon | `POST /regelingen/_zoek`, paged by `page.totalPages` up to 10 |
+| `/v1/dso/regelingen/{id}/annotaties` | GET | 6 Ozon | the regeling's annotation graph |
+| `/v1/dso/regelingen/{id}/documentstructuur/{wId}` | GET | 6 Ozon | the document component's own text |
+| `/v1/dso/activiteiten/{urn}/dossier` | GET | **2 + 5 + 6** | the composite route — see [Activity dossier and quality profile](#activity-dossier-and-quality-profile) |
+
+**One parameter, two formats.** `datum` is the one value that crosses the RTR/Ozon boundary,
+and the two expect different formats: the RTR takes `dd-MM-yyyy`, Ozon takes `YYYY-MM-DD`.
+No single value satisfies both, so the route keeps `dd-MM-yyyy` on its own surface and
+converts before calling Ozon. Until v2026.09.6 it forwarded the parameter unchanged, and the
+failure was silent: the annotations leg was caught into `provenance.failures` while
+`legalSource.available` stayed true, so a real regeling title rendered above *"0 juridische
+regels"*.
 
 Request parameters and response shapes for each route are in the
 [API Specification](../reference/api-specification.md).
@@ -213,13 +236,14 @@ If an activity is queried from the wrong DSO environment (e.g. trying to view a 
 The RTR returns child activities as bare HAL hrefs under `_links.onderliggendeActiviteiten`,
 with no `omschrijving` attached. The panel therefore cannot label them without asking the API
 about each child individually. As soon as the parent resolves, it fires **one additional
-activity-detail request per child, all in parallel**, purely to read each child's name:
+activity-detail request per child**, purely to read each child's name — but through a pool
+of five, so the requests leave in waves rather than all at once:
 
 ```
 GET /v1/dso/activiteiten/{parent-urn}       ->  1 request
   |- GET /v1/dso/activiteiten/{child-1}     -+
-  |- GET /v1/dso/activiteiten/{child-2}      |-  N requests, fired together
-  |- ...                                    -+
+  |- GET /v1/dso/activiteiten/{child-2}      |-  N requests, at most 5 in flight,
+  |- ...                                    -+   five workers off a shared cursor
 ```
 
 Every one of those is the same endpoint chain as the parent, so a single click costs `1 + N`
@@ -228,20 +252,179 @@ upstream RTR calls. `N` is whatever the parent declares — an activity such as
 
 What that means in practice:
 
-- The fan-out uses `Promise.allSettled`, so one failing child never breaks the panel or the
-  other lookups.
+- The fan-out keeps `Promise.allSettled` semantics, so one failing child never breaks the
+  panel or the other lookups — a child that fails simply never reports a name.
 - Children that resolve render as a named link; children that fail, or that come back without
   an `omschrijving`, fall back to the raw URN — still clickable, just unlabelled. This is why
   a panel can show a mix of names and URNs.
 - The `Child activities (N)` heading counts the *href list*, not the resolved names, so the
   count stays correct even when some lookups fail.
 - Each child request inherits the parent's `datum` and `env`.
+- Names appear **as each child resolves**, rather than when the slowest one does.
 - Names live in local component state, cleared and re-fetched on every `urn` / `datum` / `env`
-  change. There is **no cache and no concurrency cap**: navigating into a child issues its own
-  fan-out, and re-opening an activity you already visited fetches everything again.
+  change, so the frontend itself never caches across navigations. **The backend does.**
+  Activity detail — the call every child request makes — is TTL-cached for five minutes under
+  the named cache `dso-activiteit`, so re-opening an activity you already visited inside that
+  window costs the RTR nothing. Staleness there is accepted deliberately; `DELETE /v1/cache/clear`
+  is the escape hatch, and `GET /v1/cache/stats` reports across every registered cache.
+- The panel stops writing after teardown. Until v2026.09.6 the component had no cancellation
+  guard at all — no flag, no `AbortController` — so an in-flight fan-out could write names for
+  an activity the user had already left. That stayed latent while everything raced to finish
+  at once; a pool that drains over time would have made it real.
 
-This is the viewer's heaviest interaction and exists only to turn hrefs into readable names.
-If child counts grow or DSO rate limiting appears, it is the first thing to memoise.
+This was the viewer's heaviest interaction until the dossier arrived, and it exists only to
+turn hrefs into readable names.
+
+---
+
+## Activity dossier and quality profile
+
+**One call assembles an activity's whole chain** (v2026.09.6).
+`GET /v1/dso/activiteiten/{urn}/dossier` joins three upstream legs — the IMOW activity and its
+child URNs from the RTR, the legal source and its annotation graph from Ozon, and both rule
+sets from Uitvoeren Gegevens — into a single `Dossier`, and returns it with its
+`QualityProfile`. The join lives in exactly one service by design: a fan-out across three
+APIs should have one place that knows how the pieces fit together.
+
+### A legal source per bestuurslaag
+
+The lookup that finds an activity's legal source used to hardcode `regelingtype_003`, the
+gemeente instrument — so for any provincie, waterschap or rijk activity it searched for a
+document type that authority never publishes. Each level has its own:
+
+| Bestuurslaag | Core instrument |
+|---|---|
+| gemeente | Omgevingsplan |
+| provincie | Omgevingsverordening |
+| waterschap | Waterschapsverordening |
+| rijk | AMvB |
+
+The level comes from `bestuursorgaan.bestuurslaag`, falling back to the authority code prefix
+when the RTR does not supply it, and an explicit `authority` parameter still overrides both.
+Where several regelingen of the right type exist — the Rijk publishes two AMvBs — they are
+tried in order, **capped at three**, because each annotation graph can run to megabytes.
+
+!!! note "A national activity needs no municipality"
+    Until v2026.09.6 the dossier refused any `mnre` URN that arrived without an `authority`
+    parameter. That guard was LDE's own, not a DSO requirement, and it rejected activities
+    that needed nothing: `RijksmonArchMonument` carries its own Conclusie and
+    Indieningsvereisten and scores 23/23 semantic, yet answered `400` — advising the caller to
+    supply a municipality, which no national activity has.
+
+### What the profile measures
+
+Two axes, deliberately never combined into one number:
+
+| Axis | Question it answers |
+|---|---|
+| **Legibility** | How readable are the rules as they stand? |
+| **Recoverability** | Where they are not, how far can a reader recover the reasoning from the published material? |
+
+A single headline grade is not produced. The profile exists to compare activities and
+municipalities, and a grade flattens exactly the differences being compared.
+
+Every decision and input name is classified:
+
+| Class | Meaning |
+|---|---|
+| `semantic` | The name says what it is |
+| `opaque-resolvable` | A GUID, but the dossier could resolve what it refers to |
+| `opaque-dangling` | A GUID that resolves to nothing |
+
+A GUID is recognised with **either** separator *and* with none at all, because IMOW URN local
+names are 32 contiguous hex characters — a separator-only detector reported GUID-named
+activities as `semantic`, which is the exact case the profile exists to surface.
+Identity resolvability is **derived from what the lookup returned**, not assumed by
+construction, so an identity that cannot be resolved scores as such rather than being
+credited.
+
+Two rules keep the numbers honest. **Conclusie and Indieningsvereisten are always reported
+separately and never blended.** And **a rule set that is absent says so** rather than
+reporting zeros, because zeros read as measured-and-empty.
+
+The evidence travels with the counts: each item's naming class, each input's own question
+text (its `vraagTekst`, resolved through its `uitvoeringsregelRef`), and the legal-source
+articles. A figure such as *"3/7 semantic, 4 opaque"* can therefore be audited by the
+municipality whose data it describes.
+
+### A partial dossier says which half is missing
+
+`provenance` distinguishes a candidate regeling **checked and found not to annotate the
+activity** from one that **could not be fetched at all**. Before v2026.09.6 an unreadable
+document was folded into the same summary sentence, asserting a negative about a document
+nobody had read. Each failure now names its subject — `documentComponent` the `wId`, `dmn`
+the rule identifier, `toepasbareRegels` the `functioneleStructuurRef` — so a reader can tell
+*"we looked and it is not there"* from *"we could not look"*. That is what makes a partial
+dossier honest rather than broken.
+
+### The Quality Profile tab
+
+The fourth tab, beside Concepts, Works and Activities. It renders the profile of the activity
+selected in the **Activities** tab.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Quality Profile tab in Scorecard layout for a selected activity, showing the Conclusie and Indieningsvereisten rule sets in separate blocks with their own decision-naming and input-naming counts, a breakdown by naming class, and an expanded evidence row showing an input's question text and the legal-source article it came from](../../assets/screenshots/linked-data-explorer-dso-quality-profile-scorecard.png)
+  <figcaption>Scorecard layout — the two rule sets never blended, with the evidence behind each count</figcaption>
+</figure>
+
+**The selection is shared, not tab-local.** `selectedUrn`, the active validity date, the
+authority OIN and the level all live in the DSO Explorer shell rather than in the Activities
+tab, so switching tabs no longer clears them. Changing **Level** or **Authority**, clicking
+**Load**, and closing the detail panel still do. Returning to Activities restores the
+authority's filtered list rather than resetting to the unfiltered date-based one.
+
+**Compare keeps the two authorities apart.** Scorecard is the default; Compare uses a matrix
+with one column per authority, and a **Clear compare** control sits beside **Dossier .md**
+while a comparison is active. The comparison fetches with the *compared* authority's code:
+passing the primary activity's `bevoegd gezag` instead meant comparing Lelystad with
+Steenwijkerland searched Lelystad's regelingen for a Steenwijkerland activity, so the compared
+card read *"Steenwijkerland — Omgevingsplan gemeente Lelystad"* with 0/10 rules traced for an
+activity that has two.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Quality Profile tab in Compare layout, showing a matrix with one column per authority — the primary activity and the compared one side by side — each column carrying its own Conclusie and Indieningsvereisten figures, with a Clear compare button next to the Dossier .md download in the header](../../assets/screenshots/linked-data-explorer-dso-quality-profile-compare.png)
+  <figcaption>Compare — a column per authority, never a merged score</figcaption>
+</figure>
+
+!!! tip "The authority filter sends the code, not the OIN"
+    The backend matches the value against `bevoegdGezag`, so an OIN would silently fail the
+    national-activity path that needs it.
+
+**A taxonomy node points at its children.** An activity that groups others carries no rules of
+its own, so its dossier is correctly empty — which told the reader nothing about where the
+rules actually are. The `Dossier` now carries `childActivityUrns`, taken from the RTR response
+the first leg already fetches, so it costs no extra upstream call. Where both rule sets are
+absent and children exist, the tab says so and lists them as links that load the child's own
+profile: *Rijksmonumentenactiviteit* points at `RijksmonArchMonument` and `RijkmonMonument`,
+which carry a Conclusie and Indieningsvereisten each. An activity with children **and** rules
+of its own is not a taxonomy node and does not get the notice.
+
+### The teaser in the detail panel
+
+The activity detail panel carries a compact quality-profile section — the **one** place the
+two rule sets are summed, into a single decision-naming row and a single input-naming row. It
+is a pointer at the tab, not a score, and the tab itself still keeps the two apart.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: the activity detail panel with its compact quality-profile teaser — one decision-naming row and one input-naming row summing both rule sets, above a Load quality profile control that opens the tab](../../assets/screenshots/linked-data-explorer-dso-quality-teaser.png)
+  <figcaption>The teaser — the only place the two rule sets are combined</figcaption>
+</figure>
+
+**It renders from cache only, and that is load-bearing.** The dossier call fans out across
+three upstream APIs including Ozon, so selecting an activity must never trigger it; a test
+asserts exactly that, because the failure mode is a detail panel that feels broken. The
+frontend caches the dossier by `env|datum|urn` and stores the *promise* rather than the
+resolved value, so concurrent calls for one key dedupe, and evicts on failure so a retry is
+not permanently blocked by one bad response.
+
+### Dossier .md
+
+**Dossier .md** renders the assembled dossier — legal source, annotations, decision criteria,
+submission requirements and the quality profile — as a readable Markdown document, so a result
+can be circulated and reviewed outside the app. The same renderer runs from the command line
+as `npm run dso:dossier`; `renderDossier` lives in `scripts/dossier-render.mjs` and is imported
+by both, with a test asserting the two references are the **same function object** rather than
+merely producing equal output, so the two cannot drift apart.
 
 ---
 
@@ -310,7 +493,7 @@ The verified URN survives saveXML round-trips and follows the same pattern as ot
 
 ## Phase plan
 
-The integration is delivered in phases. The detailed plan, current status, confirmed test anchors, and remaining work for each phase are tracked in [DSO Integration Phase Plan](dso-integration-phase-plan.md). Phases 1–3 are live as of v1.5.3; Phase 2a/2d and Phase 4 (STTR → DMN/form extraction, Import into LDE, and the DMN publish handoff) landed across v1.9.3–v1.9.5.
+The integration is delivered in phases. The detailed plan, current status, confirmed test anchors, and remaining work for each phase are tracked in [DSO Integration Phase Plan](dso-integration-phase-plan.md). Phases 1–3 are live as of v1.5.3; Phase 2a/2d and Phase 4 (STTR → DMN/form extraction, Import into LDE, and the DMN publish handoff) landed across v1.9.3–v1.9.5. v2026.09.6 added the activity dossier, its quality profile and the sixth upstream API they need.
 
 ---
 

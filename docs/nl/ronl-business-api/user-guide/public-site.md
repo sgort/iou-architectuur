@@ -19,6 +19,8 @@ component: RONL Business API
 
 ## Five sources
 
+## A rule's concepts, split into input and output
+
 ## Further sections
 
 ## Accountability

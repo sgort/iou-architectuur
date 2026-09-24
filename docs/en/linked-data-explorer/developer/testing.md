@@ -12,20 +12,65 @@ before that the repository had no test files at all and `npm test` exited 1 with
 
 !!! info "Figures on this page are measured, not estimated"
     Every count, command and coverage percentage below was produced by running
-    the suites against **v2026.09.5** on **19 September 2026**, at `ec4792f` on
-    `main` — the promoted commit — in a clean clone of that commit after
-    `npm ci`, under Node 24.14.1. CI pins Node 22.23.2 for the backend and
-    20.20.2 for the frontend; `npm ci` installs from the lockfile, so the
-    dependency tree is identical. Rerun the commands in
+    the suites against **v2026.09.6** on **24 September 2026**, at `9c58737` on
+    `acc`, in a separate clean clone of that commit after `npm ci`. This is an
+    **acceptance release**: `main` is still on v2026.09.5, so the figures below
+    describe what is on `acc` and not yet what is promoted.
+
+    The runs used **Node v24.14.1 and npm 11.11.0**, while the repository's
+    `.nvmrc` pins **24.21.0**, which was not installed on the measuring machine —
+    the numbers are reproducible on 24.14.1, and a reader on the pinned runtime
+    may see durations move. `npm ci` installs from the lockfile, so the
+    dependency tree is identical either way. Rerun the commands in
     [Running the tests](#running-the-tests) to reproduce them.
 
-**At a glance:** 136 test files · **2821 tests** · all passing · backend 98.39%
-statements, frontend 95.10%.
+**At a glance:** 144 test files · **3082 tests** · all passing · backend 98.36%
+statements, frontend 95.37%.
 
-| Package | Runner | Files | Tests | Statements | Branches | Functions | Lines |
-|---|---|---:|---:|---:|---:|---:|---:|
-| `packages/backend` | Jest + ts-jest | 63 | 1649 | 98.39% | 92.41% | 97.26% | 99.05% |
-| `packages/frontend` | Vitest + RTL | 73 | 1172 | 95.10% | 93.26% | 92.56% | 96.09% |
+| Package | Runner | Files | Tests | Runner time | Statements | Branches | Functions | Lines |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `packages/backend` | Jest + ts-jest | 69 | 1823 | 89.6 s | 98.36% | 92.49% | 97.48% | 99.06% |
+| `packages/frontend` | Vitest + RTL | 75 | 1259 | 64.6 s | 95.37% | 92.93% | 93.18% | 96.39% |
+
+`packages/ropa-site` has no `package.json` and is not an npm workspace member, so
+`npm test` never reaches it. One further test file lives outside both packages
+and outside the total above — see
+[The one test the suite does not run](#the-one-test-the-suite-does-not-run).
+
+**Against v2026.09.5 that is +8 files and +261 tests** — backend +174, frontend
++87 — with no suite shrinking and nothing skipped.
+
+**v2026.09.6 is a DSO release, and its tests follow the new services.** Six
+modules arrived with their own suites, and two of them landed clean:
+
+| New module | Package | Tests | Statements | Branches | Functions | Lines |
+|---|---|---:|---:|---:|---:|---:|
+| `src/services/dossier.service.ts` | backend | 57 | 97.77% | 95.52% (134 br) | 100% | 98.71% |
+| `src/services/quality.service.ts` | backend | 38 | 96.47% | 91.11% (45 br) | 95.45% | 100% |
+| `src/services/ozon.service.ts` | backend | 13 | **100%** | **100%** (28 br) | **100%** | **100%** |
+| `src/utils/ttl-cache.ts` | backend | 13 | **100%** | **100%** (11 br) | **100%** | **100%** |
+| `components/DsoExplorer/QualityProfileTab.tsx` | frontend | 43 | 98.77% | 90.65% (246 br) | 98.76% | 99.55% |
+| `src/services/deployTargetService.ts` | frontend | 5 | 100% | 91.66% (12 br) | 100% | 100% |
+
+`ozon.service.ts` — the client for Omgevingsdocumenten Presenteren — is the
+cleanest new module in the release at 100% on all four metrics, and `ttl-cache.ts`
+matches it. Both are small and pure enough to test exhaustively, which is the
+point: the branching that resists coverage lives in the components, not here.
+The Ozon and dossier suites are backed by a **captured production annotation
+payload**, `src/__fixtures__/annotaties-gm0995-prod.json`, rather than a
+hand-written stub — so the parsing they assert is parsing that a real response
+actually requires.
+
+The two largest existing suites grew to meet them: `routes/dso.routes.test.ts` to
+110 tests and `services/dso.service.test.ts` to 92, and on the frontend
+`DsoExplorer.test.tsx` to 88 and `services/dsoService.test.ts` to 53. A new
+`DsoExplorer/shared.tsx` extracted from the explorer reads 100% on all four.
+
+Package branch averages barely moved — backend 92.41% → **92.49%**, frontend
+93.26% → **92.93%** — which is the expected shape when a release adds heavily
+branching code and covers it to roughly the existing standard. The average is
+not what holds a release to account here; see
+[The per-file branch floor](#the-per-file-branch-floor).
 
 **v2026.09.5 added 579 tests, 498 of them in the backend**, almost all of them
 new code under test rather than margin on old. The outbound guard alone brought
@@ -87,17 +132,13 @@ computes.
 Run from the repository root after `npm install`. The root scripts fan out over
 both workspaces with `--workspaces --if-present`.
 
-| Command | Scope | Files | Tests |
-|---|---|---:|---:|
-| `npm test` | Both packages | 136 | 2821 |
-| `npm test -w packages/backend` | Backend only (Jest, with coverage) | 63 | 1649 |
-| `npm test -w packages/frontend` | Frontend only (Vitest, with coverage) | 73 | 1172 |
-| `npm run test:contract -w packages/backend` | `src/openapi` and `src/routes`, without coverage | 27 | 734 |
-
-`test:contract` is a **subset** of the backend run, not an addition to it: every
-route suite, plus the OpenAPI tests, with coverage switched off — 21.9 seconds
-against 59.8 for the full backend suite. It is the fast loop while editing
-`openapi.yaml` or a route.
+| Command | Scope | Files | Tests | Time |
+|---|---|---:|---:|---:|
+| `npm test` | Both packages | 144 | 3082 | — |
+| `npm test -w packages/backend` | Backend only (Jest, with coverage) | 69 | 1823 | 89.6 s |
+| `npm test -w packages/frontend` | Frontend only (Vitest, with coverage) | 75 | 1259 | 64.6 s |
+| `npm run test:contract -w packages/backend` | `src/openapi` and `src/routes`, without coverage | 27 | 762 | 30.0 s |
+| `node scripts/dso-dossier.test.mjs` | The dossier renderer — **not** part of `npm test` | 1 | 24 checks | 0.2 s |
 
 Both packages' `test` scripts include coverage by default, so a plain run always
 produces a report. Watch modes are `test:watch` in either package; the backend
@@ -111,9 +152,64 @@ npm test
 npm test -w packages/backend
 npm test -w packages/frontend
 
+# The contract subset — the fast loop while editing openapi.yaml or a route
+npm run test:contract -w packages/backend
+
 # Watch mode while working on the backend
 npm run test:watch -w packages/backend
+
+# The dossier renderer's own harness, which npm test does not run
+node scripts/dso-dossier.test.mjs
+
+# Diagnostic only — see "When the frontend suite fails only in parallel"
+cd packages/frontend && npx vitest run --no-file-parallelism --coverage
 ```
+
+### The contract subset is a backend run, selected by path
+
+`test:contract` is a **subset** of the backend run, not an addition to it, and
+not a frontend concern:
+
+```
+jest --config jest.config.js src/openapi src/routes --coverage=false
+```
+
+**Selection is by path prefix.** Not a filename convention, not a tag, not a
+`describe` name: every `*.test.ts` under `src/openapi` or `src/routes` is in the
+subset, and everything else is out. That is the whole rule, and it is what you
+need to know to add a test to it — put the file under one of those two
+directories and it is included; put a contract assertion anywhere else and it
+will never run in the fast loop.
+
+At v2026.09.6 that is **27 files and 762 tests in 30.0 seconds**, against 89.6
+for the full backend suite: **724 tests from `src/routes`** and **38 from
+`src/openapi`**. It is the loop to use while editing `openapi.yaml` or a route.
+
+**There is no frontend contract subset.** `packages/frontend` defines no
+`test:contract` script and carries no test file with `contract` in its name; its
+only test entry points are `test` and `test:watch`. If this page's contract
+figure is ever quoted beside the frontend total, that is a misreading — the
+number belongs to the backend row.
+
+### The one test the suite does not run
+
+`scripts/dso-dossier.test.mjs` covers the DSO activity dossier renderer, and it
+runs **only when someone types the command**. It is referenced by no npm script,
+no Azure workflow and neither git hook, so nothing invokes it on commit, on push
+or in CI.
+
+It is also not a runner. It is a hand-rolled ESM harness — not `node:test` — that
+pushes `[name, boolean]` pairs onto a `checks` array, prints `PASS: 24 checks`,
+and calls `process.exit(1)` naming any check that failed. At v2026.09.6 it
+reports **24 checks, all passing, in 0.2 seconds**.
+
+**Its 24 checks are deliberately excluded from the 3082.** They are not
+comparable to a Jest or Vitest test: they have no per-case isolation, no setup or
+teardown, no reporter and no coverage instrumentation, and a thrown exception
+partway through the file silently truncates the run rather than failing one case.
+Folding them into the headline would inflate it with a different unit of
+measurement. Counted as files rather than tests, the repository has 145
+executable test files, of which `npm test` runs 144.
 
 ### Linting and formatting
 
@@ -126,7 +222,8 @@ npm run test:watch -w packages/backend
 
 `lint:openapi` builds `openapi/openapi.json` from `openapi/openapi.yaml` and lints
 it with Spectral against the NL API Design Rules 2.2.1. All four passed at
-`ec4792f`.
+`ec4792f`; they were **not** re-run for the v2026.09.6 measurement, which covered
+the test suites only.
 
 Both root commands fan out over both packages. The backend checks
 `src/**/*.ts`; the frontend checks the whole package.
@@ -214,18 +311,27 @@ that is where the only lockfile lives.
 `packages/backend`, `jest.config.js` with the `ts-jest` preset.
 `collectCoverageFrom` spans all of `src/**/*.ts`, so untested files report as 0%
 rather than being omitted from the report — a deliberate choice that keeps the
-headline number honest.
+headline number honest. A coverage tool that only reports files a test happened
+to import will show a clean table for a feature nobody tested at all; this one
+makes that feature appear as a 0% row. Four things are excluded, each for a
+stated reason: `*.test.ts`, `src/types/**` (declarations, no runtime), `index.ts`
+(the boot script) and `db/seed-ropa.ts` (a self-executing CLI, not an importable
+module). `db/migrate.ts` is pointedly **not** excluded — it exports a plain
+`migrate()` that a mocked pool can drive, so it stays visible rather than being
+written off. At v2026.09.6 the table instruments **58 backend files**.
 
 | Area | Files | Tests | Covers |
 |---|---:|---:|---|
-| `src/routes` | 23 | 696 | Every route module plus `routes/index` and `routes/registry`, each mounted in isolation (a fresh `express()` app per file, not the full `index.ts`) with the service layer mocked and supertest driving requests — and each response validated against the OpenAPI document |
-| `src/services` | 18 | 646 | Every service: operaton, sparql, dso, norms, edocs, ropa, vendor, assets, template, triplydb, orchestration, shacl-validation, dmn-validation, externalTaskWorker |
-| `src/utils` | 10 | 202 | `outboundUrl` 62, `config` 27, `errors` 23, `outboundHttp` 20, `rootViews` 13, `publicPaths` 13, `buildInfo` 12, `etag` 11, `logger` 11, `problem` 10 |
+| `src/services` | 21 | 768 | Every service: operaton, sparql, dso, dossier, quality, ozon, norms, edocs, ropa, vendor, assets, template, triplydb, orchestration, shacl-validation, dmn-validation, externalTaskWorker |
+| `src/routes` | 23 | 724 | Every route module plus `routes/index` and `routes/registry`, each mounted in isolation (a fresh `express()` app per file, not the full `index.ts`) with the service layer mocked and supertest driving requests — and each response validated against the OpenAPI document |
+| `src/utils` | 11 | 218 | `outboundUrl` 62, `config` 27, `outboundHttp` 23, `errors` 23, `ttl-cache` 13, `rootViews` 13, `publicPaths` 13, `buildInfo` 12, `etag` 11, `logger` 11, `problem` 10 |
 | `src/openapi` | 4 | 38 | The conformance helpers routes are checked with (16), route-to-operation matching (10), the served document (9), and the coverage rule that fails when a `/v1` route is undocumented (3) |
 | `src/middleware` | 3 | 33 | `error.middleware` 22, `cors.middleware` 8, `version.middleware` 3 |
 | `src/db` | 3 | 25 | `mappers` 15, `migrate` 7, `pool` 3 |
-| `src/example-fixture-parity.test.ts` | 4 | Every file in a mirrored RIP bundle is byte-identical to its twin — `examples/organizations/flevoland/rip-phase-2x/` against `e2e-fixtures/flevoland/`. Bundles opt in through `MIRRORED_BUNDLES` |
-| `src/e2e-fixtures.test.ts` | 5 | The `e2e-fixtures/` bundle consumed by the RONL Business API's E2E suite — manifest parses, every declared file exists, each BPMN's process id matches its `processDefinitionKey`, each shell's `calledElement` references resolve, and every process keeps its artifacts after its flow elements |
+| `src/e2e-fixtures.test.ts` | 1 | 5 | The `e2e-fixtures/` bundle consumed by the RONL Business API's E2E suite — manifest parses, every declared file exists, each BPMN's process id matches its `processDefinitionKey`, each shell's `calledElement` references resolve, and every process keeps its artifacts after its flow elements |
+| `src/e2e-fixture-decisions.test.ts` | 1 | 5 | The bundle's **DMN dependencies**, which the manifest used to omit entirely: every declared decision file ships, each provides exactly the decisions it claims, those match the `decisionRef`s in its BPMN, every decision any fixture calls is shipped or declared external, and every `businessRuleTask` resolves the untenanted decision |
+| `src/example-fixture-parity.test.ts` | 1 | 4 | Every file in a mirrored RIP bundle is byte-identical to its twin — `examples/organizations/flevoland/rip-phase-2x/` against `e2e-fixtures/flevoland/`. Bundles opt in through `MIRRORED_BUNDLES` |
+| `src/public-example-fixture-parity.test.ts` | 1 | 3 | The *looser* parity rule for the pair the Modeler serves against the one LDE deploys — `packages/frontend/public/examples/` against `e2e-fixtures/` — which must match once four sanctioned labels are stripped, and where the fixtures copy must actually carry the labels it is allowed to carry |
 
 Techniques worth knowing before adding tests here:
 
@@ -257,28 +363,30 @@ Techniques worth knowing before adding tests here:
 a DOM. Uses `@testing-library/react`, `jest-dom`, `user-event`, `jsdom` and
 `msw`.
 
-| Area | Tests | Notes |
-|---|---:|---|
-| `components/ChainBuilder` | 185 | First `@dnd-kit`-coupled area. The hooks render fine with no `DndContext` wrapper — dnd-kit's context hooks fall back to sane defaults |
-| `components/DocumentComposer` | 167 | The heaviest area, coupling `@tiptap/react` and `@dnd-kit`. Real ProseMirror runs under jsdom once `Range.getClientRects`/`getBoundingClientRect` and `document.elementFromPoint` are polyfilled |
-| `components/BpmnModeler` | 154 | `bpmn-js` and the properties panel mocked outright via a small fake modeler class built in a `vi.hoisted` block |
-| `src/components` (top level) | 153 | `ShaclValidator` 40, `DmnValidator` 30, `ResultsTable` 26, `GraphView` 23, `OrganizationCard` 12, `Changelog` 11, `OrganizationsView` 11 |
-| `src/services` | 147 | All 11 service modules — `msw` for the network-calling ones, jsdom `localStorage` for the two storage modules. `sparqlService` is tested against the backend route only; its browser-direct path and CORS-proxy fallback were removed in v2026.09.5 |
-| `src/utils` | 106 | Pure logic: `exportFormats`, `exampleVersions`, `testData`, `logoResolver`, `ronlAttributes` |
-| `components/DsoExplorer` | 68 | The largest single component file; `dsoService` mocked via `vi.mock` + `vi.importActual` so the pure URL/URN helpers stay real |
-| `components/FormEditor` | 58 | `@bpmn-io/form-js` mocked — exercising the real library would mean mounting a full canvas editor |
-| `components/RopaEditor` | 45 | Record fields, legal-basis SPARQL lookup, hydrate-from-linked-forms, the BPMN `ronl:ropaRef` tab, confirm-gated status transitions |
-| `src/App.test.tsx` | 33 | `App.tsx` renders 11 feature components as inspectable stubs, isolating the orchestrator's own state machine. Includes the regression test for the error overlay, which is asserted on the view that raises it |
-| `components/common` | 26 | Toolbar, language and organisation selectors |
-| `src/data` | 21 | `dsoAuthorities` — the authority list generated from the government organisations register: levels, OINs, and type-ahead-friendly names |
-| `vite/cspPlugin.test.ts` | 9 | The build-time Content-Security-Policy generator, including the build failing on a missing or invalid API URL |
+| Area | Files | Tests | Notes |
+|---|---:|---:|---|
+| `components/ChainBuilder` | 13 | 185 | First `@dnd-kit`-coupled area. The hooks render fine with no `DndContext` wrapper — dnd-kit's context hooks fall back to sane defaults |
+| `components/DocumentComposer` | 10 | 171 | The heaviest area, coupling `@tiptap/react` and `@dnd-kit`. Real ProseMirror runs under jsdom once `Range.getClientRects`/`getBoundingClientRect` and `document.elementFromPoint` are polyfilled |
+| `src/services` | 12 | 164 | All 12 service modules — `msw` for the network-calling ones, jsdom `localStorage` for the two storage modules. `dsoService` is the largest at 53. `sparqlService` is tested against the backend route only; its browser-direct path and CORS-proxy fallback were removed in v2026.09.5 |
+| `components/BpmnModeler` | 9 | 155 | `bpmn-js` and the properties panel mocked outright via a small fake modeler class built in a `vi.hoisted` block. `BpmnCanvas` 59, `BpmnModeler` 50 |
+| `src/components` (top level) | 7 | 153 | `ShaclValidator` 40, `DmnValidator` 30, `ResultsTable` 26, `GraphView` 23, `OrganizationCard` 12, `Changelog` 11, `OrganizationsView` 11 |
+| `components/DsoExplorer` | 2 | 131 | `DsoExplorer` 88 and `QualityProfileTab` 43. `dsoService` is mocked via `vi.mock` + `vi.importActual` so the pure URL/URN helpers stay real |
+| `src/utils` | 9 | 108 | Pure logic: `exportService` 38, `ronlAttributes` 17, `logoResolver` 14, `testData` 11, `buildInfo` 8, `exampleVersions` 7, `exportFormats` 6, `problem` 5, `constants` 2 |
+| `components/FormEditor` | 3 | 58 | `@bpmn-io/form-js` mocked — exercising the real library would mean mounting a full canvas editor |
+| `components/RopaEditor` | 3 | 45 | Record fields, legal-basis SPARQL lookup, hydrate-from-linked-forms, the BPMN `ronl:ropaRef` tab, confirm-gated status transitions |
+| `src/App.test.tsx` | 1 | 33 | `App.tsx` renders 11 feature components as inspectable stubs, isolating the orchestrator's own state machine. Includes the regression test for the error overlay, which is asserted on the view that raises it |
+| `components/common` | 4 | 26 | Toolbar, language and organisation selectors |
+| `src/data` | 1 | 21 | `dsoAuthorities` — the authority list generated from the government organisations register: levels, OINs, and type-ahead-friendly names |
+| `vite/cspPlugin.test.ts` | 1 | 9 | The build-time Content-Security-Policy generator, including the build failing on a missing or invalid API URL |
 
 !!! note "These are the runner's own per-file counts, summed"
-    Every row above was derived from Vitest's default reporter — the
-    `(N tests)` it prints beside each file — grouped by directory. The rows
-    therefore sum to exactly 1172. The backend table is the same, from Jest's
-    `--json` report, and sums to 1649 — 1640 in the six areas above, plus the
-    two fixture files (9).
+    Every row above was derived from **Vitest's own JSON reporter**, grouped by
+    directory — never from counting `it(` with grep, which miscounts every
+    `test.each`, every commented-out case and every string containing the word.
+    The rows therefore sum to exactly 1259, and their file column to 75. The
+    backend table is the same, from Jest's `--json` report, and sums to 1823
+    across 69 files — 1806 in the six directory areas, plus the four
+    fixture-integrity files (17).
 
     **The previous revision of this table did not.** Its rows summed to 573
     against a stated total of 1020, because they had been gathered per area at
@@ -308,9 +416,10 @@ Documented rather than silently skipped:
 
 Two entries left this list. **`exportService.ts` was 0%** — only 2 of its 6
 functions are exported, the rest reachable only through real DOM manipulation and
-JSZip archive building — and now reads 100% statements, 94.66% branches.
+JSZip archive building — and now reads 100% statements, 94.80% branches.
 **`DsoExplorer.tsx` was the largest genuine gap at 72% statements** and now sits
-at 92.55%.
+at 94.40%, over 358 branches — the most branching file in the frontend, and
+still 89.38% of them covered after v2026.09.6 grew it again.
 
 ---
 
@@ -321,13 +430,19 @@ Since v2026.09.2 both runners enforce **80% branch coverage per file**, natively
 `vite.config.ts` takes `thresholds: { branches: 80, perFile: true }`.
 
 `perFile` is the mechanism, not a detail. Against a package *average* the
-threshold is inert — the frontend sits at 93.26% and the backend at 92.41%, so a
+threshold is inert — the frontend sits at 92.93% and the backend at 92.49%, so a
 single file dropping to 40% would barely move either. Branches specifically,
 because statement and line coverage largely restate *"was this file imported"*,
 while an uncovered branch is a decision no test has ever checked.
 
 **Branches only.** A functions floor would fail today, and is not a companion
 setting to add without measuring first.
+
+**Every file meets it.** At v2026.09.6, measured with the thresholds live,
+**zero files are below 80% branches in either package** — 58 instrumented files
+in the backend, 83 in the frontend. Both runs exit 0 with the floor enforcing,
+which is the only claim worth making here: a threshold that is never exercised is
+a comment, not a gate.
 
 ### The margin, and why it needed widening
 
@@ -338,20 +453,41 @@ have turned CI red on an unrelated change — which is how a floor stops being r
 as a floor and starts being read as an obstacle.
 
 v2026.09.2 raised twelve files. Of the frontend files carrying at least one
-branch — 71 of 80 at v2026.09.5 — **one is below 85%**: `GraphView.tsx` at 82.26%. Its eleven remaining
-uncovered branches are all inside d3's force-simulation tick and drag handlers —
-`d.x || 0` position fallbacks, `if (!event.active)` drag guards — which need a
-running simulation and synthesised drag events to reach. That is a d3 harness,
-not a test of this component. The config comment says so, so that whoever next
-turns this red knows the answer is to test their new branch rather than lower the
-floor.
+branch — **74 of 83** at v2026.09.6 — exactly **one is below 85%**:
+`GraphView.tsx` at 82.25%. Its eleven remaining uncovered branches are all inside
+d3's force-simulation tick and drag handlers — `d.x || 0` position fallbacks,
+`if (!event.active)` drag guards — which need a running simulation and
+synthesised drag events to reach. That is a d3 harness, not a test of this
+component. The config comment says so, so that whoever next turns this red knows
+the answer is to test their new branch rather than lower the floor.
 
-**The backend's margin is the thinner one now.** Of its 54 instrumented files, 48
-carry a branch, and three sit between the floor and 85%:
-`services/sparql.service.ts` at 82.86%, `utils/outboundHttp.ts` at 83.33% and
-`services/dmn-validation.service.ts` at 84.98%. `outboundHttp.ts` is new in
-v2026.09.5 — the connect-time half of the outbound guard — so it is the file
-where the next uncovered branch is most likely to land.
+**The backend is no longer the thinner margin.** Of its **58 instrumented files,
+52** carry a branch, and **two** sit between the floor and 85%:
+`services/sparql.service.ts` at 82.85% and `services/dmn-validation.service.ts`
+at 84.97%. `utils/outboundHttp.ts`, flagged here at v2026.09.5 as the likeliest
+place for the next uncovered branch to land, was given margin in v2026.09.6 and
+now reads 85.71%; `utils/outboundUrl.ts` sits just above it at 85.48%.
+
+The tightest files in each package, for anyone about to add a branch to one:
+
+| Package | File | Branches | Of |
+|---|---|---:|---:|
+| backend | `services/sparql.service.ts` | 82.85% | 70 |
+| backend | `services/dmn-validation.service.ts` | 84.97% | 233 |
+| backend | `routes/dso.routes.ts` | 85.04% | 107 |
+| backend | `utils/outboundUrl.ts` | 85.48% | 62 |
+| backend | `utils/outboundHttp.ts` | 85.71% | 21 |
+| frontend | `components/GraphView.tsx` | 82.25% | 62 |
+| frontend | `DocumentComposer/AssetLibrary.tsx` | 85.71% | 21 |
+| frontend | `BpmnModeler/BpmnCanvas.tsx` | 86.18% | 181 |
+| frontend | `DocumentComposer/DocumentComposer.tsx` | 86.25% | 80 |
+| frontend | `BpmnModeler/DmnTemplateSelector.tsx` | 86.66% | 45 |
+
+Note the branch *counts* beside the percentages. `AssetLibrary.tsx` at 85.71% of
+21 branches is three uncovered decisions and one new `if` away from red;
+`dmn-validation.service.ts` at 84.97% of 233 has thirty-five uncovered and far
+more room to absorb a change. A percentage alone does not tell you which files
+are actually fragile.
 
 ### Every new test was mutation-checked
 
@@ -366,6 +502,82 @@ handler **throws** partway through, because React surfaces an error thrown insid
 a click handler on `window`'s `error` event rather than rejecting the click. The
 test sees no state change and passes — for the wrong reason. See
 [Raising coverage without writing hollow tests](../../contributing/coverage-floor.md#raising-coverage-without-writing-hollow-tests).
+
+---
+
+## When the frontend suite fails only in parallel
+
+Vitest runs test files in parallel by default, and on a loaded machine that can
+produce failures that are not defects. This happened during the v2026.09.6
+measurement and is documented here because the diagnosis is reusable, not because
+anything was wrong with the code.
+
+**What was seen.** The first `npm test -w packages/frontend` run reported
+`Test Files 1 failed | 74 passed (75)` and `Tests 2 failed | 1257 passed (1259)`.
+Both failures were in `components/DsoExplorer/DsoExplorer.test.tsx`, both with
+the same message, `Error: Test timed out in 5000ms`:
+
+- *Authority option labels carry no level prefix, so native type-ahead works on
+  the short name*
+- *switching Activities → Quality Profile → Activities preserves the selected
+  authority and its filtered list*
+
+**What establishes it as contention.** A failure inside a full parallel run is
+not a finding until it has been reproduced on its own, so three runs were done
+before any conclusion was drawn — and the failing run itself took **201.5 s**,
+more than three times its normal 64.6:
+
+| Run | Result |
+|---|---|
+| The file alone — `npx vitest run src/components/DsoExplorer/DsoExplorer.test.tsx` | **88 passed, 0 failed**, 64.55 s. The two named tests took **1632 ms** and **676 ms** |
+| The whole suite serially — `npx vitest run --no-file-parallelism --coverage` | **75 files, 1259 tests, all passed**, 375.0 s |
+| The same parallel command again, unchanged | **75 files, 1259 tests, all passed**, 64.58 s |
+
+(The first and third rows landing within 0.03 s of each other is coincidence, not
+a transcription slip — one file under no contention happens to cost about what
+all seventy-five cost when the pool is healthy.)
+
+Two tests that need 1.6 s and 0.7 s do not fail a 5000 ms budget because of
+anything in the component. And the retry passing outright settles it: this was
+not even a reproducible ordering problem, it was one starved run.
+
+**The diagnostic that makes it legible** is in Vitest's own summary line. Compare
+the `environment` figure across the three runs:
+
+| Run | `environment` |
+|---|---:|
+| The failing parallel run | **862 s** |
+| Serial | 121 s |
+| The single file alone | 2.95 s |
+
+862 seconds spent constructing test environments, against 121 for the same work
+done one file at a time, is a worker pool contending for a machine that had
+nothing left to give. When environment setup alone eats that much wall clock, a
+5000 ms `findBy*` budget that normally resolves in 1.6 s expires — and the test
+that reports the timeout is simply whichever one was waiting when the machine
+stalled, not the one at fault.
+
+!!! warning "Do not answer this with a standing `--no-file-parallelism`"
+    Serial execution makes the symptom go away and costs more than it saves.
+    It is **5.8× slower here** — 375 s against 64.6 s — on every run, forever.
+    It diverges local runs from CI, where the Azure workflows still run the
+    suite in parallel, so the configuration that is green locally is not the
+    one being gated. And flakiness under parallelism is usually a real defect
+    — shared module state, an unisolated temp directory, a port collision — so
+    switching it off converts a signal into silence.
+
+    `--no-file-parallelism` belongs in the diagnosis, as above, and not in a
+    config file.
+
+**If it recurs**, the fix belongs at that file's own boundary: a per-file
+`testTimeout` on `DsoExplorer.test.tsx` with a comment naming the contention it
+is sized to survive, so the next reader knows the number is deliberate rather
+than arbitrary. Not a global timeout, and not a global parallelism setting.
+
+**The figures on this page are the clean runs.** The frontend's 75 files and 1259
+tests are confirmed by both the serial run and the second parallel run, which
+agree exactly; the 64.6 s is the parallel run's time, since parallel is what
+`npm test` and CI actually do.
 
 ---
 
@@ -473,6 +685,62 @@ broken fixtures before it was allowed to pass.
 
 ---
 
+## There is no browser suite in this repository
+
+Stated as established rather than assumed, because the directory name invites the
+opposite guess. Three checks at `9c58737`:
+
+- **No dependency.** Neither `package.json` nor any config file in the repository
+  mentions Playwright, under any casing.
+- **No lockfile entry.** `package-lock.json` contains no
+  `node_modules/@playwright`, `node_modules/playwright` or `node_modules/cypress`
+  package — so nothing is installed even transitively.
+- **No script.** Neither workspace defines an e2e entry point. `test` is
+  `jest --coverage` in the backend and `vitest run --coverage` in the frontend,
+  and that is the whole surface.
+
+**`e2e-fixtures/` is not a test suite.** It holds **55 files** — 30 `.form`, 11
+`.document`, 8 `.bpmn`, 5 `.dmn` and one `manifest.json` — and no spec of any
+kind; a search for a filename containing `spec` or `test` under it returns
+nothing. The directory name describes *what the fixtures represent*, a
+deployable end-to-end bundle, not a runner that lives here.
+
+What consumes them is four **backend Jest tests** that parse and cross-check the
+bundle as data — `e2e-fixtures.test.ts`, `e2e-fixture-decisions.test.ts`,
+`example-fixture-parity.test.ts` and `public-example-fixture-parity.test.ts`, 17
+tests between them. The bundle is *executed* by the RONL Business API's E2E
+suite, in that repository. This one is their source of truth, with a manifest and
+integrity tests; it is not their runner. See
+[The one the tests missed](#the-one-the-tests-missed) for what that division of
+labour cost once.
+
+---
+
+## What this page does not measure
+
+Three gaps, named so that nobody reads a figure here as covering them:
+
+**The pinned runtime.** `.nvmrc` specifies Node 24.21.0; the measurement ran on
+**24.14.1**, which was the version installed on the measuring machine. `npm ci`
+installs from the lockfile so the dependency tree is identical, and both suites
+ran clean — but no run on 24.21.0 backs these numbers. Durations in particular
+are the figures most likely to move.
+
+**Per-test-file coverage attribution on the frontend.** Vitest's v8 coverage is
+whole-run: it reports what the suite as a whole covered, not what each test file
+contributed. Where the v2026.09.6 table near the top of this page pairs a new
+test file with a coverage figure, it is pairing a file with *its obvious
+subject*, which is an editorial judgement, not a measurement. Two test files
+touching the same module cannot be told apart by these numbers.
+
+**`ec4792f` itself.** The v2026.09.5 commit was not re-run for this pass, so
+every delta quoted here — +8 files, +261 tests, backend +174, frontend +87, the
+contract subset's +28 — is arithmetic against the **previously published**
+figures on the earlier revision of this page, not against a fresh measurement of
+the older commit. If those figures were wrong, the deltas inherit the error.
+
+---
+
 ## Adding tests
 
 - **Colocate** — `foo.ts` → `foo.test.ts`, beside the source.
@@ -495,13 +763,19 @@ broken fixtures before it was allowed to pass.
 ## Roadmap
 
 **Close the remaining frontend gaps.** Both items that stood here are done —
-`DsoExplorer.tsx` went from 72% to 92.55% statements, and `exportService.ts` got
-its DOM/JSZip harness and reads 100%. What is left is `GraphView.tsx` at 82.26%
+`DsoExplorer.tsx` went from 72% to 94.40% statements, and `exportService.ts` got
+its DOM/JSZip harness and reads 100%. What is left is `GraphView.tsx` at 82.25%
 branches, which is a deliberate hold rather than a gap: see
 [The per-file branch floor](#the-per-file-branch-floor).
 
+**Wire up the dossier harness, or convert it.** `scripts/dso-dossier.test.mjs`
+runs nothing unless a human types the command, which means its 24 checks protect
+the dossier renderer only as long as someone remembers. Either port it to
+`node:test` and give the root a script that runs it, or accept that it is a
+development aid rather than a gate. See
+[The one test the suite does not run](#the-one-test-the-suite-does-not-run).
+
 **Deliberately out of scope for now:** visual regression, a cross-browser matrix,
-and E2E in this repository. Note the E2E fixtures that live here under
-`e2e-fixtures/` are consumed by the **RONL Business API's** E2E suite, not run by
-this one — this repository is their source of truth, with a manifest and an
-integrity test, but not their runner.
+and E2E in this repository — see
+[There is no browser suite in this repository](#there-is-no-browser-suite-in-this-repository)
+for what does and does not live under `e2e-fixtures/`.

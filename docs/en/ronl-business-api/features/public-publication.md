@@ -50,9 +50,28 @@ A public government site commits to WCAG 2.1 level AA conformance. In practice t
 
 ---
 
+## Concepts, divided by the side they sit on
+
+A published rule names the concepts its service works with, and those concepts
+are divided rather than listed flat: the values the rules need in order to
+decide, and the values the rules determine. The division comes from the
+knowledge graph — it was always there and was simply being dropped on the way
+out — so a reader can see what a service asks for separately from what it
+answers, without opening the decision model.
+
+A concept the graph leaves undirected is still shown, in a group of its own
+rather than filtered away.
+
+---
+
 ## Open data
 
 Everything published is also available as open data: every item is machine-readable through the same anonymous API the site itself calls, with no key and no account required, and is free to reuse as public government information without copyright restriction.
+
+That commitment constrains how the published shape may change. When concepts
+gained their direction, the divided list was added **alongside** the flat one
+rather than replacing it, because outside consumers read the flat array and a
+published field is not ours alone to reshape.
 
 ---
 

@@ -160,6 +160,14 @@ All environment variables are prefixed `VITE_` and read at build time:
 | Variable | Default (development) | Description |
 |---|---|---|
 | `VITE_API_BASE_URL` | `http://localhost:3001` | Backend API base URL |
-| `VITE_OPERATON_BASE_URL` | `http://localhost:8081/engine-rest` | **Display only.** Names the Operaton the BPMN deploy modal deploys to, and the Cockpit link in exported instructions. The backend's `OPERATON_BASE_URL` decides where a process actually deploys. |
+| `VITE_CPSV_EDITOR_URL` | `http://localhost:3002` | The CPSV Editor the DSO → DMN publish handoff deep-links to. Run it on a non-3000 port locally, since LDE's dev server also uses 3000 |
 
 Build targets: `npm run build:prod` (production), `npm run build:acc` (acceptance), `npm run dev` (development). The deploy workflows use `build:acc` and `build:prod`; each mode reads its own `.env.<mode>` file.
+
+!!! note "`VITE_OPERATON_BASE_URL` was removed in v2026.09.6"
+    It named, display-only, the Operaton the BPMN deploy modal deploys to and the Cockpit
+    link in exported instructions — while the backend's `OPERATON_BASE_URL` decided where a
+    process actually landed. A build-time copy of a value the backend owns can drift from it,
+    so the modal and the exported README now ask
+    [`GET /v1/dmns/process/deploy-target`](backend.md#deploy-target-v2026096) instead, through
+    `services/deployTargetService.ts`. The variable is gone from all three `.env` files.

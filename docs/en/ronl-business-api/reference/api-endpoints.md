@@ -12,12 +12,30 @@ All current endpoints use the `/v1/` prefix. Legacy `/api/*` endpoints are depre
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| `GET` | `/` | None | API name, version, status, endpoint map |
-| `GET` | `/v1/health` | None | Health check with service latencies (Keycloak + Operaton) |
+| `GET` | `/` | None | Service banner: API name, version, status, deployment environment, the map of 17 advertised route groups, and a security summary |
+| `GET` | `/v1/health` | None | Health check with service latencies (Keycloak + Operaton), and a `build` block naming the commit and run that produced the running artifact |
 | `GET` | `/v1/health/live` | None | Liveness probe — returns `{ status: "alive" }` |
 | `GET` | `/v1/health/ready` | None | Readiness probe — checks Operaton availability |
 | `GET` | `/v1/health/external` | None | Reachability check for CPRMV API, TriplyDB, and LDE. Performs server-side HEAD requests (5-second timeout) to avoid CORS. Returns `{ status: "up"|"down", latency: number }` per service. |
 | `GET` | `/api/health` | None | ⚠ Deprecated |
+
+!!! warning "The banner advertises no documentation endpoint, deliberately"
+    Until v2026.09.10 the root response promised documentation at `/v1/docs`,
+    and the startup log repeated the claim. **Nothing ever mounted it.** The
+    advertisement traces to the initial commit, so the service had promised
+    documentation since day one and never served it — and there is no Swagger,
+    OpenAPI or Scalar dependency in the backend either, so this was planned and
+    not built rather than a mount that regressed.
+
+    The field is gone. Serving real documentation for a service with 17 route
+    groups and external consumers is the better answer and stays open; until
+    something serves it, saying nothing beats pointing a consumer at a 404.
+
+    **Nothing enforces that every advertised path is mounted.** The server entry
+    point calls `startServer()` at import, so a test cannot load it to compare
+    the two — which is exactly why a false claim survived from the initial
+    commit. Keeping the banner and the mounts in step remains a human job, and
+    the code says so rather than implying a guarantee that is not there.
 
 **`GET /v1/health` response:**
 
@@ -101,6 +119,31 @@ These endpoints require no authentication and are accessible before login. They 
 | `GET` | `/v1/public/use-cases` | None | List GitLab issues for the IOU Architecture project. Query: `?state=opened` (default) or `?state=closed`. Returns up to 100 items sorted by `created_at` descending. |
 | `POST` | `/v1/public/feedback` | None | Submit feedback with optional screenshot attachments as a GitLab issue. Accepts `multipart/form-data`. Images are uploaded to the GitLab project uploads API and embedded as markdown references in the issue body. |
 | `POST` | `/v1/public/upload-file` | None | Upload a single file of any type to the GitLab project and receive its markdown reference. Used by the use-case form to pre-upload attachments before JSON submission. Accepts `multipart/form-data` with a single file under the field name `file`. |
+| `GET` | `/v1/public/zoeken` | None | The federated public index behind the public site's combined search — news, products, rules, processes and concepts in one result set. |
+| `GET` | `/v1/public/regels/:slug` | None | One rule's public detail item, by slug. Siblings: `/v1/public/nieuws/:slug` and `/v1/public/producten/:slug`. |
+
+!!! note "A rule's concepts now carry their direction — alongside the flat list, not instead of it"
+    Since v2026.09.11 a `regel` item carries **`begrippenIO`**, the same concepts
+    each with the side of the rules it sits on (`invoer`, `uitvoer`, or `null`
+    where the graph does not say).
+
+    The flat **`begrippen`** array is left exactly as it was, because it is part
+    of the open, anonymous API and outside consumers read it. The two are not
+    the same length: both are deduplicated, but a concept the graph places on
+    both sides appears twice in `begrippenIO` and once in `begrippen`.
+
+    The direction is read from the knowledge graph two ways, one per generation
+    of export — an older export states it as the variable's edge to the DMN
+    (`cpsv:isRequiredBy` / `cpsv:produces`), a CPRMV 0.4.1 export only as the
+    `/input/N` or `/output/N` tail of the variable URI. The edge is read first,
+    with the URI as fallback. Across the live graph the two agree wherever both
+    appear, 193 of 193 rows, and all 241 concept rows of all 14 services resolve
+    to a side.
+
+    **Attribution is per service, not per rule.** All 21 concepts of the
+    thuisbatterij service hang off a single DMN, so a concept reads as an output
+    of the *service* even where a particular rule plausibly consumes it.
+    Per-rule attribution is not in the graph.
  
 **`GET /v1/public/nieuws` response shape:**
  

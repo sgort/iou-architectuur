@@ -14,17 +14,31 @@ and the only board with its own end-to-end suite.
     why the frontend's own totals fell between v2026.08.23 and v2026.08.33
     without anything being deleted.
 
-**Package: 43 files · 476 tests.** **Backend: 16 files · 533 tests** in
+**Package: 43 files · 476 tests.** **Backend: 16 files · 578 tests** in
 `src/pa-monitoring` — the largest single area in the repository.
 **E2E: 2 specs · 7 tests**, still in the frontend package.
 
-Measured with `npm test --workspace=@ronl/pa-cockpit` on **12 September 2026**
-against `main` at `311d732` (v2026.09.7): **476 of 476 passing**, `Duration
-27.68s`. Coverage **90.11 % statements · 88.52 % branches · 86.52 % functions ·
+Measured with `npm test --workspace=@ronl/pa-cockpit` on **24 September 2026**
+against `main` at `86af73e` (v2026.09.11), after a clean `npm ci` in a separate
+clone on Node 24.14.1 / npm 11.11.0: **476 of 476 passing**, `Duration 37.58s`.
+Coverage **90.11 % statements · 88.52 % branches · 86.52 % functions ·
 91.33 % lines** — branches up 12.97 points from v2026.08.36 under the per-file
 80% floor adopted in v2026.09.2, which v2026.09.6 wrote into this package's
 `vitest.config.ts` as `thresholds: { branches: 80, perFile: true }`. The run
 passed it without naming a file.
+
+!!! note "Four releases, four identical counts"
+    43 files and 476 tests at v2026.09.7, v2026.09.9 and v2026.09.11, and the
+    only `src/` change in the latest window was to `src/scaffold.test.ts`, whose
+    three tests did not change in number. The coverage figures above are the
+    12 September ones re-measured: the 20 September pass read 90.07 statements
+    and 86.39 functions, and this one reads what 12 September did. That is the
+    second-decimal noise described on
+    [Coverage](../coverage.md), not a change in the package.
+
+    This package holds **8 of the 26 files** an 80% *functions* floor would fail
+    — the second-largest share after the frontend — while **none** of its 38
+    source files is below the 80% *branch* floor that is actually configured.
 
 !!! warning "Until v2026.09.6, these 476 tests ran nowhere in CI"
     `@ronl/pa-cockpit` is a library: it has no deploy workflow of its own, and
@@ -37,10 +51,11 @@ passed it without naming a file.
     consume it too and watch `packages/pa-cockpit/**` in their path filters,
     but run only pa-demo's own suite.
 
-!!! note "The backend and E2E figures above are older"
-    The package counts and coverage are from 12 September 2026. The
-    `src/pa-monitoring` backend figure and the two E2E specs were last measured
-    on 29–30 August and were not re-run in this pass.
+!!! note "The E2E figures above are older than the rest"
+    The package counts and coverage, and the `src/pa-monitoring` backend figure,
+    are all from **24 September 2026**. The two E2E specs were last measured on
+    29–30 August and were not re-run in this pass — running them needs the full
+    local stack. See [E2E & live smoke](../e2e.md).
 
 ---
 

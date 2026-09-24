@@ -39,6 +39,10 @@ component: RONL Business API
 
 ---
 
+## Concepts, divided by the side they sit on
+
+---
+
 ## Open data
 
 ---

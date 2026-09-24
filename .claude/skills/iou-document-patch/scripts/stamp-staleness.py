@@ -104,7 +104,15 @@ CI_PATHS = [
 
 # Workflow names that deploy something. Supply-chain audits and backend builds
 # run on the same push but ship nothing a reader can see.
-DEPLOY_WORKFLOW = re.compile(r"deploy|static web apps", re.IGNORECASE)
+#
+# "promot" is here because a deploy need not be a top-level run any more. Since
+# the RONL Business API's #187 a push to `main` starts one "Promote to
+# Production" run, which calls the four deploy workflows as reusable workflows —
+# so they appear as *jobs inside it* and the Actions listing shows neither their
+# names nor any run of their own. A matcher that only knew "deploy" reported a
+# promoted commit as having triggered no deploy at all, which is the opposite of
+# the truth and exactly the inference this script exists to save a reader from.
+DEPLOY_WORKFLOW = re.compile(r"deploy|promot|static web apps", re.IGNORECASE)
 GITHUB_REPO = re.compile(r"github\.com/([^/]+/[^/]+?)/?$")
 GITHUB_RUN = re.compile(r"github\.com/([^/]+/[^/]+)/actions/runs/(\d+)")
 

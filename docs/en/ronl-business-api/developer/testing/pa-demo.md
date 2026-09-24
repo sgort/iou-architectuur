@@ -10,13 +10,13 @@ wired into CI.
 
 !!! info "Figures on this page are measured, not estimated"
     **19 files · 106 tests, all passing**, measured with
-    `npm test --workspace=@ronl/pa-demo` on **20 September 2026** against `main`
-    at `10bcf8b` (v2026.09.9), after a clean `npm ci` in a separate clone on
-    Node 24.14.1 / npm 11.11.0: `Duration 8.57s`. Coverage **93.47 % statements ·
+    `npm test --workspace=@ronl/pa-demo` on **24 September 2026** against `main`
+    at `86af73e` (v2026.09.11), after a clean `npm ci` in a separate clone on
+    Node 24.14.1 / npm 11.11.0: `Duration 19.62s`. Coverage **93.47 % statements ·
     95.65 % branches · 85.00 % functions · 92.85 % lines** — **all four
-    reproduced to the decimal** for the third release running, which is exactly
+    reproduced to the decimal** for the fourth release running, which is exactly
     what to expect from a package whose `src/` tree has not changed since
-    v2026.09.5: `git diff 311d732 10bcf8b -- packages/pa-demo/` touches nothing
+    v2026.09.5: `git diff 311d732 86af73e -- packages/pa-demo/` touches nothing
     but `package.json`. Branches stand 8.70 points above v2026.08.33 under the
     per-file 80% floor adopted in v2026.09.2 — a floor that v2026.09.6 turned
     from a convention into a configured threshold here
@@ -25,7 +25,10 @@ wired into CI.
 
     A repeat measurement reproducing to the decimal is the useful kind of
     boring: it is the check that the harness, not the package, is what changed
-    when a figure moves elsewhere.
+    when a figure moves elsewhere. The **duration** is the counter-example in
+    the same run — 8.57s on 20 September, 19.62s here, for byte-identical
+    source. Coverage percentages are a property of the code; elapsed time is a
+    property of the machine.
 
 **At a glance:**
 
@@ -33,7 +36,7 @@ wired into CI.
 |---|---|
 | Runner | Vitest 4 + jsdom, coverage via v8 |
 | Files / tests | 19 / 106 |
-| Wall time | 8.57 s |
+| Wall time | 19.62 s |
 | Playwright | 11 tests in `e2e/plato-demo.spec.ts`, **runs in CI** |
 
 ---
@@ -143,10 +146,10 @@ real selectors, which would have opened exactly that hole.
 
 `packages/pa-demo/e2e/plato-demo.spec.ts` — **11 tests**, Chromium only.
 
-!!! note "Not re-run on 20 September 2026"
-    The spec file was confirmed present and unchanged at `10bcf8b`, but the
-    suite itself was not executed in this pass: its last measurement stands at
-    **30 August 2026 — 11 passed, 14.7s**. See
+!!! note "Not re-run on 24 September 2026"
+    The spec file was confirmed present and unchanged at `86af73e`, but the
+    suite itself was not executed in this pass either: its last measurement
+    still stands at **30 August 2026 — 11 passed, 14.7s**. See
     [E2E & live smoke](e2e.md).
 
 This is the one Playwright suite in the repository that **runs in CI**, as a
@@ -198,19 +201,38 @@ the latter proven load-bearing by a red probe with the agenda mock disabled.
 
 ## Coverage
 
-| Area | Stmts | Branch | Funcs | Lines |
-|---|---:|---:|---:|---:|
-| **All files** | **93.47** | **95.65** | **85.00** | **92.85** |
-| `src/demo` | 95.91 | 84.61 | 100 | 97.72 |
-| `src/demo/changelog` | 100 | 87.50 | 100 | 100 |
-| `src/demo/shims` | 75.00 | 100 | 44.44 | 75.00 |
-| `src` | 75.00 | 100 | 50.00 | 75.00 |
+Re-derived on 24 September 2026 from the run's own `coverage-summary.json`.
 
-The uncovered remainder is almost entirely **shims that deliberately return
+| Area | Files | Stmts | Branch | Funcs | Lines |
+|---|---:|---:|---:|---:|---:|
+| **All files** | **16** | **93.47** | **95.65** | **85.00** | **92.85** |
+| `src/demo` | 8 | 100 | 100 | 100 | 100 |
+| `src/demo/changelog` | 2 | 100 | 87.50 | 100 | 100 |
+| `src/demo/shims` | 4 | 75.00 | 100 | 44.44 | 75.00 |
+| `src` | 2 | 75.00 | 100 | 50.00 | 75.00 |
+
+!!! warning "The `src/demo` row on this page was stale, and the package total is what caught it"
+    Through v2026.09.9 this table gave `src/demo` as 95.91 / 84.61 / 100 /
+    97.72. Re-derived from the report, all eight files directly in that
+    directory are at **100 on all four measures** — which is what
+    [Coverage → pa-demo by area](coverage.md#pa-demo-by-area) has carried since
+    20 September, while this table did not. The figures were left over from
+    before the vendored fork was removed.
+
+    The tell was available the whole time: a row below the package's 95.65%
+    branches, in a package whose other three rows are at 100, 87.5 and 100,
+    cannot be reconciled with a 95.65% total. **Two tables of the same numbers
+    is a contradiction waiting for the next release** — the same warning
+    [Backend suite](backend.md) carries, demonstrated here.
+
+The uncovered remainder is entirely **shims that deliberately return
 nothing**: the dock stand-in and the session-expiry warning both render `null`
 by design, because the real components pull in chat machinery and session
 handling that a public page must not have. They depress the function percentage
-without representing a gap.
+without representing a gap. Five files in this package would fail an 80%
+functions floor — `App.tsx`, `PADock.tsx` and `SessionExpiryWarning.tsx` at 0%,
+`keycloak.ts` at 66.66% and `tenant.ts` at 50% — and **none at all would fail
+the 80% branch floor**, which is the floor that is actually configured.
 
 ---
 

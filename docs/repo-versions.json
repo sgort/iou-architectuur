@@ -1,19 +1,19 @@
 {
-  "docs_built": "2026-09-20",
+  "docs_built": "2026-09-24",
   "repositories": [
     {
       "name": "RONL Business API",
       "icon": "⚙️",
-      "version": "v2026.09.9",
+      "version": "v2026.09.11",
       "environment": "prod",
-      "commit": "10bcf8b...",
-      "commit_date": "2026-09-19",
+      "commit": "86af73e...",
+      "commit_date": "2026-09-23",
       "build": {
-        "sha": "10bcf8b",
-        "run": 14,
-        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/35467550376"
+        "sha": "86af73e",
+        "run": 2,
+        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/35891822589"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/10bcf8b4ca3f6cc1610611fa3bc9ffb0250736ff",
+      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/86af73e9c0c35fe2fb7b554475cbe84870ac5ae4",
       "ci_repo": "https://github.com/sgort/ronl-business-api"
     },
     {
@@ -44,16 +44,16 @@
     {
       "name": "Linked Data Explorer",
       "icon": "🔍",
-      "version": "v2026.09.5",
-      "environment": "prod",
-      "commit": "ec4792f...",
-      "commit_date": "2026-09-19",
+      "version": "v2026.09.6",
+      "environment": "acc",
+      "commit": "9c58737...",
+      "commit_date": "2026-09-24",
       "build": {
-        "sha": "ec4792f",
-        "run": 51,
-        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/35442086578"
+        "sha": "9c58737",
+        "run": 395,
+        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/35926467034"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/ec4792f09c289f8fee6c68da5184fd775a27ccc9",
+      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/9c587371f2dfba27de65622bec3b85d05346c6b9",
       "ci_repo": "https://github.com/sgort/linked-data-explorer"
     },
     {

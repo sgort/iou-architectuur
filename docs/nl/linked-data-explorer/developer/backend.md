@@ -17,7 +17,7 @@ De backend is een Node.js/Express TypeScript-API. Het staat tussen de React-fron
 | Productie | `https://backend.linkeddata.open-regels.nl/v1` |
 | Acceptatie | `https://acc.backend.linkeddata.open-regels.nl/v1` |
 
-Alle endpoints volgen `/v1/*`. De releaseversie wordt in elke respons opgenomen via de `API-Version`-header — `API-Version: 2026.09.5` op het moment van schrijven — conform de Nederlandse API Design Rules API-20 en API-57 van de Overheid.
+Alle endpoints volgen `/v1/*`. De releaseversie wordt in elke respons opgenomen via de `API-Version`-header — op het moment van schrijven `API-Version: 2026.09.6` op acceptatie en `2026.09.5` op productie, want de twee omgevingen kunnen een release uiteenlopen — conform de Nederlandse API Design Rules API-20 en API-57 van de Overheid.
 
 **Het contract is gepubliceerd.** `GET /v1/openapi.json` levert een OpenAPI 3.1-beschrijving van elke `/v1`-route, gebouwd uit `packages/backend/openapi/openapi.yaml`. Het is de referentie voor de vorm van requests en responses; de pagina [API Specification](../reference/api-specification.md) toont hem. `/v1/openapi.json` is een van de drie openbare mounts die aan elke origin worden geleverd (zie [Beveiliging](#beveiliging)), dus elke client kan hem lezen.
 
