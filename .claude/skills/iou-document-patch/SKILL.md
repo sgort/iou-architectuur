@@ -1,6 +1,6 @@
 ---
 name: iou-document-patch
-description: Bring the IOU architecture documentation site into sync with the latest documented version of a linked component's code, in a controlled staged manner. Verifies the source clone is current, analyzes the component's changelog.json against what the docs currently record, plans per-perspective doc updates (developer / features / reference / user-guide), and — as a required stage, not optional tidying — updates the cross-cutting contributor documentation under docs/en/contributing/ (CI, git hooks, the supply-chain gate, the release process, the assistant's plugin set and its working boundaries in ~/.claude/), re-counting every counted claim against source. Also builds a required-screenshots manifest, updates the What's New card and repo-versions.json metadata, and keeps EN/NL in sync. Use when the user asks to sync/patch/update the docs to a component's latest version, or invokes /iou-document-patch.
+description: Use when the user asks to sync, patch or update the IOU architecture documentation site (iou-architectuur) to a component's latest release — CPSV Editor / ttl-editor, Linked Data Explorer, RONL Business API, Norm Editor, CPRMV — or invokes /iou-document-patch; and use when the user asks for the weekly Sunday pass, the cross-cutting contributor pages under docs/en/contributing/, a new ICTU dependency-guideline assessment or score, or the test-posture figures behind its charts. The run has two modes that touch different files — a component sync edits that component's own pages and defers the cross-cutting half, while the weekly pass edits the contributing pages and docs/data/ictu-assessments.yml and reads no component changelog. Establish which mode before Stage 0.
 ---
 
 # IOU Document Patch
@@ -11,16 +11,48 @@ default component is the **CPSV Editor**, whose code lives in the sibling
 `../ttl-editor` repo and whose per-release notes live in
 `../ttl-editor/src/data/changelog.json`.
 
-A sync has **two halves**, and both are required: the component's own pages
-(four perspectives, EN/NL, screenshots, `repo-versions.json`), and the
-cross-cutting contributor pages under `docs/en/contributing/` that describe the
-tooling across *every* component at once. For a release made of CI,
-supply-chain, release-process or tooling work, the second half is the larger
-one.
-
 The work is **staged**: analyse → present a plan + screenshot manifest → get the
 user's approval and the `repo-versions.json` metadata → apply → verify. Never
 skip straight to editing docs.
+
+## Establish the mode first
+
+There are two halves to keeping this site true, and since 24 September 2026 they
+run on **different cadences and in different files**. Decide which one you are in
+before Stage 0, and say so in your first message.
+
+| | **Component sync** | **Weekly pass** |
+|---|---|---|
+| Triggered by | a component and/or a version — "sync RBA", "patch the docs to v2026.09.9", `/iou-document-patch <component>` | "the Sunday pass", "the weekly pass", "a new assessment", "score the guideline", "the cross-cutting pages", `/iou-document-patch weekly` |
+| Cadence | whenever a component ships | every Sunday, over all components at once |
+| Reads | that component's changelog at its branch of record | the three repositories' `acc` heads, and the queue (below) |
+| Edits | `docs/{en,nl}/<component>/**`, the What's New card, `repo-versions.json`, the screenshot manifest | `docs/{en,nl}/contributing/**`, `docs/data/ictu-assessments.yml` |
+| Must not edit | **anything under `docs/{en,nl}/contributing/`**, and no `verified:` stamp | any component page, `repo-versions.json`, the What's New card |
+| Stages | 0, 1, 2, 2b, 2c, 2d, 3, 4, 5 — **2e is deferred, not skipped** | 6 (which has its own staging) |
+
+**Why they were split.** Until 20 September 2026 every component sync carried the
+cross-cutting half with it, and that half is the larger one for a CI or
+supply-chain release. Two things followed: a component sync became too big to
+finish in one sitting, and the contributing pages were re-checked only when a
+component happened to ship. They now move on a weekly rhythm of their own, which
+is also what makes the ICTU score series comparable week to week — the scores are
+read on the same weekday, at each repository's `acc` head.
+
+!!! danger "Deferred means recorded. Skipped means the pages rot."
+    Stage 2e was dropped by three consecutive runs of this skill before it was
+    made mandatory, and making it *conditional* is exactly how that returns. In a
+    component sync the stage does not disappear — it becomes two obligations:
+
+    1. **Append to the queue** — `cross-cutting-queue.md` at the repository root
+       (an operational artifact, never under `docs/`). One entry per cross-cutting
+       fact the sync turned up, with the evidence: the changelog entry or the
+       source file that establishes it, and which contributing page it bears on.
+    2. **Say so in the report**, naming the queue file and the facts you put in it.
+
+    A component sync that edits no contributing page and writes no queue entry
+    has **skipped** the stage, not deferred it. If a release genuinely surfaced
+    nothing cross-cutting, write that sentence in the queue file with the date —
+    a silent no-op is indistinguishable from a forgotten step on the next run.
 
 ## Component map
 
@@ -37,7 +69,9 @@ adapt the paths — the same staging applies.
 | Home "What's New" card | `docs/en/index.md` (and `docs/nl/index.md`) — CPSV Editor grid card |
 | Screenshots referenced by docs | `../../assets/screenshots/cpsv-editor-*.png` → real files in `docs/assets/screenshots/` (language-neutral, served at site root) |
 | Testing page | `docs/en/<component>/developer/testing.md` — the site is the **single source of truth** for test docs (see Stage 2d) |
-| Cross-cutting contributor docs | `docs/en/contributing/**` — **not component-scoped, and easy to miss.** These pages describe the tooling across *all* components at once: CI, git hooks, lint/format scripts, the repository table, the release process, the supply-chain gate, the assistant's plugin set and its working boundaries. A single component's release can falsify them, and they carry no `component:` front matter to flag them as in-scope. **Stage 2e is a required stage, not optional tidying** |
+| Cross-cutting contributor docs | `docs/en/contributing/**` — **not component-scoped, and easy to miss.** These pages describe the tooling across *all* components at once: CI, git hooks, lint/format scripts, the repository table, the release process, the supply-chain gate, the assistant's plugin set and its working boundaries. A single component's release can falsify them, and they carry no `component:` front matter to flag them as in-scope. **Owned by the weekly pass (Stage 6); a component sync queues instead of editing them** |
+| Cross-cutting queue | `cross-cutting-queue.md` at the repository root — what a component sync noticed and deferred. An operational artifact like the screenshot manifest, so never under `docs/`, where a file outside the nav warns on every build |
+| ICTU assessment series | `docs/data/ictu-assessments.yml` — one entry per Sunday: the three `acc` heads, eleven scores per component, and a reason per moved cell. Every table and chart on `contributing/ictu-dependency-guideline.md` is generated from it; write the week's scores here and nowhere else |
 | Assistant-tooling sources of truth | `~/.claude/CLAUDE.md` (working boundaries), `~/.claude/plugins/installed_plugins.json` (what is installed, and at which scope), `~/.claude/settings.json` → `enabledPlugins` (what is actually on), `~/.claude/plugins/known_marketplaces.json`. These are the **only** authority for `development-workflow/skills-and-boundaries.md` and `working-with-claude-code.md` — never restate those pages from memory. See Stage 2e |
 | Per-page metadata header | `component:` front matter on every edited/added component page; `scope: cross-cutting` on every `contributing/**` page (see below) |
 
@@ -46,7 +80,7 @@ adapt the paths — the same staging applies.
 | Component | Source repo | Changelog | Notes |
 |---|---|---|---|
 | **Norm Editor** | sibling repo **`../editor`** (confirmed on the Windows workstation at `C:\Users\gorts01\Development\editor`; also seen at `/home/steven/Development/editor` on Linux) | `gui/public/changelog.json`, schema **`{versions: {<service>: <semver>, ...}, releases: [{version, date, changes: {<conventional-commit-type>: [commit, ...]}, commits: [...]}]}`** — git-log-derived, not curated. `version-gap.py` auto-detects this shape (a `releases` array) vs. the curated `versions` array and normalizes both to the same `sections`/`items` shape; it also drops the synthetic `"Unreleased"` pseudo-version. Pass `--changelog <path> --component "Norm Editor"` explicitly. | No `developer/changelog-roadmap.md` existed before the 2026.07.0 sync (create it + add the mkdocs.yml nav entry — don't assume the page is there). Docs currently have **zero** screenshots — don't force a manifest entry for that reason alone. `docs/nl/index.md` is a placeholder with no "What's New" section to mirror at all — check before assuming both `docs/en/index.md` and `docs/nl/index.md` need the card edit. Because the first tag can land long after the code it covers, don't backfill version numbers onto pre-existing features you can't date — only claim what genuinely changed inside the tagged commit range. |
-| **Linked Data Explorer** | sibling repo `../linked-data-explorer` | `packages/frontend/src/changelog.json` — a dict with a **`versions`** array, same curated `format: "commits"` shape as the CPSV Editor, plus a per-entry `scope` field (`frontend` / `backend` / `both`, absent on most). **`version-gap.py` works against it unmodified** — pass `--changelog ../linked-data-explorer/packages/frontend/src/changelog.json --component "Linked Data Explorer"`. | Versions switched from SemVer to CalVer mid-history (…, 1.9.12, 1.9.13, 2026.07.0, …), so an ordered gap can span both schemes — the same transition the CPSV Editor made. `repo-versions.json` and the roadmap headings carry a `v` prefix; the changelog does not. **i18n differs from the CPSV Editor**: all 60 EN pages have an NL counterpart, and **three are real translations** — `developer/backend.md`, `reference/api-stability.md`, `user-guide/multilingualism.md` — so check each NL page before assuming it is a placeholder. A screenshot manifest already exists at `screenshot-manifest/linked-data-explorer-screenshots-todo.md`. There is no `developer/testing.md` yet (note `developer/test-cases.md` is a *feature* doc, not the test-suite page). |
+| **Linked Data Explorer** | sibling repo `../linked-data-explorer` | `packages/frontend/src/changelog.json` — a dict with a **`versions`** array, same curated `format: "commits"` shape as the CPSV Editor, plus a per-entry `scope` field (`frontend` / `backend` / `both`, absent on most). **`version-gap.py` works against it unmodified** — pass `--changelog ../linked-data-explorer/packages/frontend/src/changelog.json --component "Linked Data Explorer"`. | Versions switched from SemVer to CalVer mid-history (…, 1.9.12, 1.9.13, 2026.07.0, …), so an ordered gap can span both schemes — the same transition the CPSV Editor made. `repo-versions.json` and the roadmap headings carry a `v` prefix; the changelog does not. **i18n differs from the CPSV Editor**: nearly every EN page has an NL counterpart (64 and 63 on 24 September 2026 — count rather than trust the number, it moves every sync), and **three are real translations** — `developer/backend.md`, `reference/api-stability.md`, `user-guide/multilingualism.md` — so check each NL page before assuming it is a placeholder. A screenshot manifest already exists at `screenshot-manifest/linked-data-explorer-screenshots-todo.md`. `developer/testing.md` **exists** (507 lines as of v2026.09.5) — refresh it, never create a second one; note `developer/test-cases.md` is a *feature* doc, not the test-suite page. The repository has **no Playwright suite at all**, so the Stage 2d end-to-end sweep legitimately returns nothing here. |
 | **RONL Business API** | sibling repo `../ronl-business-api` | `packages/frontend/src/pages/changelog-data.ts` — a **TypeScript file**, not JSON: unquoted object keys, mixed single/double-quoted strings, trailing commas, and a `ChangelogItem = string \| FeedbackItem` union mixed into `items` arrays. `version-gap.py`'s `json.loads()` cannot parse it directly, and no safe regex conversion exists (a colon inside changelog prose would get mangled by a naive `key:` → `"key":` transform). **Use the shim, not `version-gap.py`:** `node .claude/skills/iou-document-patch/scripts/ts-changelog.js <file.ts>`, with `--latest`, `--gap <version>` or `--json`. It slices off everything before the `export const changelog` assignment and evaluates the remaining object literal as a JavaScript expression in a throwaway `vm` context, so nothing regexes the content. Feed it a file read from a **ref**, not the working tree. If it reports that it cannot evaluate the literal, the data has grown a real TypeScript construct — say so rather than working around it. | Version strings carry a `v` prefix in `repo-versions.json` and `changelog-roadmap.md` headings (`v3.9.1`) but not in `changelog-data.ts` itself (`'3.9.1'`) — normalize before comparing. **Documentation convention for User Guides**: pages are **ACC-brief / PROD-full** — a page's depth follows the release maturity of what it documents, not a fixed template. The current set is Getting Started, four board pages (Caseworker, PA-Cockpit, Infra-board, Woo-dashboard), and Public Site. `user-guide/test-guides/` holds live Dutch test scripts that are **maintained, not archived** — never give them the archive banner or treat them as frozen. Promoting a board from ACC to PROD is the trigger to expand its brief page into a full guide. |
 
 ### i18n rule (do not violate)
@@ -69,6 +103,24 @@ Consequences for this skill:
   ```
   grep -L "Documentatie in ontwikkeling" docs/nl/<component>/**/*.md
   ```
+
+  **That grep detects the banner, not the emptiness, and there is a third kind
+  of page it misfiles.** `docs/nl/linked-data-explorer/features/dso-integration.md`
+  carries the banner *and* 58 lines of substantive Dutch prose, some of it stale
+  by a release. The grep calls it a placeholder; it is not. So make the test two
+  parts — the banner, **and** no prose under the `##` headers:
+
+  ```
+  wc -l docs/nl/<component>/<page>.md      # a placeholder is ~20-40 lines of headers
+  ```
+
+  On a page of that third kind, **"Code is leading" still applies**: a claim the
+  source contradicts is corrected **in Dutch**, in the narrowest edit that makes
+  it true — the heading and the sentence that states the falsified fact, nothing
+  else. That is not turning a placeholder into a half-English page; leaving a
+  Dutch sentence asserting something untrue is the worse outcome. Prose that is
+  merely *older* than this gap stays as it is, and goes in the report as a
+  translation-pass finding.
 - The **What's New** card exists in both `docs/en/index.md` and
   `docs/nl/index.md` — update both.
 
@@ -223,6 +275,7 @@ Supporting infrastructure (already in place — do not rebuild it):
 | File | Role |
 |---|---|
 | `hooks/repo_versions.py` | `on_config` hook loading `repo-versions.json` into `config.extra.repo_versions`, deriving each component's `commit_base` from its `repo_url` so stamps can link any commit |
+| `hooks/kpi_charts.py` | Renders `docs/data/ictu-assessments.yml` wherever a page leaves a `<!-- ictu:scores\|totals\|movement\|heatmap\|changes\|tests\|testgates -->` placeholder — tables and inline SVG, styled by the `.ictu-*` rules in `docs/stylesheets/extra.css`. Inline SVG rather than a chart library: no third-party script origin to add to the CSP work, and Material's palette carries into dark mode |
 | `scripts/stamp-staleness.py` (in this skill) | Reports, per stamped page and component, the CI-relevant commits on the branch of record since the stamp; exits 1 on a malformed stamp |
 | `overrides/partials/doc-meta.html` | Renders the header |
 | `overrides/main.html` | `content` block override — renders the header first, suppresses the bottom `source-file.html` for opted-in pages |
@@ -264,6 +317,18 @@ Material upgrade changes that file, re-check the override.
     git status -sb | head -1              # "behind N" ⇒ stale
     git log --oneline acc..origin/acc     # what you have not seen
     ```
+
+    Where even a fetch is unwelcome — a dry run, or another agent mid-write in
+    this tree — compare against the remote without writing a ref:
+
+    ```bash
+    git ls-remote origin refs/heads/acc refs/heads/main
+    git rev-parse origin/acc origin/main   # differs ⇒ your refs are stale
+    ```
+
+    That is the same trick the component-staleness box below offers, and it is
+    strictly better evidence: it reads the remote's live answer instead of one a
+    fetch has just written.
 
     If it is behind, **stop and tell the user before pulling** — and branch from
     `origin/acc`, never from a stale local `acc`. Two failure modes follow from
@@ -371,6 +436,14 @@ gap version numbers and their key terms:
 grep -rn "1\.10\.[3-6]\|<key-term>" docs/en/cpsv-editor docs/en/index.md
 ```
 
+**Scope the grep to the component's own tree, as above — never to `docs/`.**
+Under CalVer the version numbers collide: `2026.09.6` is a released version of
+the CPSV Editor *and* of the Linked Data Explorer *and* of the RONL Business API.
+A repository-wide grep for a gap version returns mostly other components'
+releases — 19 hits, none of them relevant, in one real run — and reading those as
+"prior partial documentation" leads to cross-linking another product's release
+notes.
+
 For each hit: **cross-link** to the existing deep page from the changelog entry
 rather than duplicating it, and mark any temporary scoped callout for **removal**
 in Stage 3 (its premise — "the rest isn't updated yet" — is exactly what this
@@ -447,9 +520,18 @@ git -C ../ttl-editor log -1 --format="%h %cd" --date=short
 ```
 
 Present defaults (target version = newest gap version; commit + date from the
-command; `docs_built` = today; keep the existing environment/repo_url base) and
-ask the user to confirm each field. The user is the authority on version,
-environment, and the exact commit that was deployed.
+command; `docs_built` = today; keep the existing `repo_url` base) and ask the
+user to confirm each field. The user is the authority on version, environment,
+and the exact commit that was deployed.
+
+!!! warning "`environment` is a fact to establish, not a field to carry over"
+    Do not default it to whatever the entry already says. Check where the gap
+    version actually is: `git -C ../<repo> rev-parse --short origin/main` against
+    the branch the changelog was read from. **A gap version that exists only on
+    `acc` cannot be recorded as `prod`** — carrying the old value forward
+    publishes a false claim on the home page's status admonition. It is also a
+    reason to ask whether to sync at all: the user may prefer to wait for the
+    promotion, or to document it as `acc` and re-stamp after.
 
 **Also derive the `build` field** for components that have a build id (CPSV
 Editor, Linked Data Explorer, RONL Business API). It is the latest successful
@@ -457,10 +539,23 @@ Editor, Linked Data Explorer, RONL Business API). It is the latest successful
 recorded commit **or an ancestor of it**:
 
 ```bash
-gh api "repos/sgort/<repo>/actions/runs?branch=<main|acc>&event=push&status=success&per_page=40" \
+gh api "repos/sgort/<repo>/actions/runs?branch=<main|acc>&event=push&per_page=40" \
   --jq '.workflow_runs[] | select(.name|test("Frontend|PROD|static";"i"))
+        | select(.conclusion=="success")
         | "\(.name) | #\(.run_number) | \(.head_sha[0:7]) | \(.html_url)"'
 ```
+
+!!! danger "Do not put `status=success` in the URL — it answers from a stale page"
+    Filter on `.conclusion` in the `jq` instead. On 24 September 2026 the URL
+    form returned *Deploy Frontend to Acceptance* **#146 at `234a9ac`** — a build
+    from 30 August — while the same query without `status=success` returned
+    **#395 at `9c58737`**, the actual `acc` head. Following the URL form writes a
+    month-old build id into `repo-versions.json`, which the header then links and
+    `stamp-staleness.py` is asked to reconcile.
+
+    Sanity-check the answer before recording it: the chosen `run_number` should
+    be the **highest** for that workflow name, and its `head_sha` should be the
+    recorded commit or an ancestor of it (`git merge-base --is-ancestor`).
 
 Expect the build's SHA to differ from the recorded commit sometimes, and record
 it anyway: the frontend workflow is path-filtered, so a commit that touched only
@@ -524,6 +619,12 @@ Consequences:
     git -C ../<repo> ls-tree -r --name-only acc | grep 'e2e/.*\.spec\.ts'
     ```
 
+    **An empty result is a legitimate answer, not a broken glob.** The Linked
+    Data Explorer has no Playwright suite at all; its `e2e-fixtures/` hold BPMN,
+    DMN and form bundles, not specs. Say so on the page rather than hunting for
+    a directory that does not exist — and do not import the RONL Business API's
+    per-board attribution rules into a component with nothing to attribute.
+
     Then **run the suites and count with the runner**, because a static count is
     wrong in both directions:
 
@@ -572,7 +673,16 @@ Page structure that worked well:
 | Adding tests | Conventions — colocation, splitting, phase scripts, where to mock |
 | Roadmap | Remaining phases and what is deliberately out of scope |
 
-### Stage 2e — Cross-cutting contributor documentation (REQUIRED)
+### Stage 2e — Cross-cutting contributor documentation
+
+**In a component sync, do not perform this stage — queue it** (see *Establish the
+mode first*). Read the checks below anyway: they tell you what counts as a
+cross-cutting fact, which is what the queue entry has to capture. Then leave
+`docs/{en,nl}/contributing/**` untouched, leave every `verified:` stamp exactly as
+it is, and write what you found into `cross-cutting-queue.md`.
+
+**In the weekly pass this stage is the work itself** — Stage 6 runs it in full,
+over all components at once.
 
 Everything above is component-scoped. `docs/en/contributing/**` is not, and that
 is exactly why it goes stale unnoticed: it describes the tooling across **all**
@@ -580,7 +690,7 @@ components at once, so a change in any one of them can falsify a sentence that
 never mentions that component by name. These pages carry no `component:` front
 matter, so nothing flags them as in-scope.
 
-**This stage is not optional and not tidying.** It has been skipped before, with
+**The stage is not optional and not tidying.** It has been skipped before, with
 consequences:
 
 - The CI test gates added on 20 August 2026 — across three repositories, in
@@ -711,7 +821,11 @@ Work in this order so a failure leaves the docs in an obvious half-state:
 1. **`changelog-roadmap.md`** — insert a `### vX.Y.Z — <headline> (<Month Year>)`
    block per gap version, newest first, above the current top entry. Use the
    existing entry style (bold lead-ins, backticked identifiers, `---` between
-   versions). Add rows to the **Completed** roadmap table for newly-shipped
+   versions). The heading level follows the page: `##` where the entries are
+   top-level (RONL Business API), `###` where they sit under a `## Changelog`
+   parent (Linked Data Explorer). Where the page has one — the CPSV Editor and
+   the RONL Business API do, the Linked Data Explorer does not — add rows to the
+   **Completed** roadmap table for newly-shipped
    roadmap-level items; if a Planned item shipped, remove/relocate it.
 2. **feature / reference / user-guide pages** — apply the prose edits from the
    plan, matching each page's voice. Add or adjust `<figure>` blocks for
@@ -735,11 +849,20 @@ Work in this order so a failure leaves the docs in an obvious half-state:
    page is new. Update any page that repeats a now-stale testing claim — the
    due-diligence review in particular tends to carry a "no automated tests"
    assessment that a coverage push invalidates.
-7. **Cross-cutting contributor pages** — apply every correction found in
-   Stage 2e, verifying each against the source (workflow YAML on `acc`,
-   `.husky/*`, `package.json`, `gh api .../rulesets`, `~/.claude/CLAUDE.md`,
-   `~/.claude/plugins/installed_plugins.json`) rather than against the prose
-   being replaced.
+7. **The cross-cutting queue** — in a component sync, this step is *not* editing
+   the contributing pages. Append to `cross-cutting-queue.md` at the repository
+   root, under a heading for this sync (date, component, version range), one
+   bullet per cross-cutting fact: what changed, the evidence for it (the
+   changelog entry, or the source file and what it says), and which page it bears
+   on. Write the "nothing cross-cutting surfaced" sentence if that is the truth.
+   Do not touch any `verified:` stamp: a stamp records a re-check, and there was
+   none.
+
+   **In the weekly pass (Stage 6) this step is the edit itself** — apply every
+   correction found in Stage 2e, verifying each against the source (workflow YAML
+   on `acc`, `.husky/*`, `package.json`, `gh api .../rulesets`,
+   `~/.claude/CLAUDE.md`, `~/.claude/plugins/installed_plugins.json`) rather than
+   against the prose being replaced.
 
     **Do this before the cosmetic steps below, not after.** It used to be step
     10 and was the step that got dropped when a run ran long — three consecutive
@@ -773,8 +896,9 @@ Work in this order so a failure leaves the docs in an obvious half-state:
 1. Re-run `version-gap.py` — it should now report `in_sync` (roadmap top ==
    documented == latest). **For RONL Business API use
    `scripts/ts-changelog.js --latest` instead**, and compare the three by hand:
-   `repo-versions.json`'s entry, the top `## vX.Y.Z` heading in
-   `changelog-roadmap.md`, and the shim's answer. All three must agree.
+   `repo-versions.json`'s entry, the top version heading in
+   `changelog-roadmap.md` (`##` or `###` — match the page, see Stage 3 step 1),
+   and the shim's answer. All three must agree.
 2. **Manifest consistency** — confirm every manifest filename is embedded in at
    least one page (enforces the Stage 2b invariant):
 
@@ -807,7 +931,17 @@ Work in this order so a failure leaves the docs in an obvious half-state:
    The only image warnings should be exactly the **NEW** manifest files (the not-
    yet-captured `.png`s). Any warning about a missing `.md` target or an existing
    screenshot is a real broken link — fix it.
-5. **Cross-cutting claims** — re-read whatever you changed under
+5. **Cross-cutting claims** — *weekly pass only; in a component sync you changed
+   none of these pages, so verify instead that you changed none:*
+
+   ```
+   git status --short docs/en/contributing docs/nl/contributing   # must be empty
+   ```
+
+   An unexpected hit is almost always a stamp refreshed out of habit. Revert it:
+   a stamp asserts a re-check that did not happen.
+
+   In the weekly pass, re-read whatever you changed under
    `docs/en/contributing/` against the source one last time, and confirm no
    *neighbouring* sentence in the same section still describes the old state.
    The failure mode here is a half-corrected section, which reads as
@@ -847,13 +981,21 @@ Work in this order so a failure leaves the docs in an obvious half-state:
    Any new page must appear in `mkdocs.yml`'s `nav`, or the build warns that it
    is not included.
 
-7. Report a summary: gap closed, files changed grouped by perspective **and a
-   separate cross-cutting group**, the screenshot manifest path with
-   NEW/REPLACE counts, and the metadata written. State explicitly what was
-   checked under `docs/en/contributing/` and found **correct**, not only what
-   was changed — "verified, no change needed" is a result, and its absence from
-   a report is how a skipped stage hides. Then list what still needs a human:
-   capturing screenshots and translating any NL pages left as placeholders.
+7. Report a summary: gap closed, files changed grouped by perspective, the
+   screenshot manifest path with NEW/REPLACE counts, and the metadata written.
+   **Then the cross-cutting half**, in its own paragraph, worded for the mode you
+   are in:
+
+   - *Component sync*: what you queued in `cross-cutting-queue.md` — each fact
+     and the page it bears on — or the explicit statement that this release
+     surfaced nothing cross-cutting. Name the file, and say the pages themselves
+     were deliberately not touched and no stamp was refreshed.
+   - *Weekly pass*: what was corrected **and what was checked and found correct**
+     — "verified, no change needed" is a result, and its absence from a report is
+     how a skipped stage hides.
+
+   Then list what still needs a human: capturing screenshots and translating any
+   NL pages left as placeholders.
 8. Run the **sibling drift check** below and report it, whatever it says.
 
 ---
@@ -904,7 +1046,7 @@ produced a false "CPSV Editor is two releases behind".
 | Linked Data Explorer | `git -C ../linked-data-explorer show origin/acc:packages/frontend/src/changelog.json` → first `versions[]` |
 | RONL Business API | `git -C ../ronl-business-api show origin/acc:packages/frontend/src/pages/changelog-data.ts` → first `version:` — TypeScript, so use the shim in `scripts/ts-changelog.js` rather than `json.loads` |
 | Norm Editor | `git -C ../editor show origin/main:gui/public/changelog.json` → first non-`Unreleased` `releases[]`. **Its releases live on `main`, not `acc`**, though `repo-versions.json` records the environment as `acc` — check both and say which you read |
-| CPRMV | `git -C ../cprmv rev-parse --short gitlab/main` against the recorded `commit`. **Its remote is `gitlab`** — `main` and `origin/main` are both stale in the usual clone |
+| CPRMV | Its remote-tracking ref for `main`, against the recorded `commit`. **Read the remote's name first** (`git -C ../cprmv remote`) — it has been `gitlab` in one clone and `origin` in another, and the wrong name makes `rev-parse` fail or, worse, answer from a months-old leftover ref |
 
 Read from a **ref**, never the working tree — a sibling repo is very often
 parked on a feature branch, and its working tree will answer confidently and
@@ -919,6 +1061,143 @@ how many releases, and let the user decide.
 Distinguish two cases, because they need different fixes: an entry merely
 *behind*, versus one *wrong about its environment*. The Norm Editor is currently
 the second kind.
+
+## Stage 6 — The weekly pass (cross-cutting pages + the ICTU series)
+
+Runs on **Sundays**, over all three applications at once, and reads no component
+changelog. It has two deliverables that belong together: the contributing pages
+re-checked against source, and one new point in the assessment series that the
+same re-check produced.
+
+**It edits `docs/{en,nl}/contributing/**` and `docs/data/ictu-assessments.yml`,
+and nothing else** — with one exception, `docs_built` in `repo-versions.json`,
+which dates the documentation rather than any component. A component's `version`,
+`commit` or `build` never moves in this pass; that is a component sync's job.
+
+### 6a — Inputs
+
+1. Stage 0's freshness checks, for this repository and for **all three** clones
+   (`../ttl-editor`, `../linked-data-explorer`, `../ronl-business-api`). Branch
+   from `origin/acc`.
+2. **Pin the heads and write them down**: `git -C ../<repo> rev-parse --short
+   origin/acc` for each. Every score, every count and every stamp in this pass is
+   read at those three commits, and they are what the page and the data file
+   record. Never mix a head from the fetch with a figure read yesterday.
+3. **Drain `cross-cutting-queue.md`** — the facts component syncs parked since the
+   last pass. Each entry is a lead, not a finding: verify it against source now,
+   then strike it from the file in this pass's commit. An entry you cannot verify
+   stays, with a note saying why.
+
+### 6b — Re-check the pages
+
+Run **Stage 2e in full** — the stamp report first, then the page-by-page
+staleness table, the required checks, the re-count of every counted claim, and the
+re-derivation of the assistant-tooling pages from `~/.claude/`. That stage is
+written for this pass; nothing here replaces it.
+
+### 6c — Score the assessment
+
+The scores live in `docs/data/ictu-assessments.yml` and every table and chart on
+`docs/en/contributing/ictu-dependency-guideline.md` is generated from it by
+`hooks/kpi_charts.py`. **Add one entry; never edit a published earlier entry**
+except to correct a demonstrated error, and say so when you do.
+
+The rubric and the interpretation of each recommendation come from the assessment
+of record — `docs/ICTU-dependencies-assessment.md` on the Linked Data Explorer's
+`acc`. Read it before scoring, so this week's judgement matches earlier weeks'.
+
+Entry shape, all of it required:
+
+```yaml
+  - date: 2026-09-27          # the Sunday
+    kind: measured            # or: reconstructed, for a backfilled week
+    heads: {TTL: <sha>, LDE: <sha>, RBA: <sha>}
+    note: >-
+      One or two sentences on what the week was about.
+    scores:
+      TTL: [ ... 11 integers, R1..R11 ... ]
+      LDE: [ ... ]
+      RBA: [ ... ]
+    changes:                  # one per cell that moved, in either direction
+      - {component: LDE, recommendation: R9, from: 3, to: 4,
+         why: "What changed, named concretely enough to check."}
+```
+
+Then refresh the `tests:` rows for the same Sunday — test files, end-to-end
+specs, workflows running a suite, and whether a per-file coverage floor is
+configured — counted from the tree at those same heads. These feed the companion
+chart, which exists because the guideline scores dependency management and says
+almost nothing about whether the code works.
+
+**Score what the source enforces today, not what was worked on.** Configuration
+that has not yet had its first scheduled run is configured, not enforced. A count
+that grew is evidence for a cell, not a cell.
+
+### 6d — Present, and stop
+
+**The scores are judgement, and the user owns them.** Present, before editing the
+data file:
+
+- the per-component table: new score, last week's, the delta, per recommendation;
+- one line of evidence per moved cell;
+- **every cell where a stricter reading would score lower**, with both readings
+  and what each would make the total. These are the cells the published page has
+  to be honest about, and the user decides them.
+
+Then stop for approval, as in Stage 2.
+
+### 6e — Apply and verify
+
+Apply the page corrections, the stamps (today's date, the three pinned heads,
+naming only components you actually re-checked on that page), and the new entry.
+Then, on top of Stage 4's checks:
+
+```bash
+venv/Scripts/python.exe - <<'PY'
+import sys, yaml; sys.path.insert(0, "hooks")
+import kpi_charts as k
+d = yaml.safe_load(open("docs/data/ictu-assessments.yml", encoding="utf-8"))
+order = [r["id"] for r in d["recommendations"]]
+prev = None
+for e in d["assessments"]:
+    for c, s in e["scores"].items():
+        assert len(s) == len(order), (e["date"], c, len(s))
+    if prev:
+        moved = {(c["component"], c["recommendation"]) for c in e.get("changes", [])}
+        for c in e["scores"]:
+            for i, rid in enumerate(order):
+                delta = e["scores"][c][i] - prev["scores"][c][i]
+                if delta and (c, rid) not in moved:
+                    print("MISSING reason", e["date"], c, rid)
+                if not delta and (c, rid) in moved:
+                    print("SPURIOUS reason", e["date"], c, rid)
+    prev = e
+    print(e["date"], e["kind"], {c: sum(s) for c, s in e["scores"].items()})
+for name in k.RENDERERS:
+    k.RENDERERS[name](d)
+print("all renderers ok")
+PY
+```
+
+Every score that moved must carry its reason and every reason must correspond to
+a move. Then build, and confirm the page holds the generated charts rather than
+the placeholders:
+
+```bash
+grep -c 'class="ictu-chart"' site/contributing/ictu-dependency-guideline/index.html   # 4
+grep -c 'ictu:'              site/contributing/ictu-dependency-guideline/index.html   # 0
+```
+
+A surviving `<!-- ictu:… -->` means the hook did not run — check `mkdocs.yml`'s
+`hooks:` list. An admonition saying the data could not be read means the YAML is
+malformed; the hook degrades rather than failing the build, deliberately.
+
+### 6f — Report
+
+The per-component totals and the week's deltas, what moved and why, which
+judgement calls the user settled and how, what was corrected on the contributing
+pages **and what was checked and found correct**, which queue entries were drained
+and which remain, and the three heads everything was read at.
 
 ## Guardrails
 
@@ -959,12 +1238,22 @@ the second kind.
 - **Respect the i18n rule** — never turn an NL placeholder into a half-English
   page; leave placeholders as placeholders unless the user asks for translation.
 - **repo-versions.json values come from the user**, not from guesses.
-- **A component sync is not finished at the component boundary.** The
-  cross-cutting pages under `docs/en/contributing/` describe every component at
-  once and carry no `component:` front matter to flag them as in-scope. They
-  have already been left stale by three consecutive syncs of this skill. Treat
-  Stage 2e as part of the sync, not as optional tidying — and report on it
-  explicitly, including where nothing needed changing.
+- **Establish the mode before Stage 0, and stay inside it.** A component sync
+  that edits a contributing page has widened itself; a weekly pass that edits a
+  component page or bumps a component's version in `repo-versions.json` has done
+  the same. Both make a reviewer read a diff that does not match its title. If
+  the other half turns out to be needed urgently, say so and let the user decide
+  — do not annex it.
+- **A component sync is not finished at the component boundary; it is finished
+  when the boundary is recorded.** The cross-cutting pages describe every
+  component at once and carry no `component:` front matter to flag them as
+  in-scope. They were left stale by three consecutive syncs of this skill, which
+  is why deferral is only legitimate when it is written down: a queue entry per
+  cross-cutting fact, or the sentence saying this release had none.
+- **Never refresh a `verified:` stamp you did not earn this run.** A stamp says a
+  human-checkable claim was re-read against a named commit on a named date. In a
+  component sync you re-read none of them, so every stamp stays exactly as it is
+  — including on a page you would swear is unaffected.
 - **Verify the inputs before trusting the tooling.** `version-gap.py` is
   deterministic but only as good as the working tree it reads. A stale clone
   makes it report `in_sync` for a component that is releases ahead. Fetch first;
