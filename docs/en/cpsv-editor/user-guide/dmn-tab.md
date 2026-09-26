@@ -57,7 +57,7 @@ For a full explanation of every issue code and its rationale, see the [DMN Valid
 
 ## Step 3: Configure the API endpoint
 
-The **Base URL** identifies the Operaton engine to deploy to and evaluate against. It defaults to `https://operaton.open-regels.nl` — change it if you are using a different instance.
+The **Base URL** names the Operaton engine the decision is recorded against. It defaults to `https://operaton.open-regels.nl` on the deployed editor. It is not where the model is deployed or evaluated — see the tip below.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: API Configuration panel showing the Base URL and the Evaluation URL preview pointing at the Linked Data Explorer backend](../../assets/screenshots/cpsv-editor-dmn-api-configuration.png)

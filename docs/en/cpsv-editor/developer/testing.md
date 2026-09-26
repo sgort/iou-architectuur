@@ -14,19 +14,23 @@ The testing roadmap that ran from P0 to P7 is **complete**: every phase has
 landed, and the per-file 80% branch floor is enforced natively by the runner.
 
 !!! info "Figures on this page are measured, not estimated"
-    Every unit count and percentage below was produced by running the suite
-    against **v2026.09.6** on **19 September 2026** at `2723db1` on `main` — the
-    full run and each scoped script individually, in a clean clone of that
-    commit after `npm ci`, under Node 24.14.1. The three **end-to-end journeys**
-    were run locally against a live stack — this editor's dev server, the Linked
-    Data Explorer backend on `:3001` and Operaton on `:8081` — and **3 passed in
-    14.0 s**, with Playwright 1.62.1. That stack was running while the unit suite
-    was measured, which is the likeliest reason for the slower wall-clock time
-    below.
+    The unit figures below were re-measured against **v2026.09.7** on
+    **26 September 2026** at `a7fe76f` on `acc` — the same tree as `7d154ba` on
+    `main` — in the working checkout after a clean `npm run deps:check`, so the
+    installed dependencies matched the lockfile, under Node 24.14.1. `.nvmrc`
+    now names 24.20.0, which is what CI runs. The full run with coverage
+    reported **62 files and 763 tests, all passing, in 73 s** (Vitest's own
+    duration), with coverage unchanged from v2026.09.6. The per-file and
+    per-script counts are unchanged too: the same 62 files, the same totals.
+    The three **end-to-end journeys were not re-run for this release**. They
+    were last run on 19 September 2026 against v2026.09.6, locally against a
+    live stack — this editor's dev server, the Linked Data Explorer backend on
+    `:3001` and Operaton on `:8081` — and **3 passed in 14.0 s**, with
+    Playwright 1.62.1.
     Rerun the commands in [Running the tests](#running-the-tests) to reproduce
     them.
 
-**At a glance:** 62 files · **763 tests** · all passing · 84 s for a full run
+**At a glance:** 62 files · **763 tests** · all passing · 73 s for a full run
 with coverage on this measurement, plus **3 end-to-end journeys** run separately.
 
 Coverage: **90.10% statements · 88.23% branches · 78.71% functions · 90.76%
@@ -112,7 +116,7 @@ Not tests, but part of the same pre-push gate:
 
 | Command | What it does |
 |---|---|
-| `npm run lint` | ESLint over `src/**/*.{js,jsx,ts,tsx}` |
+| `npm run lint` | `eslint .` — the flat config lints `src/**`, `e2e/**`, the root config files and `scripts/**/*.{js,mjs}` |
 | `npm run lint:fix` | The same, applying fixable corrections |
 | `npm run check-format` | Prettier in check mode over the whole tree |
 | `npm run format` | Prettier in write mode over the whole tree |
@@ -129,35 +133,38 @@ Husky installs two hooks:
 `deps:check` runs first since v2026.09.5: a clone whose install has fallen behind
 the lockfile stops there with `npm ci` named, instead of failing lint or the
 format check on the wrong tool versions. `npm start` runs the same check before
-Vite starts.
+Vite starts. It also warns when the machine's npm is older than 11.10, which
+ignores the 14-day cooldown in `.npmrc` without a word.
 
 !!! important "The hooks do not run the tests"
     `pre-push` gates on the install, lint and formatting only, so nothing client-side stops
     a push that breaks the suite — run `npm run test:ci` yourself before
-    pushing. Since 20 August 2026 the deploy pipelines do run it, and since
-    v2026.08.2 a branch ruleset means a failing pull request cannot be merged
-    into `acc` at all; see [CI](#ci).
+    pushing. The deploy pipelines do run it, and `Build and deploy ACC` is a
+    required check on `acc`, so a pull request that fails the suite cannot be
+    merged there; see [CI](#ci).
     Note that `check-format` runs across the **whole tree**, not just staged
     files — a Prettier violation in a Markdown file fails the push just as a
     source file would.
 
     **Since v2026.09.2 formatting is also checked in CI**, in the `audit` job
-    rather than the deploy workflows. Those carry `paths-ignore` for `docs/**`
-    and `**/*.md`, so a check placed there would never see markdown — precisely
+    rather than the deploy workflows. Those skip changes confined to `docs/**`,
+    `.claude/**` and `**/*.md`, so a check placed there would never see markdown — precisely
     what drifts, since `lint-staged` only formats `src/**` and `package.json` on
     commit.
 
 ### CI
 
-Five workflows run in this repository.
+Seven workflows run in this repository. Every job runs on `ubuntu-24.04`.
 
 | Workflow | Job | Runs |
 |---|---|---|
-| **Deploy ACC (orange-beach)** | `build_and_deploy_job` | `npm ci` → `npm run lint` → `npm run test:ci` → deploy to acceptance |
-| **Deploy PROD (white-sky)** | `build_and_deploy_job` | The same sequence, deploying production |
-| **Supply-chain audit** (`zizmor.yml`) | `audit` | zizmor 1.29.0, `renovate-config-validator --strict`, `npm run check-format`, and `npm run check-supply-chain` |
+| **Deploy ACC (orange-beach)** | `changes`, then `Build and deploy ACC` | `changes` decides whether a pull request touches anything outside `docs/**`, `.claude/**` and `**/*.md`; then Node from `.nvmrc` → `npm ci` → `npm run lint` → `npm run test:ci` → `npm run build` → upload `dist/` to acceptance |
+| **Deploy PROD (white-sky)** | `Build and deploy PROD` | The same sequence without `changes`, deploying production |
+| **Supply-chain audit** (`zizmor.yml`) | `audit` | On Node 24.20.0: zizmor 1.29.0, `renovate-config-validator --strict`, *Lockfile matches package.json* (`npm ci --dry-run --ignore-scripts`), `npm run check-format`, and `npm run check-supply-chain` |
 | **Semgrep** (`semgrep.yml`) | `scan` | Semgrep Code and Supply Chain — see [Dependency Scanning](../../contributing/dependency-scanning.md) |
-| **Close preview environments** | `close_acc_preview`, `close_prod_preview` | Deletes a pull request's Static Web Apps preview when it closes — no tests, but see below |
+| **Close preview environments** | `Close ACC staging environment`, `Close PROD staging environment` | Deletes a pull request's Static Web Apps preview when it closes — no tests, but see below |
+| **Dependency audit** (`dependency-audit.yml`) | `dependency-audit` | Daily at 05:17 UTC: `npm audit --package-lock-only` on both `acc` and `main`, failing on a high or critical production advisory — no tests |
+| **Release SBOM** (`sbom.yml`) | `release-sbom` | On a push to `main`: writes the CycloneDX SBOM and checks the released version has one committed — no tests |
 
 **Preview environments close from a workflow with no path filter** (v2026.09.6). The
 close jobs used to live in the deploy workflows, whose `paths-ignore` applies to the
@@ -171,37 +178,40 @@ a pull request with a merge conflict, so the release procedure also runs
 `npm run check-previews`, which lists orphaned previews and prints the exact delete
 command without running it.
 
-The two deploy workflows run lint and then the full suite before the deploy
-action, and a failure blocks the deploy. Until 20 August 2026 neither ran
-anything of ours at all: the Static Web Apps action builds inside its own
-container and invokes none of the repository's scripts, so the workflows went
-from checkout straight to build-and-deploy. Both now carry an explicit Node
-setup, `npm ci`, lint and test sequence ahead of it.
+The two deploy workflows run lint and then the full suite, then build the bundle
+on the runner, and a failure anywhere blocks the deploy. The deploy action only
+uploads `dist/` (`skip_app_build: true`), so the tree the tests ran against is
+the tree that ships, on the Node `.nvmrc` names. Until 20 August 2026 the
+workflows ran nothing of ours at all: they went from checkout straight to the
+Static Web Apps action, which built inside its own container.
 
-Two v2026.09.0 changes affect when you see a result. The deploy workflows now
-skip documentation-only pull requests (`paths-ignore` on `docs/**`, `.claude/**`
-and `**/*.md`), so a docs change gets **no test run and no preview
-environment** — if you changed only Markdown and expected a green tick from the
-suite, that is why. The `audit` workflow moved the opposite way: it lost its
-`branches` filter entirely and now runs on *every* pull request, including one
-based on another feature branch. Before that, a stacked pull request accumulated
-no audit and GitHub reported it as clean with zero checks, then blocked it
-permanently once the base was retargeted to `acc`.
+Documentation-only changes get **no test run and no preview environment** — if
+you changed only Markdown and expected a green tick from the suite, that is why.
+On a pull request into `acc`, the `changes` job decides this and `Build and
+deploy ACC` is *skipped*, which reports as a pass; a failed lookup builds in
+full. Pushes, and pull requests into `main`, filter at the trigger with
+`paths-ignore`. The `audit` workflow goes the opposite way: it has no `branches`
+filter and runs on *every* pull request, including one based on another feature
+branch. While it had one, a stacked pull request accumulated no audit and GitHub
+reported it as clean with zero checks, then blocked it permanently once the base
+was retargeted to `acc`.
 
-Since v2026.08.2 the `acc supply-chain gate` ruleset makes this *enforcement*
-rather than reporting: `acc` requires a pull request, and `audit` is a required
-status check. A workflow that runs but cannot block is advice — and requiring
-the check without also requiring a pull request would still let a direct push
-past it. There are no bypass actors, so this applies to releases and to the
-repository owner alike. The mechanics are covered in
+The `acc supply-chain gate` ruleset makes this *enforcement* rather than
+reporting: `acc` requires a pull request, and `audit`, `scan` and `Build and
+deploy ACC` are required status checks. A workflow that runs but cannot block is
+advice — and requiring the checks without also requiring a pull request would
+still let a direct push past them. There are no bypass actors, so this applies to
+releases and to the repository owner alike. `main` requires no status checks.
+The mechanics are covered in
 [Supply-Chain Pinning](../../contributing/supply-chain.md).
 
 !!! note "`audit` does not run the tests, and the deploy job does not run the audit"
     They are separate gates on the same pull request. `audit` reasons about the
-    pipeline's own supply chain; `build_and_deploy_job` reasons about the code.
-    A pull request needs both to be green before it can merge — and because the
-    deploy workflow is path-filtered while the audit is not, a documentation-only
-    pull request is gated by `audit` alone.
+    pipeline's own supply chain; `Build and deploy ACC` reasons about the code.
+    A pull request into `acc` needs both, and `scan`, to be green before it can
+    merge — and because the deploy job skips a documentation-only pull request
+    while the audit does not, such a pull request is in practice gated by
+    `audit` and `scan` alone.
 
 ---
 
@@ -365,8 +375,9 @@ so the journey is not blocked, and the threshold is documented rather than dodge
 
 ## Coverage
 
-Measured with `npm run test:ci` against v2026.09.6 on 19 September 2026, in a
-clean clone after `npm ci`.
+Measured with `npm run test:ci` against v2026.09.7 on 26 September 2026, in a
+checkout whose install `npm run deps:check` confirmed against the lockfile. The
+totals are identical to v2026.09.6's.
 
 **Overall: 90.10% statements · 88.23% branches · 78.71% functions · 90.76%
 lines** — against 54.75% / 40.88% / 38.68% / 55.57% at v2026.09.0. The jump is
@@ -466,8 +477,8 @@ question, deliberately left open.
   `versionTarget`, `dateAxis`, `citationStub` — rather than one large one:
   easier to review, and easier to see what is covered at a glance.
 - **Add a script pair per phase.** Each new phase gets
-  `test:<phase>` and `test:<phase>:watch` in `package.json`, using a
-  `--testPathPattern` regex naming the files it covers, mirroring the existing
+  `test:<phase>` and `test:<phase>:watch` in `package.json`, passing Vitest
+  the file-name filters of the files it covers, mirroring the existing
   `test:p2` / `test:p3` / `test:p4` entries.
 - **Mock at the network boundary.** There is no local backend to run against —
   the editor depends on the Linked Data Explorer's shared Express backend for
@@ -531,7 +542,7 @@ Not phases, but the honest remaining edges:
   reach — `if (!uploadedFile)` under a button that only renders once a file
   exists, and three of the same shape. Chasing them would mean testing through
   the component's internals; the file documents them as defensive dead code.
-- **Three files one branch above the floor**, with no ratchet left to absorb a
+- **Two files one branch above the floor**, with no ratchet left to absorb a
   regression.
 - **A functions floor**, which is a separate decision needing its own
   measurement — `App.jsx` sits at 55.55% functions against 81.48% branches.

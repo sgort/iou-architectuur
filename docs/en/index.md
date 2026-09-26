@@ -157,13 +157,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.09.6** · *September 2026*
+-   **✏️ CPSV Editor — v2026.09.7** · *September 2026*
 
     ---
 
-    **The error says why again, and previews stop outliving their pull requests**
+    **What ships is what was tested, and each release keeps its bill of materials**
 
-    The Linked Data Explorer backend now answers every error as RFC 9457 problem details, and the editor [reads them](cpsv-editor/developer/dmn-implementation.md#reading-the-backends-error-messages-v2026096) — so DMN validation, deployment, SHACL validation and the TriplyDB service update show the server's reason again instead of generic text. A DSO import opens the DMN tab with the model in it, where it used to highlight the tab over an empty panel. Preview environments close from a workflow with no path filter, and each release lists any that were orphaned anyway. `npm start` and every push now check the install against the lockfile first, and the last four Semgrep findings are answered in the source rather than the dashboard. The [suite](cpsv-editor/developer/testing.md) stands at 763 tests and three end-to-end journeys, all passing.
+    The production bundle is now built on the runner, from the tree `npm ci` installed and on the Node the tests ran on, and uploaded with `skip_app_build` — until now Oryx rebuilt it inside a floating container, so the code that passed the tests and the code that shipped were different builds. Node is one exact version, 24.20.0 from `.nvmrc`, and production moved up from 22.22.0 ([Deployment](cpsv-editor/developer/deployment.md)). Every release now commits a CycloneDX SBOM of its production dependencies, a daily audit reads the lockfiles of both `acc` and `main`, and npm itself observes the 14-day cooldown Renovate already kept. Renovate never offers a major's X.0.0, ubuntu 26.04 is deferred on record, a lockfile out of step with `package.json` fails under its own name, and the build check is now required on `acc`. The editor itself is unchanged; the [suite](cpsv-editor/developer/testing.md) still stands at 763 tests, all passing.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 

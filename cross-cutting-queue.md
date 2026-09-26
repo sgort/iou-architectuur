@@ -421,6 +421,73 @@ larger one.
     Not a claim on any page. Raise it with the weekly pass as a change to the skill.
 
 
+### 26 September 2026 — CPSV Editor v2026.09.6 → v2026.09.7
+
+Read at `origin/acc` = `a7fe76f`; `origin/main` = `7d154ba` holds the same tree, **promoted**
+(Deploy PROD run #102 green). The release is CI and supply-chain work almost entirely, so this
+is its larger half. The same changes landed in the Linked Data Explorer (v2026.09.8) and the
+RONL Business API (v2026.09.12) the same week, all citing `sgort/linked-data-explorer#119` —
+their entries below repeat the shared facts per repository; merge them per page, not per entry.
+
+1. **A release SBOM exists.**
+   Evidence: `5b83e8d`. `scripts/write-sbom.mjs` (`npm run sbom`, a bump-release step) writes
+   `docs/sbom/ttl-editor-<version>.cdx.json` — CycloneDX, production dependencies only, from the
+   lockfile. `docs/sbom/` holds `2026.09.6` (backfilled) and `2026.09.7`. `sbom.yml`, job
+   `release-sbom`, runs on push to `main`, dispatch, and tooling pull requests; modes write,
+   `--check`, `--verify-release`.
+   Bears on: `ictu-dependency-guideline.md` (R10 SBOM row, CPSV ⬜; the sentence that SBOMs are
+   pipeline work nobody has started), `dependency-scanning.md` ("No release carries an SBOM"),
+   and the weekly score.
+
+2. **Dependencies are audited daily on `acc` and `main`.**
+   Evidence: `417a510`, `7e5ef52`, `d1a2639`. `dependency-audit.yml`, cron `17 5 * * *` plus
+   dispatch, `npm audit --package-lock-only` per branch, fails on a high or critical production
+   advisory, one tracking issue. `scripts/audit-tree.mjs` groups by advisory; exit 2 = could not
+   run = finding. The script is copied to `$RUNNER_TEMP` because the branch checkouts remove it.
+   Bears on: `ictu-dependency-guideline.md` (R10 daily-audit row, and the claim that no workflow
+   in any of the three has a `schedule:` trigger), `dependency-scanning.md` (same claim). For the
+   pass to decide: whether "scan what production runs, not only `acc`" is now partly met, since
+   the audit reads `main`'s lockfile.
+
+3. **A job may not share a required check's name.**
+   Evidence: `d1a2639` — the daily job was first named `audit`, the name of zizmor's required
+   job; required checks match by name, and the collision blocked `ronl-business-api#206`. It is
+   now `dependency-audit`; `sbom.yml` names `release-sbom` for the same reason.
+   Bears on: `branch-protection.md` (how required checks match).
+
+4. **The audit job checks lockfile sync before installing.**
+   Evidence: `d37875d`, `35c3712`. `zizmor.yml` step "Lockfile matches package.json" =
+   `npm ci --dry-run --ignore-scripts`; `--ignore-scripts` because a dry run still runs
+   `postinstall`, which failed on a clean checkout. Stated limit: it checks the pull request's own
+   merge commit — dependency pull requests merge one at a time, each rebased onto `acc`.
+   Bears on: `supply-chain.md` and `code-standards.md` (what the `audit` job contains).
+
+5. **Renovate: no `X.0.0`, and ubuntu 26.04 deferred on record.**
+   Evidence: `9cda617` (`allowedVersions: "!/^\\d+\\.0\\.0$/"`, `matchManagers: ["npm"]`),
+   `e2b3396` (a disabled rule for the runner's `ubuntu` major with its reason and exit condition;
+   the other queued majors deliberately stay behind Dependency Dashboard approval).
+   Bears on: `ictu-dependency-guideline.md` (R7 — wait for the first patch; the deferral record),
+   `supply-chain.md` (runner-pin section).
+
+6. **The ACC build check is required, via a `changes` job.**
+   Evidence: `1ab793e`, `e69db67`. `orange-beach.yml` drops the `pull_request` path filter and
+   decides relevance in a `changes` job; `gh api repos/sgort/ttl-editor/rulesets/21728745` requires
+   `audit`, `scan`, `Build and deploy ACC`. `main` still requires nothing (#131). The PROD workflow
+   keeps its `paths-ignore`.
+   Bears on: `branch-protection.md`, `controls.md`. (Pages written ahead of this sync may already
+   say so — verify rather than re-add.)
+
+7. **Counts moved.** 7 workflow files, 9 jobs, all `ubuntu-24.04`, none `ubuntu-latest`.
+   Evidence: `git grep -c runs-on origin/acc -- .github/workflows`.
+   Bears on: `ictu-dependency-guideline.md` ("All 39 jobs — 7, 15 and 17"), `supply-chain.md`
+   (the runner-pin count), `code-standards.md`.
+
+Checked and already right on the contributing pages, no entry needed: `.nvmrc` 24.20.0 and
+`skip_app_build` on both deploy steps; "Node 24.20.0 bundles npm 11.19"; the `acc` ruleset's
+three checks on `branch-protection.md`. Queue item 10 of the Linked Data Explorer entry above
+(`.nvmrc` missing from the deploy filters) does **not** apply here: this repository filters with a
+`paths-ignore` denylist, so a pull request changing only `.nvmrc` builds.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

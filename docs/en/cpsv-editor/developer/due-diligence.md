@@ -104,14 +104,14 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 |---|---|
 | Frontend | React 19, Vite, Tailwind CSS, Lucide icons |
 | State management | React hooks (`useEditorState`, `useArrayHandlers`), no external state library |
-| Build & lint | CRA, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
-| Testing | Vitest, `@testing-library/react`, Playwright — 751 tests across 61 files, plus 3 end-to-end journeys ([Testing](testing.md)) |
+| Build & lint | Vite, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
+| Testing | Vitest, `@testing-library/react`, Playwright — 763 tests across 62 files at v2026.09.7, plus 3 end-to-end journeys ([Testing](testing.md)) |
 | TTL parsing | Custom hand-written parser (no RDF library dependency) |
 | DMN parsing | Browser DOMParser (XML) |
 | External APIs | TriplyDB REST + SPARQL, Operaton REST (Camunda-compatible), RONL SPARQL vocabulary |
 | Backend dependency | Shared Express server (Linked Data Explorer repo) for CORS-proxied SPARQL queries, TriplyDB service updates, and DMN syntactic validation (libxmljs2) |
 | Hosting | Azure Static Web Apps (acc branch → acceptance, main → production) |
-| CI/CD | GitHub Actions → Azure SWA deploy |
+| CI/CD | GitHub Actions: lint, tests and the production build on the runner (Node 24.20.0 from `.nvmrc`), uploaded to Azure Static Web Apps with `skip_app_build`; a daily dependency audit and an SBOM per release ([Deployment](deployment.md)) |
 
 ---
 
@@ -144,7 +144,7 @@ The prototype has no user authentication. A user publishing a government service
 | Integration point | Current auth mechanism |
 |---|---|
 | TriplyDB publishing | Personal API token, entered by the user, stored in browser localStorage |
-| Operaton deployment & testing | Hardcoded Basic Auth (`demo:demo`) |
+| Operaton deployment & testing | None in the editor — deploy and evaluate go through the Linked Data Explorer backend, which sends an optional bearer token (`OPERATON_API_KEY`) to the engine |
 | Shared Express backend (LDE) | No authentication — endpoints are open |
 | Azure Static Web Apps | Deployment tokens in GitHub Secrets (CI/CD only, no user auth) |
 
@@ -156,7 +156,7 @@ None of these mechanisms establish who the user is, which organization they repr
 
 - **Backend-mediated publishing.** In production, the publish action should not go directly from the browser to TriplyDB with a user-supplied API token. Instead, the authenticated user should request publication through the backend, which holds the TriplyDB service credentials and can enforce authorization rules (does this user have the right to publish for this organization, to this dataset/graph?). This also eliminates the localStorage token storage issue.
 
-- **Operaton credentials.** The hardcoded `demo:demo` Basic Auth must be replaced. In production, the backend should proxy Operaton calls with proper service credentials, similar to how it already proxies SPARQL queries to TriplyDB.
+- **Operaton credentials — addressed in part.** The editor holds no Operaton credential: deploy and evaluate are proxied by the Linked Data Explorer backend, which calls the engine server-to-server with its own optional `OPERATON_API_KEY`. What remains is the next point — the proxy itself is open to any caller.
 
 - **Backend authentication.** The shared Express backend currently has no authentication middleware. Adding an OIDC token verification middleware (validating JWT access tokens from the organization's IdP) would protect all three backend functions (SPARQL proxy, TriplyDB publishing, DMN validation) in one layer.
 

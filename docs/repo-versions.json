@@ -1,5 +1,5 @@
 {
-  "docs_built": "2026-09-24",
+  "docs_built": "2026-09-26",
   "repositories": [
     {
       "name": "RONL Business API",
@@ -29,16 +29,16 @@
     {
       "name": "CPSV Editor",
       "icon": "✏️",
-      "version": "v2026.09.6",
+      "version": "v2026.09.7",
       "environment": "prod",
-      "commit": "2723db1...",
-      "commit_date": "2026-09-19",
+      "commit": "7d154ba...",
+      "commit_date": "2026-09-26",
       "build": {
-        "sha": "2723db1",
-        "run": 100,
-        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/35447454898"
+        "sha": "7d154ba",
+        "run": 102,
+        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/36253030787"
       },
-      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/2723db19fbdbb1c68d5d62a4faa94cf1b7e611d6",
+      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/7d154ba50d9457851f358b470f90c5884bd95cc3",
       "ci_repo": "https://github.com/sgort/ttl-editor"
     },
     {
