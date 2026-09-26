@@ -563,6 +563,78 @@ repository.
     (24 checks, passing on its own). Measured 26 September 2026.
     Bears on: `code-standards.md` and the weekly `tests:` rows (what counts as a suite in CI).
 
+### 26 September 2026 — RONL Business API v2026.09.11 → v2026.09.12
+
+Read at `origin/main` = `2443adc`, **promoted** (Promote to Production run #3: backend, frontend,
+public-site and pa-demo all deployed). `origin/acc` = `3c44b9e` is two commits ahead, touching only
+`scripts/check-previews.sh` (item 11). The SBOM, daily-audit, lockfile-sync and Renovate facts
+repeat the CPSV Editor and Linked Data Explorer entries above for this repository.
+
+1. **`openapi-rendering.md` describes one component; a second now publishes.**
+   Evidence: `3c8d0b3`, `openapi.routes.ts` (wildcard CORS on the document), and live reads of
+   `acc.api.open-regels.nl` on 26 September 2026. What that page states as general is
+   LDE-specific: RBA's document **carries its own version** (`info.version`, injected from
+   `package.json` by `scripts/build-openapi.cjs`); RBA **declares `securitySchemes`**
+   (`bearerAuth`, `mediaAggregatorKey`); RBA's `/v1/health` is wrapped (`{ success, data }`) with
+   `build { sha, run, runId }` and no `label`; RBA acceptance echoes only
+   `https://iou-architectuur.open-regels.nl` on `/v1/health` — not `acc.iou-architectuur…`, not
+   `localhost` — so its provenance banner **and Scalar's Test Request** work only on the production docs tier (a preflight from the acceptance docs origin gets no `Access-Control-Allow-Origin`; adding `https://acc.iou-architectuur.open-regels.nl` to the RBA acceptance App Service's `CORS_ORIGIN` would change that); and CSP
+   `connect-src` now names a second host (`https://acc.api.open-regels.nl`, added in this sync).
+   Bears on: `contributing/doc-architecture/openapi-rendering.md`.
+
+2. **SBOM per release** (`c43de59`): `docs/sbom/` holds 2026.09.11 and 2026.09.12; `sbom.yml` on
+   push to `main` with `--verify-release`. Falsifies the RBA cells of the R10 SBOM row and
+   `dependency-scanning.md` ("No release carries an SBOM").
+
+3. **Daily dependency audit** (`34a5a57`, `9ded0aa`, `dfb6ace`). This is the repository whose
+   `#206` the job-name collision blocked; Node is pinned as a literal `24.20.0` in the job because
+   it audits two branches that need not share an `.nvmrc`. Bears on: `dependency-scanning.md`,
+   `branch-protection.md`, `ictu-dependency-guideline.md`.
+
+4. **The lockfile incident this week's checks came from** (`05d76bd`, `b2e9bf1`, `c81098b`).
+   Three dependency pull requests (#221–#223) merged back to back without rebasing, each green
+   against its own base, left `acc` with a lockfile matching no `package.json`; `npm ci` failed
+   with `EUSAGE`. The ruleset does not require a branch to be up to date. Bears on:
+   `supply-chain.md`, `branch-protection.md`, `code-standards.md`.
+
+5. **Renovate R7, and a Node deferral the other two repositories do not have** (`617d105`,
+   `0a75676`). Ubuntu 26.04 **and Node 24** are disabled rules with reasons and exit conditions:
+   both App Services run `NODE|22-lts` against an `.nvmrc` of 22.23.2, and taking 24 in `.nvmrc`
+   alone would build for a major the host does not run. **Reconcile with LDE item 4 and the LDE
+   `.nvmrc` 24.21.0 movement** rather than applying either alone. Bears on:
+   `ictu-dependency-guideline.md` (R7), `supply-chain.md`.
+
+6. **`keycloak-connect` removed** (`bae66c9`): production tree −48 packages, including
+   `chromedriver` via an optionalDependency on `latest`, `adm-zip`, `elliptic`, `proxy-agent`;
+   three Dependabot alerts can no longer arrive by that route. Bears on: `supply-chain.md`,
+   `dependency-scanning.md` (alert counts).
+
+7. **Pinning scope** (`08a988a`): local compose images pinned by digest via `docker:pinDigests`;
+   `deployment/vm/` compose deliberately unpinned (#196); the App Service runtime cannot be pinned
+   below the major (`az webapp list-runtimes`: `NODE|22-lts`, `NODE|24-lts`, `NODE|26`). Bears on:
+   `supply-chain.md` (pinning table).
+
+8. **Counts moved:** 13 workflow files on `main` (was 11). Re-count jobs and `uses:` against
+   `SECURITY-PIPELINE.md` before writing. Bears on: `code-standards.md`, `supply-chain.md`,
+   `ci-posture-deck.md`.
+
+9. **Semgrep triage method** (`cbbb57c`): a verification scan whose ruleset lacked the rules
+   reported 0 on the old tree too; re-run with the five exact rule ids, 14 → 0. The lesson —
+   a zero is evidence only if the same scan finds the findings before the fix — belongs with the
+   scanning methodology. Bears on: `dependency-scanning.md`, `code-standards.md`.
+
+10. **The LDE production reviewer's removal is recorded in this repository too** (`7ed9ba7`):
+    both repositories now exclude `pull_request` from production workflows for the promotion
+    argument alone. Bears on the same pages as LDE item 2.
+
+11. **Acc-only, not promoted:** `check-previews.sh` strips the carriage returns `az` writes on
+    Windows (`80e34a2`, merged `3c44b9e`). Document after promotion, wherever `check-previews` is
+    described.
+
+12. **Test posture for the weekly `tests:` rows:** backend test files 89 → 96; new scripts
+    `test:contract` and `test:openapi-coverage`; the OpenAPI coverage gate's pending ceiling is 18.
+    Use the figures measured in this sync (RBA testing pages), not these counts.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

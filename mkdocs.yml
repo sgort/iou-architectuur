@@ -183,6 +183,7 @@ nav:
         - PostgreSQL (Azure): ronl-business-api/developer/deployment/postgresql.md
         - PROD Deployment Notes - v2.9.1: ronl-business-api/developer/deployment/prod-deployment-v2.9.1.md
     - References:
+      - API Specification: ronl-business-api/reference/api-specification.md
       - API Endpoints: ronl-business-api/reference/api-endpoints.md
       - BRP API Endpoints: ronl-business-api/reference/brp-api-endpoints.md
       - BPMN Design Criteria: ronl-business-api/reference/bpmn-design-criteria.md

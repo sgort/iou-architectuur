@@ -83,26 +83,38 @@ Both backend workflows follow the same process:
  3. npm ci                          (install all workspace dependencies)
  4. Build shared package            (npm run build --workspace=@ronl/shared)
  5. Lint backend                    (npm run lint in packages/backend)
- 6. Unit tests                      (npm test in packages/backend)
- 7. Build TypeScript                (npm run build in packages/backend → dist/)
- 8. Verify dist/index.js exists
- 9. Prepare deployment package:
+ 6. Lint the OpenAPI document       (npm run lint:openapi in packages/backend)
+ 7. Unit tests                      (npm test in packages/backend)
+ 8. Build TypeScript                (npm run build in packages/backend → dist/)
+ 9. Verify dist/index.js exists
+10. Prepare deployment package:
       deploy/
         dist/                       (compiled TypeScript, structure preserved)
         package.json                (backend package.json at deploy root)
+        openapi/openapi.json        (the document GET /v1/openapi.json serves)
         build-info.json             (commit SHA, run number, run id)
         node_modules/               (production dependencies, from the lockfile)
         node_modules/@ronl/shared/  (shared package dist + package.json)
         .deployment                 (SCM_DO_BUILD_DURING_DEPLOYMENT=false)
-10. Create deployment zip → Upload artifact
-11. azure/login                     (OIDC — no publish profile, no secret)
-12. az webapp deploy --type zip
-13. Liveness check                  (5 attempts, 10s apart → /v1/health/live)
-14. Verify the deploy took effect   (12 attempts, 15s apart → /v1/health build.sha)
+11. Create deployment zip → Upload artifact
+12. azure/login                     (OIDC — no publish profile, no secret)
+13. az webapp deploy --type zip
+14. Liveness check                  (5 attempts, 10s apart → /v1/health/live)
+15. Verify the deploy took effect   (12 attempts, 15s apart → /v1/health build.sha)
 ```
 
-Steps 11–14 are skipped on a pull request to `acc`, so a pull request builds and
+Steps 12–15 are skipped on a pull request to `acc`, so a pull request builds and
 tests the backend without shipping it while the build check stays required.
+
+Step 6 lints the published contract against the NL API Design Rules 2.2.1
+ruleset before the tests run, so a document that breaks a rule fails fast and
+names it; the coverage gate inside `npm test` then checks the document against
+the routes actually served. `openapi/openapi.json` is generated from
+`openapi/openapi.yaml` by the `prebuild` hook and is gitignored, so step 10 copies
+it into the artifact explicitly — only the JSON, since the YAML source, the
+vendored ruleset and the Spectral config are build-time inputs. The backend
+resolves it as `../../openapi/openapi.json` from `dist/openapi`, and reads it once
+at startup. See [API specification](../../reference/api-specification.md).
 
 ### Authentication is OIDC
 
@@ -187,6 +199,17 @@ running, which is the failure this exists to detect.
 **Runtime:** `NODE|22-lts`  
 **Startup command:** `node dist/index.js`
 
+App Service pins the Node runtime at the major only: `az webapp list-runtimes
+--os linux` offers `NODE|22-lts`, `NODE|24-lts` and `NODE|26`, with no exact
+version and no digest. What can be kept is the major in step with `.nvmrc`,
+which is `22.23.2`. A Node major bump therefore changes two places in a fixed
+order — **switch both App Services to the new `NODE|<major>-lts` first, then
+merge the `.nvmrc` bump** — because the other order builds the artifact on one
+major and runs it on another. No pull-request check runs against an App Service,
+so nothing enforces this; `SECURITY-PIPELINE.md` records it as the rule, and a
+disabled Renovate rule holds Node 24 until it is followed (see
+[CI/CD → Node runtime](../cicd.md#node-runtime)).
+
 Azure App Settings (environment variables) are configured via CLI or the Azure Portal. Set the production values from `docs/deployment/environment-variables.md`:
 
 ```bash
@@ -254,7 +277,6 @@ az webapp config appsettings set \
     HELMET_ENABLED="true" \
     SECURE_COOKIES="true" \
     TRUST_PROXY="true" \
-    ENABLE_SWAGGER="false" \
     ENABLE_METRICS="true" \
     ENABLE_HEALTH_CHECKS="true" \
     ENABLE_TENANT_ISOLATION="true" \

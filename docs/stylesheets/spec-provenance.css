@@ -1,4 +1,6 @@
-/* Provenance banner on the Linked Data Explorer API Specification page.
+/* Provenance banner on the API Specification pages (Linked Data Explorer and
+ * RONL Business API). The LDE page targets it by id; later pages use the
+ * shared .spec-provenance class.
  *
  * The page renders /v1/openapi.json live, so it has no committed version to
  * cite; the banner carries the version and build read from /v1/health instead.
@@ -9,7 +11,8 @@
  * without a second rule.
  */
 
-#lde-spec-provenance {
+#lde-spec-provenance,
+.spec-provenance {
   margin: 0 0 1.2em;
   padding: 0.5em 0.8em;
   border-left: 0.2rem solid var(--md-accent-fg-color);

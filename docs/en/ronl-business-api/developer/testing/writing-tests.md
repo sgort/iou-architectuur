@@ -19,6 +19,18 @@ suite was green and wrong.
   an `x-test-roles` header. Path aliases (`@utils/`, `@services/`, `@auth/`,
   `@middleware/`, `@routes/`, `@models/`, `@ronl/shared`) are mapped in
   `packages/backend/jest.config.js` and work inside test files.
+- **A new backend route needs a registry entry and an OpenAPI description.**
+  Since v2026.09.12 `src/routes/registry.ts` is the one list of `/v1` mounts:
+  `index.ts` mounts from it, the root banner advertises from it, and
+  `src/openapi/coverage.test.ts` compares it against `openapi/openapi.yaml`.
+  An operation that is served but neither documented there nor listed in
+  `openapi/pending.json` fails that test, inside the ordinary `npm test`.
+  Pending is not an escape hatch for new work: it holds the 18 operations not
+  yet described, and the test caps it at 18 so the list can only shrink. So
+  describe the new operation in `openapi.yaml`, then run
+  `npm run test:contract --workspace=@ronl/backend` for a quick check and
+  `npm run lint:openapi --workspace=@ronl/backend` for the NL API Design Rules
+  ruleset, which CI runs before the tests.
 - **The four Vitest packages** (frontend, pa-cockpit, pa-demo, public site):
   default to the `node` Vitest environment and opt
   into `jsdom` per file with `// @vitest-environment jsdom` only when a component
@@ -41,7 +53,8 @@ suite was green and wrong.
   configured **per file** in all five runner configs, so a thin new file does
   not merely look thin: it exits `npm test` non-zero and names itself. It is a
   branch floor only — the functions column carries no threshold, and adding one
-  at 80 today would fail 31 existing files.
+  at 80 would fail 26 existing files as measured on 26 September 2026 (the
+  configs' own comments still say 31).
 - **Update the counts on these pages** when work lands, from a real run
   (`--json --outputFile=…` for Jest, `--reporter=json --outputFile=…` for
   Vitest) rather than an estimate or a grep for `it(` / `test(` — both miscount

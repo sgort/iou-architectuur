@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Lokale ontwikkelomgeving
 
 !!! info "Documentatie in ontwikkeling"
@@ -13,21 +17,33 @@
 
 ## Prerequisites
 
+### A bash shell is required
+
 ---
 
 ## Clone and install
 
 ---
 
-## Environment files
+## Backend environment
+
+### Settings to check
+
+### Front-end configuration
 
 ---
 
-## Start Docker services
+## The Docker stack
 
 ---
 
-## Start development servers
+## Initialising Operaton
+
+### The engine starts empty
+
+---
+
+## Starting the development servers { #start-development-servers }
 
 ---
 
@@ -35,11 +51,11 @@
 
 ---
 
-## Verify the setup
+## Verifying the setup
 
 ---
 
-## Getting a JWT token for API testing
+## Calling the API with a token
 
 ---
 
@@ -47,11 +63,15 @@
 
 ---
 
-## Local service URLs
+## Service URLs
 
 ---
 
-## Stopping the environment
+## Stopping and resetting
+
+---
+
+## Git hooks
 
 ---
 

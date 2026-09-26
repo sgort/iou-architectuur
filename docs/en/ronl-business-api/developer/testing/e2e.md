@@ -19,31 +19,42 @@ against `acc` at `15dfbf9` with a full local stack running. That was the first
 pass in which all three were run together rather than described from
 configuration, and it is still the last.
 
-!!! warning "Not re-run on 24 September — and now understating the frontend suite"
-    The unit suites were re-measured against `main` at `86af73e` (v2026.09.11);
-    the Playwright suites were **not**, for the third pass running. Every count
-    in this page's tables dates from 30 August and is repeated unchanged rather
-    than re-derived — a measured number is worth more stale than a guess is
-    fresh. Two of the three suites need services these passes deliberately did
-    not start.
+!!! warning "Not re-run on 26 September — and still understating the frontend suite"
+    The unit suites were re-measured for v2026.09.12 (`main` at `2443adc`) on
+    26 September; the Playwright suites were **not**, for the fourth pass
+    running. Every count in this page's tables dates from 30 August and is
+    repeated unchanged rather than re-derived — a measured number is worth more
+    stale than a guess is fresh. Two of the three suites need services these
+    passes deliberately did not start.
 
-    **What has changed is the inventory, and this time it moved.** Re-checked at
-    `86af73e` straight from the spec tree: `packages/frontend/e2e/` now holds
-    **eleven** specs, not ten. `thuisbatterij-journey.spec.ts` was added in this
-    window, so the 27-test frontend figure — measured when there were ten —
-    **cannot** include it. Read 27 as a floor rather than a total until the
-    suite is run again. The other two directories are unchanged at one spec
-    each, and so is the workflow wiring: the pa-demo spec runs in
-    `azure-pa-demo-acc.yml` and only there, and no workflow runs the other two.
+    **The inventory, re-checked at `2443adc` straight from the spec tree, is
+    thirteen specs**: eleven in `packages/frontend/e2e/`, plus
+    `packages/pa-demo/e2e/plato-demo.spec.ts` and
+    `packages/public-site/e2e/publiek.spec.ts`. The count is unchanged since
+    v2026.09.11. `thuisbatterij-journey.spec.ts` arrived in that release, after
+    the only run of this suite, so the 27-test frontend figure — measured when
+    there were ten — **cannot** include it. Read 27 as a floor rather than a
+    total until the suite is run again. The workflow wiring is unchanged too:
+    the pa-demo spec runs in `azure-pa-demo-acc.yml` and only there, and no
+    workflow runs the other two.
 
     The eleven: `caseworker-journey`, `infra-board-journey`, `login-redirect`,
     `pa-live-authoring`, `pa-mock-journey`, `protected-route`,
     `rip-r21-journey`, `smoke`, `tenant-isolation`, **`thuisbatterij-journey`**,
     `zorgtoeslag-journey`.
 
-    The three `playwright.config.ts` files were re-read at `86af73e` — see
+    **Two specs changed in v2026.09.12, neither in its test count.**
+    `thuisbatterij-journey.spec.ts` was edited in `0e71fd3` to match its two
+    caseworker tasks by their new Dutch names as well as their old English ones
+    — see [below](#frontend-playwright-suite). `zorgtoeslag-journey.spec.ts`
+    changed only in a comment (`b762a13`), which now attributes the routing of
+    a citizen's case to the deployment's tenant to `tenant-access.ts` rather
+    than to an override in `process.routes.ts`.
+
+    The three `playwright.config.ts` files and `e2e/global-setup.ts` are
+    unchanged between `86af73e` and `2443adc` — see
     [What each suite needs running](#what-each-suite-needs-running), which is
-    current as of 24 September even though the counts above are not.
+    current as of 26 September even though the counts above are not.
 
 ### What each suite needs running
 
@@ -52,7 +63,7 @@ every spec under that directory. This is the table to check before running
 anything locally — it is what separates a suite you can start cold from one that
 will fail its preconditions.
 
-Re-read at `86af73e` on 24 September 2026.
+Re-read at `86af73e` on 24 September 2026; unchanged at `2443adc` (v2026.09.12).
 
 | Config | Declares `webServer`? | Has a `globalSetup`? | What must already be up |
 |---|---|---|---|
@@ -108,7 +119,7 @@ Four things follow from that table:
 
 !!! warning "Count these with the runner, never with `grep`"
     A static count of top-level `test(` across the eleven frontend specs gives
-    **24** at `86af73e`. The runner reported **27** across ten of them on
+    **24** at `86af73e`, and still 24 at `2443adc`. The runner reported **27** across ten of them on
     30 August. `login-redirect.spec.ts` alone declares one `test(` and runs
     five, because the cases are parameterised — and `rip-r21-journey.spec.ts`
     contains **two** `test.skip(true, reason)` calls *inside* test bodies,
@@ -147,8 +158,9 @@ suite trades parallelism for correctness.
 
 The directory held **27 tests across 10 specs** when it was last run, in one
 pass on 30 August 2026 against `acc` at `15dfbf9`: **27 passed, 1.9m**, no
-failures, no flakes, nothing skipped. It holds **eleven specs** at `86af73e`,
-so the 27 is a floor — see the warning at the top of this page.
+failures, no flakes, nothing skipped. It holds **eleven specs** at `86af73e`
+and at `2443adc`, so the 27 is a floor — see the warning at the top of this
+page.
 
 | Spec | Tests | Covers |
 |---|---:|---|
@@ -162,10 +174,28 @@ so the 27 is a floor — see the warning at the top of this page.
 | `zorgtoeslag-journey.spec.ts` | 1 | The zorgtoeslag journey |
 | `tenant-isolation.spec.ts` | 1 | Tenant scoping |
 | `smoke.spec.ts` | 1 | Boot and render |
-| **`thuisbatterij-journey.spec.ts`** | *not yet measured* | **New in this window.** A third deep two-persona journey: a citizen applies for a Thuisbatterij subsidy, the six-decision `RechtEnHoogteSubsidieThuisbatterij` DRD evaluates, and the caseworker reviews the resulting task |
+| **`thuisbatterij-journey.spec.ts`** | *not yet measured* | **New in v2026.09.11.** A third deep two-persona journey: a citizen applies for a Thuisbatterij subsidy, the six-decision `RechtEnHoogteSubsidieThuisbatterij` DRD evaluates, and the caseworker reviews the resulting task |
+
+!!! note "The thuisbatterij journey accepts both task names — edited in v2026.09.12"
+    `0e71fd3`, *"match the Thuisbatterij tasks by their Dutch names as well"*,
+    widened the two task matchers the caseworker half of the journey depends
+    on, because the Thuisbatterij process definitions — which come from
+    linked-data-explorer — rename those tasks in the swimlane redesign. Each
+    regex now accepts the old English name **or** the new Dutch one:
+
+    | Task | Before the redesign | After it |
+    |---|---|---|
+    | The review | *Case review: recht en hoogte subsidie…* | *Beoordeling behandelaar: recht en hoogte subsidie…* |
+    | The follow-up notify task | *Phase 6: Notify applicant of decision* | *Fase 6: Aanvrager informeren over besluit* |
+
+    Accepting both rather than switching to the new names is deliberate, and the
+    commit says why: the journey should pass on engines still running the old
+    definitions and on those running the new ones. The test count is unchanged — one `test()` — and the
+    spec has still never been run by these pages, so its row stays *not yet
+    measured*. Read from the spec at `2443adc`, not run.
 
 !!! note "What the thuisbatterij journey is actually guarding"
-    Read from the spec at `86af73e`, not run. Its processes deploy under
+    Read from the spec at `86af73e`, not run; the passage below is unchanged at `2443adc`. Its processes deploy under
     tenant-id `flevoland` while the DMNs they call deploy **without** a tenant,
     so every business-rule task carries
     `camunda:decisionRefTenantId="${null}"` to reach them. Drop that attribute
@@ -370,11 +400,12 @@ starts its own dev server.
 
 Its own tests were last counted on 30 August; the timing and pass figures on
 [Public site suite](public-site.md#playwright-suite) date from 19 August and
-were re-run for none of v2026.08.23, v2026.09.7, v2026.09.9 or v2026.09.11. The
-package's unit suite has grown three times since (**32 files, 235 tests on
-24 September 2026**, up from 31 and 225), so the six E2E tests are an inventory
-figure, not a fresh result. The inventory itself was re-checked at `86af73e`:
-still one spec, still in no workflow.
+were re-run for none of v2026.08.23, v2026.09.7, v2026.09.9, v2026.09.11 or
+v2026.09.12. The package's unit suite has grown three times since (**32 files,
+235 tests**, up from 31 and 225, and unchanged between 24 and 26 September
+2026), so the six E2E tests are an inventory figure, not a fresh result. The
+inventory itself was re-checked at `2443adc`: still one spec, still in no
+workflow.
 
 ---
 

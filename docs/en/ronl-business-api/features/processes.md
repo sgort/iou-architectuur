@@ -29,7 +29,7 @@ One failure mode is left, and it is a client error: a phase code the catalogue d
 Starting a process creates a **process instance** — a running copy of the workflow, addressed by its own instance id. A start request carries:
 
 - the **process definition key** identifying which workflow to start,
-- an optional **business key**, a caller-chosen identifier for the instance (used to correlate it with a case elsewhere), and
+- an optional **business key**, the case's human-facing handle. A key the caller supplies is kept verbatim — a RIP phase started for a project passes the key its first phase minted, so every phase of one project shares it. Without one, the backend mints `<owning organisation>-<timestamp>`, naming the organisation that owns the case rather than the caller's; and
 - a set of **input variables**, which seed the process instance's variable scope and are typically supplied by a **start form** — a schema deployed alongside the BPMN and bound to the process's start event.
 
 The response reports the new instance's id, business key, and status (`active`, `suspended`, or `ended`).
@@ -42,16 +42,28 @@ Once running, an instance can be queried for its status and variables, cancelled
 
 ## Tenancy
 
-Operaton has a native **tenant-id** concept, independent of any variable carried inside the process. A deployment can be made under a specific tenant-id, restricting who can see or start it, or it can be deployed **untenanted** — with no tenant-id at all — in which case it is visible and startable regardless of tenant.
+Operaton has a native **tenant-id** concept, independent of any variable carried inside the process. A deployment can be made under a specific tenant-id, or it can be deployed **untenanted** — with no tenant-id at all.
 
-When a process is started or queried, the request resolves against a tenant:
+### Which deployment a start resolves to
 
-- If the process definition's own deployed tenant-id can be determined, that tenant scopes the request — not necessarily the tenant of the caller. A process can deliberately be deployed under a fixed tenant so that every instance of it, regardless of who starts it, is handled by that one tenant.
-- If no tenant-scoped deployment of that key can be found, the platform falls back to starting it untenanted — the behaviour a process gets when it has deliberately been deployed shared, without a tenant-id, and is meant to be startable across tenants.
+Before starting, the backend asks Operaton which tenants deploy the latest version of the process definition key, and picks one:
 
-This makes multi-tenancy a property of the deployment, not of the caller: the same process definition key can be deployed once, shared across every tenant, or deployed separately per tenant, and the platform resolves which applies without the caller needing to know which case it is.
+1. The caller's own tenant, if it deploys the key.
+2. Otherwise the single tenant that deploys it.
+3. If several other tenants deploy it and none of them is the caller's, there is no basis for choosing: the start is refused with `409 AMBIGUOUS_DEPLOYMENT` and nothing is started. The start-form lookup answers the same way.
+4. If no tenant-scoped deployment exists (or the lookup itself fails), the process starts untenanted — the behaviour of a process deliberately deployed shared, without a tenant-id.
 
-Every running instance also carries its own tenant as a process variable, separate from Operaton's native tenant-id, which is what scopes later access to that instance's status, variables, and history to the tenant it belongs to.
+The choice never depends on the order in which Operaton lists its definitions.
+
+### Who owns the case
+
+The resolved deployment then decides whether the caller may start it and which organisation owns the resulting case:
+
+- An untenanted deployment, or one under the caller's own tenant: the case belongs to the caller's tenant.
+- A deployment under another tenant, started by a citizen: the case goes to the deploying tenant, and `originTenantId` records the tenant the citizen came in through. A citizen of one municipality applying for a benefit handled by a national organisation is this case.
+- A deployment under another tenant, started by staff: refused with `403 TENANT_MISMATCH`; no instance is created.
+
+The owning tenant is written into the instance's `municipality` process variable, so it always agrees with the tenant Operaton runs the instance under. That variable is the only tenant label any access check reads, and the checks fail closed: an instance without it is refused to everyone. The five reads — status, variables, historic variables, activity history and decision document — are open to the owning tenant and to the case's own applicant; cancelling the instance is open to the owning tenant only. See [Authentication & IAM — Tenancy](authentication-iam.md#tenancy) for the full rule set.
 
 This tenant scoping is covered by an automated end-to-end test — see [Testing](../developer/testing/dashboards/caseworker.md#e2e).
 

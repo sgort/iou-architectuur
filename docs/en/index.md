@@ -137,13 +137,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.09.11** · *September 2026*
+-   **⚙️ RONL Business API — v2026.09.12** · *September 2026*
 
     ---
 
-    **A promotion is one ordered run, and the backend finally deploys itself**
+    **The API describes itself, and one rule decides every tenant**
 
-    A push to `main` used to fire four deploy workflows at once with nothing sequencing them, and the frontends reliably won — so a new site could call a backend that did not yet serve its routes, and the public site would prerender that 404 straight into its deployed output. [A single promotion workflow](ronl-business-api/developer/deployment/backend.md#how-a-promotion-reaches-production) now decides what changed, deploys the backend alone, and releases the three sites only once it is serving the promoted commit. The backend [deploys from CI at last](ronl-business-api/developer/cicd.md), over OIDC and installing from the lockfile rather than re-resolving every version range on a developer's machine — and it proves itself afterwards by polling `/v1/health` until the running build is the commit just shipped. Pull-request previews became [opt-in and useful in the same release](ronl-business-api/developer/cicd.md#pull-request-previews): one is created only when someone asks for it, eight that had leaked are now reported by a check, and a preview can reach the acceptance backend instead of only proving that static pages render. On the public site, a rule's concepts [now say which side of the rules they sit on](ronl-business-api/user-guide/public-site.md) — what the rules need, and what they determine.
+    The backend now publishes an OpenAPI 3.1 description at `/v1/openapi.json` — 113 of its 131 operations, each checked against a running service, with only the machine-to-machine group still to come — and a test fails whenever a served route is neither described nor listed as pending. [Browse it on the new API Specification page](ronl-business-api/reference/api-specification.md). Tenant access now has [a single source of truth](ronl-business-api/features/authentication-iam.md#tenancy): every process and task check reads the case's own organisation label, refuses when there is none, and answers one code, `403 TENANT_MISMATCH`. Staff can no longer start another organisation's process, a citizen's case goes to the organisation that runs it and stays readable to them, and a task completion can no longer relabel a case. On the supply chain, every release now carries an SBOM, dependencies are [audited daily on both branches](ronl-business-api/developer/cicd.md), and an unused Keycloak adapter that pulled 48 packages into production is gone. [Local development](ronl-business-api/developer/local-development.md) is rewritten from the code, including how the Operaton engine starts and why a bash shell is required.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

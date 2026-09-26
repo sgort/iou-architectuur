@@ -14,7 +14,7 @@ component: RONL Business API
 |---|---|---|---|
 | `NODE_ENV` | Yes | — | `development`, `acceptance`, or `production` |
 | `PORT` | Yes | `3002` | HTTP listen port (Azure uses `8080`) |
-| `HOST` | Yes | `localhost` | Bind address (`0.0.0.0` on Azure) |
+| `HOST` | No | `0.0.0.0` | Bind address |
 
 ### CORS
 
@@ -73,7 +73,7 @@ component: RONL Business API
 |---|---|---|
 | `OPERATON_BASE_URL` | Yes | `https://operaton.open-regels.nl/engine-rest` |
 | `OPERATON_TIMEOUT` | `30000` | Operaton request timeout in ms |
-| `OPERATON_M2M_BASE_URL` | — | Dedicated Operaton `engine-rest` base URL for M2M routes. Falls back to `OPERATON_BASE_URL` when unset |
+| `OPERATON_M2M_BASE_URL` | — | Dedicated Operaton `engine-rest` base URL for M2M routes. Defaults to `https://operaton-doc.open-regels.nl/engine-rest` when unset |
 | `OPERATON_M2M_USERNAME` | — | Basic auth username for the M2M Operaton instance |
 | `OPERATON_M2M_PASSWORD` | — | Basic auth password for the M2M Operaton instance |
 
@@ -82,9 +82,8 @@ component: RONL Business API
 | Variable            | Required              | Default | Description                                                                 |
 |---------------------|-----------------------|---------|-----------------------------------------------------------------------------|
 | `MCP_ENABLED`       | No                    | `false` | Enables the MCP client and `POST /v1/mcp/chat`. Must be `true` on ACC/PROD. |
-| `ANTHROPIC_API_KEY` | — | Anthropic API key; required when `MCP_ENABLED=true` |
 | `MCP_SKIP_HEALTH_CHECK` | No | `false` | Skips provider health checks on startup. Useful when providers start slowly on first deployment. |
-| `ANTHROPIC_API_KEY` | Conditional | — | Anthropic API key. Required when `MCP_ENABLED=true` and `AnthropicLlmProvider` is active. |
+| `ANTHROPIC_API_KEY` | Yes | — | Anthropic API key. Required in every environment, whatever `MCP_ENABLED` says: the boot fails without it, and in production also when it is still a placeholder value. |
 | `OPENAI_API_KEY` | No | — | Enables `OpenAILlmProvider` and exposes `gpt-4o` and `gpt-4o-mini` in the model selector. Leave unset to use Anthropic only. Requires the `openai` package: `npm install openai --workspace=@ronl/backend`. |
 | `TRIPLYDB_MCP_ENABLED` | No | `false` | Enables the TriplyDB Knowledge Graph MCP provider. |
 | `TRIPLYDB_ENDPOINT` | Conditional | — | SPARQL endpoint URL. Required when `TRIPLYDB_MCP_ENABLED=true`. Use `https://api.open-regels.triply.cc/datasets/stevengort/RONL/services/RONL/sparql` for the canonical RONL graph. |
@@ -101,7 +100,7 @@ component: RONL Business API
  
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `OPERATON_M2M_BASE_URL` | No | — | Base URL for a dedicated Operaton instance used by M2M routes only. Falls back to `OPERATON_BASE_URL` when unset. On ACC: `https://operaton-doc.open-regels.nl/engine-rest` |
+| `OPERATON_M2M_BASE_URL` | No | `https://operaton-doc.open-regels.nl/engine-rest` | Base URL for a dedicated Operaton instance used by M2M routes only. The default applies when unset, so M2M routes never fall back to `OPERATON_BASE_URL` |
 | `OPERATON_M2M_USERNAME` | No | — | Basic auth username for the M2M Operaton instance |
 | `OPERATON_M2M_PASSWORD` | No | — | Basic auth password for the M2M Operaton instance |
 
@@ -122,7 +121,7 @@ component: RONL Business API
 | `GITLAB_TOKEN` | — | Personal access token with `api` scope for the GitLab instance |
 | `GITLAB_BASE_URL` | `https://git.open-regels.nl` | GitLab instance base URL |
 | `GITLAB_PROJECT_PATH` | — | URL-encoded project path (e.g. `showcases%2Fiou-architectuur`) |
-| `GITLAB_UC_LABEL` | `Submitted` | Label applied to newly created use-case issues |
+| `GITLAB_UC_LABEL` | `uc::submitted` | Label applied to newly created use-case issues |
 
 ### Database (PostgreSQL)
 
@@ -145,7 +144,7 @@ component: RONL Business API
 |---|---|---|---|
 | `RATE_LIMIT_WINDOW_MS` | No | `60000` | Rate limit window in ms |
 | `RATE_LIMIT_MAX_REQUESTS` | No | `1000` | Max requests per window |
-| `RATE_LIMIT_PER_TENANT` | No | `true` | Scope limit per tenant+IP |
+| `RATE_LIMIT_PER_TENANT` | No | `true` | Asks for the limit to be keyed per tenant and IP. **Has no effect**: the limiter runs before any route authenticates the caller, so there is never a tenant to key on and every bucket is per client IP |
 
 !!! note "The limit buckets per client, which is why acceptance could raise it"
     `TRUST_PROXY` is `true` on both deployed tiers, so the limiter buckets per
@@ -164,8 +163,8 @@ component: RONL Business API
 |---|---|---|---|
 | `LOG_LEVEL` | No | `info` | `debug`, `info`, `warn`, `error` |
 | `LOG_FORMAT` | No | `json` | `json` (production) or `pretty` (local) |
-| `LOG_FILE_ENABLED` | No | `false` | Write logs to file |
-| `LOG_FILE_PATH` | No | — | Log file directory |
+| `LOG_FILE_ENABLED` | No | `true` | Write logs to rotating files |
+| `LOG_FILE_PATH` | No | `./logs` | Log file directory |
 | `LOG_FILE_MAX_SIZE` | No | `10m` | Max log file size before rotation |
 | `LOG_FILE_MAX_FILES` | No | `7` | Number of rotated log files to keep |
 
@@ -175,7 +174,7 @@ component: RONL Business API
 |---|---|---|---|
 | `AUDIT_LOG_ENABLED` | No | `true` | Enable audit log writes |
 | `AUDIT_LOG_INCLUDE_IP` | No | `true` | Include client IP in audit records |
-| `AUDIT_LOG_RETENTION_DAYS` | No | `2555` | Days to retain audit records (7 years) |
+| `AUDIT_LOG_RETENTION_DAYS` | No | `2555` | Parsed into `Config` and **read by no code**: nothing purges audit records |
 
 ### Security
 
@@ -189,24 +188,24 @@ component: RONL Business API
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `ENABLE_SWAGGER` | No | `true` | Read into `Config` and **has no effect** — no OpenAPI surface is served at any path |
-| `ENABLE_METRICS` | No | `true` | Enable metrics endpoint |
-| `ENABLE_HEALTH_CHECKS` | No | `true` | Enable `/v1/health` endpoint |
-| `ENABLE_TENANT_ISOLATION` | No | `true` | Enforce per-tenant data isolation |
-| `DEFAULT_MAX_PROCESS_INSTANCES` | No | `1000` | Max active instances per tenant |
+| `ENABLE_TENANT_ISOLATION` | No | `true` | Switches the tenant middleware's presence check (`403 MISSING_TENANT` for a token without a tenant). It does not switch tenant access: the `TENANT_MISMATCH` checks on process instances and tasks always run |
+| `ENABLE_METRICS` | No | `true` | Parsed into `Config` and **read by no code**; no metrics endpoint is served |
+| `ENABLE_HEALTH_CHECKS` | No | `true` | Parsed into `Config` and **read by no code**; `/v1/health` is always served |
+| `DEFAULT_MAX_PROCESS_INSTANCES` | No | `1000` | Parsed into `Config` and **read by no code**; no per-tenant instance limit is applied |
 | `RONL_SPARQL_ENDPOINT` | No | `https://api.triplydb.com/...` | Override the default RONL TriplyDB SPARQL endpoint used by the Regelcatalogus service |
 
-!!! warning "`ENABLE_SWAGGER` does nothing — the flag exists, the surface does not"
-    It is parsed into `Config` and defaults to `true`, and it is in
-    `.env.example`, so a reader will find it. Nothing reads it into a mount:
-    there is no Swagger, OpenAPI or Scalar dependency in the backend at all.
+### Media aggregator
 
-    This is recorded rather than quietly dropped because the service advertised
-    documentation at `/v1/docs` from its initial commit until v2026.09.10 and
-    never served it — planned and not built, not a mount that regressed. Serving
-    real documentation for a service with 17 route groups and external consumers
-    remains worth doing; until something serves it, the root response says
-    nothing rather than pointing a consumer at a 404.
+The backend both serves a media aggregator at `/v1/media-aggregator` and, for the policy-analysis cockpit, consumes one as a media source. The two halves are configured separately.
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `MEDIA_SOURCE_ENABLED` | No | `false` | Adds media as a policy-analysis source: curation and searches query the aggregator at `MEDIA_AGGREGATOR_BASE` |
+| `MEDIA_AGGREGATOR_BASE` | When `MEDIA_SOURCE_ENABLED=true` | — | Base URL of the aggregator the policy-analysis media source calls (`<base>/search`) |
+| `MEDIA_AGGREGATOR_API_KEY` | When the aggregator requires a key | — | Sent as `Authorization: Bearer` by the policy-analysis media source |
+| `MEDIA_AGGREGATOR_ACCEPT_KEY` | No | — | Guards `GET /v1/media-aggregator/search`: when set, a caller must send it as a bearer token, and anything else gets `401`; when unset, the endpoint is open. This is the `mediaAggregatorKey` security scheme in the OpenAPI description. Set it to the same value as `MEDIA_AGGREGATOR_API_KEY` when the backend consumes its own aggregator |
+| `MEDIA_AGGREGATOR_CACHE_TTL_MS` | No | `900000` | How long the aggregator's in-memory article set is served before a refresh (15 minutes). A missing or non-positive value uses the default |
+| `MEDIA_AGGREGATOR_SENTIMENT_ENABLED` | No | — | **Has no effect**: sentiment analysis is not implemented, and every article's sentiment is `null` whatever this says |
 
 ### Public surface
 

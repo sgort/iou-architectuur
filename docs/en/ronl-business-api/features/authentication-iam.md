@@ -10,10 +10,10 @@ RONL Business API uses **Keycloak** as its identity and access management layer,
 
 ## Authenticating
 
-Keycloak issues tokens along two distinct paths, which converge at the same validation step once a token reaches the Business API:
+Keycloak is the only token issuer the Business API accepts. The frontend sends the browser to Keycloak's login, with an identity-provider hint when the user picked DigiD, eHerkenning or eIDAS on the login choice page:
 
-- A user can sign in directly against Keycloak, with credentials managed in Keycloak itself.
-- A user can be authenticated through an external identity provider — DigiD, eHerkenning, or eIDAS — federated by Keycloak acting as an identity broker. The browser is redirected to the chosen provider, the provider returns a signed assertion, and Keycloak validates it and issues a token in exchange, mapping the provider's own attributes onto claims Keycloak controls.
+- A user can sign in directly against Keycloak, with credentials managed in Keycloak itself. This is how every account in the repository's realm export signs in.
+- Keycloak can act as an identity broker for an external provider: the browser is redirected to the provider, the provider returns a signed assertion, and Keycloak validates it and issues its own token. The realm export defines `digid` and `eidas` as SAML providers, both disabled and pointing at placeholder endpoints; it defines no eHerkenning provider. Where the hinted provider is not available, Keycloak shows its own login form.
 
 Either way, the caller ends up with a Keycloak-issued JWT access token and presents it on every subsequent request as an `Authorization: Bearer` header.
 
@@ -25,7 +25,7 @@ Every request to a protected endpoint passes through JWT validation before any r
 
 1. The `Authorization: Bearer <token>` header is extracted; a missing or malformed header is rejected with `401 MISSING_TOKEN`.
 2. The signing key is fetched from Keycloak's JWKS endpoint, matched by the token's `kid`, and cached to avoid a lookup on every request.
-3. The signature is verified, and the token's `exp`, `iss`, and `aud` claims are checked against the configured issuer and audience.
+3. The signature is verified (RS256 only), and the token's `exp`, `iss`, and `aud` claims are checked against the configured issuer and audience.
 4. On success, the decoded claims are attached to the request as the authenticated caller's identity for every downstream check.
 
 A token that fails any of these steps is rejected with `401 INVALID_TOKEN` before it reaches a route handler.
@@ -34,35 +34,50 @@ A token that fails any of these steps is rejected with `401 INVALID_TOKEN` befor
 
 ## Claims carried in the token
 
-Beyond the standard OIDC claims, a token carries the attributes the platform relies on for authorization: the caller's identity, their tenant, their organisation type, their roles, and — where relevant — a level of assurance reflecting how strongly their identity was established. An optional mandate claim can also express that the caller is acting on someone else's behalf, and where the caller is a member of staff rather than an external user, an employee identifier can be carried as well.
+Beyond the standard OIDC claims, a token carries the attributes the platform relies on for authorization: the caller's identity, their tenant, their organisation type, their realm roles, and a level of assurance reflecting how strongly their identity was established. An optional mandate claim can express that the caller is acting on someone else's behalf, and where the caller is a member of staff, an employee identifier can be carried as well. See [JWT Claims](../reference/jwt-claims.md) for the claim names and the Keycloak mappers that produce them.
 
 ---
 
 ## Roles and authorization
 
-A caller's roles are carried in the token and checked against whatever a given endpoint requires: a route can require the caller to hold at least one of a set of roles, and a caller lacking all of them is rejected with `403 FORBIDDEN`. This is the same role-checking mechanism that determines which candidate groups a caller's roles let them see — see [Tasks — Visibility](tasks.md#visibility).
+A caller's roles are read from the token's `realm_access.roles` and checked against whatever a given endpoint requires: a route can require the caller to hold at least one of a set of roles, and a caller lacking all of them is rejected with `403 FORBIDDEN`. The same roles decide which candidate groups a caller's task list covers — see [Tasks — Visibility](tasks.md#visibility).
 
-Some operations additionally require a minimum level of assurance, checked against the token's assurance-level claim rather than its roles: evaluating a decision or starting certain processes can require the caller's identity to have been established to at least a given level, rejecting the request with `403 INSUFFICIENT_ASSURANCE` otherwise.
+Two operations additionally require a minimum level of assurance, checked against the token's `loa` claim rather than its roles. The levels are ordered `basis`, `midden`, `substantieel`, `hoog`: evaluating a decision requires at least `basis`, and starting a process at least `midden`. A token below the required level, or carrying no recognised level at all, is rejected with `403 INSUFFICIENT_ASSURANCE`.
 
 ---
 
 ## Tenancy
 
-Every authenticated caller carries a tenant identifier and an organisation type as claims in their token. Tenancy is the mechanism, applied consistently, by which the platform scopes what a signed-in caller can reach — it is not a description of any one deployment, and the same underlying mechanism applies whether a given deployment is used by one organisation or by several sharing the platform.
+Every authenticated caller carries a tenant identifier (the `municipality` claim) and an organisation type in their token. Tenancy decides which organisation's cases a signed-in caller can reach. The same mechanism applies whether a deployment serves one organisation or several.
 
-A dedicated tenant-checking step runs after authentication and before a request reaches its handler:
+**The tenant must be present.** On the process, task, decision, capacity, HR, RIP, ValidSign and policy-analysis routes, a tenant step runs after authentication and rejects a token that carries no tenant identifier with `403 MISSING_TENANT`. `ENABLE_TENANT_ISOLATION=false` switches this presence check off; it does not switch off any of the checks below.
 
-- It requires a tenant identifier to be present in the caller's claims at all, rejecting a token that carries none with `403 MISSING_TENANT`.
-- Where a request addresses a resource by an explicit tenant identifier in its path, that identifier is checked against the caller's own tenant, and a mismatch is rejected with `403 TENANT_MISMATCH` — a caller cannot address another tenant's resources by simply naming them.
-- When a caller starts a process, their tenant identifier, organisation type, and own identity are attached to the new process instance's variables automatically, and the instance's business key is derived to include the tenant — so every later check against that instance (its status, its variables, its history) traces back to the tenant that started it.
+**One label decides access.** Every tenant decision on a process instance or task is made in one module, `auth/tenant-access.ts`, and reads one value: the instance's `municipality` process variable. Operaton's own tenant-id on the deployment is never compared against. The checks fail closed and answer the same way:
 
-This tenant identifier is a claim the platform itself checks; it is separate from Operaton's own native tenant-id concept, which scopes which *deployment* of a process or decision answers a request rather than which caller may reach it. See [Processes — Tenancy](processes.md#tenancy) for how the two compose: a caller's tenant governs what they are authorized to reach, while a process definition's deployed tenant-id governs which deployment of that process definition actually runs.
+- An instance with no `municipality` label is refused to every caller — an instance started outside this backend carries none.
+- Every tenant refusal is `403 TENANT_MISMATCH`.
+
+**Starting a process** stamps the label. The backend first resolves which tenant the process is deployed under (see [Processes — Tenancy](processes.md#tenancy)), then applies the start rule:
+
+- Deployed untenanted, or under the caller's own tenant: the case belongs to the caller's tenant.
+- Deployed under another tenant, caller is a citizen (holds the `citizen` realm role): the case goes to the deploying tenant, and `originTenantId` records the citizen's own tenant.
+- Deployed under another tenant, caller is anyone else: refused with `403 TENANT_MISMATCH`, and no instance is created.
+
+The stamped `municipality` always comes from this rule, never from the request body. The start also records the caller as `applicantId` and `initiator`, with their organisation type and assurance level. The business key is kept as the caller supplied it; otherwise it is minted as `<owning organisation>-<timestamp>`. It grants nothing — access runs on `municipality`.
+
+**Reading and acting on an instance** follows the owning organisation:
+
+- The five process reads — status, variables, historic variables, activity history and decision document — are allowed to the owning tenant, or to the case's own applicant (the caller whose user id matches `applicantId`). A citizen whose case went to another tenant's deployment can therefore still follow it.
+- Cancelling an instance (`DELETE`) and every task operation are allowed to the owning tenant only.
+
+**The label cannot be rewritten.** `municipality`, `originTenantId` and `applicantId` are reserved: a user task completion that includes any of them is refused with `400 RESERVED_VARIABLE` before anything reaches Operaton. The machine-to-machine routes under `/v1/m2m` are trusted system actors: they run without the tenant step, and their completion route does not apply this check.
 
 ---
 
 ## Related
 
 - [Tasks](tasks.md) — how a caller's roles determine which candidate groups they belong to, and how tenancy scopes a task list
-- [Processes](processes.md) — Operaton's own native tenant-id, and how it composes with a caller's tenant
+- [Processes](processes.md) — which deployment a start resolves to, and how that sets the owning tenant
 - [Security & Compliance](security-compliance.md) — how authentication and audit logging fit into the platform's wider security posture
-- [API Design](api-design.md) — the versioned surface these checks protect
+- [API Design](api-design.md) — the versioned surface these checks protect, and its error codes
+- [JWT Claims](../reference/jwt-claims.md) — the claims behind the identity, tenant, role and assurance checks

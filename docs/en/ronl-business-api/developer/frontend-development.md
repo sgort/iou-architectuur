@@ -293,18 +293,19 @@ If a request returns HTTP 401 (token expired between refresh cycles), the interc
 
 ## Environment variables
 
-Required in `.env` files:
+The frontend reads its settings from committed per-mode files in
+`packages/frontend/`. Vite picks the file from the mode, so there is no `.env`
+to create for local development:
 
-```bash
-# Keycloak IAM
-VITE_KEYCLOAK_URL=https://acc.keycloak.open-regels.nl
+| Variable | `.env.development` (`vite`, local) | `.env.acceptance` (`build:acc`) | `.env.production` (`build`, `build:prod`) |
+|---|---|---|---|
+| `VITE_KEYCLOAK_URL` | `http://localhost:8080` | `https://acc.keycloak.open-regels.nl` | `https://keycloak.open-regels.nl` |
+| `VITE_API_URL` | `http://localhost:3002/v1` | `https://acc.api.open-regels.nl/v1` | `https://api.open-regels.nl/v1` |
+| `VITE_LDE_API_URL` (Procesbibliotheek) | `http://localhost:3001/v1` | `https://acc.backend.linkeddata.open-regels.nl/v1` | `https://backend.linkeddata.open-regels.nl/v1` |
+| `VITE_PA_SIGNALS_MOCK`, `VITE_PA_DOSSIERS_MOCK`, `VITE_PA_AGENDA_MOCK` | `false` | `false` | `false` |
 
-# Business API
-VITE_API_URL=https://acc.api.open-regels.nl/v1
-
-# Linked Data Explorer (used by ProcesBibliotheek)
-VITE_LDE_API_URL=https://acc.backend.linkeddata.open-regels.nl/v1
-```
+To override a value on your own machine, use `.env.development.local`, which is
+gitignored. See [Local Development Setup](local-development.md#front-end-configuration).
 
 **Environment detection:**
 
@@ -327,28 +328,34 @@ This is used in the Architecture footer to show environment-specific URLs.
 
 ## Development commands
 
+Install once from the repository root with `npm ci`; see
+[Local Development Setup](local-development.md#clone-and-install). The
+commands below are `@ronl/frontend` workspace scripts, run from the root:
+
 ```bash
-# Install dependencies
-npm install
+# Dev server only (http://localhost:5173), without the dependency and Docker checks
+npm run dev:frontend
 
-# Start dev server (http://localhost:5173)
-npm run dev
+# Build: production mode, or acceptance mode
+npm run build --workspace=@ronl/frontend
+npm run build:acc --workspace=@ronl/frontend
 
-# Build for production
-npm run build
+# Preview the last build
+npm run preview --workspace=@ronl/frontend
 
-# Preview production build
-npm run preview
+# Type check, lint
+npm run type-check --workspace=@ronl/frontend
+npm run lint --workspace=@ronl/frontend
 
-# Type check
-npm run type-check
-
-# Lint
-npm run lint
-
-# Format
-npm run format
+# Unit tests (Vitest), E2E (Playwright)
+npm run test --workspace=@ronl/frontend
+npm run test:e2e --workspace=@ronl/frontend
 ```
+
+`npm run dev` at the root starts the frontend together with the backend, the
+public site and PA-demo. Formatting is a root script only, covering the whole
+repository: `npm run format` writes, `npm run check-format` checks. For the test
+suites, see [Testing](testing/overview.md).
 
 ---
 

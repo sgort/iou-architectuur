@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Troubleshooting
 
 ---
@@ -13,6 +17,7 @@ Start by identifying which layer the error comes from:
 | Terminal running `npm run dev` | Backend errors, stack traces |
 | `docker compose logs -f keycloak` | Keycloak startup, authentication errors |
 | `docker compose logs -f postgres` | Database connection errors |
+| `docker compose logs -f operaton` | Local engine startup, deployment and process errors |
 
 ---
 
@@ -24,7 +29,12 @@ Start by identifying which layer the error comes from:
 Token validation failed: jwt audience invalid. expected: ronl-business-api
 ```
 
-The access token is missing the `aud` claim. Add the Audience mapper in Keycloak Admin:
+The access token is missing the `aud` claim. Locally, a realm imported from the
+current `config/keycloak/ronl-realm.json` already carries this mapper and the
+`realm_roles` mapper below; see
+[Local Development — Common issues](local-development.md#common-issues) for
+resetting an older realm. On an environment you cannot reset, add the Audience
+mapper in Keycloak Admin:
 
 1. Open Keycloak Admin: `http://localhost:8080`
 2. Select realm **ronl**
@@ -120,19 +130,34 @@ The response must include `Access-Control-Allow-Origin: https://mijn.open-regels
 curl http://localhost:3002/v1/health | jq .
 ```
 
-Expected:
+The endpoint answers `200` with `data.status` `"healthy"` when Keycloak and
+Operaton are both up, and `503` with `"degraded"` otherwise:
+
 ```json
 {
-  "status": "healthy",
-  "services": {
-    "keycloak": { "status": "up" },
-    "operaton": { "status": "up" }
+  "success": false,
+  "data": {
+    "status": "degraded",
+    "dependencies": {
+      "keycloak": { "status": "up", "latency": 9 },
+      "operaton": { "status": "down", "error": "<the connection error>" },
+      "cache": { "status": "up" }
+    }
   }
 }
 ```
 
-If `keycloak` is `"down"`: check Docker — `docker compose ps` — and that Keycloak is listening on port 8080.  
-If `operaton` is `"down"`: check that `https://operaton.open-regels.nl` is reachable from your network.
+The full response shape is on [Local Development — Verifying the setup](local-development.md#verifying-the-setup).
+
+If `keycloak` is `"down"`: check `docker compose ps` and that `ronl-keycloak` is
+healthy and listening on port 8080.  
+If `operaton` is `"down"`: locally the engine is the `ronl-operaton` container.
+Check `docker compose ps` and `docker compose logs operaton`, and check that
+`OPERATON_BASE_URL` in `packages/backend/.env` is
+`http://localhost:8081/engine-rest`. Without that key the backend falls back to
+the shared remote engine.  
+If `cache` is `"down"`: Redis (`ronl-redis`) is not reachable. This does not
+make the check fail; the PA monitoring cache falls back to live fetches.
 
 ---
 
@@ -160,7 +185,9 @@ Alternatively, change the port in `packages/backend/.env`:
 PORT=3003
 ```
 
-And update `VITE_API_URL` in `packages/frontend/.env` to match.
+And point `VITE_API_URL` at it in `packages/frontend/.env.development.local`
+(gitignored; it overrides the committed `.env.development`). Add
+`http://localhost:<port>` origins to `CORS_ORIGIN` if you move a front end.
 
 ---
 
@@ -229,17 +256,23 @@ Verify the users exist in Keycloak:
 
 1. Open Keycloak Admin → **Users**
 2. Search for `test-citizen-utrecht`
-3. Should find 8 users total (citizen + caseworker × 4 municipalities)
+3. The realm holds 22 test users across eight tenants, all with password
+   `test123`; see [Local Development — Test users](local-development.md#test-users)
 
-If the users are missing, the realm import did not run. Reimport:
+If the users are missing, the realm import did not run, or ran from an older
+realm file. Keycloak stores the realm in Postgres and skips the import when a
+`ronl` realm already exists, so removing only `keycloak-data` does not bring it
+back. Reset all volumes:
 
 ```bash
-docker compose down
-docker volume rm ronl-business-api_keycloak-data
-docker compose up -d
-# Wait 60 seconds for Keycloak to start and import the realm
+npm run docker:down:volumes
+npm run docker:up
+# Wait up to a minute for Keycloak to become healthy and import the realm
 npm run dev
 ```
+
+This also clears the audit database, Redis and the Operaton deployments, so
+[deploy the fixtures again](local-development.md#the-engine-starts-empty).
 
 ---
 
@@ -278,9 +311,16 @@ If still broken, use Incognito for the remainder of the session. This is a brows
 warning: LF will be replaced by CRLF
 ```
 
-```bash
-git config --global core.autocrlf false
-```
+The repository's `.gitattributes` sets `* text=auto eol=lf`, which keeps text
+files LF on checkout and commit whatever your `core.autocrlf` says. You do not
+need to change your Git configuration for this repository. If a file still shows
+up as modified with only line-ending changes after you pull the `.gitattributes`
+change, run `git add --renormalize .` once.
+
+### `bash` not found, or scripts running in WSL
+
+`npm ci`, `npm run dev` and the checks call `bash`. See
+[Local Development — A bash shell is required](local-development.md#a-bash-shell-is-required).
 
 ---
 
@@ -292,21 +332,24 @@ When everything is broken and you want a clean slate:
 # 1. Stop dev servers
 Ctrl+C
 
-# 2. Wipe Docker (containers + volumes = all Keycloak data)
-docker compose down -v
-docker system prune -f
+# 2. Wipe Docker: containers and all four volumes
+#    (Keycloak realm, audit database, Redis, Operaton deployments)
+npm run docker:down:volumes
 
-# 3. Wipe Node modules
-rm -rf node_modules
-rm -rf packages/*/node_modules
-
-# 4. Fresh install and start
-npm install
+# 3. Reinstall exactly what package-lock.json records
+#    (npm ci deletes node_modules itself)
+npm ci
 npm run build --workspace=@ronl/shared
+
+# 4. Start
 npm run docker:up
-# Wait 60 seconds
+# Wait until docker compose ps shows the containers healthy
 npm run dev
 ```
+
+After this the local Operaton engine is empty. Deploy the process and decision
+fixtures again before starting processes; see
+[Local Development — The engine starts empty](local-development.md#the-engine-starts-empty).
 
 ---
 
@@ -335,6 +378,9 @@ netstat -ano | findstr :8080
 # API health with formatted output
 curl http://localhost:3002/v1/health | jq
 
-# Keycloak health
-curl http://localhost:8080/health/ready
+# Keycloak: is the ronl realm served?
+curl http://localhost:8080/realms/ronl/.well-known/openid-configuration
+
+# Operaton engine version
+curl -u demo:demo http://localhost:8081/engine-rest/version
 ```

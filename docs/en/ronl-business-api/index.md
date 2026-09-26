@@ -93,4 +93,4 @@ ACC is the environment of record for this documentation — the Province of Flev
 - [**Features**](features/overview.md) — What RONL Business API does and why
 - [**User Guides**](user-guide/getting-started.md) — The werkomgeving's four boards and the public knowledge base
 - [**Developer Docs**](developer/local-development.md) — Local setup, backend, frontend, deployment
-- [**References**](reference/api-endpoints.md) — API endpoints, environment variables, JWT claims, standards
+- [**References**](reference/api-endpoints.md) — [API specification](reference/api-specification.md), API endpoints, environment variables, JWT claims, standards
