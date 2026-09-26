@@ -91,6 +91,7 @@ plugins:
 hooks:
   - hooks/repo_versions.py
   - hooks/kpi_charts.py
+  - hooks/code_glyphs.py
 
 # Navigation structure
 nav:
@@ -435,6 +436,7 @@ markdown_extensions:
 extra_css:
   - stylesheets/extra.css
   - stylesheets/spec-provenance.css
+  - stylesheets/code-font.css
 
 extra_javascript:
   - javascripts/doc-status.js
