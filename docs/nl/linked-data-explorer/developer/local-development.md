@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Lokale Ontwikkeling
 
 !!! info "Documentatie in ontwikkeling"
@@ -15,27 +19,15 @@
 
 ---
 
-## Setup
-
-# 1. Clone the repository
-
-# 2. Install all workspace dependencies
+## Install
 
 ---
 
 ## Backend configuration
 
-# Server
+---
 
-# CORS — must include both frontend dev ports
-
-# TriplyDB — default SPARQL endpoint
-
-# Operaton
-
-# Logging
-
-# Performance
+## PostgreSQL setup (local)
 
 ---
 
@@ -45,22 +37,40 @@
 
 ## Starting the services
 
+### The checks that run first
+
+### What the backend logs
+
 ---
 
 ## Verifying the setup
 
 ---
 
-## Running backend tests
+## RoPA records (local)
+
+### Seed example records
+
+### Verify records in the database
+
+### Verify the public endpoint
+
+### Test the public site locally
 
 ---
 
-## Code quality
-
-# Lint and format (from repo root)
+## Environment comparison
 
 ---
 
-## Pushing to ACC
+## Tests and code quality
 
-# From repo root
+### Git hooks
+
+---
+
+## Repository scripts
+
+---
+
+## Getting a change to ACC

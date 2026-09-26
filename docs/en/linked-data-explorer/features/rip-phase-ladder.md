@@ -172,8 +172,11 @@ existing for multiple tenants. `"deployment"` resolves the form from the process
 definition's own deployment, unique by construction, so tenanted and untenanted copies
 coexist and no deployment history has to be destroyed.
 
-91 of 109 references were converted. `thuisbatterij` and `ind` remain on `"latest"`
-because their form keys resolve nowhere in the repository.
+Every `camunda:formRef` in the processes the Modeler seeds from `public/examples/` binds
+this way, the Thuisbatterij bundle included. The only `"latest"` references left in the repository's BPMN files are the
+reference copies under `examples/organizations/flevoland/thuisbatterij/` and
+`examples/organizations/ind/`, which are not seeded: most of their form keys match no
+`.form` file in the repository.
 
 ---
 

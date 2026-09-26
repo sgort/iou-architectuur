@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # JWT Claims
 
 RONL Business API validates every request against a JWT access token issued by Keycloak. The token contains standard OIDC claims plus custom claims injected via Keycloak protocol mappers.
@@ -25,8 +29,8 @@ RONL Business API validates every request against a JWT access token issued by K
     "email_verified": false,
     "municipality": "utrecht",
     "organisation_type": "municipality",
-    "roles": ["citizen"],
-    "loa": "substantial"
+    "realm_access": { "roles": ["citizen"] },
+    "loa": "hoog"
   }
 }
 ```
@@ -49,39 +53,37 @@ RONL Business API validates every request against a JWT access token issued by K
 
 ## Custom RONL claims
 
-These claims are added by Keycloak protocol mappers configured on the `ronl-business-api` client:
+These claims are added by Keycloak protocol mappers configured on the `ronl-business-api` client in the realm export (`config/keycloak/ronl-realm.json`):
 
-| Claim               | Type     | Mapper type     | Description                                                                                                                                                                                   |
-| ------------------- | -------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `municipality`      | string   | User Attribute  | Tenant identifier — maps to `TenantConfig.id`                                                                                                                                                 |
-| `organisation_type` | string   | User Attribute  | Organisation category: `municipality`, `province`, or `national`                                                                                                                              |
-| `roles`             | string[] | User Realm Role | Roles assigned in the Keycloak realm                                                                                                                                                          |
-| `loa`               | string   | User Attribute  | Level of Assurance from DigiD (`low`, `substantial`, `high`)                                                                                                                                  |
-| `mandate`           | string   | User Attribute  | Representation authority (optional — `legal-guardian`, `power-of-attorney`)                                                                                                                   |
-| `bsn`               | string   | User Attribute  | Citizen Service Number (encrypted in production, placeholder in test)                                                                                                                         |
-| `employeeId`        | string   | User Attribute  | Employee ID injected from `employee_id` user attribute. Present on caseworker accounts that have been onboarded via `HrOnboardingProcess`; absent for citizens and non-onboarded caseworkers. |
+| Claim | Type | Mapper | Source | Description |
+|---|---|---|---|---|
+| `municipality` | string | User Attribute | `municipality` | Tenant identifier — the organisation the caller belongs to (`utrecht`, `flevoland`, `toeslagen`, …) |
+| `organisation_type` | string | User Attribute | `organisation_type` | Organisation category: `municipality`, `province`, `national`, or `commercial` |
+| `realm_access.roles` | string[] | User Realm Role | realm roles | The caller's realm roles; the backend reads its roles from here |
+| `loa` | string | User Attribute | `assurance_level` | Level of assurance: `basis`, `midden`, `substantieel`, or `hoog` |
+| `mandate` | string | User Attribute | `mandate` | Representation authority (optional). Passed through to `req.user`; no check reads it |
+| `employeeId` | string | User Attribute | `employee_id` | Present on caseworker accounts onboarded via `HrOnboardingProcess`; absent for citizens and non-onboarded caseworkers |
+| `given_name`, `family_name`, `email` | string | User Property | `firstName`, `lastName`, `email` | Used for signer details; when the name claims are missing, the name is split from `name` or `preferred_username` |
+
+The client maps no `bsn` claim. The frontend reads a `bsn` claim first when it looks up a citizen's service number — the field DigiD fills — and falls back to a fixed mapping for the test usernames.
 
 ---
 
 ## How claims are used by the backend
 
-After successful JWT validation in `jwt.middleware.ts`, the decoded payload is attached to `req.user`:
+After successful JWT validation in `jwt.middleware.ts`, the claims are mapped onto `req.user`:
 
-```typescript
-interface JwtClaims {
-  sub: string; // → userId in audit log
-  municipality: string; // → tenant isolation filter
-  organisation_type: string; // → propagated to BPMN process variables
-  roles: string[]; // → authorization checks
-  loa: string; // → LoA-gated endpoint checks
-  preferred_username: string;
-  mandate?: string;
-  bsn?: string;
-  employeeId?: string; // → HR onboarding profile lookup
-}
-```
+| `req.user` field | From claim | Used for |
+|---|---|---|
+| `userId` | `sub` | Audit log; `applicantId` and `initiator` on a started process |
+| `tenantId` | `municipality` | The `MISSING_TENANT` presence check and every tenant decision |
+| `organisationType` | `organisation_type` | Propagated to process variables |
+| `roles` | `realm_access.roles` | Role checks, the citizen/staff distinction at process start, task candidate groups |
+| `assuranceLevel` | `loa` | Assurance-level checks (`basis` for decision evaluation, `midden` for a process start) |
+| `mandate` | `mandate` | Carried only |
+| `employeeId` | `employeeId` | HR onboarding profile lookup |
 
-The tenant middleware reads `req.user.municipality` to load the `TenantConfig` and apply the feature allowlist for the request.
+The tenant middleware only checks that `tenantId` is present, answering `403 MISSING_TENANT` when it is not. Which organisation may reach a process instance or task is decided separately, in `auth/tenant-access.ts`, from the instance's `municipality` variable — see [Authentication & IAM — Tenancy](../features/authentication-iam.md#tenancy).
 
 ---
 

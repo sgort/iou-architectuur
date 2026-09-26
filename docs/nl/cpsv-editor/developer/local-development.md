@@ -19,7 +19,7 @@ component: CPSV Editor
 
 ---
 
-## Architecture
+## The local stack
 
 ---
 
@@ -27,28 +27,34 @@ component: CPSV Editor
 
 ---
 
-## Setup
-
-### Frontend (CPSV Editor)
-
-### Shared backend
-
-### Linked Data Explorer (optional, for full regression testing)
+## Install and start the editor
 
 ---
 
-## Pre-deployment checklist
+## Running alongside the Linked Data Explorer
+
+### Port 3000 is taken twice
+
+### Start the LDE backend
+
+### LDE root scripts
 
 ---
 
-## Deploying to ACC
+## Environment variables
 
-# 1. Commit your changes
+---
 
-# 2. Push to ACC branch
+## Build and preview locally
 
-# 3. Monitor the GitHub Actions workflow
+---
 
-# https://github.com/sgort/ttl-editor/actions
+## Tests and hooks
 
-# 4. Verify the ACC deployment
+---
+
+## Getting a change to ACC
+
+---
+
+## Maintainer scripts

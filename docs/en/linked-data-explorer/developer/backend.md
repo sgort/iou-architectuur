@@ -64,7 +64,11 @@ Returns service health: TriplyDB and Operaton latency checks, the SHACL shape la
 }
 ```
 
-`version` names the release; `build` names the commit and workflow run, read from the `deploy/build-info.json` the deploy workflow writes into the artifact. `build` is tracked only when both `sha` and `run` are present — a missing or malformed file reports a local build and never affects `status`. The deploy workflows wait until `build.sha` equals the commit they deployed and `shacl.complete` is `true` before they pass; see [Post-deployment verification](deployment.md#post-deployment-verification).
+`version` names the release; `build` names the commit and workflow run, read from the `deploy/build-info.json` the deploy workflow writes into the artifact. `build` is tracked only when both `sha` and `run` are present — a missing or malformed file reports a local build and never affects `status`.
+
+`utils/buildInfo.ts` reads `build-info.json` **once, at module load**, the same moment `version` is bound from `package.json`, so the two cannot disagree: a stale process can only report the build it started with. The read is deliberately not lazy. A zip deploy overwrites `build-info.json` while the previous process is still serving and restarts it afterwards, so a read on first use let the old process report the new `build.sha` — a false pass in the deploy gate, seen on the v2026.09.6 production promotion, where `build.sha` showed the new commit while `version` still read 2026.09.5. Eager reading closes that since v2026.09.7. `/v1/openapi.json` stays lazy on purpose: it reads its document on the first request and caches it, but does not cache a failed read, so a document that is not built yet is retried and surfaces as a `500` rather than being remembered as broken.
+
+The deploy workflows wait until `build.sha` equals the commit they deployed and `shacl.complete` is `true` before they pass; see [Post-deployment verification](deployment.md#post-deployment-verification).
 
 ### DMN deploy and evaluate (v2026.08.2)
 

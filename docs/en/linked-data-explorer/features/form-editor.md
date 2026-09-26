@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Form Editor
 
 The Form Editor lets you create and edit **Camunda Forms** (schemaVersion 16) directly in the Linked Data Explorer. Forms authored here can be linked to BPMN `UserTask` and `StartEvent` elements in the BPMN Modeler and deployed to Operaton in a single operation alongside the process definition.
@@ -13,7 +17,7 @@ The Form Editor lets you create and edit **Camunda Forms** (schemaVersion 16) di
 
 The Form Editor uses a two-panel layout:
 
-- **Left panel** — Form list. Shows all forms stored in `localStorage` with create, rename, and delete actions. An **EXAMPLE** badge marks the three read-only seed forms; user-created forms carry a **WIP** badge; forms imported from a DSO activity carry a green **DSO** badge (v1.9.5).
+- **Left panel** — Form list. Shows all forms stored in `localStorage` with create, rename, and delete actions. An **EXAMPLE** badge marks the bundled example forms; user-created forms carry a **WIP** badge; forms imported from a DSO activity carry a green **DSO** badge (v1.9.5).
 - **Right panel** — Form canvas. Hosts the `@bpmn-io/form-js` graphical editor for the selected form, with a toolbar for saving and exporting.
 
 ---
@@ -24,30 +28,34 @@ The list panel shows every form in storage. Each entry displays the form name, i
 
 | Badge | Meaning |
 |---|---|
-| **EXAMPLE** | Read-only seed form — cannot be renamed or deleted |
+| **EXAMPLE** | Bundled example form — editable and renamable, but cannot be deleted |
 | **WIP** | User-created form — fully editable |
 | **DSO** (green) | Form scaffold imported from a DSO activity's Indieningsvereisten (v1.9.4–v1.9.5) |
 
 Actions available on each form:
 
 - **Click** — opens the form in the canvas editor
-- **Double-click name** — enters inline rename mode (WIP forms only)
-- **Trash icon** — deletes the form after confirmation (WIP forms only)
+- **Double-click name** — enters inline rename mode
+- **Trash icon** — deletes the form after confirmation; on an example form it refuses with *Cannot delete example forms*
 - **+ button** (header) — creates a new empty form with `schemaVersion 16`
 
 ---
 
 ## Example forms
 
-On first launch the application seeds three read-only example forms if `localStorage` is empty. They demonstrate complete Camunda Form schemas and serve as a starting point for customisation.
+The Form Editor seeds 22 example forms from `public/examples/`, listed in `EXAMPLE_FORMS` in `FormEditor.tsx`. They belong to the same bundles as the BPMN Modeler's example processes:
 
-| Form ID | Name | Purpose |
+| Bundle | Organization | Forms |
 |---|---|---|
-| `kapvergunning-start` | Kapvergunning Start | Citizen-facing start form for the AWB tree felling permit application |
-| `tree-felling-review` | Tree Felling Review | Caseworker review form — confirms or overrides DMN decisions |
-| `awb-notify-applicant` | AWB Notify Applicant | Caseworker notification form — confirms the decision before Phase 6 completes |
+| Kapvergunning (AWB tree felling permit) | `flevoland` | start, caseworker review, notify applicant |
+| Thuisbatterij subsidy | `flevoland` | start, caseworker review, notify applicant, *aanvullende gegevens* (missing information) |
+| Zorgtoeslag | `toeslagen` | notify applicant, provisional start, provisional review, final settlement review |
+| DvTP consent | `bzk` | start, info, decision |
+| HR capacity claim (Dutch) | `flevoland` | eight forms, from intake to financial reservation |
 
----
+Seeding is versioned. On mount, `FormEditor.tsx` compares each example's entry in `EXAMPLE_VERSIONS` (`utils/exampleVersions.ts`) with the version recorded in this browser's `localStorage`; when the recorded version is lower or absent, it re-fetches the `.form` file and overwrites the stored record. A first visit therefore seeds all of them, and a later version bump re-seeds only the forms whose number moved.
+
+Example records carry `status: 'example'`, which drives the **EXAMPLE** badge and blocks deletion. They are not read-only: you can edit, save and rename them, and like any other form they are written to the backend. An edit lasts until that form's version is bumped (or it is seeded again in a browser that has no version recorded), when the seed overwrites it with the bundled file.
 
 ## Form canvas
 
@@ -73,7 +81,7 @@ Forms are stored in PostgreSQL via the LDE backend under the key `linkedDataExpl
 }
 ```
 
-Example forms (`readonly: true`) are seeded from `public/examples/` and are never written to the database.
+Example forms are seeded from `public/examples/` with `readonly: false`, so seeding and every later save write them to the database as well as to `localStorage`.
 
 See [Asset Storage](../developer/asset-storage.md) for the full architecture.
 
@@ -126,4 +134,4 @@ The form-js properties panel loses input focus when typing pauses (Field label, 
 
 - [RONL Business API — Dynamic Forms](../../../ronl-business-api/features/dynamic-forms.md) — how the three AWB Kapvergunning forms are deployed and rendered at runtime in MijnOmgeving
 - [BPMN Modeler — One-click deploy](bpmn-modeler.md#one-click-deploy) — deploying BPMN and forms together to Operaton in one step
-- [RONL API Endpoints — Process definition deployment](../../../ronl-business-api/reference/api-endpoints.md#process-definition-deployment) — the `POST /api/dmns/process/deploy` endpoint called by the deploy button
+- [API Specification](../reference/api-specification.md) — the Linked Data Explorer's `POST /v1/dmns/process/deploy` endpoint called by the deploy button

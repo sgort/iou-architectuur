@@ -8,6 +8,28 @@ component: CPSV Editor
 
 ## Changelog
 
+### v2026.09.7 — What Ships Is What Was Tested, and Each Release Keeps Its Bill of Materials (September 2026)
+
+> How it deploys now: [Deployment](deployment.md). The mechanism across repositories: [Supply-Chain Pinning](../../contributing/supply-chain.md) and [ICTU Dependency Guideline](../../contributing/ictu-dependency-guideline.md). Measured suites: [Testing](testing.md). No change in the editor itself — the release is CI and supply-chain work.
+
+**The shipped bundle is built on the runner, on the Node the tests use.** Until now the deploy workflows handed the source to `Azure/static-web-apps-deploy`, and Oryx rebuilt it inside the floating `staticappsclient:stable` container with `npm install`, on Node 22.22.0 — while the tests ran on Node 24 from `npm ci`. The code that passed the tests and the code that shipped were different builds. Both deploy workflows now run `npm run build` from the tree `npm ci` installed, fail if `dist/index.html` is missing, and upload `dist/` with `skip_app_build: true`; the `VITE_` build variables are set on that build step. Node is read as an exact version, 24.20.0, from `.nvmrc`, instead of a bare `'24'`, so production moved up from 22.22.0 to the version the tests already ran on.
+
+**Every release carries an SBOM, committed and uploaded.** `scripts/write-sbom.mjs` writes `docs/sbom/<name>-<version>.cdx.json` — CycloneDX, production dependencies only, read from the lockfile with `--package-lock-only`, so it needs no install. `npm run sbom` is a bump-release step, after the version bump, because the filename carries the version. `sbom.yml` runs on a push to `main`, on demand, and on pull requests that touch the tooling, and uploads the document as an artifact. Two copies, because neither suffices alone: GitHub keeps an artifact for ninety days on a public repository, so the committed copy is the durable one, and the artifact is what a scanner can fetch without a checkout. It has three modes: writing; `--check`, strict, where the release is cut; and `--verify-release` on a promotion, where a missing document fails but drift only warns, since a promotion carries every commit merged since the release.
+
+**Dependencies are audited daily, on `acc` and on `main`.** Every other gate runs on a commit, so a new advisory against unchanged code was seen by nothing, and Dependabot watches `acc`, not the `main` production deploys from. `dependency-audit.yml` runs at 05:17 UTC and on demand, reads each branch's lockfile with `npm audit --package-lock-only`, fails on a high or critical advisory in production dependencies, and opens, updates and closes one tracking issue so a scheduled failure reaches someone. `scripts/audit-tree.mjs` groups findings by advisory rather than by package; an audit that cannot run exits 2 and counts as a finding, never as a clean tree. Two fixes followed its first run: the script is copied to `$RUNNER_TEMP` before the loop, because checking out each branch removed it; and the job is called `dependency-audit`, because a second job named `audit` made the required `audit` check ambiguous.
+
+**npm observes the 14-day cooldown too.** Renovate's `minimumReleaseAge` covers only the updates Renovate proposes; lock-file maintenance hands the refresh to npm, where the transitive tree moves. A root `.npmrc` now sets `min-release-age=14`. npm 11.10 or newer honours it on install and update; `npm ci` ignores it on purpose, so CI cannot fail on it; older npm ignores it silently, which is why `npm run deps:check` now warns, without failing, when npm is older than 11.10.
+
+**A lockfile out of step with `package.json` fails under its own name.** `npm ci` already refused one, but only as an `EUSAGE` error inside "Install dependencies for the formatter", three steps into a job about pinning. A step named "Lockfile matches package.json" now runs `npm ci --dry-run --ignore-scripts` first — `--ignore-scripts` because a dry run still runs the `postinstall`, which failed on a clean checkout. Its limit is recorded beside it: it checks the pull request's own merge commit, so dependency pull requests are merged one at a time, each rebased onto the merged `acc`.
+
+**Renovate waits for a major's first patch, and holds ubuntu 26.04 on record.** An npm-scoped `allowedVersions` rule excludes `X.0.0`, so the earliest a new major can arrive is `X.0.1`. Ubuntu 26.04 was assessed on 24 September 2026 and deferred by a Renovate rule that carries its reason and the condition that ends it; the other queued majors stay behind Dependency Dashboard approval, where a person sees them. Every job now runs on `ubuntu-24.04` rather than `ubuntu-latest`, so a change of OS release arrives as a diff in this repository.
+
+**The ACC build check is required.** A required check must report on every pull request, and a workflow excluded by its `pull_request` path filter reports nothing. The ACC deploy workflow now starts on every pull request and decides relevance in a `changes` job; a build skipped by its own `if:` reports success, and a failed lookup means a full build rather than a free pass. The `acc` ruleset requires `Build and deploy ACC` alongside `audit` and `scan`.
+
+**The DMN `apiConfig.baseUrl` comment says what it still does.** It claimed evaluate still called Operaton directly; both deploy and evaluate go through the Linked Data Explorer backend. What `baseUrl` still decides is the evaluate URL recorded as `dmnData.apiEndpoint`, which the TTL generator publishes as `cprmv:implementedBy` — as [DMN Implementation](dmn-implementation.md) already described. Comment only.
+
+---
+
 ### v2026.09.6 — The Error Says Why Again, and Previews Stop Outliving Their Pull Requests (September 2026)
 
 > Measured suites: [Testing](testing.md). The backend change this answers: [Linked Data Explorer v2026.09.5](../../linked-data-explorer/developer/changelog-roadmap.md).
@@ -554,6 +576,10 @@ Initial release. React + Tailwind CSS web application. Five-tab interface: Servi
 | [Semgrep Code and Supply Chain](../../contributing/dependency-scanning.md), a required check on `acc` | v2026.09.3 |
 | E2E journeys against an already-deployed build (`E2E_BASE_URL`) | v2026.09.3 |
 | Weekly lock-file maintenance, with majors behind approval — Supply Chain findings at 0 | v2026.09.4 |
+| [Shipped bundle built on the runner, on the Node the tests use](deployment.md) | v2026.09.7 |
+| Release SBOM (CycloneDX), committed and uploaded | v2026.09.7 |
+| Daily dependency audit of `acc` and `main` | v2026.09.7 |
+| ACC build check required on `acc` | v2026.09.7 |
 
 ---
 

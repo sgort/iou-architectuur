@@ -1,19 +1,24 @@
 # RONL Business API — screenshots to capture
 
-!!! warning "One outstanding — requested 24 September 2026"
-    `ronl-business-api-public-site-begrippen-io.png`, for v2026.09.11. The
-    `<figure markdown>` block that embeds it is already on
-    `user-guide/public-site.md`, so a non-strict `mkdocs build` will warn about
-    exactly this one missing image until it is captured. That is expected: the
-    reference is correct, and this file tracks the capture.
+!!! note "Nothing outstanding — reviewed 26 September 2026 for v2026.09.12"
+    `ronl-business-api-public-site-begrippen-io.png`, requested for v2026.09.11,
+    is in `docs/assets/screenshots/`, committed in `dac4b20` on 24 September 2026.
+    The v2026.09.12 review asked for no captures and retired one figure (below).
 
-    Everything requested before this sync has been captured.
-    `ronl-business-api-public-site-processen.png`, requested by the
-    v2026.09.7 → v2026.09.9 sync, was captured the same day, 20 September 2026.
-    The 12 September 2026 review, for v2026.09.6 and v2026.09.7, asked for none;
-    the two before it — requested by the v2026.09.5 sync — landed on
-    5 September 2026, the same day they were asked for. The file is retained as
-    the record of what each image shows and why it was needed.
+## Sync v2026.09.11 → v2026.09.12 — nothing to capture, one figure retired
+
+Reviewed on 26 September 2026. The release's frontend changes are not visual — the
+BSN dropped from a console message in `brp.api.ts`, a username instead of the claims
+object in a `bsn.mapping.ts` log, a constant format string in `SectionErrorBoundary.tsx`,
+and a `nosemgrep` comment in the public site's search. The OpenAPI description renders
+live on the new API Specification page, so it needs no image. Tenant access, the SBOM,
+the daily audit, the lockfile check and the pinned compose images have no surface.
+
+**Retired, not replaced:** `ronl-business-api-health-check.png` on
+`developer/local-development.md` showed the pre-CalVer `/v1/health` shape
+(`version: "1.0.0"`, a `services` block). The rewritten page shows the response as a
+code block instead, which cannot drift from the text around it. The file stays in
+`docs/assets/screenshots/` until nothing references it; the archived pages do not.
 
 ## Sync v2026.09.9 → v2026.09.11 — one NEW, several declined
 

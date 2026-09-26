@@ -4,18 +4,22 @@ component: RONL Business API
 
 # CI/CD
 
-RONL Business API runs **eleven GitHub Actions workflows**: an
-acceptance/production pair for each of four packages, two scanning
-workflows — the supply-chain `audit` gate and a Semgrep `scan` — and, since
-v2026.09.10, the **promotion workflow** that orchestrates the four production
-deploys. Every one of the **twenty-two jobs** across them names `ubuntu-24.04`,
-never `ubuntu-latest`: that label is one GitHub moves to a new Ubuntu release on
-its own schedule, so pinning it means a change of OS release arrives as a diff
-here rather than silently. The label pins the *release*, not the image — GitHub
+RONL Business API runs **thirteen GitHub Actions workflows**: an
+acceptance/production pair for each of four packages; two scanning workflows —
+the supply-chain `audit` gate and a Semgrep `scan`; two that watch dependencies
+rather than a commit — the daily `dependency-audit` and the release SBOM; and the
+**promotion workflow** that orchestrates the four production deploys. They hold
+**twenty-four jobs**. Twenty of them choose a runner, and every one of those
+names `ubuntu-24.04`, never `ubuntu-latest`; the other four are the promotion's
+calls into the production workflows, whose own jobs are among the twenty. That
+label is one GitHub moves to a new Ubuntu release on its own schedule, so
+pinning it means a change of OS release arrives as a diff here rather than
+silently. The label pins the *release*, not the image — GitHub
 rebuilds the image about weekly, and a hosted runner cannot pin it by digest.
 
-!!! info "`acc` and `main` carry the same eleven files, and deliberately different shapes"
-    Verified against `main` at `86af73e` on 23 September 2026 (v2026.09.11).
+!!! info "`acc` and `main` carry the same thirteen files, and deliberately different shapes"
+    Verified against `main` at `2443adc` on 26 September 2026 (v2026.09.12):
+    `.github/workflows/` is identical on `origin/acc` and `origin/main`.
     `main` was once four workflows behind and carried none of the pinning or
     gating described below — closing that gap was a CI-alignment programme that
     finished in v2026.09.7, and `main` has its own `main promotion gate` ruleset.
@@ -35,6 +39,8 @@ rebuilds the image about weekly, and a hosted runner cannot pin it by digest.
 |---|---|---|---|
 | `zizmor.yml` | PR, push to `acc`/`main` | — | No — the `audit` gate |
 | `semgrep.yml` | PR, push to `acc`/`main` | — | No — the `scan` job |
+| `dependency-audit.yml` | schedule (05:17 UTC daily), `workflow_dispatch`, PR touching its own files | — | No — the `dependency-audit` job |
+| `sbom.yml` | push to `main`, `workflow_dispatch`, PR touching the SBOM tooling | — | No — the `release-sbom` job |
 | `promote-to-production.yml` | push to `main` (**no paths filter**), `workflow_dispatch` | — | No — it *calls* the four below |
 | `azure-backend-acc.yml` | push + PR to `acc` | `acc.api.open-regels.nl` | **Yes** — except on a pull request |
 | `azure-backend-prod.yml` | `workflow_call`, `workflow_dispatch` | `api.open-regels.nl` | **Yes** |
@@ -49,7 +55,8 @@ All eight Azure workflows support `workflow_dispatch`, and for the four
 production ones that is now the **only** manual route into Azure — and the
 escape hatch if the promotion workflow itself is broken. Neither scanning
 workflow supports it: both are meant to run from the events themselves and
-nothing else.
+nothing else. `dependency-audit.yml` and `sbom.yml` do, so an audit or an SBOM
+can be produced on demand.
 
 !!! note "The four production workflows no longer trigger on a push"
     They carry `workflow_call:` and `workflow_dispatch:` and nothing more. A
@@ -145,14 +152,15 @@ unsatisfiable `needs` graph — it simply deploys nothing.
 
 ---
 
-## The two scanning workflows
+## Scanning, audit and SBOM workflows
 
-Neither deploys anything, and neither carries a `paths:` filter: both must reach
-every pull request regardless of what it touched.
+None of the four deploys anything. The two scanners carry no `paths:` filter:
+both must reach every pull request regardless of what it touched. The other two
+run on a pull request only when it touches their own tooling.
 
 ### `audit` — the required check
 
-`zizmor.yml` has one job, and it runs **eight steps, all of them blocking**:
+`zizmor.yml` has one job, and it runs **nine steps, all of them blocking**:
 
 | # | Step | What it does |
 |---|---|---|
@@ -160,12 +168,13 @@ every pull request regardless of what it touched.
 | 2 | Set up Node `24.21.0` | For the config validator only — see [Node runtime](#node-runtime) |
 | 3 | Run zizmor | Workflow static analysis, with zizmor itself pinned to `1.29.0` — maintained by Renovate, which maps the action to the image `ghcr.io/zizmorcore/zizmor`, not bumped by hand |
 | 4 | Validate `renovate.json` | `renovate-config-validator --strict` |
-| 5 | `npm ci` | So the three steps below run *this* repository's tooling rather than a version named in the workflow |
-| 6 | `npm run check-format` | Prettier, via the root script the pre-push hook also runs |
-| 7 | `npm run check-shared` | [`@ronl/shared` holds declarations, not logic](shared-package.md#kept-declarations-only) |
-| 8 | `npm run check-supply-chain` | Every digest resolved against the GitHub API, and the register in `SECURITY-PIPELINE.md` compared against the workflows |
+| 5 | Lockfile matches `package.json` | `npm ci --dry-run --ignore-scripts` — resolves and validates without writing `node_modules` |
+| 6 | `npm ci` | So the three steps below run *this* repository's tooling rather than a version named in the workflow |
+| 7 | `npm run check-format` | Prettier, via the root script the pre-push hook also runs |
+| 8 | `npm run check-shared` | [`@ronl/shared` holds declarations, not logic](shared-package.md#kept-declarations-only) |
+| 9 | `npm run check-supply-chain` | Every digest resolved against the GitHub API, and the register in `SECURITY-PIPELINE.md` compared against the workflows |
 
-Steps 4 through 8 carry `if: always()`. That makes them run *after* an earlier
+Steps 4 through 9 carry `if: always()`. That makes them run *after* an earlier
 failure, so one run reports on every half of the policy instead of stopping at
 the first — it does **not** make them non-blocking. The job still fails.
 
@@ -176,9 +185,22 @@ finding appears only in the log while every check reads *success*.
 `check-supply-chain` ran that way from its adoption until v2026.09.7 promoted it
 to blocking.
 
-Step 6 is in this job rather than in a deploy workflow for the same reason step 7
+Step 7 is in this job rather than in a deploy workflow for the same reason step 8
 is: `audit` has no paths filter and is the required check, so a
 documentation-only pull request reaches it too.
+
+Step 5 exists because a lockfile out of step with `package.json` was already
+detectable, but only as an `EUSAGE` error inside the formatter's `npm ci`, where
+it does not read as a lockfile problem. On 25 September 2026 three dependency
+pull requests were merged back to back without rebasing between them; each had
+computed its lockfile against an older `acc`, each was green against its own
+base, and together they produced a lockfile matching no `package.json` (fixed in
+`05d76bd`). `--ignore-scripts` keeps the root `postinstall`, which copies the
+lockfile into a `node_modules` a dry run never creates, from failing the step for
+the wrong reason. Its limit is stated beside it: the check runs on the pull
+request's merge commit, so it proves the lockfile consistent with *that* base,
+not with a base that moves afterwards. **Merge dependency pull requests one at a
+time, each rebased onto the merged `acc` first.**
 
 ### `scan` — Semgrep, required on `acc`
 
@@ -202,6 +224,69 @@ here: pull-request runs cancel, pushes to `acc` and `main` do not. Those pushes
 are what write the Semgrep Cloud baseline, and cancelling one mid-upload leaves
 the dashboard describing a scan that never finished.
 
+### `dependency-audit` — daily, on `acc` and `main`
+
+Every other gate runs on a commit, so a new advisory against unchanged code was
+seen by nothing, and Dependabot watches `acc`, not the `main` production deploys
+from. `dependency-audit.yml` runs at 05:17 UTC daily — off the hour, because
+GitHub queues scheduled runs and the top of the hour is busiest — and on
+`workflow_dispatch`. It also runs on a pull request that touches the workflow or
+`scripts/audit-tree.mjs`, so a change to the audit is exercised before it merges;
+the issue step is skipped there.
+
+- **Both branches, from their lockfiles.** The job fetches `acc` and `main`,
+  checks out each in turn and runs `npm audit --package-lock-only` against it, so
+  no install is needed.
+- **It fails on a high or critical advisory in production dependencies**
+  (`--omit=dev`) on either branch. Everything else — lower severities and
+  dev-only advisories — is reported but does not fail it.
+- **Findings are grouped by advisory, not by package.** `npm audit` reports one
+  entry per affected package, so one advisory on a widely used package reads as
+  dozens of findings; `audit-tree.mjs` collapses them.
+- **One tracking issue.** A scheduled failure that only fails a job reports to an
+  Actions page nobody opens, so the job opens, updates and closes a single issue
+  titled *Daily dependency audit: production high or critical advisory*.
+- **"Could not run" is never "clean".** The script exits 0 clean, 1 on a finding,
+  2 when the audit could not run; anything higher is clamped to 2, and 2 is
+  handled with the weight of a finding.
+- **The script is copied to `$RUNNER_TEMP` first.** Checking out a branch replaces
+  the working tree, including a script that exists on the branch under review
+  before it exists on `acc` or `main`; the first run lost it at the first
+  checkout and read the missing module as a finding.
+- **Node is an exact literal**, `'24.20.0'`, not `.nvmrc`: the job reads both
+  branches, which need not share an `.nvmrc`, and the tool reading a lockfile
+  should not change with the tree it reads. Renovate maintains it.
+
+!!! warning "The job is called `dependency-audit`, not `audit`"
+    `audit` is `zizmor.yml`'s job and the required check. Required checks match
+    by **name**, so a second job called `audit` made the required context
+    ambiguous — one passing and one failing check under one name, which no
+    ruleset can satisfy — and its first run blocked #206 outright.
+
+### `release-sbom` — an SBOM for every release
+
+A promotion to `main` is the release here: there are no tags and no GitHub
+Releases. Each release keeps a CycloneDX SBOM of its **production** dependencies
+in two copies, because neither is enough alone:
+
+- **Committed**, as `docs/sbom/<name>-<version>.cdx.json`, written by `npm run
+  sbom` (`scripts/write-sbom.mjs`) with `npm sbom --package-lock-only --omit=dev`.
+  It describes the lockfile rather than whatever is in `node_modules`. `npm run
+  sbom` is a bump-release step, after the version bump, since the filename carries
+  the version. This copy answers a question about a version that shipped a year
+  ago.
+- **Uploaded** by `sbom.yml` as a workflow artifact, which a scanner can fetch
+  without a checkout. A public repository keeps artifacts ninety days at most,
+  which is why the committed copy exists.
+
+The script has three modes: writing; `--check`, strict — the file must exist and
+match — for where the release is cut; and `--verify-release`, which `sbom.yml`
+runs on a push to `main`: a missing document fails, drift only warns, because a
+promotion carries every commit merged into `acc` since the release was cut. Both
+comparisons ignore `serialNumber` and `metadata.timestamp`, which change on every
+run. Node is pinned as the same `'24.20.0'` literal as the daily audit, for the
+same reason.
+
 ---
 
 ## Node runtime
@@ -213,6 +298,9 @@ deployed artifact on a major the host does not run.
 - The **eight deploy workflows** read `node-version-file: .nvmrc`.
 - `.nvmrc` carries an exact `22.23.2`.
 - The root `engines.node` is `>=22`, and `engines.npm` is `>=10.0.0`.
+- `dependency-audit.yml` and `sbom.yml` name an exact `'24.20.0'`: they read
+  lockfiles — both branches', in the audit's case — and should not change Node
+  with the tree they read.
 - `zizmor.yml` names an exact `'24.21.0'`, deliberately on a different major:
   its `renovate-config-validator` step needs Node 24, because `renovate`
   declares `engines.node ^24.11.0`. npm accepts that mismatch with an
@@ -237,6 +325,36 @@ deployed artifact on a major the host does not run.
 
 `.nvmrc` is also in every deploy workflow's **path filter**, which it was not
 until v2026.09.9 — see [Path filters](#path-filters).
+
+### Majors that are deferred, and majors that wait
+
+Two majors are held by a Renovate rule that sets `enabled: false` and carries,
+in its `description`, the reason and the condition that ends it:
+
+- **Node 24.** Both App Services run `NODE|22-lts` against an `.nvmrc` of
+  `22.23.2`, so the tree is consistent today; taking 24 in `.nvmrc` alone would
+  build the backend on a major the host does not run. The rule ends by
+  **switching both App Services to `NODE|24-lts` first**, then removing the rule
+  in the same change as the `.nvmrc` bump. App Service offers the runtime at the
+  major only — see [Backend deployment](deployment/backend.md#azure-app-service-configuration).
+- **Ubuntu 26.04.** The runner pins exist to stop drift, not to be newest, and
+  `ubuntu-latest` still resolves to 24.04. The rule ends when `ubuntu-latest`
+  moves; then every workflow moves in one pull request, the way 24.04 arrived.
+
+Every other major waits as a Dependency Dashboard checkbox rather than being
+disabled, so a person still sees it. When one is approved, a second rule decides
+**which** version may be offered: for the npm manager, `allowedVersions` is
+`!/^\d+\.0\.0$/`, so the earliest a major can arrive is `X.0.1`. It is scoped
+to npm because the same pattern against Docker tags or the runner datasource
+would mean something else; the recorded cost is that a package publishing `X.0.0`
+and never a patch is never offered that major, which takes a per-package
+exception with its reason.
+
+The local development stack in `docker-compose.yml` pins all five images by tag
+**and** digest, maintained by Renovate through `docker:pinDigests` in
+`renovate.json`'s `extends`. The compose files under `deployment/vm/` are
+deliberately left unpinned: nothing in this repository applies them, so a digest
+there would record a value no deploy consults (#196).
 
 ---
 
@@ -278,7 +396,7 @@ and a failing test blocks the deploy.
 
 | Workflow | Lint | Type-check | Tests | Extra gates |
 |---|:---:|:---:|:---:|---|
-| `azure-backend-*` | ✅ | – | ✅ | Verifies `dist/index.js` exists, packages from the lockfile, then deploys and verifies the deploy took effect |
+| `azure-backend-*` | ✅ | – | ✅ | Lints the OpenAPI document; verifies `dist/index.js` exists, packages from the lockfile, then deploys and verifies the deploy took effect |
 | `azure-frontend-*` | ✅ | – | ✅ | `@ronl/pa-cockpit`'s 476 tests, then a performance budget, each its own step |
 | `azure-publicsite-*` | ✅ | ✅ | ✅ | Prerender + bundle-cleanliness gate, inside the build |
 | `azure-pa-demo-*` | ✅ | ✅ | ✅ | **Playwright E2E**, then the bundle gate inside the build |
@@ -321,9 +439,11 @@ vendor container. See
 ### Backend pipeline
 
 ```
-npm ci → Build @ronl/shared → Lint → Unit tests → tsc → Verify dist/index.js
+npm ci → Build @ronl/shared → Lint → Lint the OpenAPI document → Unit tests
     ↓
-Prepare deployment package → Create zip → Upload artifact
+tsc → Verify dist/index.js
+    ↓
+Prepare deployment package (incl. openapi/openapi.json) → Create zip → Upload artifact
     ↓
 azure/login (OIDC)  →  az webapp deploy
     ↓
@@ -331,6 +451,14 @@ Liveness check (5 × 10s on /v1/health/live)
     ↓
 Verify the deploy took effect (12 × 15s, comparing /v1/health build.sha)
 ```
+
+*Lint the OpenAPI document* runs `npm run lint:openapi` in both backend
+workflows: it builds `openapi/openapi.json` and lints it with Spectral against the
+vendored NL API Design Rules 2.2.1 ruleset, before the tests, so a broken rule
+fails fast and by name. The tests then include the coverage gate that compares
+the document with the routes actually served, and the artifact carries
+`openapi/openapi.json` for `GET /v1/openapi.json` — see
+[API specification](../reference/api-specification.md).
 
 Since v2026.09.10 the backend is deployed **by the workflow**, not by hand. Three
 parts of that are worth knowing, because each replaced something that had gone
@@ -376,11 +504,11 @@ v2026.09.10 no `push` trigger either. Every commit reaching `main` is promoted
 from `acc` and has already run this suite on its own pull request, so re-running
 it on the promotion says nothing new, while `audit`, which *is* required on
 `main`, reports there on every pull request regardless of base. The Linked Data
-Explorer excludes its production workflow for a different reason that does not
-apply here — there the `production` environment carries required reviewers, so a
-`pull_request` trigger would put a human approval in front of the very tests
-meant to inform it. **Neither environment in this repository has any protection
-rule at all**, so the exclusion here stands on the promotion argument alone.
+Explorer excludes the trigger from its production workflow for the same reason:
+its production environment no longer carries a required reviewer, which was
+removed on 24 September 2026, so both repositories rest the exclusion on the
+promotion argument alone. **Neither environment in this repository has any
+protection rule at all.**
 
 ---
 

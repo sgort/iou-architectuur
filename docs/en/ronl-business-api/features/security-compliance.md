@@ -16,11 +16,11 @@ Traffic to the platform's own services is encrypted end to end. TLS certificates
 
 ## Request-level protections
 
-Every response carries a Content Security Policy restricting where scripts, styles, and images may be loaded from, and HTTP Strict Transport Security instructing browsers to only ever reach the platform over HTTPS.
+Every response carries a Content Security Policy restricting where scripts, styles, and images may be loaded from, and HTTP Strict Transport Security instructing browsers to only ever reach the platform over HTTPS. Both are set by Helmet, which `HELMET_ENABLED` can switch off and which is on by default.
 
-Requests are rate-limited: a general limit applies across the authenticated API, keyed per caller IP (or per tenant and IP, where that stricter keying is enabled) so that one tenant's traffic cannot exhaust the limit for another. A separate, stricter limit applies to the public, unauthenticated endpoints that accept a write — submitting content without being signed in — and those endpoints additionally require passing a proof-of-work challenge before the write is accepted, which is what stands in for a login wall on a surface that deliberately has none.
+Requests are rate-limited. One general limit applies to every request, authenticated or not, keyed per client IP; the ValidSign callback is exempt and has its own limiter. The limiter runs before any route authenticates the caller, so the per-tenant keying that `RATE_LIMIT_PER_TENANT` asks for never has a tenant to key on: in practice every bucket is per client IP. A separate, stricter limit — 10 requests per 15 minutes per IP — applies to the three public endpoints that accept a write without a login: submitting a use case, uploading a file for one, and sending feedback. The use-case and feedback submissions also require a solved ALTCHA proof-of-work challenge, which stands in for a login wall on a surface that deliberately has none; the check is skipped when no `ALTCHA_HMAC_KEY` is configured, and the file upload is not challenged.
 
-Only requests from explicitly configured origins are accepted; anything else is rejected before it reaches a route handler.
+Cross-origin access is governed by CORS, which is a browser control, not an access boundary. For a request from an origin that is not configured, the backend withholds the CORS response headers, so the browser does not hand the response to the calling page — but the request itself is still handled. Requests without an `Origin` header (server-to-server calls, `curl`, health probes) are allowed through. `/v1/openapi.json` is open to every origin, as the NL API Design Rules require for a published description.
 
 ---
 
@@ -32,21 +32,30 @@ Every protected endpoint requires a valid, signature-verified token before any r
 
 ## Secrets management
 
-Credentials — Keycloak client secrets, database connection strings, and the like — are held as environment configuration on the hosting platform, not committed to the repository. Only template files documenting which variables are expected are version-controlled.
+Credentials — database connection strings, the Operaton, eDOCS and ValidSign credentials, the Anthropic API key, and the like — are held as environment configuration on the hosting platform, not committed to the repository. Only template files documenting which variables are expected are version-controlled. The Business API's own Keycloak client, `ronl-business-api`, is a public client: it has no client secret to hold. In production the boot refuses a missing Anthropic API key and one still set to a placeholder value.
 
 ---
 
 ## Audit logging
 
-A request that results in a process action is recorded once it completes, capturing who made it (the caller's identity and tenant), what it was (the HTTP method and endpoint, and the resource type and id it addressed where the path identifies one), when it happened, the caller's IP address where that is configured to be captured, and the outcome (success, failure, or error, derived from the response status). Audit logging can be disabled entirely by configuration, and IP capture can be disabled independently of the rest of the record. High-frequency, read-only traffic that would otherwise flood the log is deliberately excluded.
+Every authenticated request is recorded once it completes, capturing who made it (the caller's identity and tenant), what it was (the HTTP method and endpoint, and the resource type and id it addressed where the path identifies one), when it happened, the caller's IP address where that is configured to be captured, and the outcome (success, failure, or error, derived from the response status). Route handlers add their own entries for specific actions — a process start, a task completion, a refused start — with details of their own. Two paths are excluded: reading the audit log itself, and the AI assistant's chat turns. Audit logging can be disabled entirely by configuration, and IP capture can be disabled independently of the rest of the record.
 
-Audit records carry a configured retention target — long enough to satisfy a government archiving expectation measured in years rather than months — though retention is a configuration value the platform is set up to honour, not an automated purge the platform runs on a schedule.
+Each entry is written to the audit database and also to the application log at `info` level.
+
+The backend never deletes audit records. `AUDIT_LOG_RETENTION_DAYS` (default 2555, seven years) is parsed into configuration and read by no code: nothing purges audit records, and nothing applies a retention period to them.
 
 ---
 
 ## Data handling
 
-Log output at debug verbosity is disabled outside development, so operational logs do not carry the level of request detail a developer would use while debugging. Error responses do not leak process variables or other request payload content beyond what the error itself needs to describe.
+The log level is set by `LOG_LEVEL` (default `info`) in every environment; nothing ties it to the deployment tier. Logs and audit records are not free of personal data:
+
+- The BRP person lookup logs its whole request body at `info` level, citizen service number (BSN) included. This is an open issue on ronl-business-api (#241).
+- The same lookup's audit entry stores the BSN it looked up, and audit entries are copied to the application log.
+
+The frontend does not write a BSN to the browser console.
+
+An unhandled error is answered with a generic message in production. Handled errors can carry upstream detail: a failed process start returns Operaton's own error message and the engine URL, and a BRP error returns the BRP response.
 
 ---
 
@@ -78,16 +87,14 @@ on [ValidSign phase-approval signing](../developer/validsign-signing.md).
 
 ## Build and pipeline integrity
 
-The delivery pipeline is itself a security surface, and is treated as one on the
-`acc` branch: every GitHub Actions reference is pinned to an immutable commit
-digest, the pipeline token is read-only unless a job demonstrably needs more, no
-git credential is left in the workspace after checkout, and a blocking audit
-gate enforces all three on every pull request. Dependency updates are held for
-fourteen days before adoption, except security advisories, which bypass the wait.
-
-Two limits are worth stating plainly. The gate does **not** cover the backend's
-path to production, which runs from a developer machine rather than CI. And the
-`main` branch does not yet carry any of this.
+The delivery pipeline is itself a security surface, and is treated as one: every
+GitHub Actions reference is pinned to an immutable commit digest, the pipeline
+token is read-only unless a job demonstrably needs more, no git credential is
+left in the workspace after checkout, and a blocking audit gate enforces all
+three on every pull request. The backend reaches production through the same
+pipeline: a promotion to `main` runs the production deploy workflow, which
+authenticates to Azure over OIDC. Dependency updates are held for fourteen days
+before adoption, except security advisories, which bypass the wait.
 
 For what is enforced, what cannot be, and where the coverage stops, see
 [Supply-chain gate](../../contributing/supply-chain.md).

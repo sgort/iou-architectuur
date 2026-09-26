@@ -106,14 +106,14 @@ De `useDsoImport`-hook (`src/hooks/useDsoImport.js`, v1.9.6) verwerkt een deep-l
 |---|---|
 | Frontend | React 19, Create React App (verouderd — zie hieronder), Tailwind CSS, Lucide-iconen |
 | Statusbeheer | React hooks (`useEditorState`, `useArrayHandlers`), geen externe state-library |
-| Build & lint | CRA, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
-| Testen | Vitest, `@testing-library/react`, Playwright — 751 tests in 61 bestanden, plus 3 end-to-end-journeys ([Testing](testing.md)) |
+| Build & lint | Vite, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
+| Testen | Vitest, `@testing-library/react`, Playwright — 763 tests in 62 bestanden bij v2026.09.7, plus 3 end-to-end-journeys ([Testing](testing.md)) |
 | TTL-parsing | Eigen handgeschreven parser (geen RDF-library-afhankelijkheid) |
 | DMN-parsing | Browser DOMParser (XML) |
 | Externe API's | TriplyDB REST + SPARQL, Operaton REST (Camunda-compatibel), RONL SPARQL-vocabulaire |
 | Backend-afhankelijkheid | Gedeelde Express-server (Linked Data Explorer-repo) voor CORS-geproxyde SPARQL-queries, TriplyDB-service-updates en DMN-syntactische validatie (libxmljs2) |
 | Hosting | Azure Static Web Apps (acc-branch → acceptatie, main → productie) |
-| CI/CD | GitHub Actions → Azure SWA deploy |
+| CI/CD | GitHub Actions: lint, tests en de productiebuild op de runner (Node 24.20.0 uit `.nvmrc`), geüpload naar Azure Static Web Apps met `skip_app_build`; een dagelijkse dependency-audit en een SBOM per release ([Deployment](deployment.md)) |
 
 ---
 
@@ -146,7 +146,7 @@ Het prototype heeft geen gebruikersauthenticatie. Een gebruiker die een overheid
 | Integratiepunt | Huidig authenticatiemechanisme |
 |---|---|
 | TriplyDB-publicatie | Persoonlijk API-token, ingevoerd door de gebruiker, opgeslagen in browser-localStorage |
-| Operaton-deployment & testen | Hardcoded Basic Auth (`demo:demo`) |
+| Operaton-deployment & testen | Geen in de editor — deployen en evalueren lopen via de backend van de Linked Data Explorer, die een optioneel bearer-token (`OPERATON_API_KEY`) naar de engine stuurt |
 | Gedeelde Express-backend (LDE) | Geen authenticatie — endpoints zijn open |
 | Azure Static Web Apps | Deployment-tokens in GitHub Secrets (alleen CI/CD, geen gebruikersauth) |
 
@@ -158,7 +158,7 @@ Geen van deze mechanismen stelt vast wie de gebruiker is, welke organisatie zij 
 
 - **Backend-gemedieerde publicatie.** In productie mag de publicatieactie niet rechtstreeks vanuit de browser naar TriplyDB gaan met een door de gebruiker opgegeven API-token. In plaats daarvan moet de geauthenticeerde gebruiker publicatie aanvragen via de backend, die de TriplyDB-servicecredentials beheert en autorisatieregels kan afdwingen (heeft deze gebruiker het recht om namens deze organisatie te publiceren, naar deze dataset/graph?). Dit elimineert tevens het localStorage-tokenopslagprobleem.
 
-- **Operaton-credentials.** De hardcoded `demo:demo` Basic Auth moet worden vervangen. In productie moet de backend Operaton-aanroepen proxyen met juiste servicecredentials, vergelijkbaar met hoe het reeds SPARQL-queries naar TriplyDB proxyt.
+- **Operaton-credentials — deels opgelost.** De editor bevat geen Operaton-credential: deployen en evalueren worden geproxyd door de backend van de Linked Data Explorer, die de engine server-naar-server aanroept met een eigen, optionele `OPERATON_API_KEY`. Wat overblijft is het volgende punt: de proxy zelf staat open voor elke aanroeper.
 
 - **Backend-authenticatie.** De gedeelde Express-backend heeft momenteel geen authenticatie-middleware. Het toevoegen van een OIDC-tokenverificatie-middleware (die JWT-access-tokens van de IdP van de organisatie valideert) zou alle drie de backendfuncties (SPARQL-proxy, TriplyDB-publicatie, DMN-validatie) in één laag beschermen.
 

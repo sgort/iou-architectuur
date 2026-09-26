@@ -137,13 +137,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.09.11** · *September 2026*
+-   **⚙️ RONL Business API — v2026.09.12** · *September 2026*
 
     ---
 
-    **A promotion is one ordered run, and the backend finally deploys itself**
+    **The API describes itself, and one rule decides every tenant**
 
-    A push to `main` used to fire four deploy workflows at once with nothing sequencing them, and the frontends reliably won — so a new site could call a backend that did not yet serve its routes, and the public site would prerender that 404 straight into its deployed output. [A single promotion workflow](ronl-business-api/developer/deployment/backend.md#how-a-promotion-reaches-production) now decides what changed, deploys the backend alone, and releases the three sites only once it is serving the promoted commit. The backend [deploys from CI at last](ronl-business-api/developer/cicd.md), over OIDC and installing from the lockfile rather than re-resolving every version range on a developer's machine — and it proves itself afterwards by polling `/v1/health` until the running build is the commit just shipped. Pull-request previews became [opt-in and useful in the same release](ronl-business-api/developer/cicd.md#pull-request-previews): one is created only when someone asks for it, eight that had leaked are now reported by a check, and a preview can reach the acceptance backend instead of only proving that static pages render. On the public site, a rule's concepts [now say which side of the rules they sit on](ronl-business-api/user-guide/public-site.md) — what the rules need, and what they determine.
+    The backend now publishes an OpenAPI 3.1 description at `/v1/openapi.json` — 113 of its 131 operations, each checked against a running service, with only the machine-to-machine group still to come — and a test fails whenever a served route is neither described nor listed as pending. [Browse it on the new API Specification page](ronl-business-api/reference/api-specification.md). Tenant access now has [a single source of truth](ronl-business-api/features/authentication-iam.md#tenancy): every process and task check reads the case's own organisation label, refuses when there is none, and answers one code, `403 TENANT_MISMATCH`. Staff can no longer start another organisation's process, a citizen's case goes to the organisation that runs it and stays readable to them, and a task completion can no longer relabel a case. On the supply chain, every release now carries an SBOM, dependencies are [audited daily on both branches](ronl-business-api/developer/cicd.md), and an unused Keycloak adapter that pulled 48 packages into production is gone. [Local development](ronl-business-api/developer/local-development.md) is rewritten from the code, including how the Operaton engine starts and why a bash shell is required.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
@@ -157,23 +157,23 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.09.6** · *September 2026*
+-   **✏️ CPSV Editor — v2026.09.7** · *September 2026*
 
     ---
 
-    **The error says why again, and previews stop outliving their pull requests**
+    **What ships is what was tested, and each release keeps its bill of materials**
 
-    The Linked Data Explorer backend now answers every error as RFC 9457 problem details, and the editor [reads them](cpsv-editor/developer/dmn-implementation.md#reading-the-backends-error-messages-v2026096) — so DMN validation, deployment, SHACL validation and the TriplyDB service update show the server's reason again instead of generic text. A DSO import opens the DMN tab with the model in it, where it used to highlight the tab over an empty panel. Preview environments close from a workflow with no path filter, and each release lists any that were orphaned anyway. `npm start` and every push now check the install against the lockfile first, and the last four Semgrep findings are answered in the source rather than the dashboard. The [suite](cpsv-editor/developer/testing.md) stands at 763 tests and three end-to-end journeys, all passing.
+    The production bundle is now built on the runner, from the tree `npm ci` installed and on the Node the tests ran on, and uploaded with `skip_app_build` — until now Oryx rebuilt it inside a floating container, so the code that passed the tests and the code that shipped were different builds. Node is one exact version, 24.20.0 from `.nvmrc`, and production moved up from 22.22.0 ([Deployment](cpsv-editor/developer/deployment.md)). Every release now commits a CycloneDX SBOM of its production dependencies, a daily audit reads the lockfiles of both `acc` and `main`, and npm itself observes the 14-day cooldown Renovate already kept. Renovate never offers a major's X.0.0, ubuntu 26.04 is deferred on record, a lockfile out of step with `package.json` fails under its own name, and the build check is now required on `acc`. The editor itself is unchanged; the [suite](cpsv-editor/developer/testing.md) still stands at 763 tests, all passing.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.09.6** · *September 2026*
+-   **🔍 Linked Data Explorer — v2026.09.8** · *September 2026*
 
     ---
 
-    **An activity's whole chain in one call, and a quality profile that shows its working**
+    **A promotion deploys in order, and every release carries its own SBOM**
 
-    **On acceptance so far** — production is still serving v2026.09.5. A sixth DSO API joins the viewer, Omgevingsdocumenten Presenteren (Ozon), because an activity's chain runs through it: one call now assembles the legal source, its annotations and both rule sets into a single dossier, and scores how legible that chain is. The [Quality Profile tab](linked-data-explorer/features/dso-integration.md#activity-dossier-and-quality-profile) reports **two axes and no overall grade**, keeps Conclusie and Indieningsvereisten apart, says when a rule set is absent rather than showing zeros, and carries the evidence behind every number — down to each input's own question. A legal source now resolves per bestuurslaag, so national activities stop being refused for lacking a municipality they cannot have. The child-activity fan-out is capped at five in flight and cached for five minutes, the Flevoland Thuisbatterij bundle finally reaches the Modeler, and the deploy modal asks the backend which Operaton it deploys to. Node moved to one `.nvmrc` at 24.21.0 — and a probe now checks the native binding on the **deployed app**, after a green deploy left DMN validation broken for every user.
+    A push to `main` used to start three production deploys at once, and on the v2026.09.6 promotion the ROPA site finished before the backend had even begun building. [One promotion workflow](linked-data-explorer/developer/deployment.md#how-a-promotion-reaches-production) now decides what changed, deploys the backend first and releases the two sites only once it has succeeded; its path rules live in a tested script, and a promotion pull request still previews the real production site, by decision. Every deploy check now runs instead of the first failure hiding the rest, and `build-info.json` is read at start-up, closing a false pass in the very gate that proves a new build is serving. Each release now commits a CycloneDX SBOM, dependencies are audited daily on both `acc` and `main`, a lockfile that disagrees with `package.json` fails under its own name, and Renovate never offers a major's X.0.0. In the Modeler, both Thuisbatterij processes gain swimlanes and Dutch names, and "Aanvullende gegevens opvragen" finally has a form that can be deployed. The [suites](linked-data-explorer/developer/testing.md) stand at 3083 tests, all passing.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

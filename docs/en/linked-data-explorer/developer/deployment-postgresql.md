@@ -55,7 +55,7 @@ az webapp config appsettings set \
 
 ### 4 — Deploy and verify
 
-Push to the `acc` branch. The CI/CD pipeline builds and deploys the backend. On first startup `migrate()` creates all three tables automatically.
+Merge a pull request into `acc`. The merge starts the ACC backend workflow, which builds and deploys the backend. On first startup `migrate()` creates all five tables automatically — `process_definitions`, `form_schemas`, `document_templates`, `ropa_records` and `ropa_personal_data_fields`.
 
 Check the App Service log stream for:
 ```

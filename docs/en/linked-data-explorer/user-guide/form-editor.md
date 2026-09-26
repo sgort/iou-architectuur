@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Form Editor
 
 The Form Editor lets you design Camunda Forms visually and export them as `.form` files. Forms you create here are automatically available to the BPMN Modeler for linking to `UserTask` and `StartEvent` elements.
@@ -8,17 +12,17 @@ The Form Editor lets you design Camunda Forms visually and export them as `.form
 
 Click the **Form Editor** icon (layout template / grid icon) in the left sidebar. The editor opens with the form list on the left and the canvas area on the right.
 
-On your first visit, three example forms are pre-loaded automatically. Open the **Kapvergunning Start** example to see a complete citizen-facing form before creating your own.
+On your first visit, the bundled example forms are pre-loaded automatically — Kapvergunning, Thuisbatterij, Zorgtoeslag, DvTP consent and HR capacity claim. Open the **Kapvergunning Start** example to see a complete citizen-facing form before creating your own.
 
 ---
 
 ## Exploring the example forms
 
-Select any entry in the form list to open it in the canvas. The three seed examples are read-only (marked **EXAMPLE**) — you can inspect and export them but not rename or delete them.
+Select any entry in the form list to open it in the canvas. The examples are marked **EXAMPLE**. You can edit, save, rename and export them, but not delete them. An example you changed is replaced by the bundled version when a later release updates that example.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Form list panel showing the three EXAMPLE forms and a WIP form, with badges clearly visible](../../assets/screenshots/linked-data-explorer-form-editor-list.png)
-  <figcaption>Form list showing EXAMPLE (read-only) and WIP (editable) badges</figcaption>
+  ![Screenshot: Form list panel showing the bundled EXAMPLE forms and a WIP form, with badges clearly visible](../../assets/screenshots/linked-data-explorer-form-editor-list.png)
+  <figcaption>The form list with the bundled EXAMPLE forms and a WIP form, each with its badge</figcaption>
 </figure>
 
 ---
@@ -100,13 +104,13 @@ See [BPMN Modeler — Linking a UserTask or StartEvent to a form](bpmn-modeler.m
 
 ## Renaming a form
 
-Double-click a form name in the list (WIP forms only) to activate inline editing. Press **Enter** or click away to save the new name.
+Double-click a form name in the list to activate inline editing. Press **Enter** or click away to save the new name.
 
 ---
 
 ## Deleting a form
 
-Click the trash icon on a WIP form entry. A confirmation dialog appears before the form is removed from `localStorage`. Example forms cannot be deleted.
+Click the trash icon on a form entry. A confirmation dialog appears before the form is removed from `localStorage` and the backend. Example forms cannot be deleted: the trash icon answers with *Cannot delete example forms*.
 
 !!! note
     If a deleted form is still referenced by a `camunda:formRef` in a saved BPMN process, that reference becomes unresolvable. The BPMN Modeler will still show the form ID in the properties panel, but the deploy modal will list it as an unmatched form reference.

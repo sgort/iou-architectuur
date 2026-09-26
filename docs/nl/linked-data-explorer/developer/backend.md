@@ -66,7 +66,11 @@ Retourneert servicehealth: latency-checks van TriplyDB en Operaton, de SHACL-sha
 }
 ```
 
-`version` noemt de release; `build` noemt de commit en de workflowrun, gelezen uit het `deploy/build-info.json` dat de deployworkflow in het artefact schrijft. `build` geldt alleen als getrackt wanneer zowel `sha` als `run` aanwezig zijn — een ontbrekend of onleesbaar bestand meldt een lokale build en heeft nooit invloed op `status`. De deployworkflows wachten tot `build.sha` gelijk is aan de gedeployde commit en `shacl.complete` `true` is voordat ze slagen; zie [Post-deployment verification](deployment.md#post-deployment-verification).
+`version` noemt de release; `build` noemt de commit en de workflowrun, gelezen uit het `deploy/build-info.json` dat de deployworkflow in het artefact schrijft. `build` geldt alleen als getrackt wanneer zowel `sha` als `run` aanwezig zijn — een ontbrekend of onleesbaar bestand meldt een lokale build en heeft nooit invloed op `status`.
+
+`utils/buildInfo.ts` leest `build-info.json` **één keer, bij het laden van de module** — hetzelfde moment waarop `version` uit `package.json` wordt vastgelegd — zodat de twee niet van elkaar kunnen afwijken: een verouderd proces kan alleen de build melden waarmee het is gestart. Het lezen is bewust niet lui. Een zip-deploy overschrijft `build-info.json` terwijl het vorige proces nog draait en herstart het pas daarna, dus een lezing bij eerste gebruik liet het oude proces de nieuwe `build.sha` melden — een onterechte geslaagde controle in de deploy-gate, gezien bij de productiepromotie van v2026.09.6, waar `build.sha` de nieuwe commit toonde terwijl `version` nog 2026.09.5 was. Het vroege lezen sluit dat sinds v2026.09.7 uit. `/v1/openapi.json` blijft bewust lui: het leest zijn document bij het eerste verzoek en cachet het, maar cachet geen mislukte lezing, zodat een document dat nog niet gebouwd is opnieuw wordt geprobeerd en als `500` zichtbaar wordt in plaats van als kapot te worden onthouden.
+
+De deployworkflows wachten tot `build.sha` gelijk is aan de gedeployde commit en `shacl.complete` `true` is voordat ze slagen; zie [Post-deployment verification](deployment.md#post-deployment-verification).
 
 ### DMN deployen en evalueren (v2026.08.2)
 

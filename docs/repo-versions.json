@@ -1,19 +1,19 @@
 {
-  "docs_built": "2026-09-24",
+  "docs_built": "2026-09-26",
   "repositories": [
     {
       "name": "RONL Business API",
       "icon": "⚙️",
-      "version": "v2026.09.11",
+      "version": "v2026.09.12",
       "environment": "prod",
-      "commit": "86af73e...",
-      "commit_date": "2026-09-23",
+      "commit": "2443adc...",
+      "commit_date": "2026-09-26",
       "build": {
-        "sha": "86af73e",
-        "run": 2,
-        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/35891822589"
+        "sha": "2443adc",
+        "run": 3,
+        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/36258255987"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/86af73e9c0c35fe2fb7b554475cbe84870ac5ae4",
+      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/2443adc6bf662262f54f5c82df7632cc3c27dedb",
       "ci_repo": "https://github.com/sgort/ronl-business-api"
     },
     {
@@ -29,31 +29,31 @@
     {
       "name": "CPSV Editor",
       "icon": "✏️",
-      "version": "v2026.09.6",
+      "version": "v2026.09.7",
       "environment": "prod",
-      "commit": "2723db1...",
-      "commit_date": "2026-09-19",
+      "commit": "7d154ba...",
+      "commit_date": "2026-09-26",
       "build": {
-        "sha": "2723db1",
-        "run": 100,
-        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/35447454898"
+        "sha": "7d154ba",
+        "run": 102,
+        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/36253030787"
       },
-      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/2723db19fbdbb1c68d5d62a4faa94cf1b7e611d6",
+      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/7d154ba50d9457851f358b470f90c5884bd95cc3",
       "ci_repo": "https://github.com/sgort/ttl-editor"
     },
     {
       "name": "Linked Data Explorer",
       "icon": "🔍",
-      "version": "v2026.09.6",
-      "environment": "acc",
-      "commit": "9c58737...",
-      "commit_date": "2026-09-24",
+      "version": "v2026.09.8",
+      "environment": "prod",
+      "commit": "4148c9a...",
+      "commit_date": "2026-09-26",
       "build": {
-        "sha": "9c58737",
-        "run": 395,
-        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/35926467034"
+        "sha": "4148c9a",
+        "run": 2,
+        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/36255107973"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/9c587371f2dfba27de65622bec3b85d05346c6b9",
+      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/4148c9a20881271d16f8ae1473b209e4ff557a66",
       "ci_repo": "https://github.com/sgort/linked-data-explorer"
     },
     {

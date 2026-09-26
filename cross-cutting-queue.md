@@ -421,6 +421,220 @@ larger one.
     Not a claim on any page. Raise it with the weekly pass as a change to the skill.
 
 
+### 26 September 2026 — CPSV Editor v2026.09.6 → v2026.09.7
+
+Read at `origin/acc` = `a7fe76f`; `origin/main` = `7d154ba` holds the same tree, **promoted**
+(Deploy PROD run #102 green). The release is CI and supply-chain work almost entirely, so this
+is its larger half. The same changes landed in the Linked Data Explorer (v2026.09.8) and the
+RONL Business API (v2026.09.12) the same week, all citing `sgort/linked-data-explorer#119` —
+their entries below repeat the shared facts per repository; merge them per page, not per entry.
+
+1. **A release SBOM exists.**
+   Evidence: `5b83e8d`. `scripts/write-sbom.mjs` (`npm run sbom`, a bump-release step) writes
+   `docs/sbom/ttl-editor-<version>.cdx.json` — CycloneDX, production dependencies only, from the
+   lockfile. `docs/sbom/` holds `2026.09.6` (backfilled) and `2026.09.7`. `sbom.yml`, job
+   `release-sbom`, runs on push to `main`, dispatch, and tooling pull requests; modes write,
+   `--check`, `--verify-release`.
+   Bears on: `ictu-dependency-guideline.md` (R10 SBOM row, CPSV ⬜; the sentence that SBOMs are
+   pipeline work nobody has started), `dependency-scanning.md` ("No release carries an SBOM"),
+   and the weekly score.
+
+2. **Dependencies are audited daily on `acc` and `main`.**
+   Evidence: `417a510`, `7e5ef52`, `d1a2639`. `dependency-audit.yml`, cron `17 5 * * *` plus
+   dispatch, `npm audit --package-lock-only` per branch, fails on a high or critical production
+   advisory, one tracking issue. `scripts/audit-tree.mjs` groups by advisory; exit 2 = could not
+   run = finding. The script is copied to `$RUNNER_TEMP` because the branch checkouts remove it.
+   Bears on: `ictu-dependency-guideline.md` (R10 daily-audit row, and the claim that no workflow
+   in any of the three has a `schedule:` trigger), `dependency-scanning.md` (same claim). For the
+   pass to decide: whether "scan what production runs, not only `acc`" is now partly met, since
+   the audit reads `main`'s lockfile.
+
+3. **A job may not share a required check's name.**
+   Evidence: `d1a2639` — the daily job was first named `audit`, the name of zizmor's required
+   job; required checks match by name, and the collision blocked `ronl-business-api#206`. It is
+   now `dependency-audit`; `sbom.yml` names `release-sbom` for the same reason.
+   Bears on: `branch-protection.md` (how required checks match).
+
+4. **The audit job checks lockfile sync before installing.**
+   Evidence: `d37875d`, `35c3712`. `zizmor.yml` step "Lockfile matches package.json" =
+   `npm ci --dry-run --ignore-scripts`; `--ignore-scripts` because a dry run still runs
+   `postinstall`, which failed on a clean checkout. Stated limit: it checks the pull request's own
+   merge commit — dependency pull requests merge one at a time, each rebased onto `acc`.
+   Bears on: `supply-chain.md` and `code-standards.md` (what the `audit` job contains).
+
+5. **Renovate: no `X.0.0`, and ubuntu 26.04 deferred on record.**
+   Evidence: `9cda617` (`allowedVersions: "!/^\\d+\\.0\\.0$/"`, `matchManagers: ["npm"]`),
+   `e2b3396` (a disabled rule for the runner's `ubuntu` major with its reason and exit condition;
+   the other queued majors deliberately stay behind Dependency Dashboard approval).
+   Bears on: `ictu-dependency-guideline.md` (R7 — wait for the first patch; the deferral record),
+   `supply-chain.md` (runner-pin section).
+
+6. **The ACC build check is required, via a `changes` job.**
+   Evidence: `1ab793e`, `e69db67`. `orange-beach.yml` drops the `pull_request` path filter and
+   decides relevance in a `changes` job; `gh api repos/sgort/ttl-editor/rulesets/21728745` requires
+   `audit`, `scan`, `Build and deploy ACC`. `main` still requires nothing (#131). The PROD workflow
+   keeps its `paths-ignore`.
+   Bears on: `branch-protection.md`, `controls.md`. (Pages written ahead of this sync may already
+   say so — verify rather than re-add.)
+
+7. **Counts moved.** 7 workflow files, 9 jobs, all `ubuntu-24.04`, none `ubuntu-latest`.
+   Evidence: `git grep -c runs-on origin/acc -- .github/workflows`.
+   Bears on: `ictu-dependency-guideline.md` ("All 39 jobs — 7, 15 and 17"), `supply-chain.md`
+   (the runner-pin count), `code-standards.md`.
+
+Checked and already right on the contributing pages, no entry needed: `.nvmrc` 24.20.0 and
+`skip_app_build` on both deploy steps; "Node 24.20.0 bundles npm 11.19"; the `acc` ruleset's
+three checks on `branch-protection.md`. Queue item 10 of the Linked Data Explorer entry above
+(`.nvmrc` missing from the deploy filters) does **not** apply here: this repository filters with a
+`paths-ignore` denylist, so a pull request changing only `.nvmrc` builds.
+
+### 26 September 2026 — Linked Data Explorer v2026.09.6 → v2026.09.8
+
+Read at `origin/acc` = `0143ea2`; `origin/main` = `4148c9a` holds the same tree, **promoted**
+(Promote to Production run 36255107973: backend and frontend deployed, ropa-site skipped). The
+SBOM, daily-audit, lockfile-sync and Renovate facts repeat the CPSV Editor entry above for this
+repository.
+
+1. **Production is promotion-driven here too.**
+   Evidence: `09c475a`. `promote-to-production.yml` is the only workflow a push to `main` starts that deploys anything (`semgrep`, `zizmor` and `sbom` also run on that push — and the LDE's own `SECURITY-PIPELINE.md` repeats the overstated wording);
+   it calls the three production deploys as reusable workflows (backend first, then both sites,
+   each gated on the backend result being `success` or `skipped`). Path rules live in
+   `scripts/promotion-targets.mjs`, whose test the `changes` job runs first, with a drift guard
+   against the sites' `pull_request` paths. Unlike the RONL Business API, the two site workflows
+   **keep** a `pull_request` preview trigger on `main`, as a recorded decision (`e14a79a`); the
+   backend is excluded. `build.run` in `repo-versions.json` is now the promotion run's number (#2).
+   Bears on: `development-workflow/overview.md`, `branch-protection.md`, `controls.md`,
+   `build-provenance.md`. The `stamp-staleness.py` limitation queued as RBA item 15 now applies
+   to this component as well.
+
+2. **The production reviewer is gone.**
+   Evidence: `azure-backend-production.yml` comment (removed 24 September 2026, #210);
+   `gh api repos/sgort/linked-data-explorer/environments/production` → protection rules
+   `branch_policy` only.
+   Falsifies: `coverage-floor.md` (the passage saying `production` has required reviewers and
+   that tests would wait on a human approval — that page's stated reason for an exclusion; the
+   source keeps the conclusion for a different reason, that `main` is promoted from `acc`).
+   Bears on: `controls.md`, `branch-protection.md`.
+
+3. **Rulesets, as read on 26 September 2026.**
+   `acc supply-chain gate`: pull request plus `audit`, `scan`, `deploy`, `Build and Deploy
+   Frontend`, `Build and Deploy ROPA Site`. `main promotion gate`: pull request (0 approvals) plus
+   `audit`, `scan`. The production job renames (`a66ca3f` — "Build and Deploy Production
+   Frontend" / "… ROPA Site") change no ruleset; they make requiring those jobs possible.
+   Bears on: `branch-protection.md`, `controls.md`.
+
+4. **SBOM per release** (`e2cb5cc`): `docs/sbom/linked-data-explorer-2026.09.{7,8}.cdx.json`,
+   `sbom.yml` on push to `main` with `--verify-release`.
+   Falsifies: `ictu-dependency-guideline.md` (R10 SBOM row, LDE ⬜; "SBOMs are pipeline work
+   nobody has started"), `dependency-scanning.md` ("No release carries an SBOM").
+
+5. **Daily dependency audit on `acc` and `main`** (`e02f8d5`, `18eae21`, `bd88c6e`). On
+   24 September this repository's 28 moderate entries were three advisories, 24 of them
+   `@tiptap/core` — the example `audit-tree.mjs`'s grouping exists for.
+   Falsifies: `ictu-dependency-guideline.md` (R10 daily-audit row, LDE ⬜; possibly "scan what
+   production runs"); bears on `dependency-scanning.md`, `controls.md`.
+
+6. **Lockfile-sync step** (`d9200ba`, `bf62026`) in `zizmor.yml`, as in the CPSV entry.
+   Bears on: `supply-chain.md`, `development-workflow/overview.md`.
+
+7. **Renovate R7** (`bd79d04`, `faae5f8`): npm `allowedVersions` excludes `X.0.0`; ubuntu 26.04
+   deferred by a rule with its reason. Falsifies `ictu-dependency-guideline.md` R7 LDE ⬜.
+
+8. **Counts at `0143ea2`:** 11 workflow files, 21 jobs, 34 `uses:` lines of which 3 are local
+   reusable-workflow calls (31 action references). Re-derive against `SECURITY-PIPELINE.md`
+   before writing. Bears on: `code-standards.md`, `supply-chain.md`.
+
+9. **Evidence for the open LDE item 4 (App Service runtime) — do not resolve it from this.**
+   Both sides now sit in the same tree: `docs/ci-posture-across-repos.md` says Node 24 on both
+   tiers in one place and all four App Services on `NODE|22-lts` in another;
+   `azure-backend-production.yml` says "matches the App Service runtime, NODE|22-lts" near
+   line 79 and "switched to NODE|24-lts" near lines 368–369.
+
+10. **The zizmor register drift is systemic** (`c515682`, `07ef51e`): Renovate rewrites a
+    workflow pin and its comment but never `SECURITY-PIPELINE.md`, so every action-bump pull
+    request fails the register half of `audit` until the row is edited on the bump branch.
+    Bears on: `supply-chain.md`.
+
+11. **The script harness runs in CI now, and fails on Windows.** `npm run test:scripts` exists
+    (`node scripts/promotion-targets.test.mjs && node scripts/dso-dossier.test.mjs`);
+    `promotion-targets.test.mjs` runs in the promotion's `changes` job ("PASS: 24 checks" in run
+    36255107973). On a Windows workstation it fails — it resolves its script with
+    `new URL(...).pathname`, which yields `/C:/…` — and the `&&` then skips `dso-dossier`
+    (24 checks, passing on its own). Measured 26 September 2026.
+    Bears on: `code-standards.md` and the weekly `tests:` rows (what counts as a suite in CI).
+
+### 26 September 2026 — RONL Business API v2026.09.11 → v2026.09.12
+
+Read at `origin/main` = `2443adc`, **promoted** (Promote to Production run #3: backend, frontend,
+public-site and pa-demo all deployed). `origin/acc` = `3c44b9e` is two commits ahead, touching only
+`scripts/check-previews.sh` (item 11). The SBOM, daily-audit, lockfile-sync and Renovate facts
+repeat the CPSV Editor and Linked Data Explorer entries above for this repository.
+
+1. **`openapi-rendering.md` describes one component; a second now publishes.**
+   Evidence: `3c8d0b3`, `openapi.routes.ts` (wildcard CORS on the document), and live reads of
+   `acc.api.open-regels.nl` on 26 September 2026. What that page states as general is
+   LDE-specific: RBA's document **carries its own version** (`info.version`, injected from
+   `package.json` by `scripts/build-openapi.cjs`); RBA **declares `securitySchemes`**
+   (`bearerAuth`, `mediaAggregatorKey`); RBA's `/v1/health` is wrapped (`{ success, data }`) with
+   `build { sha, run, runId }` and no `label`; RBA acceptance echoes only
+   `https://iou-architectuur.open-regels.nl` on `/v1/health` — not `acc.iou-architectuur…`, not
+   `localhost` — so its provenance banner **and Scalar's Test Request** work only on the production docs tier (a preflight from the acceptance docs origin gets no `Access-Control-Allow-Origin`; adding `https://acc.iou-architectuur.open-regels.nl` to the RBA acceptance App Service's `CORS_ORIGIN` would change that); and CSP
+   `connect-src` now names a second host (`https://acc.api.open-regels.nl`, added in this sync).
+   Bears on: `contributing/doc-architecture/openapi-rendering.md`.
+
+2. **SBOM per release** (`c43de59`): `docs/sbom/` holds 2026.09.11 and 2026.09.12; `sbom.yml` on
+   push to `main` with `--verify-release`. Falsifies the RBA cells of the R10 SBOM row and
+   `dependency-scanning.md` ("No release carries an SBOM").
+
+3. **Daily dependency audit** (`34a5a57`, `9ded0aa`, `dfb6ace`). This is the repository whose
+   `#206` the job-name collision blocked; Node is pinned as a literal `24.20.0` in the job because
+   it audits two branches that need not share an `.nvmrc`. Bears on: `dependency-scanning.md`,
+   `branch-protection.md`, `ictu-dependency-guideline.md`.
+
+4. **The lockfile incident this week's checks came from** (`05d76bd`, `b2e9bf1`, `c81098b`).
+   Three dependency pull requests (#221–#223) merged back to back without rebasing, each green
+   against its own base, left `acc` with a lockfile matching no `package.json`; `npm ci` failed
+   with `EUSAGE`. The ruleset does not require a branch to be up to date. Bears on:
+   `supply-chain.md`, `branch-protection.md`, `code-standards.md`.
+
+5. **Renovate R7, and a Node deferral the other two repositories do not have** (`617d105`,
+   `0a75676`). Ubuntu 26.04 **and Node 24** are disabled rules with reasons and exit conditions:
+   both App Services run `NODE|22-lts` against an `.nvmrc` of 22.23.2, and taking 24 in `.nvmrc`
+   alone would build for a major the host does not run. **Reconcile with LDE item 4 and the LDE
+   `.nvmrc` 24.21.0 movement** rather than applying either alone. Bears on:
+   `ictu-dependency-guideline.md` (R7), `supply-chain.md`.
+
+6. **`keycloak-connect` removed** (`bae66c9`): production tree −48 packages, including
+   `chromedriver` via an optionalDependency on `latest`, `adm-zip`, `elliptic`, `proxy-agent`;
+   three Dependabot alerts can no longer arrive by that route. Bears on: `supply-chain.md`,
+   `dependency-scanning.md` (alert counts).
+
+7. **Pinning scope** (`08a988a`): local compose images pinned by digest via `docker:pinDigests`;
+   `deployment/vm/` compose deliberately unpinned (#196); the App Service runtime cannot be pinned
+   below the major (`az webapp list-runtimes`: `NODE|22-lts`, `NODE|24-lts`, `NODE|26`). Bears on:
+   `supply-chain.md` (pinning table).
+
+8. **Counts moved:** 13 workflow files on `main` (was 11). Re-count jobs and `uses:` against
+   `SECURITY-PIPELINE.md` before writing. Bears on: `code-standards.md`, `supply-chain.md`,
+   `ci-posture-deck.md`.
+
+9. **Semgrep triage method** (`cbbb57c`): a verification scan whose ruleset lacked the rules
+   reported 0 on the old tree too; re-run with the five exact rule ids, 14 → 0. The lesson —
+   a zero is evidence only if the same scan finds the findings before the fix — belongs with the
+   scanning methodology. Bears on: `dependency-scanning.md`, `code-standards.md`.
+
+10. **The LDE production reviewer's removal is recorded in this repository too** (`7ed9ba7`):
+    both repositories now exclude `pull_request` from production workflows for the promotion
+    argument alone. Bears on the same pages as LDE item 2.
+
+11. **Acc-only, not promoted:** `check-previews.sh` strips the carriage returns `az` writes on
+    Windows (`80e34a2`, merged `3c44b9e`). Document after promotion, wherever `check-previews` is
+    described.
+
+12. **Test posture for the weekly `tests:` rows:** backend test files 89 → 96; new scripts
+    `test:contract` and `test:openapi-coverage`; the OpenAPI coverage gate's pending ceiling is 18.
+    Use the figures measured in this sync (RBA testing pages), not these counts.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |
