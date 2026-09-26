@@ -44,16 +44,16 @@
     {
       "name": "Linked Data Explorer",
       "icon": "🔍",
-      "version": "v2026.09.6",
-      "environment": "acc",
-      "commit": "9c58737...",
-      "commit_date": "2026-09-24",
+      "version": "v2026.09.8",
+      "environment": "prod",
+      "commit": "4148c9a...",
+      "commit_date": "2026-09-26",
       "build": {
-        "sha": "9c58737",
-        "run": 395,
-        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/35926467034"
+        "sha": "4148c9a",
+        "run": 2,
+        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/36255107973"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/9c587371f2dfba27de65622bec3b85d05346c6b9",
+      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/4148c9a20881271d16f8ae1473b209e4ff557a66",
       "ci_repo": "https://github.com/sgort/linked-data-explorer"
     },
     {

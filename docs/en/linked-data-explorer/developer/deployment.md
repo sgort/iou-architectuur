@@ -4,35 +4,40 @@ component: Linked Data Explorer
 
 # Deployment
 
-The Linked Data Explorer deploys through six GitHub Actions workflows — one per deployable package per environment — with automatic deployment to ACC and a reviewer-approved gate on the production backend. Two further workflows, Semgrep and zizmor, scan the code and the workflows themselves and deploy nothing.
+The Linked Data Explorer has eleven GitHub Actions workflows. Six deploy — one per deployable package per environment. The three ACC deploys start when a pull request is merged into `acc`; the three production deploys are called, in order, by a seventh, `promote-to-production.yml`, when a promotion is merged into `main`. No deploy waits for a human approval: the gates are the pull request rulesets and the checks each workflow runs. The remaining four deploy nothing — Semgrep and zizmor scan the code and the workflows themselves, `sbom.yml` records the SBOM of each release, and `dependency-audit.yml` audits both branches daily.
 
 ---
 
 ## Workflow overview
 
-| Workflow | Trigger | Target | Approval |
-|---|---|---|---|
-| `azure-frontend-acc.yml` | push to `acc` | Azure Static Web Apps (ACC) | Automatic |
-| `azure-frontend-production.yml` | push to `main` | Azure Static Web Apps (production) | Automatic |
-| `azure-backend-acc.yml` | push to `acc` | Azure App Service (ACC) | Automatic |
-| `azure-backend-production.yml` | push to `main` | Azure App Service (production) | Required reviewer |
-| `azure-ropa-site-acc.yml` | push to `acc` | Azure Static Web Apps — public ROPA site (ACC) | Automatic |
-| `azure-ropa-site-prod.yml` | push to `main` | Azure Static Web Apps — public ROPA site (production) | Automatic |
+| Workflow | Started by | Target |
+|---|---|---|
+| `azure-frontend-acc.yml` | push to `acc`, path-filtered; pull requests into `acc` | Azure Static Web Apps (ACC) |
+| `azure-backend-acc.yml` | push to `acc`, path-filtered; pull requests into `acc` (build and test, no deploy); manual | Azure App Service (ACC) |
+| `azure-ropa-site-acc.yml` | push to `acc`, path-filtered; pull requests into `acc` | Azure Static Web Apps — public ROPA site (ACC) |
+| `promote-to-production.yml` | push to `main`, no path filter; manual (`dry_run`) | Calls the three production workflows below, in order |
+| `azure-backend-production.yml` | called by the promotion; manual | Azure App Service (production) |
+| `azure-frontend-production.yml` | called by the promotion; pull requests into `main` (production preview) | Azure Static Web Apps (production) |
+| `azure-ropa-site-prod.yml` | called by the promotion; pull requests into `main` (production preview) | Azure Static Web Apps — public ROPA site (production) |
+| `semgrep.yml` | every pull request; push to `acc` and `main` | — (Semgrep Code and Supply Chain, job `scan`) |
+| `zizmor.yml` | every pull request; push to `acc` and `main` | — (supply-chain audit, job `audit`) |
+| `sbom.yml` | push to `main`; manual; pull requests touching the SBOM tooling | — (release SBOM) |
+| `dependency-audit.yml` | daily at 05:17 UTC; manual; pull requests touching the audit | — (audits `acc` and `main`) |
 
-The production backend job declares `environment: production`, whose protection rules require a reviewer and restrict the branch. That gate exists because the production backend serves both the production LDE frontend and the production CPSV Editor.
+The production backend job declares `environment: production`. Its only protection rule is a branch policy; it has **no required reviewer**. The reviewer was removed on 24 September 2026 ([#210](https://github.com/sgort/linked-data-explorer/issues/210)): it gated the one production deploy that already carried the most automated checks, while both production site workflows deployed with no approval at all. What orders the production deploys now is the promotion itself — see [How a promotion reaches production](#how-a-promotion-reaches-production).
 
 ---
 
 ## Frontend deployment
 
-The frontend builds to a static site on Node.js 20:
+The frontend builds to a static site on the Node version pinned in `.nvmrc` (24.21.0), which the workflows read with `node-version-file`:
 
 ```
-git push → GitHub Actions
+merge into acc (ACC)   /   called by the promotion (production)
   npm ci
   lint, typecheck, unit tests
   npm run build:acc   (ACC)   /   npm run build:prod   (production)
-  Azure Static Web Apps deployment action
+  Azure Static Web Apps deployment action, uploading that build (skip_app_build)
 ```
 
 The two build commands differ because they inject different `VITE_API_BASE_URL` values through `.env.acceptance` and `.env.production`.
@@ -55,14 +60,14 @@ The only committed `staticwebapp.config.json` is the public ROPA site's, in `pac
 The backend builds TypeScript and runs on Azure App Service (Linux, Node.js 22). Both backend workflows run the same steps:
 
 ```
-git push → GitHub Actions
+merge into acc (ACC)   /   called by the promotion (production)
   npm ci (backend package only)
   lint · lint the OpenAPI description · typecheck · unit tests
   npm run build                        (tsc → dist/)
   prepare the deployment package       (dist/, the SHACL shapes, deploy/build-info.json)
   Azure Web Apps deploy
   health check
-  verify v1 endpoints                  (build.sha and shacl.complete — see below)
+  verify v1 endpoints                  (build, shape layers, OpenAPI version, native binding — see below)
 ```
 
 **ACC:** `https://acc.backend.linkeddata.open-regels.nl`
@@ -142,11 +147,65 @@ az webapp config appsettings set \
 feature/xyz  →  acc  →  main
                  ↓         ↓
                ACC       production
-             (auto)      (auto frontend and ROPA site,
-                          reviewer-approved backend)
+             (each deploy  (one promotion: backend first,
+              on its own)   then frontend and ROPA site)
 ```
 
-All changes go to `acc` first. After acceptance testing, `acc` is promoted to `main` through a pull request. The production backend deployment then waits for a reviewer in the `production` environment.
+All changes go to `acc` first, through a pull request. After acceptance testing, `acc` is promoted to `main` through a pull request, and merging it starts the promotion described below. Both branches change only through a pull request; the rulesets that enforce it are listed under [The rulesets](#the-rulesets).
+
+---
+
+## How a promotion reaches production
+
+`promote-to-production.yml` is the only workflow a push to `main` starts that deploys anything. (Semgrep, zizmor and `sbom.yml` run on the same push; none of them deploys.) It calls the three production deploys as reusable workflows, in this order:
+
+```
+changes ──▶ backend ──┬──▶ frontend
+                      └──▶ ropa-site
+```
+
+Until [#210](https://github.com/sgort/linked-data-explorer/issues/210) each production workflow started itself on a push to `main`, with its own path filter, and the three raced: on the v2026.09.6 promotion the ROPA site finished deploying before the backend had started building.
+
+**Its trigger has no path filter, on purpose.** The workflow is what decides which deploys a promotion needs, so it has to start on every push to `main` — a filter would mean the decision never ran. It can also be dispatched by hand, with a `dry_run` input that **defaults to true**: a dry run reports which deploys would be needed and stops before deploying anything.
+
+**The `changes` job decides.** It first runs `scripts/promotion-targets.test.mjs`, then feeds `git diff --name-only --no-renames` over the pushed commit range to `scripts/promotion-targets.mjs`, which answers `backend`, `frontend` and `ropa_site` with `true` or `false`. `--no-renames` makes a moved file count under both its old and its new name, as GitHub's own path filters do. When the range cannot be read — a manual dispatch, a first push or force-push, or a `before` commit the clone does not have — it runs the script with `--all` and deploys everything. A failure of the `changes` job itself also deploys everything: each deploy runs when `changes` did not succeed, as well as when it said `true`.
+
+**The backend goes first, and alone.** The two sites wait for it, then run in parallel. Each site deploys only when the backend's result is `success` or `skipped` — a positive list, so a cancelled backend stops them too — and its own target is needed. A failed backend stops both sites.
+
+**The path rules live in one place.** `scripts/promotion-targets.mjs` holds the three patterns. The backend's and the frontend's include the root `package.json`, `package-lock.json` and `.nvmrc`; the ROPA site's does not. Changes to the ACC workflows or to the promotion workflow itself deploy nothing. The two production site workflows still carry their own paths on their `pull_request` trigger, and the test's drift guard fails when those lists and the script's patterns stop agreeing.
+
+### The production preview on a promotion pull request
+
+The frontend and ROPA site production workflows keep a `pull_request` trigger on `main`. A promotion pull request therefore builds a preview of the **production** site from `acc`, so the real thing can be looked at before anything is promoted. That preview is not part of the promotion sequence: a different trigger, a different concurrency group, and it runs before the promotion exists.
+
+It was kept deliberately (commit `e14a79a`), with its costs recorded:
+
+- a public URL on the production resource, serving unreleased code, for as long as the pull request is open;
+- an environment slot on the production Static Web App;
+- teardown depends on `close_pull_request_job`, and GitHub does not run `pull_request` workflows while a pull request has a merge conflict — closing included — so a conflicted pull request that is closed can leave its preview behind.
+
+The **backend is excluded on purpose**: a preview site is a page to look at, while a preview backend on production would be a second live API against production data.
+
+The site jobs are named **Build and Deploy Production Frontend** and **Build and Deploy Production ROPA Site**, distinct from the ACC jobs, because required checks are matched by job name.
+
+### The rulesets
+
+| Ruleset | Branch | Pull request | Required checks |
+|---|---|---|---|
+| `acc supply-chain gate` | `acc` | required, 0 approvals, merge commits only | `audit`, `scan`, `deploy`, `Build and Deploy Frontend`, `Build and Deploy ROPA Site` |
+| `main promotion gate` | `main` | required, 0 approvals, merge commits only | `audit`, `scan` |
+
+Both also block deleting the branch and non-fast-forward pushes.
+
+### Supporting workflows
+
+- **`sbom.yml`** runs on every push to `main`. It generates the CycloneDX SBOM from the lockfile, checks with `--verify-release` that the committed `docs/sbom/` file for the released version exists, and uploads the SBOM as an artifact kept for 90 days. The committed copy is the durable one.
+- **`dependency-audit.yml`** runs daily at 05:17 UTC and audits both `acc` and `main`. A high or critical advisory in production dependencies fails it and opens — or updates — a tracking issue, which it closes once the audit is clean.
+- **zizmor's lockfile step.** `zizmor.yml` runs `npm ci --dry-run --ignore-scripts`, so a `package-lock.json` that no longer matches `package.json` fails under its own name rather than inside a later install.
+
+### A promotion, as it ran
+
+The v2026.09.8 promotion — run [36255107973](https://github.com/sgort/linked-data-explorer/actions/runs/36255107973), at `4148c9a` on 26 September 2026 — is the sequence working as designed. The `changes` job printed `PASS: 24 checks` for the decision script's test, read 16 changed files, and answered `backend=true`, `frontend=true`, `ropa_site=false`. The backend deployed first (16:20–16:24 UTC), the frontend deployed once it had succeeded (16:24–16:27 UTC), and the ROPA site was skipped.
 
 ---
 
@@ -154,12 +213,14 @@ All changes go to `acc` first. After acceptance testing, `acc` is promoted to `m
 
 ### What the workflows check
 
-The backend workflows do not stop at a health check, because the health check passes against the **previous** build too — Azure keeps it answering while it starts the new one. After the deploy, *Verify v1 endpoints* reads `/v1/health` up to twelve times, fifteen seconds apart, and passes only when **both** hold:
+The backend workflows do not stop at a health check, because the health check passes against the **previous** build too — Azure keeps it answering while it starts the new one. After the deploy, *Verify v1 endpoints* asserts, in both the ACC and the production workflow:
 
-- `build.sha` equals the commit this run deployed — so a deploy that left the old artifact serving fails instead of passing; and
-- `shacl.complete` is `true` — every SHACL shape layer loaded.
+- **`build.sha` equals the commit this run deployed** — so a deploy that left the old artifact serving fails instead of passing. `/v1/health` is read up to twelve times, fifteen seconds apart; the window is about three minutes, because a 34-second window was measured to give up 14 seconds before a new build came up.
+- **`shacl.complete` is `true`** — every SHACL shape layer loaded. Read in the same loop.
+- **`/v1/openapi.json` describes the running release** — its `info.version` equals the `version` `/v1/health` reports, retried up to five times.
+- **The libxmljs2 native binding loads on the deployed app.** The step posts a small DMN to `POST /v1/dmns/validate` and fails only when the base layer reports a native-load error — a message matching `NODE_MODULE_VERSION` or `was compiled against` — never because the DMN is invalid. The packaging step already proves the binding loads on the runner; this proves it on the host, where on 23 September 2026 a stale `.node` file broke DMN validation for every user while health, `build.sha` and the shape layers all reported fine.
 
-Each failed attempt logs the values it read. The window is about three minutes; a 34-second window was measured to give up 14 seconds before a new build came up.
+Each failed attempt logs the values it read. **Every assertion runs.** Since v2026.09.7 a failed check sets `checks_failed` and the step fails at the end, naming each failure, instead of exiting at the first one — on the v2026.09.6 promotion the version comparison failed first, and the native-binding check below it never ran.
 
 ### Release checklist
 
@@ -200,3 +261,16 @@ The CSP collector check sends one synthetic report, which the backend logs as a 
 The asset-status row checks the **outcome** of the v2026.09.5 migration that made `form_schemas.status` and `document_templates.status` `NOT NULL`. The migration itself runs at start-up and cannot be observed from outside; that no row lacks a status can.
 
 v2026.09.5 was also the release that put the outbound guard ([#142](https://github.com/sgort/linked-data-explorer/issues/142)) into production. Before it, the production backend would request any host a caller named.
+
+### v2026.09.8 — the production verify step, 26 September 2026
+
+The release checklist above was not run by hand for v2026.09.8. What is on record is the production backend's own *Verify v1 endpoints* step in the promotion run [36255107973](https://github.com/sgort/linked-data-explorer/actions/runs/36255107973), at `4148c9a`:
+
+| Check | Production |
+|---|---|
+| Running build | `4148c9a` on the fifth read — the first four, 16:23:19 to 16:24:07 UTC, still returned the previous build, `99e29f9`, with every shape layer loaded |
+| SHACL shape layers | all loaded |
+| OpenAPI description | `info.version` 2026.09.8, equal to `/v1/health` |
+| Native binding | libxmljs2 loads on the deployed app |
+
+The first four reads are the stale window the three-minute loop exists for: the previous build kept answering, and a check that stopped at the health endpoint would have passed against it.

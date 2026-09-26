@@ -503,6 +503,25 @@ deploying it a file-shuffling exercise rather than the Modeler flow kapvergunnin
 zorgtoeslag already have. Both records carry `organization: 'flevoland'`, and the decision
 subprocess declares `shellId` alongside `calledElement`.
 
+Both Thuisbatterij processes are drawn as a pool with lanes and carry Dutch element names;
+their element ids are the ones they always had, so nothing that references them by id changes.
+The main process sits in the pool *Subsidie Thuisbatterij Flevoland - Hoofdproces* with the
+lanes **Aanvrager**, **Behandelaar** and **Systeem**. The decision subprocess sits in the pool
+*Thuisbatterijsubsidie - Beoordeling recht en hoogte* with only **Behandelaar** and
+**Systeem** — it has no applicant-facing step.
+
+The user task *Aanvullende gegevens opvragen (Awb 4:5)* (`Task_RequestMissingInfo`) opens the
+form-js form `thuisbatterij-aanvullende-gegevens` with `camunda:formRefBinding="deployment"`.
+That form carries the `supplementReceived` checkbox the next gateway, *Aanvulling ontvangen?*,
+branches on. The task used to point at an embedded HTML form
+(`embedded:deployment:awb-missing-info-form.html`) that was never part of the bundle, so
+nothing could set `supplementReceived`. The form is seeded as the Form Editor example
+`example_thuisbatterij_missing_info`, and the `e2e-fixtures/manifest.json` entry for
+`ThuisbatterijSubsidieAanvraagProcess` lists it beside the start and notification forms.
+In `utils/exampleVersions.ts`, `example_thuisbatterij_aanvraag` and
+`example_thuisbatterij_decision` stand at version 2, so the Modeler replaces copies seeded
+before the redraw; `example_thuisbatterij_missing_info` starts at 1.
+
 !!! warning "A tenanted process cannot see an untenanted DMN"
     Operaton resolves a business rule task's `decisionRef` **inside the process instance's own
     tenant**. A process deployed under tenant-id `flevoland` therefore cannot reach a DMN

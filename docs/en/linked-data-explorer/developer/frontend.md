@@ -32,6 +32,11 @@ packages/frontend/src/
 │   │   ├── BpmnProperties.tsx     properties panel
 │   │   ├── ProcessList.tsx        process management sidebar
 │   │   └── DmnTemplateSelector.tsx DMN/DRD dropdown for BusinessRuleTask
+│   ├── DsoExplorer/
+│   │   ├── DsoExplorer.tsx        DSO Explorer shell (default export only)
+│   │   ├── QualityProfileTab.tsx  quality profile tab (Scorecard/Matrix)
+│   │   ├── shared.tsx             shared components — only Section
+│   │   └── tokens.ts              shared constants, the Tone type, toneForRatio()
 │   ├── GraphView.tsx              D3.js RDF graph visualisation
 │   ├── ResultsTable.tsx           SPARQL results table + CSV export
 │   └── Changelog.tsx              version history display
@@ -50,6 +55,12 @@ packages/frontend/src/
 │   └── export.types.ts            export types
 └── changelog.json                 version history data (JSON)
 ```
+
+`DsoExplorer/` splits what its two tabs share by kind: `shared.tsx` exports only
+components, and `tokens.ts` holds the constants, type and helper that
+`DsoExplorer.tsx` and `QualityProfileTab.tsx` both import. A `.tsx` module that
+exports anything besides components cannot be hot-swapped by React Fast Refresh,
+which the `react-refresh/only-export-components` lint rule enforces.
 
 `tutorial.json` sat beside `changelog.json` until v2026.09.2, which removed the
 in-app tutorial and its 596 lines of content along with the `Tutorial` component

@@ -11,37 +11,50 @@ before that the repository had no test files at all and `npm test` exited 1 with
 *"No tests found"*.
 
 !!! info "Figures on this page are measured, not estimated"
-    Every count, command and coverage percentage below was produced by running
-    the suites against **v2026.09.6** on **24 September 2026**, at `9c58737` on
-    `acc`, in a separate clean clone of that commit after `npm ci`. This is an
-    **acceptance release**: `main` is still on v2026.09.5, so the figures below
-    describe what is on `acc` and not yet what is promoted.
+    The headline counts, package coverage and command results below were
+    produced by running the suites against **v2026.09.8** on **26 September
+    2026**, at `0143ea2` on `acc` — the same tree as `4148c9a` on `main`, so
+    ACC and production both run what was measured. The runs used the working
+    checkout, with `npm run deps:check` reporting the installed dependencies in
+    step with the lockfile.
+
+    The per-module and per-file coverage tables further down are **from the
+    v2026.09.6 measurement** (24 September 2026, `9c58737`) and say so where
+    they appear; they were not regenerated for v2026.09.8.
 
     The runs used **Node v24.14.1 and npm 11.11.0**, while the repository's
     `.nvmrc` pins **24.21.0**, which was not installed on the measuring machine —
     the numbers are reproducible on 24.14.1, and a reader on the pinned runtime
-    may see durations move. `npm ci` installs from the lockfile, so the
-    dependency tree is identical either way. Rerun the commands in
-    [Running the tests](#running-the-tests) to reproduce them.
+    may see durations move. The dependency tree is the lockfile's either way.
+    Rerun the commands in [Running the tests](#running-the-tests) to reproduce
+    them.
 
-**At a glance:** 144 test files · **3082 tests** · all passing · backend 98.36%
+**At a glance:** 144 test files · **3083 tests** · all passing · backend 98.36%
 statements, frontend 95.37%.
 
 | Package | Runner | Files | Tests | Runner time | Statements | Branches | Functions | Lines |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| `packages/backend` | Jest + ts-jest | 69 | 1823 | 89.6 s | 98.36% | 92.49% | 97.48% | 99.06% |
-| `packages/frontend` | Vitest + RTL | 75 | 1259 | 64.6 s | 95.37% | 92.93% | 93.18% | 96.39% |
+| `packages/backend` | Jest + ts-jest | 69 | 1824 | 31.3 s | 98.36% | 91.98% | 97.48% | 99.06% |
+| `packages/frontend` | Vitest + RTL | 75 | 1259 | 82.7 s | 95.37% | 92.93% | 93.18% | 96.39% |
 
 `packages/ropa-site` has no `package.json` and is not an npm workspace member, so
-`npm test` never reaches it. One further test file lives outside both packages
+`npm test` never reaches it. Two further test files live outside both packages
 and outside the total above — see
-[The one test the suite does not run](#the-one-test-the-suite-does-not-run).
+[Script harnesses outside `npm test`](#script-harnesses-outside-npm-test).
 
-**Against v2026.09.5 that is +8 files and +261 tests** — backend +174, frontend
-+87 — with no suite shrinking and nothing skipped.
+**Against v2026.09.6 that is +0 files and +1 test**, in the backend: the
+`buildInfo.test.ts` case *"reports the build it loaded with, even after the file
+changes underneath"*, which pins that `deploy/build-info.json` is read once, at
+start-up, rather than on first request. The frontend count and all four of its
+coverage figures are unchanged. Backend branches moved 92.49% → **91.98%**; the
+only backend source files changed since v2026.09.6 are `utils/buildInfo.ts`,
+`routes/openapi.routes.ts` and `services/quality.service.ts`, and which of them
+moved the average was not measured per file.
 
-**v2026.09.6 is a DSO release, and its tests follow the new services.** Six
-modules arrived with their own suites, and two of them landed clean:
+**v2026.09.6 added 8 files and 261 tests** — backend +174, frontend +87. It was
+a DSO release, and its tests follow the new services. Six modules arrived with
+their own suites, and two of them landed clean (coverage as measured at
+v2026.09.6):
 
 | New module | Package | Tests | Statements | Branches | Functions | Lines |
 |---|---|---:|---:|---:|---:|---:|
@@ -129,16 +142,33 @@ computes.
 
 ## Running the tests
 
-Run from the repository root after `npm install`. The root scripts fan out over
+Run from the repository root after `npm ci`. The root scripts fan out over
 both workspaces with `--workspaces --if-present`.
 
 | Command | Scope | Files | Tests | Time |
 |---|---|---:|---:|---:|
-| `npm test` | Both packages | 144 | 3082 | — |
-| `npm test -w packages/backend` | Backend only (Jest, with coverage) | 69 | 1823 | 89.6 s |
-| `npm test -w packages/frontend` | Frontend only (Vitest, with coverage) | 75 | 1259 | 64.6 s |
-| `npm run test:contract -w packages/backend` | `src/openapi` and `src/routes`, without coverage | 27 | 762 | 30.0 s |
-| `node scripts/dso-dossier.test.mjs` | The dossier renderer — **not** part of `npm test` | 1 | 24 checks | 0.2 s |
+| `npm test` | Both packages | 144 | 3083 | — |
+| `npm test -w packages/backend` | Backend only (Jest, with coverage) | 69 | 1824 | 31.3 s |
+| `npm test -w packages/frontend` | Frontend only (Vitest, with coverage) | 75 | 1259 | 82.7 s |
+| `npm run test:contract -w packages/backend` | `src/openapi` and `src/routes`, without coverage | 27 | 762 | — |
+| `npm run test:scripts` | Both script harnesses in `scripts/` — **not** part of `npm test` | 2 | 24 + 24 checks | — |
+| `node scripts/promotion-targets.test.mjs` | The promotion decision script alone | 1 | 24 checks | — |
+| `node scripts/dso-dossier.test.mjs` | The dossier renderer alone | 1 | 24 checks | — |
+
+!!! warning "`npm run test:scripts` fails on Windows"
+    Measured on 26 September 2026: on Windows the first harness,
+    `promotion-targets.test.mjs`, fails its four command-line checks — reading
+    stdin, `--all`, the exit 2 for an unknown argument, and appending to
+    `GITHUB_OUTPUT`. The script under test is not at fault; the harness is.
+    It locates the script with `new URL('./promotion-targets.mjs',
+    import.meta.url).pathname`, which on Windows yields `/C:/…`, a path Node
+    cannot run. The same file prints `PASS: 24 checks` on Linux, as it did in
+    the promotion's `changes` job at `4148c9a`.
+
+    And because `test:scripts` joins the two with `&&`, the dossier harness
+    **never runs** after that failure. Run on its own, it passes with
+    `PASS: 24 checks`. On Windows, run `node scripts/dso-dossier.test.mjs`
+    directly, and the promotion harness only on Linux or in CI.
 
 Both packages' `test` scripts include coverage by default, so a plain run always
 produces a report. Watch modes are `test:watch` in either package; the backend
@@ -158,7 +188,10 @@ npm run test:contract -w packages/backend
 # Watch mode while working on the backend
 npm run test:watch -w packages/backend
 
-# The dossier renderer's own harness, which npm test does not run
+# The two script harnesses, which npm test does not run (see the warning above)
+npm run test:scripts
+
+# The dossier renderer's harness alone
 node scripts/dso-dossier.test.mjs
 
 # Diagnostic only — see "When the frontend suite fails only in parallel"
@@ -181,9 +214,10 @@ need to know to add a test to it — put the file under one of those two
 directories and it is included; put a contract assertion anywhere else and it
 will never run in the fast loop.
 
-At v2026.09.6 that is **27 files and 762 tests in 30.0 seconds**, against 89.6
-for the full backend suite: **724 tests from `src/routes`** and **38 from
-`src/openapi`**. It is the loop to use while editing `openapi.yaml` or a route.
+At v2026.09.8 that is **27 files and 762 tests**, all passing: **724 tests from
+`src/routes`** and **38 from `src/openapi`**, the same as at v2026.09.6, when it
+ran in 30.0 seconds against 89.6 for the full backend suite. It is the loop to
+use while editing `openapi.yaml` or a route.
 
 **There is no frontend contract subset.** `packages/frontend` defines no
 `test:contract` script and carries no test file with `contract` in its name; its
@@ -191,25 +225,33 @@ only test entry points are `test` and `test:watch`. If this page's contract
 figure is ever quoted beside the frontend total, that is a misreading — the
 number belongs to the backend row.
 
-### The one test the suite does not run
+### Script harnesses outside `npm test`
 
-`scripts/dso-dossier.test.mjs` covers the DSO activity dossier renderer, and it
-runs **only when someone types the command**. It is referenced by no npm script,
-no Azure workflow and neither git hook, so nothing invokes it on commit, on push
-or in CI.
+Two test files live in `scripts/`, outside both workspaces, and `npm test` runs
+neither. The root script `npm run test:scripts` runs both, in order:
+`node scripts/promotion-targets.test.mjs && node scripts/dso-dossier.test.mjs`.
 
-It is also not a runner. It is a hand-rolled ESM harness — not `node:test` — that
-pushes `[name, boolean]` pairs onto a `checks` array, prints `PASS: 24 checks`,
-and calls `process.exit(1)` naming any check that failed. At v2026.09.6 it
-reports **24 checks, all passing, in 0.2 seconds**.
+| Harness | Covers | Runs in CI | Checks |
+|---|---|---|---:|
+| `promotion-targets.test.mjs` | `scripts/promotion-targets.mjs`, which decides which production deploys a promotion needs — including a drift guard that the two production site workflows' `pull_request` paths agree with its patterns | **Yes** — `promote-to-production.yml` runs it in its `changes` job, before the script it tests makes the decision | 24 |
+| `dso-dossier.test.mjs` | The DSO activity dossier renderer | **No** — no workflow and neither git hook invokes it | 24 |
 
-**Its 24 checks are deliberately excluded from the 3082.** They are not
+So the promotion harness is a gate: a promotion whose decision script fails its
+own test deploys nothing. The dossier harness still protects its renderer only
+when someone runs it — by hand, or through `test:scripts`.
+
+Neither is a runner. Both are hand-rolled ESM harnesses — not `node:test` — that
+push `[name, boolean]` pairs onto a `checks` array, print `PASS: 24 checks`, and
+call `process.exit(1)` naming any check that failed. See the warning under
+[Running the tests](#running-the-tests) for how `test:scripts` behaves on
+Windows.
+
+**Their checks are deliberately excluded from the 3083.** They are not
 comparable to a Jest or Vitest test: they have no per-case isolation, no setup or
-teardown, no reporter and no coverage instrumentation, and a thrown exception
-partway through the file silently truncates the run rather than failing one case.
-Folding them into the headline would inflate it with a different unit of
-measurement. Counted as files rather than tests, the repository has 145
-executable test files, of which `npm test` runs 144.
+teardown, no reporter and no coverage instrumentation. Folding them into the
+headline would inflate it with a different unit of measurement. Counted as files
+rather than tests, the repository has **146** executable test files — 69 in the
+backend, 75 in the frontend and 2 in `scripts/` — of which `npm test` runs 144.
 
 ### Linting and formatting
 
@@ -221,9 +263,8 @@ executable test files, of which `npm test` runs 144.
 | `npm run lint:openapi` | ✅ runs | – |
 
 `lint:openapi` builds `openapi/openapi.json` from `openapi/openapi.yaml` and lints
-it with Spectral against the NL API Design Rules 2.2.1. All four passed at
-`ec4792f`; they were **not** re-run for the v2026.09.6 measurement, which covered
-the test suites only.
+it with Spectral against the NL API Design Rules 2.2.1. All four pass at
+`0143ea2`, run with the v2026.09.8 measurement.
 
 Both root commands fan out over both packages. The backend checks
 `src/**/*.ts`; the frontend checks the whole package.
@@ -281,6 +322,12 @@ Four of the six Azure workflows run the suites, and a failure blocks the deploy:
 | `azure-frontend-acc` / `-production` | ✅ | ✅ | – | **✅** | ✅ | ✅ |
 | `azure-ropa-site-acc` / `-prod` | – | – | – | – | – | ✅ |
 
+The production workflows in the table are no longer started by a push to `main`:
+`promote-to-production.yml` calls them, and runs one test of its own first —
+`scripts/promotion-targets.test.mjs`, in its `changes` job, before the decision
+that test covers. See
+[How a promotion reaches production](deployment.md#how-a-promotion-reaches-production).
+
 The two `ropa-site` workflows run nothing, correctly: `packages/ropa-site` is a
 static `index.html` plus a `staticwebapp.config.json`, with no build and no test
 script to run.
@@ -318,13 +365,14 @@ stated reason: `*.test.ts`, `src/types/**` (declarations, no runtime), `index.ts
 (the boot script) and `db/seed-ropa.ts` (a self-executing CLI, not an importable
 module). `db/migrate.ts` is pointedly **not** excluded — it exports a plain
 `migrate()` that a mocked pool can drive, so it stays visible rather than being
-written off. At v2026.09.6 the table instruments **58 backend files**.
+written off. The table instruments **58 backend files**, as it did at
+v2026.09.6 — no backend source file has been added since.
 
 | Area | Files | Tests | Covers |
 |---|---:|---:|---|
 | `src/services` | 21 | 768 | Every service: operaton, sparql, dso, dossier, quality, ozon, norms, edocs, ropa, vendor, assets, template, triplydb, orchestration, shacl-validation, dmn-validation, externalTaskWorker |
 | `src/routes` | 23 | 724 | Every route module plus `routes/index` and `routes/registry`, each mounted in isolation (a fresh `express()` app per file, not the full `index.ts`) with the service layer mocked and supertest driving requests — and each response validated against the OpenAPI document |
-| `src/utils` | 11 | 218 | `outboundUrl` 62, `config` 27, `outboundHttp` 23, `errors` 23, `ttl-cache` 13, `rootViews` 13, `publicPaths` 13, `buildInfo` 12, `etag` 11, `logger` 11, `problem` 10 |
+| `src/utils` | 11 | 219 | `outboundUrl` 62, `config` 27, `outboundHttp` 23, `errors` 23, `ttl-cache` 13, `rootViews` 13, `publicPaths` 13, `buildInfo` 13, `etag` 11, `logger` 11, `problem` 10 |
 | `src/openapi` | 4 | 38 | The conformance helpers routes are checked with (16), route-to-operation matching (10), the served document (9), and the coverage rule that fails when a `/v1` route is undocumented (3) |
 | `src/middleware` | 3 | 33 | `error.middleware` 22, `cors.middleware` 8, `version.middleware` 3 |
 | `src/db` | 3 | 25 | `mappers` 15, `migrate` 7, `pool` 3 |
@@ -384,9 +432,15 @@ a DOM. Uses `@testing-library/react`, `jest-dom`, `user-event`, `jsdom` and
     directory — never from counting `it(` with grep, which miscounts every
     `test.each`, every commented-out case and every string containing the word.
     The rows therefore sum to exactly 1259, and their file column to 75. The
-    backend table is the same, from Jest's `--json` report, and sums to 1823
-    across 69 files — 1806 in the six directory areas, plus the four
+    backend table is the same, from Jest's `--json` report, and sums to 1824
+    across 69 files — 1807 in the six directory areas, plus the four
     fixture-integrity files (17).
+
+    Both tables were generated at v2026.09.6. No frontend test file has changed
+    since, and the frontend still totals 1259. The backend's one change is the
+    single case added to `utils/buildInfo.test.ts`, carried into the
+    `src/utils` row by hand from the diff — which the runner's total of 1824
+    confirms, but which is not a regenerated report.
 
     **The previous revision of this table did not.** Its rows summed to 573
     against a stated total of 1020, because they had been gathered per area at
@@ -430,7 +484,7 @@ Since v2026.09.2 both runners enforce **80% branch coverage per file**, natively
 `vite.config.ts` takes `thresholds: { branches: 80, perFile: true }`.
 
 `perFile` is the mechanism, not a detail. Against a package *average* the
-threshold is inert — the frontend sits at 92.93% and the backend at 92.49%, so a
+threshold is inert — the frontend sits at 92.93% and the backend at 91.98%, so a
 single file dropping to 40% would barely move either. Branches specifically,
 because statement and line coverage largely restate *"was this file imported"*,
 while an uncovered branch is a decision no test has ever checked.
@@ -467,6 +521,13 @@ the answer is to test their new branch rather than lower the floor.
 at 84.97%. `utils/outboundHttp.ts`, flagged here at v2026.09.5 as the likeliest
 place for the next uncovered branch to land, was given margin in v2026.09.6 and
 now reads 85.71%; `utils/outboundUrl.ts` sits just above it at 85.48%.
+
+The per-file figures in this section are **from the v2026.09.6 measurement**.
+None of the ten files in the table below has changed since, so their rows still
+hold; files that did change — among them `DsoExplorer.tsx`, `QualityProfileTab.tsx`
+and the new `DsoExplorer/tokens.ts` in the frontend, `buildInfo.ts`,
+`openapi.routes.ts` and `quality.service.ts` in the backend — were not
+re-measured per file, so one of them could now belong in it.
 
 The tightest files in each package, for anyone about to add a branch to one:
 
@@ -574,10 +635,11 @@ stalled, not the one at fault.
 is sized to survive, so the next reader knows the number is deliberate rather
 than arbitrary. Not a global timeout, and not a global parallelism setting.
 
-**The figures on this page are the clean runs.** The frontend's 75 files and 1259
-tests are confirmed by both the serial run and the second parallel run, which
-agree exactly; the 64.6 s is the parallel run's time, since parallel is what
-`npm test` and CI actually do.
+**The v2026.09.6 figures were the clean runs.** Its 75 files and 1259 tests were
+confirmed by both the serial run and the second parallel run, which agree
+exactly; the 64.6 s quoted above was the parallel run's time, since parallel is
+what `npm test` and CI actually do. The v2026.09.8 figures at the top of this
+page come from a parallel run in which all 1259 passed.
 
 ---
 
@@ -688,7 +750,7 @@ broken fixtures before it was allowed to pass.
 ## There is no browser suite in this repository
 
 Stated as established rather than assumed, because the directory name invites the
-opposite guess. Three checks at `9c58737`:
+opposite guess. Three checks at `0143ea2`:
 
 - **No dependency.** Neither `package.json` nor any config file in the repository
   mentions Playwright, under any casing.
@@ -699,7 +761,7 @@ opposite guess. Three checks at `9c58737`:
   `jest --coverage` in the backend and `vitest run --coverage` in the frontend,
   and that is the whole surface.
 
-**`e2e-fixtures/` is not a test suite.** It holds **55 files** — 30 `.form`, 11
+**`e2e-fixtures/` is not a test suite.** It holds **56 files** — 31 `.form`, 11
 `.document`, 8 `.bpmn`, 5 `.dmn` and one `manifest.json` — and no spec of any
 kind; a search for a filename containing `spec` or `test` under it returns
 nothing. The directory name describes *what the fixtures represent*, a
@@ -721,10 +783,10 @@ labour cost once.
 Three gaps, named so that nobody reads a figure here as covering them:
 
 **The pinned runtime.** `.nvmrc` specifies Node 24.21.0; the measurement ran on
-**24.14.1**, which was the version installed on the measuring machine. `npm ci`
-installs from the lockfile so the dependency tree is identical, and both suites
-ran clean — but no run on 24.21.0 backs these numbers. Durations in particular
-are the figures most likely to move.
+**24.14.1**, which was the version installed on the measuring machine. The
+installed tree matched the lockfile, and both suites ran clean — but no run on
+24.21.0 backs these numbers. Durations in particular are the figures most likely
+to move.
 
 **Per-test-file coverage attribution on the frontend.** Vitest's v8 coverage is
 whole-run: it reports what the suite as a whole covered, not what each test file
@@ -733,11 +795,12 @@ test file with a coverage figure, it is pairing a file with *its obvious
 subject*, which is an editorial judgement, not a measurement. Two test files
 touching the same module cannot be told apart by these numbers.
 
-**`ec4792f` itself.** The v2026.09.5 commit was not re-run for this pass, so
-every delta quoted here — +8 files, +261 tests, backend +174, frontend +87, the
-contract subset's +28 — is arithmetic against the **previously published**
-figures on the earlier revision of this page, not against a fresh measurement of
-the older commit. If those figures were wrong, the deltas inherit the error.
+**`9c58737` itself.** The v2026.09.6 commit was not re-run for this pass, so the
+delta quoted at the top — +0 files, +1 test — is arithmetic against the
+**previously published** v2026.09.6 figures, not against a fresh measurement of
+the older commit. The same holds one release further back: v2026.09.6's own
+deltas against v2026.09.5 were computed from that release's published figures.
+If those figures were wrong, the deltas inherit the error.
 
 ---
 
@@ -768,12 +831,13 @@ its DOM/JSZip harness and reads 100%. What is left is `GraphView.tsx` at 82.25%
 branches, which is a deliberate hold rather than a gap: see
 [The per-file branch floor](#the-per-file-branch-floor).
 
-**Wire up the dossier harness, or convert it.** `scripts/dso-dossier.test.mjs`
-runs nothing unless a human types the command, which means its 24 checks protect
-the dossier renderer only as long as someone remembers. Either port it to
-`node:test` and give the root a script that runs it, or accept that it is a
-development aid rather than a gate. See
-[The one test the suite does not run](#the-one-test-the-suite-does-not-run).
+**Put the dossier harness in CI, and make `test:scripts` portable.** The root
+now has a script for the two harnesses, `npm run test:scripts`, and the promotion
+harness runs in CI. Two things remain. `scripts/dso-dossier.test.mjs` still runs
+in no workflow and no hook, so its 24 checks protect the dossier renderer only as
+long as someone remembers. And `test:scripts` fails on Windows before it reaches
+the dossier harness at all. Neither harness has been ported to `node:test`. See
+[Script harnesses outside `npm test`](#script-harnesses-outside-npm-test).
 
 **Deliberately out of scope for now:** visual regression, a cross-browser matrix,
 and E2E in this repository — see

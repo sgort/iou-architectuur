@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Form Editor Implementation
 
 The Form Editor wraps the `@bpmn-io/form-js` library in a two-panel React component. This page covers the component structure, storage layer, and the integration points with the BPMN Modeler.
@@ -31,8 +35,10 @@ interface FormSchema {
   schema: Record<string, unknown>;     // the @bpmn-io/form-js JSON schema
   createdAt: string;                   // ISO 8601
   updatedAt: string;
-  readonly?: boolean;                  // true for EXAMPLE seed forms
-  status?: 'example' | 'wip';
+  readonly?: boolean;                  // skips the backend write; no seeded form sets it
+  status?: 'example' | 'wip' | 'dso' | 'e2e';
+  language?: 'en' | 'nl' | 'de';
+  organization?: string;
 }
 ```
 
@@ -55,32 +61,42 @@ FormService.saveForm(form: FormSchema): void             // upsert by .id
 FormService.deleteForm(formId: string): void
 ```
 
-The methods read/write the entire array on each call. There is no batching or indexedDB fallback — the storage size is small (three seed schemas are ≈ 3 KB total).
+The methods read/write the entire array on each call. There is no batching or indexedDB fallback.
 
 ---
 
 ## `FormEditor.tsx` — seeding logic
 
-On mount, `FormEditor.tsx` runs a `useEffect` that checks for the presence of each seed form by `FormSchema.id`:
+`EXAMPLE_FORMS` at the top of `FormEditor.tsx` lists 22 example forms — id, display name, description, path under `public/examples/`, `language` and `organization`. On mount, a `useEffect` seeds them by version rather than by presence:
 
 ```typescript
-useEffect(() => {
-  const existing = FormService.getForms();
-  const existingIds = new Set(existing.map((f) => f.id));
+for (const def of EXAMPLE_FORMS) {
+  if (getStoredVersion(def.id) >= EXAMPLE_VERSIONS[def.id]) continue;
 
-  for (const seed of SEED_FORMS) {
-    if (!existingIds.has(seed.id)) {
-      FormService.saveForm(seed);
-    }
-  }
-
-  setForms(FormService.getForms());
-}, []);
+  const schema = await fetch(def.path).then((r) => r.json());
+  const form: FormSchema = {
+    id: def.id,
+    // name, description, schema, createdAt, updatedAt …
+    readonly: false,
+    status: 'example',
+    language: def.language,
+    organization: def.organization,
+  };
+  FormService.saveForm(form);
+  setStoredVersion(def.id, EXAMPLE_VERSIONS[def.id]);
+}
 ```
 
-The three seed IDs are `example_kapvergunning_start`, `example_tree_felling_review`, and `example_awb_notify_applicant`. Their `readonly: true` flag causes `FormList` to suppress rename and delete controls.
+`EXAMPLE_VERSIONS`, `getStoredVersion` and `setStoredVersion` live in `utils/exampleVersions.ts`, shared with the BPMN Modeler's seed. The recorded versions sit in `localStorage` under `linkedDataExplorer_exampleVersions`, so they are per browser. A form is re-fetched and its record overwritten when its number in `EXAMPLE_VERSIONS` is higher than the recorded one, or when none is recorded; to ship a changed `.form` file to existing users, bump its entry. When any form was seeded, the effect refreshes the list and opens the first one.
 
-The `schema.id` values embedded in the JSON schemas are `kapvergunning-start`, `tree-felling-review`, and `awb-notify-applicant` respectively — these are the values written into `camunda:formRef`.
+Seeded records are `readonly: false` with `status: 'example'`, and the two fields do different jobs:
+
+- **`status: 'example'`** shows the **EXAMPLE** badge and makes `handleDeleteForm` refuse with *Cannot delete example forms*.
+- **`readonly`** is what `FormList` checks for the rename and delete controls and the footer's language and organization fields, and what `FormService.saveForm` checks before POSTing to `/v1/assets/forms`. Because it is `false`, an example can be edited, saved and renamed, and seeding itself writes every example to the backend.
+
+A user's edit to an example therefore survives only until the seed runs for that id again — after a version bump, or in a browser with no recorded version — when the bundled file overwrites it locally and on the backend.
+
+The Kapvergunning examples `example_kapvergunning_start`, `example_tree_felling_review` and `example_awb_notify_applicant` embed the `schema.id` values `kapvergunning-start`, `tree-felling-review` and `awb-notify-applicant` — the values written into `camunda:formRef`.
 
 ---
 

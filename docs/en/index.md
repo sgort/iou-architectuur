@@ -167,13 +167,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.09.6** · *September 2026*
+-   **🔍 Linked Data Explorer — v2026.09.8** · *September 2026*
 
     ---
 
-    **An activity's whole chain in one call, and a quality profile that shows its working**
+    **A promotion deploys in order, and every release carries its own SBOM**
 
-    **On acceptance so far** — production is still serving v2026.09.5. A sixth DSO API joins the viewer, Omgevingsdocumenten Presenteren (Ozon), because an activity's chain runs through it: one call now assembles the legal source, its annotations and both rule sets into a single dossier, and scores how legible that chain is. The [Quality Profile tab](linked-data-explorer/features/dso-integration.md#activity-dossier-and-quality-profile) reports **two axes and no overall grade**, keeps Conclusie and Indieningsvereisten apart, says when a rule set is absent rather than showing zeros, and carries the evidence behind every number — down to each input's own question. A legal source now resolves per bestuurslaag, so national activities stop being refused for lacking a municipality they cannot have. The child-activity fan-out is capped at five in flight and cached for five minutes, the Flevoland Thuisbatterij bundle finally reaches the Modeler, and the deploy modal asks the backend which Operaton it deploys to. Node moved to one `.nvmrc` at 24.21.0 — and a probe now checks the native binding on the **deployed app**, after a green deploy left DMN validation broken for every user.
+    A push to `main` used to start three production deploys at once, and on the v2026.09.6 promotion the ROPA site finished before the backend had even begun building. [One promotion workflow](linked-data-explorer/developer/deployment.md#how-a-promotion-reaches-production) now decides what changed, deploys the backend first and releases the two sites only once it has succeeded; its path rules live in a tested script, and a promotion pull request still previews the real production site, by decision. Every deploy check now runs instead of the first failure hiding the rest, and `build-info.json` is read at start-up, closing a false pass in the very gate that proves a new build is serving. Each release now commits a CycloneDX SBOM, dependencies are audited daily on both `acc` and `main`, a lockfile that disagrees with `package.json` fails under its own name, and Renovate never offers a major's X.0.0. In the Modeler, both Thuisbatterij processes gain swimlanes and Dutch names, and "Aanvullende gegevens opvragen" finally has a form that can be deployed. The [suites](linked-data-explorer/developer/testing.md) stand at 3083 tests, all passing.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
