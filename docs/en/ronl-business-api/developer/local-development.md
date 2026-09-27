@@ -336,7 +336,7 @@ The Keycloak admin console is at `http://localhost:8080` with `admin`/`admin`.
 curl -s http://localhost:3002/v1/health
 ```
 
-A healthy local stack answers `200`:
+A healthy local stack answers `200`. This response was captured from the local stack on 26 September 2026, at v2026.09.12; `timestamp`, `uptime`, `duration` and the latencies differ on every call:
 
 ```json
 {
@@ -346,14 +346,22 @@ A healthy local stack answers `200`:
     "version": "2026.09.12",
     "build": null,
     "status": "healthy",
-    "timestamp": "2026-09-26T10:00:00.000Z",
-    "uptime": 42.7,
+    "timestamp": "2026-09-26T20:44:28.620Z",
+    "uptime": 119.675175,
     "environment": "development",
-    "duration": 18,
+    "duration": 30,
     "dependencies": {
-      "keycloak": { "status": "up", "latency": 9 },
-      "operaton": { "status": "up", "latency": 14 },
-      "cache": { "status": "up" }
+      "keycloak": {
+        "status": "up",
+        "latency": 18
+      },
+      "operaton": {
+        "status": "up",
+        "latency": 12
+      },
+      "cache": {
+        "status": "up"
+      }
     }
   }
 }
