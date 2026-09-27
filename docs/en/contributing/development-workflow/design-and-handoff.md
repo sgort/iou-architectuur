@@ -23,11 +23,11 @@ interaction does not.
 
 A design leaves Claude Design as a handoff package, not as code. It contains:
 
-- the design itself
-- standalone HTML
-- screenshots
+- the design itself, as standalone HTML, with screenshots
 - a README
-- a PROMPT
+- a PROMPT for Claude Code
+- a `reference/` folder of the design's own source files
+- often, architecture notes
 
 Two rules govern how a handoff package is used, both learned in practice.
 

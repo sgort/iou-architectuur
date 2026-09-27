@@ -1,27 +1,26 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-20
+  date: 2026-09-27
   against:
-    CPSV Editor: "1868087"
-    Linked Data Explorer: "0e7733e"
-    RONL Business API: "6ca80f2"
+    CPSV Editor: "a7fe76f"
+    Linked Data Explorer: "0143ea2"
+    RONL Business API: "702a4f2"
 ---
 
 # The Coverage Floor
 
-!!! info "What was re-checked on 20 September 2026, and what was not"
-    The **CI and ruleset claims** on this page were re-checked against `1868087`,
-    `0e7733e` and `6ca80f2`: which workflows run the suites, on which triggers, and
-    which checks each branch requires. That is what moved — the floor became blocking
-    on `acc` in all three on 19 September 2026.
+!!! info "What was re-checked on 27 September 2026, and what was not"
+    The **CI, ruleset and environment claims** on this page were re-checked on
+    27 September 2026 against `a7fe76f`, `0143ea2` and `3c44b9e`: which workflows run
+    the suites, on which triggers, which checks each branch requires, and what each
+    deployment environment demands. The floor has been blocking on `acc` in all three
+    since 19 September 2026.
 
     **The percentages and file counts below were not re-measured on that date.** They
     were measured on 12 September 2026 against `f5bae6a`, `be6bc54` and `311d732`, the
     RONL Business API's by running all five suites with coverage rather than reading a
-    record. Nothing in the 19 September work touches application code, so they should
-    still hold — but they are a dated measurement, and this note is the honest version
-    of that.
+    record. They are a dated measurement, and this note is the honest version of that.
 
 *A per-file 80% branch-coverage floor, and what it took to enforce it in three
 repositories*
@@ -345,8 +344,8 @@ three diverge most:
 
 **All three now run their suites before the merge.** The RONL Business API was the last
 to close that gap, and it had two halves. Its backend workflow triggered on `push`
-alone, so its 2008 tests ran only *after* a merge and its backend branch threshold
-gated nothing on a pull request
+alone, so its suite — 2008 tests at the time — ran only *after* a merge and its backend
+branch threshold gated nothing on a pull request
 ([#87](https://github.com/sgort/ronl-business-api/issues/87)). And `@ronl/pa-cockpit`,
 a library with no deploy workflow of its own, **ran nowhere in CI at all** — its 476
 tests were measured only on a developer's machine; both frontend workflows now run its
@@ -368,7 +367,9 @@ caught it.
     `acc` ruleset requires the build and deploy checks alongside `audit` and `scan`,
     and those jobs run the suites — coverage thresholds included — before they build.
     A pull request that drops a file below 80% turns a **required** check red, and the
-    merge button goes with it.
+    merge button goes with it — for a source change. In the RONL Business API a
+    lockfile-only pull request still runs only the backend's suite: the three site
+    workflows' `changes` patterns do not name the root lockfile.
 
     Until that date this said the opposite, correctly: the workflows that enforce the
     floor were named by no ruleset, so a sub-80% file stopped the deploy and left the
@@ -385,14 +386,14 @@ caught it.
 
 !!! warning "The fix is not identical, and the difference matters before copying one into the other"
     The Linked Data Explorer's backend workflow **deploys to Azure**, so its
-    `pull_request` trigger had to come with six deploy-side steps gated on the
+    `pull_request` trigger had to come with five deploy-side steps gated on the
     event — arranged as per-step conditions rather than a job split, so the check
     name stays stable and no ruleset entry changes.
 
-    RONL Business API's backend workflow **does not deploy**: it ends at a
-    deployment zip and an uploaded artifact, with the real deploy a manual script
-    run from a clean `acc`. Nothing in that job has an external side effect, so
-    there is nothing to gate — the change is the trigger alone.
+    RONL Business API's backend workflow did not deploy when its trigger landed in
+    v2026.09.7 — it ended at an uploaded artifact, so the change was the trigger
+    alone. Since v2026.09.11 it deploys too, over OIDC, and its four deploy-side
+    steps are gated on the event the same way: the two workflows have converged.
 
 !!! tip "A package outside the measurement is not covered — it is unmeasured"
     `@ronl/shared` has no test runner, deliberately: it holds types, constant data and
@@ -416,13 +417,15 @@ caught it.
     The general rule this leaves: **where a package cannot be measured, enforce what
     makes it unmeasurable** rather than measuring nothing and calling it covered.
 
-**Production workflows are deliberately excluded from that treatment**, on
-evidence rather than preference. In the Linked Data Explorer the `acceptance`
-environment has no protection rules while `production` has required reviewers and
-a branch policy — so a `pull_request` trigger on a production workflow would make
-every pull request to `main` **wait on a human approval before the tests could
-run**: an approval gate in front of the check meant to inform it. `main` is
-promoted from `acc`, and those commits already ran the full suite there.
+**Production backend workflows are deliberately excluded from that treatment.**
+`main` is promoted from `acc`, and those commits already ran the full suite on their
+own `acc` pull requests; a second pre-merge run would re-test the same commits. The
+Linked Data Explorer used to give a heavier reason first — its `production`
+environment required a reviewer, so a `pull_request` trigger would have put a human
+approval in front of the tests — and that reviewer was removed on 24 September 2026
+([#210](https://github.com/sgort/linked-data-explorer/issues/210)). Both repositories
+now exclude it on the promotion argument alone. The Linked Data Explorer's two
+production *site* workflows do build on a promotion pull request, as a preview.
 
 ---
 

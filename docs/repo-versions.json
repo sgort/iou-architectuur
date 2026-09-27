@@ -1,5 +1,19 @@
 {
-  "docs_built": "2026-09-26",
+  "docs_built": "2026-09-27",
+  "last_patch": {
+    "date": "2026-09-27",
+    "kind": "Weekly pass",
+    "summary": "Every contributing page re-checked against the three applications' acc heads and re-stamped, and the 27 September ICTU dependency-guideline assessment added (CPSV Editor 35, Linked Data Explorer 33, RONL Business API 31 of 55).",
+    "previous": {
+      "date": "2026-09-26",
+      "kind": "Component syncs",
+      "summary": "CPSV Editor v2026.09.7, Linked Data Explorer v2026.09.8 and RONL Business API v2026.09.12, all in production; local development pages rewritten from the code."
+    },
+    "open_findings": {
+      "label": "iou-architectuur#105",
+      "url": "https://github.com/sgort/iou-architectuur/issues/105"
+    }
+  },
   "repositories": [
     {
       "name": "RONL Business API",

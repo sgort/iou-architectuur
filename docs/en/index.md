@@ -2,6 +2,8 @@
 
 Welcome to the comprehensive documentation for the IOU Architecture Framework and the RONL ecosystem.
 
+<div id="last-patch"></div>
+
 ---
 
 ## What is this?

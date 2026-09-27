@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-20
+  date: 2026-09-27
   against:
-    CPSV Editor: "1868087"
-    Linked Data Explorer: "0e7733e"
-    RONL Business API: "6ca80f2"
+    CPSV Editor: "a7fe76f"
+    Linked Data Explorer: "0143ea2"
+    RONL Business API: "702a4f2"
 ---
 
 # The GitLab Mirror
@@ -25,8 +25,9 @@ step that lands the release through a pull request — step 6 in the CPSV Editor
 Linked Data Explorer, 8 in the RONL Business API — and compares each remote-tracking ref
 with the mirror's. **It closes the observation half
 of the problem, not the drift.** It cannot run in CI, and that is a property of the mirror
-rather than a shortcoming of the check: the `gitlab` remote lives in `.git/config` and no
-tracked file names the host, so a runner has no such remote and no route to it. It also
+rather than a shortcoming of the check: the `gitlab` remote lives in `.git/config`, not
+in any tracked file, so a runner has no such remote, no credential for it and no route to
+it. It also
 never pushes — it prints the exact command and stops, because writing to a shared remote
 is a decision for a person.
 
@@ -47,24 +48,28 @@ Two were checked again on 19 September 2026, after their promotions that day, an
 were in sync: the Linked Data Explorer with `acc` at `379cbab` and `main` at `ec4792f`,
 the CPSV Editor with `acc` at `a37bace` and `main` at `2723db1`.
 
-**The check itself was re-read from all three repositories on 20 September 2026** and is
-unchanged — the supply-chain work that landed on 19 September touched CI and left this
-control alone, which is the point of it being the one that runs outside CI. The mirror
-state itself is not re-asserted here for that date; a tick in the table above is always
-*synced at the last check*.
+**The check itself was re-read from all three repositories on 27 September 2026** and is
+unchanged since it landed. On the same day, by `git ls-remote` against both remotes, all
+three mirrors were in sync after that week's promotions: the CPSV Editor at `a7fe76f` /
+`7d154ba`, the Linked Data Explorer at `0143ea2` / `4148c9a`, the RONL Business API at
+`3c44b9e` / `2443adc` (`acc` / `main`). A tick is still *synced at the last check*.
 
-**The CPSV Editor's release procedure runs a second check straight after this one.**
-`npm run check-previews` (v2026.09.6) lists the Static Web Apps preview environments Azure
-actually has against the pull requests GitHub has open, and prints the exact
+**Two of the three release procedures run a second check straight after this one** — the
+CPSV Editor's since v2026.09.6 and the RONL Business API's since v2026.09.11.
+`npm run check-previews` lists the Static Web Apps preview environments Azure actually has
+against the pull requests GitHub has open, and prints the exact
 `az staticwebapp environment delete` command for each orphan. It exists for the same
 reason as the mirror check: GitHub starts no workflow for a pull request with a merge
-conflict, so no close job ever runs for it, and eight previews on acceptance and
-production had outlived their pull requests unnoticed. Like `check-mirror` it runs on a
-workstation, finds its targets from the deploy workflows' own file names rather than
-hardcoding them, and never deletes anything itself.
+conflict, so no close job ever runs for it, and in the CPSV Editor eight previews on
+acceptance and production had outlived their pull requests unnoticed. Like `check-mirror`
+it runs on a workstation and never deletes anything itself. It hardcodes no app: the CPSV
+Editor's derives each from its deploy workflow's file name, and the RONL Business API's —
+whose workflow names carry no hostname, and whose apps span two subscriptions — finds
+them by `repositoryUrl` across every subscription the login can read. The Linked Data
+Explorer has no such check.
 
 A tick is *synced at the last check*, not *kept in sync*. The RONL Business API's mirror
-had never been audited before that day, and both branches turned out to be strict
+had never been audited before 12 September, and both branches turned out to be strict
 ancestors — `acc` eight commits behind and `main` one hundred and eighty-four — so two
 fast-forwards reconciled it. It then drifted three more times the same day, as each
 promotion pull request merged, which is the behaviour the check exists to surface.
