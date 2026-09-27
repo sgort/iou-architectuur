@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-20
+  date: 2026-09-27
   against:
-    CPSV Editor: "1868087"
-    Linked Data Explorer: "0e7733e"
-    RONL Business API: "6ca80f2"
+    CPSV Editor: "a7fe76f"
+    Linked Data Explorer: "0143ea2"
+    RONL Business API: "702a4f2"
 ---
 
 # CI Posture Across Repos — Slide Deck
@@ -31,9 +31,10 @@ which is a different question and the one a decision needs answered.
 
 !!! warning "The posture has moved since this export — read the slides as of 12 September 2026"
     A batch of supply-chain work landed on all three `acc` branches on **19 September
-    2026**, after this deck was exported. The slides and their descriptions below are
-    left exactly as the PDF states them, because a transcription that drifts from its
-    source is worse than a dated one. Four of their claims are now out of date:
+    2026**, and more since, after this deck was exported. The slides and their
+    descriptions below are left exactly as the PDF states them, because a transcription
+    that drifts from its source is worse than a dated one. Five of their claims are now
+    out of date:
 
     - **Required checks.** The slides say `audit` and `scan` are required on `acc`. All
       three `acc` rulesets now also require the build and deploy checks, so a red test
@@ -45,7 +46,12 @@ which is a different question and the one a decision needs answered.
     - **What ships.** Slide 4's clean-up argument predates the move to building on the
       runner; in both applications the tested build is now the shipped build.
     - **The status footnote.** Its commits, `f5bae6a`/`be6bc54` and `f7fe80f`/`daa4816`,
-      are the 12 September heads. The current `acc` heads are `1868087` and `0e7733e`.
+      are the 12 September heads. The current `acc` heads are `a7fe76f` and `0143ea2`,
+      and each `main` carries the same tree.
+    - **How production deploys.** In the Linked Data Explorer a push to `main` now
+      starts one ordered *Promote to Production* workflow, which deploys the backend
+      before the sites, rather than each deploy workflow firing on its own. See
+      [Development Workflow](development-workflow/overview.md).
 
     The decision the deck asks for is unaffected: the delivery pipeline below the
     prototyping track still does not exist.
@@ -99,9 +105,10 @@ The [controls index](controls.md) carries the same five rows across all three ap
 
     - **The RONL Business API now runs the same five controls**, as of 12 September 2026,
       and the deck says so on its closing slide while keeping it out of scope for the
-      decision. It differs in one respect worth knowing: its `scan` **runs on every pull
-      request and is deliberately not a required check** while its first scan's 435 findings
-      are triaged, so `audit` is the only required check on either of its branches. See the
+      decision. It differed in one respect when the deck was exported: its `scan` ran on
+      every pull request but was deliberately not a required check while its first scan's
+      435 findings were triaged. Since 19 September it is required on `acc`, alongside
+      `audit` and the build and deploy checks; its `main` still requires `audit` alone. See the
       [controls index](controls.md).
     - **The Norm Editor is shaped differently** again — GitLab CI, its own hook directory,
       and none of these controls. See
@@ -182,7 +189,7 @@ release now notices.
 ## Verified against the repositories
 
 The deck's status claims were re-checked on **12 September 2026** rather than taken on
-trust, and re-read against the current `acc` heads on **20 September 2026**:
+trust, and re-read against the current `acc` heads on **27 September 2026**:
 
 - **The rulesets were read from the API**, per branch, with
   `gh api repos/<owner>/<repo>/rules/branches/<branch>`, which reports the effective rules
@@ -200,16 +207,24 @@ trust, and re-read against the current `acc` heads on **20 September 2026**:
     `acc` only.
 
 - **The pin counts were re-derived** by counting `uses:` references on each `acc` head rather
-  than read from a register: the CPSV Editor 12 of 12, the Linked Data Explorer 24 of 24
-  across eight workflows, the RONL Business API 31 of 31 across ten. All are fully
-  digest-pinned. The CPSV Editor's twelve sat across **four** workflows when the deck was
-  exported and now sit across **five** — the count is unchanged, but v2026.09.6 moved its
-  two preview-closing steps into a workflow of their own.
-- **`acc` and `main` carry the same code in both applications the deck covers.** The deck's
-  footnote says exactly that, and the promotion commits it names — `f5bae6a` and `be6bc54` —
-  are the ones this page is stamped against.
-- **Production has run in both**: the CPSV Editor's *Deploy PROD* at `f5bae6a` as run 94, the
-  Linked Data Explorer's *Deploy Frontend to Production* at `be6bc54` as run 44. The deck's
+  than read from a register: the CPSV Editor 17 of 17 across seven workflows, the Linked
+  Data Explorer 31 of 31 across eleven, the RONL Business API 39 of 39 across thirteen. All
+  are fully digest-pinned. The counts are action references: each promotion workflow also
+  calls the production deploys as local reusable workflows, three in the Linked Data
+  Explorer and four in the RONL Business API, which name a path in the same repository
+  rather than a version and have nothing to pin. The CPSV Editor's references sat across
+  **four** workflows when the deck was exported; v2026.09.6 moved its two preview-closing
+  steps into a workflow of their own, and v2026.09.7 added the daily dependency audit and
+  the release SBOM.
+- **`acc` and `main` carry the same code in both applications the deck covers** — as they
+  did on 12 September, when the deck's footnote named the promotion commits `f5bae6a` and
+  `be6bc54`. On 27 September they are `7d154ba` (the CPSV Editor) and `4148c9a` (the Linked
+  Data Explorer), each the same tree as its `acc` head.
+- **Production has run in both**: at the deck's export, the CPSV Editor's *Deploy PROD* at
+  `f5bae6a` as run 94 and the Linked Data Explorer's *Deploy Frontend to Production* at
+  `be6bc54` as run 44; on 27 September, *Deploy PROD* #102 at `7d154ba`, and the Linked
+  Data Explorer's *Promote to Production* #2 at `4148c9a` — which since v2026.09.7 is the
+  one workflow a push to its `main` deploys through. The deck's
   *"confirmed by eye — 9 Sep"* refers to the first builds, `#88` and `#39`.
 
 One claim on slide 2 is **not** verifiable from here and is reported as the deck states it:

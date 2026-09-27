@@ -1,24 +1,25 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-20
+  date: 2026-09-27
   against:
-    CPSV Editor: "1868087"
-    Linked Data Explorer: "0e7733e"
-    RONL Business API: "6ca80f2"
+    CPSV Editor: "a7fe76f"
+    Linked Data Explorer: "0143ea2"
+    RONL Business API: "702a4f2"
 ---
 
 # Code Standards
 
 !!! info "Verification status"
-    All three repositories' claims were re-checked on **20 September 2026**, against
-    `1868087`, `0e7733e` and `6ca80f2`: rulesets read from the API per ruleset, workflow
+    All three repositories' claims were re-checked on **27 September 2026**, against
+    `a7fe76f`, `0143ea2` and `3c44b9e`: rulesets read from the API per ruleset, workflow
     files enumerated and their steps, triggers, filters, runners and pins read from
     source, both hook files read from each repository, and the merge-commit settings read
     from each repository.
 
-    **What moved is the merge gate.** Until 19 September 2026 this page said, correctly,
-    that a red test blocked no merge anywhere. On `acc` it now does, in all three.
+    **What moved is production.** In the Linked Data Explorer and the RONL Business API
+    a push to `main` no longer starts the production deploys directly: one promotion
+    workflow calls them in order, backend first. The rulesets did not move.
 
 This page covers three application repositories — CPSV Editor (`ttl-editor`), Linked
 Data Explorer, and RONL Business API — that share a common tooling convention:
@@ -75,7 +76,8 @@ two things everywhere: staged-file linting and formatting on commit, full lintin
 formatting on push.
 
 - **`pre-commit`** runs `lint-staged`, formatting and linting only the files staged for
-  that commit (via `prettier --write` and each affected workspace's `lint:fix`).
+  that commit (via `prettier --write` and ESLint's `--fix` — through each affected
+  workspace's `lint:fix` in the RONL Business API, directly in the other two).
 - **`pre-push`** first checks the installed dependencies against the lockfile —
   `npm run deps:check`, the first line of the hook in all three repositories since
   mid-September 2026 — and stops with `npm ci` named when they differ. Only then does
@@ -128,19 +130,21 @@ and a failing test blocks the deploy. That has only been true since 20 August 20
 before then CI and the hooks left the same gap, and RONL Business API's public-site
 package had the only real test gate anywhere.
 
-**RONL Business API** — **ten** workflows: an acc/prod pair for each of **four**
-deployable packages, plus the supply-chain `audit` and, since v2026.09.7, the Semgrep
-`scan`:
+**RONL Business API** — **thirteen** workflows: an acc/prod pair for each of **four**
+deployable packages, the supply-chain `audit`, since v2026.09.7 the Semgrep `scan`, and
+since v2026.09.11–12 three more: `promote-to-production.yml`, which is what a push to
+`main` starts and which calls the four production workflows in order, the daily
+`dependency-audit` and the release `sbom`:
 
 | Workflow pair | Lint | Type-check | Tests | Notes |
 |---|:---:|:---:|:---:|---|
-| `azure-backend-*` | ✅ | – | ✅ | Builds and uploads a deployment artifact; it does not deploy |
+| `azure-backend-*` | ✅ | – | ✅ | Builds, uploads the artifact, and since v2026.09.11 deploys it over OIDC (`azure/login` then `az webapp deploy`), then waits until `/v1/health` reports the deployed commit. The four deploy steps are skipped on a pull request. Also lints the OpenAPI document |
 | `azure-frontend-*` | ✅ | – | ✅ | Also runs `npm run test:perf`, the wall-clock budget, as a step of its own |
 | `azure-publicsite-*` | ✅ | ✅ | ✅ | Its build additionally gates on a prerender and a bundle-cleanliness check |
-| `azure-pa-demo-*` | ✅ | ✅ | ✅ | Also installs Chromium and runs the Playwright E2E suite before the bundle gate |
+| `azure-pa-demo-*` | ✅ | ✅ | ✅ | The acc workflow also installs Chromium and runs the Playwright E2E suite before the bundle gate; the production one does not |
 
 The frontend's performance budget runs separately because it asserts wall-clock time,
-which means nothing while 133 test files compete for cores — see
+which means nothing while more than a hundred test files compete for cores — see
 [The performance budget](../ronl-business-api/developer/testing/overview.md#the-performance-budget).
 
 Two changes in v2026.09.6 and v2026.09.7 are worth reading off that table rather than
@@ -148,16 +152,21 @@ inferring from it. **`@ronl/pa-cockpit` has no workflow of its own**, being a li
 rather than a deployable, so its 476 tests ran nowhere in CI; both frontend workflows now
 run its suite first, because the frontend imports it. And **the backend pair now triggers
 on `pull_request` as well as `push`**
-([#87](https://github.com/sgort/ronl-business-api/issues/87)), so its 2008 tests run
-before the merge rather than after it. That needed no per-step event guards, unlike the
-Linked Data Explorer's equivalent change below: the backend workflow ends at an uploaded
-artifact and has no deploy step to gate. Both filters gained `package-lock.json` and
-`package.json`, because every workspace resolves through them and a lockfile-only change
-was built and tested by nothing.
+([#87](https://github.com/sgort/ronl-business-api/issues/87)), so its suite — 2008 tests
+at the time — runs before the merge rather than after it. That needed no per-step event
+guards at the time, unlike the Linked Data Explorer's equivalent change below: the backend
+workflow then ended at an uploaded artifact and had no deploy step to gate. Both filters
+gained `package-lock.json` and `package.json`, because every workspace resolves through
+them and a lockfile-only change was built and tested by nothing. The other three
+acceptance workflows did not: the `changes` patterns of the frontend, PA demo and public
+site name neither file, so a lockfile-only pull request still skips all three required
+site checks, which report success, and only the backend's `build` runs a suite.
 
-**Linked Data Explorer** — **eight** workflows: six deployment workflows, the
-supply-chain `audit` gate added in v2026.08.7, and the Semgrep `scan` added in
-v2026.09.3 (see [Supply-Chain Pinning — the npm tree](dependency-scanning.md)).
+**Linked Data Explorer** — **eleven** workflows in the tree: six deployment workflows,
+the supply-chain `audit` gate added in v2026.08.7, the Semgrep `scan` added in
+v2026.09.3, and since v2026.09.7–8 `promote-to-production.yml`, the daily
+`dependency-audit` and the release `sbom` (see
+[Supply-Chain Pinning — the npm tree](dependency-scanning.md)).
 Both backend and both frontend workflows run lint and then the suite before building.
 **Since v2026.09.5 the backend workflows also lint the OpenAPI description** —
 `npm run lint:openapi`, Spectral against the NL API Design Rules 2.2.1 — straight after
@@ -167,15 +176,22 @@ test step, which validates every response against it.
 The two `ropa-site` workflows run neither, and correctly so: that package is a static
 `index.html` plus a `staticwebapp.config.json`, with no build and no test script to run.
 
-Unlike the other two, **the Linked Data Explorer's CI does deploy its backend** — the
-backend workflows end in `azure/webapps-deploy`, where RONL Business API's end in an
-uploaded artifact that a developer deploys by hand. **Since v2026.09.2 the backend's
-acceptance workflow also triggers on `pull_request`**, with its six deploy-side steps
-gated on the event, so a pull request runs the backend suite before the merge rather
-than `acc` discovering a break afterwards. The production backend workflow stays
-push-only on purpose: it declares the protected `production` environment, and a
-pull-request trigger there would put a human approval *in front of* the tests meant to
-inform it.
+**Both backends are now deployed by CI.** The Linked Data Explorer's end in
+`azure/webapps-deploy` with a publish profile; since v2026.09.11 the RONL Business API's
+end in `azure/login` over OIDC and `az webapp deploy` — OIDC because SCM basic auth is
+disabled on both of its App Services, so a publish profile would be refused. The hand-run
+deploy scripts remain there as break-glass only. **Since v2026.09.2 the Linked Data
+Explorer's backend acceptance workflow also triggers on `pull_request`**, with its five
+deploy-side steps gated on the event, so a pull request runs the backend suite before the
+merge rather than `acc` discovering a break afterwards. Both of its backend workflows
+then POST a minimal DMN to the deployed `/v1/dmns/validate` and fail on a
+`NODE_MODULE_VERSION` mismatch — the one failure a runner-side `require` cannot see.
+Neither production backend workflow has a `pull_request` trigger, and since 24 September
+2026 for the same reason in both: `main` is promoted from `acc`, whose pull requests
+already ran the suite. The Linked Data Explorer used to give a second reason — that its
+`production` environment required a reviewer, which would have put a human approval in
+front of the tests — and that reviewer was removed on 24 September
+([#210](https://github.com/sgort/linked-data-explorer/issues/210)).
 
 Since v2026.09.1 all four of its deployment workflows also run a **Typecheck** step.
 That closed a real hole rather than adding ceremony: **fifteen type errors had
@@ -184,20 +200,45 @@ accumulated invisibly, because nothing in the repository ran `tsc` at all.** `bu
 ESLint; `test` is Vitest. None of the three typechecks, so a type error could reach
 `acc` and deploy. A `typecheck` script now exists at the root and in both workspaces.
 
-**CPSV Editor** — five workflows: two Azure Static Web Apps workflows, `acc` and `main`
+**In the Linked Data Explorer (v2026.09.7) and the RONL Business API (v2026.09.11) a push
+to `main` no longer deploys anything directly.** `promote-to-production.yml` starts on
+every push to `main` — deliberately with no path filter, because it is what decides which
+deploys are needed — and calls the production workflows as reusable workflows: a
+`changes` job first, then the backend, then the sites together, each site running only
+when the backend's result is `success` or `skipped`. The production workflows kept
+`workflow_dispatch` and lost `push`; their path rules moved into
+`scripts/promotion-targets.mjs` and `scripts/promotion-targets.sh`, which fail safe to
+deploying everything when the commit range cannot be read. The Linked Data Explorer's
+`changes` job runs the script's own test first — `node scripts/promotion-targets.test.mjs`
+— so a promotion carries one suite of its own. Two consequences worth knowing: the
+deploys are jobs inside the promotion's run, so an Actions listing shows *Promote to
+Production* and not the deploys; and if the promotion workflow breaks, nothing deploys,
+and nothing on `main` says so, because its checks are not required. The CPSV Editor is
+unchanged: `Deploy PROD (white-sky)` still triggers itself on a push to `main`.
+
+**CPSV Editor** — seven workflows: two Azure Static Web Apps workflows, `acc` and `main`
 alike, running `npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy action
 — and, since 19 September 2026, a `Build` step of their own that runs `npm run build` on
 the runner and asserts `dist/index.html` exists before the deploy action uploads it with
 `skip_app_build: true` — plus the supply-chain `audit`, since v2026.09.3 the Semgrep
 `scan` (see
 [Supply-Chain Pinning — the npm tree](dependency-scanning.md)), and since v2026.09.6
-`close-preview-environments.yml`. That last one holds the two jobs that delete a pull
+`close-preview-environments.yml`, and since v2026.09.7 the daily `dependency-audit` and
+the release `sbom`. The preview workflow holds the two jobs that delete a pull
 request's Static Web Apps preview when it closes. They used to sit in the deploy
 workflows, whose `paths-ignore` applies to the close event too — so a documentation-only
 pull request never started the workflow holding its close job, and its preview kept
 running on a public URL. The new workflow has no path filter at all. Since v2026.09.2 that `audit` job also runs
 `npm run check-format` and `npm run check-supply-chain` — and it gained its first
-`npm ci` to do so, everything in it having previously run from `npx` or plain node. Since v2026.09.0 the deploy workflows are named
+`npm ci` to do so, everything in it having previously run from `npx` or plain node.
+Since 25 September 2026 a **Lockfile matches package.json** step runs before that
+install in all three repositories — `npm ci --dry-run --ignore-scripts` — so a lockfile
+out of step with its manifest fails under its own name rather than as an `EUSAGE` three
+steps into a job about pinning. It checks the pull request's own merge commit, and no
+more: two dependency pull requests each green against an older base can still merge into
+a lockfile neither was tested against, because no ruleset requires a branch to be up to
+date. That happened in the RONL Business API on 25 September (#221–#223); merge
+dependency pull requests one at a time, rebased. Since v2026.09.0 the deploy workflows are named
 **`Deploy ACC (orange-beach)`** and **`Deploy PROD (white-sky)`**; both were previously
 called `Azure Static Web Apps CI/CD`, with both jobs named `Build and Deploy Job`, so a
 production run was indistinguishable from an acceptance one in the Actions list, in a
@@ -224,8 +265,8 @@ the wrong one.
 Linked Data Explorer's filters named each workflow's own package and nothing else, so a
 change to the root `package-lock.json` alone — Renovate's lock-file maintenance, above
 all — was built, tested and deployed by nothing. The root `package.json` and
-`package-lock.json` are now in all four backend and frontend filters, acceptance and
-production.
+`package-lock.json` are now in both backend and frontend acceptance filters and, for
+production, in the promotion's target rules.
 
 **A workflow's own file in its `paths:` list is a trigger.** Each Linked Data Explorer
 filter names its workflow file alongside its package, which is correct — a change to how
@@ -237,8 +278,13 @@ looks like the package.
 **And `.nvmrc` belongs in every one of them.** Since 19 September 2026 each repository
 names its Node version once, in `.nvmrc`, read through `node-version-file`. A filter that
 does not list that file means a Node bump builds and deploys **nothing** — the version
-moves and no artifact does. Every deploy workflow's filter in all three repositories now
-names it.
+moves and no artifact does. Every Node-building deploy workflow's allowlist in the Linked
+Data Explorer and the RONL Business API now names it — push filter, `changes` pattern
+and, for production, the promotion's target rules. The ROPA site does not, correctly: it
+is static files with no Node step. The CPSV Editor filters with a denylist, which never
+excluded `.nvmrc`. The sharper half is what the build checks being required added: a pull
+request changing `.nvmrc` alone showed every required build check skipped, and was
+therefore mergeable having tested nothing.
 
 !!! warning "A skip marker in a commit message turns every gate off"
     GitHub Actions skips all `push` and `pull_request` workflows for a commit whose
@@ -247,7 +293,7 @@ names it.
     discussing them**. A skipped required check reports nothing rather than failing,
     so the symptom is a pull request that can never become mergeable and has no red
     run to explain why. Describe the markers in words in a commit message; they are
-    safe in a file. The Linked Data Explorer composes merge commits from the pull
+    safe in a file. All three repositories compose merge commits from the pull
     request **title** with a **blank** body, so a marker quoted in a pull request
     description cannot reach its merge commit — check that repository setting before
     relying on it anywhere else.
@@ -291,10 +337,10 @@ sit behind Dependency Dashboard approval** rather than a global approval flag, s
 concurrent-pull-request limit is spent on the updates that can actually merge. See
 [Supply-Chain Pinning — Renovate maintains dependencies, not the tree](dependency-scanning.md#renovate-maintains-dependencies-not-the-tree).
 
-Since v2026.09.0 the CPSV Editor's `audit` job also validates `renovate.json` with
-`--strict` — pinning without working automated updates decays into an unpatched tree, so
-a Renovate that has silently stopped running is itself a supply-chain failure. That is
-not hypothetical: five keys used as JSON comments in the Linked Data Explorer's
+Since v2026.09.0 in the CPSV Editor, and since 29 August 2026 in the other two, the
+`audit` job also validates `renovate.json` with `--strict` — pinning without working
+automated updates decays into an unpatched tree, so a Renovate that has silently stopped
+running is itself a supply-chain failure. That is not hypothetical: five keys used as JSON comments in the Linked Data Explorer's
 configuration were rejected as invalid and Renovate stopped opening pull requests, with
 nothing in CI noticing.
 
@@ -302,8 +348,9 @@ The rollout is not identical across the three. All three are now on the v7 actio
 majors — RONL Business API first, the CPSV Editor since v2026.09.0, and the Linked Data
 Explorer since v2026.09.2, which retired its last `actions/checkout` at v3.7.0 on the
 way. **The CPSV Editor is now the only one whose `main` is ungated**, by decision; the
-Linked Data Explorer and the RONL Business API both hold a promotion pull request to the
-same rules as the pull requests it carries.
+Linked Data Explorer and the RONL Business API both hold a promotion pull request to a
+ruleset of its own — a pull request plus `audit`, and `scan` in the Linked Data Explorer —
+which is fewer checks than `acc` requires, and no build.
 
 [Supply-Chain Pinning](supply-chain.md) covers the mechanism, what the gate deliberately
 does not protect, and the order to copy the four artifacts into the next repository. The
@@ -371,8 +418,8 @@ threshold actually bites rather than trusting a green run.
 
 **A floor only gates where the tests run before the merge**, and as of 12 September 2026
 all three do. The RONL Business API's backend workflow triggered on `push` alone until
-v2026.09.7, so its 2008 tests ran only *after* a merge and its branch threshold gated
-nothing on a pull request; the trigger closed that
+v2026.09.7, so its suite — 2008 tests at the time — ran only *after* a merge and its
+branch threshold gated nothing on a pull request; the trigger closed that
 ([#87](https://github.com/sgort/ronl-business-api/issues/87)) and proved itself
 immediately, when an `axios` 1.18 security bump broke the backend build on the pull
 request rather than on `acc`.

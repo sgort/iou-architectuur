@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-20
+  date: 2026-09-27
   against:
-    CPSV Editor: "1868087"
-    Linked Data Explorer: "0e7733e"
-    RONL Business API: "6ca80f2"
+    CPSV Editor: "a7fe76f"
+    Linked Data Explorer: "0143ea2"
+    RONL Business API: "702a4f2"
 ---
 
 # Skills & Boundaries
@@ -32,8 +32,9 @@ that sit on opposite sides of it.
 **`/bump-release` exists three times**, once per repository, because each repository's
 release process is genuinely different. `ronl-business-api` keeps its changelog as a
 typed TypeScript module (`changelog-data.ts`) with a per-entry `scope` array, because a
-release there can touch any combination of three independently versioned packages
-(frontend, backend, public site). `linked-data-explorer` keeps a plain JSON file
+release there can touch any combination of four independently versioned deployables
+(frontend, backend, public site and PA demo), plus a `ci` tag that versions nothing.
+`linked-data-explorer` keeps a plain JSON file
 (`changelog.json`) with a per-entry `scope` field, for the same reason at a smaller
 scale — frontend and backend. `ttl-editor` keeps the same plain-JSON shape but drops
 `scope` entirely, because it is a single-package repository with nothing to scope. Same
@@ -68,9 +69,9 @@ precisely the test.
 
 The assistant operates inside a set of recorded boundaries: things it will not do
 unprompted, and approvals it will not infer from an earlier one. `~/.claude/CLAUDE.md`
-is the authority for the full set — **thirteen rules** as of 19 September 2026 — and is
-not reproduced here in full, because a copy would drift. The set has grown four times since
-the 2026-08-19 consolidation and will grow again; treat any count on this page as a
+is the authority for the full set — **fourteen rules** as of 27 September 2026 — and is
+not reproduced here in full, because a copy would drift. The set has grown five times since
+the 2026-08-19 consolidation, most recently on 26 September, and will grow again; treat any count on this page as a
 snapshot, and the file as the authority. The boundaries most visible to a day-to-day
 contributor:
 
@@ -126,6 +127,12 @@ contributor:
     [Code Standards — Git hooks](../code-standards.md#git-hooks).
 - **Create a branch before implementing.** Integration branches (`acc`, `main`) are
   not worked on directly — direct changes there are hard to isolate and review.
+- **No git worktrees unless asked.** Recorded on 26 September 2026, after a
+  subagent-driven run had to override a skill's worktree setup by hand. Work happens on
+  a feature branch in the main checkout; a skill that offers or requires a worktree has
+  that step skipped, with one line saying so. The branch already isolates the work, and
+  the write-guard that checks edits is scoped to the working directory, so edits inside
+  `.claude/worktrees` fail anyway.
 - **No Claude attribution in any artifact.** Originally scoped to commit trailers,
   this was broadened in September 2026 to cover *every* artifact the assistant
   produces — pull request descriptions, issue bodies, code comments and documentation
@@ -175,10 +182,14 @@ Since August 2026 it no longer merges anything locally. Where a
 a pull request that passes `audit` — which is the boundary above applied to the
 assistant's own tooling rather than to a contributor.
 
-**`/iou-document-patch`** brings this documentation site into sync with a component's
+**`/iou-document-patch`** runs in one of two modes, and establishes which before it
+starts. A **component sync** brings that component's own pages into line with its
 latest release, in staged fashion: analyse the component's changelog against what the
 docs currently record, plan the per-perspective updates, get sign-off, apply them, and
-verify. It is a *skill*, defined once in this repository at
+verify. It records the cross-cutting half of what it finds in a queue rather than
+editing these contributing pages itself. The **weekly pass** re-checks the contributing
+pages against the repositories and adds the week's ICTU dependency-guideline
+assessment. It reads no component changelog. It is a *skill*, defined once in this repository at
 `.claude/skills/iou-document-patch/SKILL.md`. It is invoked by name, as
 `/iou-document-patch`.
 

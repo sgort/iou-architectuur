@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-20
+  date: 2026-09-27
   against:
-    CPSV Editor: "1868087"
-    Linked Data Explorer: "0e7733e"
-    RONL Business API: "6ca80f2"
+    CPSV Editor: "a7fe76f"
+    Linked Data Explorer: "0143ea2"
+    RONL Business API: "702a4f2"
 ---
 
 # Branch Protection
@@ -19,8 +19,9 @@ how a merge is allowed to land. The checks themselves are documented on their ow
 the [Coverage Floor](coverage-floor.md) — and the
 [controls index](controls.md) is the one-page summary of where each holds.
 
-All three repositories' rulesets were read from the API on 20 September 2026, and **all
-three `acc` rulesets moved on 19 September**: each now requires the build and deploy
+All three repositories' rulesets were read from the API again on 27 September 2026 and
+had not moved since 19 September, when **all three `acc` rulesets** gained the build and
+deploy checks: each now requires the build and deploy
 checks alongside `audit` and `scan`, so a red test suite blocks a merge to `acc` rather
 than only stopping the deploy. The `main` rulesets did not move. What made that possible
 was not a ruleset edit alone — see
@@ -44,19 +45,22 @@ is rejected outright** in all three repositories, including for releases and inc
 for the repository owner. Linked Data Explorer adopted the same ruleset in v2026.08.7;
 all three are named `acc supply-chain gate` and carry zero bypass actors.
 
-They are not identical in shape. Read per ruleset from the API on 20 September 2026:
+They are not identical in shape. Read per ruleset from the API on 27 September 2026:
 
 | | `acc` | `main` |
 |---|---|---|
-| CPSV Editor | pull request, `audit`, `scan`, `Build and deploy ACC` | a pull request, no status checks |
+| CPSV Editor | pull request, `audit`, `scan`, `Build and deploy ACC` | a pull request, no status checks — classic branch protection, not a ruleset |
 | Linked Data Explorer | pull request, `audit`, `scan`, `deploy`, `Build and Deploy Frontend`, `Build and Deploy ROPA Site`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward |
 | RONL Business API | pull request, `audit`, `scan`, `build`, `Build and Deploy ACC Frontend`, `Build and Deploy ACC PA Demo`, `Build and Deploy ACC Public Site`, deletion, non-fast-forward | pull request, `audit`, deletion, non-fast-forward |
 
 **Two of the three now gate `main`.** The Linked Data Explorer's `main promotion gate`
 came first, on 9 September 2026; the RONL Business API created its own on 12 September,
-before the promotion pull request was opened, replacing a classic protection under which
-an administrator could push to `main` directly — so the branch that deploys production
-had been the *less* protected of its two.
+before the promotion pull request was opened, layered over a classic protection under
+which an administrator could push to `main` directly — so the branch that deploys
+production had been the *less* protected of its two. That classic protection is still
+configured, force pushes allowed, and it is the ruleset's zero bypass actors and
+non-fast-forward rule that now close it. The Linked Data Explorer's `main` likewise
+still carries a classic protection, without admin enforcement, beneath its ruleset.
 
 **Each `main` ruleset used to mirror its `acc` twin, and no longer does.** Until
 19 September the two differed in exactly one parameter:
@@ -105,21 +109,39 @@ mergeable until the fix landed in v2026.09.7.
 What closed it is the build and deploy checks in the table above. Each of those jobs runs
 `npm ci`, the linter, the type check where one exists and the unit suites **before** it
 builds, so requiring the job requires everything in front of it. On `acc`, a pull request
-that breaks a test now has a red required check and no merge button.
+that breaks a test now has a red required check and no merge button. In the RONL
+Business API that holds for source changes; a lockfile-only pull request still skips the
+three site suites, whose `changes` patterns do not name the root lockfile, and runs only
+the backend's.
+
+**No ruleset requires a branch to be up to date before merging**
+(`strict_required_status_checks_policy: false` in all five). Every required check is
+therefore green against the pull request's own base, not against the `acc` it merges
+into. On 25 September 2026 three RONL Business API dependency pull requests
+(#221–#223), each green, merged back to back into a lockfile that matched no
+`package.json`. The `audit` job's lockfile-sync step now names that failure on the next
+pull request; it cannot prevent it.
 
 **On `main` it is still advice.** The Linked Data Explorer's `main promotion gate`
 requires `audit` and `scan`; the RONL Business API's requires `audit`; the CPSV Editor's
 `main` requires no status check at all. The deploy checks were deliberately not added
-there, for the reason the next section gives: a production deploy workflow that ignores
-documentation paths cannot report on a documentation-only promotion, and a required check
-that never reports wedges the pull request permanently.
+there, and the reason now differs by repository. In the Linked Data Explorer and the RONL
+Business API, production deploys run from a push to `main` through
+`promote-to-production.yml`, not on the promotion pull request: the RONL Business API's
+four production workflows have no `pull_request` trigger at all, and the Linked Data
+Explorer's backend has none, so there is no check to require. The Linked Data Explorer's
+two production site workflows do build on a promotion pull request — a preview of the
+production site — but that trigger is still path-filtered, and a required check that
+never reports wedges the pull request permanently. The CPSV Editor's
+`Deploy PROD (white-sky)` keeps `paths-ignore` on its `pull_request` trigger for the same
+reason.
 
 ICTU's guideline asks for more than the check list — that **the entire pipeline** succeeds
 before an update merges, and that the transitive changes in a lockfile diff are reviewed on
 a risk basis: new runtime packages, new origins, downgrades and licence changes. The first
 half is now met on `acc`; **none of the three has tooling for that lockfile review yet.**
 The scores are on [ICTU Dependency Guideline](ictu-dependency-guideline.md), recommendation
-R9, and the work was tracked in
+R9, and the work is tracked in
 [linked-data-explorer#119](https://github.com/sgort/linked-data-explorer/issues/119).
 
 ## How a path-filtered workflow became requireable
@@ -153,8 +175,10 @@ The fix is to move the filter one level down, and it is worth copying verbatim:
 
 This landed in all three repositories on 19 September 2026, in the CPSV Editor's
 `Deploy ACC (orange-beach)`, the Linked Data Explorer's three `*-acc` workflows and the
-RONL Business API's four. Production workflows were left filtered at the trigger and
-their checks left un-required, which is why `main` is still ungated on builds.
+RONL Business API's four. Production workflows were left out: the CPSV Editor's is still
+filtered at its trigger, and in the other two a promotion workflow now calls them on the
+push rather than on the pull request. Their checks are un-required, which is why `main`
+is still ungated on builds.
 
 ## What makes it enforcement
 
@@ -174,6 +198,15 @@ gate`, on `main` — see [Adoption status](supply-chain.md#adoption-status).
 
 Both rules are needed *together*. Requiring the check alone would still let a
 direct push to `acc` bypass the gate entirely.
+
+**A required check is matched by its job name, and by nothing else.** Any job anywhere in
+the repository that reports under the same name satisfies — or blocks — it. The daily
+dependency audit was first named `audit`, the name of the supply-chain job every ruleset
+requires; the collision blocked `ronl-business-api#206`, and the job is now
+`dependency-audit`. The SBOM job is `release-sbom` for the same reason. The Linked Data
+Explorer's production site jobs were renamed from the shared *Build and Deploy Job* to
+*Build and Deploy Production Frontend* and *… ROPA Site* so that either could ever be
+required. Renaming a required job means editing the ruleset in the same change.
 
 Approvals are `0` because these repositories have a single maintainer and GitHub
 does not permit self-approval — requiring `1` would make `acc` unmergeable.

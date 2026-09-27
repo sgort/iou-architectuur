@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-20
+  date: 2026-09-27
   against:
-    CPSV Editor: "1868087"
-    Linked Data Explorer: "0e7733e"
-    RONL Business API: "6ca80f2"
+    CPSV Editor: "a7fe76f"
+    Linked Data Explorer: "0143ea2"
+    RONL Business API: "702a4f2"
 ---
 
 # Technology Stack
@@ -23,8 +23,16 @@ The site is built on MkDocs with the Material theme, the mkdocs-static-i18n plug
 | Internationalisation | mkdocs-static-i18n | 1.2+ |
 | Revision dates | git-revision-date-localized | 1.2+ |
 | Diagram rendering | Mermaid | via Material |
+| Code font | JetBrains Mono, vendored in `docs/assets/fonts` | 2.304, self-hosted (SIL OFL 1.1) |
 | Hosting | Azure Static Web Apps | — |
 | CI/CD | GitHub Actions | — |
+
+Material's default code font, Roboto Mono, has no box-drawing characters, so
+diagrams drawn with them in a fenced block borrowed glyphs from a fallback font at
+another width and their borders drifted. JetBrains Mono draws them at column width,
+and it is vendored because Google Fonts' subsets omit that range.
+`hooks/code_glyphs.py` warns at build time when a box diagram uses a character the
+font cannot draw — in practice, emoji.
 
 ```mermaid
 graph LR
@@ -107,7 +115,7 @@ mean.
 A contributing page makes claims about repository configuration — workflows,
 `SECURITY-PIPELINE.md`, `renovate.json`, runner configs and their thresholds. **Most
 changes to those produce no new build.** Every frontend deploy workflow is
-path-filtered, as read on 20 September 2026:
+path-filtered, as read on 27 September 2026:
 
 | Repository | The frontend build fires on | Does not fire on |
 |---|---|---|
@@ -154,9 +162,9 @@ Two consequences are deliberate:
 - **An old stamp is information.** It tells the reader how long a page has gone
   without being checked, which is more useful than a fresh date that means
   nothing.
-- **A partial stamp is honest.** `build-provenance.md` names two components, not
-  three, because on 9 September only the CPSV Editor's and the Linked Data
-  Explorer's claims on it were re-checked.
+- **A partial stamp is honest.** `build-provenance.md` named two components, not
+  three, from 9 September until the 20 September pass, because on 9 September only
+  the CPSV Editor's and the Linked Data Explorer's claims on it were re-checked.
 
 **On a stamped page the stamp replaces `docs built`.** The two dates answer
 different questions and will usually drift apart — `docs built` moves with every
@@ -193,6 +201,11 @@ own words.
 The script also fails on a malformed stamp — an unquoted SHA, an unknown
 component, a commit that does not resolve — and on a recorded build that
 contradicts the Actions run it names.
+
+Since 24 September it also counts a *Promote to Production* run as a deploy. In the
+Linked Data Explorer and the RONL Business API the production deploys run as jobs
+inside that run, so a check on workflow names alone would report a promoted commit
+as having deployed nothing.
 
 ### Every SHA leads to the run that deployed it
 

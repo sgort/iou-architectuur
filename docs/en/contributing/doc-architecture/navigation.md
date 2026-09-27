@@ -13,58 +13,40 @@ The site uses MkDocs Material's tabbed navigation. Each top-level tab correspond
 ```
 IOU Architecture Docs
 │
-├── 🇬🇧 English (/)
-│   ├── 📖 Home
-│   ├── ⚙️ RONL Business API
-│   │   ├── Overview
-│   │   ├── Features
-│   │   │   ├── Overview
-│   │   │   ├── Authentication & IAM
-│   │   │   ├── Multi-Tenant Portal
-│   │   │   ├── Business Rules Execution
-│   │   │   ├── API Design
-│   │   │   └── Security & Compliance
-│   │   ├── User Guides
-│   │   │   ├── Login & DigiD Flow
-│   │   │   ├── Caseworker Workflow
-│   │   │   ├── Submitting a Calculation
-│   │   │   └── Adding a Municipality
-│   │   ├── Developer Docs
-│   │   │   ├── Local Development
-│   │   │   ├── Backend Development
-│   │   │   ├── Frontend Development
-│   │   │   ├── Shared Package
-│   │   │   ├── Testing
-│   │   │   ├── CI/CD
-│   │   │   ├── Troubleshooting
-│   │   │   └── Deployment
-│   │   │       ├── Overview
-│   │   │       ├── Backend
-│   │   │       ├── Frontend
-│   │   │       ├── Keycloak
-│   │   │       ├── Operaton
-│   │   │       └── Caddy
-│   │   └── References
-│   │       ├── API Endpoints
-│   │       ├── Environment Variables
-│   │       ├── JWT Claims
-│   │       ├── Keycloak Realm Configuration
-│   │       ├── Municipality Themes
-│   │       ├── Standards & Compliance
-│   │       └── Changelog
-│   ├── ✏️ CPSV Editor
+├── English (/)
+│   ├── Home
+│   ├── IOU Architecture (slides)
+│   ├── RONL Business API
 │   │   ├── Overview
 │   │   ├── Features
 │   │   ├── User Guides
 │   │   ├── Developer Docs
 │   │   └── References
-│   ├── 🔍 Linked Data Explorer
+│   ├── Norm Editor
 │   │   ├── Overview
 │   │   ├── Features
 │   │   ├── User Guides
 │   │   ├── Developer Docs
 │   │   └── References
-│   └── 🤝 Contributing
+│   ├── CPSV Editor
+│   │   ├── Overview
+│   │   ├── Features
+│   │   ├── User Guides
+│   │   ├── Developer Docs
+│   │   └── References
+│   ├── Linked Data Explorer
+│   │   ├── Overview
+│   │   ├── Features
+│   │   ├── User Guides
+│   │   ├── Developer Docs
+│   │   └── References
+│   ├── CPRMV API
+│   │   ├── Overview
+│   │   ├── Features
+│   │   ├── User Guides
+│   │   ├── Developer Docs
+│   │   └── References
+│   └── Contributing
 │       ├── Overview
 │       ├── Development Workflow
 │       │   ├── Overview
@@ -87,7 +69,7 @@ IOU Architecture Docs
 │       ├── ICTU Dependency Guideline
 │       └── CI Posture (slides)
 │
-└── 🇳🇱 Nederlands (/nl/)
+└── Nederlands (/nl/)
     └── (mirrors English structure — Dutch translations or placeholders)
 ```
 
@@ -98,10 +80,17 @@ IOU Architecture Docs
     added here. Reconcile the two whenever a page joins the nav — a navigation diagram
     that omits a section is worse than none, because it reads as a complete map.
 
-    The component tabs are shown one level deep on purpose; only Contributing and the
-    RONL Business API are expanded, as examples of the Features / User Guides / Developer
-    Docs / References grouping.
+    The component tabs are shown one level deep on purpose; only Contributing is
+    expanded. The tree was reconciled against `mkdocs.yml` again on 27 September 2026:
+    the RONL Business API subtree, until then expanded as an example, had drifted as far
+    as the Contributing one once did, and the Norm Editor and CPRMV API tabs were
+    missing. It is shown one level deep now, like the others. The tree carries no emoji:
+    the code font cannot draw them at column width, and `hooks/code_glyphs.py` warns when
+    a box diagram uses one.
 
-    The Dutch tree mirrors the English one, with one known exception: there is no Dutch
-    counterpart to **OpenAPI Rendering**.
+    The Dutch tree mirrors the English one, and falls back to the English page where no
+    Dutch counterpart exists. As of 27 September 2026 that is six pages: **OpenAPI
+    Rendering**, both components' **API Specification** pages (Linked Data Explorer and
+    RONL Business API), the CPSV Editor's **Data Model Diagrams**, the **IOU
+    Architecture** slide deck, and the Norm Editor's **Changelog & Roadmap**.
 

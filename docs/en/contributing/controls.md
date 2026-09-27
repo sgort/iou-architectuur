@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-20
+  date: 2026-09-27
   against:
-    CPSV Editor: "1868087"
-    Linked Data Explorer: "0e7733e"
-    RONL Business API: "6ca80f2"
+    CPSV Editor: "a7fe76f"
+    Linked Data Explorer: "0143ea2"
+    RONL Business API: "702a4f2"
 ---
 
 # Controls at a Glance
@@ -45,7 +45,7 @@ run, and **Branch Protection** is what turns the rest from checks into gates.
 | **Linked Data Explorer** | pull request · `audit` · `scan` · `deploy` · `Build and Deploy Frontend` · `Build and Deploy ROPA Site` · no deletion · no force-push | pull request · `audit` · `scan` · no deletion · no force-push |
 | **RONL Business API** | pull request · `audit` · `scan` · `build` · `Build and Deploy ACC Frontend` · `Build and Deploy ACC PA Demo` · `Build and Deploy ACC Public Site` · no deletion · no force-push | pull request · `audit` · no deletion · no force-push |
 
-Read from the API on 20 September 2026 with `gh api repos/<owner>/<repo>/rules/branches/<branch>`,
+Read from the API on 27 September 2026 with `gh api repos/<owner>/<repo>/rules/branches/<branch>`,
 which reports the effective rules from every ruleset at once. Three things this table does
 not say, and all three matter:
 
@@ -58,9 +58,11 @@ not say, and all three matter:
 - **`main` did not move with `acc`.** Every repository now requires strictly more on `acc`
   than on `main`, and a promotion pull request is held to less than the pull requests it
   carries. Read the table rather than assuming the two branches match.
-- **`audit` is one check running several things.** Pin truth, the register, formatting and —
-  in the RONL Business API — the declarations-only check on `@ronl/shared` all report through
-  it. One red cross can mean any of them.
+- **`audit` is one check running several things.** zizmor itself, the `renovate.json`
+  validator, lockfile-against-`package.json` agreement (since 25 September 2026),
+  formatting, pin truth, the register and — in the RONL Business API — the
+  declarations-only check on `@ronl/shared` all report through it. One red cross can mean
+  any of them.
 
 ## Where each differs, and why
 
@@ -70,8 +72,14 @@ Three deliberate differences, each decided rather than drifted into:
   commits already passed all three, and its production deploy workflow ignores documentation
   paths — so requiring it would wedge any documentation-only promotion permanently
   ([#131](https://github.com/sgort/ttl-editor/issues/131)).
-- **No `main` requires a build check, in any of the three.** The production deploy
-  workflows kept their trigger-level path filters, and a required check that never reports
+- **No `main` requires a build check, in any of the three**, and in none would one report
+  on every promotion. The CPSV Editor's production workflow keeps `paths-ignore` on its
+  `pull_request` trigger; the Linked Data Explorer's two production site workflows keep a
+  path-filtered `pull_request` preview trigger, and its backend has none; the RONL Business
+  API's four have no `pull_request` trigger at all. Since 23 September 2026 in the RONL
+  Business API and 26 September in the Linked Data Explorer, production deploys only
+  through `promote-to-production.yml` on a push to `main`, which calls the production
+  workflows and decides which to run in a script. A required check that never reports
   wedges a pull request forever — see
   [how a path-filtered workflow became requireable](branch-protection.md#how-a-path-filtered-workflow-became-requireable)
   for the mechanism that solved this on `acc` and was deliberately not applied to `main`.
@@ -80,6 +88,15 @@ Three deliberate differences, each decided rather than drifted into:
   `main`** in both repositories whose `main` is gated. A promotion carries commits under
   several author identities against a ruleset requiring zero approvals, so the flag would
   demand an approval nobody can give. Preserved rather than harmonised.
+
+And one risk that came with the promotion workflow:
+
+- **A broken promotion workflow deploys nothing, and says so nowhere.** In the two
+  repositories that promote, the production deploy workflows no longer trigger on a push to
+  `main`; `promote-to-production.yml` calls them, and it is not a required check. The
+  source names the consequence itself: *"If THIS workflow breaks, nothing deploys —
+  silently."* The escape hatch is `workflow_dispatch` on each deploy workflow — all four in
+  the RONL Business API, and the backend in the Linked Data Explorer.
 
 ## The fourth and fifth components
 
@@ -100,12 +117,12 @@ is addressed, and what the controls do not yet reach:
 | Recommendations | Addressed on | Not yet reached |
 |---|---|---|
 | R1, R11 — vet before adding; re-check maintenance quarterly | nowhere yet | a written criterion and a scheduled review, in all three |
-| R2–R4 — no floating tags, exact pins, hash pins and `npm ci` | [Supply-Chain Pinning](supply-chain.md#what-this-does-not-protect) | the App Service runtime `NODE\|22-lts`, container images, and the RONL Business API's hand-deployed backend. The runner image and **the build that ships** were on this list until 19 September 2026 |
+| R2–R4 — no floating tags, exact pins, hash pins and `npm ci` | [Supply-Chain Pinning](supply-chain.md#what-this-does-not-protect) | the RONL Business API's VM container images (`deployment/vm/`, still undigested, one on `:latest` — [#196](https://github.com/sgort/ronl-business-api/issues/196)), and its break-glass deploy scripts, which still install without the lockfile. The App Service runtime is decided rather than open — the platform pins a major and nothing finer — and the RONL Business API's backend has deployed from the lockfile in CI since 20 September 2026. The runner image and **the build that ships** were on this list until 19 September 2026 |
 | R5 — internal registry, verified origin | nowhere yet | an ICTU infrastructure question before a repository one |
-| R6 — a cooldown of at least 7 days | [Supply-Chain Pinning](supply-chain.md#the-cooldown-stops-at-the-manifest) | the cooldown now exists at the package-manager level too, but `npm ci` ignores it by design and npm older than 11.10 ignores it silently |
-| R7, R8 — assess majors; update on a schedule | [Dependency Scanning](dependency-scanning.md#renovate-maintains-dependencies-not-the-tree) | a rule to wait for a major's first patch release |
+| R6 — a cooldown of at least 7 days | [Supply-Chain Pinning](supply-chain.md#the-cooldown-stops-at-the-manifest) | the cooldown now exists at the package-manager level too, but `npm ci` ignores it by design and npm older than 11.10 ignores it silently — which leaves the RONL Business API, whose `.nvmrc` names Node 22.23.2 and so npm 10.9.8, uncovered on its own toolchain |
+| R7, R8 — assess majors; update on a schedule | [Dependency Scanning](dependency-scanning.md#renovate-maintains-dependencies-not-the-tree) | the first-patch rule exists since 25 September 2026 but covers npm alone — action, runner, Node and Docker majors wait on Dependency Dashboard approval, which, on the stricter reading of R7, leaves no written assessment |
 | R9 — reviewed MR, whole pipeline green, no automerge | [Branch Protection](branch-protection.md#what-the-rulesets-still-do-not-require) | met on `acc` since 19 September 2026; no `main` requires a build or a test, and nothing reviews a lockfile diff |
-| R10 — daily audit, including released versions | [Dependency Scanning](dependency-scanning.md#what-nothing-watches-between-merges) | nothing runs on a schedule, and nothing watches `main` |
+| R10 — daily audit, including released versions | [Dependency Scanning](dependency-scanning.md#what-nothing-watches-between-merges) | a daily audit of `acc` and `main` and a committed SBOM per release exist in all three since 24 and 26 September 2026; still open are the alerts neither fixed nor dismissed with a reason, in the Linked Data Explorer and the RONL Business API, the audit passing moderates and development-only advisories, and nothing re-analysing a stored SBOM |
 
 The finding the assessment ranked first has since been closed. In the CPSV Editor and the
 Linked Data Explorer's frontend, **the build that passed the tests was not the build that

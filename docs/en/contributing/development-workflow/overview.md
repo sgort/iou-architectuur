@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-20
+  date: 2026-09-27
   against:
-    CPSV Editor: "1868087"
-    Linked Data Explorer: "0e7733e"
-    RONL Business API: "6ca80f2"
+    CPSV Editor: "a7fe76f"
+    Linked Data Explorer: "0143ea2"
+    RONL Business API: "702a4f2"
 ---
 
 # Development Workflow
@@ -38,7 +38,10 @@ first, then the minimum code needed to make it pass.
 ## 4. Release
 
 A release is cut with `/bump-release`, a command defined per repository — each component
-keeps its own version, tailored to its own changelog format.
+keeps its own version, tailored to its own changelog format. It also regenerates the
+release's SBOM in all three repositories, and in the RONL Business API it runs the full
+test suite before the release commit, because a version bump is input to tests that
+read a `package.json`.
 
 **A release lands through a pull request, not a local fast-forward.** The
 [supply-chain gate](../supply-chain.md) is in place in all three application
@@ -66,10 +69,21 @@ side effect is that Renovate's dependency pull requests land as merge commits to
 which costs nothing — the changelog range already excludes merge commits, and the
 underlying update commit is what an entry should name.
 
+Production is a second pull request, `acc` → `main`, and what a push to `main` then
+does differs by repository. In the Linked Data Explorer (since v2026.09.7) and the RONL
+Business API (since v2026.09.10) it starts one ordered workflow, *Promote to
+Production*: a `changes` job decides which targets the promotion touches, the backend
+deploys first, and each site deploys only if the backend succeeded or was skipped. The
+production deploy workflows no longer trigger on the push themselves; they are called
+by the promotion. The CPSV Editor has no backend and keeps a single *Deploy PROD*
+workflow that runs on the push to `main`.
+
 ## 5. Documentation
 
 Once a component has shipped, `/iou-document-patch` — defined once, in this
-documentation repository — brings these docs into sync with the new release.
+documentation repository — brings that component's pages into sync with the new
+release. Its weekly pass re-checks these contributing pages against the repositories
+themselves.
 
 ## Where to go next
 

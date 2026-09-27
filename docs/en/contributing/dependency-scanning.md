@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-20
+  date: 2026-09-27
   against:
-    CPSV Editor: "1868087"
-    Linked Data Explorer: "0e7733e"
-    RONL Business API: "6ca80f2"
+    CPSV Editor: "a7fe76f"
+    Linked Data Explorer: "0143ea2"
+    RONL Business API: "702a4f2"
 ---
 
 # Dependency Scanning
@@ -181,6 +181,20 @@ visible in review, and survives the Semgrep project being recreated; a dashboard
 ignore is platform state nobody reading the file can see, lost with the project.
 Use the dashboard only where the file cannot carry a comment — JSON, for instance.
 
+Two more have joined since, on the backend's DMN quality service, for the same rule and the
+same reason: its tag parameter was narrowed to a closed union, `MeasuredTag`, so the
+Linked Data Explorer carries **ten** such lines at `0143ea2`, five of them
+`detect-non-literal-regexp`. The RONL Business API took the same approach on 24 September
+2026, for the first time — *"No nosemgrep annotation existed in this repository before"* —
+annotating fifteen false positives on fourteen lines, each with its own reason; with one
+added later the same day for its public OpenAPI route, it carries fifteen at `3c44b9e`.
+
+That change also recorded the lesson that belongs next to every "0 findings" claim: *"The
+first scan used --config=p/javascript and reported 0 findings. Running it against the
+PRE-change tree also reported 0 … Re-run with the five exact rule ids: before 14, after
+0."* The ruleset had not contained those rules at all. **A zero counts as evidence only if
+the same scan finds the findings before the fix.**
+
 Each comment also says **when it stops being true**. `insecure-object-assign` is
 safe because of its current caller, not because of the line, so its comment ends
 by naming the change that would make it unsafe: `updateTestCase` receiving
@@ -231,8 +245,10 @@ update — so a weekly refresh can take a transitive version published that morn
 Keeping it running took four changes, and the order in which they proved
 necessary is the useful part:
 
-1. **The root `package-lock.json` and `package.json` are in all four deploy
-   workflows' `paths:` filters**, acceptance and production. Before, a
+1. **The root `package-lock.json` and `package.json` are in the backend and frontend
+   deploy filters**, acceptance and production: in the acceptance workflows' `push`
+   filters and `changes` patterns, and in `scripts/promotion-targets.mjs` for
+   production. Before, a
    lockfile-only change — lock-file maintenance above all — was built, tested and
    deployed by nothing: every filter named its own package, and the one file all
    three workspaces share was in none of them. The first two pull requests after
@@ -263,36 +279,55 @@ necessary is the useful part:
 
 ### What nothing watches between merges
 
-Semgrep runs on `push` and `pull_request` and on nothing else, and so does every other
-workflow: **not one workflow in any of the three repositories has a `schedule:` trigger.** A
-vulnerability published against a dependency the day after a merge is found by the next
-pull request that happens to run the scan — or by nothing, if none does.
+Semgrep runs on `push` and `pull_request` and on nothing else. **Since 24 September 2026
+one workflow in each repository does run on a schedule**: `dependency-audit.yml`, daily at
+05:17 UTC and on demand, runs `npm audit --package-lock-only` against the lockfiles of
+**both `acc` and `main`** — the branch production is built from included — and on a high or
+critical advisory in production dependencies it fails and opens or updates a single
+tracking issue, closing it again once clean. It is npm's advisory database rather than
+Semgrep's, and it deliberately passes moderates and development-only advisories. It proved
+itself on its first scheduled runs: on 25 and 26 September it passed in the CPSV Editor and
+the Linked Data Explorer and failed in the RONL Business API, on an `adm-zip` high that was
+gone from `acc` and still on `main` — the version production ran. The promotion that
+removed `keycloak-connect` cleared it.
 
-Dependabot *alerts* are the only continuous monitoring, and they watch the default branch,
-which is `acc` in all three. **Production deploys from `main`**, so a version that is still
-on `main` after `acc` has moved past it is watched by nobody. Read from the API on
-20 September 2026, with the 13 September figures beside them:
+Dependabot *alerts* still watch the default branch only, which is `acc` in all three, so
+the daily audit is what now sees `main`. Read from the API on 27 September 2026, with the
+20 September figures beside them:
 
-| Repository | Open alerts | On 13 September | Dismissed with a reason |
+| Repository | Open alerts | On 20 September | Dismissed with a reason |
 |---|:-:|:-:|:-:|
 | CPSV Editor | **0** | 0 | 0 |
-| Linked Data Explorer | **3** | 3, all medium | 0 |
-| RONL Business API | **8** | **154** — 2 critical, 54 high, 83 medium, 15 low | 0 |
+| Linked Data Explorer | **3** — `qs` ×2, `@tiptap/core`, all medium | 3 | 0 |
+| RONL Business API | **5** — `minimatch` high (development scope), `qs` ×2 and `react-router` ×2 medium | 8 | 0 |
 
 **The RONL Business API's drop is what lock-file maintenance does on its first run.** It
 was enabled on 12 September 2026 and had not yet had a Monday; the refresh that followed
-took 154 alerts to single figures without a line of application code changing, exactly as
-it had in the other two. The reading to take from it is not that the number is small now
-but that **nothing had ever refreshed the transitive tree** — Renovate maintains the
-packages a manifest names, and the alerts were almost all beneath them.
+took 154 alerts — 2 critical, 54 high — to single figures without a line of application
+code changing, exactly as it had in the other two. The reading to take from it is not that
+the number is small now but that **nothing had ever refreshed the transitive tree** —
+Renovate maintains the packages a manifest names, and the alerts were almost all beneath
+them. Three more went on 24 September by removal rather than update: `keycloak-connect`,
+declared in the backend's `package.json` and imported nowhere, took `adm-zip`, `elliptic`
+and a `chromedriver` pulled at the floating tag `latest` out of the tree with it.
 
-ICTU's guideline asks for each finding to be mitigated **or explicitly accepted**. None has
-been dismissed with a reason in any of the three, so every open alert is still neither.
+ICTU's guideline asks for each finding to be mitigated **or explicitly accepted**. Two were
+dismissed with a written reason on 24 September — the RONL Business API's `adm-zip` and
+`elliptic`, neither with a patched version — and both closed as fixed the same day, when
+`keycloak-connect` went. None of the eight open today is dismissed, so each is still
+neither mitigated nor accepted; every one waits on a major queued behind Dependency
+Dashboard approval (Express 5, Tiptap 3, React Router 7, a `typescript-eslint` major).
 
-Two further gaps belong with this one. **No release carries an SBOM**, so the dependencies of
-a version already in production cannot be re-analysed when a new advisory lands. And **every
-resolved package comes straight from the public registry** — 567 in the CPSV Editor's
-lockfile, 1,484 in the Linked Data Explorer's, 1,394 in the RONL Business API's, all from
+Two further gaps belonged with this one, and one has closed. **Every release now carries an
+SBOM**, since 26 September 2026: `scripts/write-sbom.mjs`, a `/bump-release` step, writes a
+CycloneDX 1.5 bill of the production dependencies from the lockfile to
+`docs/sbom/<name>-<version>.cdx.json`, and `sbom.yml` checks on each push to `main` that
+the committed file still matches the lockfile it describes. Committed so far: the CPSV
+Editor's 2026.09.6 (backfilled) and 2026.09.7, the Linked Data Explorer's 2026.09.7 and
+2026.09.8, the RONL Business API's 2026.09.11 and 2026.09.12. Nothing yet re-analyses them
+when a new advisory lands. The other gap stands: **every resolved package comes straight
+from the public registry** — 566 in the CPSV Editor's lockfile, 1,463 in the Linked Data
+Explorer's, 1,499 in the RONL Business API's on 27 September 2026, all from
 `registry.npmjs.org` — with no proxy in between and no provenance or signature check. (The
 only entries resolving elsewhere are the workspace links each monorepo makes to its own
 packages.) That one is an ICTU infrastructure question before it is a repository one.

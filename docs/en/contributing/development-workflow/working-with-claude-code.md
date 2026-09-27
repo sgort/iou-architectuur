@@ -16,17 +16,18 @@ repository and every session. They come from two marketplaces: Anthropic's
 | Plugin | Version | What it contributes |
 |---|---|---|
 | [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.12.1 | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
-| [`superpowers`](https://github.com/obra/superpowers) | 6.3.0 | The brainstorm → plan → execute structure for multi-step work, and a TDD skills library |
-| `github` | `c447c3207a42` | The official GitHub MCP server: issues, pull requests, reviews, repository search |
+| [`superpowers`](https://github.com/obra/superpowers) | 6.4.1 | The brainstorm → plan → execute structure for multi-step work, and a TDD skills library |
+| `github` | `fa59bc903774` | The official GitHub MCP server: issues, pull requests, reviews, repository search |
 | `semgrep` | 2.3.0 | Scans generated code for security findings — SAST, secrets, and supply-chain |
 | `typescript-lsp` | 1.0.0 | TypeScript/JavaScript language server: go-to-definition, find references, error checking |
 
 !!! note "Versions in that table are a snapshot, not a contract"
-    The table shows the re-read of 19 September 2026, recorded last below. It was
+    The table shows the re-read of 27 September 2026, recorded last below. It was
     first read from `~/.claude/plugins/installed_plugins.json` on 12 September 2026,
     and already moved twice while this page was being written. `claude-mem`'s
-    marketplace is configured with `autoUpdate: true`, so its version advances
-    on its own — it went 13.12.1 → 13.24.0 without anyone asking. The `github`
+    marketplace was configured with `autoUpdate: true` when this page was first
+    written, so its version advanced on its own — it went 13.12.1 → 13.24.0 without
+    anyone asking. It no longer is: see the 27 September re-read. The `github`
     plugin is worse: it carries a commit ref rather than a version, and that ref
     moved twice in a single day (`ed404106fcd8` → `1dd995193ba2` →
     `85cce0381e78`). Treat the **set** of plugins as the durable claim and the
@@ -48,6 +49,14 @@ repository and every session. They come from two marketplaces: Anthropic's
     earlier. That is what the file says; why is not established here. It is the
     clearest case yet for treating the version column as an observation.
 
+    **Re-read on 27 September 2026.** Five plugins, all enabled, all at user scope,
+    from the same two marketplaces. `superpowers` moved 6.3.0 → 6.4.1 and `github`
+    `c447c3207a42` → `fa59bc903774`; `claude-mem` still reads 13.12.1, and the file now
+    gives the likely reason it stopped moving: the `thedotmack` marketplace reads
+    `autoUpdate: false`. That entry, and `claude-mem`'s own `installedAt` and
+    `lastUpdated`, are all dated 23 July 2026, so whatever produced the 13.24.x
+    readings in between has left no trace in either file.
+
 !!! warning "Enabled is not the same as reachable"
     Both MCP-backed plugins can be enabled and still fail to connect in a given
     session — `github` on a malformed authorization header, `semgrep` on a cached
@@ -59,7 +68,8 @@ repository and every session. They come from two marketplaces: Anthropic's
     4 September 2026, with the same malformed-authorization-header error, and the
     v2026.09.0 documentation sync used `gh api` throughout instead. It failed the
     same way on 11 September 2026, and that day's sync did the same. A capability
-    you can only reach half the time is one you should have a fallback for.
+    you can only reach half the time is one you should have a fallback for. It failed
+    the same way again on 27 September 2026.
 
 Two notes on that table, because both are easy to get wrong:
 
@@ -78,9 +88,15 @@ Two notes on that table, because both are easy to get wrong:
   server installed globally, plus a `typescript` package carrying `lib/tsserver.js`
   in the repository you have **open** — the workspace root is the session's working
   directory, not wherever the file lives. Measured on 28 August 2026:
-  `ronl-business-api` and `linked-data-explorer` both have 5.9.3, `ttl-editor` has
-  4.9.5 via `react-scripts`; the Norm Editor has no `typescript` dependency, and this
-  documentation repository is Python/MkDocs, so the plugin does nothing in either.
+  `ronl-business-api` and `linked-data-explorer` both had 5.9.3, `ttl-editor` 4.9.5
+  via `react-scripts`. Re-read on 27 September 2026 from the lockfiles: the first two
+  still resolve 5.9.3, and `ttl-editor` — now built with Vite, with no `react-scripts`
+  — resolves 6.0.3, transitively, with no `typescript` in its own `package.json`. The
+  Norm Editor has no `typescript` dependency, and this documentation repository is
+  Python/MkDocs, so the plugin does nothing in either. **On the maintainer's
+  workstation, as of 27 September 2026, `typescript-language-server` is not on the
+  `PATH` at all** — so the plugin is enabled and does nothing anywhere until the server
+  is installed as described above.
 
 `semgrep` deserves a specific mention: it is the assistant-side counterpart to the
 [supply-chain gate](../supply-chain.md) in CI. One scans what is being written, the
@@ -89,8 +105,10 @@ other gates what the pipeline executes — and neither substitutes for the other
 It also has a working-tree side effect worth knowing about, because it is the only
 plugin here that writes into the repository: it drops a machine-local `.semgrep/`
 cache in the project root, which shows up as untracked noise in every `git status`
-until it is ignored. The CPSV Editor added it to `.gitignore` in v2026.09.0; a
-repository adopting the plugin will want to do the same. Machine-local plugin state
+until it is ignored. All four repositories this documentation covers now ignore it —
+the Linked Data Explorer and the RONL Business API from 3 September 2026, the CPSV
+Editor from 4 September (v2026.09.0), and this documentation repository from
+24 September. A repository adopting the plugin will want to do the same. Machine-local plugin state
 belongs in `.gitignore`, not in a commit.
 
 ## Session memory

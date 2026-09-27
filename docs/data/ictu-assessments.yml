@@ -463,6 +463,96 @@ assessments:
           Open Dependabot alerts fell from 154 to 8 when the first lock-file
           refresh landed. None is dismissed with a reason, and nothing audits on
           a schedule, so it goes no higher.
+  - date: 2026-09-27
+    kind: measured
+    heads:
+      TTL: a7fe76f
+      LDE: 0143ea2
+      RBA: 3c44b9e
+    note: >-
+      The monitoring week. A daily audit of both `acc` and `main` and a
+      committed SBOM per release reached all three, so R10 moved for the first
+      time since August; npm majors can no longer be taken at X.0.0; and the
+      RONL Business API's backend now deploys from the lockfile in CI.
+    scores:
+      TTL: [1, 4, 3, 4, 0, 4, 5, 5, 4, 4, 1]
+      LDE: [1, 4, 3, 4, 0, 4, 5, 4, 4, 3, 1]
+      RBA: [2, 3, 3, 4, 0, 4, 4, 4, 3, 3, 1]
+    changes:
+      - component: LDE
+        recommendation: R2
+        from: 3
+        to: 4
+        why: >-
+          The App Service runtime, the one thing that floated, is a recorded
+          decision — the platform offers majors only — and both apps read
+          `NODE|24-lts` in Azure on 27 September, in step with `.nvmrc`
+          24.21.0. A deploy now fails if the host's major differs from the
+          build's: the native-binding check passed on the deployed app at acc
+          and in production.
+      - component: RBA
+        recommendation: R3
+        from: 2
+        to: 3
+        why: >-
+          The backend deploys from CI with `npm ci --omit=dev` against the root
+          lockfile, closing #34, so no normal deploy re-resolves a range. The
+          hand-run scripts remain as a break-glass path, and 156 caret ranges.
+      - component: RBA
+        recommendation: R4
+        from: 3
+        to: 4
+        why: >-
+          The backend ships the root lockfile's integrity hashes, and the local
+          stack's five images carry digests. The VM's Keycloak, Postgres and
+          Skosmos images still do not (#196).
+      - component: TTL
+        recommendation: R7
+        from: 4
+        to: 5
+        why: >-
+          Renovate never proposes an npm X.0.0, so a major arrives at its first
+          patch at the earliest, on top of approval and the written deferrals —
+          now including ubuntu 26.04.
+      - component: LDE
+        recommendation: R7
+        from: 4
+        to: 5
+        why: >-
+          npm X.0.0 excluded by `allowedVersions`, ubuntu 26.04 deferred with a
+          reason, majors and pre-1.0 minors behind approval.
+      - component: RBA
+        recommendation: R7
+        from: 3
+        to: 4
+        why: >-
+          npm X.0.0 excluded, and ubuntu 26.04 and Node 24 deferred with reasons
+          and exit conditions. Twelve majors still wait for approval on the
+          Dependency Dashboard without a written assessment.
+      - component: TTL
+        recommendation: R10
+        from: 2
+        to: 4
+        why: >-
+          `dependency-audit.yml` audits `acc` and `main` daily and ran on
+          schedule on 25 and 26 September; every release commits a CycloneDX
+          SBOM. No open alerts. Nothing yet analyses the SBOMs.
+      - component: LDE
+        recommendation: R10
+        from: 2
+        to: 3
+        why: >-
+          The same daily audit and release SBOM, run on schedule twice. Three
+          moderate alerts have been open since early September, neither fixed
+          nor dismissed with a reason.
+      - component: RBA
+        recommendation: R10
+        from: 2
+        to: 3
+        why: >-
+          The daily audit failed on schedule on 25 and 26 September for a high
+          advisory on `main`, and the promotion that removed `keycloak-connect`
+          cleared it. Five alerts remain open, none dismissed with a reason.
 
 # The test work of the same period, which the guideline above barely scores.
 # Counted from the tree at each weekly commit: files whose name ends in
@@ -494,3 +584,7 @@ tests:
     TTL: {files: 65, e2e: 3, ci: 2, workflows: 5, floor: true}
     LDE: {files: 137, e2e: 0, ci: 4, workflows: 8, floor: true}
     RBA: {files: 303, e2e: 12, ci: 8, workflows: 10, floor: true}
+  - date: 2026-09-27
+    TTL: {files: 65, e2e: 3, ci: 2, workflows: 7, floor: true}
+    LDE: {files: 146, e2e: 0, ci: 5, workflows: 11, floor: true}
+    RBA: {files: 314, e2e: 13, ci: 8, workflows: 13, floor: true}
