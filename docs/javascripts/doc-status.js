@@ -5,6 +5,10 @@
  *   2. Injects an ACC badge into matching What's New grid cards
  *      (identified by .whats-new-cards) for any repository whose
  *      environment is "acc".
+ *   3. Renders the "last documentation patch" box under the home page's
+ *      subtitle (identified by #last-patch) from the `last_patch` record —
+ *      when the site was last patched, what kind of run it was, the run
+ *      before it, and where the findings left open are tracked.
  *
  * Update repo-versions.json manually whenever you sync content from a
  * component repository, then rebuild the MkDocs site.
@@ -95,6 +99,55 @@
     );
   }
 
+  function escapeHtml(text) {
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function patchLine(patch) {
+    return (
+      "<strong>" +
+      formatDate(patch.date) +
+      "</strong> · " +
+      escapeHtml(patch.kind) +
+      " — " +
+      escapeHtml(patch.summary)
+    );
+  }
+
+  /* The last documentation patch, from repo-versions.json's `last_patch`.
+   * Every run of /iou-document-patch updates the record, so the box says
+   * when the site was last brought in line with the code, and links the
+   * issue where the source findings of those runs wait to be fixed.
+   */
+  function buildLastPatch(patch) {
+    var html =
+      '<div class="admonition note last-patch-admonition">' +
+      '<p class="admonition-title">Last documentation patch: ' +
+      formatDate(patch.date) +
+      " · " +
+      escapeHtml(patch.kind) +
+      "</p>" +
+      "<p>" +
+      escapeHtml(patch.summary) +
+      "</p>";
+    if (patch.previous) {
+      html += "<p>Before that: " + patchLine(patch.previous) + "</p>";
+    }
+    if (patch.open_findings && patch.open_findings.url) {
+      html +=
+        '<p>Open findings — what the patches found in the component repositories and left for them to fix: <a href="' +
+        escapeHtml(patch.open_findings.url) +
+        '" target="_blank" rel="noopener">' +
+        escapeHtml(patch.open_findings.label) +
+        "</a></p>";
+    }
+    return html + "</div>";
+  }
+
   /* Inject ACC badges into What's New grid cards.
    *
    * Each card's first <strong> contains the component name, e.g.
@@ -135,8 +188,9 @@
   function render() {
     var target = document.getElementById("doc-status");
     var hasCards = document.querySelector(".whats-new-cards");
+    var lastPatch = document.getElementById("last-patch");
 
-    if (!target && !hasCards) return; // not on home page
+    if (!target && !hasCards && !lastPatch) return; // not on home page
 
     // Resolve JSON path relative to site root regardless of language prefix
     var base = document.querySelector("base");
@@ -151,6 +205,9 @@
       .then(function (data) {
         if (target) {
           target.innerHTML = buildAdmonition(data);
+        }
+        if (lastPatch && data.last_patch) {
+          lastPatch.innerHTML = buildLastPatch(data.last_patch);
         }
         decorateWhatsNewCards(data);
       })

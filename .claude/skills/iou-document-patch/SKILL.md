@@ -890,6 +890,16 @@ Work in this order so a failure leaves the docs in an obvious half-state:
 10. **`repo-versions.json`** — set the component's `version`/`commit`/
     `commit_date`/`environment`/`repo_url`, its `build` where it has one, and
     the top-level `docs_built` to the user-confirmed values.
+11. **`last_patch` in `repo-versions.json`** — the record behind the home page's
+    *Last documentation patch* box (rendered by `docs/javascripts/doc-status.js`
+    into `<div id="last-patch">` under the subtitle). Move the current record into
+    `previous` (keep one level only), then write this run: `date` (today), `kind`
+    (`Component sync` or `Weekly pass`), a one-sentence `summary` naming the
+    components and versions or what the pass covered, and `open_findings` — the
+    label and URL of the issue where this run's source findings were filed. A run
+    that changes no page still writes the record: the box answers *when did the
+    docs last meet the code*, and a stale date there is the very thing it exists
+    to prevent.
 
 ## Stage 4 — Verify & report
 
@@ -1070,8 +1080,9 @@ re-checked against source, and one new point in the assessment series that the
 same re-check produced.
 
 **It edits `docs/{en,nl}/contributing/**` and `docs/data/ictu-assessments.yml`,
-and nothing else** — with one exception, `docs_built` in `repo-versions.json`,
-which dates the documentation rather than any component. A component's `version`,
+and nothing else** — with two exceptions in `repo-versions.json`, `docs_built` and
+`last_patch` (Stage 3 step 11), which date the documentation rather than any
+component. A component's `version`,
 `commit` or `build` never moves in this pass; that is a component sync's job.
 
 ### 6a — Inputs
@@ -1149,7 +1160,8 @@ Then stop for approval, as in Stage 2.
 ### 6e — Apply and verify
 
 Apply the page corrections, the stamps (today's date, the three pinned heads,
-naming only components you actually re-checked on that page), and the new entry.
+naming only components you actually re-checked on that page), the new entry, and
+the `last_patch` record (Stage 3 step 11).
 Then, on top of Stage 4's checks:
 
 ```bash
