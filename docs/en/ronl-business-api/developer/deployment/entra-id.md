@@ -152,6 +152,46 @@ The script also creates any `rip-*` role the realm lacks. Then, in the admin con
 
 ---
 
+## Adding and removing an employee
+
+Flevoland IT grants access by adding a colleague to one or more of the four Entra groups. Some of the result is automatic; the rest is a manual step in Keycloak that is easy to forget. Everything below applies **per environment**: ACC and PROD each create their own Keycloak user.
+
+### When a colleague is added to a group
+
+**Nothing can be done before their first login.** The Keycloak user does not exist until the colleague has signed in once through **Inloggen met uw Flevoland-account**. That first login creates it with `municipality=flevoland`, `organisation_type=province`, `assurance_level=substantieel` and the roles of their groups (`IOU_ADMIN` → `admin`, `IOU_USERS` → `caseworker`, `IOU_PA` → `public-affairs`, `IOU_INFRA` → `infra-projectteam`).
+
+**After that first login**, depending on what they need:
+
+| Group or board | Action in Keycloak | Why |
+|---|---|---|
+| `flv-role-iou-poc-admin` or `flv-role-iou-poc-user` only | None | Everything comes from Entra |
+| `Flv-role-IOU-infra-contributors` (Infra-board) | `GRANT_USER=<email> bash scripts/keycloak-add-rip-roles.sh`, then assign `infra-medewerker` | Without the `rip-*` roles the board shows no tasks; see [Infra-board users](#infra-board-users) |
+| The infra group, but **not** `flv-role-iou-poc-user` | None possible — ask Flevoland IT to add them to the user group too | Without `caseworker` the Infra-board assistant answers `403` ([ronl-business-api#251](https://github.com/sgort/ronl-business-api/issues/251)) |
+| Woo board | Assign `woo-coordinatie` | No Entra app role exists for it |
+| PA-Cockpit authoring (Dossierbeheer) | Assign `pa-author`, `pa-editor` or `pa-admin` as needed | These are finer than `IOU_PA` |
+
+Assign roles in the admin console: Users → the colleague (their username is their e-mail address) → Role mapping → Assign role. **Never assign `admin`, `caseworker`, `public-affairs` or `infra-projectteam` there**; the next login removes them again.
+
+The colleague signs out and in once more to receive a token with the new roles.
+
+### When a colleague is removed from a group, or leaves
+
+- **Removed from a group:** the mapped role disappears at their next login. Roles assigned by hand — `rip-*`, `infra-medewerker`, `woo-coordinatie`, `pa-*` — **remain** until removed by hand in each environment.
+- **Leaves the organisation:** once Flevoland IT disables the Entra account, the colleague can no longer sign in. The Keycloak user and its hand-assigned roles remain. Disable or delete the user in each environment.
+- **An active session** keeps its roles until the access token expires, at most 15 minutes.
+
+### What is manual today
+
+For a discussion of proper user and application management, these are the steps nothing automates yet:
+
+- **Per environment, per colleague:** the first login has to happen before any role can be granted, and every hand-assigned role is granted separately on ACC and on PROD.
+- **Roles without an Entra source:** `rip-*`, `infra-medewerker`, `woo-coordinatie`, `pa-author`, `pa-editor`, `pa-admin`. The script grants all 34 `rip-*` roles at once; nothing models which RIP role a colleague actually holds.
+- **No deprovisioning:** removing someone from a group, or disabling their account, leaves their hand-assigned roles and their Keycloak user in place.
+- **No overview:** which colleague holds which hand-assigned role is only visible per user, per environment, in the admin console.
+- **Group composition:** an infra colleague needs two groups ([ronl-business-api#251](https://github.com/sgort/ronl-business-api/issues/251)); nothing checks that.
+
+---
+
 ## Rotating the client secret
 
 Flevoland IT issues a new secret before the current one expires. Run step 1 of [Rolling out to an environment](#rolling-out-to-an-environment) again with the new secret, in every environment and locally; it updates the provider in place. Logins fail from the moment the old secret expires until the new one is in. Once every environment has the new secret, ask Flevoland IT to delete the old one.
