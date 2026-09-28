@@ -70,39 +70,65 @@ packages/frontend/public/
 
 ## Landing page architecture
 
-The frontend uses a three-route flow: landing page → auth callback → dashboard. The authentication callback behaves differently depending on whether the user selected a citizen IdP or the caseworker option.
+The frontend uses a three-route flow: landing page → auth callback → dashboard. Every flow now starts the same way at the callback — a passive `check-sso` — and differs only in the `keycloak.login()` call it makes when that comes back unauthenticated.
 
 **1. Landing Page (`/` — `LoginChoice.tsx`)**
 
-Identity provider selection page with four buttons. Three are for citizens (orange DigiD, blue eHerkenning, indigo eIDAS); one is for caseworkers (slate "Inloggen als Medewerker"), visually separated by a "MEDEWERKERS" section divider.
+The landing page offers three ways in, plus a card per board:
+
+| Control | Handler | Effect |
+|---|---|---|
+| Hero primary button, **Inloggen met uw Flevoland-account** | `startIdpLogin(FLEVOLAND_IDP)` | Hints Provincie Flevoland's Entra ID, brokered by Keycloak |
+| **Inwoner? Log in met DigiD** (`citizen-link`) | `startIdpLogin('digid')` | Hints DigiD |
+| Top-bar **Inloggen** (`login-link`) | `startMedewerkerLogin()` | No hint — Keycloak's own form, with the medewerker sentinel |
+| A board card | `startMedewerkerLogin(route, testUser)` | As above, plus a stored redirect to that board |
+
+`FLEVOLAND_IDP` is `'entra-flevoland'`, exported from `services/identity-providers.ts` so the landing page can name the provider without importing `keycloak-js`. The alias must match the provider `scripts/keycloak-add-entra-idp.sh` creates and the redirect URI registered in Flevoland's Entra app registration — renaming it means changing all three. **Bekijk de borden** beside the hero button is a secondary anchor to `#boards`; it starts no login.
 
 ```typescript
-const handleIDPSelection = (
-  idp: "digid" | "eherkenning" | "eidas" | "medewerker",
-) => {
-  sessionStorage.setItem("selected_idp", idp);
+function startIdpLogin(idp: "digid" | "eherkenning" | "eidas" | typeof FLEVOLAND_IDP) {
+  try {
+    // A board click stores a redirect and a test-user hint before the user
+    // may come back and choose an identity provider instead. Neither belongs
+    // to this login: the landing page follows the role Entra/DigiD grants.
+    sessionStorage.removeItem("post_login_redirect");
+    sessionStorage.removeItem("username_hint");
+    sessionStorage.setItem("selected_idp", idp);
+  } catch {
+    /* non-fatal */
+  }
   navigate("/auth");
-};
+}
 ```
 
-The selected value is stored in `sessionStorage` under the key `selected_idp` and read by `AuthCallback.tsx`.
+The selected value is stored in `sessionStorage` under the key `selected_idp` and read by `AuthCallback.tsx`. `'eherkenning'` and `'eidas'` remain in the parameter's type union but no control emits them today: the realm export defines `digid` and `eidas` as disabled SAML providers and no eHerkenning provider at all.
 
 **2. Authentication Callback (`/auth` — `AuthCallback.tsx`)**
 
-The callback reads `selected_idp` and branches on whether the user is a caseworker.
+The callback reads `selected_idp` and branches on whether the user is a caseworker. Both branches call `initializeKeycloak()` first — a shared, memoised `check-sso` that never redirects by itself — and only then call `keycloak.login(...)`.
 
-**Citizen path (digid / eherkenning / eidas):**
+**External-IdP path (`entra-flevoland` / `digid`):**
 
 ```typescript
-const initOptions = {
-  onLoad: "login-required",
-  checkLoginIframe: false,
-  idpHint: selectedIdp, // 'digid' | 'eherkenning' | 'eidas'
-};
-const authenticated = await keycloak.init(initOptions);
+const authenticated = await initializeKeycloak();
+if (authenticated) {
+  sessionStorage.removeItem("selected_idp");
+  navigateAfterLogin(navigate);
+} else {
+  await keycloak.login(selectedIdp ? { idpHint: selectedIdp } : undefined);
+}
 ```
 
-`onLoad: 'login-required'` triggers an immediate OIDC redirect. The `idpHint` tells Keycloak to skip its native login form and redirect straight to the chosen external identity provider (DigiD, eHerkenning, or eIDAS). In the test environment where real IdPs are not configured, Keycloak falls back to its native form without a context banner.
+The `idpHint` tells Keycloak to skip its native login form and redirect straight to the hinted provider. For `entra-flevoland` that is Provincie Flevoland's Entra ID; on a Flevoland-managed laptop Entra usually signs the employee in without a prompt. Where the hinted provider is not configured, Keycloak falls back to its native form without a context banner.
+
+!!! warning "`keycloak.init({ onLoad: 'login-required', idpHint })` is not how this works any more"
+    An earlier version of the citizen flow called `.init()` directly with
+    `onLoad: 'login-required'`. It broke the moment anything else in the app —
+    `ProtectedRoute` on a protected route visited while logged out, for
+    instance — had already called the shared, memoised init with different
+    options. `.init()` can only ever run once; `.login()` has no such
+    restriction, which is why it is the only safe way to trigger a real
+    redirect from more than one call site.
 
 **Caseworker path (medewerker):**
 
@@ -237,14 +263,14 @@ const keycloak = new Keycloak({
 export default keycloak;
 ```
 
-`AuthCallback.tsx` is the only place `keycloak.init()` is called. The two init strategies are:
+`AuthCallback.tsx` is the only place `keycloak.init()` is called, through the shared `initializeKeycloak()`. There is now **one** init strategy, and the branch is in the `login()` call that follows it:
 
-| Strategy   | `onLoad` value     | When used                 | Triggers redirect?     |
-| ---------- | ------------------ | ------------------------- | ---------------------- |
-| Citizen    | `'login-required'` | digid, eherkenning, eidas | Yes — immediately      |
-| Caseworker | `'check-sso'`      | medewerker                | No — silent check only |
+| Flow | Init | Redirect, when `check-sso` returns `false` |
+| --- | --- | --- |
+| External IdP | `'check-sso'` | `keycloak.login({ idpHint })` — `entra-flevoland` or `digid` |
+| Medewerker | `'check-sso'` | `keycloak.login({ loginHint })` — the stored username hint, else the `__medewerker__` sentinel |
 
-After `check-sso` returns `false`, `keycloak.login({ loginHint: '__medewerker__' })` performs the redirect with the sentinel. After any successful authentication, `sessionStorage.removeItem('selected_idp')` is called before navigating to `/dashboard`.
+After any successful authentication, `sessionStorage.removeItem('selected_idp')` is called before `navigateAfterLogin()` chooses where to go: a stored `post_login_redirect` the caller's roles allow, otherwise the default board — Woo, then Infra-board, then PA-Cockpit, then Caseworker, falling through to `/dashboard/citizen`.
 
 Token refresh is handled automatically by the Keycloak JS adapter. The adapter refreshes the access token before the 15-minute expiry as long as the SSO session remains active.
 
@@ -605,16 +631,19 @@ npm test -- --watch
 
 **Landing page:**
 
-- [ ] All four login buttons render correctly
-- [ ] Citizen buttons (DigiD, eHerkenning, eIDAS) are visually grouped
-- [ ] Caseworker button appears below "MEDEWERKERS" divider
+- [ ] The hero's primary button reads "Inloggen met uw Flevoland-account"
+- [ ] "Bekijk de borden" renders as the secondary action and only scrolls to `#boards`
+- [ ] The DigiD link and the top-bar "Inloggen" both render
+- [ ] The board cards render, one per entitled board
 - [ ] Changelog panel opens and closes correctly
 - [ ] Mobile responsive (< 640px)
 
-**Citizen flow:**
+**External-IdP flow:**
 
+- [ ] The Flevoland button stores `selected_idp = entra-flevoland` in sessionStorage
+- [ ] Choosing a provider clears any `post_login_redirect` and `username_hint` a board card left behind
 - [ ] DigiD button stores `selected_idp = digid` in sessionStorage
-- [ ] `AuthCallback` redirects to Keycloak with `idpHint=digid`
+- [ ] `AuthCallback` redirects to Keycloak with the matching `idpHint`
 - [ ] Login succeeds and JWT contains `roles: ["citizen"]`
 - [ ] Dashboard loads with correct municipality theme
 - [ ] Zorgtoeslag calculator submits and displays results
@@ -670,22 +699,15 @@ Edit `public/tenants.json`:
 
 ### Add a new IDP button
 
-Edit `LoginChoice.tsx`:
+The alias has to exist as an identity provider in the `ronl` realm first — `AuthCallback` passes it through as `idpHint` and Keycloak falls back to its own form for an alias it does not know. Then edit `LoginChoice.tsx`:
 
 ```typescript
-{/* New IDP Button */}
-<button
-  onClick={() => handleIDPSelection('new-idp')}
-  className="w-full flex items-center justify-between px-6 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl"
->
-  <div className="flex items-center gap-3">
-    <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg">
-      {/* Icon */}
-    </div>
-    <span className="font-semibold text-lg">Inloggen met New IDP</span>
-  </div>
+<button type="button" className="citizen-link" onClick={() => startIdpLogin('new-idp')}>
+  Inloggen met New IDP
 </button>
 ```
+
+Widen `startIdpLogin`'s parameter type to accept the alias. If it is a provider the platform owns rather than a one-off, give it a named export in `services/identity-providers.ts` the way `FLEVOLAND_IDP` has one, so the alias is written down in exactly one place.
 
 ### Debug Keycloak issues
 

@@ -1,9 +1,96 @@
 # RONL Business API — screenshots to capture
 
-!!! note "Nothing outstanding — reviewed 26 September 2026 for v2026.09.12"
-    `ronl-business-api-public-site-begrippen-io.png`, requested for v2026.09.11,
-    is in `docs/assets/screenshots/`, committed in `dac4b20` on 24 September 2026.
-    The v2026.09.12 review asked for no captures and retired one figure (below).
+!!! warning "Two captures outstanding — reviewed 28 September 2026 for v2026.09.13"
+    Both are **REPLACE** rows on figures the site already embeds, and both sit
+    behind sign-in on acceptance, so both are maintainer steps. Until they are
+    taken, a non-strict `mkdocs build` still reports **zero** missing-image
+    warnings — the files exist, they are simply a release out of date, which no
+    build can detect. Earlier rounds are settled: everything requested for
+    v2026.09.11 and before is captured and in `docs/assets/screenshots/`.
+
+## Sync v2026.09.12 → v2026.09.13 — two REPLACE, no NEW
+
+Reviewed on 28 September 2026 for **v2026.09.13**, an **acceptance** release. Of
+the thirteen changelog entries, eleven have no product surface at all — a
+provisioning script, a cache key, two npm scripts, a git hook and the end-to-end
+harness. Two changes are visible, and both land inside a figure this site
+already embeds.
+
+**Neither row needs a new `<figure>` block.** Both files are already referenced
+by their embedding page, so nothing has to be added to the docs during Stage 3 —
+these are re-captures of existing figures, and the Stage 2b invariant (every
+manifest entry maps to a real `<figure>`) is satisfied by the blocks already
+there.
+
+| # | Status | File | Embedding page | What it must show | Trigger |
+|---|---|---|---|---|---|
+| 9 | ⬜ **REPLACE** | `ronl-business-api-rip-phase-swimlane.png` | `user-guide/infra-board.md` | The same R2.2 *Voorlopig Ontwerp (VO)* swimlane, with **two** document badges under *Opstellen concept VO* — **Ontwerptoelichting** *and* **Objectenboom** | v2026.09.13 |
+| 10 | ⬜ **REPLACE** | `ronl-business-api-landing-page.png` | `user-guide/getting-started.md` | The werkomgeving landing page with its hero's **primary button reading "Inloggen met uw Flevoland-account"**, *Bekijk de borden* beside it as the secondary action, and the note below reading *"Met het account waarmee u op uw werkplek bent aangemeld"* | v2026.09.13 |
+
+### Why item 9 is a REPLACE and not a leave-alone
+
+The existing capture was checked rather than assumed. It is the **R2.2** phase,
+and its *Opstellen concept VO* node carries exactly **one** badge,
+`Ontwerptoelichting`. That is precisely the task this release changes: the R2.2
+model's `ronl:documentRef` became `rip-ontwerptoelichting,rip-objectenboom`, and
+the board now renders one badge per document. The current image therefore shows
+the pre-change state of the exact frame the release is about — the strongest
+case a REPLACE row can have.
+
+**Capture notes**
+
+- **Same view, same framing.** `/dashboard/infra-board` → a project in R2.2 →
+  the phase swimlane, at the width of the existing capture so the two read as
+  one series on the page.
+- **After the acceptance redeploy.** The fixture change reaches the engine with
+  a redeploy; a capture taken from a stale definition will still show one badge,
+  which is the defect rather than the fix.
+- **The two badges must both be legible** at the page's rendered width. If they
+  are not, crop to the *Ontwerper* lane rather than shrinking the whole diagram.
+- It sits behind sign-in, so this is a maintainer step.
+
+### Why item 10 is a REPLACE
+
+The four board cards the caption names are unchanged — but the hero above them
+is the page's primary control, and it now says something different. *Bekijk de
+borden* went from the `btn-primary` anchor to a `btn-secondary` one; the new
+`btn-primary` is a sign-in button; and the note beneath changed from *"Inloggen
+vereist via medewerkersaccount"* to *"Met het account waarmee u op uw werkplek
+bent aangemeld"*. A reader arriving at `getting-started.md` to find out how to
+get in is looking straight at the part of the frame that is wrong.
+
+**Capture notes**
+
+- **Capture in Dutch.** The existing capture is Dutch — a known inconsistency
+  with the English public-site capture, recorded further down this file — and
+  the new button text is Dutch, so a re-shot in Dutch both matches the series
+  and shows the string the prose quotes.
+- **Capture from acceptance**, `https://acc.mijn.open-regels.nl`. v2026.09.13 is
+  not promoted; production still serves v2026.09.12 and would show the old hero.
+- **Include the hero and the four cards in one frame**, as the current capture
+  does, so the caption still holds.
+- **Sign out first.** The landing page is the signed-out view.
+
+### Declined, and why
+
+Recorded so the next review does not re-open them.
+
+| Change | Why no figure |
+|---|---|
+| The Entra provisioning script (`8e36b93`) and the lower-casing fix (`328f502`) | Terminal output — a list of created mappers and a redirect URI. The runbook quotes both. |
+| The `IOU_USERS` role mapping (`39176bd`) | A value in a table on two pages. Nothing spatial. |
+| The Caseworker-card redirect fix (`1ae2b94`) | A routing outcome: the same card leads somewhere else. A still image of the card before and after is identical. |
+| Deployed-BPMN caching by definition id (`36eb5a5`) | Invisible in the right direction — it makes a *correct* diagram appear where a stale one did. A still cannot show "after a redeploy". |
+| `e2e:deploy-fixtures`, `check-swimlane-fixtures` (`b4c3176`, `71b76a9`, `4d0dc73`, `dfa325a`, `2bdff69` in part) | Terminal scripts and a git hook. |
+| `check-previews` carriage returns (`80e34a2`) | A shell script's exit status. |
+
+**The Keycloak login page's Flevoland button was considered and is not
+requested.** It is a fallback path — the landing-page button is how an employee
+actually signs in — and `ronl-keycloak-custom-theme.png` already shows that page
+with its provider buttons. A second capture of it would document the route
+nobody takes.
+
+---
 
 ## Sync v2026.09.11 → v2026.09.12 — nothing to capture, one figure retired
 

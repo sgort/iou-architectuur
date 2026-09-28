@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Entra ID (Provincie Flevoland)
 
 !!! info "Documentatie in ontwikkeling"

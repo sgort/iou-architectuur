@@ -5,10 +5,23 @@ component: RONL Business API
 # Public site suite
 
 `packages/public-site`, Vitest with jsdom. **32 files · 235 tests · all
-passing · 29.21s.**
+passing · 13.62s.**
 
-The public site is the auth-free search and rule-catalogue package. Measured on
-**24 September 2026** on `main` at `86af73e` (v2026.09.11) with
+!!! success "Re-measured at v2026.09.13, and every figure held"
+    Re-run on **28 September 2026** at `963fe24` (`acc`, v2026.09.13) after a
+    clean `npm ci` in a separate clone: **32 files · 235 tests · all passing ·
+    13.62s**, coverage **95.92 / 96.31 / 95.07 / 96.41**. Both counts, all four
+    package percentages and every per-area row on
+    [Coverage](coverage.md#public-site-by-area) reproduced to the decimal for
+    the third pass running. Only the elapsed time moved — 29.21s to 13.62s on
+    an identical suite, which is the host, not the code.
+
+    The package's `src/` tree has not changed since the two lines
+    `lib/search.tsx` gained in v2026.09.12. The narrative below is the
+    24 September one and still describes the package.
+
+The public site is the auth-free search and rule-catalogue package. First
+measured on **24 September 2026** on `main` at `86af73e` (v2026.09.11) with
 `npm test --workspace=@ronl/public-site`, coverage included, after a clean
 `npm ci` in a separate clone on Node 24.14.1 / npm 11.11.0. The suite has grown
 in every recent window — 30 files and 204 tests at v2026.09.5, 31 and 225 at
