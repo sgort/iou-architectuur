@@ -4,26 +4,48 @@ component: RONL Business API
 
 # Backend suite
 
-`packages/backend`, Jest with the `ts-jest` preset. **96 files · 2198 tests ·
-all passing · nothing skipped · `Time: 59.864 s`.** Coverage is on by default;
+`packages/backend`, Jest with the `ts-jest` preset. **96 files · 2202 tests ·
+all passing · nothing skipped · `Time: 94.982 s`.** Coverage is on by default;
 see [Coverage](coverage.md#backend-by-area) for the per-area figures.
 
-Measured on **26 September 2026** for v2026.09.12 (`main` at `2443adc`) with
-`npm test --workspace=@ronl/backend`, in the working checkout on `acc` at
-`3c44b9e` — which differs from `main` only in `scripts/check-previews.sh` —
-after `npm run deps:check` reported the install in step with the lockfile, on
-Node 24.14.1 / npm 11.11.0 (`.nvmrc` names 22.23.2). Counts come from the
-runner's own JSON output, not from grepping for `it(`, which miscounts
-parameterised and multi-line cases.
+Measured on **28 September 2026** for v2026.09.13 with
+`npm test --workspace=@ronl/backend`, in a fresh clone checked out at
+`963fe24` — the head of `acc` — after a clean `npm ci`, on Node 24.14.1 /
+npm 11.11.0 (`.nvmrc` names 22.23.2). Counts come from the runner's own JSON
+output, not from grepping for `it(`, which miscounts parameterised and
+multi-line cases.
 
-!!! note "2011 → 2008 → 2028 → 2072 → 2198, and nothing was lost on the way"
+**This is an acceptance release**: `main` is still v2026.09.12 (`2443adc`), so
+these figures describe `acc` until v2026.09.13 is promoted.
+
+!!! success "The release note's own claim checks out — and it is the backend's, not the repository's"
+    The v2026.09.13 changelog entry for `36eb5a5` ends *"2202 tests pass across
+    96 suites."* Re-measured here independently, Jest reports exactly
+    `Test Suites: 96 passed, 96 total` and `Tests: 2202 passed, 2202 total`.
+
+    **That figure is this package's alone.** The repository runs **300 test
+    files and 4141 tests** across five workspaces — see
+    [Overview](overview.md). 2202 / 96 is roughly half of it, and quoting it as
+    a repository total understates the suite by nearly two thousand tests.
+
+!!! note "2011 → 2008 → 2028 → 2072 → 2198 → 2202, and nothing was lost on the way"
     The suite reported **2011** for several releases, of which 2008 ran and
     **three were permanently skipped**. Those three guarded the
     `PHASE_NOT_MODELLED` branch of the RIP phase model. v2026.09.7 made an
     unmodelled phase unrepresentable (issue #85), the branch went, and the
     three skipped cases went with it — a deletion of dead tests rather than a
-    regression. The **2198** measured here is growth on that 2008 base. No
+    regression. The **2202** measured here is growth on that 2008 base. No
     workspace in this repository skips anything.
+
+    **v2026.09.13 is the smallest step of the six: +4, and no new file.** All
+    four are in files that already existed, and they are the release's two
+    fixes seen from the inside — nine cases in
+    `services/operaton.service.test.ts` now cover caching by process-definition
+    **id** rather than by key, replacing twelve that covered the old key-based
+    caches, and `rip-swimlane/bpmn-swimlane.test.ts` gains
+    *reads every document of a task that carries more than one*. The Operaton
+    regression test replays the ACC sequence directly: the R2.2 fixture cut back
+    to one document, then a redeploy of the full fixture under the same key.
 
     v2026.09.11 added three files; **v2026.09.12 added seven, and 73 of its
     +126 tests are in them**:
@@ -61,7 +83,7 @@ Both backend workflows run this suite as `npm test`, coverage included, so the
 per-file 80% branch floor in `jest.config.js` rides along with it rather than
 needing a coverage job of its own — and so does the OpenAPI coverage gate
 below, since it is an ordinary test file. Since v2026.09.7 `azure-backend-acc.yml` also
-triggers on `pull_request`, so these 2198 tests run *before* a merge rather than
+triggers on `pull_request`, so these 2202 tests run *before* a merge rather than
 only after one — and since **19 September 2026 that run is a required check**,
 so a red backend suite now blocks the merge to `acc` outright. See
 [Overview → What actually gates a merge](overview.md#what-actually-gates-a-merge).
@@ -70,9 +92,9 @@ so a red backend suite now blocks the merge to `acc` outright. See
 |---|---:|---:|
 | `src/routes` | 19 | 579 |
 | `src/pa-monitoring` | 16 | 578 |
-| `src/services` | 27 | 534 |
+| `src/services` | 27 | 537 |
 | `src/utils` | 13 | 131 |
-| `src/rip-swimlane` | 2 | 119 |
+| `src/rip-swimlane` | 2 | 120 |
 | `src/media-aggregator` | 8 | 107 |
 | `src/mcp-servers` | 3 | 49 |
 | `src/auth` | 2 | 44 |
@@ -80,20 +102,24 @@ so a red backend suite now blocks the merge to `acc` outright. See
 | `src/openapi` | 3 | 27 |
 
 !!! success "Both columns are current, and they sum"
-    Re-derived on 26 September 2026 from the run's own JSON output: the Files
-    column accounts for all **96** files and the Tests column sums to **2198**,
+    Re-derived on 28 September 2026 from the run's own JSON output: the Files
+    column accounts for all **96** files and the Tests column sums to **2202**,
     the measured total. Earlier versions of this page carried a Files column
     from one date and a Tests column from another that fell 274 short, with a
-    warning attached; that gap is closed and has stayed closed across three
+    warning attached; that gap is closed and has stayed closed across four
     re-derivations.
 
-    Five areas moved in this window, one is new, and the other four are
-    unchanged to the test. **`src/routes`** 17 → 19 files and 524 → 579 tests,
-    taking it past `src/pa-monitoring` to the largest area in the package;
-    **`src/auth`** 1 → 2 and 18 → 44, more than doubling on `tenant-access`;
-    **`src/middleware`** 2 → 3 and 25 → 30; **`src/services`** 27 files still,
-    522 → 534; **`src/utils`** 13 files still, 130 → 131. **`src/openapi`** is
-    new, at 3 files and 27 tests, counting `src/openapi/testing/` with it.
+    **Two areas moved in v2026.09.13 and no file count changed anywhere**:
+    `src/services` 534 → **537** and `src/rip-swimlane` 119 → **120**. The
+    other eight areas are unchanged to the test.
+
+    The v2026.09.12 window, for comparison, moved five areas and added one:
+    **`src/routes`** 17 → 19 files and 524 → 579 tests, taking it past
+    `src/pa-monitoring` to the largest area in the package; **`src/auth`** 1 → 2
+    and 18 → 44, more than doubling on `tenant-access`; **`src/middleware`**
+    2 → 3 and 25 → 30; **`src/services`** 27 files still, 522 → 534;
+    **`src/utils`** 13 files still, 130 → 131; and **`src/openapi`** new, at 3
+    files and 27 tests, counting `src/openapi/testing/` with it.
 
     `src/rip-swimlane` is the area that used to read *not counted* —
     `bpmn-swimlane.test.ts` and `doc-label.test.ts`, covering the derivation of
@@ -107,16 +133,19 @@ so a red backend suite now blocks the merge to `acc` outright. See
     In this one only the route file grew; the other four counts are a repeat
     measurement:
 
-    | File | Tests | File time, 26 Sep |
+    | File | Tests | File time, 28 Sep |
     |---|---:|---:|
-    | `routes/validsign.routes.test.ts` | 116 | under 5s |
-    | `services/validsign.service.test.ts` | 32 | under 5s |
-    | `services/validsignCompletion.service.test.ts` | 9 | under 5s |
-    | `services/validsignPoller.service.test.ts` | 7 | under 5s |
-    | `utils/config.validsign.test.ts` | 4 | under 5s |
+    | `routes/validsign.routes.test.ts` | 116 | 39.6s |
+    | `services/validsign.service.test.ts` | 32 | 32.2s |
+    | `services/validsignCompletion.service.test.ts` | 9 | 2.4s |
+    | `services/validsignPoller.service.test.ts` | 7 | 1.5s |
+    | `utils/config.validsign.test.ts` | 4 | 1.7s |
 
-    *Under 5s* is all the console says: Jest prints a file's time only when it
-    exceeds its five-second slow-test threshold, and none of these five did.
+    None of the five changed in v2026.09.13, and all five counts are a repeat
+    measurement. The times are not: on 26 September none of these files ran
+    long enough for Jest to print a time at all, and on 28 September two of them
+    took over half a minute. Read the next warning before drawing anything from
+    that.
 
     The route file carries the most because the two unauthenticated routes are
     where the security properties live — capability URLs, the shared-secret
@@ -133,20 +162,22 @@ so a red backend suite now blocks the merge to `acc` outright. See
 
 !!! warning "A per-file time is not a ranking, and this page used to publish it as one"
     Through v2026.09.9 the note above called `validsign.routes.test.ts` *the
-    slowest single file in the backend suite*, at 38.5 seconds. Measured on
-    24 September the same unchanged file took **81.7 seconds** and was
-    **fifth**. On 26 September, with eight more tests in it, it did not take
-    long enough for Jest to print a time at all. The slowest files in that run
-    were two of the new ones — `openapi/coverage.test.ts` (51.7s) and
-    `routes/registry.test.ts` (51.6s), each of which imports every route module
-    through the registry — ahead of `pa-monitoring/pa.routes.test.ts` (42.7s)
-    and `pa-monitoring/curation.service.test.ts` (41.8s).
+    slowest single file in the backend suite*, at 38.5 seconds. The same file,
+    across four passes: **38.5s**, then **81.7s** on 24 September (and only
+    fifth), then too fast to print at all on 26 September, then **39.6s** on
+    28 September. It gained eight tests in the middle of that and nothing since.
+
+    The slowest files change with it. On 26 September they were
+    `openapi/coverage.test.ts` (51.7s) and `routes/registry.test.ts` (51.6s);
+    on 28 September the same two took 23.8s and 25.8s, and the top of the list
+    was `pa-monitoring/pa.routes.test.ts` (71.5s) and
+    `pa-monitoring/curation.service.test.ts` (69.4s).
 
     None of these figures is wrong and nothing regressed or improved. Jest
     reports each file's **elapsed** time while running several workers at once,
     so a file's number depends on what shared the machine with it — which is why
     the file times on this page sum to far more than the suite's own
-    `Time: 59.864 s`. Compare per-file times within one run, never across two,
+    `Time: 94.982 s`. Compare per-file times within one run, never across two,
     and do not build a superlative out of them.
 
 Test files are colocated with the source they cover (`foo.ts` →
@@ -179,7 +210,8 @@ area from 43.47% statements to 100%. It has kept growing since: 11 files when
 ValidSign added its own config coverage, and **13 files and 130 tests** at
 v2026.09.11, which added `build-info.test.ts` and `cors-origin.test.ts` and
 another 25 cases to `config.test.ts`, and 131 at v2026.09.12, one more case in
-`errors.test.ts`. Of the twelve source files the area reports on 26 September,
+`errors.test.ts`, where it still stands at v2026.09.13. Of the twelve source
+files the area reports on 28 September,
 **eleven are at 100 on all four measures**; the twelfth is `config.ts`
 at 95.12% statements and 98.31% branches — see
 [Coverage](coverage.md#backend-by-area).

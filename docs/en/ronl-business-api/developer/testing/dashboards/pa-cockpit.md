@@ -27,14 +27,22 @@ Coverage **90.11 % statements · 88.52 % branches · 86.52 % functions ·
 `vitest.config.ts` as `thresholds: { branches: 80, perFile: true }`. The run
 passed it without naming a file.
 
-!!! note "Four releases, four identical counts"
-    43 files and 476 tests at v2026.09.7, v2026.09.9 and v2026.09.11, and the
-    only `src/` change in the latest window was to `src/scaffold.test.ts`, whose
-    three tests did not change in number. The coverage figures above are the
-    12 September ones re-measured: the 20 September pass read 90.07 statements
-    and 86.39 functions, and this one reads what 12 September did. That is the
-    second-decimal noise described on
-    [Coverage](../coverage.md), not a change in the package.
+!!! note "Six releases, six identical counts — and a coverage figure that still wobbles"
+    43 files and 476 tests at v2026.09.7, v2026.09.9, v2026.09.11, v2026.09.12
+    and v2026.09.13, re-measured on **28 September 2026** at `963fe24` (`acc`)
+    and passing 476 of 476 in `Duration 23.87s`.
+
+    The package has had **no `src/` change and no test change** across the last
+    two releases, which makes it the cleanest available test of how stable these
+    percentages are. The answer is: not entirely. Branches and lines have read
+    **88.52** and **91.33** on every pass. Statements and functions have
+    alternated — 90.11 / 86.52 on 12 and 26 September, **90.07 / 86.39** on 20
+    and 28 September — on identical code, identical tests and the same runner.
+
+    The figures at the top of this page are the 24 September reading; the
+    repository-wide table on [Coverage](../coverage.md) carries the
+    28 September one. Both are correct, which is the point of the
+    second-decimal warning there.
 
     This package holds **8 of the 26 files** an 80% *functions* floor would fail
     — the second-largest share after the frontend — while **none** of its 38

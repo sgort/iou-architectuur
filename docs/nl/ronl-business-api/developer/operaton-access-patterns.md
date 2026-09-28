@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Operaton toegangspatronen
 
 !!! info "Documentatie in ontwikkeling"
@@ -28,6 +32,10 @@
 ---
 
 ## Waarom de patronen incompatibel zijn
+
+---
+
+## Caching van wat uit gedeployde BPMN wordt afgeleid
 
 ---
 

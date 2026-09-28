@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Keycloak Realm Configuration
 
 The `ronl` realm is defined in `config/keycloak/ronl-realm.json`. It is imported automatically on first Keycloak container start and can be re-imported at any time without data loss (using `--override true`).

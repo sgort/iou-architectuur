@@ -10,7 +10,7 @@ RONL Business API uses **Keycloak** as its identity and access management layer,
 
 ## Authenticating
 
-Keycloak is the only token issuer the Business API accepts. The frontend sends the browser to Keycloak's login, with an identity-provider hint when the user picked DigiD, eHerkenning or eIDAS on the login choice page:
+Keycloak is the only token issuer the Business API accepts. The frontend sends the browser to Keycloak's login, with an identity-provider hint when the user chose an external provider on the landing page — **Inloggen met uw Flevoland-account**, which hints Provincie Flevoland's Entra ID, or **Inwoner? Log in met DigiD**. Staff signing in without a provider go to Keycloak's own form:
 
 - A user can sign in directly against Keycloak, with credentials managed in Keycloak itself. This is how every account in the repository's realm export signs in.
 - Keycloak can act as an identity broker for an external provider: the browser is redirected to the provider, the provider returns a signed assertion, and Keycloak validates it and issues its own token. Employees of Provincie Flevoland sign in this way through Entra ID (the `entra-flevoland` provider): Keycloak sets their tenant and assurance level and maps their Entra app roles to realm roles — see [Entra ID](../developer/deployment/entra-id.md). The realm export also defines `digid` and `eidas` as SAML providers, both disabled and pointing at placeholder endpoints; it defines no eHerkenning provider. Where the hinted provider is not available, Keycloak shows its own login form.

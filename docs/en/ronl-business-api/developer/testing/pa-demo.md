@@ -30,6 +30,13 @@ wired into CI.
     source. Coverage percentages are a property of the code; elapsed time is a
     property of the machine.
 
+    **Re-measured again on 28 September 2026** at `963fe24` (`acc`,
+    v2026.09.13), same method: **19 files · 106 tests · all passing**, coverage
+    **93.47 / 95.65 / 85.00 / 92.85**, every per-area row on
+    [Coverage](coverage.md#pa-demo-by-area) unchanged — the **sixth** release
+    running in which nothing in this package moved. The duration made its point
+    a third time: `Duration 8.16s`, against 19.62s for the same bytes.
+
 **At a glance:**
 
 | | |

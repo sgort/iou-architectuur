@@ -10,10 +10,11 @@ Infra-board is portfolio steering for infrastructure projects. It organises proj
 
 On opening the board you see projects grouped by phase, with their status and RIP information, so the portfolio's progress is visible in one view.
 
-Since September 2026 the **Faseladder reads twelve of twelve deelprocessen inzetbaar** — every RIP phase from R2.1 through R6.1 is modelled and deployed, where previously only R2.1 was. Two things follow for you:
+Since September 2026 the **Faseladder reads twelve of twelve deelprocessen inzetbaar** — every RIP phase from R2.1 through R6.1 is modelled and deployed, where previously only R2.1 was. Three things follow for you:
 
 - **Finishing a phase readies the project for the next one.** A completed instance moves its project into the following phase's *Starten* list automatically, so you no longer start each phase from a standing position.
 - **Every phase has a real diagram.** Opening a project shows the process drawn from the model actually deployed on the engine, not a hand-maintained sketch — including its rework loops, and coloured by what genuinely ran when you select a finished rung.
+- **A task shows every document it carries.** Where a process step produces more than one deliverable, the diagram gives it one badge per document rather than naming only the first. R2.2's *Opstellen concept VO* is the clearest case: it yields both an **Ontwerptoelichting** and an **Objectenboom**, and both are named on the node.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: a RIP phase swimlane diagram derived from the deployed BPMN, showing lanes, task states and a rework loop](../../assets/screenshots/ronl-business-api-rip-phase-swimlane.png)

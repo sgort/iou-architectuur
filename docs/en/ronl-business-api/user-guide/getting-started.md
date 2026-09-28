@@ -17,6 +17,14 @@ The werkomgeving (`ronl.werkomgeving`, Province of Flevoland) presents four boar
   <figcaption>Werkomgeving landing page with its four boards: Caseworker, PA-Cockpit, Infra-board, and Woo-dashboard</figcaption>
 </figure>
 
+### Signing in
+
+The landing page's primary action is **Inloggen met uw Flevoland-account**. It takes you to Provincie Flevoland's own sign-in, brokered by the platform's identity server; on a Flevoland-managed laptop you are usually signed in with the account the device is joined to, without a prompt. **Bekijk de borden** beside it scrolls to the board cards without signing you in, and inwoners sign in with DigiD from the link at the top.
+
+After signing in you land on the board your roles allow. Picking a board card first takes you to that board instead, so the card you clicked is the one you get. The boards you are not entitled to see are not shown.
+
+For how access is granted, and what an administrator has to set up per environment, see [Entra ID (Provincie Flevoland)](../developer/deployment/entra-id.md).
+
 | Board | Tagline | What it's for |
 |---|---|---|
 | [Caseworker](caseworker.md) | *werk · taken* | Personal work queue for case handlers: tasks, claims and deadlines per case, with a built-in assistant for quick assessment. |

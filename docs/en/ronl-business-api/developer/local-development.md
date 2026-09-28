@@ -6,7 +6,7 @@ component: RONL Business API
 
 This page takes a fresh clone of `ronl-business-api` to a running local stack:
 five Docker services, four dev servers, and a Keycloak realm with test users.
-It describes release **v2026.09.12**.
+It describes release **v2026.09.13**.
 
 ---
 
@@ -51,6 +51,13 @@ checkout and stay runnable regardless of `core.autocrlf`.
     has not been tested. If `npm ci` or `npm run dev` fails in a way that
     suggests the wrong tools, run `where bash` in `cmd.exe` to see which one
     resolves first, and work from Git Bash instead.
+
+Two further root scripts are plain Node and need no shell:
+
+| Script | Runs | What for |
+|---|---|---|
+| `check-swimlane-fixtures` | `node scripts/check-swimlane-fixtures.mjs` | Verifies the twelve RIP phase BPMNs under `packages/backend/src/rip-swimlane/__fixtures__/` against the sha256 fingerprints in `rip-bpmn-fingerprints.json`, which is committed identically here and in `linked-data-explorer`. With that repository checked out alongside it also compares byte for byte; `--sync` copies the models and the fingerprint file down from it, and `LDE_PATH` says where it is. Runs in `pre-push` |
+| `e2e:deploy-fixtures` | `node scripts/deploy-e2e-fixtures.mjs` | Deploys the end-to-end process and decision bundle into the local engine, in one command. The script here is a shim: the deployer lives in `linked-data-explorer` beside the fixtures and the manifest, and this resolves the checkout (`LDE_PATH`, defaulting to a sibling), runs it and passes arguments and the exit code through. See [E2E testing](testing/e2e.md) |
 
 ---
 
@@ -496,13 +503,17 @@ Husky installs two hooks during `npm ci`:
 | Hook | Runs |
 |---|---|
 | `pre-commit` | `npx lint-staged`: ESLint `--fix` in the owning workspace and `prettier --write` on the staged files |
-| `pre-push` | `deps:check`, then `npm run build --workspace=@ronl/shared`, `type-check`, `lint` and `check-format` |
+| `pre-push` | `deps:check`, then `npm run build --workspace=@ronl/shared`, `check-swimlane-fixtures`, `type-check`, `lint` and `check-format` |
 
 `deps:check` comes first in `pre-push` so that a push from a stale install stops
 with `npm ci` named as the fix, instead of the later checks failing on the wrong
 tool versions. On 14 September 2026 a clone still on Prettier 3.8.1 after the
 lockfile moved to 3.9.6 failed `check-format` on seven correctly formatted files
 with nothing saying why.
+
+`check-swimlane-fixtures` is new in v2026.09.13 and sits ahead of the type
+checks. It is not a test run — it compares files against committed fingerprints —
+so the hooks still run no suite.
 
 For running the test suites, see [Testing](testing/overview.md).
 

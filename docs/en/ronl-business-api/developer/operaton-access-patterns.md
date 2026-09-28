@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Operaton Access Patterns
 
 This page documents the three distinct ways to access Operaton within the RONL ecosystem. Each pattern targets a different caller, speaks a different protocol contract, and requires a different authentication strategy. Choosing the wrong pattern is the most common source of integration errors.
@@ -131,6 +135,29 @@ The `operaton-mcp-client` Keycloak client is shared across both Pattern 2 and Pa
 |---|---|---|
 | `https://operaton-doc.open-regels.nl/engine-rest` | Pattern 2 | Yes |
 | `https://acc.api.open-regels.nl` | Pattern 3 | No — wrong path structure |
+
+---
+
+## Caching what is derived from deployed BPMN
+
+Several things the Infra-board draws are derived from the BPMN a definition was deployed with: the XML itself, the parsed swimlane model, and the `boardOwner` tag the Modeler writes into the process. All three are expensive enough to cache and, for a given definition, immutable — so the only question is what the cache is keyed by.
+
+**A process-definition key is not a version.** Operaton answers `/process-definition/key/{key}` with whatever is newest under that key, so a redeploy changes what the key *means* while the key itself stays put. A cache keyed by `tenantId::processKey` cannot see that happen, and goes on serving the previous deployment's derivation indefinitely.
+
+That is not hypothetical. On acceptance on 28 September 2026, R2.2 was redeployed three minutes after a backend restart and the swimlane kept rendering one document however often it was reloaded. Localhost never reproduced it, because the dev server restarts on every file change and empties the cache with it.
+
+**A definition id is the version.** Operaton mints a new one per deployment, so a redeploy misses the cache by construction. `getCurrentDefinitionId(processKey, tenantId)` resolves a key and tenant to the id it currently means, and everything downstream is keyed by that id:
+
+| | Keyed by | Notes |
+|---|---|---|
+| `getCurrentDefinitionId` | — | **Deliberately uncached.** This one call is what makes a redeploy visible; caching it would move the staleness up a level. A previous id is remembered only to notice that it changed |
+| `getCachedBpmnXml` | process-definition id | The XML is immutable for a given id, so it never needs invalidating |
+| The parsed swimlane model | process-definition id, plus the phase | |
+| `boardOwner` | process-definition id | `null` — deployed but carrying no tag — is cached too; a lookup that *threw* is not |
+
+When the id for a key moves, the previous id's entries are dropped from all three. The separate phase-BPMN cache that used to sit beside these is gone rather than re-keyed: the XML fetch already had a cache keyed correctly.
+
+**Writing a new cache over a deployed definition?** Key it by the definition id, not by the key, and resolve the id per request. If you find yourself wanting to cache the resolution too, that is the bug this section exists to describe.
 
 ---
 

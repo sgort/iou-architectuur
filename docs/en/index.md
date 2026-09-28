@@ -139,13 +139,15 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.09.12** · *September 2026*
+-   **⚙️ RONL Business API — v2026.09.13** · *September 2026* · **acceptance**
 
     ---
 
-    **The API describes itself, and one rule decides every tenant**
+    **Signing in with a Flevoland account, and a task's every document**
 
-    The backend now publishes an OpenAPI 3.1 description at `/v1/openapi.json` — 113 of its 131 operations, each checked against a running service, with only the machine-to-machine group still to come — and a test fails whenever a served route is neither described nor listed as pending. [Browse it on the new API Specification page](ronl-business-api/reference/api-specification.md). Tenant access now has [a single source of truth](ronl-business-api/features/authentication-iam.md#tenancy): every process and task check reads the case's own organisation label, refuses when there is none, and answers one code, `403 TENANT_MISMATCH`. Staff can no longer start another organisation's process, a citizen's case goes to the organisation that runs it and stays readable to them, and a task completion can no longer relabel a case. On the supply chain, every release now carries an SBOM, dependencies are [audited daily on both branches](ronl-business-api/developer/cicd.md), and an unused Keycloak adapter that pulled 48 packages into production is gone. [Local development](ronl-business-api/developer/local-development.md) is rewritten from the code, including how the Operaton engine starts and why a bash shell is required.
+    Employees of Provincie Flevoland now sign in with their own Flevoland account: the landing page's primary action sends the browser through Keycloak straight to Entra ID, and on a managed laptop Entra usually signs them in without a prompt. Keycloak brokers it — [a provisioning script](ronl-business-api/developer/deployment/entra-id.md) creates the provider and the seven mappers that set the employee's tenant and assurance level and turn their Entra app roles into realm roles — and [the backend still trusts one issuer](ronl-business-api/features/authentication-iam.md). On the [Infra-board](ronl-business-api/user-guide/infra-board.md), a swimlane task now shows **every** document it carries rather than the first, and the twelve phase fixtures are pinned to their source by fingerprints committed in both repositories. A redeploy is visible again: [derivations from deployed BPMN](ronl-business-api/developer/operaton-access-patterns.md#caching-what-is-derived-from-deployed-bpmn) are keyed by definition id rather than by process key, which had left acceptance rendering a stale diagram for as long as the process stayed up. And the end-to-end fixture bundle now deploys with one command instead of file by file through the Modeler.
+
+    *This release is on acceptance; production still serves v2026.09.12.*
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

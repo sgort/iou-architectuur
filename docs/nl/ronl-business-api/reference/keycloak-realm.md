@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Keycloak-realmconfiguratie
 
 !!! info "Documentatie in ontwikkeling"

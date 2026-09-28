@@ -53,12 +53,23 @@ suite was green and wrong.
   configured **per file** in all five runner configs, so a thin new file does
   not merely look thin: it exits `npm test` non-zero and names itself. It is a
   branch floor only — the functions column carries no threshold, and adding one
-  at 80 would fail 26 existing files as measured on 26 September 2026 (the
-  configs' own comments still say 31).
+  at 80 would fail 26 existing files as measured on 20, 24, 26 and
+  28 September 2026, the same 26 every time (the configs' own comments still
+  say 31).
+
+  **Three files are at exactly 80.00%** and have no headroom at all:
+  `backend/src/media-aggregator/sanitize.ts`,
+  `frontend/src/components/CaseworkerDashboardV2/NoAccessPanel.tsx` and
+  `pa-cockpit/src/components/PADashboardV2/dossierbeheer/DossierRow.tsx`.
+  Adding an uncovered edge to any of them fails the run, so plan on a test
+  going in with the change.
 - **Update the counts on these pages** when work lands, from a real run
-  (`--json --outputFile=…` for Jest, `--reporter=json --outputFile=…` for
+  (`--json --outputFile=…` for Jest, `--reporter=json --outputFile.json=…` for
   Vitest) rather than an estimate or a grep for `it(` / `test(` — both miscount
-  multi-line and parameterised cases. For elapsed time quote Vitest's
+  multi-line and parameterised cases. Give those output paths **absolutely**:
+  `npm test --workspace=…` runs with the cwd set to the package, so a relative
+  one lands in `packages/`. Take the file count from `testResults.length`, not
+  from `numTotalTestSuites`, which counts `describe` blocks. For elapsed time quote Vitest's
   `Duration` and Jest's `Time:`, never Vitest's aggregate `tests …s` line: it
   sums per-worker time across parallel workers and reads several times longer
   than anyone actually waited.

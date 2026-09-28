@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Keycloak Deployment (VM)
 
 Keycloak runs in Docker on the VM (`open-regels.nl`). Two fully isolated instances run in parallel: ACC and PROD. Each has its own PostgreSQL database container and custom RONL theme.
@@ -659,7 +663,7 @@ If nothing is returned, redeploy the theme files and restart the container.
 
 **Cause 2:** `sessionStorage` is not carrying `selected_idp = medewerker` to `/auth`.
 
-**Solution:** Open DevTools → Application → Session Storage → `http://localhost:5173` (or the ACC URL). Confirm `selected_idp` equals `medewerker` before the `/auth` route is hit. If it is missing or a different value, the `handleIDPSelection` call in `LoginChoice.tsx` is not firing correctly.
+**Solution:** Open DevTools → Application → Session Storage → `http://localhost:5173` (or the ACC URL). Confirm `selected_idp` equals `medewerker` before the `/auth` route is hit. If it is missing or a different value, the `startMedewerkerLogin` call in `LoginChoice.tsx` is not firing correctly — the top-bar **Inloggen** button and the board cards both go through it.
 
 ### Username field pre-filled with `__medewerker__`
 

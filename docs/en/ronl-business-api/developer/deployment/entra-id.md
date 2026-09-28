@@ -97,6 +97,8 @@ It prompts for the Keycloak admin password and the Entra client secret. The secr
 
 Before creating anything the script checks that the four mapped realm roles exist, and stops with their names if one is missing.
 
+It also normalises what you paste. Both GUIDs are trimmed of surrounding whitespace and of the carriage return a copied value can carry — the Flevoland client id arrived with a leading space — and both are then **lower-cased**. That last step matters: Entra issues tokens with the tenant id in lower case and Keycloak compares the token's `iss` to the configured issuer as an exact string, so an upper-case paste passes the GUID check and then fails every login.
+
 Locally, run it again after every fresh `--import-realm`.
 
 ---
@@ -210,6 +212,7 @@ Flevoland IT issues a new secret before the current one expires. Run step 1 of [
 | Signed in, but `403 INSUFFICIENT_ASSURANCE` | The `assurance-level` mapper is missing; re-run the script |
 | Infra-board opens, but shows no tasks | The employee lacks the `rip-*` roles; see [Infra-board users](#infra-board-users) |
 | Signed in, but no tasks or dashboard | The employee's Entra group gives a role that is not the one the dashboard needs; check the token's `realm_access.roles` |
+| Keycloak log: wrong issuer, and **every** login fails from the moment the provider was created | The configured issuer does not match the `iss` Entra sends, which is the tenant id in lower case. Re-run the script; it lower-cases both IDs before it builds the endpoints |
 | Several Microsoft accounts in the browser | Entra shows its account picker; choose the Flevoland account |
 | A script fails with `curl: (35) schannel: … CRYPT_E_NO_REVOCATION_CHECK`, then "could not obtain an admin token (HTTP 000000)" | On the Flevoland network, TLS is re-signed by a *Provincie Flevoland* CA whose revocation cannot be checked, and Git Bash's curl (Schannel) treats that as fatal; the browser does not. For the shell session, before running the scripts: `export CURL_HOME=$(mktemp -d); echo ssl-revoke-best-effort > "$CURL_HOME/.curlrc"`. The chain is still verified against the Windows store; only an uncheckable revocation is tolerated |
 

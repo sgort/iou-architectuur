@@ -19,24 +19,31 @@ against `acc` at `15dfbf9` with a full local stack running. That was the first
 pass in which all three were run together rather than described from
 configuration, and it is still the last.
 
-!!! warning "Not re-run on 26 September — and still understating the frontend suite"
-    The unit suites were re-measured for v2026.09.12 (`main` at `2443adc`) on
-    26 September; the Playwright suites were **not**, for the fourth pass
+!!! warning "Not re-run on 28 September — and still understating the frontend suite"
+    The unit suites were re-measured for v2026.09.13 (`acc` at `963fe24`) on
+    28 September; the Playwright suites were **not**, for the fifth pass
     running. Every count in this page's tables dates from 30 August and is
     repeated unchanged rather than re-derived — a measured number is worth more
     stale than a guess is fresh. Two of the three suites need services these
     passes deliberately did not start.
 
-    **The inventory, re-checked at `2443adc` straight from the spec tree, is
+    **The inventory, re-checked at `963fe24` straight from the spec tree, is
     thirteen specs**: eleven in `packages/frontend/e2e/`, plus
     `packages/pa-demo/e2e/plato-demo.spec.ts` and
     `packages/public-site/e2e/publiek.spec.ts`. The count is unchanged since
-    v2026.09.11. `thuisbatterij-journey.spec.ts` arrived in that release, after
-    the only run of this suite, so the 27-test frontend figure — measured when
-    there were ten — **cannot** include it. Read 27 as a floor rather than a
-    total until the suite is run again. The workflow wiring is unchanged too:
-    the pa-demo spec runs in `azure-pa-demo-acc.yml` and only there, and no
-    workflow runs the other two.
+    v2026.09.11, and **v2026.09.13 neither added nor removed a spec**.
+    `thuisbatterij-journey.spec.ts` arrived in v2026.09.11, after the only run
+    of this suite, so the 27-test frontend figure — measured when there were
+    ten — **cannot** include it. Read 27 as a floor rather than a total until
+    the suite is run again. The workflow wiring is unchanged too: the pa-demo
+    spec runs in `azure-pa-demo-acc.yml` and only there, and no workflow runs
+    the other two.
+
+    **What v2026.09.13 did change is how the fixtures these suites need get
+    deployed** — see
+    [Deploying the E2E fixtures](#deploying-the-e2e-fixtures) below. That is a
+    read of the scripts and the configuration, not a run: nothing on this page
+    was executed in this pass.
 
     The eleven: `caseworker-journey`, `infra-board-journey`, `login-redirect`,
     `pa-live-authoring`, `pa-mock-journey`, `protected-route`,
@@ -63,7 +70,8 @@ every spec under that directory. This is the table to check before running
 anything locally — it is what separates a suite you can start cold from one that
 will fail its preconditions.
 
-Re-read at `86af73e` on 24 September 2026; unchanged at `2443adc` (v2026.09.12).
+Re-read at `86af73e` on 24 September 2026; unchanged at `2443adc`
+(v2026.09.12) and again at `963fe24` (v2026.09.13).
 
 | Config | Declares `webServer`? | Has a `globalSetup`? | What must already be up |
 |---|---|---|---|
@@ -144,6 +152,92 @@ is the whole environment. The other two need a running stack, which is the whole
 of why they are not there yet — though the gap is narrower than it looks: the
 public-site suite needs **one** service, not five, and starts its own dev server
 already.
+
+### Deploying the E2E fixtures
+
+**New in v2026.09.13**, and read at `963fe24` rather than run: the repository
+root gained a script for the one precondition the table above describes but
+cannot help you meet — the process and decision bundle that the frontend
+suite's `globalSetup` refuses to start without.
+
+```bash
+npm run e2e:deploy-fixtures    # repo root
+```
+
+!!! info "It is a shim. The deployer lives in linked-data-explorer"
+    `scripts/deploy-e2e-fixtures.mjs` in this repository **deploys nothing**. It
+    resolves a linked-data-explorer checkout — `LDE_PATH`, defaulting to a
+    sibling directory — and, if
+    `<LDE>/scripts/deploy-e2e-fixtures.mjs` is not there, exits 1 saying so and
+    naming the two ways to fix it. Otherwise it runs that script with
+    `cwd` set to the LDE checkout and passes arguments and the exit code
+    straight through.
+
+    **The deployer moved because two copies had already drifted.** Both read
+    `ronl:documentRef` out of the BPMN; when that attribute became a
+    comma-separated list, the copy here silently stopped matching any template
+    and the whole bundle would have failed to deploy. The fixtures, the
+    manifest and the deploy route all live in linked-data-explorer, so the
+    script does too — and the command name stays here, because this
+    repository's E2E gate is what needs the bundle and what prints the command
+    when it is missing.
+
+What the real deployer does, and what it needs:
+
+| | |
+|---|---|
+| **Talks to** | the **linked-data-explorer backend** at `LDE_URL`, default `http://localhost:3001` — never straight to Operaton, so the bundle is also recorded in LDE's own store and the `boardOwner` tag is derived by the same code a Modeler deploy uses |
+| **Refuses** | any target that is not on this machine. It asks `GET /v1/dmns/process/deploy-target` first and rejects a host that is not `localhost`, `127.0.0.1` or `::1` — a fixture bundle on a shared tier is drift, not a deployment |
+| **Reads** | `linked-data-explorer/e2e-fixtures/manifest.json`, plus the external `zorgtoeslag_resultaat` rules set from `TTL_EDITOR_REPO`, default `../ttl-editor` — the manifest names that decision but deliberately does not ship it |
+| **Step 1** | every file under `sharedDecisions.files` through `POST /v1/dmns/deploy`, **without** a tenant id, which is the point: each `businessRuleTask` resolves its decision with `decisionRefTenantId="${null}"` |
+| **Step 2** | one `POST /v1/dmns/process/deploy` per top-level manifest entry — sub-processes, forms and documents in the same request, `organization` set to the tenant directory it lives in — one request per entry, as one Modeler action is |
+| **Exit** | 0 when everything deployed, 1 on the first failure. Every run deploys a new version of everything, since LDE disables Operaton's duplicate filtering; the gate reads the latest version, so a run always leaves the engine matching the fixtures on disk |
+
+!!! note "The gate prints this command, which is why the shim had to stay"
+    `packages/frontend/e2e/global-setup.ts` checks four things, in order, and
+    throws on the first that fails with a message naming the fix:
+
+    1. **Chromium actually launches.** It launches a browser and closes it
+       rather than comparing version strings — Playwright keeps its browsers
+       outside `node_modules`, so `npm ci` installs a new Playwright without
+       fetching the build it needs, and every spec would otherwise die in
+       `browserType.launch` with the one explanatory line buried in the first
+       of N identical failures. The fix it names is
+       `npx playwright install chromium`.
+    2. **Four services answer**: the frontend, the backend's `/v1/health`,
+       Keycloak, and — locally, or whenever `LDE_URL` is set — the LDE
+       backend's `/v1/health`. Three seconds each locally, fifteen against a
+       remote tier.
+    3. **Every process in the manifest is deployed under its tenant**
+       (`verifyRequiredProcesses()`).
+    4. **Every decision those processes call is deployed _without_ an
+       Organization** (`verifyRequiredDecisions()`), so a tenant-scoped process
+       can reach it.
+
+    **Failures 3 and 4 both print `npm run e2e:deploy-fixtures` as the fix** —
+    which is precisely why the shim stays in this repository after the deployer
+    left it. A gate that names a command has to name one that exists.
+
+    Checks 3 and 4 are separate on purpose. A missing or tenant-pinned DMN does
+    not show up as a missing process; it surfaces mid-journey as a 500 on
+    process start, or on a citizen's screen as *"probeer het opnieuw"*, neither
+    of which mentions a decision.
+
+!!! warning "What a full local E2E run actually needs"
+    Five things, and none of them is started by Playwright for this suite:
+
+    - `docker compose up -d` at this repository's root — Keycloak, Postgres,
+      Redis;
+    - `npm run dev` at this repository's root — frontend on `:5173` and backend
+      on `:3002`;
+    - `npm run dev:backend` in the **linked-data-explorer** checkout — the LDE
+      backend on `:3001`, which is also what the fixture deploy goes through;
+    - a **ttl-editor** checkout beside them, for the one external decision;
+    - `npx playwright install chromium`, then `npm run e2e:deploy-fixtures`.
+
+    Only then does `npm run test:e2e --workspace=@ronl/frontend` get past its
+    own preconditions. That list is the whole reason this suite is not in CI,
+    and the reason its figures on this page are a month old.
 
 ---
 
