@@ -171,6 +171,7 @@ Flevoland IT issues a new secret before the current one expires. Run step 1 of [
 | Infra-board opens, but shows no tasks | The employee lacks the `rip-*` roles; see [Infra-board users](#infra-board-users) |
 | Signed in, but no tasks or dashboard | The employee's Entra group gives a role that is not the one the dashboard needs; check the token's `realm_access.roles` |
 | Several Microsoft accounts in the browser | Entra shows its account picker; choose the Flevoland account |
+| A script fails with `curl: (35) schannel: … CRYPT_E_NO_REVOCATION_CHECK`, then "could not obtain an admin token (HTTP 000000)" | On the Flevoland network, TLS is re-signed by a *Provincie Flevoland* CA whose revocation cannot be checked, and Git Bash's curl (Schannel) treats that as fatal; the browser does not. For the shell session, before running the scripts: `export CURL_HOME=$(mktemp -d); echo ssl-revoke-best-effort > "$CURL_HOME/.curlrc"`. The chain is still verified against the Windows store; only an uncheckable revocation is tolerated |
 
 ---
 
