@@ -35,6 +35,10 @@
 
 ---
 
+## Adding and removing an employee
+
+---
+
 ## Rotating the client secret
 
 ---
