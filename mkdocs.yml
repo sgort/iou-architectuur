@@ -177,6 +177,7 @@ nav:
       - Deployment:
         - Overview: ronl-business-api/developer/deployment/overview.md
         - Keycloak (VM): ronl-business-api/developer/deployment/keycloak.md
+        - Entra ID (Flevoland): ronl-business-api/developer/deployment/entra-id.md
         - Operaton (VM): ronl-business-api/developer/deployment/operaton.md
         - Backend (Azure App Service): ronl-business-api/developer/deployment/backend.md
         - Frontend (Azure Static Web Apps): ronl-business-api/developer/deployment/frontend.md

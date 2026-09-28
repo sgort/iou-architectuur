@@ -67,6 +67,8 @@ These claims are added by Keycloak protocol mappers configured on the `ronl-busi
 
 The client maps no `bsn` claim. The frontend reads a `bsn` claim first when it looks up a citizen's service number — the field DigiD fills — and falls back to a fixed mapping for the test usernames.
 
+For an employee who signs in through Entra ID (the `entra-flevoland` provider), the same client mappers produce the same claims. The values behind them come from identity-provider mappers instead of hand-set user attributes: `municipality` is `flevoland`, `organisation_type` is `province`, `loa` is `substantieel`, and `realm_access.roles` includes the roles mapped from the Entra app roles. `sub` is the Keycloak user's own id, not Entra's. See [Entra ID](../developer/deployment/entra-id.md).
+
 ---
 
 ## How claims are used by the backend
