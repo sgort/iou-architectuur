@@ -64,6 +64,22 @@ Its mappers run on every login (sync mode `FORCE`):
 
 Roles assigned by hand in Keycloak — `pa-author`, `pa-editor`, `pa-admin`, the `rip-*` groups — are not touched by the mappers. Assign them to the brokered user after their first login.
 
+The four mapped roles are the exception. A hand-assigned `admin`, `caseworker`, `public-affairs` or `infra-projectteam` is removed at the next login whenever the Entra token lacks the matching app role. Grant those through the Entra groups only.
+
+---
+
+## Infra-board users
+
+`infra-projectteam` opens the Infra-board, but its task list is filtered by the `rip-*` candidate groups the RIP processes address their tasks to. Without them the board shows no tasks. After the employee's first login — the Keycloak user must exist — grant the `rip-*` roles with the existing script, and `infra-medewerker` in the admin console (Users → the employee → Role mapping):
+
+```bash
+KEYCLOAK_URL=https://acc.keycloak.open-regels.nl \
+GRANT_USER=steven.gort@flevoland.nl \
+  bash scripts/keycloak-add-rip-roles.sh
+```
+
+The brokered user's username is their Entra `preferred_username`, e.g. `steven.gort@flevoland.nl`.
+
 ---
 
 ## Running the script
@@ -101,6 +117,7 @@ Flevoland IT issues a new secret before the current one expires. Run the script 
 | Keycloak: "Unexpected error when authenticating with identity provider" (HTTP 502 on `/broker/entra-flevoland/endpoint`) | Keycloak could not exchange the code at Entra. The Keycloak container log (`docker compose logs keycloak` locally) names the Entra error |
 | Keycloak log: `AADSTS7000215` (invalid client secret) | The secret in Keycloak is not the secret's **value** — often the secret ID, or a mis-pasted value. Re-run the script with the value from the *Value* column; it is shown only when the secret is created |
 | Signed in, but `403 INSUFFICIENT_ASSURANCE` | The `assurance-level` mapper is missing; re-run the script |
+| Infra-board opens, but shows no tasks | The employee lacks the `rip-*` roles; see [Infra-board users](#infra-board-users) |
 | Signed in, but no tasks or dashboard | The employee's Entra group gives a role that is not the one the dashboard needs; check the token's `realm_access.roles` |
 | Several Microsoft accounts in the browser | Entra shows its account picker; choose the Flevoland account |
 
