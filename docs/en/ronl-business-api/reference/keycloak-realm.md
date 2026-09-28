@@ -69,7 +69,7 @@ The `employeeId` claim is present only for users who have the `employee_id` attr
 
 ## Identity provider: `entra-flevoland`
 
-An OIDC provider for Provincie Flevoland's Entra ID, configured by `scripts/keycloak-add-entra-idp.sh` rather than by the realm export, because it carries a client secret. Its mappers set `municipality = flevoland`, `organisation_type = province` and `assurance_level = substantieel`, and map the Entra app roles `IOU_ADMIN`, `IOU_USER`, `IOU_PA` and `IOU_INFRA` to `admin`, `caseworker`, `public-affairs` and `infra-projectteam`, on every login. See [Entra ID](../developer/deployment/entra-id.md).
+An OIDC provider for Provincie Flevoland's Entra ID, configured by `scripts/keycloak-add-entra-idp.sh` rather than by the realm export, because it carries a client secret. Its mappers set `municipality = flevoland`, `organisation_type = province` and `assurance_level = substantieel`, and map the Entra app roles `IOU_ADMIN`, `IOU_USERS`, `IOU_PA` and `IOU_INFRA` to `admin`, `caseworker`, `public-affairs` and `infra-projectteam`, on every login. See [Entra ID](../developer/deployment/entra-id.md).
 
 ---
 

@@ -41,7 +41,7 @@ Access is granted through Entra groups, each assigned one app role:
 | Entra group | App role | RBA realm role |
 |---|---|---|
 | `flv-role-iou-poc-admin` | `IOU_ADMIN` | `admin` |
-| `flv-role-iou-poc-user` | `IOU_USER` | `caseworker` |
+| `flv-role-iou-poc-user` | `IOU_USERS` | `caseworker` |
 | `Flv-role-IOU-publicAffairs-contributors` | `IOU_PA` | `public-affairs` |
 | `Flv-role-IOU-infra-contributors` | `IOU_INFRA` | `infra-projectteam` |
 
