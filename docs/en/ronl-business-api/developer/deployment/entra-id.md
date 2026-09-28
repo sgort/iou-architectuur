@@ -41,7 +41,7 @@ Access is granted through Entra groups, each assigned one app role:
 | Entra group | App role | RBA realm role |
 |---|---|---|
 | `flv-role-iou-poc-admin` | `IOU_ADMIN` | `admin` |
-| `flv-role-iou-poc-user` | `IOU_USER` | `caseworker` |
+| `flv-role-iou-poc-user` | `IOU_USERS` | `caseworker` |
 | `Flv-role-IOU-publicAffairs-contributors` | `IOU_PA` | `public-affairs` |
 | `Flv-role-IOU-infra-contributors` | `IOU_INFRA` | `infra-projectteam` |
 
@@ -101,9 +101,60 @@ Locally, run it again after every fresh `--import-realm`.
 
 ---
 
+## Rolling out to an environment
+
+Every Keycloak has its own realm. Each environment therefore needs the provider, and each employee there needs the roles that do not come from Entra, set up separately. The landing-page button reaches ACC when a pull request merges into `acc`, and PROD with the `acc` → `main` promotion. The fallback button on the Keycloak login page works as soon as the provider exists.
+
+| | ACC | PROD |
+|---|---|---|
+| Keycloak | `https://acc.keycloak.open-regels.nl` | `https://keycloak.open-regels.nl` |
+| Landing page | `https://acc.mijn.open-regels.nl` | `https://mijn.open-regels.nl` |
+| Redirect URI registered in Entra | Yes | **Ask Flevoland IT first** — see [The Entra side](#the-entra-side) |
+| Keycloak admin password | `KEYCLOAK_ADMIN_PASSWORD` in the `.env` beside the Keycloak `docker-compose.yml` on the ACC VM | The same, on the PROD VM |
+
+Run the commands from a checkout of `ronl-business-api` that contains the change, in Git Bash. Set `KEYCLOAK_URL` once per environment:
+
+```bash
+KEYCLOAK_URL=https://acc.keycloak.open-regels.nl   # PROD: https://keycloak.open-regels.nl
+```
+
+**1. Check the secret against Entra, then create the provider.** Entra is asked for a token with the secret first. Only if it accepts does the script run, so a secret ID or a mis-pasted value cannot reach Keycloak:
+
+```bash
+read -rsp "Entra client secret VALUE: " ENTRA_CLIENT_SECRET; echo; export ENTRA_CLIENT_SECRET
+printf '%s' "$ENTRA_CLIENT_SECRET" | curl -s -X POST \
+  https://login.microsoftonline.com/95f3a7d8-730c-4f35-a909-867d3fbde8fe/oauth2/v2.0/token \
+  -d client_id=ef967eb0-3902-408f-8161-4e294c826473 -d grant_type=client_credentials \
+  --data-urlencode scope=https://graph.microsoft.com/.default --data-urlencode client_secret@- \
+  | jq -e '.access_token' >/dev/null && echo "SECRET OK" \
+&& KEYCLOAK_URL=$KEYCLOAK_URL \
+   ENTRA_TENANT_ID=95f3a7d8-730c-4f35-a909-867d3fbde8fe \
+   ENTRA_CLIENT_ID=ef967eb0-3902-408f-8161-4e294c826473 \
+   bash scripts/keycloak-add-entra-idp.sh
+```
+
+Expected: `SECRET OK`, `created provider entra-flevoland`, seven `created mapper` lines and `verified: provider entra-flevoland with 7 mappers`. If the script reports that the realm lacks a mapped role, create that role in the realm first; do not remove the mapper.
+
+**2. First login.** Each employee signs in once through **Inloggen met uw Flevoland-account**. This creates their Keycloak user, with the tenant attributes and the roles of their Entra groups. Until step 3 an Infra-board user sees the board without tasks.
+
+**3. Grant the roles that do not come from Entra.** Per employee, after their first login:
+
+```bash
+KEYCLOAK_URL=$KEYCLOAK_URL GRANT_USER=steven.gort@flevoland.nl \
+  bash scripts/keycloak-add-rip-roles.sh
+```
+
+The script also creates any `rip-*` role the realm lacks. Then, in the admin console (Users → the employee → Role mapping), assign `infra-medewerker` to Infra-board users, and where needed `woo-coordinatie` (Woo board) and `pa-author`, `pa-editor` or `pa-admin` (Dossierbeheer). Never assign `admin`, `caseworker`, `public-affairs` or `infra-projectteam` here; see [The Keycloak side](#the-keycloak-side).
+
+**4. Sign out and in again, and check.** A new token carries the new roles. In the admin console the employee's **Attributes** show `municipality=flevoland`, `organisation_type=province` and `assurance_level=substantieel`, and **Role mapping** shows the Entra-mapped roles plus those from step 3. The Flevoland button lands on the highest-priority board the roles allow (Woo, then Infra-board, then PA-Cockpit, then Caseworker). The other boards open through their cards on the landing page.
+
+**5. Record the secret's expiry date** for this environment. Rotation means repeating step 1 in every environment; see below.
+
+---
+
 ## Rotating the client secret
 
-Flevoland IT issues a new secret before the current one expires. Run the script again with the new secret; it updates the provider in place. Logins fail from the moment the old secret expires until the new one is in.
+Flevoland IT issues a new secret before the current one expires. Run step 1 of [Rolling out to an environment](#rolling-out-to-an-environment) again with the new secret, in every environment and locally; it updates the provider in place. Logins fail from the moment the old secret expires until the new one is in. Once every environment has the new secret, ask Flevoland IT to delete the old one.
 
 ---
 
