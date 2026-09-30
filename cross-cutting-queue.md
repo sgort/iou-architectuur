@@ -208,6 +208,25 @@ Read at `origin/main` = `ae06c9e` (Promote to Production run #5, all four deploy
     direction unless `--force`). Extends 28 September item 3.
     Bears on: whichever contributing page describes the cross-repository fixture contract.
 
+11. **`~/.claude/CLAUDE.md` now holds sixteen rules.**
+    Evidence: `grep -c '^## ' ~/.claude/CLAUDE.md` = 16 on 30 September 2026. Two were added that day:
+    "Semgrep: suppress false positives in code, not in the UI" and "Azure: changing an App Service
+    setting" (read first, hand the user a short script, verify with `list`, restart and check
+    `uptime`, verify the effect).
+    Bears on: `development-workflow/skills-and-boundaries.md` (states fourteen) and possibly
+    `working-with-claude-code.md`. Re-derive from the file, not from this entry.
+
+12. **RBA acceptance now allows the acceptance docs origin — the RBA spec page's banner and Test
+    Request work on both docs tiers.**
+    Evidence: `CORS_ORIGIN` on `ronl-business-api-acc` set on 30 September 2026 to
+    `https://acc.mijn.open-regels.nl,https://iou-architectuur.open-regels.nl,https://acc.publiek.open-regels.nl,https://acc.iou-architectuur.open-regels.nl`
+    and the app restarted; `curl -H "Origin: https://acc.iou-architectuur.open-regels.nl"
+    https://acc.api.open-regels.nl/v1/health` now returns that origin in
+    `Access-Control-Allow-Origin`. `localhost` is still not allowed.
+    Bears on: `doc-architecture/openapi-rendering.md` (says the RBA banner and Test Request work only on
+    the production docs tier). The same sentence is in the leading HTML comment of
+    `ronl-business-api/reference/api-specification.md` — a component page, for the next RBA sync.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |
