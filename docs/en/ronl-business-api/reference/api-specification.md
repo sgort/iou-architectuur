@@ -68,9 +68,9 @@ Fetched live from the acceptance API, so it always shows what the service
 declares right now. **Test Request** calls acceptance and never production, on
 purpose.
 
-**Every operation the service serves is described** — 133 in release
-2026.09.15, the machine-to-machine surface under `/v1/m2m` included. Two
-backend checks hold the document to the code:
+**Every operation the service serves is described**, the machine-to-machine
+surface under `/v1/m2m` included; the banner above names the release the
+document comes from. Two backend checks hold the document to the code:
 
 - **Coverage.** `src/openapi/coverage.test.ts` compares the document with the
   route registry and fails on a served operation that is not described, and on
