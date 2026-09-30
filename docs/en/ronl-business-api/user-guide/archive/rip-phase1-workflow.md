@@ -286,6 +286,6 @@ Password for all test accounts: `test123`
 
 - [Caseworker Workflow](caseworker-workflow.md) — General task queue and claim-first pattern
 - [HR Onboarding Workflow](hr-onboarding.md) — How `infra-projectteam` roles get assigned
-- [API Endpoints](../../reference/api-endpoints.md) — RIP and eDOCS endpoints
+- [API Endpoints](../../reference/api-specification.md) — RIP and eDOCS endpoints
 - [Keycloak Realm Configuration](../../reference/keycloak-realm.md) — `infra-projectteam`, `infra-medewerker` roles and test users
 - [BPMN Design Criteria](../../reference/bpmn-design-criteria.md) — `candidateGroups`, `ronl:documentRef` pattern

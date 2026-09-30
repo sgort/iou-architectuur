@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # BPMN Design Criteria
 
 This page documents design constraints and conventions that apply when authoring BPMN processes and DMN decisions for deployment in the RONL Business API platform. Following these criteria ensures correct runtime behaviour and prevents issues in the citizen portal and caseworker interface.
@@ -144,8 +148,69 @@ Recommended values:
 
 ---
 
+## Lanes and `ronl:awbPhase`: the caseworker process view
+
+The caseworker board shows where an open task stands in its process — the Awb-phase stepper ("Waar sta ik"), the steps per role, and the whole process as a swimlane — only for processes whose deployed BPMN carries the information. The backend reads it with `parseSwimlane()` in `packages/backend/src/rip-swimlane/bpmn-swimlane.ts`, served by `GET /v1/process/definition/key/:key/swimlane`; nothing about a process is configured anywhere else.
+
+### Lanes
+
+- **Without a `laneSet`, there is no process view.** The task keeps the flat list of steps it had before.
+- **Put the user tasks in the lanes.** A lane's roles are derived from the `candidateGroups` of the user tasks drawn in it (its `flowNodeRef`s), never configured. A lane with no user task has no roles, so it cannot be recognised as the caseworker's.
+- **`candidateGroups` must be literals.** Comma-separated group names are read; an expression (`${…}` or `#{…}`) names no group until runtime and is dropped.
+- Lanes are ordered by the `y` of their shape in the diagram; node positions are recomputed, not read from the diagram.
+
+### `ronl:awbPhase`
+
+Declare the namespace on `<bpmn:definitions>` and mark the nodes where a phase begins:
+
+```xml
+<bpmn:definitions
+  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:ronl="http://ronl.nl/schema/1.0"
+  ...>
+  <bpmn:process id="AwbShellProcess" ...>
+    <bpmn:userTask id="Task_Phase6_Notify"
+      name="Fase 6: Aanvrager informeren over besluit (Awb 3:6)"
+      camunda:formRef="awb-notify-applicant"
+      camunda:candidateGroups="caseworker"
+      ronl:documentRef="example_treefelling_beschikking"
+      ronl:awbPhase="6">
+```
+
+Any element in the list of flow-node types below can carry a marker — in `AwbShellProcess` they sit on the start event, a script task, business-rule tasks, the call activity, a user task and two gateways.
+
+| Value | Stepper label |
+|---|---|
+| `1` | Rechtsbetrekking |
+| `2` | Ontvangst |
+| `3` | Ontvankelijkheid |
+| `4+5` | Behandeling en besluit |
+| `6` | Bekendmaking |
+| `7` | Betaling |
+| `8` | Ketenproces |
+| `archivering` | Archivering |
+
+The values are exactly those of `AWB_PHASES` in `@ronl/shared`. Phases 4 and 5 are one step, because the kapvergunning subprocess handles treatment and decision together. **Any other value is ignored without a warning**, so a typo such as `4-5` or `Archivering` leaves the node unmarked.
+
+- **An unmarked node inherits.** It takes the latest phase among its forward predecessors, so a join after an optional step (payment) lands in the later phase. Back edges — the flows that close a rework loop — are excluded, so a loop cannot pull an earlier step into a later phase. Marking the first node of each phase is therefore enough.
+- **No markers, no stepper.** A process with no valid marker gets no phases, and the board hides the stepper. A task in an unmarked subprocess takes the phase of the call activity that started it, walking up the call chain.
+
+### Other attributes the view reads
+
+| Element or attribute | Shown as |
+|---|---|
+| `scriptTask` | A step of its own kind (script) |
+| `businessRuleTask` with `camunda:decisionRef` | A decision step carrying its DMN key |
+| `callActivity` with `calledElement` | A subprocess step; the view can open the called process |
+| `camunda:formRef` | The form a step uses, per node |
+| `ronl:documentRef` | The documents a step produces; a comma-separated list for several |
+
+Only the first `<bpmn:process>` in a file is read, and only these flow-node types become nodes: start, end and intermediate events, user, manual, receive, script, business-rule, service and send tasks, call activities, subprocesses, and exclusive, inclusive, event-based and parallel gateways.
+
+---
+
 ## Related pages
 
 - [Business Rules Execution](../features/business-rules-execution.md) — BPMN/DMN execution via Operaton
 - [Operaton DMN Compatibility](../../linked-data-explorer/reference/operaton-dmn-compatibility.md) — DMN authoring constraints for the Linked Data Explorer
-- [API Endpoints Reference](../reference/api-endpoints.md) — `/v1/process` and `/v1/task` endpoints
+- [API Specification](../reference/api-specification.md) — `/v1/process` and `/v1/task` endpoints

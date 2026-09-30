@@ -4,43 +4,66 @@ component: RONL Business API
 
 # Infra-board — tests
 
-**Frontend: 17 files · 188 tests. E2E: 2 specs · 8 tests.**
+**Frontend: 18 files · 252 tests. E2E: 2 specs · 8 tests.**
 
 The infra-board is well covered at the unit level — `src/pages/infra-board` is
-the single best-covered area in the frontend at **99.64%** statements — and it
-is the **only board with two Playwright specs**: one driving the shell, one
-driving the work that happens inside it.
+at **100%** statements, functions and lines and 98.47% branches, the
+best-covered substantial area in the frontend — and it is the **only board with
+two Playwright specs**: one driving the shell, one driving the work that
+happens inside it.
 
 ---
 
 ## Frontend
 
+Re-derived on **30 September 2026** at `ae06c9e` (v2026.09.15). The frontend
+package was measured the same day — 120 files, 1318 tests, all passing — but
+Vitest's console reports only that total, so the counts below are taken from
+the source, each test file parsed with its `.each` tables expanded; summed
+over the whole package the method gives exactly the runner's 1318. The figures
+this page carried before were derived on 30 August.
+
 | Area | Files | Tests |
 |---|---:|---:|
-| `pages/infra-board` (data and pure logic) | 6 | 88 |
-| `components/InfraBoardDashboard` | 10 | 86 |
-| `pages/InfraBoardDashboard.test.tsx` | 1 | 14 |
+| `pages/infra-board` (data and pure logic) | 6 | 108 |
+| `components/InfraBoardDashboard` | 11 | 126 |
+| `pages/InfraBoardDashboard.test.tsx` | 1 | 18 |
+
+!!! note "The phase swimlane's tests moved to `components/process/`"
+    `PhaseSwimlane.test.tsx` lived in `components/InfraBoardDashboard/` until
+    v2026.09.14, with 22 tests on 28 September. The caseworker's process view
+    needed the same swimlane and the same phase stepper, so both components
+    and their tests moved to the shared `components/process/` directory, where
+    `PhaseSwimlane.test.tsx` now holds 38 and `PhaseStepper.test.tsx` 7. This
+    board still uses both — `ProjectDetail` imports them from there — but they
+    are counted once, on the [Caseworker](caseworker.md) page, rather than on
+    both.
 
 | File | Tests | Covers |
 |---|---:|---|
-| `components/InfraBoardDashboard/PhaseDetail.test.tsx` | 26 | Phase detail view |
-| `pages/infra-board/infra-board.data.test.ts` | 26 | The board's data module |
-| `pages/infra-board/rip-model.test.ts` | 20 | The RIP phase model |
+| `pages/infra-board/infra-board.data.test.ts` | 34 | The board's data module |
+| `components/InfraBoardDashboard/PhaseDetail.test.tsx` | 31 | Phase detail view |
+| `pages/infra-board/rip-model.test.ts` | 26 | The RIP phase model |
+| `components/InfraBoardDashboard/ProjectDetail.test.tsx` | 20 | Project detail, with the shared phase stepper and swimlane |
+| `pages/InfraBoardDashboard.test.tsx` | 18 | The page container |
 | `pages/infra-board/rail-stats.test.ts` | 15 | Rail statistics |
-| `pages/InfraBoardDashboard.test.tsx` | 14 | The page container |
+| `components/InfraBoardDashboard/SigningPanel.test.tsx` | 15 | The [signing panel](../../validsign-signing.md) an approval task renders |
 | `components/InfraBoardDashboard/InfraSectionRouter.test.tsx` | 14 | Section routing |
-| `pages/infra-board/rip-phases.catalog.test.ts` | 11 | The twelve-phase catalogue |
-| `components/InfraBoardDashboard/FaseladderOverview.test.tsx` | 9 | Faseladder overview |
-| `components/InfraBoardDashboard/Portfolio.test.tsx` | 9 | Portfolio view |
+| `pages/infra-board/rip-phases.catalog.test.ts` | 14 | The twelve-phase catalogue |
+| `components/InfraBoardDashboard/FaseladderOverview.test.tsx` | 11 | Faseladder overview |
+| `components/InfraBoardDashboard/Portfolio.test.tsx` | 11 | Portfolio view |
+| `pages/infra-board/rip-phase-counts.test.ts` | 10 | Phase counts |
+| `components/InfraBoardDashboard/InfraCommandPalette.test.tsx` | 9 | Command palette |
 | `pages/infra-board/modes.config.test.ts` | 9 | Mode configuration |
-| `components/InfraBoardDashboard/InfraCommandPalette.test.tsx` | 8 | Command palette |
-| `pages/infra-board/rip-phase-counts.test.ts` | 7 | Phase counts |
-| `components/InfraBoardDashboard/ProjectDetail.test.tsx` | 6 | Project detail |
-| `components/InfraBoardDashboard/MijnDag.test.tsx` | 5 | The "Mijn Dag" section |
+| `components/InfraBoardDashboard/MijnDag.test.tsx` | 6 | The "Mijn Dag" section |
+| `components/InfraBoardDashboard/InfraDock.test.tsx` | 4 | The dock |
+| `components/InfraBoardDashboard/resolveSigningUrl.test.ts` | 4 | Resolving the signing ceremony's URL |
+| `components/InfraBoardDashboard/InfraNoAccessPanel.test.tsx` | 1 | The no-access panel |
 
-Coverage: `pages/infra-board` **99.64 / 97.2 / 100 / 100** —
-the highest in the frontend — and `components/InfraBoardDashboard`
-90.96 / 84.54 / 87.87 / 91.68.
+Coverage on 30 September: `pages/infra-board` **100 / 98.47 / 100 / 100**, and
+`components/InfraBoardDashboard` 95.06 / 89.37 / 93.71 / 96.14 — up from
+94.06 / 88.43 / 90.25 / 95.12 on 28 September, over twelve source files now
+that `PhaseSwimlane.tsx` has moved out.
 
 The gap between those two rows is the usual one: the pure data and model
 modules are exhaustively covered, while the components carry the

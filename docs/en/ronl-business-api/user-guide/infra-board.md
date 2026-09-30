@@ -86,7 +86,6 @@ what happens if the callback never arrives — see
 
 ---
 
-!!! note "Brief by design"
-    This board is on the acceptance environment. The page covers what it is for
-    and what you see; a full step-by-step guide follows when it reaches
-    production. See [Getting Started](getting-started.md).
+!!! note "Brief for now"
+    This page covers what the board is for and what you see; a fuller
+    step-by-step guide will follow. See [Getting Started](getting-started.md).

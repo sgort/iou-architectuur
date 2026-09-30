@@ -1,10 +1,14 @@
+---
+component: RONL Business API
+---
+
 # eDOCS — Live Testing
 
 This page tracks live testing of the `/v1/edocs/*` surface against a real
 OpenText eDOCS DM server — what's been verified, what's broken, and why. For
 the OAuth/Copilot Studio integration itself, see
 [Copilot Studio — eDOCS](../copilot-studio-edocs.md). For the general endpoint
-shapes, see [API Endpoints](../../reference/api-endpoints.md#edocs).
+shapes, see [API Specification](../../reference/api-specification.md), under **Documents**.
 
 !!! warning "Test account has restricted rights"
     All results below were captured against `infocenter-test.flevoland.nl`

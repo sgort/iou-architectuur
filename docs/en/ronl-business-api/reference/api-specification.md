@@ -6,7 +6,8 @@ component: RONL Business API
 
 <!--
   Modelled on the Linked Data Explorer's API Specification page, with these
-  differences — each checked against the acceptance API on 26 September 2026:
+  differences — each checked against the acceptance API on 26 September 2026,
+  and the CORS point again on 30 September 2026:
 
   - /v1/openapi.json DOES carry the version (info.version is the CalVer release
     string, set at build time). The banner still reads /v1/health, because that
@@ -20,11 +21,13 @@ component: RONL Business API
 
   - CORS: /v1/openapi.json is served with Access-Control-Allow-Origin: *, so the
     render works from any origin. /v1/health — and every other route, so also
-    Test Request — goes through the backend's CORS allowlist, and on acceptance
-    that echoes only https://iou-architectuur.open-regels.nl. Neither
-    acc.iou-architectuur.open-regels.nl nor localhost is echoed, so the banner
-    (and Test Request) work only on the PRODUCTION documentation tier. Elsewhere
-    the banner stays hidden: it degrades to nothing rather than to an error.
+    Test Request — goes through the backend's CORS allowlist. On acceptance that
+    allowlist (the App Service's CORS_ORIGIN) names both documentation tiers,
+    https://iou-architectuur.open-regels.nl and
+    https://acc.iou-architectuur.open-regels.nl — the second added on
+    30 September 2026 — so the banner and Test Request work on both. localhost
+    is not on it: under `mkdocs serve` the banner stays hidden, degrading to
+    nothing rather than to an error, as on the LDE page.
 
   - Scalar version, layout and the Acceptance-only servers override are the
     same as the LDE page. The document itself lists Production first; the
@@ -62,27 +65,19 @@ component: RONL Business API
 </script>
 
 Fetched live from the acceptance API, so it always shows what the service
-declares right now. **Test Request** calls acceptance and never production, on
-purpose.
+declares right now. Every operation the service serves is described, `/v1/m2m`
+included — the backend's tests fail when one is not, or when a described
+operation was never checked against a real response. **Test Request** calls
+acceptance and never production, on purpose.
 
-**113 of 131 operations are described.** The remaining 18 are the `/v1/m2m`
-surface, pending [#214](https://github.com/sgort/ronl-business-api/issues/214);
-until then they are listed in `openapi/pending.json` and documented on
-[API Endpoints](api-endpoints.md#m2m-operaton). A backend test
-(`src/openapi/coverage.test.ts`) fails when a served operation is neither
-described nor pending, and the pending list may only shrink.
-
-Two security schemes are declared: `bearerAuth`, a Keycloak-issued JWT that
-applies by default, and `mediaAggregatorKey`, which the media-aggregator search
-requires only when the service is configured with a key.
-The document is linted with Spectral against the NL API Design Rules 2.2.1
-ruleset, with its deviations recorded rather than hidden: `nlgov:semver` is off
-because releases are CalVer, and the problem-details rules are off because the
-API answers its own `{ success, error }` envelope rather than
-`application/problem+json`.
-
-For versioning, the response envelope and error handling, see
-[API Design](../features/api-design.md).
+Deploying process definitions belongs to the Linked Data Explorer — see its
+[API Specification](../../linked-data-explorer/reference/api-specification.md).
+For versioning, the response envelope, the error format and how the document is
+linted, see [API Design](../features/api-design.md#published-description); for
+who may call `/v1/m2m`, see
+[Authentication & IAM](../features/authentication-iam.md). For how this page is
+wired and what it depends on at run time, see
+[OpenAPI Rendering](../../contributing/doc-architecture/openapi-rendering.md).
 
 <script
   id="api-reference"

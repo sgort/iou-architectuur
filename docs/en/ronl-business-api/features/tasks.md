@@ -30,6 +30,18 @@ A claimed task is typically handled through a **task form** — a schema deploye
 
 ---
 
+## Where a task stands in its process
+
+A task is one step in a larger process, and the working environment can show where. For the task's process it loads the [lineage and activity history](processes.md#lineage) — walking up through any process that called it — and the [swimlane model](processes.md#swimlane-model-of-a-process) of every process involved, then draws the task in that context:
+
+- **Lanes are roles.** Each lane carries the literal candidate groups of the user tasks drawn in it. A lane whose groups meet the user's realm roles is marked as the user's own; a candidate group written as an expression (`${…}`, `#{…}`) names no role and is left out.
+- **Awb phases come from markers.** Where the BPMN marks nodes with `ronl:awbPhase`, the task's phase and a phase stepper are shown; a task in a subprocess without markers takes the phase of the call activity that started it. With no markers anywhere in the chain, the task has no phase and no stepper is shown.
+- **One history across the chain.** The activity histories of the main process and its subprocesses are merged into one list in engine order, with a subprocess's steps placed directly after the call activity that started it.
+
+Only the task's own lineage and history are required; a calling process the user may not read, or a model that fails to load, leaves the view partial rather than empty. A process whose BPMN has no lanes keeps the flat list of steps. [BPMN Design Criteria](../reference/bpmn-design-criteria.md) describes how to model a process for this view, and the [Caseworker guide](../user-guide/caseworker.md) how it looks.
+
+---
+
 ## Completing
 
 **Completing** a task submits the outcome — whatever variables the task form collected — back to the process instance and returns control to the engine. Completion is what allows the process to continue past the point the task represented; the engine resumes execution from there, which may produce further automated steps, another task for someone else, or the end of the process.

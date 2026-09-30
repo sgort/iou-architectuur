@@ -45,6 +45,8 @@ For how access is granted, and what an administrator has to set up per environme
 
 The site is live at `publiek.open-regels.nl`, with an acceptance copy at `acc.publiek.open-regels.nl`.
 
+A shared link to the werkomgeving or to the public knowledge base unfolds into a preview card. On the acceptance copies the card's title begins with `[ACC]`, and those copies are kept out of search engines.
+
 ---
 
 ## PA-Cockpit demo
@@ -53,14 +55,16 @@ The site is live at `publiek.open-regels.nl`, with an acceptance copy at `acc.pu
 
 It exists for showing the product: to a prospective province, to a colleague from another organisation, or to a room. Because it is the real cockpit rather than a mock-up, what a visitor clicks is what the product does. A role selector lets a visitor see how the same board changes for a narrower set of rights.
 
-It runs on both tiers: `acc.plato.open-regels.nl` on acceptance, and
-`plato.open-regels.nl` in production since 12 September 2026.
+It runs in production at `plato.open-regels.nl` since 12 September 2026, with an
+acceptance copy at `acc.plato.open-regels.nl`.
 
 ---
 
 !!! info "Documentation depth follows release maturity"
     The RONL Business API is developed in short cycles with a diverse user
-    group. While a board is on the acceptance environment it is documented at
-    this level — what it is for and what you see. Full step-by-step guides
-    follow when a board reaches production. Guides describing earlier versions
-    are kept under [Archive](archive/login-flow.md).
+    group. Something that is only on the acceptance environment is documented
+    briefly — what it is for and what you see — and gets a full step-by-step
+    guide once it reaches production. All four boards are in production: the
+    [Caseworker](caseworker.md) guide is full, and the other three are brief
+    for now and will be expanded. Guides describing earlier versions are kept
+    under [Archive](archive/login-flow.md).

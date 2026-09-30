@@ -70,7 +70,7 @@ Apart from the media aggregator's bare `{ error }`, every JSON error carries a s
 |---|---|---|
 | `400` | A malformed request, or a task completion that sets a variable fixed at process start | `VALIDATION_ERROR`, `RESERVED_VARIABLE` |
 | `401` | A missing or invalid token | `MISSING_TOKEN`, `INVALID_TOKEN`, `UNAUTHORIZED` |
-| `403` | A role, tenant or assurance-level check that failed | `FORBIDDEN`, `TENANT_MISMATCH`, `MISSING_TENANT`, `INSUFFICIENT_ASSURANCE` |
+| `403` | A role, tenant, assurance-level or machine-client check that failed | `FORBIDDEN`, `TENANT_MISMATCH`, `MISSING_TENANT`, `INSUFFICIENT_ASSURANCE`, `M2M_CLIENT_NOT_ALLOWED` |
 | `404` | A resource that does not exist or is not visible to the caller | resource-specific `*_NOT_FOUND`, `NOT_FOUND` |
 | `409` | A process start whose key several other organisations deploy | `AMBIGUOUS_DEPLOYMENT` |
 | `429` | A rate limit | `RATE_LIMIT_EXCEEDED` |
@@ -91,7 +91,7 @@ The document is linted with Spectral against a vendored copy of the NL API Desig
 - The three problem-details rules (`nlgov:use-problem-schema`, `nlgov:problem-schema-members`, `nlgov:problem-invalid-input`) are off, because the API answers its own `{ success, error }` envelope rather than RFC 9457 `application/problem+json`. Every error response in the document refers to one shared component, so a later migration is one change.
 - Two date-named properties that carry full timestamps are exempt from the date-instead-of-datetime rule.
 
-A coverage test compares the document with the route registry: it fails when a served operation is neither documented nor listed as pending, when a documented operation is not served, or when the pending list grows. The machine-to-machine routes under `/v1/m2m` are the operations still pending.
+Every served operation is described, the machine-to-machine routes under `/v1/m2m` included. A coverage test compares the document with the route registry and fails when a served operation is not documented or a documented operation is not served. A conformance check goes further: route tests compare real responses against the document's schemas, and `npm test` fails when any documented operation was never compared against a real response.
 
 ---
 
@@ -99,7 +99,7 @@ A coverage test compares the document with the route registry: it fails when a s
 
 Not every endpoint requires a token. A set of routes is deliberately public — reachable with no login — publishing read-only information for anyone to consult; see [Regelcatalogus](regelcatalogus.md) and [Procesbibliotheek](procesbibliotheek.md) for what that surface exposes. The `/v1/public` routes follow the same envelope and versioned prefix as the authenticated ones, and the handful of public endpoints that accept a write are held to a stricter rate limit, and most of them to a proof-of-work check, rather than a login — see [Security & Compliance](security-compliance.md).
 
-Every other endpoint requires a valid token, checked as described in [Authentication & IAM](authentication-iam.md), before any request data is processed. Three exceptions authenticate differently: the ValidSign callback, which ValidSign calls without a token; `/v1/pa/signals.rss`, which takes a token in its query string because RSS readers cannot send headers; and `/v1/media-aggregator/search`, which requires a shared bearer key when one is configured and is open otherwise.
+Every other endpoint requires a valid token, checked as described in [Authentication & IAM](authentication-iam.md), before any request data is processed. Four exceptions authenticate differently: the ValidSign callback, which ValidSign calls without a token; `/v1/pa/signals.rss`, which takes a token in its query string because RSS readers cannot send headers; `/v1/media-aggregator/search`, which requires a shared bearer key when one is configured and is open otherwise; and the machine-to-machine routes under `/v1/m2m`, which accept a token only when it was issued to a client on an allow-list — see [Authentication & IAM — Tenancy](authentication-iam.md#tenancy).
 
 ---
 

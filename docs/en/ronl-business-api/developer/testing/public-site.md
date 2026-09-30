@@ -4,60 +4,70 @@ component: RONL Business API
 
 # Public site suite
 
-`packages/public-site`, Vitest with jsdom. **32 files · 235 tests · all
-passing · 13.62s.**
+`packages/public-site`, Vitest with jsdom. **33 files · 265 tests · all
+passing · 24.09s.**
 
-!!! success "Re-measured at v2026.09.13, and every figure held"
-    Re-run on **28 September 2026** at `963fe24` (`acc`, v2026.09.13) after a
-    clean `npm ci` in a separate clone: **32 files · 235 tests · all passing ·
-    13.62s**, coverage **95.92 / 96.31 / 95.07 / 96.41**. Both counts, all four
-    package percentages and every per-area row on
-    [Coverage](coverage.md#public-site-by-area) reproduced to the decimal for
-    the third pass running. Only the elapsed time moved — 29.21s to 13.62s on
-    an identical suite, which is the host, not the code.
+!!! success "Re-measured at v2026.09.15: one new file, thirty new tests"
+    Re-run on **30 September 2026** for v2026.09.15 (`main` at `ae06c9e`), in
+    the working checkout on `acc` at `142d909`, a tree identical to
+    `ae06c9e`: **33 files · 265 tests · all passing · 24.09s**, coverage
+    **96.60 / 97.34 / 95.07 / 97.17**, against 32 · 235 and
+    95.92 / 96.31 / 95.07 / 96.41 on 28 September.
 
-    The package's `src/` tree has not changed since the two lines
-    `lib/search.tsx` gained in v2026.09.12. The narrative below is the
-    24 September one and still describes the package.
+    Two changes account for all of it. **v2026.09.14's link previews**
+    (`6c3fe10`) added `src/indexHtml.test.ts` — the Open Graph and robots tags
+    in `index.html`, filled per build mode from the committed `.env` files, 23
+    tests — and three cases to `scripts/prerender.test.ts`, which now reads the
+    site's origin, API and indexability through Vite's `loadEnv`, builds a
+    `robots.txt` that shuts crawlers out on ACC, and replaces the shell's
+    canonical link rather than adding a second. **v2026.09.15's branch-margin
+    commit** (`73a6764`) added three cases to `lib/api.test.ts` and one to
+    `Footer.test.tsx`, and made the package's only source change: `lib/api.ts`
+    now reads `import.meta.env` directly so its base-URL fallbacks can be
+    stubbed, taking that file from 83.78% branches to 97.29%.
 
-The public site is the auth-free search and rule-catalogue package. First
-measured on **24 September 2026** on `main` at `86af73e` (v2026.09.11) with
-`npm test --workspace=@ronl/public-site`, coverage included, after a clean
-`npm ci` in a separate clone on Node 24.14.1 / npm 11.11.0. The suite has grown
-in every recent window — 30 files and 204 tests at v2026.09.5, 31 and 225 at
-v2026.09.7, 32 and 231 at v2026.09.9, **32 and 235 now**. This is the first of
-those windows to add no file: the four new tests are all in
-`src/pages/Detail.test.tsx`, which grew by 86 lines to **25 tests** alongside
-changes to `Detail.tsx`, `lib/api.ts` and both i18n dictionaries.
+The public site is the auth-free search and rule-catalogue package, measured
+with `npm test --workspace=@ronl/public-site`, coverage included, on Node
+24.14.1 / npm 11.11.0 (`.nvmrc` names 22.23.2). The suite has grown in every
+recent window — 30 files and 204 tests at v2026.09.5, 31 and 225 at
+v2026.09.7, 32 and 231 at v2026.09.9, 32 and 235 at v2026.09.11 through
+v2026.09.13, **33 and 265 now**.
 
-Coverage is **95.92% statements · 96.31% branches · 95.07% functions · 96.41%
+Coverage is **96.60% statements · 97.34% branches · 95.07% functions · 97.17%
 lines**, and the package passes the per-file 80% branch floor that its
 `vite.config.ts` enforces rather than merely records: no file in it is below the
-line.
+line, and since v2026.09.15 none is below 85 either. The lowest by branches are
+`lib/useQueryState.ts` and `pages/herkomst/HerkomstTrace.tsx`, both at 87.50%.
 
-!!! note "Three measures up, branches fractionally down"
-    Against v2026.09.9 — 95.82 / 96.45 / 94.89 / 96.33 — statements, functions
-    and lines each gained while branches gave up 0.14 of a point. `Detail.tsx`
-    is at 100% statements and 97.84% branches after the change, so nothing
-    regressed; what moved the package figure is `lib/api.ts`, which gained
-    branch surface it is not yet fully exercising (83.78% branches, its lowest
-    measure). This is the ordinary shape of adding a guarded code path and
-    testing its main case first.
+!!! note "History: branches fractionally down at v2026.09.11, and why"
+    Against v2026.09.9 — 95.82 / 96.45 / 94.89 / 96.33 — v2026.09.11 gained on
+    statements, functions and lines while branches gave up 0.14 of a point.
+    `Detail.tsx` was at 100% statements and 97.84% branches after its change,
+    so nothing regressed; what moved the package figure was `lib/api.ts`, which
+    gained branch surface it was not yet fully exercising (83.78% branches).
+    That is the ordinary shape of adding a guarded code path and testing its
+    main case first — and v2026.09.15 tested the rest, taking the file to
+    97.29%.
 
 ---
 
 ## Inventory
 
-**Re-derived on 24 September 2026** from the run's own JSON output. Both numeric
-columns are from that run: the Files column accounts for all **32** files and
-the Tests column sums to **235**.
+**Re-derived on 30 September 2026** at `ae06c9e`. The Files column accounts for
+all **33** files and the Tests column sums to **265**, the runner's total. The
+per-area test counts are taken from the source — each test file parsed, with
+`it.each` tables and the `describe.each` in `indexHtml.test.ts` expanded —
+because this pass used Vitest's console reporter, which prints only the
+package total; the same method reproduces the 24 September runner-derived
+table exactly at `963fe24`.
 
 | Area | Files | Tests | Covers |
 |---|---:|---:|---|
 | `src/pages` | 16 | 137 | Includes a full `herkomst/` provenance-explorer sub-area (`HerkomstExplorer`, `HerkomstTrace`, `HerkomstChip`, `HerkomstBackground`, `herkomstConcepts`, `herkomstData`, `herkomstScroll`, `herkomstTrail` — 8 files) plus the generic `SectionIndex` / `Regelcatalogus` / `Results` / **`Detail` (25)** / `Woordenboek` / static pages |
-| `src/lib` | 7 | 46 | `slug` (kept identical to the backend's slugifier by design), `useQueryState` (URL-backed filters), `search` (`highlight()`), `api` (the typed `/v1/public/*` client), `sectionHits` (`mapToHits()`), `prerenderedData` (the seeded-render reader), `buildInfo` |
-| `src/components` | 4 | 22 | `chrome` (7), `Footer` (6), **`StatusTag` (5, new in v2026.09.9)**, `TechDetails` (4) |
-| `scripts/` | 2 | 21 | `prerender.test.ts` (11 — `escapeHtml`, `buildSitemap`, `injectIntoShell`), `check-bundle.test.ts` (10 — the build-time gate that fails if any auth or telemetry string ships in the bundle) |
+| `src/lib` | 7 | 49 | `slug` (kept identical to the backend's slugifier by design), `useQueryState` (URL-backed filters), `search` (`highlight()`), `api` (the typed `/v1/public/*` client, 13 — three new in v2026.09.15 for its base-URL fallbacks), `sectionHits` (`mapToHits()`), `prerenderedData` (the seeded-render reader), `buildInfo` |
+| `scripts/` | 2 | 24 | `prerender.test.ts` (14 — `escapeHtml`, `readSiteEnv` per build mode, `buildRobots`, `buildSitemap`, `injectIntoShell`), `check-bundle.test.ts` (10 — the build-time gate that fails if any auth or telemetry string ships in the bundle) |
+| `src/components` | 4 | 23 | `chrome` (7), `Footer` (7), `StatusTag` (5, new in v2026.09.9), `TechDetails` (4) |
+| **`src/indexHtml.test.ts`** | 1 | 23 | **New in v2026.09.14.** The link-preview and robots tags in `index.html` as `vite build --mode <mode>` writes them, for production, acceptance, development and test (five tests each), plus the fixed Dutch copy, the title and the card image's size |
 | `src/App.test.tsx` | 1 | 5 | Routing shell — every route registered, `<html lang>` synced to the language switch |
 | `src/i18n` | 1 | 3 | NL/EN dictionary key parity |
 | `src/staticwebapp-csp.test.ts` | 1 | 1 | Guards the shipped CSP header — a regression here silently breaks the org-logo host |
@@ -65,11 +75,19 @@ the Tests column sums to **235**.
 !!! success "Both columns are current, and they sum"
     Earlier versions of this page carried a Files column from one date and a
     Tests column from 19 August that summed to 134 against a measured 225, with
-    a warning attached. Re-derived from the runner, the columns agree: 32
-    files, **235** tests. The largest correction was `src/pages`, recorded at 71
-    and actually holding 133 in September; it is **137** now.
+    a warning attached. Re-derived, the columns agree: 33 files, **265** tests.
+    Against 24 September, `src/pages` is unchanged at 137; `src/lib` gained 3,
+    `scripts/` 3 and `src/components` 1, and `indexHtml.test.ts` is new with 23.
 
-!!! info "`StatusTag` is the file this release added"
+    The prerender test runs in the `node` environment rather than jsdom since
+    v2026.09.14: `prerender.ts` now reads the `.env` files through Vite's
+    `loadEnv`, and the esbuild that Vite loads refuses to start under jsdom.
+    Both it and `indexHtml.test.ts` set the inherited `VITE_*` variables aside
+    first, because Vitest has already put the test mode's values into
+    `process.env`, which `loadEnv` lets override the file — without that, every
+    mode would read the test file.
+
+!!! info "`StatusTag` is the file v2026.09.9 added"
     `src/components/StatusTag.test.tsx` arrived with the `StatusTag.tsx` it
     covers, and both are at **100% statements, branches, functions and lines**
     — 3/3 statements, 2/2 branches, 1/1 functions, 3/3 lines. Its five tests
@@ -86,15 +104,15 @@ the Tests column sums to **235**.
     palette, and it is the kind of regression a snapshot test would happily
     wave through.
 
-Per-area coverage was also re-derived on 24 September and reconciles to the
+Per-area coverage was also re-derived on 30 September and reconciles to the
 package total — see [Coverage](coverage.md#public-site-by-area).
 
 The statement-to-branch gap this package was once known for is gone. It was the
 widest of the five at 16.4 points, 86.82% statements against 70.39% branches.
-Today branches sit **above** statements — 96.31% against 95.92% — which is
+Today branches sit **above** statements — 97.34% against 96.60% — which is
 what a campaign against a per-file *branch* floor looks like once it lands. The
-margin has narrowed from 0.63 of a point to 0.39, which is worth watching
-rather than acting on.
+margin had narrowed from 0.63 of a point to 0.39 by 28 September; the
+`lib/api.ts` work widened it again, to 0.74.
 
 ---
 
@@ -107,17 +125,18 @@ preservation, a deep link with pre-applied filters, keyboard-only navigation,
 and three axe-core accessibility scans (home, results, a detail page) asserting
 no critical or serious violations.
 
-!!! warning "These figures date from 19 August and were not re-run for v2026.09.11"
+!!! warning "These figures date from 19 August and were not re-run for v2026.09.15"
     **Measured 19 August 2026 against v2026.08.19: 6 tests, 6 passed, 0 failed,
     0 flaky, 0 skipped, 8.9s.**
 
-    They were not re-measured on 12 September, not on 20 September, and **not on
-    24 September 2026 either** — running them needs a live backend, and each of
-    those passes deliberately ran nothing that required the stack. The package
-    has changed underneath them three times since, so take the six as an
-    inventory figure rather than as a result. What *was* re-checked at `86af73e`
-    is the inventory itself: `e2e/publiek.spec.ts` is still the one spec, and it
-    still runs in no workflow. These remain the oldest figures on these pages.
+    They were not re-measured on 12 September, not on 20 or 24 September, and
+    **not on 30 September 2026 either** — running them needs a live backend,
+    and each of those passes deliberately ran nothing that required the stack.
+    The package has changed underneath them four times since, so take the six
+    as an inventory figure rather than as a result. What *was* re-checked at
+    `ae06c9e` is the inventory itself: `e2e/publiek.spec.ts` is still the one
+    spec, unchanged since `2443adc`, and it still runs in no workflow. These
+    remain the oldest figures on these pages.
 
 Unlike the frontend suite, Playwright starts its own dev server for this package
 — `playwright.config.ts` declares a `webServer` running `npm run dev` on
@@ -129,7 +148,7 @@ fail on timeouts without it.
 Setting `E2E_BASE_URL` skips starting the local server entirely and points
 `baseURL` at an already-deployed site instead, which is how the suite is used
 for post-deploy verification against ACC. Re-read from the config at `86af73e`
-on 24 September 2026 and unchanged: `webServer` on `:5175`, no `globalSetup` of
+on 24 September 2026 and unchanged at `ae06c9e`: `webServer` on `:5175`, no `globalSetup` of
 any kind, and the backend dependency stated in the config's own header comment
 rather than checked before the run.
 
@@ -143,18 +162,29 @@ Both `azure-publicsite-acc.yml` and `-prod.yml` run `npm run lint`,
 gates on a prerender step and a bundle-cleanliness check. A failing test blocks
 the deploy.
 
+**Since v2026.09.14 the build step also runs `node scripts/check-og.mjs
+acceptance`** (or `production`) against the built `dist/`, before the upload.
+The unit tests prove the template, the `.env` files and the prerender agree;
+this proves the files actually shipped are the ones for their environment —
+every prerendered page, not only the home page, since each is a copy of the
+shell. An ACC build carrying the production card, or letting crawlers in,
+fails the deploy rather than reaching every link unfurler's cache or a search
+index.
+
 **Since 19 September 2026 it blocks the merge as well.** The `acc` ruleset
 (*acc supply-chain gate*) lists **`Build and Deploy ACC Public Site`** among its
 required status checks, alongside `audit`, `scan`, `build`,
 `Build and Deploy ACC Frontend` and `Build and Deploy ACC PA Demo` — so a red
 suite here now stops the pull request rather than merely reporting against it.
-Read from `gh api repos/sgort/ronl-business-api/rulesets` on 20 September 2026.
+Read from `gh api repos/sgort/ronl-business-api/rulesets` on 20 September 2026,
+and unchanged when re-read on 30 September.
 
 !!! warning "This page said the opposite until 20 September 2026"
     It previously stated that the only required check on `acc` and `main` was
     `audit`, so "a red suite here has to be read rather than relied on to stop a
     pull request". That was true when written and is now false for `acc`. It
-    remains true for `main`, deliberately: no production workflow has a
+    remains true for `main`, deliberately — `main` requires `audit` and, since
+    the end of September, `scan`, but no suite: no production workflow has a
     `pull_request` trigger, so no production check could be required of a
     promotion. See
     [Overview → What actually gates a merge](overview.md#what-actually-gates-a-merge).

@@ -1,12 +1,30 @@
 # RONL Business API — screenshots to capture
 
-!!! warning "Two captures outstanding — reviewed 28 September 2026 for v2026.09.13"
-    Both are **REPLACE** rows on figures the site already embeds, and both sit
-    behind sign-in on acceptance, so both are maintainer steps. Until they are
-    taken, a non-strict `mkdocs build` still reports **zero** missing-image
-    warnings — the files exist, they are simply a release out of date, which no
-    build can detect. Earlier rounds are settled: everything requested for
-    v2026.09.11 and before is captured and in `docs/assets/screenshots/`.
+!!! note "Nothing outstanding — reviewed 30 September 2026 for v2026.09.15"
+    Rows 11 and 12 were captured on acceptance on 30 September 2026, on a laned,
+    `ronl:awbPhase`-marked Thuisbatterij task. Rows 9 and 10 from v2026.09.13 were
+    replaced in `19fc36c` on 28 September 2026.
+
+## Sync v2026.09.13 → v2026.09.15 — one REPLACE, one NEW
+
+Reviewed on 30 September 2026 for **v2026.09.14** and **v2026.09.15**, both in
+production. One change has a surface a figure already shows, and one adds a view
+worth its own figure — both on the Caseworker board:
+
+| # | Status | File | Embedding page | What it must show | Trigger |
+|---|---|---|---|---|---|
+| 11 | ✅ **REPLACE** (30 Sep) | `ronl-business-api-caseworker-board.png` | `user-guide/caseworker.md` | A task whose process is drawn in lanes and marked with `ronl:awbPhase`: the "Awb-fase" hint in the Taken list, *Waar sta ik* with the eight-phase stepper, the folded **Procesgegevens** bar, and *Processtappen per rol*. The current capture (19 August) shows the expanded Procesgegevens table and a flat English step list. | v2026.09.14 — the process view (`45a0a1c`, `5a6e418`, `0ae18b5`) |
+| 12 | ✅ **NEW** (30 Sep) | `ronl-business-api-caseworker-process-overlay.png` | `user-guide/caseworker.md` | The process overview modal for the same task: full stepper, *Hoofdproces › Deelproces* breadcrumb, legend and the swimlane scrolled to the task's node. | v2026.09.14 — `ProcessOverlay` (`45a0a1c`) |
+
+**Capture on acceptance, with a model that has lanes and markers.** The view only
+appears for a process whose deployed BPMN is drawn in lanes, and the stepper
+needs `ronl:awbPhase` markers. On 30 September 2026 such models exist on the Linked
+Data Explorer's `acc` (`dec2359`) and not yet on its `main`, so production tasks
+show the flat list. Deploy a marked model to acceptance first.
+
+**Considered and not captured:** the citizen `StartFailureNotice` (an error state,
+described in prose), the link-preview cards (they live in other apps' unfurls, not
+on this site), and the `/v1/m2m` changes (no surface).
 
 ## Sync v2026.09.12 → v2026.09.13 — two REPLACE, no NEW
 
@@ -24,8 +42,8 @@ there.
 
 | # | Status | File | Embedding page | What it must show | Trigger |
 |---|---|---|---|---|---|
-| 9 | ⬜ **REPLACE** | `ronl-business-api-rip-phase-swimlane.png` | `user-guide/infra-board.md` | The same R2.2 *Voorlopig Ontwerp (VO)* swimlane, with **two** document badges under *Opstellen concept VO* — **Ontwerptoelichting** *and* **Objectenboom** | v2026.09.13 |
-| 10 | ⬜ **REPLACE** | `ronl-business-api-landing-page.png` | `user-guide/getting-started.md` | The werkomgeving landing page with its hero's **primary button reading "Inloggen met uw Flevoland-account"**, *Bekijk de borden* beside it as the secondary action, and the note below reading *"Met het account waarmee u op uw werkplek bent aangemeld"* | v2026.09.13 |
+| 9 | ✅ **REPLACE** (`19fc36c`) | `ronl-business-api-rip-phase-swimlane.png` | `user-guide/infra-board.md` | The same R2.2 *Voorlopig Ontwerp (VO)* swimlane, with **two** document badges under *Opstellen concept VO* — **Ontwerptoelichting** *and* **Objectenboom** | v2026.09.13 |
+| 10 | ✅ **REPLACE** (`19fc36c`) | `ronl-business-api-landing-page.png` | `user-guide/getting-started.md` | The werkomgeving landing page with its hero's **primary button reading "Inloggen met uw Flevoland-account"**, *Bekijk de borden* beside it as the secondary action, and the note below reading *"Met het account waarmee u op uw werkplek bent aangemeld"* | v2026.09.13 |
 
 ### Why item 9 is a REPLACE and not a leave-alone
 

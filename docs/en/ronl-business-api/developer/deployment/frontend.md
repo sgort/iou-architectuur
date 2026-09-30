@@ -54,10 +54,12 @@ The frontend is deployed to Azure Static Web Apps via GitHub Actions. Separate i
 
 ### ACC Workflow
 
-**File:** `.github/workflows/azure-frontend-acc.yml`
+**File:** `.github/workflows/azure-frontend-acc.yml` — abridged: comments
+removed, and the `changes` and `close_pull_request_job` jobs shortened to their
+outline.
 
 ```yaml
-name: Deploy Frontend to ACC
+name: Deploy Frontend to Azure ACC
 
 on:
   push:
@@ -69,48 +71,130 @@ on:
       - 'packages/pa-cockpit/**'
       - '.github/workflows/azure-frontend-acc.yml'
       - '.nvmrc'
+  pull_request:
+    types: [opened, synchronize, reopened, closed, labeled]
+    branches:
+      - acc
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
-  build_and_deploy:
+  changes:            # outputs `relevant` (build?) and `preview` (deploy a preview?)
+    ...
+
+  build_and_deploy_job:
+    needs: changes
+    permissions:
+      contents: read
+      pull-requests: write
+    if: ${{ !cancelled() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.action != 'closed')) && (needs.changes.result != 'success' || needs.changes.outputs.relevant == 'true') }}
     runs-on: ubuntu-24.04
-    name: Build and Deploy to ACC
+    name: Build and Deploy ACC Frontend
+    environment:
+      name: acc
+      url: https://acc.mijn.open-regels.nl
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: true
+          lfs: false
+          persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .nvmrc
-          cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          npm ci
-          npm ci --workspace=packages/frontend
+        run: npm ci
 
-      - name: Build frontend
-        run: npm run build --workspace=packages/frontend
+      - name: Build shared package
+        run: npm run build --workspace=@ronl/shared
+
+      - name: Run linter
+        working-directory: packages/frontend
+        run: npm run lint
+
+      - name: Unit tests (pa-cockpit)
+        working-directory: packages/pa-cockpit
+        run: npm test
+
+      - name: Unit tests
+        working-directory: packages/frontend
+        run: npm test
+
+      - name: Performance budget
+        working-directory: packages/frontend
+        run: npm run test:perf
+
+      - name: Build frontend for ACC
+        working-directory: packages/frontend
         env:
-          VITE_KEYCLOAK_URL: ${{ secrets.ACC_KEYCLOAK_URL }}
-          VITE_API_URL: ${{ secrets.ACC_API_URL }}
+          VITE_BUILD_SHA: ${{ github.sha }}
+          VITE_BUILD_RUN: ${{ github.run_number }}
+        run: |
+          npm run build:acc
+
+          echo "Build output:"
+          ls -la dist/
+          test -f dist/index.html || (echo "ERROR: index.html not found!" && exit 1)
+          node scripts/check-og.mjs acceptance
+          echo "✅ Build completed successfully"
 
       - name: Deploy to Azure Static Web Apps
-        uses: Azure/static-web-apps-deploy@v1
+        if: ${{ github.event_name != 'pull_request' || needs.changes.outputs.preview == 'true' }}
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@4d27395796ac319302594769cfe812bd207490b1 # v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.ACC_AZURE_SWA_TOKEN }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ACC }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: 'upload'
-          app_location: 'packages/frontend'
-          output_location: 'dist'
+          app_location: '/packages/frontend/dist'
+          api_location: ''
+          output_location: ''
           skip_app_build: true
+
+      - name: Wait for deployment
+        if: ${{ github.event_name != 'pull_request' || needs.changes.outputs.preview == 'true' }}
+        run: sleep 15
+
+      - name: Verify deployment
+        if: ${{ github.event_name != 'pull_request' || needs.changes.outputs.preview == 'true' }}
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://acc.mijn.open-regels.nl)
+          if [ "$response" = "200" ]; then
+            echo "✅ Frontend is accessible!"
+          else
+            echo "⚠️  Frontend returned HTTP $response"
+          fi
+
+  close_pull_request_job:   # tears the preview down when the pull request closes
+    ...
 ```
 
 **Triggers:**
-- Push to `acc` branch
-- Changes in `packages/frontend/**`
-- Changes to workflow file itself
+
+- A push to `acc` that changes `packages/frontend/**`, `packages/shared/**`,
+  `packages/pa-cockpit/**`, `.nvmrc` or the workflow file itself.
+- Every pull request to `acc`, with no path filter on the trigger: the
+  `changes` job applies the same paths, so the required check **Build and
+  Deploy ACC Frontend** reports on every pull request. A pull request is
+  linted, tested and built; it is deployed to a preview environment only when
+  it carries the `preview` label and changed more than a manifest — see
+  [Pull-request previews](../cicd.md#pull-request-previews).
+- `workflow_dispatch`.
+
+The API, Keycloak and LDE URLs are not injected by the workflow: `npm run
+build:acc` runs `tsc && vite build --mode acceptance`, and Vite reads them from
+the committed `packages/frontend/.env.acceptance` — see [Environment
+Files](#environment-files).
 
 ### PROD Workflow
 
@@ -192,21 +276,36 @@ The workflow automatically:
 
 1. Checks out code
 2. Sets up Node.js from `.nvmrc` (22.23.2)
-3. Installs dependencies (monorepo aware)
-4. Builds frontend with environment variables
-5. Outputs to `packages/frontend/dist/`
+3. Installs dependencies with `npm ci` and builds `@ronl/shared`
+4. Lints, then runs the PA cockpit tests, the frontend tests and the
+   performance budget
+5. Builds with `npm run build:acc` (or `build:prod`), reading the committed
+   `.env.acceptance` (or `.env.production`), into `packages/frontend/dist/`
+6. Runs `node scripts/check-og.mjs acceptance` (or `production`) against the
+   built `dist/`
 
 **Build artifacts:**
 ```
 dist/
-├── index.html                 # Entry point
+├── index.html                 # Entry point, link-preview tags filled per mode
 ├── assets/
 │   ├── index-[hash].js        # Main bundle
 │   ├── index-[hash].css       # Styles
 │   └── [other assets]
+├── og-image-acc.png           # Link-preview images (copied from public/)
+├── og-image-prod.png
 ├── tenants.json               # Municipality config (copied from public/)
 └── staticwebapp.config.json   # SPA routing (copied from public/)
 ```
+
+`check-og.mjs` fails the build step unless `dist/index.html` carries this
+environment's link preview: `og:url`, `og:image`, `og:title` (prefixed `[ACC] `
+on acceptance), `robots` (`noindex, nofollow` on acceptance, `index, follow` on
+production) and the canonical link, with no `%VITE_…%` placeholder left
+unfilled and the named image present in `dist/`. `src/indexHtml.test.ts` proves
+the template and the `.env` files agree; this step proves the file actually
+shipped is the one for its environment, because an acceptance card that
+reaches Teams or LinkedIn is cached there for days.
 
 ### Step 3 — Azure Deployment
 
@@ -224,7 +323,7 @@ The `Azure/static-web-apps-deploy@v1` action:
 
 ```bash
 # Check deployment status
-# GitHub Actions → Workflows → Deploy Frontend to ACC
+# GitHub Actions → Workflows → Deploy Frontend to Azure ACC
 
 # Test URLs
 curl -I https://acc.mijn.open-regels.nl
@@ -244,31 +343,48 @@ curl -I https://acc.mijn.open-regels.nl/auth
 
 ## Environment Files
 
-Environment variables are configured as GitHub Secrets:
+The build-time configuration is **committed**, not stored as GitHub Secrets.
+Each build script names a Vite mode — `build:acc` is `vite build --mode
+acceptance`, `build:prod` is `vite build --mode production` — and Vite reads
+`packages/frontend/.env.<mode>`. None of these values is secret: they end up in
+the public bundle and in `index.html`.
 
-### ACC Secrets
+| Variable | `.env.development` | `.env.acceptance` | `.env.production` |
+|---|---|---|---|
+| `VITE_API_URL` | `http://localhost:3002/v1` | `https://acc.api.open-regels.nl/v1` | `https://api.open-regels.nl/v1` |
+| `VITE_KEYCLOAK_URL` | `http://localhost:8080` | `https://acc.keycloak.open-regels.nl` | `https://keycloak.open-regels.nl` |
+| `VITE_LDE_API_URL` | `http://localhost:3001/v1` | `https://acc.backend.linkeddata.open-regels.nl/v1` | `https://backend.linkeddata.open-regels.nl/v1` |
+| `VITE_SITE_URL` | `http://localhost:5173` | `https://acc.mijn.open-regels.nl` | `https://mijn.open-regels.nl` |
+| `VITE_OG_IMAGE` | `og-image-acc.png` | `og-image-acc.png` | `og-image-prod.png` |
+| `VITE_OG_TITLE_PREFIX` | `"[DEV] "` | `"[ACC] "` | `""` |
+| `VITE_ROBOTS` | `noindex, nofollow` | `noindex, nofollow` | `index, follow` |
 
-```
-ACC_KEYCLOAK_URL=https://acc.keycloak.open-regels.nl
-ACC_API_URL=https://acc.api.open-regels.nl/v1
-ACC_AZURE_SWA_TOKEN=<deployment-token>
-```
+The three `VITE_PA_*_MOCK` flags are `false` in all three files. The four
+link-preview variables fill the `%VITE_…%` placeholders in `index.html` — the
+Open Graph and Twitter tags, the `robots` meta tag and the canonical link — and
+`VITE_OG_TITLE_PREFIX` is quoted so its trailing space survives.
 
-### PROD Secrets
+The workflows add only two variables of their own, on the build step:
+`VITE_BUILD_SHA` (`github.sha`) and `VITE_BUILD_RUN` (`github.run_number`). Vite
+merges `VITE_`-prefixed process environment over the mode file, so they reach
+`import.meta.env` without touching it; without them the app prints `local
+build`.
 
-```
-PROD_KEYCLOAK_URL=https://keycloak.open-regels.nl
-PROD_API_URL=https://api.open-regels.nl/v1
-PROD_AZURE_SWA_TOKEN=<deployment-token>
-```
+### Secrets the workflows use
 
-### Adding/Updating Secrets
+| Secret | Used by |
+|---|---|
+| `AZURE_STATIC_WEB_APPS_API_TOKEN_ACC` | `azure-frontend-acc.yml` — upload, and closing a preview |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN_PROD` | `azure-frontend-prod.yml`, passed by name from `promote-to-production.yml` |
+| `GITHUB_TOKEN` | `repo_token` on the deploy step |
 
-1. **GitHub Repository** → Settings → Secrets and variables → Actions
-2. Click **New repository secret**
-3. Name: `ACC_KEYCLOAK_URL`
-4. Value: `https://acc.keycloak.open-regels.nl`
-5. Click **Add secret**
+### Adding or updating a deployment token
+
+Store a token with `scripts/set-secret.sh`, never by piping it straight into
+`gh secret set`, which stores a trailing newline — see [Storing a token without
+breaking the deploy](../cicd.md#storing-a-token-without-breaking-the-deploy).
+To change a URL, edit the `.env.<mode>` file in a pull request; it takes effect
+on the next build.
 
 ---
 
@@ -299,7 +415,8 @@ PROD_AZURE_SWA_TOKEN=<deployment-token>
 1. Navigate to Static Web App resource
 2. Left menu → **Deployment tokens**
 3. Copy **Deployment token**
-4. Store in GitHub Secrets as `ACC_AZURE_SWA_TOKEN`
+4. Store it as `AZURE_STATIC_WEB_APPS_API_TOKEN_ACC` (or `_PROD`) with
+   `scripts/set-secret.sh`
 
 **Token permissions:**
 
@@ -329,22 +446,32 @@ PROD_AZURE_SWA_TOKEN=<deployment-token>
 
 ## Post-Deployment Verification
 
-### Automated Tests (Future)
+### Automated checks in the workflow
 
-```yaml
-# Add to workflow after deployment
-- name: Test deployed app
-  run: |
-    # Test root route
-    curl -f https://acc.mijn.open-regels.nl
+Both frontend workflows gate the deploy on tests that run **before** the build,
+each as its own step, so a failure stops the run before anything is uploaded:
 
-    # Test SPA routes
-    curl -f https://acc.mijn.open-regels.nl/auth
-    curl -f https://acc.mijn.open-regels.nl/dashboard
+| Step | Command | What it covers |
+|---|---|---|
+| Run linter | `npm run lint` (in `packages/frontend`) | ESLint |
+| Unit tests (pa-cockpit) | `npm test` (in `packages/pa-cockpit`) | The PA cockpit library the frontend consumes, ahead of the frontend's own suite |
+| Unit tests | `npm test` (in `packages/frontend`) | `vitest run --coverage` |
+| Performance budget | `npm run test:perf` | The `*.perf.test.ts` wall-clock budgets, run alone under `vitest.perf.config.ts` |
 
-    # Test static assets
-    curl -f https://acc.mijn.open-regels.nl/tenants.json
-```
+After the build, still inside the build step, `node scripts/check-og.mjs
+acceptance` (or `production`) checks the built `dist/index.html` — see [Step 2 —
+GitHub Actions Build](#step-2-github-actions-build).
+
+After the deploy, the workflow waits 15 seconds and requests the root URL.
+That check **reports but does not fail**: a status other than 200 prints a
+warning and the job still succeeds. It requests `/` only, not the SPA routes or
+static files.
+
+The frontend's Playwright suite (`packages/frontend/e2e/`, `npm run test:e2e`)
+does **not** run in either workflow; it needs a running backend, Keycloak and
+engine. The only end-to-end suite in CI is the PA demo's, in
+`azure-pa-demo-acc.yml` — see [CI/CD → What each pipeline
+runs](../cicd.md#what-each-pipeline-runs).
 
 ### Manual Testing Checklist
 
@@ -503,25 +630,22 @@ git push origin acc
 
 **Symptoms:** App loads but can't connect to Keycloak or API.
 
-**Cause:** Build-time environment variables not set.
+**Cause:** The bundle was built in the wrong Vite mode, or the mode file holds
+the wrong URL. The values come from the committed `.env.<mode>` files, not from
+GitHub Secrets.
 
 **Solution:**
 
 ```bash
-# Check GitHub Secrets are configured
-# Repository → Settings → Secrets and variables → Actions
+# Which mode does the build script use?
+grep '"build:' packages/frontend/package.json
+#   build:acc  → vite build --mode acceptance → .env.acceptance
+#   build:prod → vite build --mode production → .env.production
 
-# Required secrets:
-# - ACC_KEYCLOAK_URL
-# - ACC_API_URL
+# What does that mode file say?
+cat packages/frontend/.env.acceptance
 
-# Verify workflow uses them:
-# .github/workflows/azure-frontend-acc.yml
-env:
-  VITE_KEYCLOAK_URL: ${{ secrets.ACC_KEYCLOAK_URL }}
-  VITE_API_URL: ${{ secrets.ACC_API_URL }}
-
-# Re-run workflow after fixing
+# Fix the file in a pull request; the next build picks it up
 ```
 
 ### CORS errors in browser console

@@ -67,7 +67,8 @@ cannot resolve.
 
 !!! danger "If the promotion workflow breaks, nothing deploys — silently"
     The four production workflows are not required checks on `main`, which
-    requires `audit` alone. A promotion whose orchestrating workflow fails
+    requires only the two scanners, `audit` and `scan`. A promotion whose
+    orchestrating workflow fails
     produces a red run and no deployment, and nothing else reports it. The
     escape hatch is `workflow_dispatch` on each of the four.
 
@@ -109,7 +110,9 @@ tests the backend without shipping it while the build check stays required.
 Step 6 lints the published contract against the NL API Design Rules 2.2.1
 ruleset before the tests run, so a document that breaks a rule fails fast and
 names it; the coverage gate inside `npm test` then checks the document against
-the routes actually served. `openapi/openapi.json` is generated from
+the routes actually served, and `npm test` ends with
+`scripts/check-conformance-coverage.cjs`, which fails when a documented
+operation was never compared against a real response. `openapi/openapi.json` is generated from
 `openapi/openapi.yaml` by the `prebuild` hook and is gitignored, so step 10 copies
 it into the artifact explicitly — only the JSON, since the YAML source, the
 vendored ruleset and the Spectral config are build-time inputs. The backend

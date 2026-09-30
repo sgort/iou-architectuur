@@ -4,7 +4,7 @@ component: RONL Business API
 
 # Woo-dashboard — tests
 
-**Frontend: 15 files · 66 tests. E2E: none yet.**
+**Frontend: 15 files · 77 tests. E2E: none yet.**
 
 The Woo dashboard is the most thinly tested of the four boards by test count,
 while reporting high coverage percentages. Both things are true at once, and
@@ -15,20 +15,27 @@ reassurance.
 
 ## Frontend
 
+Re-derived on **30 September 2026** at `ae06c9e` (v2026.09.15). The frontend
+package was measured the same day — 120 files, 1318 tests, all passing — but
+Vitest's console reports only that total, so the counts below are taken from
+the source, each test file parsed with its `.each` tables expanded; summed
+over the whole package the method gives exactly the runner's 1318. The figures
+this page carried before were derived on 30 August.
+
 | Area | Files | Tests |
 |---|---:|---:|
-| `components/WooDashboard` | 12 | 39 |
-| `pages/woo` (data and config) | 2 | 18 |
-| `pages/WooDashboard.test.tsx` | 1 | 9 |
+| `components/WooDashboard` | 12 | 43 |
+| `pages/woo` (data and config) | 2 | 22 |
+| `pages/WooDashboard.test.tsx` | 1 | 12 |
 
 | File | Tests | Covers |
 |---|---:|---|
-| `pages/woo/woo.data.test.ts` | 15 | The board's data module |
-| `pages/WooDashboard.test.tsx` | 9 | The page container |
+| `pages/woo/woo.data.test.ts` | 19 | The board's data module |
+| `pages/WooDashboard.test.tsx` | 12 | The page container |
+| `components/WooDashboard/Register.test.tsx` | 8 | The register section |
 | `components/WooDashboard/WooCommandPalette.test.tsx` | 8 | Command palette |
 | `components/WooDashboard/charts.test.tsx` | 7 | Chart rendering |
 | `components/WooDashboard/WooSectionRouter.test.tsx` | 7 | Section routing |
-| `components/WooDashboard/Register.test.tsx` | 4 | The register section |
 | `pages/woo/modes.config.test.ts` | 3 | Mode configuration |
 | `components/WooDashboard/Bezwaar.test.tsx` | 2 | Objections |
 | `components/WooDashboard/Proces.test.tsx` | 2 | Process view |
@@ -37,21 +44,26 @@ reassurance.
 | `components/WooDashboard/WooDock.test.tsx` | 2 | The dock |
 | `components/WooDashboard/Overzicht.test.tsx` | 1 | Overview |
 | `components/WooDashboard/Tijdigheid.test.tsx` | 1 | Timeliness |
+| `components/WooDashboard/WooNoAccessPanel.test.tsx` | 1 | The no-access panel |
 
-Coverage: `components/WooDashboard` **97.68 / 89.56 / 98.52 / 97.85** and
-`pages/woo` 96.55 / 84.12 / 94.44 / 98.01.
+`woo.data.test.ts` (+4) and `WooDashboard.test.tsx` (+3) grew in v2026.09.15's
+branch-margin work; the other counts are as they were on 28 September.
+
+Coverage on 30 September: `components/WooDashboard`
+**98.26 / 94.78 / 98.52 / 98.57** and `pages/woo` **99.13 / 100 / 100 / 99** —
+the latter up from 96.55 / 84.12 / 94.44 / 98.01.
 
 !!! note "High coverage, few assertions"
-    Seven of the twelve component files carry one or two tests each. Those
+    Eight of the twelve component files carry one or two tests each. Those
     render the section and assert it renders — which executes nearly every line
-    in a presentational component and so scores 97%, without asserting much
+    in a presentational component and so scores 98%, without asserting much
     about what it renders.
 
     That is a legitimate scoping choice for presentational sections, and it is
     the same "critical interactions only" approach used across the frontend.
     But it means this board's coverage percentage is a weaker signal than the
-    identical percentage on, say, `pages/infra-board`, where 88 tests across six
-    files are asserting real behaviour. Read the test count alongside the
+    identical percentage on, say, `pages/infra-board`, where 108 tests across
+    six files are asserting real behaviour. Read the test count alongside the
     percentage.
 
 ---
@@ -59,7 +71,8 @@ Coverage: `components/WooDashboard` **97.68 / 89.56 / 98.52 / 97.85** and
 ## E2E
 
 **None.** There is no Playwright spec that drives this board — verified against
-`packages/frontend/e2e/` on 30 August 2026, not inferred from a changelog. It is
+`packages/frontend/e2e/` on 30 August 2026 and again at `ae06c9e` on
+30 September, not inferred from a changelog. It is
 now the only board in that position; see
 [Coverage per board](../e2e.md#coverage-per-board).
 

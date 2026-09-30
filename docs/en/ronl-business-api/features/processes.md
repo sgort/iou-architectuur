@@ -38,6 +38,26 @@ A process definition can also expose no start form at all, in which case startin
 
 Once running, an instance can be queried for its status and variables, cancelled outright, or — once it has produced history — inspected for its final variable state and the sequence of steps the engine executed between user tasks.
 
+The activity history lists every step in the order the engine executed it — sorted on Operaton's `occurrence`, not start time alone, so steps that start in the same millisecond keep their causal order. Each entry names the process definition it belongs to (`processDefinitionKey`, `processDefinitionId`) and, for a call activity, the instance it started (`calledProcessInstanceId`).
+
+### Lineage
+
+`GET /v1/process/{id}/lineage` places an instance in its call chain: its process definition, and `superProcessInstanceId` — the instance that called it, or `null` for a top-level instance. It reads Operaton's historic instance, so it also answers for an instance that has ended. It is subject to the same tenant check as the activity history. An unknown instance answers `404 PROCESS_NOT_FOUND`; any other failure `500 PROCESS_LINEAGE_FAILED`.
+
+Together, lineage and activity history let a client walk from a task in a subprocess up to its main process and merge the histories of the whole chain — which is what the caseworker's process view does; see [Tasks — Where a task stands in its process](tasks.md#where-a-task-stands-in-its-process).
+
+---
+
+## Swimlane model of a process
+
+`GET /v1/process/definition/key/{key}/swimlane` returns the process a key currently resolves to as a swimlane model, parsed from its deployed BPMN: its lanes (with the literal candidate groups of the user tasks drawn in each), its nodes and flows, and — where the model carries `ronl:awbPhase` markers — the Awb phase of every node. The same parser serves the Infra-board's RIP phases; nothing in it is specific to RIP.
+
+- **Tenant-scoped lookup.** The key is resolved under the caller's tenant first, falling back to an untenanted deployment, so another tenant's deployment is never reached.
+- **Cached by definition id.** The parsed model is cached per deployed definition, so a redeploy is picked up on the next request.
+- **Validated key.** The key must be an XML NCName — a letter or underscore, then letters, digits, `_`, `.` or `-` — or the request is refused with `400 INVALID_PROCESS_KEY` before anything reaches the engine.
+
+A key with no deployment answers `404 PROCESS_DEFINITION_NOT_FOUND`; a model that cannot be built, `500 SWIMLANE_MODEL_FAILED`. How to model a process so the view has lanes and phases to show is described in [BPMN Design Criteria](../reference/bpmn-design-criteria.md).
+
 ---
 
 ## Tenancy
@@ -63,7 +83,7 @@ The resolved deployment then decides whether the caller may start it and which o
 - A deployment under another tenant, started by a citizen: the case goes to the deploying tenant, and `originTenantId` records the tenant the citizen came in through. A citizen of one municipality applying for a benefit handled by a national organisation is this case.
 - A deployment under another tenant, started by staff: refused with `403 TENANT_MISMATCH`; no instance is created.
 
-The owning tenant is written into the instance's `municipality` process variable, so it always agrees with the tenant Operaton runs the instance under. That variable is the only tenant label any access check reads, and the checks fail closed: an instance without it is refused to everyone. The five reads — status, variables, historic variables, activity history and decision document — are open to the owning tenant and to the case's own applicant; cancelling the instance is open to the owning tenant only. See [Authentication & IAM — Tenancy](authentication-iam.md#tenancy) for the full rule set.
+The owning tenant is written into the instance's `municipality` process variable, so it always agrees with the tenant Operaton runs the instance under. That variable is the only tenant label any access check reads, and the checks fail closed: an instance without it is refused to everyone. The six reads — status, variables, historic variables, activity history, lineage and decision document — are open to the owning tenant and to the case's own applicant; cancelling the instance is open to the owning tenant only. See [Authentication & IAM — Tenancy](authentication-iam.md#tenancy) for the full rule set.
 
 This tenant scoping is covered by an automated end-to-end test — see [Testing](../developer/testing/dashboards/caseworker.md#e2e).
 

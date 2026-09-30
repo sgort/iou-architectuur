@@ -139,15 +139,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.09.13** · *September 2026* · **acceptance**
+-   **⚙️ RONL Business API — v2026.09.15** · *September 2026*
 
     ---
 
-    **Signing in with a Flevoland account, and a task's every document**
+    **The caseworker sees the process, and every operation is documented and checked**
 
-    Employees of Provincie Flevoland now sign in with their own Flevoland account: the landing page's primary action sends the browser through Keycloak straight to Entra ID, and on a managed laptop Entra usually signs them in without a prompt. Keycloak brokers it — [a provisioning script](ronl-business-api/developer/deployment/entra-id.md) creates the provider and the seven mappers that set the employee's tenant and assurance level and turn their Entra app roles into realm roles — and [the backend still trusts one issuer](ronl-business-api/features/authentication-iam.md). On the [Infra-board](ronl-business-api/user-guide/infra-board.md), a swimlane task now shows **every** document it carries rather than the first, and the twelve phase fixtures are pinned to their source by fingerprints committed in both repositories. A redeploy is visible again: [derivations from deployed BPMN](ronl-business-api/developer/operaton-access-patterns.md#caching-what-is-derived-from-deployed-bpmn) are keyed by definition id rather than by process key, which had left acceptance rendering a stale diagram for as long as the process stayed up. And the end-to-end fixture bundle now deploys with one command instead of file by file through the Modeler.
-
-    *This release is on acceptance; production still serves v2026.09.12.*
+    In the [Caseworker](ronl-business-api/user-guide/caseworker.md)'s Taken inbox, a task whose process is drawn in lanes now shows where it stands: its Awb phase on an eight-step stepper, its steps grouped per role with *jouw rol* marked, and the whole swimlane in an overview opened from the task or from ⌘K. The [OpenAPI description](ronl-business-api/reference/api-specification.md) now covers every operation, `/v1/m2m` included, and every documented operation is compared against a real response in the test run. `/v1/m2m` answers only allow-listed clients, the BRP proxy no longer writes BSNs into its log lines, and a failed citizen start explains why outside production. Links to the werkomgeving and the public site unfurl as preview cards, with acceptance marked and kept out of search engines, and v2026.09.15 gives every file an 85% branch margin. Both releases, and v2026.09.13's Flevoland sign-in, are in production.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
