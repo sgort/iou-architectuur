@@ -6,7 +6,7 @@ component: RONL Business API
 
 This page takes a fresh clone of `ronl-business-api` to a running local stack:
 five Docker services, four dev servers, and a Keycloak realm with test users.
-It describes release **v2026.09.13**.
+The release it describes is the one in the header above.
 
 ---
 

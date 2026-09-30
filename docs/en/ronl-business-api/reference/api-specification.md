@@ -6,7 +6,8 @@ component: RONL Business API
 
 <!--
   Modelled on the Linked Data Explorer's API Specification page, with these
-  differences — each checked against the acceptance API on 26 September 2026:
+  differences — each checked against the acceptance API on 26 September 2026,
+  and the CORS point again on 30 September 2026:
 
   - /v1/openapi.json DOES carry the version (info.version is the CalVer release
     string, set at build time). The banner still reads /v1/health, because that
@@ -20,11 +21,13 @@ component: RONL Business API
 
   - CORS: /v1/openapi.json is served with Access-Control-Allow-Origin: *, so the
     render works from any origin. /v1/health — and every other route, so also
-    Test Request — goes through the backend's CORS allowlist, and on acceptance
-    that echoes only https://iou-architectuur.open-regels.nl. Neither
-    acc.iou-architectuur.open-regels.nl nor localhost is echoed, so the banner
-    (and Test Request) work only on the PRODUCTION documentation tier. Elsewhere
-    the banner stays hidden: it degrades to nothing rather than to an error.
+    Test Request — goes through the backend's CORS allowlist. On acceptance that
+    allowlist (the App Service's CORS_ORIGIN) names both documentation tiers,
+    https://iou-architectuur.open-regels.nl and
+    https://acc.iou-architectuur.open-regels.nl — the second added on
+    30 September 2026 — so the banner and Test Request work on both. localhost
+    is not on it: under `mkdocs serve` the banner stays hidden, degrading to
+    nothing rather than to an error, as on the LDE page.
 
   - Scalar version, layout and the Acceptance-only servers override are the
     same as the LDE page. The document itself lists Production first; the
