@@ -1,10 +1,9 @@
 # RONL Business API — screenshots to capture
 
-!!! warning "Two captures outstanding — reviewed 30 September 2026 for v2026.09.15"
-    Rows 11 and 12 below, both on the Caseworker board and both behind sign-in, so
-    maintainer steps. Row 12 is **NEW**: until it is captured a non-strict
-    `mkdocs build` reports exactly one missing image, `ronl-business-api-caseworker-process-overlay.png`.
-    Rows 9 and 10 from v2026.09.13 were replaced in `19fc36c` on 28 September 2026.
+!!! note "Nothing outstanding — reviewed 30 September 2026 for v2026.09.15"
+    Rows 11 and 12 were captured on acceptance on 30 September 2026, on a laned,
+    `ronl:awbPhase`-marked Thuisbatterij task. Rows 9 and 10 from v2026.09.13 were
+    replaced in `19fc36c` on 28 September 2026.
 
 ## Sync v2026.09.13 → v2026.09.15 — one REPLACE, one NEW
 
@@ -14,8 +13,8 @@ worth its own figure — both on the Caseworker board:
 
 | # | Status | File | Embedding page | What it must show | Trigger |
 |---|---|---|---|---|---|
-| 11 | ⬜ **REPLACE** | `ronl-business-api-caseworker-board.png` | `user-guide/caseworker.md` | A task whose process is drawn in lanes and marked with `ronl:awbPhase`: the "Awb-fase" hint in the Taken list, *Waar sta ik* with the eight-phase stepper, the folded **Procesgegevens** bar, and *Processtappen per rol*. The current capture (19 August) shows the expanded Procesgegevens table and a flat English step list. | v2026.09.14 — the process view (`45a0a1c`, `5a6e418`, `0ae18b5`) |
-| 12 | ⬜ **NEW** | `ronl-business-api-caseworker-process-overlay.png` | `user-guide/caseworker.md` | The process overview modal for the same task: full stepper, *Hoofdproces › Deelproces* breadcrumb, legend and the swimlane scrolled to the task's node. | v2026.09.14 — `ProcessOverlay` (`45a0a1c`) |
+| 11 | ✅ **REPLACE** (30 Sep) | `ronl-business-api-caseworker-board.png` | `user-guide/caseworker.md` | A task whose process is drawn in lanes and marked with `ronl:awbPhase`: the "Awb-fase" hint in the Taken list, *Waar sta ik* with the eight-phase stepper, the folded **Procesgegevens** bar, and *Processtappen per rol*. The current capture (19 August) shows the expanded Procesgegevens table and a flat English step list. | v2026.09.14 — the process view (`45a0a1c`, `5a6e418`, `0ae18b5`) |
+| 12 | ✅ **NEW** (30 Sep) | `ronl-business-api-caseworker-process-overlay.png` | `user-guide/caseworker.md` | The process overview modal for the same task: full stepper, *Hoofdproces › Deelproces* breadcrumb, legend and the swimlane scrolled to the task's node. | v2026.09.14 — `ProcessOverlay` (`45a0a1c`) |
 
 **Capture on acceptance, with a model that has lanes and markers.** The view only
 appears for a process whose deployed BPMN is drawn in lanes, and the stepper
