@@ -65,47 +65,19 @@ component: RONL Business API
 </script>
 
 Fetched live from the acceptance API, so it always shows what the service
-declares right now. **Test Request** calls acceptance and never production, on
-purpose.
+declares right now. Every operation the service serves is described, `/v1/m2m`
+included — the backend's tests fail when one is not, or when a described
+operation was never checked against a real response. **Test Request** calls
+acceptance and never production, on purpose.
 
-**Every operation the service serves is described**, the machine-to-machine
-surface under `/v1/m2m` included; the banner above names the release the
-document comes from. Two backend checks hold the document to the code:
-
-- **Coverage.** `src/openapi/coverage.test.ts` compares the document with the
-  route registry and fails on a served operation that is not described, and on
-  a described operation that is not served.
-- **Conformance.** Route tests compare real responses against the document with
-  `expectToMatchOperation`, which validates with Ajv against JSON Schema
-  2020-12 with strict schema checking on. `npm test` then runs
-  `scripts/check-conformance-coverage.cjs`, which fails the run when any
-  described operation was never compared against a real response.
-
-Three security schemes are declared:
-
-- `bearerAuth`, a Keycloak-issued JWT, applies by default.
-- `m2mOAuth`, the client-credentials grant, applies to `/v1/m2m`. A valid token
-  is not enough: the token's `azp` must be on `M2M_ALLOWED_CLIENTS`
-  (`operaton-mcp-client` alone by default). OpenAPI cannot express that
-  condition, so the scheme's description states it and every `/v1/m2m`
-  operation carries the shared `M2mForbidden` response — `403
-  M2M_CLIENT_NOT_ALLOWED` for a caller off the allow-list, `403
-  OPERATION_NOT_PERMITTED` for an operation withdrawn from machine consumers.
-- `mediaAggregatorKey` applies to the media-aggregator search, which requires it
-  only when the service is configured with a key.
-
-Deploying process definitions is not part of this API: it belongs to the Linked
-Data Explorer — see its
+Deploying process definitions belongs to the Linked Data Explorer — see its
 [API Specification](../../linked-data-explorer/reference/api-specification.md).
-
-The document is linted with Spectral against the NL API Design Rules 2.2.1
-ruleset, with its deviations recorded rather than hidden: `nlgov:semver` is off
-because releases are CalVer, and the problem-details rules are off because the
-API answers its own `{ success, error }` envelope rather than
-`application/problem+json`.
-
-For versioning, the response envelope and error handling, see
-[API Design](../features/api-design.md).
+For versioning, the response envelope, the error format and how the document is
+linted, see [API Design](../features/api-design.md#published-description); for
+who may call `/v1/m2m`, see
+[Authentication & IAM](../features/authentication-iam.md). For how this page is
+wired and what it depends on at run time, see
+[OpenAPI Rendering](../../contributing/doc-architecture/openapi-rendering.md).
 
 <script
   id="api-reference"
