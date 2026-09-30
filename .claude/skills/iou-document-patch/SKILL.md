@@ -1007,6 +1007,29 @@ Work in this order so a failure leaves the docs in an obvious half-state:
    Then list what still needs a human: capturing screenshots and translating any
    NL pages left as placeholders.
 8. Run the **sibling drift check** below and report it, whatever it says.
+9. **Sweep for screenshots added since staging — before the first push.** The
+   user captures the manifest's rows while the run is under way, and often *after*
+   the sync commit: the files land in `docs/assets/screenshots/` untracked (a NEW
+   row) or modified (a REPLACE row) and are silently left out of a commit that was
+   staged path by path. Immediately before the first push of the run — the push of
+   `acc` to `flevoland` for the user's ACC check, or any push, whichever comes
+   first — and again before each later push:
+
+   ```bash
+   git status --short --untracked-files=all docs/assets/screenshots/
+   ```
+
+   For every file it lists: confirm it is one of the manifest's rows (a file the
+   manifest does not name is a question for the user, not something to commit
+   unasked), **look at the image** to check it shows what the row asks for, mark the
+   row ✅ with the date in the manifest, and update the manifest's status banner.
+   Then stage the images and the manifest together and ask to commit them — as their
+   own commit if the sync commit already exists. An empty result is a result: say
+   "no new captures" in the report rather than skipping the step.
+
+   **It has happened.** On 30 September 2026 both Caseworker captures for rows 11
+   and 12 were saved a few minutes after the RONL Business API sync commit; `acc`
+   went to `flevoland` without them, and the user found the gap on the ACC site.
 
 ---
 
@@ -1223,6 +1246,10 @@ and which remain, and the three heads everything was read at.
   Slice at `indexOf` and concatenate, or pass a function (`() => text`), and compare
   line counts before and after every splice.
 
+- **Sweep for new screenshots before every push** (Stage 4 step 9). Captures arrive
+  while the run is under way and after the commit that the manifest rows belong to;
+  a commit staged path by path leaves them untracked, and the ACC site then shows a
+  missing image the user already supplied.
 - **Staged, not one-shot.** Always present the Stage 2 plan and stop for
   approval before any edit.
 - **Fetch this repository first, and branch from `origin/acc`.** A stale docs
