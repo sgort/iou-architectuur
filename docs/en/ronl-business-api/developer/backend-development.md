@@ -14,13 +14,13 @@ The backend is `packages/backend` (`@ronl/backend`) — a Node.js 22 Express app
 packages/backend/
 ├── openapi/
 │   ├── openapi.yaml              # The OpenAPI 3.1 description, written by hand
-│   ├── pending.json              # Served operations not described yet — may only shrink
 │   ├── .spectral.yaml            # Spectral config: extends the ruleset below, with recorded exceptions
 │   └── adr-ruleset-2.2.1.yaml    # NL API Design Rules 2.2.1 ruleset, vendored
 │                                 # (openapi.json is generated beside these and gitignored)
 ├── scripts/
 │   ├── build-openapi.cjs         # openapi.yaml → openapi.json; info.version from package.json
-│   ├── jest-global-setup.cjs     # Builds openapi.json before every Jest run
+│   ├── jest-global-setup.cjs     # Builds openapi.json before every Jest run; sets CONFORMANCE_LOG
+│   ├── check-conformance-coverage.cjs  # After Jest: fails unless every documented operation was checked
 │   ├── jest-setup-env.cjs        # The one variable validateConfig() demands in tests
 │   └── edocs-healthcheck.ts, doccle-healthcheck.ts, reset-pa-data.ts
 └── src/
@@ -38,8 +38,10 @@ packages/backend/
     │   └── admin.routes.ts, m2m.routes.ts, mcp.routes.ts
     ├── openapi/
     │   ├── document.ts           # Reads the built openapi/openapi.json
-    │   ├── coverage.test.ts      # Document vs. served routes vs. pending.json
-    │   └── testing/routeOperations.ts  # Lists served and documented operations
+    │   ├── coverage.test.ts      # Document vs. served routes, in both directions
+    │   └── testing/
+    │       ├── routeOperations.ts    # Lists served and documented operations
+    │       └── conformance.ts        # expectToMatchOperation(): a real response against its operation
     ├── middleware/
     │   ├── version.middleware.ts # API-Version response header
     │   ├── audit.middleware.ts   # Audit entry per request, and auditLog()
@@ -49,7 +51,7 @@ packages/backend/
     │   └── tenant-access.ts      # Every tenant decision for process and task access
     ├── pa-monitoring/            # Policy analysis: /v1/pa routers, sources, curation
     ├── media-aggregator/         # /v1/media-aggregator
-    ├── rip-swimlane/             # BPMN swimlane rendering for RIP
+    ├── rip-swimlane/             # BPMN swimlane parsing: Infra-board phases and any laned process
     ├── mcp-servers/              # eDOCS, LDE and TriplyDB MCP servers
     ├── services/                 # Operaton, audit, eDOCS, ValidSign, Doccle, … plus llm/, mcp/, document/
     ├── types/                    # audit.types.ts, auth.types.ts
@@ -124,7 +126,9 @@ import myfeatureRoutes from './myfeature.routes';
 
    Every mount is under `/v1` — `registry.test.ts` checks it — and there is no `/api` alias. Omit `advertiseAs` only for a second router on a mount the first already advertises, as `/v1/validsign` and `/v1/pa` do.
 
-3. Describe every operation it serves in `openapi/openapi.yaml`. `coverage.test.ts` fails when a served operation is neither documented nor listed in `openapi/pending.json`, when a documented operation is not served, when a pending one is already documented or no longer served, and when `pending.json` grows past its ceiling of 18. The pending list may only shrink: a new route is described, not parked. Run `npm run lint:openapi` as well — both backend workflows run it. See [API specification](../reference/api-specification.md) for the published document.
+3. Describe every operation it serves in `openapi/openapi.yaml`. `coverage.test.ts` fails when a served operation is not documented and when a documented operation is not served; there is no pending list, so a new route is described, not parked. Run `npm run lint:openapi` as well — both backend workflows run it. See [API specification](../reference/api-specification.md) for the published document.
+
+4. Call `expectToMatchOperation(res, '<method>', '<path>')` from `src/openapi/testing/conformance.ts` in the route's own test, for each operation. `<path>` is the document's path — no `/v1` prefix, `{braces}` for parameters. The helper fails the test unless the status is documented for that operation, a 2xx carries `API-Version`, the content type is documented and the body matches its schema (Ajv 2020-12 with strict schema mode, so a misspelled keyword in the document fails too). It also records the operation in `CONFORMANCE_LOG`. After Jest, `scripts/check-conformance-coverage.cjs` fails `npm test` when any documented operation was never checked this way — so a description no test compares against a response cannot land.
 
 **Mount order is data.** Express matches in mount order, and the ValidSign callback router must precede the authenticated router on the same `/v1/validsign` path, because ValidSign sends no token. That ordering is the array order in `registry.ts`, and `registry.test.ts` asserts it.
 
@@ -158,11 +162,13 @@ For configuration and live-mode switchover, see [Copilot Studio — eDOCS OAuth 
  
 ## M2M route group
  
-`m2m.routes.ts` exposes the full Operaton surface to machine-to-machine clients without tenant scoping. It applies `jwtMiddleware` only — `tenantMiddleware` is intentionally absent.
- 
+`m2m.routes.ts` exposes 18 Operaton operations to machine-to-machine clients without tenant scoping. It applies `jwtMiddleware` and then `requireM2mClient` — `tenantMiddleware` is intentionally absent.
+
+`requireM2mClient` admits only a token whose `azp` is on `M2M_ALLOWED_CLIENTS` (comma-separated; default `operaton-mcp-client`). Every person in the realm holds a token for the `ronl-business-api` audience, so a valid token is not enough: anything else, a person's token included, gets `403 M2M_CLIENT_NOT_ALLOWED` before any engine call.
+
 A `M2M_ALLOWED_OPERATIONS` constant at the top of the file controls which operations are active. Commenting out an entry returns `403 OPERATION_NOT_PERMITTED` for that operation with no other code changes required.
- 
-The route group is instantiated with a dedicated `OperatonService` when `OPERATON_M2M_BASE_URL` is set, otherwise it reuses the shared singleton:
+
+The route group gets its own `OperatonService` built from `config.operaton.m2mBaseUrl`. That value is `OPERATON_M2M_BASE_URL`, or `https://operaton-doc.open-regels.nl/engine-rest` when the variable is unset, so the `: operatonService` branch below is reached only if the config default is removed:
  
 ```typescript
 const m2mOperatonService = config.operaton.m2mBaseUrl
@@ -225,8 +231,8 @@ npm run start                  # Run compiled dist/index.js
 npm run lint                   # ESLint 9 flat config
 npm run lint:fix               # ESLint with auto-fix
 npm run type-check             # tsc --noEmit (no output, type check only)
-npm test                       # Jest with coverage
-npm run test:serial            # Jest with coverage, --runInBand
+npm test                       # Jest with coverage, then check-conformance-coverage.cjs
+npm run test:serial            # The same, with Jest --runInBand
 npm run test:unit              # Unit tests only
 npm run test:integration       # Integration tests only
 npm run build:openapi          # openapi/openapi.yaml → openapi/openapi.json
@@ -235,7 +241,7 @@ npm run test:openapi-coverage  # Jest over src/openapi — the coverage gate, wi
 npm run test:contract          # Jest over src/openapi and src/routes, without coverage reporting
 ```
 
-Run these in `packages/backend`, or from the root with `--workspace=@ronl/backend`. `scripts/jest-global-setup.cjs` also builds `openapi.json` before every Jest run, because both backend workflows run the tests before they build.
+Run these in `packages/backend`, or from the root with `--workspace=@ronl/backend`. `scripts/jest-global-setup.cjs` also builds `openapi.json` before every Jest run, because both backend workflows run the tests before they build, and truncates the file `CONFORMANCE_LOG` names (`conformance-operations.log`). `npm test` and `npm run test:serial` end with `node scripts/check-conformance-coverage.cjs`, which reads that log and exits non-zero when a documented operation was never checked against a real response. A filtered run (`npx jest -t …`, one file) does not go through that step; with no log at all, the script skips with a note.
 
 ---
 

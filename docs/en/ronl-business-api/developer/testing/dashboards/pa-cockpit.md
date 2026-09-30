@@ -14,41 +14,45 @@ and the only board with its own end-to-end suite.
     why the frontend's own totals fell between v2026.08.23 and v2026.08.33
     without anything being deleted.
 
-**Package: 43 files · 476 tests.** **Backend: 16 files · 578 tests** in
-`src/pa-monitoring` — the largest single area in the repository.
-**E2E: 2 specs · 7 tests**, still in the frontend package.
+**Package: 43 files · 515 tests.** **Backend: 16 files · 583 tests** in
+`src/pa-monitoring` — the second-largest area in the backend, after
+`src/routes`. **E2E: 2 specs · 7 tests**, still in the frontend package.
 
-Measured with `npm test --workspace=@ronl/pa-cockpit` on **24 September 2026**
-against `main` at `86af73e` (v2026.09.11), after a clean `npm ci` in a separate
-clone on Node 24.14.1 / npm 11.11.0: **476 of 476 passing**, `Duration 37.58s`.
-Coverage **90.11 % statements · 88.52 % branches · 86.52 % functions ·
-91.33 % lines** — branches up 12.97 points from v2026.08.36 under the per-file
-80% floor adopted in v2026.09.2, which v2026.09.6 wrote into this package's
-`vitest.config.ts` as `thresholds: { branches: 80, perFile: true }`. The run
-passed it without naming a file.
+Measured with `npm test --workspace=@ronl/pa-cockpit` on **30 September 2026**
+for v2026.09.15 (`main` at `ae06c9e`), in the working checkout on `acc` at
+`142d909`, a tree identical to `ae06c9e`, on Node 24.14.1 / npm 11.11.0:
+**515 of 515 passing**, `Duration 35.32s`. Coverage **92.61 % statements ·
+93.89 % branches · 89.56 % functions · 93.13 % lines** — branches up 18.34
+points from v2026.08.36 under the per-file 80% floor adopted in v2026.09.2,
+which v2026.09.6 wrote into this package's `vitest.config.ts` as
+`thresholds: { branches: 80, perFile: true }`. The run passed it without naming
+a file, and no file is below 85% either: the lowest is
+`services/dossierbeheer.api.ts` at 85.10%.
 
-!!! note "Six releases, six identical counts — and a coverage figure that still wobbles"
+!!! note "Six releases of identical counts, then +39 tests"
     43 files and 476 tests at v2026.09.7, v2026.09.9, v2026.09.11, v2026.09.12
-    and v2026.09.13, re-measured on **28 September 2026** at `963fe24` (`acc`)
-    and passing 476 of 476 in `Duration 23.87s`.
+    and v2026.09.13 — and **43 files and 515 tests** at v2026.09.15. Every one
+    of the 39 is from the two branch-margin commits: `391b1a8` (#256) added four
+    to `DossierRow.test.tsx`, taking a file that sat at exactly 80.00% branches
+    to 100 and exposing a latent crash when a dossier had no `kompas`, fixed in
+    the same commit; `73a6764` added 35 across six files, `Monitoring.test.tsx`
+    (+16) and `services/pa.api.test.ts` (+13) above all.
 
-    The package has had **no `src/` change and no test change** across the last
-    two releases, which makes it the cleanest available test of how stable these
-    percentages are. The answer is: not entirely. Branches and lines have read
-    **88.52** and **91.33** on every pass. Statements and functions have
-    alternated — 90.11 / 86.52 on 12 and 26 September, **90.07 / 86.39** on 20
-    and 28 September — on identical code, identical tests and the same runner.
+    **The package's percentages had wobbled in the second decimal while
+    nothing changed.** Across v2026.09.12 and v2026.09.13 — no `src/` change and
+    no test change — branches and lines read **88.52** and **91.33** on every
+    pass, while statements and functions alternated between 90.11 / 86.52 and
+    90.07 / 86.39 on identical code. That is the second-decimal warning on
+    [Coverage](../coverage.md) in its cleanest form, and it is why the moves of
+    two to five points on 30 September are worth reporting and a move in the
+    second decimal is not.
 
-    The figures at the top of this page are the 24 September reading; the
-    repository-wide table on [Coverage](../coverage.md) carries the
-    28 September one. Both are correct, which is the point of the
-    second-decimal warning there.
+    This package now holds **7 of the 23 files** an 80% *functions* floor would
+    fail — the second-largest share after the frontend — while **none** of its
+    38 source files is below the 80% *branch* floor that is actually
+    configured.
 
-    This package holds **8 of the 26 files** an 80% *functions* floor would fail
-    — the second-largest share after the frontend — while **none** of its 38
-    source files is below the 80% *branch* floor that is actually configured.
-
-!!! warning "Until v2026.09.6, these 476 tests ran nowhere in CI"
+!!! warning "Until v2026.09.6, this package's tests ran nowhere in CI"
     `@ronl/pa-cockpit` is a library: it has no deploy workflow of its own, and
     no other workflow ran its suite. The most heavily tested surface in the
     product was therefore covered on developer machines and nowhere else, while
@@ -61,7 +65,7 @@ passed it without naming a file.
 
 !!! note "The E2E figures above are older than the rest"
     The package counts and coverage, and the `src/pa-monitoring` backend figure,
-    are all from **24 September 2026**. The two E2E specs were last measured on
+    are all from **30 September 2026**. The two E2E specs were last measured on
     29–30 August and were not re-run in this pass — running them needs the full
     local stack. See [E2E & live smoke](../e2e.md).
 
@@ -69,31 +73,40 @@ passed it without naming a file.
 
 ## The package suite
 
+Re-derived on **30 September 2026** at `ae06c9e`. Vitest's console reports
+only the package total, so the per-file counts are taken from the source, each
+test file parsed with its `.each` tables expanded; they sum to exactly the
+runner's **515**, and the same method gives exactly 476 at `963fe24`. The
+table this page carried before was older than the 476 it sat under, and had
+fallen behind most of these files.
+
 | File | Tests | Covers |
 |---|---:|---|
-| `services/pa.api.test.ts` | 66 | The cockpit's API client — the single largest test file in the package |
-| `pages/public-affairs-v2/PaDataProvider.test.tsx` | 21 | The context every cockpit screen consumes |
+| `services/pa.api.test.ts` | 90 | The cockpit's API client — the single largest test file in the package |
+| `pages/public-affairs-v2/Monitoring.test.tsx` | 51 | Monitoring view (35 on 28 September) |
+| `pages/PADashboardV2.test.tsx` | 27 | The page container and the host contract it requires |
+| `pages/public-affairs-v2/PaDataProvider.test.tsx` | 24 | The context every cockpit screen consumes |
+| `pages/public-affairs-v2/Issuekaart.test.tsx` | 24 | The issue map |
+| `components/PADashboardV2/ZoekcriteriaSection.test.tsx` | 22 | Saved-search criteria |
+| `pages/public-affairs-v2/Kompas.test.tsx` + `kompas.test.ts` | 21 | The kompas view and its pure data module |
 | `pages/public-affairs-v2/NotificationsPanel.test.tsx` | 19 | Previously 0% — notifications were hardcoded to empty |
 | `services/dossierbeheer.api.test.ts` | 17 | The dossier API client |
 | `components/PADashboardV2/dossierbeheer/Dossierbeheer.test.tsx` | 17 | Dossier list, filters, status transitions |
-| `pages/PADashboardV2.test.tsx` | 15 | The page container and the host contract it requires |
+| `pages/public-affairs-v2/dossierbeheer.data.test.ts` | 16 | The dossier data module |
+| `pages/public-affairs-v2/AgendaView.test.tsx` | 16 | The agenda |
 | `components/PADashboardV2/PaSectionsRouter.test.tsx` | 15 | The section-id grammar that replaced a fourteen-export surface |
-| `pages/public-affairs-v2/Monitoring.test.tsx` | 14 | Monitoring view |
-| `pages/public-affairs-v2/Issuekaart.test.tsx` | 14 | The issue map |
 | `components/PADashboardV2/dossierbeheer/DossierEditor.test.tsx` | 14 | Authoring a dossier |
+| `components/PADashboardV2/dossierbeheer/DossierRow.test.tsx` | 12 | Row rendering and actions (8 on 28 September) |
+| `components/PADashboardV2/dossierbeheer/MdEditor.test.tsx` | 11 | The Markdown editor |
 | `services/mock-demo.store.test.ts` | 11 | The mock store both hosts drive |
-| `pages/public-affairs-v2/Kompas.test.tsx` + `kompas.test.ts` | 20 | The kompas view and its pure data module |
-| `components/PADashboardV2/dossierbeheer/MdEditor.test.tsx` | 9 | The Markdown editor |
-| `components/PADashboardV2/ZoekcriteriaSection.test.tsx` | 9 | Saved-search criteria |
+| `components/PADashboardV2/PACommandPalette.test.tsx` | 11 | The ⌘K palette |
 | `pages/public-affairs-v2/Vandaag.test.tsx` | 8 | The 30-second start screen |
 | `pages/public-affairs-v2/FeitenCijfers.test.tsx` | 8 | Facts and figures |
-| `components/PADashboardV2/dossierbeheer/DossierRow.test.tsx` | 8 | Row rendering and actions |
-| `pages/public-affairs-v2/AgendaView.test.tsx` | 7 | The agenda |
-| `components/PADashboardV2/PACommandPalette.test.tsx` | 7 | The ⌘K palette |
+| `pages/public-affairs-v2/modes.gate.test.ts` | 8 | The per-item rail gate — authentication, role and organisation type — which no shipped item uses yet |
 
-By directory: `pages/public-affairs-v2` **119**, `services` **94**,
-`components/PADashboardV2/dossierbeheer` **67**, `components/PADashboardV2`
-**53**, `pages` **15**, `modes` **7**, package root **10**, `test` **3**.
+By directory: `pages/public-affairs-v2` **203**, `services` **118**,
+`components/PADashboardV2/dossierbeheer` **74**, `components/PADashboardV2`
+**73**, `pages` **27**, package root **10**, `modes` **7**, `test` **3**.
 
 ### The guards that came with the extraction
 
@@ -123,24 +136,26 @@ seam cannot silently close again.
 
 ## Backend
 
-`src/pa-monitoring` — 533 tests across 16 files:
+`src/pa-monitoring` — **583 tests across 16 files**, from the backend run's own
+JSON output on 30 September 2026:
 
 | File | Tests |
 |---|---:|
-| `pa.routes.test.ts` | 131 |
+| `pa.routes.test.ts` | 133 |
 | `pa-dossiers.routes.test.ts` | 96 |
 | `curation.service.test.ts` | 61 |
 | `rules.test.ts` | 38 (pure scoring) |
 | `pa-dossiers.db.test.ts` | 30 |
+| `pa-cache.test.ts` | 23 |
 | `pa-monitoring.db.test.ts` | 10 |
-| `pa-cache.test.ts` | 9 |
 | `notifications.service.test.ts` | 8 |
 | `query-match.test.ts` | 6 |
 | `rss.test.ts` | 4 |
 
-Plus the TK, OB, EU, agenda and media source clients under
-`pa-monitoring/sources`. Coverage: `pa-monitoring` 98.32%,
-`pa-monitoring/sources` 97.07%.
+Plus 174 tests in the six source clients under `pa-monitoring/sources`: EU
+(73), media (27), EP texts submitted (24), TK (21), OB (19) and agenda (10).
+Coverage on 30 September (statements / branches): `pa-monitoring`
+98.95 / 89.35, `pa-monitoring/sources` 98.13 / 93.05.
 
 ---
 

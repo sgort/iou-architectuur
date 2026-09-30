@@ -10,60 +10,98 @@ The frontend is `packages/frontend` (`@ronl/frontend`) — a React 18 + TypeScri
 
 ## Project structure
 
-!!! info "The Public Affairs cockpit is no longer in this package"
-    As of v2026.08.27 the PA cockpit lives in
+!!! info "The Public Affairs cockpit is not in this package"
+    Since v2026.08.27 the PA cockpit lives in
     [`@ronl/pa-cockpit`](pa-cockpit-package.md), which the frontend imports and
-    configures through a host adapter. What remains below is the caseworker
-    application. The structure shown is the caseworker tree, not the whole
-    front end of the product.
+    configures through a host adapter (`pages/pa-cockpit-host.tsx`,
+    `pages/PaCockpitRoute.tsx`, `components/PADashboardV2/`). Everything else —
+    the landing page, the citizen portal and the Caseworker, Infra-board and Woo
+    boards — is in the tree below. Test files (`*.test.ts[x]`) sit beside the
+    code they test and are left out, except `indexHtml.test.ts`, which tests
+    no module.
 
 ```
 packages/frontend/src/
-├── App.tsx                     # React Router wrapper
-├── main.tsx                    # React entry point, StrictMode
-├── index.css                   # Global CSS (Tailwind base + custom properties)
+├── App.tsx                        # React Router routes
+├── main.tsx                       # React entry point, StrictMode
+├── index.css                      # Global CSS (Tailwind base + custom properties)
+├── vite-env.d.ts
 ├── pages/
-│   ├── LoginChoice.tsx         # Landing page with IDP selection
-│   ├── AuthCallback.tsx        # Keycloak initialization handler
-│   ├── CaseworkerDashboard.tsx # Caseworker shell: auth state, nav state, layout only
-│   ├── Dashboard.tsx           # Citizen portal (zorgtoeslag calculator)
-│   ├── ChangelogPanel.tsx      # Sliding changelog panel
-│   └── changelog-data.ts       # Changelog content
+│   ├── LoginChoice.tsx            # Landing page: Flevoland account, DigiD, board cards
+│   ├── login-choice/              # boards.config.ts, login-portal.css
+│   ├── AuthCallback.tsx           # Keycloak check-sso, then login() with a hint
+│   ├── Dashboard.tsx              # Citizen portal (start forms, Mijn aanvragen)
+│   ├── CaseworkerDashboardV2.tsx  # Caseworker shell: auth, tenant, nav state, layout
+│   ├── caseworker-v2/             # modes.config.ts, dashboard-v2.css, regelsimulatie.css
+│   ├── InfraBoardDashboard.tsx    # Infra-board shell
+│   ├── infra-board/               # RIP phase catalog and model, data, modes, dashboard-infra.css
+│   ├── WooDashboard.tsx           # Woo dashboard shell
+│   ├── woo/                       # modes.config.ts, woo.data.ts, dashboard-woo.css
+│   ├── PaCockpitRoute.tsx         # Route into @ronl/pa-cockpit
+│   ├── pa-cockpit-host.tsx        # Host adapter for @ronl/pa-cockpit
+│   ├── ChangelogPanel.tsx         # Sliding changelog panel
+│   ├── ChangelogPanelContent.tsx
+│   └── changelog-data.ts          # Changelog content
 ├── components/
-│   └── CaseworkerDashboard/    # All caseworker dashboard sections (extracted v2.9.2)
-│       ├── NieuwsSection.tsx
-│       ├── BerichtenSection.tsx
-│       ├── RegelCatalogus.tsx
-│       ├── TakenSection.tsx
-│       ├── ArchiefSection.tsx
-│       ├── ProfielSection.tsx
-│       ├── RollenSection.tsx
-│       ├── HrOnboardingSection.tsx
-│       ├── OnboardingArchiefSection.tsx
-│       ├── RipFase1Section.tsx
-│       ├── RipFase1WipSection.tsx
-│       ├── RipFase1GereedSection.tsx
-│       ├── GereedschapSection.tsx
-│       ├── AuditSection.tsx
-│       ├── McpChatSection.tsx
-│       ├── ProductenDienstenCatalogus.tsx
-│       ├── ProcesBibliotheek.tsx
-│       ├── IouGebruiksscenarioSection.tsx
-│       ├── IouFeedbackSection.tsx
-│       └── IouZakenSection.tsx
-├── contexts/                   # React contexts (auth, tenant)
+│   ├── process/                   # The process view, shared by the Infra-board and the Taken inbox
+│   │   ├── PhaseStepper.tsx       # Phase stepper (RIP phases or Awb phases)
+│   │   ├── PhaseSwimlane.tsx      # SVG BPMN swimlane
+│   │   ├── ProcessWhere.tsx       # "Waar sta ik": compact Awb stepper under the task header
+│   │   ├── ProcessLaneSteps.tsx   # "Processtappen per rol"
+│   │   ├── ProcessOverlay.tsx     # Modal: full stepper, breadcrumb, legend, swimlane
+│   │   ├── useTaskProcessContext.ts  # Loads a task's call chain, histories and models
+│   │   ├── processContext.ts      # buildProcessContext: pure assembly, engine-ordered history
+│   │   ├── laneSteps.ts           # Derivations behind "Processtappen per rol"
+│   │   ├── awbStepper.ts          # Awb phases as stepper phases
+│   │   ├── swimlaneText.ts        # Condition expressions as readable flow labels
+│   │   ├── process-view.css       # Stepper and swimlane styles, scoped under .pbd
+│   │   └── caseworker-process.css # Caseworker additions (one-line rules; not prettier-formatted)
+│   ├── CaseworkerDashboardV2/     # V2 shell parts: SectionRouter, TakenInbox, CommandPalette,
+│   │   │                          #   PaletteActions, paletteActionsContext, AssistantDock,
+│   │   │                          #   RegelSimulatie, GegevenswoordenboekV2, NoAccessPanel,
+│   │   │                          #   SectionErrorBoundary
+│   │   └── regelsimulatie/        # Simulation engine, chart and panels
+│   ├── CaseworkerDashboard/       # Sections the V2 shell routes to (Nieuws, Berichten,
+│   │                              #   RegelCatalogus, ProcesBibliotheek, HR onboarding,
+│   │                              #   capacity claim, DVTP, IOU, Audit, Gereedschap, McpChat,
+│   │                              #   Profiel, Rollen, …) and TaskFormViewer.tsx
+│   ├── InfraBoardDashboard/       # Infra-board sections: Portfolio, ProjectDetail, PhaseDetail,
+│   │                              #   MijnDag, FaseladderOverview, SigningPanel, router, dock
+│   ├── WooDashboard/              # Woo sections: Overzicht, Verzoeken, Proces, Publicatie,
+│   │                              #   Register, Bezwaar, Tijdigheid, router, dock, charts
+│   ├── PADashboardV2/             # PA dock and section router for the host
+│   ├── LoginChoice/               # BoardCard, BoardPreview
+│   ├── ProcessStartFormViewer.tsx # Citizen start form (@bpmn-io/form-js)
+│   ├── StartFailureNotice.tsx     # The notice under a failed citizen start (#171)
+│   ├── DecisionViewer.tsx         # Final decision of a completed citizen process
+│   ├── AltchaWidget.tsx
+│   ├── PersonalDataPanel.tsx
+│   ├── SessionExpiryWarning.tsx
+│   └── TimeLine.tsx
 ├── hooks/
-│   └── useProfielData.ts       # Shared hook for Profiel and Rollen sections
+│   └── useProfielData.ts          # Shared hook for Profiel and Rollen sections
 ├── services/
-│   ├── keycloak.ts             # Keycloak JS adapter initialization
-│   ├── api.ts                  # Business API HTTP client (Axios)
-│   └── tenant.ts               # Tenant config loading and theme application
+│   ├── api.ts                     # Business API client (Axios) — businessApi
+│   ├── keycloak.ts                # Keycloak JS adapter, initializeKeycloak()
+│   ├── identity-providers.ts      # FLEVOLAND_IDP, the Entra alias sent as idpHint
+│   ├── tenant.ts                  # Tenant config loading and theme application
+│   ├── infra.api.ts               # Infra-board live-data hooks over businessApi
+│   └── brp.api.ts, brp.timeline.ts, bsn.mapping.ts
+├── types/
+│   └── brp.types.ts
 ├── utils/
-│   └── formatDate.ts           # Shared date formatter
-└── themes/                     # Per-municipality theme tokens
+│   ├── buildInfo.ts               # "build <sha> · #<run>", or "local build"
+│   └── formatDate.ts              # Shared date formatter
+├── test/                          # Vitest setup and fixtures
+└── indexHtml.test.ts              # index.html and the .env.<mode> files agree
 packages/frontend/public/
-├── tenants.json                # Municipality configurations (loaded at runtime)
-└── staticwebapp.config.json    # Azure SWA routing configuration
+├── tenants.json                   # Municipality configurations (loaded at runtime)
+├── timeline-config.json
+├── og-image-acc.png, og-image-prod.png  # Link-preview images, one per environment
+├── pa/                            # PA cockpit assets
+└── staticwebapp.config.json       # Azure SWA routing configuration
+packages/frontend/scripts/
+└── check-og.mjs                   # CI gate: the built index.html carries this environment's link preview
 ```
 
 ---
@@ -329,6 +367,18 @@ to create for local development:
 | `VITE_API_URL` | `http://localhost:3002/v1` | `https://acc.api.open-regels.nl/v1` | `https://api.open-regels.nl/v1` |
 | `VITE_LDE_API_URL` (Procesbibliotheek) | `http://localhost:3001/v1` | `https://acc.backend.linkeddata.open-regels.nl/v1` | `https://backend.linkeddata.open-regels.nl/v1` |
 | `VITE_PA_SIGNALS_MOCK`, `VITE_PA_DOSSIERS_MOCK`, `VITE_PA_AGENDA_MOCK` | `false` | `false` | `false` |
+| `VITE_SITE_URL` | `http://localhost:5173` | `https://acc.mijn.open-regels.nl` | `https://mijn.open-regels.nl` |
+| `VITE_OG_IMAGE` | `og-image-acc.png` | `og-image-acc.png` | `og-image-prod.png` |
+| `VITE_OG_TITLE_PREFIX` | `"[DEV] "` | `"[ACC] "` | `""` |
+| `VITE_ROBOTS` | `noindex, nofollow` | `noindex, nofollow` | `index, follow` |
+
+The last four fill the link-preview tags in `index.html` at build time —
+`%VITE_…%` placeholders in the canonical link, the `robots` meta tag and the
+Open Graph and Twitter tags, since crawlers do not run JavaScript. The prefix
+is quoted so its trailing space survives. `src/indexHtml.test.ts` checks the
+template against each mode's file, and every deploy build checks the built
+`dist/index.html` with `scripts/check-og.mjs` — see [CI/CD → Static-site deploy
+shape](cicd.md#static-site-deploy-shape).
 
 To override a value on your own machine, use `.env.development.local`, which is
 gitignored. See [Local Development Setup](local-development.md#front-end-configuration).
@@ -469,9 +519,13 @@ Renders the start form for a BPMN process in the citizen dashboard.
 | `processKey` | `string` | BPMN process definition key |
 | `initialData` | `Record<string, unknown>` | Hidden pre-populated variables (e.g. `applicantId`, `productType`) |
 | `onStarted` | `(dossier: string) => void` | Called with `businessKey` on successful process start |
-| `onError` | `() => void` | Called on API or form error |
+| `onError` | `(failure: StartFailure) => void` | Called when the start fails, with `{ cause?, instance? }` |
 
 On mount: calls `businessApi.process.startForm(processKey)` to fetch the schema. On submit: calls `businessApi.process.start(processKey, formData)`. Extracts `businessKey` from the response (falls back to `processInstanceId`).
+
+When the start fails, `StartFailure` carries what came back: `cause` is the backend's own explanation (`error.details`, else `error.message` — Operaton's message when the engine refused) or a thrown error's message, and `instance` is the engine base URL the backend targeted. Either may be absent. The viewer logs `Process start failed` with the process key and both fields to the browser console **on every tier, production included**, and then calls `onError`; whether the detail reaches the screen is the caller's decision.
+
+The citizen dashboard (`Dashboard.tsx`) renders it with `StartFailureNotice` under each of its three start forms. The headline is the same on every tier — *De aanvraag kon niet worden ingediend. Probeer het opnieuw.* — and below it the notice shows **Oorzaak** and **Operaton** unless the Vite build mode is `production` (#171). `build:prod` builds with `--mode production`, `build:acc` — acceptance and its pull-request previews — with `--mode acceptance`, and the dev server runs as `development`, so only the production build hides the cause.
 
 ### `TaskFormViewer`
 
@@ -510,6 +564,88 @@ On mount, fires two requests in parallel via `Promise.allSettled`:
 Caseworker-only fields are excluded from both rendering paths.
 
 See [Dynamic Forms — Document templates](../features/dynamic-forms.md#document-templates) for the feature description.
+
+---
+
+## The process view
+
+`components/process/` holds the process view: the phase stepper and BPMN
+swimlane the Infra-board has always drawn, and the caseworker's view of where a
+task stands in its process, which the Taken inbox (`CaseworkerDashboardV2/TakenInbox.tsx`)
+renders for the selected task. What a caseworker sees is described in the
+[Caseworker guide](../user-guide/caseworker.md); this section is how it is put
+together.
+
+### Which parts render
+
+| Part | Component | Renders when |
+|---|---|---|
+| **Waar sta ik** — compact Awb stepper under the task header | `ProcessWhere` | The task's process has lanes **and** the task has an Awb phase |
+| **Processtappen per rol** — history and what comes next, grouped by lane | `ProcessLaneSteps` | The task's process has lanes |
+| The overlay — full stepper, `Hoofdproces › Deelproces` breadcrumb, legend, swimlane | `ProcessOverlay` | Opened from either part above, or from ⌘K |
+
+Without lanes, or when the context failed to load, the inbox shows the
+flat list of activity-history steps it has always shown. The Awb
+phase comes from `ronl:awbPhase` markers in the BPMN; a task in a subprocess
+without markers takes the phase of the call activity that started it, walking
+up the chain. With no phase at all, `ProcessWhere` renders nothing. See [BPMN
+design criteria](../reference/bpmn-design-criteria.md) for what a model needs.
+
+### Loading a task's context
+
+`useTaskProcessContext(task)` loads everything the view draws for one task and
+reloads when the selection changes; a result for a task that is no longer
+selected is discarded, so a slow earlier load cannot overwrite the current one.
+`loadProcessContext` fetches, in order:
+
+1. the task's own lineage (`businessApi.process.lineage`, `GET
+   /v1/process/:id/lineage`), then each calling instance upwards through
+   `superProcessInstanceId`, at most five levels;
+2. the activity history of every instance in that chain, and of each child a
+   call activity started (`calledProcessInstanceId`) that is not in the chain;
+3. the swimlane model (`businessApi.process.swimlane`, `GET
+   /v1/process/definition/key/:key/swimlane`) of every process involved, plus
+   any subprocess a call node names that the case has not reached yet, so the
+   overlay can open it.
+
+**Only the task's own lineage and history are required** — either failing
+rejects the load. Everything above or beside it (a caller refused by the tenant
+check, a finished child, a model) is optional, so a partial chain still renders.
+
+`buildProcessContext` in `processContext.ts` is the pure assembly step. It
+merges the histories into one list in **engine order**, which time alone cannot
+give: Operaton runs a call activity, its child's start event and the child's
+first automated steps in one transaction, often in the same millisecond. So each
+instance's own entries are ordered by time and a child's entries are spliced in
+directly after the call activity that started it. From that list it derives a
+node status per process, the call chain, the task's Awb phase and `hasLanes`.
+`laneSteps.ts`, `awbStepper.ts` and `swimlaneText.ts` hold the remaining
+derivations as pure functions, so the rules are unit-tested and the components
+only render.
+
+### Styling
+
+`process-view.css` carries the stepper and swimlane styles moved verbatim from
+the Infra-board, still scoped under `.pbd`, so the Infra-board renders exactly
+as before. A caseworker container opts in by carrying the `pbd` class — only
+the two wrappers do, `ProcessWhere`'s `.cwp-where` and `ProcessOverlay`'s
+`.cwp-ov-panel`, not the inbox around them. `PhaseSwimlane` adds `.cwp-swim` to
+its root when it is given any caseworker prop (`myLaneKeys`, `claimedLabel`,
+`onOpenCall`, `scrollToNodeId`), and that class scopes the caseworker restyling
+of elements the Infra-board also draws, such as the claimed-node tab and the
+label clamp. Aligning the two boards' styling is open as #277.
+`caseworker-process.css` is written as one-line rules, as its header says; the
+root `format` and `check-format` scripts cover only `ts`, `tsx`, `json` and
+`md`, so they leave it alone — do not run Prettier on it by hand.
+
+### The ⌘K action
+
+A section can offer a command to the ⌘K palette while it has something to act
+on. `PaletteActionsProvider` wraps the caseworker shell, `usePaletteAction`
+registers an action from anywhere below it, and `CommandPalette` lists the
+registered actions beside the static sections from `modes.config`. The Taken
+inbox registers **Proces van deze taak bekijken**, which opens the overlay,
+while the selected task's process has lanes.
 
 ---
 

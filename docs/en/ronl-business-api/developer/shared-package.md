@@ -79,7 +79,7 @@ interface JwtClaims {
 A passing run reads:
 
 ```
-check-shared-declarations: 11 file(s) in packages/shared/src/ — declarations and constant data only.
+check-shared-declarations: 12 file(s) in packages/shared/src/ — declarations and constant data only.
 ```
 
 A failure names the file, the line, and where the logic should live instead. If the package ever genuinely needs runtime logic, the documented path is to give it a Vitest runner with the same per-file floor and delete the script — a deliberate change, not a workaround.

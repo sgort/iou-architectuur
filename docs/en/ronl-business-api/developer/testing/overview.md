@@ -12,23 +12,21 @@ cockpit (`packages/pa-cockpit`), the public cockpit demo
 jsdom. All five run with coverage by default.
 
 !!! info "Figures on this page are measured, not estimated"
-    Every count and percentage below was produced on **28 September 2026**
-    against **v2026.09.13**, in a fresh clone checked out at `963fe24` — the
-    head of `acc` — after a clean `npm ci`. Each workspace was run on its own,
-    one after another, with its own `npm test`; all five of those scripts
-    already include coverage. Rerun the commands in
-    [Running the tests](#running-the-tests) to reproduce them.
+    Every count and percentage below was produced on **30 September 2026**
+    against **v2026.09.15**, the release in production: `main` is at
+    `ae06c9e`. The runs were made in the working checkout on `acc` at
+    `142d909`, whose tree is identical to `ae06c9e`, after
+    `npm run deps:check` reported the installed dependencies in sync with the
+    lockfile. Each workspace was run on its own, one after another, with its
+    own `npm test`; all five of those scripts already include coverage. Rerun
+    the commands in [Running the tests](#running-the-tests) to reproduce them.
 
-    **This is an acceptance release, and these pages record it as one.**
-    `main` is still **v2026.09.12** (`2443adc`); v2026.09.13 exists only on
-    `acc` until it is promoted. Where this page compares against an earlier
-    release it names the date that figure was taken, because not every figure
-    here has been re-measured on every pass.
-
-    The method returns to a separate clone with `npm ci`, as the 24 September
-    pass used. The 26 September pass ran in the working checkout instead, after
-    `npm run deps:check`; that is the only methodological difference between
-    the two, and it is stated rather than assumed away.
+    **The method differs from the 28 September pass in one respect**, and it is
+    stated rather than assumed away: that pass used a fresh clone after a clean
+    `npm ci`, this one the working checkout after `deps:check`, as the
+    26 September pass did. Where this page compares against an earlier release
+    it names the date that figure was taken, because not every figure here has
+    been re-measured on every pass.
 
     **The runtime was Node 24.14.1 / npm 11.11.0, and `.nvmrc` names
     22.23.2.** Every figure on this page was taken on a newer Node than the one
@@ -41,84 +39,104 @@ jsdom. All five run with coverage by default.
     are further out of date than a stale figure usually is: the spec inventory
     is **thirteen specs** — eleven frontend (including `thuisbatterij-journey`
     and `zorgtoeslag-journey`), `pa-demo/e2e/plato-demo` and
-    `public-site/e2e/publiek` — unchanged at `963fe24`, and the 27-test frontend
+    `public-site/e2e/publiek` — unchanged at `ae06c9e`, and the 27-test frontend
     figure predates `thuisbatterij-journey.spec.ts` entirely. Read those counts
-    as a floor, not a total. What *is* new in v2026.09.13 is how the fixtures
-    those suites need get deployed — see
-    [E2E & live smoke](e2e.md#deploying-the-e2e-fixtures). The four live-smoke
-    shell scripts remain described from their configuration only.
+    as a floor, not a total. What *did* change between v2026.09.13 and
+    v2026.09.15 is the selectors in three frontend specs and in the shared
+    login helper — see [E2E & live smoke](e2e.md). The four live-smoke shell
+    scripts remain described from their configuration only.
 
     **`npm run test:perf` was not re-run either**, and because
     `vite.config.ts` excludes `src/**/*.perf.test.ts`, its one test is **not**
-    part of the 110 frontend files or the repository-wide 300 / 4141 below.
+    part of the 120 frontend files or the repository-wide 312 / 4574 below.
     Wherever this page states a repository-wide file count, that count excludes
     the performance spec.
 
-    **None of the root gates were re-run in this pass, and the branch rulesets
-    were not re-read.** `lint`, `check-format`, `lint:openapi`, `check-shared`,
-    `check-supply-chain` and the rulesets all keep the result and the date they
-    already carried — see
-    [Linting, formatting, git hooks, and CI](#linting-formatting-git-hooks-and-ci).
-    What *was* re-read at `963fe24` is `.husky/pre-push`, which had gained a
-    step the table below did not have, and the list of workflow files.
+    **The root gates were re-run in this pass, and the branch rulesets were
+    re-read.** `lint`, `check-format`, `lint:openapi`, `check-shared`,
+    `check-supply-chain` and `check-swimlane-fixtures` all passed on
+    30 September, as did the backend's `test:contract` and
+    `test:openapi-coverage` — see
+    [Linting, formatting, git hooks, and CI](#linting-formatting-git-hooks-and-ci)
+    and [What actually gates a merge](#what-actually-gates-a-merge).
 
 **At a glance:**
 
 | Package | Runner | Files | Tests | Result | Duration¹ | Statements | Branches | Functions | Lines |
 |---|---|---:|---:|---|---:|---:|---:|---:|---:|
-| `packages/backend` | Jest + ts-jest | 96 | 2202² | all passing | 94.98s | 98.49% | 92.57% | 97.51% | 98.89% |
-| `packages/frontend` | Vitest + RTL | 110 | 1122 | all passing³ | 133.15s | 93.24% | 89.91% | 87.98% | 94.07% |
-| `packages/pa-cockpit` | Vitest + RTL | 43 | 476 | all passing | 23.87s | 90.07% | 88.52% | 86.39% | 91.33% |
-| `packages/pa-demo` | Vitest + jsdom | 19 | 106 | all passing | 8.16s | 93.47% | 95.65% | 85.00% | 92.85% |
-| `packages/public-site` | Vitest + jsdom | 32 | 235 | all passing | 13.62s | 95.92% | 96.31% | 95.07% | 96.41% |
+| `packages/backend` | Jest + ts-jest | 97 | 2370² | all passing | 54.67s | 98.90% | 95.14% | 97.98% | 99.20% |
+| `packages/frontend` | Vitest + RTL | 120 | 1318 | all passing³ | 114.82s | 95.36% | 93.09% | 91.41% | 95.89% |
+| `packages/pa-cockpit` | Vitest + RTL | 43 | 515 | all passing | 35.32s | 92.61% | 93.89% | 89.56% | 93.13% |
+| `packages/pa-demo` | Vitest + jsdom | 19 | 106 | all passing | 15.67s | 93.47% | 95.65% | 85.00% | 92.85% |
+| `packages/public-site` | Vitest + jsdom | 33 | 265 | all passing | 24.09s | 96.60% | 97.34% | 95.07% | 97.17% |
 
-**300 files · 4141 tests**, all passing, **nothing skipped**, in about
-**4 minutes 34 seconds** of runner-reported time across the five runs (about
-5 minutes 19 seconds of wall clock, counting npm's own start-up). One
-performance spec runs separately and is excluded from both the 110 and the
-300 — 4142 in total. See [Coverage](coverage.md) for what those percentages
-mean and where the remaining gaps are.
+**312 files · 4574 tests**, all passing, **nothing skipped**, in about
+**4 minutes 5 seconds** of runner-reported time across the five runs (about
+5 minutes of wall clock — 73s, 130s, 42s, 24s and 31s — counting npm's own
+start-up). One performance spec runs separately and is excluded from both the
+120 and the 312 — 4575 in total. See [Coverage](coverage.md) for what those
+percentages mean and where the remaining gaps are.
 
-**Against the 24 September measurement of v2026.09.11 — two releases back —
-that is +7 files and +135 tests.** All seven files and 130 of the 135 tests are
-the backend's; the other five are the frontend's. Written out:
+**Against the 28 September measurement of v2026.09.13 — two releases back,
+since v2026.09.14 was not measured on its own — that is +12 files and
++433 tests.** Four of the five workspaces grew; pa-demo reproduced its counts
+and all four of its percentages exactly. Written out:
 
-| | 24 Sep · v2026.09.11 | 28 Sep · v2026.09.13 | Δ |
+| | 28 Sep · v2026.09.13 | 30 Sep · v2026.09.15 | Δ |
 |---|---:|---:|---:|
-| `packages/backend` | 89 files · 2072 | **96 · 2202** | +7 · +130 |
-| `packages/frontend` | 110 files · 1117 | **110 · 1122** | — · +5 |
-| `packages/pa-cockpit` | 43 files · 476 | **43 · 476** | — |
+| `packages/backend` | 96 files · 2202 | **97 · 2370** | +1 · +168 |
+| `packages/frontend` | 110 files · 1122 | **120 · 1318** | +10 · +196 |
+| `packages/pa-cockpit` | 43 files · 476 | **43 · 515** | — · +39 |
 | `packages/pa-demo` | 19 files · 106 | **19 · 106** | — |
-| `packages/public-site` | 32 files · 235 | **32 · 235** | — |
-| **Total** | **293 · 4006** | **300 · 4141** | **+7 · +135** |
+| `packages/public-site` | 32 files · 235 | **33 · 265** | +1 · +30 |
+| **Total** | **300 · 4141** | **312 · 4574** | **+12 · +433** |
 
-The seven new backend test files all arrived in **v2026.09.12**, and cover six
-new source modules: `auth/tenant-access`, `middleware/version.middleware`,
-`openapi/document`, `openapi/testing/routeOperations`, `routes/openapi.routes`
-and `routes/registry` — plus `openapi/coverage`, which has no source file of its
-own because it is a contract gate over the built `openapi.json`. **v2026.09.13
-added no test file anywhere.** Its +4 backend tests and +5 frontend tests went
-into files that already existed: the Operaton definition-id caching regression
-and the swimlane's multiple-documents case in the backend, and the Entra sign-in
-work in `AuthCallback.test.tsx` (+2) and `LoginChoice.test.tsx` (+3).
+The twelve new files, by workspace:
+
+- **Backend, one:** `openapi/testing/conformance.test.ts` (20 tests), for the
+  helper that checks a real response against the documented schema (#269) —
+  see [Backend suite](backend.md). The other +148 backend tests went into
+  existing files, most of them in the route suites (+46), `rip-swimlane`
+  (+56, the parser that now reads any laned process and its Awb phases) and
+  `services` (+29); `openapi/coverage.test.ts` *shrank* from 7 tests to 3
+  when the pending list it policed was emptied and deleted.
+- **Frontend, ten:** seven in the new `components/process/` directory — the
+  caseworker's process view — plus `PaletteActions.test.tsx`,
+  `StartFailureNotice.test.tsx` and `src/indexHtml.test.ts`, the link-preview
+  tags per build mode. An eighth file in `components/process/`,
+  `PhaseSwimlane.test.tsx`, is not new: it moved there from
+  `InfraBoardDashboard/` and grew from 22 tests to 38. The directory holds
+  119 tests across those eight. Vitest's console reports only the package
+  total, so these per-file figures are counted from the source by parsing
+  every test file with `.each` tables expanded — a method that reproduces the
+  runner's total exactly, 1318 at `ae06c9e` and 1122 at `963fe24`.
+- **Public site, one:** `src/indexHtml.test.ts`, its own link-preview check,
+  23 tests across four build modes.
+
+**pa-cockpit gained 39 tests and no file**, all from the two branch-margin
+commits (see [Coverage](coverage.md)): `391b1a8` added four to
+`DossierRow.test.tsx`, and `73a6764` the other 35 —
+`pages/public-affairs-v2/Monitoring.test.tsx` (+16) and
+`services/pa.api.test.ts` (+13) above all.
 
 ² The backend reported **2011** for several releases, of which 2008 ran and
 three were permanently skipped; those three went with the unreachable
-`PHASE_NOT_MODELLED` branch they guarded (issue #85). The 2202 measured here is
-growth on top of that 2008 — **2011 → 2008 → 2028 → 2072 → 2198 → 2202** — and
-**no workspace skips anything**. The last step is the smallest of the six: four
-tests, nine counting the frontend's five, on a release whose weight is in what
-it fixes rather than in what it adds.
+`PHASE_NOT_MODELLED` branch they guarded (issue #85). The 2370 measured here is
+growth on top of that 2008 — **2011 → 2008 → 2028 → 2072 → 2198 → 2202 →
+2370** — and **no workspace skips anything**. The last step is the largest of
+the seven, and it spans two releases. The same run ended with
+*"✓ all 133 documented operations were checked against a real response"*,
+the conformance-coverage step `npm test` now carries after Jest — see
+[Backend suite](backend.md).
 
-³ The frontend is **1122/1122 green**, and the row's percentages come from its
-default parallel run — the one CI makes. That run finished **1121 passed,
-1 failed**, the failure being a single contention-only one in
-`ChangelogPanel.variants.test.tsx`; it did not reproduce in either of two
-further parallel runs, the file passes 7/7 in isolation, and the whole suite is
-green serially. See
+³ The frontend is **1318/1318 green in its default parallel run** — the one CI
+makes, and the one the row's percentages come from. No test failed, so there
+was nothing to re-run in isolation or serially. The file that failed under
+load in four of the five previous passes, `ChangelogPanel.variants.test.tsx`,
+was fixed at its own boundary in `afc2001`, which closed
+[issue #199](https://github.com/sgort/ronl-business-api/issues/199) on
+28 September — see
 [A parallel failure is not a finding](#a-parallel-failure-is-not-a-finding).
-[Issue #199](https://github.com/sgort/ronl-business-api/issues/199) remains
-open.
 
 !!! note "A coverage campaign, and every workspace moved at once"
     v2026.09.2 extended the backend-only coverage push to **all five workspaces
@@ -128,32 +146,45 @@ open.
     decimal in the others.
 
     Branches moved furthest, which is the point of a *branch* floor, and the
-    28 September figures hold the gain: public-site **70.39% → 96.31%**,
-    pa-cockpit **75.55% → 88.52%**, frontend **80.33% → 89.91%**, backend
-    **90.01% → 92.57%**, pa-demo **86.95% → 95.65%**.
+    30 September figures hold and extend the gain: public-site
+    **70.39% → 97.34%**, pa-cockpit **75.55% → 93.89%**, frontend
+    **80.33% → 93.09%**, backend **90.01% → 95.14%**, pa-demo
+    **86.95% → 95.65%**.
 
-    **The floor is now a gate, and it is per file.** v2026.09.6 configured it in
+    **The floor is a gate, and it is per file.** v2026.09.6 configured it in
     all five runner configs — a glob key `'./src/**/*.ts': { branches: 80 }` in
     `packages/backend/jest.config.js`, and
     `thresholds: { branches: 80, perFile: true }` in the four Vitest configs —
     so one file dropping below 80% branches exits the run non-zero and names
-    that file. **All five configurations are still in place at `963fe24`, and
-    no run named a file**; scanning every file entry in the five
-    `coverage-summary.json` reports independently finds **zero of 306 files
-    below 80% branches** in any workspace.
+    that file. **All five configurations are still in place at `ae06c9e`, and
+    no run named a file**; reading every file entry in the five workspaces'
+    coverage reports independently finds **zero of 319 files below 80%
+    branches** in any workspace.
 
-    **The margin is thinner than "zero below the line" sounds.** Three files
-    sit at exactly **80.00%** branches — `backend/src/media-aggregator/
-    sanitize.ts`, `frontend/src/components/CaseworkerDashboardV2/
-    NoAccessPanel.tsx` and `pa-cockpit/src/components/PADashboardV2/
-    dossierbeheer/DossierRow.tsx`. One uncovered edge in any of the three
-    fails the run. The lowest file elsewhere is public-site's `lib/api.ts` at
-    83.78% and pa-demo's `DemoChangelogPanel.tsx` at 87.50%.
+    **The floor is still 80, but every file now clears 85.** The 28 September
+    pass found three files at exactly 80.00% with no headroom at all;
+    `391b1a8` (#256) took all three to 100%, and `73a6764` then brought the 32
+    files that sat between 80 and 85 to 85 or above. Measured today, the
+    lowest file per workspace is:
+
+    | Workspace | Lowest file by branches | Branches |
+    |---|---|---:|
+    | backend | `pa-monitoring/pa-cache.ts`, `services/llm/OpenAILlmProvider.ts` | 86.36 |
+    | frontend | `components/CaseworkerDashboard/IouFeedbackSection.tsx` | **85.00** |
+    | pa-cockpit | `services/dossierbeheer.api.ts` | 85.10 |
+    | pa-demo | `demo/changelog/DemoChangelogPanel.tsx` | 87.50 |
+    | public-site | `lib/useQueryState.ts`, `pages/herkomst/HerkomstTrace.tsx` | 87.50 |
+
+    That is a margin of five points or more everywhere, against none for three
+    files two days earlier. It is a margin, not a new floor: the configs still
+    say 80, and `IouFeedbackSection.tsx` sits exactly on the 85 line.
 
     The floor is **branches only**, deliberately: measured the same way, a
-    functions floor at 80 would fail **26 files** (frontend 10, pa-cockpit 8,
-    pa-demo 5, public-site 3, backend 0) — while the configs' own comments
-    still say 31. See
+    functions floor at 80 would now fail **23 files** (frontend 8, pa-cockpit 7,
+    pa-demo 5, public-site 3, backend 0). The configs' own comments were
+    corrected from 31 to 26 in `391b1a8`, dated 28 September; three fewer
+    files fall short now — two in the frontend, one in pa-cockpit — so the
+    comments are three high. See
     [Coverage Floor](../../../contributing/coverage-floor.md) and
     [Coverage](coverage.md).
 
@@ -161,20 +192,22 @@ open.
 own file parallelism left on, run one workspace at a time. Treat them as an
 order of magnitude rather than a figure to match, and compare like with like —
 on 28 September the frontend suite took **133.15s** parallel and **372.31s**
-under `test:serial`, about 2.8 times longer.
+under `test:serial`, about 2.8 times longer. No serial run was made on
+30 September.
 
-They are machine-dependent to a degree worth keeping in mind, and this pass is
-the clearest evidence of it yet: the same backend suite has now been measured
-at **118.06s** (24 Sep), **59.86s** (26 Sep) and **94.98s** (28 Sep) while
-gaining seven files and then four tests. The frontend reads 176.97s, 119.31s
-and 133.15s across the same three dates on a suite that changed by five tests.
-Spread like that says more about the host than about the suites, which is why
-nothing on this page is compared on time alone.
+They are machine-dependent to a degree worth keeping in mind: the same backend
+suite has been measured at **118.06s** (24 Sep), **59.86s** (26 Sep),
+**94.98s** (28 Sep) and **54.67s** (30 Sep) — the fastest of the four on the
+largest suite of the four, 2370 tests against 2072. The frontend reads
+176.97s, 119.31s, 133.15s and 114.82s across the same dates, the last on 196
+more tests; pa-cockpit went the other way, 23.87s to 35.32s. Spread like that
+says more about the host than about the suites, which is why nothing on this
+page is compared on time alone.
 
 !!! warning "Vitest's `tests` line is not elapsed time"
-    The frontend run takes **133.15 seconds** by Vitest's own `Duration`, and
-    the same summary block prints `tests 231.83s` beside it — and
-    `environment 826.05s`, which is larger still. Those figures sum per-worker
+    The frontend run takes **114.82 seconds** by Vitest's own `Duration`, and
+    the same summary block prints `tests 286.64s` beside it — and
+    `environment 588.41s`, which is larger still. Those figures sum per-worker
     time across parallel workers; nobody ever waited for either. Read as
     elapsed, they turn a two-minute suite into a claimed ten-minute one —
     which is the most likely origin of the ~444s this table carried for
@@ -183,7 +216,7 @@ nothing on this page is compared on time alone.
 
     The same trap has a second form in the JSON reporters. Vitest's
     `numTotalTestSuites` counts **`describe` blocks, not files** — public-site
-    reports 88 against its 32 files. The file count is `testResults.length`,
+    reported 88 against its 32 files on 28 September. The file count is `testResults.length`,
     which is what the console's `Test Files` line shows.
 
 ---
@@ -193,33 +226,46 @@ nothing on this page is compared on time alone.
 | Page | Covers |
 |---|---|
 | [Coverage](coverage.md) | Headline and per-area coverage for all five packages, and why the last two decimals are noise |
-| [Backend suite](backend.md) | The 96 files and 2202 tests in `packages/backend`, by area |
-| [Public site suite](public-site.md) | The 32 files and 235 tests in `packages/public-site`, plus its own Playwright suite |
+| [Backend suite](backend.md) | The 97 files and 2370 tests in `packages/backend`, by area |
+| [Public site suite](public-site.md) | The 33 files and 265 tests in `packages/public-site`, plus its own Playwright suite |
 | [PA-demo suite](pa-demo.md) | The 19 files and 106 tests in `packages/pa-demo`, and the one Playwright suite that runs in CI |
 | [Caseworker](dashboards/caseworker.md) · [PA cockpit](dashboards/pa-cockpit.md) · [Infra-board](dashboards/infra-board.md) · [Woo-dashboard](dashboards/woo-dashboard.md) | The frontend and cockpit suites, split the way the product is — one page per board |
 | [E2E & live smoke](e2e.md) | The Playwright suites, what they need running, and the four cross-app shell scripts |
 | [Writing tests](writing-tests.md) | Conventions for adding tests here, and the traps that have already cost time |
 
 !!! note "The four board pages do not add up to the frontend total, by design"
-    They account for **841 of the 1155** frontend tests *as the split was last
-    derived, on 30 August 2026*. It was **not** re-derived on 24 or
-    26 or 28 September, when the frontend measured 1117 and then 1122 tests with the cockpit's 476 living in
-    their own package — so read the shares below as proportions rather than as
-    current counts. The other 314 were not board-specific and so had no board
-    page to live on:
+    Re-derived on **30 September 2026** at `ae06c9e`, they account for
+    **900 of the 1318** frontend tests: Caseworker 452, the shared process view
+    in `components/process/` 119 (listed on the Caseworker page), Infra-board
+    252 and Woo-dashboard 77. The PA cockpit's 515 live in their own package
+    and are not part of the 1318. Per-file frontend counts are taken from the
+    source, with `.each` tables expanded, because Vitest's console reports only
+    the package total; summed, they reproduce that total exactly. The split was
+    last derived before this on 30 August, which is why the board pages carried
+    figures a month old until now. The other 418 are not board-specific and so
+    have no board page to live on:
 
-    - **223** in `src/services` (211), `App.test.tsx` (5), `src/hooks` (4) and
-      `src/test` (3)
-    - **49** in shared widgets reused across boards — `ProcessStartFormViewer`,
-      `TimeLine`, `DecisionViewer`, `LoginChoice`, `AltchaWidget`,
-      `SessionExpiryWarning`, `PersonalDataPanel`
-    - **42** in pages that belong to no board — `AuthCallback`, `Dashboard`,
-      `ChangelogPanel`, `LoginChoice`
+    - **213** in `src/services` (159), the three root test files (38 —
+      `App.test.tsx`, `indexHtml.test.ts`, `pa-cockpit-class-coverage.test.ts`),
+      `src/hooks` (5) and `src/utils` (11)
+    - **70** in shared widgets reused across boards — `ProcessStartFormViewer`,
+      `TimeLine`, `DecisionViewer`, `StartFailureNotice`, `AltchaWidget`,
+      `SessionExpiryWarning`, `PersonalDataPanel` and the two `LoginChoice`
+      components
+    - **40** in the frontend's host side of the PA cockpit —
+      `components/PADashboardV2` (30), `PaCockpitRoute` and
+      `pa-cockpit-host` (5 each)
+    - **95** in pages that belong to no board — `AuthCallback`, `Dashboard`,
+      `ChangelogPanel` and its variants, `LoginChoice`, `no-eager-changelog`
+      and `pages/login-choice`
 
     Note also that `components/CaseworkerDashboard/` is counted under
     [Caseworker](dashboards/caseworker.md) but is the **shared section-component
-    library**, reused across three of the four V2 dashboards. Its 185 tests
-    protect more than that one board.
+    library**, reused across three of the four V2 dashboards. Its 231 tests
+    protect more than that one board — and `components/process/` is shared the
+    same way, since the Infra-board's `ProjectDetail` draws its phase stepper
+    and swimlane with the same `PhaseStepper` and `PhaseSwimlane` the
+    caseworker's process overview uses.
 
 ---
 
@@ -230,16 +276,16 @@ be installed in every workspace).
 
 | Command | Scope | Files | Tests |
 |---|---|---:|---:|
-| `npm test` | Every workspace with a `test` script (see below) | 300 | 4141 |
-| `npm run test:serial` | The same, without file parallelism | 300 | 4141 |
-| `npm test --workspace=@ronl/backend` | Backend only (Jest, coverage on by default) | 96 | 2202 |
-| `npm run test:contract --workspace=@ronl/backend` | `src/openapi` and `src/routes` — the OpenAPI gate plus every route suite, coverage off | 22 | 606 |
-| `npm run test:openapi-coverage --workspace=@ronl/backend` | `src/openapi` only — the coverage gate and its helpers, coverage off | 3⁴ | 27⁴ |
+| `npm test` | Every workspace with a `test` script (see below) | 312 | 4574 |
+| `npm run test:serial` | The same, without file parallelism | 312 | 4574 |
+| `npm test --workspace=@ronl/backend` | Backend only (Jest, coverage on by default), then the conformance-coverage check | 97 | 2370 |
+| `npm run test:contract --workspace=@ronl/backend` | `src/openapi` and `src/routes` — the OpenAPI gates plus every route suite, coverage off | 23 | 668 |
+| `npm run test:openapi-coverage --workspace=@ronl/backend` | `src/openapi` only — the coverage gate, the conformance helper and their helpers, coverage off | 4 | 43 |
 | `npm run lint:openapi --workspace=@ronl/backend` | Builds `openapi/openapi.json` and lints it with Spectral against the NL API Design Rules 2.2.1 ruleset, failing on `error` | — | — |
-| `npm test --workspace=@ronl/frontend` | Frontend only (Vitest, coverage on by default) | 110 | 1122 |
-| `npm test --workspace=@ronl/pa-cockpit` | The cockpit package | 43 | 476 |
+| `npm test --workspace=@ronl/frontend` | Frontend only (Vitest, coverage on by default) | 120 | 1318 |
+| `npm test --workspace=@ronl/pa-cockpit` | The cockpit package | 43 | 515 |
 | `npm test --workspace=@ronl/pa-demo` | The public demo | 19 | 106 |
-| `npm test --workspace=@ronl/public-site` | Public site only (Vitest, coverage on by default) | 32 | 235 |
+| `npm test --workspace=@ronl/public-site` | Public site only (Vitest, coverage on by default) | 33 | 265 |
 | `npm run test:perf --workspace=@ronl/frontend` | The wall-clock budget, run without file parallelism | 1 | 1 |
 
 ```bash
@@ -286,17 +332,17 @@ npm test --workspace=@ronl/<pkg> -- --reporter=default --reporter=json \
     console output, and never from `numTotalTestSuites`, which counts
     `describe` blocks (see the warning above).
 
-⁴ Neither script was run on its own on 28 September; both rows carry their
-26 September result. `test:contract` was **22 suites · 606 tests · passing**
-then, and `lint:openapi` passed with *"No results with a severity of 'error'
-found!"*. `test:openapi-coverage` was not run separately; its row is
-the `src/openapi` share of the full backend run, which the `test:contract`
-count reconciles with (`src/routes` 19 files and 579 tests, plus these 3 and
-27). All three scripts are new in v2026.09.12. The two test scripts are subsets
-of the backend's own `npm test`, which runs the same files with coverage on —
-they exist to check the contract quickly, not as extra gates. `lint:openapi` is
-the one that is not covered by `npm test`: both backend workflows run it as its
-own step, before the tests.
+All three backend contract scripts were run on their own on 30 September and
+passed: `test:contract` **23 suites · 668 tests**, `test:openapi-coverage`
+**4 suites · 43 tests**, and `lint:openapi` with *"No results with a severity
+of 'error' found!"*. The two test counts reconcile with the full backend run —
+`src/routes` 19 files and 625 tests, plus `src/openapi`'s 4 and 43. The two
+test scripts are subsets of the backend's own `npm test`, which runs the same
+files with coverage on — they exist to check the contract quickly, not as
+extra gates — and, being filtered Jest runs, **neither ends with the
+conformance-coverage check** that `npm test` runs after Jest; see
+[Backend suite](backend.md). `lint:openapi` is the one that is not covered by
+`npm test`: both backend workflows run it as its own step, before the tests.
 
 !!! warning "Reach for `test:serial`, not for a flag"
     This repository runs **two test runners behind one command shape** — the
@@ -314,14 +360,20 @@ own step, before the tests.
 
 ### A parallel failure is not a finding
 
-The 24 September pass is the worked example of the rule above, and the reason
-the frontend row in the table carries a footnote. The same file has now been
-the one to go red under load in three of four passes — **one test on
+The 24 September pass is the worked example of the rule above. The same file
+was the one to go red under load in four of five passes — **one test on
 20 September, five on 24 September, none on 26 September, one again on
-28 September** — which is what makes the mechanism worth publishing rather than
-merely noting.
+28 September** — which is what made the mechanism worth publishing rather than
+merely noting. **On 30 September, at v2026.09.15, the frontend's default
+parallel run was 1318/1318 green**, the first measured pass since the file was
+fixed at its own boundary in `afc2001`, which closed
+[issue #199](https://github.com/sgort/ronl-business-api/issues/199) on
+28 September. One green run does not prove a fix; what the fix changed, and why
+it removes the cause rather than widening a timeout, is set out
+[below](#why-this-file-and-why-the-count-moves). The accounts that follow are
+history, kept as they were measured.
 
-!!! note "28 September: one failure, and it is contention — established, not assumed"
+!!! note "History, 28 September: one failure, and it is contention — established, not assumed"
     The v2026.09.13 pass ran the frontend's default parallel `npm test` and got
     **110 files · 1122 tests · 1121 passed · 1 failed · 133.15s**. The failure
     was in `ChangelogPanel.variants.test.tsx` again, and again on
@@ -353,10 +405,9 @@ merely noting.
     had not yet quietened down; the three green runs came later, on a host with
     less on it. A contention failure needs contention.
 
-    What this does *not* do is close
-    [issue #199](https://github.com/sgort/ronl-business-api/issues/199). The
-    one-second `findBy*` budget is still unconfigured and the module it waits on
-    is still growing — see
+    That run did not close
+    [issue #199](https://github.com/sgort/ronl-business-api/issues/199), and
+    was not meant to. The fix landed the same evening, in `afc2001` — see
     [Why this file](#why-this-file-and-why-the-count-moves).
 
 **The 24 September account, kept as it was measured.** The frontend's default
@@ -372,27 +423,29 @@ The whole suite serially was **110 files · 1117 tests · passing · 408.71s**,
 with the file taking **654ms** inside that run against **7225ms** inside the
 parallel one.
 
-So the honest way to publish the frontend, then as now, is **all green
-serially, with contention-only failures in the default parallel run in a file
-that passes in isolation**.
+So the honest way to publish the frontend, through 28 September, was **all
+green serially, with contention-only failures in the default parallel run in a
+file that passes in isolation**. On 30 September it is simply all green.
 
 #### Why this file, and why the count moves
 
-!!! info "Open work — [issue #199](https://github.com/sgort/ronl-business-api/issues/199)"
-    Opened 24 September 2026 on the evidence below, and still open at
-    v2026.09.13. What follows is a diagnosis with a fix still to choose, not a
-    closed explanation: nothing in the repository yet stops this recurring.
+!!! success "Closed — [issue #199](https://github.com/sgort/ronl-business-api/issues/199), fixed in `afc2001`"
+    Opened 24 September 2026 on the evidence below and **closed on
+    28 September** by `afc2001`, *"stop the changelog variants test loading the
+    real history"*, which reached production with v2026.09.14. The diagnosis
+    below is kept as history, because the mechanism is not the one most people
+    reach for and the same shape can recur in any test that awaits a lazy
+    chunk.
 
-    **What four passes have changed is the shape of the symptom.** One failing
+    **What four passes showed was the shape of the symptom.** One failing
     test, then five, then none, then one again — and on 28 September two of the
     three parallel runs of the same suite on the same commit were green. The
-    failure is **intermittent and load-dependent**, not the reliable, worsening
-    one the 24 September reading suggested. That is a weaker signal than a
-    steady trend line, and it is a worse one to live with: a check that fails
-    once in three runs is the kind CI teaches people to re-run rather than read.
+    failure was **intermittent and load-dependent**, not the reliable, worsening
+    one the 24 September reading suggested: the kind of check CI teaches people
+    to re-run rather than read, which is why it was fixed rather than lived
+    with.
 
-The mechanism is worth stating, because it is not the timeout most people reach
-for and because it explains why the count moves without any change to the test:
+The mechanism, as diagnosed before the fix:
 
 - `ChangelogPanel` is a **`lazy()` + `Suspense` shim**, split so the changelog
   data does not ship in the entry chunk. Its content therefore resolves
@@ -409,43 +462,49 @@ for and because it explains why the count moves without any change to the test:
   as a timeout.
 - **The module it waits on keeps growing.** `changelog-data.ts` was
   **572,299 bytes** at v2026.09.9, **612,980** at v2026.09.11 (+7.1%),
-  **648,881** at v2026.09.12, and is **659,684 bytes** at v2026.09.13 — up
+  **648,881** at v2026.09.12, and **659,684 bytes** at v2026.09.13 — up
   **46,704 bytes, +7.6%, in the four days** since v2026.09.11. Over the same
   window neither the test nor the component moved at all:
   `git diff --name-status 86af73e 963fe24 -- 'packages/frontend/src/pages/ChangelogPanel*'`
-  returns nothing.
+  returns nothing. It has kept growing since: **689,070 bytes** at
+  v2026.09.15.
 
-The test did not get worse. The module it waits on got bigger, and the
-one-second budget it is measured against did not move. That is the reason
-[#199](https://github.com/sgort/ronl-business-api/issues/199) is open rather
-than this being a footnote — though note what four passes have actually shown:
-not a clean upward trend in failures, but an intermittent one whose count
-tracks how busy the machine is. The growth is real and monotonic; the failure
-count is not.
+The test did not get worse. The module it waited on got bigger, and the
+one-second budget it was measured against did not move — though four passes
+showed not a clean upward trend in failures, but an intermittent one whose
+count tracked how busy the machine was. The growth was real and monotonic; the
+failure count was not.
 
-!!! note "Its sibling is the better warning sign"
+**The fix was at the file's own boundary, and it stopped the clock rather than
+widening the budget.** The issue had carried three candidates: an explicit
+`findByRole('dialog', { timeout })` in that file, a package-wide
+`configure({ asyncUtilTimeout })` in `src/test/setup.ts`, or decoupling the
+test from the real module. `afc2001` took the third, and in doing so corrected
+the diagnosis above in one respect. This page had said the file *"already mocks
+`./changelog-data`"*; it did, but through `importActual`, spreading the real
+module before overriding `changelog`, its only runtime export — so every run
+loaded the whole release history inside the `lazy()` import the first
+`findByRole` waited on, only to throw the data away. The commit:
+
+- mocks `./changelog-data` **without** `importActual`, so the real history is
+  never loaded by this file at all; and
+- resolves the lazy `ChangelogPanelContent` chunk once in a `beforeAll`, under
+  the hook timeout, so no `findBy*` pays for an import.
+
+By the commit's own measurement the first test dropped from 409–662 ms to
+99–125 ms on an idle machine, and it no longer grows with the changelog.
+Neither timeout was raised, and parallelism was not touched.
+
+!!! note "Its sibling was left as it is, deliberately"
     `ChangelogPanel.test.tsx` renders every real version entry and does **not**
     fail — but on 28 September it took **44.1 seconds** in the measured parallel
     run, and 30.4s in another run of the same suite on the same commit. It
-    passes only because `testTimeout` was raised to 20s package-wide and this
-    file was given more on top of that. A test that needs 44 seconds to render
-    a changelog is carrying the same growth as its sibling, and it will reach
-    its own ceiling without anything changing in the test.
-
-**Whatever the fix turns out to be, it belongs at the file's own boundary** —
-and **not** at a parallelism flag. CI runs `npm test` parallel and should keep
-doing so. The issue carries three candidates, none yet chosen:
-
-- an explicit `findByRole('dialog', { timeout })` in that file;
-- a `configure({ asyncUtilTimeout })` in the frontend's `src/test/setup.ts`,
-  which would cover every `findBy*` in the package rather than this one file;
-- decoupling the variants test from the real 600 KB module altogether, with a
-  fixture — the option that removes the trend line instead of raising the
-  budget ahead of it. The file already mocks `./changelog-data`; what it waits
-  on is the lazy chunk behind the panel itself.
-
-The first two buy time proportional to the number chosen. The third is the only
-one that stops the clock.
+    passes because `testTimeout` was raised to 20s package-wide and this file
+    was given 60s on top of that. `afc2001` left it alone on purpose: it imports
+    the data and the content module statically, so its `findBy*` never waits on
+    an import, and its real-history rendering is what its own 60s timeout is
+    for. It still carries the changelog's growth; its time was not re-measured
+    on 30 September, because Vitest's console does not print per-file times.
 
 This class of failure is not a surprise here; `packages/frontend/vite.config.ts`
 already documents it in the comment above `testTimeout: 20000`, which records
@@ -453,8 +512,8 @@ the suite as green in five consecutive parallel runs on an idle machine and
 producing 8–16 timeout failures under concurrent load, across a file set that
 changes with how busy the machine is. `ChangelogPanel.test.tsx` is named in that
 same comment as a file needing more headroom still. What that comment does not
-cover, and what every one of these failures is, is the *other* timeout — the one
-testing-library owns rather than Vitest.
+cover, and what every one of the variants file's failures was, is the *other*
+timeout — the one testing-library owns rather than Vitest.
 
 !!! danger "The fix is not to turn parallelism off"
     Disabling file parallelism globally would make the symptom go away and take
@@ -519,12 +578,13 @@ So the budget moved rather than moved up:
   which concatenates arrays and would have kept the base `exclude`, hiding the
   perf specs from their own run.
 - `npm run test:perf` runs it, and both frontend workflows run that as their
-  own blocking CI step. **Not re-run on 24, 26 or 28 September 2026 either** — its
-  last measured result is still from **12 September 2026: 1 file · 1 test ·
-  passing · 1.04s**, with coverage off. Because `vite.config.ts` excludes
-  `src/**/*.perf.test.ts`, the frontend's 110 files and 1122 tests above do
-  **not** include it, and neither does the repository-wide **300 files / 4141
-  tests** — it is the one test in the repository that has to be counted
+  own blocking CI step. **Not re-run on 24, 26, 28 or 30 September 2026
+  either** — its last measured result is still from **12 September 2026:
+  1 file · 1 test · passing · 1.04s**, with coverage off. Because
+  `vite.config.ts` excludes `src/**/*.perf.test.ts`, the frontend's 120 files
+  and 1318 tests above do **not** include it, and neither does the
+  repository-wide **312 files / 4574 tests** — it is the one test in the
+  repository that has to be counted
   separately, and the one unit-test figure on this page that was carried over
   rather than re-measured.
 
@@ -542,49 +602,52 @@ that prompted the raise and a reminder of how little headroom 15s left.
 double the 24 September figure and three quarters of the 60s ceiling, on a
 file whose only input that changed is `changelog-data.ts`. It still passes, and
 it is the clearest quantity on this page for how fast that module is growing.
+It was not timed on 30 September: the suite was run with Vitest's default
+console reporter, which prints no per-file times.
 
 Its sibling `ChangelogPanel.variants.test.tsx` is the file that failed under
 parallel load on 20 September, five times over on 24 September, not at all on
-26 September and once again on 28 September —
-same component, same root cause, still the variants file rather than this one
-that has yet to be given headroom. The headroom it needs is **not**
-`testTimeout`, which is what was raised for this file. That is
-[issue #199](https://github.com/sgort/ronl-business-api/issues/199); see
+26 September and once again on 28 September — same component, same growth,
+but a different timeout. What it needed was **not** `testTimeout`, which is
+what was raised for this file, and it did not get a bigger budget of any kind:
+`afc2001` stopped it loading the real history at all, closing
+[issue #199](https://github.com/sgort/ronl-business-api/issues/199). See
 [Why this file, and why the count moves](#why-this-file-and-why-the-count-moves).
 
 ---
 
 ## Linting, formatting, git hooks, and CI
 
-All four root gates were run on 20 September 2026 and all four passed. On
-**26 September** two of them were run again and passed again — `lint` and
-`check-format` — together with the backend's `lint:openapi`. **None of them
-was re-run on 28 September**, so every row below carries the date it was last
-measured rather than the date at the top of this page. The timings are from
-20 September; later runs did not record any.
+All the root gates were run again on **30 September 2026**, at the same tree
+as the suites above, and all passed. The timings are from 20 September; later
+runs did not record any.
 
-| Command | What it does | Result (measured) |
+| Command | What it does | Result (measured 30 Sep) |
 |---|---|---|
-| `npm run lint` | `npm run lint --workspaces --if-present` — `eslint .` in backend, frontend, public-site | exit 0, no errors — **26 Sep** (68s on 20 Sep) |
-| `npm run check-format` | `prettier --check "**/*.{ts,tsx,json,md}" --ignore-path .gitignore` — **one repo-wide glob, not a per-workspace fan-out** | *All matched files use Prettier code style!* — **26 Sep** (15s on 20 Sep) |
-| `npm run lint:openapi --workspace=@ronl/backend` | Builds `openapi/openapi.json`, then `spectral lint` against the NL API Design Rules 2.2.1 ruleset with `--fail-severity error` — new in v2026.09.12 | *No results with a severity of 'error' found!* — **26 Sep** |
-| `npm run check-shared` | `node scripts/check-shared-declarations.mjs` — what stands in for tests in `packages/shared` | `check-shared-declarations: 11 file(s) in packages/shared/src/ — declarations and constant data only.`, 1s — 20 Sep |
-| `npm run check-supply-chain` | `node scripts/check-supply-chain.mjs` — every action pin against its version comment and the register | `31 pinned reference(s) across 5 action(s) in .github/workflows/` … `OK — digests, version comments and the register all agree.`, 4s — 20 Sep, before the two workflows added in v2026.09.12 |
+| `npm run lint` | `npm run lint --workspaces --if-present` — `eslint .` in backend, frontend, public-site | exit 0, no errors (68s on 20 Sep) |
+| `npm run check-format` | `prettier --check "**/*.{ts,tsx,json,md}" --ignore-path .gitignore --ignore-path .prettierignore` — **one repo-wide glob, not a per-workspace fan-out** | *All matched files use Prettier code style!* (15s on 20 Sep) |
+| `npm run lint:openapi --workspace=@ronl/backend` | Builds `openapi/openapi.json`, then `spectral lint` against the NL API Design Rules 2.2.1 ruleset with `--fail-severity error` — new in v2026.09.12 | *No results with a severity of 'error' found!* |
+| `npm run check-shared` | `node scripts/check-shared-declarations.mjs` — what stands in for tests in `packages/shared` | `check-shared-declarations: 12 file(s) in packages/shared/src/ — declarations and constant data only.` (11 on 20 Sep) |
+| `npm run check-supply-chain` | `node scripts/check-supply-chain.mjs` — every action pin against its version comment and the register | `39 pinned reference(s) across 6 action(s) in .github/workflows/` … `OK — digests, version comments and the register all agree.` (31 across 5 on 20 Sep, before the two workflows added in v2026.09.12) |
+| `npm run check-swimlane-fixtures` | `node scripts/check-swimlane-fixtures.mjs` — the parser's RIP fixtures against their fingerprints (see [Git hooks](#git-hooks)) | `✓ 12 swimlane fixtures match their fingerprints; 12 compared against ..\linked-data-explorer.` |
 
 `npm run lint` skips `@ronl/shared` the same way `test` does — no `lint` script
 there. `npm run check-format`, by contrast, is **not** scoped by workspace
 scripts at all: it is a single Prettier invocation over the whole tree (minus
 `.gitignore`d paths), so it reaches `packages/shared` too even though `shared`
-defines no format-check script of its own.
+defines no format-check script of its own. The second ignore file is new in
+v2026.09.14 (`96fabb6`): `.prettierignore` holds one pattern, `*-handoff/`,
+keeping design handoff folders — scratch input that is never committed — out
+of the check.
 
 !!! note "`packages/shared` has no test script, and that is the design"
     It defines `build`, `prepare`, `clean` and `type-check` and nothing else,
     so `--if-present` skips it. What polices it instead is `check-shared`,
     which asserts that every file under `packages/shared/src/` holds
     declarations and constant data only — no runtime behaviour, hence nothing
-    to unit test. It runs in the `audit` job, which is the one required check,
-    so the package with no tests is in fact the one whose rule is enforced on
-    every pull request.
+    to unit test. It runs in the `audit` job, a required check on both `acc`
+    and `main`, so the package with no tests is in fact the one whose rule is
+    enforced on every pull request.
 
 ### Git hooks
 
@@ -594,7 +657,7 @@ defines no format-check script of its own.
 | `pre-push` | `npm run deps:check` → build `@ronl/shared` → **`npm run check-swimlane-fixtures`** → `npm run type-check` → `npm run lint` → `npm run check-format` | All workspaces (type-check, lint) / whole tree (check-format) / the twelve BPMN fixtures (check-swimlane-fixtures) |
 
 !!! important "The hooks do not run the tests"
-    Re-read against `.husky/pre-push` at `963fe24` on 28 September 2026 and
+    Re-read against `.husky/pre-push` at `ae06c9e` on 30 September 2026 and
     still true: `pre-commit` runs `npx lint-staged` and nothing else, and
     `pre-push` runs the **six** commands above in that order. Neither invokes
     any `test` script, so nothing client-side stops a push that breaks a suite
@@ -608,7 +671,16 @@ defines no format-check script of its own.
     against sha256 fingerprints committed identically in this repository and in
     linked-data-explorer, and byte-for-byte against the real files when that
     checkout is alongside. A fixture edited here fails it, because the edit
-    belongs upstream. That is a file comparison, not a suite.
+    belongs upstream. That is a file comparison, not a suite. Since
+    v2026.09.14 (`97e0534`, #268) the check tells the two directions of drift
+    apart from the fingerprint file: a fixture that disagrees with its
+    fingerprint is stale and `--sync` fixes it, while one that agrees but
+    differs from the linked-data-explorer checkout means *that checkout* is out
+    of step — and `--sync` now refuses to copy from it unless `--force` is
+    given. The seven Awb fixtures added under
+    `__fixtures__/awb/` in the same release are **not** part of it: the check
+    matches only the RIP phase files, so those seven are exercised by the
+    parser's tests but not drift-checked against linked-data-explorer.
 
     **`deps:check` is new at the front of `pre-push`**, and it is there for a
     reason the hook file records: on 14 September 2026 a clone still on Prettier
@@ -627,23 +699,26 @@ defines no format-check script of its own.
 
 ### CI
 
-**Thirteen** workflows under `.github/workflows/`. The file list was re-read at
-`963fe24` on 28 September and is unchanged; the steps inside them were last read
-at `2443adc`, and the table below is that reading. The thirteen are an
-acc/prod pair per deployable package, the supply-chain `audit` gate, the
-Semgrep `scan` job added in v2026.09.7, the promotion orchestrator added since
-v2026.09.9, and two added in v2026.09.12: a daily dependency audit and a
-release SBOM:
+**Thirteen** workflows under `.github/workflows/`. Re-read at `ae06c9e` on
+30 September against `2443adc`, the last full reading: no workflow was added
+or removed, and **no test step changed**. What did change is a
+`node scripts/check-og.mjs acceptance|production` check of the built
+link-preview tags inside the build step of the four frontend and public-site
+deploy workflows, and Node 24.21.0 in `dependency-audit.yml` and `sbom.yml`.
+The thirteen are an acc/prod pair per deployable package, the supply-chain
+`audit` gate, the Semgrep `scan` job added in v2026.09.7, the promotion
+orchestrator added since v2026.09.9, and two added in v2026.09.12: a daily
+dependency audit and a release SBOM:
 
 | Workflow | Lint | Type-check | **Tests** | E2E | Perf budget | Build | Deploys? |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|---|
-| `azure-backend-acc.yml` / `-prod.yml` | ✅ + OpenAPI (`lint:openapi`) | – | **✅** | – | – | ✅ | **No** — packages and uploads an artifact |
+| `azure-backend-acc.yml` / `-prod.yml` | ✅ + OpenAPI (`lint:openapi`) | – | **✅**, with the conformance-coverage check | – | – | ✅ | Yes — over OIDC since v2026.09.10, then a liveness check and a check that `/v1/health` reports the deployed commit; the acc workflow skips all three on a pull request |
 | `azure-frontend-acc.yml` / `-prod.yml` | ✅ | – | **✅ ×2** — pa-cockpit, then frontend | – | **✅** | ✅ | Yes |
 | `azure-pa-demo-acc.yml` / `-prod.yml` | ✅ | ✅ | **✅** | **✅ (acc only)** | – | ✅ | Yes |
 | `azure-publicsite-acc.yml` / `-prod.yml` | ✅ | ✅ | **✅** | – | – | ✅ | Yes |
 | `promote-to-production.yml` | – | – | – | – | – | – | Orchestrates the four `-prod` workflows in order |
 | `zizmor.yml` | – | – | – | – | – | – | No — the required `audit` gate, which since v2026.09.12 also checks that the lockfile matches `package.json` |
-| `semgrep.yml` | – | – | – | – | – | – | No — `scan`, reporting and not required |
+| `semgrep.yml` | – | – | – | – | – | – | No — `scan`, required on `acc` and, since the end of September, on `main` |
 | `dependency-audit.yml` | – | – | – | – | – | – | No — a daily scheduled audit of the dependency tree, the one check here that runs on a clock rather than a commit |
 | `sbom.yml` | – | – | – | – | – | – | No — generates and uploads the release SBOM on a push to `main` |
 
@@ -654,9 +729,11 @@ established: the rulesets were not re-read in this pass (see
 **The backend's contract is now linted before its tests run.** Both backend
 workflows gained a *Lint the OpenAPI document* step in v2026.09.12, placed
 before *Unit tests* so a document that breaks the NL API Design Rules ruleset
-fails fast and names the rule. The check that the document matches the routes
-actually served is not a separate step: it is `src/openapi/coverage.test.ts`,
-inside the backend's ordinary `npm test` — see
+fails fast and names the rule. The checks that the document matches the routes
+actually served, and that every documented operation's response was compared
+against its schema, are not separate steps: they are
+`src/openapi/coverage.test.ts` and the conformance-coverage script that the
+backend's ordinary `npm test` runs after Jest — see
 [Backend suite](backend.md).
 
 !!! note "The four `-prod.yml` workflows no longer trigger themselves"
@@ -675,8 +752,9 @@ before that ran neither lint nor test, going straight from `npm ci` to
 
 **`@ronl/pa-cockpit` was the package that phrasing missed.** It is a library
 with no deploy workflow of its own, so until v2026.09.6 nothing triggered its
-suite and **its 476 tests ran nowhere in CI** — a count third only to the
-backend's and the frontend's, covered locally and only locally. Both frontend
+suite and **its tests ran nowhere in CI** — a suite third in size only to the
+backend's and the frontend's (515 tests on 30 September), covered locally and
+only locally. Both frontend
 workflows now run it, as a step placed *before* the frontend's own, because the
 frontend imports it: there is no point testing the consumer while the library
 is broken. The pa-demo workflows consume the cockpit too, and watch
@@ -703,14 +781,21 @@ run.
 
 **This changed on 19 September 2026, and the two branches are deliberately
 different.** Read from the repository rulesets
-(`gh api repos/sgort/ronl-business-api/rulesets`) on 20 September 2026 and
-**not re-read on 24, 26 or 28 September** — a gating claim is only as current as the last
-time somebody ran that command:
+(`gh api repos/sgort/ronl-business-api/rulesets`) on 20 September 2026, not
+re-read on 24, 26 or 28 September, and **re-read on 30 September** — a gating
+claim is only as current as the last time somebody ran that command:
 
 | Branch | Ruleset | Required status checks |
 |---|---|---|
 | `acc` | *acc supply-chain gate* | `audit`, `scan`, `build`, `Build and Deploy ACC Frontend`, `Build and Deploy ACC PA Demo`, `Build and Deploy ACC Public Site` |
-| `main` | *main promotion gate* | `audit` |
+| `main` | *main promotion gate* | `audit`, `scan` |
+
+The `acc` row is unchanged since 20 September. **`main` now requires `scan` as
+well as `audit`**, where the 20 September reading had `audit` alone. Both
+rulesets are active, and neither branch carries classic branch protection any
+more — `gh api repos/sgort/ronl-business-api/branches/<branch>/protection`
+answers *Branch not protected* for both, so the rulesets are the whole of the
+gate.
 
 So on `acc` a red suite now **does** block the merge. `build` is
 `azure-backend-acc.yml`'s build job, which runs the backend's `npm test`; the
@@ -722,15 +807,15 @@ the same change; test files remain excluded from its Code scanning, a fixture
 credential not being a leaked one. Both rulesets also forbid deletion and
 non-fast-forward pushes, and require a pull request to change the branch at all.
 
-!!! note "`main` requiring only `audit` is not an oversight"
+!!! note "`main` requiring no suite is not an oversight"
     **No production workflow has a `pull_request` trigger.** A check that never
     runs on the pull request cannot be required of it: adding one would block
     every promotion forever. `main` is promoted from `acc`, where those same
     suites have already run and now also gate. `audit` and `scan` are the two
-    workflows that do trigger on any pull request, which is what makes `audit`
-    requirable there.
+    workflows that do trigger on any pull request, which is what makes them
+    requirable there — and both now are.
 
-    This is now doubly true. Read at `86af73e` and again at `2443adc`, the four `-prod.yml` files have
+    This is now doubly true. Read at `86af73e`, at `2443adc` and again at `ae06c9e`, the four `-prod.yml` files have
     no `push` trigger either — they are `workflow_call` and `workflow_dispatch`
     only, invoked by `promote-to-production.yml`. Through v2026.09.9 they fired
     on `push` to `main`, which is what this note used to say.
@@ -747,10 +832,17 @@ non-fast-forward pushes, and require a pull request to change the branch at all.
 the first Playwright in CI anywhere in this repository. See
 [PA-demo suite](pa-demo.md#the-playwright-suite).
 
-The backend workflows are the exception to "deploy": they end at *Create
-deployment zip* → *Upload deployment artifact*. Nothing in them calls a deploy
-action, and there is no post-deployment health check — the artifact is
-deployed separately, from a developer machine. See
+**The backend workflows deploy too, since v2026.09.10.** Until then they ended
+at *Create deployment zip* → *Upload deployment artifact*, and the artifact
+was deployed separately, from a developer machine — which is what this
+paragraph still said through the 28 September pass, although the change
+(`e3c7dd6`, 20 September) was already in the `2443adc` reading above. They now
+log in to Azure over OIDC, run `az webapp deploy`, poll `/v1/health/live` for
+liveness, and then fail the job unless `/v1/health` reports the commit that was
+just deployed as its `build.sha` — a liveness check alone passes against the
+previous build while Azure starts the new one. On `azure-backend-acc.yml` all
+of that is skipped on a pull request, so `build` can stay a required check
+without a pull request shipping anything. See
 [CI/CD](../cicd.md) and the [supply-chain gate](../../../contributing/supply-chain.md).
 
 **The coverage gap closed differently from the test gap.** Gating on coverage

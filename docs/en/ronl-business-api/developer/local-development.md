@@ -56,7 +56,7 @@ Two further root scripts are plain Node and need no shell:
 
 | Script | Runs | What for |
 |---|---|---|
-| `check-swimlane-fixtures` | `node scripts/check-swimlane-fixtures.mjs` | Verifies the twelve RIP phase BPMNs under `packages/backend/src/rip-swimlane/__fixtures__/` against the sha256 fingerprints in `rip-bpmn-fingerprints.json`, which is committed identically here and in `linked-data-explorer`. With that repository checked out alongside it also compares byte for byte; `--sync` copies the models and the fingerprint file down from it, and `LDE_PATH` says where it is. Runs in `pre-push` |
+| `check-swimlane-fixtures` | `node scripts/check-swimlane-fixtures.mjs` | Verifies the twelve RIP phase BPMNs under `packages/backend/src/rip-swimlane/__fixtures__/` against the sha256 fingerprints in `rip-bpmn-fingerprints.json`, which is committed identically here and in `linked-data-explorer`. With that repository checked out alongside it also compares byte for byte, and tells the two directions of drift apart: a fixture that disagrees with its fingerprint is stale here, and the advice is `--sync`; a fixture that agrees with its fingerprint but differs from the checkout means that checkout is out of step, and the advice is to update it there. `--sync` copies the models and the fingerprint file down, and refuses when the checkout disagrees with its own fingerprints; `--force` overrides that for deliberate, uncommitted upstream edits. `LDE_PATH` says where the checkout is (default: a sibling). Only the `RipRNNProcess.bpmn` files are checked — the seven Awb fixtures in `__fixtures__/awb/` sit outside the fingerprint contract. Runs in `pre-push` |
 | `e2e:deploy-fixtures` | `node scripts/deploy-e2e-fixtures.mjs` | Deploys the end-to-end process and decision bundle into the local engine, in one command. The script here is a shim: the deployer lives in `linked-data-explorer` beside the fixtures and the manifest, and this resolves the checkout (`LDE_PATH`, defaulting to a sibling), runs it and passes arguments and the exit code through. See [E2E testing](testing/e2e.md) |
 
 ---
@@ -115,11 +115,11 @@ committed `.env.development` files (see [Front-end configuration](#front-end-con
 
 | Key | What to do |
 |---|---|
-| `NODE_EXTRA_CA_CERTS`, `NODE_TLS_REJECT_UNAUTHORIZED=0` | **Remove both lines** unless you sit behind the corporate proxy they were written for. The first points at a CA file on one developer's machine (the backend logs a warning and carries on when the file is unreadable). The second switches off TLS certificate checking for every outbound HTTPS call the backend makes. Issue [sgort/iou-architectuur#105](https://github.com/sgort/iou-architectuur/issues/105) tracks removing them from `.env.example` |
+| `NODE_EXTRA_CA_CERTS`, `NODE_TLS_REJECT_UNAUTHORIZED=0` | Both ship **commented out**; leave them so unless you sit behind a corporate proxy that intercepts TLS. There, point `NODE_EXTRA_CA_CERTS` at your own copy of the proxy's CA file — the proper fix. `NODE_TLS_REJECT_UNAUTHORIZED=0` is a development-only workaround that switches off TLS certificate checking for every outbound HTTPS call the backend makes: Keycloak JWKS, Operaton, BRP, the LLM providers |
 | `ANTHROPIC_API_KEY` | Must be **non-empty**, or the backend refuses to start with `Configuration validation failed: ANTHROPIC_API_KEY is required`. The shipped placeholder passes the check in development; the AI assistant works only with a real key |
 | `OPERATON_BASE_URL` | Keep `http://localhost:8081/engine-rest` with `OPERATON_USERNAME`/`OPERATON_PASSWORD` = `demo`/`demo`. `OPERATON_M2M_BASE_URL` points at the same local engine |
 | `DATABASE_URL` | `postgresql://audit_user:audit_password@localhost:5432/audit_logs`, the database and user the Postgres container creates on first start |
-| `LDE_MCP_ENABLED` | Set to `false` unless you create the `lde_assets` database yourself. `LDE_DATABASE_URL` points at it, but `init-databases.sql` does not create it. With the flag on, the backend still starts; the assistant's LDE tools fail when called |
+| `LDE_MCP_ENABLED` | Ships `true`, with `LDE_DATABASE_URL` pointing at `lde_assets` as `lde_user`/`lde_password`. `init-databases.sql` creates that database and role, but empty: the schema belongs to the Linked Data Explorer, so the provider connects and has nothing to read, and the assistant's LDE tools answer with an error when called. A `postgres-data` volume created before the script had that block has no `lde_assets` at all — see [Postgres](#the-docker-stack) below. Set the flag to `false` if you do not need the LDE tools |
 
 !!! danger "An unset Operaton URL reaches the shared engine"
     `OPERATON_BASE_URL` has a default, and it is not local: without the key the
@@ -190,7 +190,18 @@ volume it runs `config/postgres/init-databases.sql`, which creates:
 - in `audit_logs`: the `audit_logs` table with its indexes, and a `tenants`
   table seeded with eight tenants: `utrecht`, `amsterdam`, `rotterdam`,
   `denhaag` (municipalities), `flevoland` (province), `uwv`, `toeslagen`
-  (national agencies) and `unive` (commercial).
+  (national agencies) and `unive` (commercial);
+- the `lde_assets` database and the user `lde_user` / `lde_password`, with
+  full privileges on it and on its `public` schema. The database is empty: the
+  Linked Data Explorer owns its tables.
+
+Postgres runs the script only when it initialises an empty data directory, so
+an existing `postgres-data` volume does not pick up anything added to it later.
+Either create the missing object by hand, or recreate the volume with
+`npm run docker:down:volumes` (`docker compose down -v`) followed by
+`npm run docker:up`. `down -v` removes
+**every** volume of the stack: the Keycloak realm and its users, the audit log,
+the Operaton engine data and the Redis cache start again from scratch.
 
 **Redis** runs `redis-server --appendonly yes`. The backend uses it as the PA
 monitoring cache; `/v1/health` reports it but does not fail when it is down.
@@ -503,7 +514,7 @@ Husky installs two hooks during `npm ci`:
 | Hook | Runs |
 |---|---|
 | `pre-commit` | `npx lint-staged`: ESLint `--fix` in the owning workspace and `prettier --write` on the staged files |
-| `pre-push` | `deps:check`, then `npm run build --workspace=@ronl/shared`, `check-swimlane-fixtures`, `type-check`, `lint` and `check-format` |
+| `pre-push` | `deps:check`, then `npm run build --workspace=@ronl/shared`, `check-swimlane-fixtures`, `type-check`, `lint` and `check-format` (Prettier over `**/*.{ts,tsx,json,md}`, ignoring what `.gitignore` and `.prettierignore` list — the latter excludes design handoff folders, `*-handoff/`) |
 
 `deps:check` comes first in `pre-push` so that a push from a stale install stops
 with `npm ci` named as the fix, instead of the later checks failing on the wrong
@@ -511,7 +522,7 @@ tool versions. On 14 September 2026 a clone still on Prettier 3.8.1 after the
 lockfile moved to 3.9.6 failed `check-format` on seven correctly formatted files
 with nothing saying why.
 
-`check-swimlane-fixtures` is new in v2026.09.13 and sits ahead of the type
+`check-swimlane-fixtures` sits ahead of the type
 checks. It is not a test run — it compares files against committed fingerprints —
 so the hooks still run no suite.
 

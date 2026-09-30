@@ -132,6 +132,82 @@ origin/acc` — so the thirteen-workflow count and every CI claim in
 `code-standards.md`, `branch-protection.md`, `dependency-scanning.md`,
 `coverage-floor.md` and `build-provenance.md` is untouched by it.
 
+### 30 September 2026 — RONL Business API v2026.09.13 → v2026.09.15 (production, `ae06c9e`)
+
+Read at `origin/main` = `ae06c9e` (Promote to Production run #5, all four deploys green); `origin/acc`
+`142d909` holds the same tree. v2026.09.13 reached production with v2026.09.14 (#292, `ae4538b`), so the
+28 September entry above is no longer acc-only, and **27 September item 1 is now due**: the
+`check-previews.sh` carriage-return fix (`80e34a2`) is on `main`.
+
+1. **Skosmos is pinned by digest — the stated reason RBA R2 is held at 3.**
+   Evidence: `62c05a7` — `deployment/vm/skosmos/docker-compose.yml` now reads
+   `quay.io/natlibfi/skosmos:latest@sha256:c585569…`. The VM Keycloak composes still carry
+   `postgres:16-alpine` and `keycloak:23.0` without a digest, and #196 is open; the tag string itself is
+   still `latest`. The weekly pass decides the cell.
+   Bears on: `ictu-dependency-guideline.md` (the R2 held-at-3 sentence and the work-table footnote on
+   row 206), `supply-chain.md` (the "what still floats" VM paragraph).
+
+2. **The audit and SBOM workflows moved to Node 24.21.0 in the RONL Business API.**
+   Evidence: `fc50fed` — `dependency-audit.yml:60`, `sbom.yml:56`.
+   Bears on: `supply-chain.md` (the sentence that the audit and SBOM literals are `24.20.0` in all three).
+   Re-read the CPSV Editor and the Linked Data Explorer before rewriting it.
+
+3. **Inline `nosemgrep` annotations in the RONL Business API grew from 15 to 18.**
+   Evidence: `c395696` — frontend `scripts/check-og.mjs:44`, public-site `scripts/check-og.mjs:50,60`
+   (`detect-non-literal-regexp`, `path-join-resolve-traversal`; eight findings on three lines), each with
+   its reason, per the CLAUDE.md rule recorded the same day.
+   Bears on: `dependency-scanning.md` (the suppression counts).
+
+4. **A Semgrep Supply Chain triage, 30 September.**
+   Evidence: `3d4913f` — lockfile-only bumps for every finding with a non-breaking fix (multer 2.4.0,
+   moment 2.31.0, qs 6.16.0 via body-parser 1.20.8 / express 4.22.3, ip-address 10.7.2, fast-uri 3.1.8,
+   brace-expansion ×3), superseding Renovate #273; react-router (fix only in v7) and minimatch via
+   @typescript-eslint v6/v7 (dev-only) left as accepted risk in the Semgrep UI.
+   Bears on: `dependency-scanning.md`, the ICTU page's alert evidence (R10). Lead to verify: whether this
+   lockfile-only pull request skipped the three required site checks, as `code-standards.md` and
+   `coverage-floor.md` say such a pull request does.
+
+5. **Branch protection changed on 29–30 September (a settings change, outside the release range).**
+   Evidence: `gh api` — the RONL Business API's `main` ruleset (`23019967`) requires `audit` + `scan`, and
+   classic protection is deleted on both `acc` and `main` (iou-architectuur#105 item 18).
+   Bears on: `branch-protection.md`, `dependency-scanning.md`, `ictu-dependency-guideline.md`,
+   `ci-posture-deck.md`, `supply-chain.md` — every sentence describing RBA's `main` as "audit alone" or
+   its classic protection as still configured. Re-read LDE and TTL settings at the same time.
+
+6. **The coverage floor's documented margins moved.**
+   Evidence: `391b1a8` — the five runner configs' functions-floor comments now say 26 (was 31), dated
+   28 September; `73a6764` — the 32 files between 80 and 85% branches are all at 85% or above (#294 open
+   for the two unreachable arms).
+   Bears on: `coverage-floor.md` (the count the configs carry, the files near the floor).
+
+7. **A new gate inside the backend's `npm test`: conformance coverage.**
+   Evidence: `1fb8dbf` — `packages/backend/package.json` `test` and `test:serial` end with
+   `&& node scripts/check-conformance-coverage.cjs`, which fails when the OpenAPI document holds an
+   operation no test compared against a real response; both backend workflows run it. A filtered Jest run
+   skips it. `openapi/pending.json` is deleted (`5d244c5`): the document describes all 133 operations.
+   Bears on: `code-standards.md` (CI gates), possibly `coverage-floor.md`; `openapi-rendering.md` if it
+   mentions a pending list.
+
+8. **`.prettierignore` keeps design handoff folders out of the format check.**
+   Evidence: `96fabb6` — `check-format` and `format` add `--ignore-path .prettierignore`, which excludes
+   `*-handoff/`. Note: `docs/pa-demo-social-handoff/` (14 files) is tracked in the repository
+   (`13f9c9a`) despite the handoff-package rule.
+   Bears on: `development-workflow/design-and-handoff.md`, `code-standards.md`.
+
+9. **Source fixes from iou-architectuur#105 reached production.**
+   Evidence: `d61734e` (items 1–3) and `537fc2f` (items 9, 13–16 and the RBA half of 17), both in
+   v2026.09.14. `SECURITY-PIPELINE.md` no longer says all four App Services run `NODE|22-lts` or that the
+   backend deploy has no lockfile, and quotes its register headline as 39 references across 13
+   workflows.
+   Bears on: any contributing page that quotes `SECURITY-PIPELINE.md` — a lead, not a finding.
+
+10. **The seven Awb swimlane fixtures are outside the fingerprint contract.**
+    Evidence: `edb4ff0` adds `packages/backend/src/rip-swimlane/__fixtures__/awb/*.bpmn` copied from the Linked
+    Data Explorer; `check-swimlane-fixtures` only matches `^RipR\d\dProcess\.bpmn$`. `97e0534` made the
+    check direction-aware (it names which repository to update, and `--sync` refuses the destructive
+    direction unless `--force`). Extends 28 September item 3.
+    Bears on: whichever contributing page describes the cross-repository fixture contract.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

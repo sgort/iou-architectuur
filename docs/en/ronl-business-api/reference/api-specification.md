@@ -65,16 +65,36 @@ Fetched live from the acceptance API, so it always shows what the service
 declares right now. **Test Request** calls acceptance and never production, on
 purpose.
 
-**113 of 131 operations are described.** The remaining 18 are the `/v1/m2m`
-surface, pending [#214](https://github.com/sgort/ronl-business-api/issues/214);
-until then they are listed in `openapi/pending.json` and documented on
-[API Endpoints](api-endpoints.md#m2m-operaton). A backend test
-(`src/openapi/coverage.test.ts`) fails when a served operation is neither
-described nor pending, and the pending list may only shrink.
+**Every operation the service serves is described** — 133 in release
+2026.09.15, the machine-to-machine surface under `/v1/m2m` included. Two
+backend checks hold the document to the code:
 
-Two security schemes are declared: `bearerAuth`, a Keycloak-issued JWT that
-applies by default, and `mediaAggregatorKey`, which the media-aggregator search
-requires only when the service is configured with a key.
+- **Coverage.** `src/openapi/coverage.test.ts` compares the document with the
+  route registry and fails on a served operation that is not described, and on
+  a described operation that is not served.
+- **Conformance.** Route tests compare real responses against the document with
+  `expectToMatchOperation`, which validates with Ajv against JSON Schema
+  2020-12 with strict schema checking on. `npm test` then runs
+  `scripts/check-conformance-coverage.cjs`, which fails the run when any
+  described operation was never compared against a real response.
+
+Three security schemes are declared:
+
+- `bearerAuth`, a Keycloak-issued JWT, applies by default.
+- `m2mOAuth`, the client-credentials grant, applies to `/v1/m2m`. A valid token
+  is not enough: the token's `azp` must be on `M2M_ALLOWED_CLIENTS`
+  (`operaton-mcp-client` alone by default). OpenAPI cannot express that
+  condition, so the scheme's description states it and every `/v1/m2m`
+  operation carries the shared `M2mForbidden` response — `403
+  M2M_CLIENT_NOT_ALLOWED` for a caller off the allow-list, `403
+  OPERATION_NOT_PERMITTED` for an operation withdrawn from machine consumers.
+- `mediaAggregatorKey` applies to the media-aggregator search, which requires it
+  only when the service is configured with a key.
+
+Deploying process definitions is not part of this API: it belongs to the Linked
+Data Explorer — see its
+[API Specification](../../linked-data-explorer/reference/api-specification.md).
+
 The document is linted with Spectral against the NL API Design Rules 2.2.1
 ruleset, with its deviations recorded rather than hidden: `nlgov:semver` is off
 because releases are CalVer, and the problem-details rules are off because the

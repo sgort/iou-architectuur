@@ -18,8 +18,9 @@ silently. The label pins the *release*, not the image — GitHub
 rebuilds the image about weekly, and a hosted runner cannot pin it by digest.
 
 !!! info "`acc` and `main` carry the same thirteen files, and deliberately different shapes"
-    Verified against `main` at `2443adc` on 26 September 2026 (v2026.09.12):
-    `.github/workflows/` is identical on `origin/acc` and `origin/main`.
+    Re-verified on 30 September 2026 (v2026.09.15): `origin/acc` at `142d909`
+    and `origin/main` at `ae06c9e` carry an identical tree, `.github/workflows/`
+    included.
     `main` was once four workflows behind and carried none of the pinning or
     gating described below — closing that gap was a CI-alignment programme that
     finished in v2026.09.7, and `main` has its own `main promotion gate` ruleset.
@@ -62,7 +63,8 @@ can be produced on demand.
     They carry `workflow_call:` and `workflow_dispatch:` and nothing more. A
     push to `main` starts `promote-to-production.yml`, which decides which of
     them to call and in what order. They never had a `pull_request` trigger,
-    which is why `audit` is still the only requirable check on `main`.
+    which is why `main` requires the two scanners, `audit` and `scan`, and no
+    build check.
 
 ---
 
@@ -135,7 +137,8 @@ unsatisfiable `needs` graph — it simply deploys nothing.
 
 !!! danger "If the promotion workflow breaks, nothing deploys — silently"
     The four production workflows are not required checks on `main`; `main`
-    requires `audit` alone. So a promotion whose orchestrating workflow fails to
+    requires `audit` and `scan`, and neither deploys anything. So a promotion
+    whose orchestrating workflow fails to
     parse, or fails at `changes`, produces a red run and no deployment, and
     nothing else reports it.
 
@@ -202,7 +205,7 @@ request's merge commit, so it proves the lockfile consistent with *that* base,
 not with a base that moves afterwards. **Merge dependency pull requests one at a
 time, each rebased onto the merged `acc` first.**
 
-### `scan` — Semgrep, required on `acc`
+### `scan` — Semgrep, required on `acc` and `main`
 
 `semgrep.yml` runs Semgrep Code and Supply Chain across the whole monorepo in a
 single job. All six workspaces resolve through the one root `package-lock.json`,
@@ -215,9 +218,9 @@ says nothing at all about the packages in the lockfile.
 
 `scan` **is** a required status check on `acc`, promoted once its baseline had
 been triaged — a workflow that runs but cannot block is advice, not a gate.
-That promotion was a ruleset change, not a change to this file. It is not
-required on `main`; see [Required checks and branch
-rules](#required-checks-and-branch-rules).
+Since 29 September 2026 it is required on `main` as well, beside `audit`. Both
+promotions were ruleset changes, not changes to this file; see [Required checks
+and branch rules](#required-checks-and-branch-rules).
 
 Its concurrency group is the one deliberate divergence from every other workflow
 here: pull-request runs cancel, pushes to `acc` and `main` do not. Those pushes
@@ -253,7 +256,7 @@ the issue step is skipped there.
   the working tree, including a script that exists on the branch under review
   before it exists on `acc` or `main`; the first run lost it at the first
   checkout and read the missing module as a finding.
-- **Node is an exact literal**, `'24.20.0'`, not `.nvmrc`: the job reads both
+- **Node is an exact literal**, `'24.21.0'`, not `.nvmrc`: the job reads both
   branches, which need not share an `.nvmrc`, and the tool reading a lockfile
   should not change with the tree it reads. Renovate maintains it.
 
@@ -284,7 +287,7 @@ match — for where the release is cut; and `--verify-release`, which `sbom.yml`
 runs on a push to `main`: a missing document fails, drift only warns, because a
 promotion carries every commit merged into `acc` since the release was cut. Both
 comparisons ignore `serialNumber` and `metadata.timestamp`, which change on every
-run. Node is pinned as the same `'24.20.0'` literal as the daily audit, for the
+run. Node is pinned as the same `'24.21.0'` literal as the daily audit, for the
 same reason.
 
 ---
@@ -298,10 +301,11 @@ deployed artifact on a major the host does not run.
 - The **eight deploy workflows** read `node-version-file: .nvmrc`.
 - `.nvmrc` carries an exact `22.23.2`.
 - The root `engines.node` is `>=22`, and `engines.npm` is `>=10.0.0`.
-- `dependency-audit.yml` and `sbom.yml` name an exact `'24.20.0'`: they read
+- `dependency-audit.yml` and `sbom.yml` name an exact `'24.21.0'`: they read
   lockfiles — both branches', in the audit's case — and should not change Node
   with the tree they read.
-- `zizmor.yml` names an exact `'24.21.0'`, deliberately on a different major:
+- `zizmor.yml` names the same exact `'24.21.0'`, deliberately on a different
+  major from `.nvmrc`:
   its `renovate-config-validator` step needs Node 24, because `renovate`
   declares `engines.node ^24.11.0`. npm accepts that mismatch with an
   `EBADENGINE` warning rather than refusing, which is how the validator once
@@ -397,8 +401,8 @@ and a failing test blocks the deploy.
 | Workflow | Lint | Type-check | Tests | Extra gates |
 |---|:---:|:---:|:---:|---|
 | `azure-backend-*` | ✅ | – | ✅ | Lints the OpenAPI document; verifies `dist/index.js` exists, packages from the lockfile, then deploys and verifies the deploy took effect |
-| `azure-frontend-*` | ✅ | – | ✅ | `@ronl/pa-cockpit`'s 476 tests, then a performance budget, each its own step |
-| `azure-publicsite-*` | ✅ | ✅ | ✅ | Prerender + bundle-cleanliness gate, inside the build |
+| `azure-frontend-*` | ✅ | – | ✅ | `@ronl/pa-cockpit`'s 476 tests, then a performance budget, each its own step; `check-og.mjs` on the built `index.html` |
+| `azure-publicsite-*` | ✅ | ✅ | ✅ | Prerender + bundle-cleanliness gate, inside the build; `check-og.mjs` on every built page and `robots.txt` |
 | `azure-pa-demo-*` | ✅ | ✅ | ✅ | **Playwright E2E**, then the bundle gate inside the build |
 
 `@ronl/pa-cockpit` has no deploy workflow of its own — it is a library both the
@@ -426,10 +430,24 @@ Lint → Type-check → Unit tests → [E2E, pa-demo only]
     ↓
 Build for the target environment
     ↓
+[frontend and public site] check-og.mjs <acceptance|production>
+    ↓
 Azure/static-web-apps-deploy   (skip_app_build: true)
     ↓
 [frontend only] Wait, then verify HTTP 200
 ```
+
+`scripts/check-og.mjs` in the frontend and in the public site reads the **built**
+`dist/` and fails the build step when its link-preview tags are not the target
+environment's: `og:url`, `og:image`, `og:title` (with its `[ACC] ` prefix on
+acceptance), the `robots` meta tag, the canonical link, an unfilled
+`%VITE_…%` placeholder, and the preview image missing from `dist/`. The public
+site's copy checks every prerendered `index.html`, expects exactly one
+canonical link per page, and compares `robots.txt` byte for byte — `Disallow:
+/` on acceptance. The unit tests prove the template and the `.env` files agree;
+this step proves the file actually shipped is the right one, because an
+acceptance card that reaches Teams or LinkedIn is cached there for days. The
+PA demo has no such step.
 
 `skip_app_build: true` matters more than it looks: the deploy action uploads an
 artifact **this pipeline built**, rather than building one inside a floating
@@ -459,6 +477,16 @@ fails fast and by name. The tests then include the coverage gate that compares
 the document with the routes actually served, and the artifact carries
 `openapi/openapi.json` for `GET /v1/openapi.json` — see
 [API specification](../reference/api-specification.md).
+
+*Unit tests* is `npm test`, which in the backend is `jest --coverage && node
+scripts/check-conformance-coverage.cjs`. The second step fails the run when an
+operation in the document was never compared against a real response
+(`expectToMatchOperation`) during the suite; the tests record each comparison
+in the log `scripts/jest-global-setup.cjs` allocates as `CONFORMANCE_LOG`. It is
+a separate process after `&&` rather than a Jest `globalTeardown` because an
+error thrown there is printed and the run still exits 0. A focused `npx jest`
+run does not go through `npm test` and never reaches the step; a missing log
+makes it exit 0 with a note.
 
 Since v2026.09.10 the backend is deployed **by the workflow**, not by hand. Three
 parts of that are worth knowing, because each replaced something that had gone
@@ -502,8 +530,8 @@ reporting it on `acc` after the merge.
 `azure-backend-prod.yml` deliberately has no `pull_request` trigger — and since
 v2026.09.10 no `push` trigger either. Every commit reaching `main` is promoted
 from `acc` and has already run this suite on its own pull request, so re-running
-it on the promotion says nothing new, while `audit`, which *is* required on
-`main`, reports there on every pull request regardless of base. The Linked Data
+it on the promotion says nothing new, while `audit` and `scan`, which *are*
+required on `main`, report there on every pull request regardless of base. The Linked Data
 Explorer excludes the trigger from its production workflow for the same reason:
 its production environment no longer carries a required reviewer, which was
 removed on 24 September 2026, so both repositories rest the exclusion on the
@@ -715,7 +743,7 @@ Releases therefore land through a pull request rather than a local fast-forward.
 | | `acc` | `main` |
 |---|---|---|
 | Ruleset | `acc supply-chain gate` | `main promotion gate` |
-| Required status checks | `audit`, `scan`, and the four build checks | `audit` |
+| Required status checks | `audit`, `scan`, and the four build checks | `audit`, `scan` |
 | Pull request | Required, 0 approvals, merge method `merge` only | Required, 0 approvals, merge method `merge` only |
 | `deletion` | Blocked | Blocked |
 | `non_fast_forward` | Blocked | Blocked |
@@ -726,8 +754,9 @@ Site**. They were promoted together with `scan` once each of their workflows
 could report on every pull request — see [Why the `pull_request` filter moved
 into a job](#why-the-pull_request-filter-moved-into-a-job).
 
-`main` stays on `audit` alone, and that makes it the weaker branch in this one
-respect. It is deliberate: **none of the production workflows has a
+`main` requires the two scanners — `audit`, and since 29 September 2026 `scan` —
+but none of the four build checks, and that makes it the weaker branch in this
+one respect. It is deliberate: **none of the production workflows has a
 `pull_request` trigger at all** — and since v2026.09.10 they have no `push`
 trigger either — so there is no build check there to require. Every commit
 reaching `main` is promoted from `acc`, where the full set has already reported
@@ -746,11 +775,14 @@ flag would have demanded an approval nobody could give. It is preserved rather
 than harmonised, and written down in both places so that the next person to
 compare them does not read it as drift.
 
-!!! note "Classic branch protection gives the wrong answer here"
-    It still reports `allow_force_pushes: true` on both branches. That is a
-    vestigial second layer rather than a hole: the ruleset's `non_fast_forward`
-    rule is what refuses the push. Reading the classic protection endpoint alone
-    is misleading.
+!!! note "The rulesets are the only layer"
+    Neither branch carries classic branch protection any more:
+    `GET /repos/sgort/ronl-business-api/branches/{acc,main}/protection` answers
+    `404 Branch not protected`. The vestigial classic layer, which reported
+    `allow_force_pushes: true` while the ruleset's `non_fast_forward` rule
+    refused the push, was deleted on both branches. To read the rules, read the
+    rulesets (`GET /repos/sgort/ronl-business-api/rulesets`), not the
+    protection endpoint.
 
 ---
 

@@ -49,4 +49,4 @@ See [Getting Started](../user-guide/getting-started.md) for how these surfaces a
 
 ## Deployment
 
-RONL Business API is deployed for the Province of Flevoland, currently on the acceptance environment. See [Getting Started](../user-guide/getting-started.md) for the werkomgeving and public knowledge base URLs.
+RONL Business API is deployed for the Province of Flevoland, in production, with an acceptance environment where each release is tried first. See [Getting Started](../user-guide/getting-started.md) for the werkomgeving and public knowledge base URLs.

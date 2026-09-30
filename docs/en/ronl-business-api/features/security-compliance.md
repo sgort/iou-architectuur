@@ -26,7 +26,7 @@ Cross-origin access is governed by CORS, which is a browser control, not an acce
 
 ## Authentication and authorization
 
-Every protected endpoint requires a valid, signature-verified token before any request data is processed — see [Authentication & IAM](authentication-iam.md) for the full validation chain, the role checks a caller's token is subject to, and the tenant boundary that keeps one caller from reaching another tenant's resources.
+Every protected endpoint requires a valid, signature-verified token before any request data is processed — see [Authentication & IAM](authentication-iam.md) for the full validation chain, the role checks a caller's token is subject to, and the tenant boundary that keeps one caller from reaching another tenant's resources. The cross-tenant machine-to-machine routes under `/v1/m2m` additionally require the token to have been issued to a client on `M2M_ALLOWED_CLIENTS`; any other token, a person's included, is refused with `403 M2M_CLIENT_NOT_ALLOWED`.
 
 ---
 
@@ -50,8 +50,8 @@ The backend never deletes audit records. `AUDIT_LOG_RETENTION_DAYS` (default 255
 
 The log level is set by `LOG_LEVEL` (default `info`) in every environment; nothing ties it to the deployment tier. Logs and audit records are not free of personal data:
 
-- The BRP person lookup logs its whole request body at `info` level, citizen service number (BSN) included. This is an open issue on ronl-business-api (#241).
-- The same lookup's audit entry stores the BSN it looked up, and audit entries are copied to the application log.
+- The BRP person lookup's own log lines carry no citizen service number (BSN): it logs the user, the tenant, the query type and the number of subjects asked for, and on a failure the upstream status, problem code or error message — never the request body or the BRP response (#241).
+- The same lookup's audit entry stores the BSN it looked up, on purpose. Every audit entry is also written to the application log at `info` level, so that BSN reaches the application log through the audit record.
 
 The frontend does not write a BSN to the browser console.
 

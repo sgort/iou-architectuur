@@ -96,6 +96,12 @@ publiek.open-regels.nl · v2026.09.6 · build 04840ed · #2
 
 The address is the environment you are actually on — the acceptance copy shows its own address there. The `v…` is the release. `build …` is the first seven characters of the commit the site was built from, and the `#…` after it is the number of the deployment run, which is what tells two builds of the same release apart. Hovering the build shows the full commit hash, so it can be copied into a bug report. A copy of the site that did not come from a deployment reads `local build` instead.
 
+## Sharing a link
+
+A link to the site, pasted into a chat, an e-mail client or a social network, unfolds into a preview card: the title *Waar komt deze regel vandaan?*, a one-line description and the site's own image. Every page shares the same card.
+
+A link to the acceptance copy is marked: its card's title begins with `[ACC]`. The acceptance copy also asks search engines to stay away — every page carries `noindex, nofollow`, and its `robots.txt` shuts out all crawlers and names no sitemap — so a search only ever leads to production.
+
 ---
 
 !!! info "Acceptance runs alongside production"

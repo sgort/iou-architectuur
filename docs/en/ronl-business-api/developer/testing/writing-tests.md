@@ -19,18 +19,35 @@ suite was green and wrong.
   an `x-test-roles` header. Path aliases (`@utils/`, `@services/`, `@auth/`,
   `@middleware/`, `@routes/`, `@models/`, `@ronl/shared`) are mapped in
   `packages/backend/jest.config.js` and work inside test files.
-- **A new backend route needs a registry entry and an OpenAPI description.**
-  Since v2026.09.12 `src/routes/registry.ts` is the one list of `/v1` mounts:
-  `index.ts` mounts from it, the root banner advertises from it, and
+- **A new backend route needs a registry entry, an OpenAPI description, and a
+  conformance assertion in its route test.** Since v2026.09.12
+  `src/routes/registry.ts` is the one list of `/v1` mounts: `index.ts` mounts
+  from it, the root banner advertises from it, and
   `src/openapi/coverage.test.ts` compares it against `openapi/openapi.yaml`.
-  An operation that is served but neither documented there nor listed in
-  `openapi/pending.json` fails that test, inside the ordinary `npm test`.
-  Pending is not an escape hatch for new work: it holds the 18 operations not
-  yet described, and the test caps it at 18 so the list can only shrink. So
-  describe the new operation in `openapi.yaml`, then run
-  `npm run test:contract --workspace=@ronl/backend` for a quick check and
-  `npm run lint:openapi --workspace=@ronl/backend` for the NL API Design Rules
-  ruleset, which CI runs before the tests.
+  Since v2026.09.14 there are two rules, and both are enforced by the ordinary
+  `npm test`:
+
+    1. **Describe it in `openapi.yaml`.** An operation that is served but not
+       documented — or documented but not served — fails `coverage.test.ts`.
+       There is no pending list to park it on any more: #214 described the
+       last undocumented operations and `openapi/pending.json` was deleted
+       with its ceiling.
+    2. **Assert that a real response matches the description.** Call
+       `expectToMatchOperation(res, '<method>', '<path>')` from
+       `src/openapi/testing/conformance.ts` in the route test that exercises
+       the operation. It checks the status, the `API-Version` header on a 2xx
+       and the body against the documented schema, and it records the
+       operation; after Jest, `scripts/check-conformance-coverage.cjs` fails
+       `npm test` if any documented operation was never checked, naming each
+       one.
+
+    **A filtered Jest run skips that second check.** `npx jest -t …`, a single
+    file, `test:contract` and `test:openapi-coverage` never reach it, so a
+    quick run can be green while an operation is still unchecked. Use
+    `npm run test:contract --workspace=@ronl/backend` for a quick check,
+    `npm run lint:openapi --workspace=@ronl/backend` for the NL API Design
+    Rules ruleset, which CI runs before the tests, and the full
+    `npm test --workspace=@ronl/backend` before you push.
 - **The four Vitest packages** (frontend, pa-cockpit, pa-demo, public site):
   default to the `node` Vitest environment and opt
   into `jsdom` per file with `// @vitest-environment jsdom` only when a component
@@ -53,20 +70,22 @@ suite was green and wrong.
   configured **per file** in all five runner configs, so a thin new file does
   not merely look thin: it exits `npm test` non-zero and names itself. It is a
   branch floor only — the functions column carries no threshold, and adding one
-  at 80 would fail 26 existing files as measured on 20, 24, 26 and
-  28 September 2026, the same 26 every time (the configs' own comments still
-  say 31).
+  at 80 would fail 23 existing files as measured on 30 September 2026
+  (26 on each of the four passes before it, which is the figure the configs'
+  own comments now carry).
 
-  **Three files are at exactly 80.00%** and have no headroom at all:
-  `backend/src/media-aggregator/sanitize.ts`,
-  `frontend/src/components/CaseworkerDashboardV2/NoAccessPanel.tsx` and
-  `pa-cockpit/src/components/PADashboardV2/dossierbeheer/DossierRow.tsx`.
-  Adding an uncovered edge to any of them fails the run, so plan on a test
-  going in with the change.
+  **Every file currently clears 85%**, five points above the floor: the three
+  that sat at exactly 80.00% on 28 September went to 100% in `391b1a8`, and
+  `73a6764` lifted the 32 between 80 and 85. The margin is a practice, not a
+  gate — the configs still say 80 — and one file,
+  `frontend/src/components/CaseworkerDashboard/IouFeedbackSection.tsx`, sits
+  at exactly 85.00%. Keep a new file above 85 rather than aiming at 80.
 - **Update the counts on these pages** when work lands, from a real run
   (`--json --outputFile=…` for Jest, `--reporter=json --outputFile.json=…` for
   Vitest) rather than an estimate or a grep for `it(` / `test(` — both miscount
-  multi-line and parameterised cases. Give those output paths **absolutely**:
+  multi-line and parameterised cases. Where a figure has to come from the
+  source instead, parse the test files and expand every `.each` table, and
+  publish it only if the per-file counts sum to the runner's own total. Give those output paths **absolutely**:
   `npm test --workspace=…` runs with the cwd set to the package, so a relative
   one lands in `packages/`. Take the file count from `testResults.length`, not
   from `numTotalTestSuites`, which counts `describe` blocks. For elapsed time quote Vitest's

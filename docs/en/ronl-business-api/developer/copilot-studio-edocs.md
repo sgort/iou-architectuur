@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Copilot Studio — eDOCS OAuth Integration
 
 This page documents how Microsoft Copilot Studio can connect to the eDOCS document management system using OAuth 2.0 via the RONL Business API and Keycloak.
@@ -53,14 +57,21 @@ The RONL Business API is the OAuth 2.0 resource server. Keycloak is the authoris
 
 ## eDOCS routes
 
-`packages/backend/src/routes/edocs.routes.ts` registers the `/v1/edocs` surface — workspace and document lifecycle endpoints, all protected by `jwtMiddleware` (a valid Bearer token issued by Keycloak is required on every request). For the full, current endpoint list and request/response shapes, see [API Endpoints — eDOCS](../reference/api-endpoints.md#edocs); for live-tested results and known issues per endpoint, see [eDOCS — Live Testing](testing/edocs-live-testing.md).
+`packages/backend/src/routes/edocs.routes.ts` registers the `/v1/edocs` surface — workspace and document lifecycle endpoints, all protected by `jwtMiddleware` (a valid Bearer token issued by Keycloak is required on every request). For the full, current endpoint list and request/response shapes, see the **Documents** tag of the [API Specification](../reference/api-specification.md); for live-tested results and known issues per endpoint, see [eDOCS — Live Testing](testing/edocs-live-testing.md).
 
-The routes are registered in `packages/backend/src/index.ts`:
+- `POST /v1/edocs/documents` requires `metadata.docName` and `metadata.department` (eDOCS `UV_AFD_NAAM`, which the DM server also demands), besides `filename` and `contentBase64`; without them it answers `400 MISSING_FIELDS`.
+
+The routes are mounted from the route registry, `packages/backend/src/routes/registry.ts`, which `index.ts` mounts in array order:
 
 ```typescript
-import edocsRoutes from "./routes/edocs.routes";
-// ...
-app.use("/v1/edocs", edocsRoutes);
+import edocsRoutes from './edocs.routes';
+// in routeRegistry:
+{
+  mount: '/v1/edocs',
+  router: edocsRoutes,
+  advertiseAs: 'edocs',
+  summary: 'Document generation and retrieval',
+},
 ```
 
 ---

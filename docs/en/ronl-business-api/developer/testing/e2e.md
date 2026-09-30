@@ -19,49 +19,56 @@ against `acc` at `15dfbf9` with a full local stack running. That was the first
 pass in which all three were run together rather than described from
 configuration, and it is still the last.
 
-!!! warning "Not re-run on 28 September — and still understating the frontend suite"
-    The unit suites were re-measured for v2026.09.13 (`acc` at `963fe24`) on
-    28 September; the Playwright suites were **not**, for the fifth pass
-    running. Every count in this page's tables dates from 30 August and is
-    repeated unchanged rather than re-derived — a measured number is worth more
-    stale than a guess is fresh. Two of the three suites need services these
-    passes deliberately did not start.
+!!! warning "Not re-run on 30 September — and still understating the frontend suite"
+    The unit suites were re-measured for v2026.09.15 (`main` at `ae06c9e`) on
+    30 September; the Playwright suites were **not**, for the sixth pass
+    running — this time by choice, rather than run against ACC. Every count in
+    this page's tables dates from 30 August and is repeated unchanged rather
+    than re-derived — a measured number is worth more stale than a guess is
+    fresh. Two of the three suites need services these passes deliberately did
+    not start.
 
-    **The inventory, re-checked at `963fe24` straight from the spec tree, is
+    **The inventory, re-checked at `ae06c9e` straight from the spec tree, is
     thirteen specs**: eleven in `packages/frontend/e2e/`, plus
     `packages/pa-demo/e2e/plato-demo.spec.ts` and
     `packages/public-site/e2e/publiek.spec.ts`. The count is unchanged since
-    v2026.09.11, and **v2026.09.13 neither added nor removed a spec**.
-    `thuisbatterij-journey.spec.ts` arrived in v2026.09.11, after the only run
-    of this suite, so the 27-test frontend figure — measured when there were
-    ten — **cannot** include it. Read 27 as a floor rather than a total until
-    the suite is run again. The workflow wiring is unchanged too: the pa-demo
-    spec runs in `azure-pa-demo-acc.yml` and only there, and no workflow runs
-    the other two.
-
-    **What v2026.09.13 did change is how the fixtures these suites need get
-    deployed** — see
-    [Deploying the E2E fixtures](#deploying-the-e2e-fixtures) below. That is a
-    read of the scripts and the configuration, not a run: nothing on this page
-    was executed in this pass.
+    v2026.09.11: **neither v2026.09.14 nor v2026.09.15 added or removed a
+    spec**. `thuisbatterij-journey.spec.ts` arrived in v2026.09.11, after the
+    only run of this suite measured here, so the 27-test frontend figure —
+    measured when there were ten — **cannot** include it. Read 27 as a floor
+    rather than a total until the suite is run again. The workflow wiring is
+    unchanged too: the pa-demo spec runs in `azure-pa-demo-acc.yml` and only
+    there, and no workflow runs the other two.
 
     The eleven: `caseworker-journey`, `infra-board-journey`, `login-redirect`,
     `pa-live-authoring`, `pa-mock-journey`, `protected-route`,
     `rip-r21-journey`, `smoke`, `tenant-isolation`, **`thuisbatterij-journey`**,
     `zorgtoeslag-journey`.
 
-    **Two specs changed in v2026.09.12, neither in its test count.**
-    `thuisbatterij-journey.spec.ts` was edited in `0e71fd3` to match its two
-    caseworker tasks by their new Dutch names as well as their old English ones
-    — see [below](#frontend-playwright-suite). `zorgtoeslag-journey.spec.ts`
-    changed only in a comment (`b762a13`), which now attributes the routing of
-    a citizen's case to the deployment's tenant to `tenant-access.ts` rather
-    than to an override in `process.routes.ts`.
+    **v2026.09.14 changed three specs and the login helper, none in its test
+    count** — read from the source at `ae06c9e`, not run:
 
-    The three `playwright.config.ts` files and `e2e/global-setup.ts` are
-    unchanged between `86af73e` and `2443adc` — see
+    - **`e2e/helpers/auth.ts` matches the medewerker login button exactly**
+      (`9f54e82`). v2026.09.13 added *"Inloggen met uw Flevoland-account"* to
+      the landing page, and `loginAsMedewerker` looked its button up by the
+      name *"Inloggen"*, which Playwright matches as a substring — so it
+      resolved to both buttons and strict mode refused to click. The commit
+      records that **26 of 28 E2E tests against ACC failed at that one line**;
+      that run is the commit's account, not a measurement these pages made.
+      The helper now passes `exact: true`, because the plain *"Inloggen"* in the
+      top bar is the Keycloak login it fills in, while the new button goes to
+      Entra ID.
+    - **`caseworker-journey.spec.ts` accepts the Dutch Kapvergunning task
+      names** (`10e83ce`), and **`zorgtoeslag-journey.spec.ts` and
+      `tenant-isolation.spec.ts` the Dutch Zorgtoeslag ones** (`1f0e52b`) —
+      the same pattern `thuisbatterij-journey` adopted in v2026.09.12; see
+      [below](#frontend-playwright-suite).
+
+    The three `playwright.config.ts` files are unchanged between `86af73e` and
+    `ae06c9e`, and `e2e/global-setup.ts` changed only in v2026.09.13, when its
+    fix messages began naming `npm run e2e:deploy-fixtures` — see
     [What each suite needs running](#what-each-suite-needs-running), which is
-    current as of 26 September even though the counts above are not.
+    current as of 30 September even though the counts above are not.
 
 ### What each suite needs running
 
@@ -70,8 +77,8 @@ every spec under that directory. This is the table to check before running
 anything locally — it is what separates a suite you can start cold from one that
 will fail its preconditions.
 
-Re-read at `86af73e` on 24 September 2026; unchanged at `2443adc`
-(v2026.09.12) and again at `963fe24` (v2026.09.13).
+Re-read at `86af73e` on 24 September 2026; the configs are unchanged at
+`2443adc` (v2026.09.12), `963fe24` (v2026.09.13) and `ae06c9e` (v2026.09.15).
 
 | Config | Declares `webServer`? | Has a `globalSetup`? | What must already be up |
 |---|---|---|---|
@@ -127,8 +134,8 @@ Four things follow from that table:
 
 !!! warning "Count these with the runner, never with `grep`"
     A static count of top-level `test(` across the eleven frontend specs gives
-    **24** at `86af73e`, and still 24 at `2443adc`. The runner reported **27** across ten of them on
-    30 August. `login-redirect.spec.ts` alone declares one `test(` and runs
+    **24** at `86af73e`, and still 24 at `2443adc` and at `ae06c9e`. The
+    runner reported **27** across ten of them on 30 August. `login-redirect.spec.ts` alone declares one `test(` and runs
     five, because the cases are parameterised — and `rip-r21-journey.spec.ts`
     contains **two** `test.skip(true, reason)` calls *inside* test bodies,
     runtime skips that a naive grep reads as skipped declarations. Neither is
@@ -252,9 +259,9 @@ suite trades parallelism for correctness.
 
 The directory held **27 tests across 10 specs** when it was last run, in one
 pass on 30 August 2026 against `acc` at `15dfbf9`: **27 passed, 1.9m**, no
-failures, no flakes, nothing skipped. It holds **eleven specs** at `86af73e`
-and at `2443adc`, so the 27 is a floor — see the warning at the top of this
-page.
+failures, no flakes, nothing skipped. It holds **eleven specs** at `86af73e`,
+at `2443adc` and at `ae06c9e`, so the 27 is a floor — see the warning at the
+top of this page.
 
 | Spec | Tests | Covers |
 |---|---:|---|
@@ -287,6 +294,31 @@ page.
     definitions and on those running the new ones. The test count is unchanged — one `test()` — and the
     spec has still never been run by these pages, so its row stays *not yet
     measured*. Read from the spec at `2443adc`, not run.
+
+!!! note "Three more specs accept the Dutch names, and the login helper matches exactly — v2026.09.14"
+    linked-data-explorer redrew the Kapvergunning and Zorgtoeslag processes in
+    swimlanes with Dutch task names, and three specs followed the
+    Thuisbatterij one, each regex accepting the old English name **or** the
+    new Dutch one so the journeys pass against either deployment:
+
+    | Spec | Commit | Review task, after the redesign | Notify task, after it |
+    |---|---|---|---|
+    | `caseworker-journey.spec.ts` | `10e83ce` | *Beoordeling behandelaar: besluit kapvergunning* | *Fase 6: Aanvrager informeren over besluit* |
+    | `zorgtoeslag-journey.spec.ts` | `1f0e52b` | *Beoordeling behandelaar: besluit voorlopige aanspraak* | *Fase 6: Aanvrager informeren over besluit* |
+    | `tenant-isolation.spec.ts` | `1f0e52b` | *Beoordeling behandelaar: besluit voorlopige aanspraak* | *Fase 6: Aanvrager informeren over besluit* |
+
+    In `tenant-isolation.spec.ts` the change matters more than a selector
+    usually does: `REVIEW_TASK_NAME` became a regex so that the check that a
+    Flevoland caseworker **cannot** see the task stays meaningful after the
+    rename, instead of passing on a name that no longer exists. A negative
+    assertion against a stale name is green for the wrong reason.
+
+    Separately, `e2e/helpers/auth.ts` now finds the medewerker login button
+    with `{ name: 'Inloggen', exact: true }` (`9f54e82`), because the landing
+    page's new *"Inloggen met uw Flevoland-account"* button made the substring
+    match ambiguous and Playwright's strict mode refused to click either. Every
+    spec that signs a medewerker in goes through that helper. Test counts are
+    unchanged in all four files; read from the source at `ae06c9e`, not run.
 
 !!! note "What the thuisbatterij journey is actually guarding"
     Read from the spec at `86af73e`, not run; the passage below is unchanged at `2443adc`. Its processes deploy under
@@ -387,7 +419,7 @@ lacks end-to-end coverage — the per-board pages defer to it.
 |---|---:|---:|---|
 | [Infra-board](dashboards/infra-board.md) | 2 | **8** | `infra-board-journey` (7, the shell), `rip-r21-journey` (1, the work) |
 | [PA cockpit](dashboards/pa-cockpit.md) | 2 | **7** | `pa-mock-journey` (5), `pa-live-authoring` (2) |
-| [Caseworker](dashboards/caseworker.md) | 3 | **2 + thuisbatterij** | `caseworker-journey` (1), `zorgtoeslag-journey` (1), `thuisbatterij-journey` (not yet measured) |
+| [Caseworker](dashboards/caseworker.md) | 3 | **2 + thuisbatterij** | `caseworker-journey` (1), `zorgtoeslag-journey` (1), `thuisbatterij-journey` (not yet measured) — all three matching the Dutch task names as well as the English ones since v2026.09.14 |
 | [Woo-dashboard](dashboards/woo-dashboard.md) | 0 | **0** | — |
 | *No single board* | 4 | **10** | `login-redirect` (5), `protected-route` (3), `tenant-isolation` (1), `smoke` (1) |
 
@@ -494,20 +526,21 @@ starts its own dev server.
 
 Its own tests were last counted on 30 August; the timing and pass figures on
 [Public site suite](public-site.md#playwright-suite) date from 19 August and
-were re-run for none of v2026.08.23, v2026.09.7, v2026.09.9, v2026.09.11 or
-v2026.09.12. The package's unit suite has grown three times since (**32 files,
-235 tests**, up from 31 and 225, and unchanged between 24 and 26 September
-2026), so the six E2E tests are an inventory figure, not a fresh result. The
-inventory itself was re-checked at `2443adc`: still one spec, still in no
-workflow.
+were re-run for none of v2026.08.23, v2026.09.7, v2026.09.9, v2026.09.11,
+v2026.09.12, v2026.09.13 or v2026.09.15. The package's unit suite has grown
+four times since (**33 files, 265 tests** on 30 September 2026, up from 32 and
+235), so the six E2E tests are an inventory figure, not a fresh result. The
+inventory itself was re-checked at `ae06c9e`: still one spec, unchanged since
+`2443adc`, still in no workflow.
 
 ---
 
 ## Live smoke suite (shell scripts, cross-app)
 
 Four gated shell scripts under `scripts/`, deliberately kept out of `npm test` —
-they hit real running services over the network, mutate real data in two cases,
-and need real credentials for some tiers.
+they hit real running services over the network, mutate real data in three
+cases (one of them only data it created itself), and need real credentials for
+some tiers.
 
 **These were not run for this page.** They are described from their
 configuration and specs only.
@@ -517,14 +550,15 @@ configuration and specs only.
 | `test-smoke-live.sh` | Cross-app health: Operaton, Keycloak, LDE, TriplyDB, CPRMV, media store, eDOCS reach/status, MCP layer | No |
 | `test-edocs-live.sh` | eDOCS workspace and document lifecycle — see [eDOCS — Live Testing](edocs-live-testing.md) | Yes |
 | `test-doccle-live.sh` | Doccle sender API — see [Doccle — Live Testing](doccle-live-testing.md) | Yes — not yet live-tested, still `DOCCLE_STUB_MODE=true` in every run so far |
-| `test-m2m-routes.sh` | M2M decision-evaluation routes against ACC | No |
+| `test-m2m-routes.sh` | The active `/v1/m2m` operations: the reads, `decision.evaluate`, and — since v2026.09.14 (#214) — a write lifecycle of start, claim, complete and delete. Local by default, reading the seeded client secret from the realm file; `TARGET=acc` needs an explicit `CLIENT_SECRET` | Yes, but only its own: the lifecycle starts two instances and removes both, and never writes to an instance it did not create |
 
 ```bash
 bash scripts/test-smoke-live.sh                                     # local, full run
 CLIENT_SECRET=<secret> TARGET=acc bash scripts/test-smoke-live.sh   # against ACC
 bash scripts/test-edocs-live.sh                                     # eDOCS, mutating
 CLIENT_SECRET=<secret> bash scripts/test-doccle-live.sh              # Doccle, mutating
-CLIENT_SECRET=<secret> bash scripts/test-m2m-routes.sh               # M2M routes vs ACC
+bash scripts/test-m2m-routes.sh                                     # M2M routes, local
+TARGET=acc CLIENT_SECRET=<secret> bash scripts/test-m2m-routes.sh   # M2M routes vs ACC
 ```
 
 Exit `0` when nothing failed, `1` on any real failure — a dependency that is

@@ -67,10 +67,12 @@ The stamped `municipality` always comes from this rule, never from the request b
 
 **Reading and acting on an instance** follows the owning organisation:
 
-- The five process reads — status, variables, historic variables, activity history and decision document — are allowed to the owning tenant, or to the case's own applicant (the caller whose user id matches `applicantId`). A citizen whose case went to another tenant's deployment can therefore still follow it.
+- The six process reads — status, variables, historic variables, activity history, lineage and decision document — are allowed to the owning tenant, or to the case's own applicant (the caller whose user id matches `applicantId`). A citizen whose case went to another tenant's deployment can therefore still follow it.
 - Cancelling an instance (`DELETE`) and every task operation are allowed to the owning tenant only.
 
 **The label cannot be rewritten.** `municipality`, `originTenantId` and `applicantId` are reserved: a user task completion that includes any of them is refused with `400 RESERVED_VARIABLE` before anything reaches Operaton. The machine-to-machine routes under `/v1/m2m` are trusted system actors: they run without the tenant step, and their completion route does not apply this check.
+
+**Only allow-listed clients reach `/v1/m2m`.** Every person in the realm holds a token for the `ronl-business-api` audience, so a valid token proves nothing about the caller being a machine. After token validation, the M2M routes check the token's `azp` — the client it was issued to — against `M2M_ALLOWED_CLIENTS` (default `operaton-mcp-client`). A token from any other client, every person's token included, or one with no `azp` at all, is refused with `403 M2M_CLIENT_NOT_ALLOWED` before any engine call.
 
 ---
 

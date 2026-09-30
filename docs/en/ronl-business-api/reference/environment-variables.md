@@ -73,9 +73,6 @@ component: RONL Business API
 |---|---|---|
 | `OPERATON_BASE_URL` | Yes | `https://operaton.open-regels.nl/engine-rest` |
 | `OPERATON_TIMEOUT` | `30000` | Operaton request timeout in ms |
-| `OPERATON_M2M_BASE_URL` | — | Dedicated Operaton `engine-rest` base URL for M2M routes. Defaults to `https://operaton-doc.open-regels.nl/engine-rest` when unset |
-| `OPERATON_M2M_USERNAME` | — | Basic auth username for the M2M Operaton instance |
-| `OPERATON_M2M_PASSWORD` | — | Basic auth password for the M2M Operaton instance |
 
 ### MCP AI Assistant
 
@@ -103,6 +100,7 @@ component: RONL Business API
 | `OPERATON_M2M_BASE_URL` | No | `https://operaton-doc.open-regels.nl/engine-rest` | Base URL for a dedicated Operaton instance used by M2M routes only. The default applies when unset, so M2M routes never fall back to `OPERATON_BASE_URL` |
 | `OPERATON_M2M_USERNAME` | No | — | Basic auth username for the M2M Operaton instance |
 | `OPERATON_M2M_PASSWORD` | No | — | Basic auth password for the M2M Operaton instance |
+| `M2M_ALLOWED_CLIENTS` | No | `operaton-mcp-client` | Comma-separated Keycloak client ids allowed to call `/v1/m2m`, matched against the token's `azp`. A token from any other client — every person's token included — is refused with `403 M2M_CLIENT_NOT_ALLOWED`. Adding a consumer means adding its client id here; nothing changes in Keycloak |
 
 ### eDOCS
  
@@ -215,13 +213,42 @@ The backend both serves a media aggregator at `/v1/media-aggregator` and, for th
 
 ---
 
-## Frontend — `packages/frontend/.env`
+## Frontend — `packages/frontend/.env.<mode>`
+
+The frontend's variables are not secrets: they are committed per build mode in `packages/frontend/.env.development`, `.env.acceptance`, `.env.production` and `.env.test`, and Vite reads the file for the mode it builds with. The ACC deploy and its pull-request previews both build with `--mode acceptance`, so a preview carries the acceptance values.
 
 | Variable | Required | Description |
 |---|---|---|
 | `VITE_API_URL` | Yes | Business API base URL (e.g. `https://api.open-regels.nl/v1`) |
 | `VITE_KEYCLOAK_URL` | Yes | Keycloak base URL (e.g. `https://keycloak.open-regels.nl`) |
 | `VITE_LDE_API_URL` | Yes | LDE public API base URL. Used by `ProcesBibliotheek` to fetch deployed BPMN bundles. ACC: `https://acc.backend.linkeddata.open-regels.nl/v1`. PROD: `https://backend.linkeddata.open-regels.nl/v1`. |
+| `VITE_SITE_URL` | Yes | The site's own origin. Fills the canonical link, `og:url` and the absolute `og:image` URL in `index.html` |
+| `VITE_OG_IMAGE` | Yes | Link-preview image file under `public/`, appended to `VITE_SITE_URL` |
+| `VITE_OG_TITLE_PREFIX` | No | Prefix for `og:title`, telling a non-production preview apart. Quoted in the file, or the trailing space is lost |
+| `VITE_ROBOTS` | Yes | Content of the `robots` meta tag |
+
+The link-preview values per mode (`.env.test` carries the development values):
+
+| Variable | Development | Acceptance | Production |
+|---|---|---|---|
+| `VITE_SITE_URL` | `http://localhost:5173` | `https://acc.mijn.open-regels.nl` | `https://mijn.open-regels.nl` |
+| `VITE_OG_IMAGE` | `og-image-acc.png` | `og-image-acc.png` | `og-image-prod.png` |
+| `VITE_OG_TITLE_PREFIX` | `"[DEV] "` | `"[ACC] "` | `""` |
+| `VITE_ROBOTS` | `noindex, nofollow` | `noindex, nofollow` | `index, follow` |
+
+---
+
+## Public site — `packages/public-site/.env.<mode>`
+
+Committed per build mode in the same way, and here too the ACC deploy and its pull-request previews build with `--mode acceptance`. `scripts/prerender.ts` reads `VITE_SITE_URL`, `VITE_API_URL` and `VITE_ROBOTS` from the same file, and fails the build when one is missing. There is no `VITE_OG_IMAGE`: every environment uses the one `og-open-regels.png`.
+
+| Variable | Development | Acceptance | Production | Description |
+|---|---|---|---|---|
+| `VITE_API_URL` | `http://localhost:3002/v1` | `https://acc.api.open-regels.nl/v1` | `https://api.open-regels.nl/v1` | Business API base URL for the public endpoints |
+| `VITE_STAFF_APP_URL` | `http://localhost:5173` | `https://acc.mijn.open-regels.nl` | `https://mijn.open-regels.nl` | Target of the sign-in link to the working environment |
+| `VITE_SITE_URL` | `http://localhost:5175` | `https://acc.publiek.open-regels.nl` | `https://publiek.open-regels.nl` | The site's own origin: canonical links, `og:url`, `og:image`, the sitemap and the footer |
+| `VITE_OG_TITLE_PREFIX` | `"[DEV] "` | `"[ACC] "` | `""` | Prefix for `og:title`; quoted to keep the trailing space |
+| `VITE_ROBOTS` | `noindex, nofollow` | `noindex, nofollow` | `index, follow` | The `robots` meta tag; a `noindex` value also makes the prerender write a `robots.txt` that disallows everything and names no sitemap |
 
 ---
 

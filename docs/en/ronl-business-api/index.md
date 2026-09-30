@@ -6,7 +6,7 @@ component: RONL Business API
 
 **Serves as a reference for implementing a compliant, secure, and reliable BPMN service using open-source components.**
 
-🧪 **Current deployment:** [acc.mijn.open-regels.nl](https://acc.mijn.open-regels.nl) — Province of Flevoland, acceptance environment
+🚀 **Current deployment:** [mijn.open-regels.nl](https://mijn.open-regels.nl) — Province of Flevoland, production environment
 
 [![Deployed on Azure Web Apps](https://img.shields.io/badge/Azure-Web_Apps-blue?logo=microsoft-azure)](https://ronl.open-regels.nl)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?logo=typescript)](https://www.typescriptlang.org/)
@@ -28,7 +28,7 @@ component: RONL Business API
 
 The **RONL Business API** implements the **Business API Layer** pattern: a security and business-logic layer that sits between an IAM system and the Operaton BPMN engine, exposing scoped capabilities — processes, tasks, forms, decisions — rather than raw engine access.
 
-It is deployed for the **Province of Flevoland**, currently on the acceptance environment. Three surfaces put its capabilities to work: a signed-in **werkomgeving** where provincial staff work through role-scoped boards, a public **knowledge base** reachable with no login, and a public **cockpit demo** running on demonstration data with no backend behind it. See [Getting Started](user-guide/getting-started.md) for how these surfaces are organised, and [Features](features/overview.md) for the capabilities themselves.
+It is deployed for the **Province of Flevoland**, in production, with an acceptance environment where each release is tried first. Three surfaces put its capabilities to work: a signed-in **werkomgeving** where provincial staff work through role-scoped boards, a public **knowledge base** reachable with no login, and a public **cockpit demo** running on demonstration data with no backend behind it. See [Getting Started](user-guide/getting-started.md) for how these surfaces are organised, and [Features](features/overview.md) for the capabilities themselves.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: RONL Business API Main UI](../../assets/screenshots/ronl-business-api-main-ui.png)
@@ -62,7 +62,7 @@ The system is hosted across two platforms. Azure hosts the stateless application
 
 ## Environments
 
-ACC is the environment of record for this documentation — the Province of Flevoland deployment currently runs there. A production environment is also configured in the codebase's deployment workflows:
+The Province of Flevoland deployment runs in production. Each release is tried on ACC first and then promoted to production:
 
 | Environment | Frontend | Backend | Keycloak |
 |---|---|---|---|
@@ -93,4 +93,4 @@ ACC is the environment of record for this documentation — the Province of Flev
 - [**Features**](features/overview.md) — What RONL Business API does and why
 - [**User Guides**](user-guide/getting-started.md) — The werkomgeving's four boards and the public knowledge base
 - [**Developer Docs**](developer/local-development.md) — Local setup, backend, frontend, deployment
-- [**References**](reference/api-endpoints.md) — [API specification](reference/api-specification.md), API endpoints, environment variables, JWT claims, standards
+- [**References**](reference/api-specification.md) — API specification, environment variables, JWT claims, standards

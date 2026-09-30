@@ -98,7 +98,7 @@ The RONL Business API exposes a curated subset of Operaton operations through it
 
 **Base URL:** `https://acc.api.open-regels.nl/v1/m2m`
 
-**Authentication:** OAuth 2.0 Client Credentials via the `operaton-mcp-client` Keycloak client. The token audience must be `ronl-business-api`. The RONL Business API validates the token with `jwtMiddleware` — no `tenantMiddleware` is applied, so no `municipality` claim is required.
+**Authentication:** OAuth 2.0 Client Credentials via the `operaton-mcp-client` Keycloak client. The token audience must be `ronl-business-api`. The RONL Business API validates the token with `jwtMiddleware`, then `requireM2mClient` checks that its `azp` is on `M2M_ALLOWED_CLIENTS` (default `operaton-mcp-client`) — any other token, a person's included, gets `403 M2M_CLIENT_NOT_ALLOWED`. No `tenantMiddleware` is applied, so no `municipality` claim is required.
 
 **Path contract:** RONL-specific paths that do not mirror `engine-rest`:
 
@@ -113,7 +113,7 @@ The RONL Business API exposes a curated subset of Operaton operations through it
 
 There is no `/v1/m2m/process-instance`, `/v1/m2m/process-definition`, or `/v1/m2m/history` — these `engine-rest` paths have no equivalent in the M2M layer.
 
-The `M2M_ALLOWED_OPERATIONS` constant in `m2m.routes.ts` acts as a curation gate — any operation not in the list returns `403 OPERATION_NOT_PERMITTED` regardless of what Operaton supports. This is intentional: it gives platform operators control over what M2M callers can do without changing authentication or deployment configuration.
+The `M2M_ALLOWED_OPERATIONS` constant in `m2m.routes.ts` acts as a curation gate — any operation not in the list returns `403 OPERATION_NOT_PERMITTED` regardless of what Operaton supports. This is intentional: it gives platform operators control over what M2M callers can do without changing authentication or deployment configuration. It is the second of two gates: `M2M_ALLOWED_CLIENTS` decides who may call the surface at all, and `M2M_ALLOWED_OPERATIONS` what an admitted caller may do.
 
 Requests through the M2M routes are written to the `audit_logs` PostgreSQL table. Because the `operaton-mcp-client` token carries no `municipality` claim, `tenant_id` is populated with the Keycloak `azp` claim (`operaton-mcp-client`), making M2M activity queryable and distinguishable from human caseworker activity.
 
@@ -140,7 +140,7 @@ The `operaton-mcp-client` Keycloak client is shared across both Pattern 2 and Pa
 
 ## Caching what is derived from deployed BPMN
 
-Several things the Infra-board draws are derived from the BPMN a definition was deployed with: the XML itself, the parsed swimlane model, and the `boardOwner` tag the Modeler writes into the process. All three are expensive enough to cache and, for a given definition, immutable — so the only question is what the cache is keyed by.
+Several things the Infra-board and the caseworker process view draw are derived from the BPMN a definition was deployed with: the XML itself, the parsed swimlane model, and the `boardOwner` tag the Modeler writes into the process. All three are expensive enough to cache and, for a given definition, immutable — so the only question is what the cache is keyed by.
 
 **A process-definition key is not a version.** Operaton answers `/process-definition/key/{key}` with whatever is newest under that key, so a redeploy changes what the key *means* while the key itself stays put. A cache keyed by `tenantId::processKey` cannot see that happen, and goes on serving the previous deployment's derivation indefinitely.
 
@@ -152,7 +152,7 @@ That is not hypothetical. On acceptance on 28 September 2026, R2.2 was redeploye
 |---|---|---|
 | `getCurrentDefinitionId` | — | **Deliberately uncached.** This one call is what makes a redeploy visible; caching it would move the staleness up a level. A previous id is remembered only to notice that it changed |
 | `getCachedBpmnXml` | process-definition id | The XML is immutable for a given id, so it never needs invalidating |
-| The parsed swimlane model | process-definition id, plus the phase | |
+| The parsed swimlane model | process-definition id, plus the phase | One cache for both boards: `GET /v1/process/definition/key/:key/swimlane`, which serves the caseworker process view, passes the process key as the phase |
 | `boardOwner` | process-definition id | `null` — deployed but carrying no tag — is cached too; a lookup that *threw* is not |
 
 When the id for a key moves, the previous id's entries are dropped from all three. The separate phase-BPMN cache that used to sit beside these is gone rather than re-keyed: the XML fetch already had a cache keyed correctly.

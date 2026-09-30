@@ -248,6 +248,38 @@ After editing, redeploy the DMN to Operaton via the Camunda Modeler deploy featu
 
 ---
 
+### The assistant's LDE tools answer with a database error
+
+**Symptom:** with the MCP providers enabled and `LDE_MCP_ENABLED=true` locally, the backend starts and logs `LDE MCP provider connected`, but an LDE tool call (`bundle_list`, `form_list`, `document_list`, …) comes back as one of:
+
+```
+Error: database "lde_assets" does not exist
+Error: relation "form_schemas" does not exist
+```
+
+The provider opens no database connection at startup; the database is first touched when a tool is called, so this shows up in the assistant, not in the startup log.
+
+**Cause:** `LDE_DATABASE_URL` in `.env.example` points at `postgresql://lde_user:lde_password@localhost:5432/lde_assets`.
+
+- *`database … does not exist`* — the `postgres-data` volume predates the `lde_assets` block in `config/postgres/init-databases.sql`. Postgres runs that script only when it initialises an empty volume.
+- *`relation … does not exist`* — the database is there, and empty, as the script creates it. The tables belong to the Linked Data Explorer; this repository creates only the database and the role.
+
+**Fix:** if you do not need the LDE tools, set `LDE_MCP_ENABLED=false` in `packages/backend/.env`. To get the database on an existing volume without losing anything else, create it by hand:
+
+```bash
+docker exec -i ronl-postgres psql -U postgres <<'SQL'
+CREATE DATABASE lde_assets;
+CREATE USER lde_user WITH PASSWORD 'lde_password';
+GRANT ALL PRIVILEGES ON DATABASE lde_assets TO lde_user;
+\c lde_assets
+GRANT ALL ON SCHEMA public TO lde_user;
+SQL
+```
+
+The alternative, `npm run docker:down:volumes && npm run docker:up`, re-runs the whole script but also wipes the Keycloak realm, the audit log and the Operaton data — see [Emergency reset](#emergency-reset). Either way the tools need the Linked Data Explorer's tables before they return data.
+
+---
+
 ## Test user issues
 
 ### Can't log in with test users

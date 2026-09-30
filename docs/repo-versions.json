@@ -1,33 +1,34 @@
 {
-  "docs_built": "2026-09-28",
+  "docs_built": "2026-09-30",
   "last_patch": {
-    "date": "2026-09-28",
+    "date": "2026-09-30",
     "kind": "Component sync",
-    "summary": "RONL Business API v2026.09.13 on acceptance: Flevoland employees sign in through Entra ID brokered by Keycloak, a swimlane task shows every document it carries, and deployed-BPMN derivations are cached by definition id so a redeploy is visible.",
+    "summary": "RONL Business API v2026.09.15 in production, with v2026.09.14 and v2026.09.13: the Caseworker board shows where a task stands in its process, every operation is documented and checked against a real response, /v1/m2m answers only allow-listed clients, and the endpoint reference gives way to the API Specification.",
     "previous": {
-      "date": "2026-09-27",
-      "kind": "Weekly pass",
-      "summary": "Every contributing page re-checked against the three applications' acc heads and re-stamped, and the 27 September ICTU dependency-guideline assessment added (CPSV Editor 35, Linked Data Explorer 33, RONL Business API 31 of 55)."
+      "date": "2026-09-28",
+      "kind": "Component sync",
+      "summary": "RONL Business API v2026.09.13 on acceptance: Flevoland employees sign in through Entra ID brokered by Keycloak, a swimlane task shows every document it carries, and deployed-BPMN derivations are cached by definition id so a redeploy is visible."
     },
     "open_findings": {
       "label": "iou-architectuur#105",
       "url": "https://github.com/sgort/iou-architectuur/issues/105"
     }
   },
+
   "repositories": [
     {
       "name": "RONL Business API",
       "icon": "⚙️",
-      "version": "v2026.09.13",
-      "environment": "acc",
-      "commit": "963fe24...",
-      "commit_date": "2026-09-28",
+      "version": "v2026.09.15",
+      "environment": "prod",
+      "commit": "ae06c9e...",
+      "commit_date": "2026-09-30",
       "build": {
-        "sha": "963fe24",
-        "run": 577,
-        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/36434597949"
+        "sha": "ae06c9e",
+        "run": 5,
+        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/36752223679"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/963fe244d33161e9e0ca92b1a9474e43f14537b9",
+      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/ae06c9e298b611d87f24ba253ebaa34d2654dd3c",
       "ci_repo": "https://github.com/sgort/ronl-business-api"
     },
     {

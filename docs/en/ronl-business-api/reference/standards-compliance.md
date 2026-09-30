@@ -14,7 +14,7 @@ This page maps standards onto what the code does. It is not a certification: not
 |---|---|
 | **BIO** (Baseline Informatiebeveiliging Overheid) | Access management through Keycloak realm roles and tenant checks on every process instance and task; an audit record of every authenticated request, stored in PostgreSQL; HTTP Strict Transport Security on every response. |
 | **NEN 7510** | Listed by the service's root banner among its compliance claims. No control in the code is specific to it. |
-| **AVG / GDPR** | Case access is limited to the owning organisation and the case's own applicant, and every authenticated request is audited. Two gaps: the BRP person lookup logs the citizen service number (BSN) in plaintext at `info` level (open issue #241), and its audit entry stores the BSN; and no retention period is applied — nothing purges audit records. |
+| **AVG / GDPR** | Case access is limited to the owning organisation and the case's own applicant, and every authenticated request is audited. The BRP person lookup's own log lines leave out the citizen service number (BSN) (#241). Two gaps remain: the lookup's audit entry stores the BSN on purpose, and every audit entry is also written to the application log at `info` level, so the BSN reaches that log through the audit record; and no retention period is applied — nothing purges audit records. |
 | **DigiD Norm** | Assurance levels from the token's `loa` claim gate two operations: `basis` for evaluating a decision, `midden` for starting a process. The realm export defines a DigiD SAML broker, disabled, with placeholder endpoints. |
 | **NCSC Beveiligingsrichtlijnen** | Supply-chain practice in the pipeline: GitHub Actions pinned to commit digests, a blocking audit gate on every pull request, a daily dependency audit of `acc` and `main`, a fourteen-day cooldown on new dependency versions, Semgrep scanning, and an SBOM committed for every release. |
 
@@ -32,7 +32,7 @@ The NL API Design Rules are applied as a Spectral lint of the published descript
 | **API-20**: Major version in URI | `/v1/*`; the OpenAPI `servers` entry carries `/v1` |
 | **API-48**: No trailing slashes | No documented path ends in a slash, which Spectral checks. Express's default routing still answers a request with a trailing slash |
 | **API-51** (`/core/publish-openapi`): Publish an OpenAPI description | `GET /v1/openapi.json` — OpenAPI 3.1, open to every origin, advertised as `documentation` in the root banner |
-| **API-53**: Hide implementation details | Operaton's REST API is not exposed directly; the backend serves its own smaller surface. Process instance, definition and task ids are Operaton's own, and a failed process start reports Operaton's error message and the engine URL |
+| **API-53**: Hide implementation details | Operaton's REST API is not exposed directly; the backend serves its own smaller surface. Process instance, definition and task ids are Operaton's own, and a failed process start reports Operaton's error message and the engine URL. The citizen start form shows that detail on screen outside production only; the production build shows a generic message |
 | **API-54**: Plural/singular naming | Not uniform. The execution core is singular (`/v1/process`, `/v1/task`, `/v1/decision`); other mounts use plural collections (`/v1/edocs/documents`, `/v1/pa/dossiers`, `/v1/public/processen`) |
 | **API-57**: Version header in responses | `API-Version` on every response, carrying the CalVer release (e.g. `2026.09.12`) |
 
