@@ -20,6 +20,27 @@ The release it describes is the one in the header above.
 | Git | — | Includes Git for Windows' **bash**, see below |
 | **bash** | Any recent bash | The install, the dev start and the checks are bash scripts |
 
+!!! note "Selecting the Node version with nvm"
+    nvm on macOS and Linux (nvm-sh) reads `.nvmrc`: run `nvm install` and `nvm use` in
+    the repository. **nvm-windows does not** — a bare `nvm use` stops with
+    `expected "<version> ..."` — so pass it the file's contents:
+
+    ```powershell
+    nvm install (Get-Content .nvmrc)   # PowerShell
+    nvm use (Get-Content .nvmrc)
+    ```
+
+    ```bash
+    nvm install "$(cat .nvmrc)"        # Git Bash
+    nvm use "$(cat .nvmrc)"
+    ```
+
+    Then check `node -v`. If it still prints another version after `nvm use` reported
+    success, a standalone Node.js install comes earlier on `PATH` than nvm's link —
+    `where.exe node` lists every `node.exe` in the order they win. Uninstall the
+    standalone Node.js (typically in `C:\Program Files\nodejs`) and run `nvm use` again,
+    from an elevated PowerShell if nvm has to create its link there.
+
 ### A bash shell is required
 
 Several root `package.json` scripts call `bash` explicitly, and the scripts
@@ -66,7 +87,7 @@ Two further root scripts are plain Node and need no shell:
 ```bash
 git clone https://github.com/sgort/ronl-business-api.git
 cd ronl-business-api
-nvm use            # picks up 22.23.2 from .nvmrc, if you use nvm
+nvm use            # nvm-sh reads .nvmrc; nvm-windows needs the version, see above
 npm ci
 ```
 

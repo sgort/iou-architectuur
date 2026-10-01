@@ -81,6 +81,27 @@ ronl-business-api stack, and the editor's `.env.development` sets `VITE_OPERATON
 | Git | — | |
 | Docker | — | Only to run the LDE backend: its `dev` script refuses to start without the `ronl-postgres` and `ronl-operaton` containers. |
 
+!!! note "Selecting the Node version with nvm"
+    nvm on macOS and Linux (nvm-sh) reads `.nvmrc`: run `nvm install` and `nvm use` in
+    the repository. **nvm-windows does not** — a bare `nvm use` stops with
+    `expected "<version> ..."` — so pass it the file's contents:
+
+    ```powershell
+    nvm install (Get-Content .nvmrc)   # PowerShell
+    nvm use (Get-Content .nvmrc)
+    ```
+
+    ```bash
+    nvm install "$(cat .nvmrc)"        # Git Bash
+    nvm use "$(cat .nvmrc)"
+    ```
+
+    Then check `node -v`. If it still prints another version after `nvm use` reported
+    success, a standalone Node.js install comes earlier on `PATH` than nvm's link —
+    `where.exe node` lists every `node.exe` in the order they win. Uninstall the
+    standalone Node.js (typically in `C:\Program Files\nodejs`) and run `nvm use` again,
+    from an elevated PowerShell if nvm has to create its link there.
+
 !!! warning "npm 10 crashes on re-resolving the tree"
     The README records that npm 10 (bundled with Node 22) installs from the lockfile with
     `npm ci`, but crashes on `npm install <package>`, `npm update`, or regenerating the
