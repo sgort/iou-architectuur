@@ -19,6 +19,27 @@ This guide sets up the Linked Data Explorer on a workstation: the frontend, the 
 | **Git** | |
 | **The RONL Business API stack** | Its `postgres` and `operaton` services, as the containers `ronl-postgres` and `ronl-operaton`. |
 
+!!! note "Selecting the Node version with nvm"
+    nvm on macOS and Linux (nvm-sh) reads `.nvmrc`: run `nvm install` and `nvm use` in
+    the repository. **nvm-windows does not** — a bare `nvm use` stops with
+    `expected "<version> ..."` — so pass it the file's contents:
+
+    ```powershell
+    nvm install (Get-Content .nvmrc)   # PowerShell
+    nvm use (Get-Content .nvmrc)
+    ```
+
+    ```bash
+    nvm install "$(cat .nvmrc)"        # Git Bash
+    nvm use "$(cat .nvmrc)"
+    ```
+
+    Then check `node -v`. If it still prints another version after `nvm use` reported
+    success, a standalone Node.js install comes earlier on `PATH` than nvm's link —
+    `where.exe node` lists every `node.exe` in the order they win. Uninstall the
+    standalone Node.js (typically in `C:\Program Files\nodejs`) and run `nvm use` again,
+    from an elevated PowerShell if nvm has to create its link there.
+
 !!! warning "Windows: `bash` must be Git Bash"
     npm runs package scripts through `cmd.exe` on Windows, so `bash` in those scripts resolves through the Windows `PATH`. It must resolve to Git for Windows' bash, and the Docker CLI must be reachable from that bash.
 
