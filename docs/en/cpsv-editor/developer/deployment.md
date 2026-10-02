@@ -73,7 +73,7 @@ Pull requests are filtered differently in each deploy workflow:
 ```
 checkout (persist-credentials: false)
        ↓
-setup-node (node-version-file: .nvmrc → 24.20.0)  →  npm ci
+setup-node (node-version-file: .nvmrc → 24.21.0)  →  npm ci
        ↓
 npm run lint  →  npm run test:ci        ← a failure here blocks the deploy
        ↓
@@ -94,8 +94,8 @@ ran on, and the deploy action uploads `dist/` as it is. The `dist/index.html`
 check exists because the deploy action, given an empty or wrong directory,
 uploads it and reports success. Before v2026.09.7 the action built the bundle
 itself, with Oryx inside its own container, on a Node the repository never
-chose; production moved from Oryx's Node 22.22.0 to the `.nvmrc`-pinned 24.20.0
-with this release. Renovate's `nvm` manager maintains `.nvmrc`.
+chose (Node 22.22.0); production now runs on the `.nvmrc`-pinned Node, currently
+24.21.0. Renovate's `nvm` manager maintains `.nvmrc`.
 
 Every `uses:` reference is pinned to a commit digest rather than a tag, each
 job declares least-privilege `permissions:`, and the checkout step does not
@@ -141,7 +141,7 @@ public repository — so the committed copy is the durable one.
 - **Cooldown.** The root `.npmrc` sets `min-release-age=14`, so npm will not
   resolve a version published less than 14 days ago — covering lock-file
   maintenance and workstation installs, which Renovate's own 14-day cooldown
-  cannot reach. npm 11.10 or newer honours it (Node 24.20.0 bundles 11.19);
+  cannot reach. npm 11.10 or newer honours it (Node 24.21.0 bundles 11.19);
   `npm ci` ignores it by design, so CI is neither blocked nor protected by it.
 - **Majors.** Renovate never offers an npm package's `X.0.0`, so the earliest a
   major can arrive is its first patch, and majors wait for Dependency Dashboard

@@ -1,6 +1,10 @@
+---
+component: CPSV Editor
+---
+
 # Vocabulary Configuration
 
-The `src/config/vocabularies_config.js` file is the central configuration for all RDF vocabulary handling in the editor. It controls how the parser recognises entities and properties in imported Turtle files. Adding support for a new vocabulary requires only configuration changes — no parser code modifications.
+The `src/config/vocabularies.config.js` file is the central configuration for all RDF vocabulary handling in the editor. It controls how the parser recognises entities and properties in imported Turtle files. Adding support for a new vocabulary requires only configuration changes — no parser code modifications.
 
 ---
 
@@ -121,8 +125,20 @@ Always add new types alongside existing ones. Removing an accepted type breaks i
 !!! warning "Detection order matters"
     `detectEntityType()` checks DMN entities first, then `cprmv:RuleSet` / `cprmv:RuleMethod`
     **before** `cprmv:Rule` — because `a cprmv:Rule` is a substring of `a cprmv:RuleSet` /
-    `a cprmv:RuleMethod` and would otherwise match first. `skos:Concept` detection excludes
-    `skos:ConceptScheme`.
+    `a cprmv:RuleMethod` and would otherwise match first. `skos:ConceptScheme` is detected
+    as a type of its own, `conceptScheme`, before `skos:Concept`: a line that detects as
+    nothing is read as a continuation of the current section, so inside a DMN section the
+    scheme would be swallowed into the preserved block while the generator also emits its
+    own copy — one extra scheme per round trip. As a named type it closes the DMN section
+    instead.
+
+!!! note "`cprmv:Rule` is decided by subject, not by type alone"
+    `cprmvRule` matches every `a cprmv:Rule`, but the cell-level grounding layer types its
+    cell resources, minted concepts and citation stubs that way too. The parser
+    (`parseTTL.enhanced.js`) therefore re-types a `cprmvRule` whose subject is not under
+    `CPRMV_RULE_BASE` (`https://cprmv.open-regels.nl/rules/`, in `src/utils/constants.js`)
+    as `dmnRule`, so it is preserved verbatim with the DMN block instead of becoming a
+    policy rule. See [Cell-Level Legislative Grounding](cell-level-grounding.md#on-import).
 
 ---
 

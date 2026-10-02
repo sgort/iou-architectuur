@@ -75,8 +75,8 @@ ronl-business-api stack, and the editor's `.env.development` sets `VITE_OPERATON
 
 | Tool | Version | Why |
 |---|---|---|
-| Node.js | 24.20.0 | `.nvmrc`. CI installs exactly this version (`node-version-file: .nvmrc`). The LDE repository pins its own version in its own `.nvmrc`, currently 24.21.0. |
-| npm | 11.10 or newer | `.npmrc` sets a 14-day cooldown (`min-release-age=14`) that older npm ignores without a warning. Node 24.20.0 bundles npm 11.19. npm 10 also crashes on anything that re-resolves the tree (`npm install <package>`, `npm update`) — see below. |
+| Node.js | 24.21.0 | `.nvmrc`. CI installs exactly this version (`node-version-file: .nvmrc`). The LDE repository pins its own version in its own `.nvmrc`, currently the same version. |
+| npm | 11.10 or newer | `.npmrc` sets a 14-day cooldown (`min-release-age=14`) that older npm ignores without a warning. Node 24.21.0 bundles npm 11.19. npm 10 also crashes on anything that re-resolves the tree (`npm install <package>`, `npm update`) — see below. |
 | bash | on `PATH` | `npm start` runs `npm run deps:check`, which is `bash scripts/check-deps.sh`; the pre-push hook runs it too. On Windows, npm runs scripts through `cmd.exe`, so `bash` must be found on `PATH` — Git for Windows provides one. |
 | Git | — | |
 | Docker | — | Only to run the LDE backend: its `dev` script refuses to start without the `ronl-postgres` and `ronl-operaton` containers. |

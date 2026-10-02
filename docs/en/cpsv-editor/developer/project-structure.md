@@ -4,7 +4,7 @@ component: CPSV Editor
 
 # Project Structure
 
-**Version:** CalVer, `YYYY.MM.N` (2026.09.7 at the time of writing)  
+**Version:** CalVer, `YYYY.MM.N` (2026.10.0 at the time of writing)  
 **Framework:** React 19, built with Vite and tested with Vitest
 
 ---
@@ -27,7 +27,7 @@ ttl-editor/
 ├── package-lock.json
 ├── renovate.json                   # Dependency update policy
 ├── SECURITY-PIPELINE.md            # Pins, required checks, accepted risks
-├── .nvmrc                          # Exact Node version (24.20.0); CI reads it
+├── .nvmrc                          # Exact Node version (24.21.0); CI reads it
 ├── .npmrc                          # min-release-age=14 — npm's 14-day cooldown
 ├── .env.development                # Local: backend :3001, Operaton :8081
 ├── .env.production                 # Loaded by every `vite build`
@@ -80,7 +80,7 @@ ttl-editor/
 │   │
 │   ├── utils/
 │   │   ├── index.js                # Barrel export
-│   │   ├── constants.js            # Shared constants, TTL_NAMESPACES, dropdown options
+│   │   ├── constants.js            # Shared constants, TTL_NAMESPACES, EMPTY_DMN_DATA, CPRMV_RULE_BASE
 │   │   ├── ttlGenerator.js         # TTL generation class
 │   │   ├── ttlHelpers.js           # TTL string/IRI helpers (escapeTTLString, sanitizeIri, …)
 │   │   ├── importHandler.js        # Import logic
@@ -118,6 +118,8 @@ ttl-editor/
 │   └── check-previews.sh           # npm run check-previews — orphaned preview environments (never deletes)
 │
 ├── docs/
+│   ├── dmn-ap-nl-voorstel.md       # DMN-AP NL proposal (Dutch, primary)
+│   ├── dmn-ap-nl-proposal.md       # DMN-AP NL proposal (English)
 │   └── sbom/                       # <name>-<version>.cdx.json, one per release
 │
 └── .github/
@@ -171,7 +173,7 @@ Class-based TTL generation. Each tab section has a corresponding generate method
 
 ### `src/parseTTL.enhanced.js`
 
-Full TTL parser. Handles vocabulary detection, multi-line values, namespace resolution, date parsing, array extraction (keywords), and DMN block capture and preservation. Returns a data structure matching the editor state shape for direct use in `useEditorState`.
+Full TTL parser. Handles vocabulary detection, multi-line values, namespace resolution, date parsing, array extraction (keywords), and DMN block capture and preservation. Returns a data structure matching the editor state shape for direct use in `useEditorState`. A subject typed `cprmv:Rule` becomes a policy rule only when it sits under `CPRMV_RULE_BASE`; any other `cprmv:Rule` — a cell-level grounding resource — is preserved with the DMN block.
 
 ### `src/config/vocabularies.config.js`
 

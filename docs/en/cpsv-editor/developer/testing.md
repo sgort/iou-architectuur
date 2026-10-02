@@ -7,33 +7,35 @@ component: CPSV Editor
 The CPSV Editor's automated test suite runs on **Vitest**, and covers the
 pure-logic core the editor depends on — TTL generation and parsing, DMN XML
 handling, validators, the iKnow import mapping — plus the state hooks, the
-network-boundary utilities, every tab component, and three end-to-end journeys
+network-boundary utilities, every tab component, and four end-to-end journeys
 driven against a live stack.
 
 The testing roadmap that ran from P0 to P7 is **complete**: every phase has
 landed, and the per-file 80% branch floor is enforced natively by the runner.
 
 !!! info "Figures on this page are measured, not estimated"
-    The unit figures below were re-measured against **v2026.09.7** on
-    **26 September 2026** at `a7fe76f` on `acc` — the same tree as `7d154ba` on
+    Every figure below was re-measured against **v2026.10.0** on
+    **2 October 2026** at `acac6b3` on `acc` — the same tree as `719683b` on
     `main` — in the working checkout after a clean `npm run deps:check`, so the
-    installed dependencies matched the lockfile, under Node 24.14.1. `.nvmrc`
-    now names 24.20.0, which is what CI runs. The full run with coverage
-    reported **62 files and 763 tests, all passing, in 73 s** (Vitest's own
-    duration), with coverage unchanged from v2026.09.6. The per-file and
-    per-script counts are unchanged too: the same 62 files, the same totals.
-    The three **end-to-end journeys were not re-run for this release**. They
-    were last run on 19 September 2026 against v2026.09.6, locally against a
-    live stack — this editor's dev server, the Linked Data Explorer backend on
-    `:3001` and Operaton on `:8081` — and **3 passed in 14.0 s**, with
-    Playwright 1.62.1.
+    installed dependencies matched the lockfile, under Node 24.21.0 and
+    npm 11.19.0 — the version `.nvmrc` names, and what CI runs. The full run
+    with coverage reported **62 files and 776 tests, all passing, in 58 s**
+    (Vitest's own duration). That is 13 tests more than v2026.09.7's 763, in
+    four existing files and no new one: `ttlGenerator.cellGrounding` 12 → 18,
+    `parseTTL.roundtrip` 9 → 14, `dmnHelpers` 54 → 55 and
+    `DMNTab.lifecycle` 15 → 16. Every phase script, lint and the format check
+    passed on the same checkout.
+    The **end-to-end journeys were run too**, locally against a live stack —
+    the Linked Data Explorer backend on `:3001`, Operaton on `:8081`, and this
+    editor's dev server started by Playwright's own `webServer` on `:3000` —
+    and **4 passed in 27.6 s**, with Playwright 1.63.0.
     Rerun the commands in [Running the tests](#running-the-tests) to reproduce
     them.
 
-**At a glance:** 62 files · **763 tests** · all passing · 73 s for a full run
-with coverage on this measurement, plus **3 end-to-end journeys** run separately.
+**At a glance:** 62 files · **776 tests** · all passing · 58 s for a full run
+with coverage on this measurement, plus **4 end-to-end journeys** run separately.
 
-Coverage: **90.10% statements · 88.23% branches · 78.71% functions · 90.76%
+Coverage: **90.31% statements · 88.39% branches · 78.92% functions · 90.99%
 lines**, with every file at or above the 80% branch floor.
 
 !!! danger "Measure after `npm ci`, never after `npm install`"
@@ -54,27 +56,31 @@ from the repository root after `npm ci`.
 
 | Command | Scope | Suites | Tests |
 |---|---|---:|---:|
-| `npm run test:ci` | Everything, once, with coverage | 62 | 763 |
-| `npm test` | Everything, interactive watch mode | 62 | 763 |
-| `npm run test:generator` | TTL generator regression tests | 8 | 119 |
-| `npm run test:roundtrip` | TTL round-trip tests (P1) | 1 | 9 |
-| `npm run test:p2` | Pure-logic utilities (P2) | 8 | 191 |
+| `npm run test:ci` | Everything, once, with coverage | 62 | 776 |
+| `npm test` | Everything, interactive watch mode | 62 | 776 |
+| `npm run test:generator` | TTL generator regression tests | 8 | 125 |
+| `npm run test:roundtrip` | TTL round-trip tests (P1) | 1 | 14 |
+| `npm run test:p2` | Pure-logic utilities (P2) | 8 | 192 |
 | `npm run test:p3` | State hooks (P3) | 3 | 33 |
 | `npm run test:p4` | Network-touching utilities (P4) | 2 | 42 |
 | `npm run test:p5` | Tab components, PreviewPanel, PublishDialog (P5) | 23 | 181 |
-| `npm run test:p6` | `DMNTab`'s full lifecycle (P6) | 6 | 98 |
-| `npm run test:e2e` | Playwright journeys (P7) — **needs a live stack** | 3 | 3 |
+| `npm run test:p6` | `DMNTab`'s full lifecycle (P6) | 6 | 99 |
+| `npm run test:e2e` | Playwright journeys (P7) — **needs a live stack** | 4 | 4 |
 
 Each scoped script has a `:watch` counterpart. The phase scripts overlap
 deliberately — a file can belong to more than one phase — so their counts do
-not sum to 763.
+not sum to 776.
 
 ### End-to-end journeys need a live stack
 
 `test:e2e` drives the real application against a real backend and a real engine,
 with nothing mocked between the browser and Operaton. It is **not wired into
-CI**: it needs the Linked Data Explorer backend and an Operaton engine, neither
-of which exists on a runner.
+CI**: three of the four journeys need the Linked Data Explorer backend and an
+Operaton engine, neither of which exists on a runner. The fourth,
+`amsterdam-reimport-journey`, only imports and downloads files and calls
+neither — but the global setup below probes both services for every run, so
+today even that spec runs only with both up, or with `E2E_BACKEND_URL` and
+`E2E_OPERATON_URL` pointed at live ones.
 
 | Command | What it does |
 |---|---|
@@ -160,7 +166,7 @@ Seven workflows run in this repository. Every job runs on `ubuntu-24.04`.
 |---|---|---|
 | **Deploy ACC (orange-beach)** | `changes`, then `Build and deploy ACC` | `changes` decides whether a pull request touches anything outside `docs/**`, `.claude/**` and `**/*.md`; then Node from `.nvmrc` → `npm ci` → `npm run lint` → `npm run test:ci` → `npm run build` → upload `dist/` to acceptance |
 | **Deploy PROD (white-sky)** | `Build and deploy PROD` | The same sequence without `changes`, deploying production |
-| **Supply-chain audit** (`zizmor.yml`) | `audit` | On Node 24.20.0: zizmor 1.29.0, `renovate-config-validator --strict`, *Lockfile matches package.json* (`npm ci --dry-run --ignore-scripts`), `npm run check-format`, and `npm run check-supply-chain` |
+| **Supply-chain audit** (`zizmor.yml`) | `audit` | On Node 24.21.0: zizmor 1.29.0, `renovate-config-validator --strict`, *Lockfile matches package.json* (`npm ci --dry-run --ignore-scripts`), `npm run check-format`, and `npm run check-supply-chain` |
 | **Semgrep** (`semgrep.yml`) | `scan` | Semgrep Code and Supply Chain — see [Dependency Scanning](../../contributing/dependency-scanning.md) |
 | **Close preview environments** | `Close ACC staging environment`, `Close PROD staging environment` | Deletes a pull request's Static Web Apps preview when it closes — no tests, but see below |
 | **Dependency audit** (`dependency-audit.yml`) | `dependency-audit` | Daily at 05:17 UTC: `npm audit --package-lock-only` on both `acc` and `main`, failing on a high or critical production advisory — no tests |
@@ -201,8 +207,11 @@ reporting: `acc` requires a pull request, and `audit`, `scan` and `Build and
 deploy ACC` are required status checks. A workflow that runs but cannot block is
 advice — and requiring the checks without also requiring a pull request would
 still let a direct push past them. There are no bypass actors, so this applies to
-releases and to the repository owner alike. `main` requires no status checks.
-The mechanics are covered in
+releases and to the repository owner alike. Since 30 September 2026 the
+`main promotion gate` ruleset does the same for `main`: a pull request, merged
+with a merge commit, and `audit` and `scan` as required status checks — but
+not `Build and deploy PROD` — again with no bypass actors. Neither branch has classic branch protection any more; the
+two rulesets are the whole gate. The mechanics are covered in
 [Supply-Chain Pinning](../../contributing/supply-chain.md).
 
 !!! note "`audit` does not run the tests, and the deploy job does not run the audit"
@@ -224,22 +233,33 @@ Test files are colocated with the source they cover (`foo.js` →
 
 | File | Tests | Style | Covers |
 |---|---:|---|---|
-| `src/parseTTL.roundtrip.test.js` | 9 | Real fixtures, no mocks | Parses a real reference export, regenerates TTL from the parsed state, then parses again — comparing business fields between the two parses rather than diffing against the original file's formatting |
+| `src/parseTTL.roundtrip.test.js` | 14 | Real fixtures, no mocks | Parses a real reference export, regenerates TTL from the parsed state, then parses again — comparing business fields between the two parses rather than diffing against the original file's formatting |
 | `src/utils/ttlGenerator.sections.test.js` | 29 | Pure unit | The skeleton the others sit in: `generate()` assembles a dozen optional sections, each behind its own condition — service identifier and sector, organisation logo, legal resource, temporal rules |
 | `src/utils/ttlGenerator.uris.test.js` | 26 | Pure unit | The URI and date helpers every emitter shares — legal-resource and ruleset URIs, `cprmvValidFrom`, rules-derived dates, CPRMV rule subject URIs. A wrong one does not throw; it publishes a graph that parses and points at the wrong resources |
 | `src/utils/ttlGenerator.entities.test.js` | 23 | Pure unit | Parameters, cost, output and the vendor service — above all that an empty field produces **no triple**, never a triple with an empty literal |
 | `src/utils/ttlGenerator.dmn.test.js` | 11 | Pure unit | The DMN section for a model uploaded in this editor — deployment, test and validation history, each optional and each its own predicate |
-| `src/utils/ttlGenerator.cellGrounding.test.js` | 12 | Pure unit | Per-cell `cprmv:Rule` emission, concept dedup, nested `hasPart` for compound cells, and the SHACL-conformance rules — see [Cell-Level Legislative Grounding](cell-level-grounding.md) |
+| `src/utils/ttlGenerator.cellGrounding.test.js` | 18 | Pure unit | Per-cell `cprmv:Rule` emission, concept dedup, nested `hasPart` for compound cells, and the SHACL-conformance rules — see [Cell-Level Legislative Grounding](cell-level-grounding.md) |
 | `src/utils/ttlGenerator.versionTarget.test.js` | 7 | Pure unit | The CPRMV version selector — namespace and shape differences between the `0.4.1` and `0.3.2` targets |
 | `src/utils/ttlGenerator.dateAxis.test.js` | 3 | Pure unit | Rules-derived consolidation dates and duplicate-path rule URIs |
 | `src/utils/ttlGenerator.citationStub.test.js` | 8 | Pure unit + the real export | The typed stub minted for a `cprmv:isBasedOn` citation — and **no** stub for a rule the same document already publishes, which asserted a second, contradictory `cprmv:id`. Half the file regenerates the real SZW normenbrief export and checks no subject carries two ids |
 | `src/utils/ttlHelpers.test.js` | 32 | Pure unit | All ten TTL string/URI helpers — escaping, sanitising (filenames, `ruleIdPath`, IRIs), formatting. `sanitizeIri` is checked for idempotence and for leaving structural URI characters (`/`, `:`, `#`, `?`) intact |
 
 Round-trip fixtures are the real reference exports in `examples/` —
-`full-test.ttl`, `full-test-import-export.ttl`, and the DMN-free
-`organizations/svb/Bepaling-leeftijd-AOW.ttl`. `dmnData` is derived from each
+`full-test.ttl`, `full-test-import-export.ttl`, the DMN-free
+`organizations/svb/Bepaling-leeftijd-AOW.ttl`, and, since v2026.10.0, the
+published `organizations/amsterdam/Digital-Twin-Inkomensregelingen.ttl`, which
+carries the whole cell-level grounding layer. `dmnData` is derived from each
 fixture's own `hasDmnData`/`importedDmnBlocks` the way `importHandler.js`
 really does it, so the tests exercise a shape the app actually produces.
+
+An equality check between two parses cannot see a defect both parses share, so
+three tests assert **values** instead. A published export types four different
+things `a cprmv:Rule` — Norms & Standards rules, and the grounding layer's cell
+resources, minted concepts and citation stubs — and on
+`full-test-import-export.ttl` the tests check that only the six subjects under
+the policy-rule base become rules, that the grounding resources stay in the
+preserved DMN block, and that regenerating invents no policy rule for any of
+them. Until v2026.10.0 the importer took all four for policy rules.
 `examples/ronl.ttl` is deliberately excluded — it is the RONL SKOS vocabulary
 file, not a CPSV-AP service export, and `parseTTLEnhanced` correctly throws on
 it.
@@ -248,7 +268,7 @@ it.
 
 | File | Tests | Style | Covers |
 |---|---:|---|---|
-| `src/utils/dmnHelpers.test.js` | 54 | Real DOM parsing (jsdom `DOMParser`) | Primary-decision-key extraction (root detection, `p_*` constant skipping, multi-root tie-breaking), rule and cell extraction, `validateDMNData`, concept generation, `evaluateTestCaseExpectation`, `extractOutputsFromDMN` |
+| `src/utils/dmnHelpers.test.js` | 55 | Real DOM parsing (jsdom `DOMParser`) | Primary-decision-key extraction (root detection, `p_*` constant skipping, multi-root tie-breaking), rule and cell extraction, `validateDMNData`, concept generation, `evaluateTestCaseExpectation`, `extractOutputsFromDMN` |
 | `src/utils/validators.test.js` | 29 | Pure unit | All eight exports: the six per-section validators, the `validateForm` aggregation across every section including array fields, and the `isValidDate` helper |
 | `src/utils/iknowParser.test.js` | 31 | Real DOM parsing | Both iKnow XML export formats, format auto-detection, the field-map helper, the dot-path value extractor, and `applyMapping` including filters and transforms — plus the two guards: prototype path segments are neither read nor written, and a nested-quantifier or over-long transform pattern throws |
 | `src/utils/cprmvImport.test.js` | 13 | Pure unit | `flattenCprmvRules` — sub-clause folding, namespace variants (0.4.1 slash, 0.3.0 `contains`, legacy flat arrays), multi-entry input, malformed input tolerance, id uniqueness |
@@ -309,7 +329,7 @@ nothing else.
 
 ### `DMNTab` lifecycle (P6)
 
-Six files, 96 tests, covering validate → deploy → evaluate. The suite walks the
+Six files, 99 tests, covering validate → deploy → evaluate. The suite walks the
 real lifecycle rather than testing each call in isolation, **because the interface
 enforces that order**: the Evaluate button stays disabled until a deployment has
 succeeded.
@@ -321,16 +341,17 @@ the branch that requires an uploaded file, so the error it raises can never fire
 
 ### End-to-end journeys (P7)
 
-Three Playwright specs, run against a live stack rather than mocks. Measured on
-11 September 2026 against the acceptance deployment, with the preflight confirming its
-backend and the Operaton engine before anything was driven:
+Four Playwright specs, run against a live stack rather than mocks. Measured on
+2 October 2026 against v2026.10.0 on a local stack — the Linked Data Explorer
+backend on `:3001`, Operaton on `:8081`, and the dev server Playwright's
+`webServer` started on `:3000` — with the preflight confirming both services
+before anything was driven:
 
 ```bash
-E2E_BASE_URL=https://acc.cpsv-editor.open-regels.nl \
-E2E_BACKEND_URL=https://acc.backend.linkeddata.open-regels.nl \
-E2E_OPERATON_URL=https://operaton.open-regels.nl \
 npx playwright test --reporter=list
-#   3 passed (9.3s) — authoring 3.1 s, normbedragen 3.2 s, round-trip 2.0 s
+#   preflight ok — backend http://localhost:3001 (HTTP 200), Operaton http://localhost:8081 (HTTP 200)
+#   4 passed (27.6s) — amsterdam-reimport 9.0 s, authoring 4.6 s,
+#                      normbedragen 2.8 s, round-trip 2.1 s
 ```
 
 `--reporter=list` rather than `npm run test:e2e`, which opens the HTML report when it
@@ -341,6 +362,7 @@ finishes — fine at a desk, a hang in anything scripted.
 | `e2e/authoring-journey.spec.js` | The application can create a service: empty form → real deploy → real evaluation → exported TTL |
 | `e2e/round-trip-journey.spec.js` | It can read an existing one back: import a full TTL, swap its decision model, deploy, evaluate, download and check what was written |
 | `e2e/normbedragen-journey.spec.js` | One deployment answers repeatedly: a chained DRD deployed once, evaluated with four request bodies that differ only in the peildatum, then exported. Added in v2026.09.3 with the 2026-H2 bijstandsnormen |
+| `e2e/amsterdam-reimport-journey.spec.js` | Reading a published file and writing it straight back changes nothing: imports the published Amsterdam export `Digital-Twin-Inkomensregelingen.ttl`, downloads it, imports that download and downloads again. Asserts the Policy tab stays empty, no `rules/incomplete_` or other fabricated rule subject appears, the cell grounding (a `cprmv:sourceQuote`, a concept's `skos:prefLabel`, a cell resource) survives both exports, and the second export equals the first once export timestamps are blanked. Calls neither Operaton nor the backend. Added in v2026.10.0 |
 
 !!! danger "`E2E_BASE_URL` points the journeys at a deployed build — and at production's engine"
     Since v2026.09.3 `E2E_BASE_URL` drives the journeys against an already-deployed
@@ -358,9 +380,10 @@ finishes — fine at a desk, a hang in anything scripted.
     redirects the preflight probe, not the application. Driving a deployed build
     means driving its stack.
 
-Both assert **values rather than status codes** — zorgtoeslag 1150 and a specific
-annotation string — because a decision table that stopped matching would still
-answer 200 with an empty result set. That assertion was verified to bite by
+The journeys that evaluate assert **values rather than status codes** — the
+round-trip journey zorgtoeslag 1150 and a specific annotation string — because a
+decision table that stopped matching would still answer 200 with an empty result
+set. That assertion was verified to bite by
 setting the expected value wrong and watching the test fail. The export assertion
 reads the downloaded file rather than trusting the filename, since a filename
 check passes on an empty file.
@@ -375,23 +398,24 @@ so the journey is not blocked, and the threshold is documented rather than dodge
 
 ## Coverage
 
-Measured with `npm run test:ci` against v2026.09.7 on 26 September 2026, in a
-checkout whose install `npm run deps:check` confirmed against the lockfile. The
-totals are identical to v2026.09.6's.
+Measured with `npm run test:ci` (Vitest's `--coverage`) against v2026.10.0 on
+2 October 2026, in a checkout whose install `npm run deps:check` confirmed
+against the lockfile.
 
-**Overall: 90.10% statements · 88.23% branches · 78.71% functions · 90.76%
+**Overall: 90.31% statements · 88.39% branches · 78.92% functions · 90.99%
 lines** — against 54.75% / 40.88% / 38.68% / 55.57% at v2026.09.0. The jump is
 P5, P6 and the branch-floor work landing together; v2026.09.3's two parser guards
-moved `src/utils` a little further.
+moved `src/utils` a little further. At v2026.10.0 `src/utils` rose again and
+`src/config` fell, to 81.13% branches.
 
 | Area | Statements | Branches | Functions | Lines |
 |---|---:|---:|---:|---:|
 | `src/hooks` | 100% | 93.44% | 100% | 100% |
-| `src/utils` | 94.80% | 88.06% | 97.98% | 95.62% |
-| `src/config` | 92.15% | 82.35% | 75.00% | 91.83% |
-| `src/components` | 84.41% | 88.65% | 85.71% | 87.50% |
-| `src/components/tabs` | 84.46% | **92.18%** | 65.93% | 84.67% |
-| `src` (App, index) | 84.56% | 82.22% | 58.62% | 85.63% |
+| `src/utils` | 95.26% | 88.52% | 98.49% | 96.11% |
+| `src/config` | 90.56% | 81.13% | 75.00% | 90.19% |
+| `src/components` | 84.41% | 87.94% | 85.71% | 87.50% |
+| `src/components/tabs` | 84.48% | **92.18%** | 65.93% | 84.69% |
+| `src` (App, index, parser) | 84.64% | 82.41% | 59.32% | 85.71% |
 
 The rows are the runner's own per-directory figures, so `src/components` counts only the
 files directly in that folder — the dialogs and panels — and the tabs have a row of their
@@ -410,11 +434,13 @@ repositories reached it.
 `DMNTab.jsx`, the largest file in the repository, is the **best-covered component**
 at 98.32% branches, from 45.73% at v2026.09.1.
 
-!!! warning "Two files sit one branch above the floor"
-    `ConceptsTab.jsx` 80.55% and `ChangelogTab.jsx` 80.70%. Thresholds pass at
-    `>= 80`, and the ratchet that used to absorb a slip is gone, so **a single
-    added `?.` or `||` default in either turns CI red** on an otherwise
-    unrelated change. `useDsoImport.js` was the third until v2026.09.6, when the
+!!! warning "Three files sit one branch above the floor"
+    `ConceptsTab.jsx` 80.55% (29 of 36 branches), `ChangelogTab.jsx` 80.70%
+    (46 of 57) and `vocabularies.config.js` 81.13% (43 of 53) — each passes by
+    exactly one covered branch. Thresholds pass at `>= 80`, and the ratchet that
+    used to absorb a slip is gone, so **a single added `?.` or `||` default in
+    any of them turns CI red** on an otherwise unrelated change.
+    `useDsoImport.js` was in the same position until v2026.09.6, when the
     deep-link fix's tests took it from 80.39% to 92.15%.
 
 !!! note "What the branch column does not see"
@@ -542,10 +568,10 @@ Not phases, but the honest remaining edges:
   reach — `if (!uploadedFile)` under a button that only renders once a file
   exists, and three of the same shape. Chasing them would mean testing through
   the component's internals; the file documents them as defensive dead code.
-- **Two files one branch above the floor**, with no ratchet left to absorb a
+- **Three files one branch above the floor**, with no ratchet left to absorb a
   regression.
 - **A functions floor**, which is a separate decision needing its own
-  measurement — `App.jsx` sits at 55.55% functions against 81.48% branches.
+  measurement — `App.jsx` sits at 55.55% functions against 83.33% branches.
 
 **Deliberately out of scope for now:** swapping in an RDF library (the
 round-trip tests are the data that should decide whether the hand-rolled

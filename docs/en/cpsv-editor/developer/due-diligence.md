@@ -36,7 +36,7 @@ Form-based authoring of CPSV-AP 3.2.0 compliant service descriptions. Ten tabs c
 | Cost / Output | Service cost and output descriptions (embedded in Service tab) | CV |
 | Changelog | Version history tracking | Custom |
 
-Additional capabilities: TTL import with full round-trip fidelity (parseTTL_enhanced.js, ~770 lines), TTL export with live preview, form validation, CPRMV JSON import, and a "clear all" reset.
+Additional capabilities: TTL import with full round-trip fidelity (`parseTTL.enhanced.js`, ~810 lines), TTL export with live preview, form validation, CPRMV JSON import, and a "clear all" reset.
 
 ### 2 — Vendor Integration
 
@@ -60,7 +60,7 @@ When the dialog opens it also runs an **advisory pre-publish SHACL validation** 
 
 ### 4 — DMN Integration & Operaton Deployment
 
-The DMN Tab (`DMNTab.jsx`, ~1520 lines) handles the full lifecycle of decision model integration. The workflow proceeds through four stages: validate → deploy → test → generate concepts.
+The DMN Tab (`DMNTab.jsx`, ~1840 lines) handles the full lifecycle of decision model integration. The workflow proceeds through four stages: validate → deploy → test → generate concepts.
 
 **Upload & Validate.** Upload a `.dmn` file or load a built-in example. On upload, the editor parses the DMN XML client-side (DOMParser) to extract the primary decision key (skipping `p_*` constant parameters), detect all testable decisions in a DRD, and auto-generate a request body from `<inputData>` elements with smart type inference (dates get random birth dates, numerics default to 0, booleans to false). Simultaneously, the editor calls the shared LDE backend's `POST /v1/dmns/validate` endpoint for five-layer syntactic validation (`dmn-validation.service.ts`, ~950 lines, using libxmljs2):
 
@@ -105,13 +105,13 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 | Frontend | React 19, Vite, Tailwind CSS, Lucide icons |
 | State management | React hooks (`useEditorState`, `useArrayHandlers`), no external state library |
 | Build & lint | Vite, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
-| Testing | Vitest, `@testing-library/react`, Playwright — 763 tests across 62 files at v2026.09.7, plus 3 end-to-end journeys ([Testing](testing.md)) |
+| Testing | Vitest, `@testing-library/react`, Playwright — 776 tests across 62 files at v2026.10.0, plus 4 end-to-end journeys ([Testing](testing.md)) |
 | TTL parsing | Custom hand-written parser (no RDF library dependency) |
 | DMN parsing | Browser DOMParser (XML) |
 | External APIs | TriplyDB REST + SPARQL, Operaton REST (Camunda-compatible), RONL SPARQL vocabulary |
 | Backend dependency | Shared Express server (Linked Data Explorer repo) for CORS-proxied SPARQL queries, TriplyDB service updates, and DMN syntactic validation (libxmljs2) |
 | Hosting | Azure Static Web Apps (acc branch → acceptance, main → production) |
-| CI/CD | GitHub Actions: lint, tests and the production build on the runner (Node 24.20.0 from `.nvmrc`), uploaded to Azure Static Web Apps with `skip_app_build`; a daily dependency audit and an SBOM per release ([Deployment](deployment.md)) |
+| CI/CD | GitHub Actions: lint, tests and the production build on the runner (Node 24.21.0 from `.nvmrc`), uploaded to Azure Static Web Apps with `skip_app_build`; a daily dependency audit and an SBOM per release ([Deployment](deployment.md)) |
 
 ---
 
@@ -121,9 +121,9 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 
 **What to assess:**
 
-- **No RDF library.** TTL parsing and generation are entirely hand-written (~770 + ~200 lines). This works but is fragile for edge cases. Evaluate whether introducing a lightweight RDF/JS library (e.g. N3.js) would reduce maintenance burden vs. the cost of migration.
+- **No RDF library.** TTL parsing and generation are entirely hand-written (a ~810-line parser and a ~1,640-line generator). This works but is fragile for edge cases. Evaluate whether introducing a lightweight RDF/JS library (e.g. N3.js) would reduce maintenance burden vs. the cost of migration.
 
-- **App.js orchestration.** The main `App.js` (1143 lines) has been partially modularized: data state lives in `useEditorState`, array CRUD operations in `useArrayHandlers`, TTL import logic in `importHandler.js`, and TTL generation in `ttlGenerator.js`. What remains in App.js is UI orchestration (tab rendering, message/status management), the publish workflow (~300 lines of step-by-step progress tracking), and glue code wiring state to child components. Further extraction targets: the publish handler could become a custom hook (`usePublishWorkflow`), and the tab navigation + message system could be separated from the data wiring.
+- **App.jsx orchestration.** The main `App.jsx` (1,243 lines) has been partially modularized: data state lives in `useEditorState`, array CRUD operations in `useArrayHandlers`, TTL import logic in `importHandler.js`, and TTL generation in `ttlGenerator.js`. What remains in App.jsx is UI orchestration (tab rendering, message/status management), the publish workflow (~300 lines of step-by-step progress tracking), and glue code wiring state to child components. Further extraction targets: the publish handler could become a custom hook (`usePublishWorkflow`), and the tab navigation + message system could be separated from the data wiring.
 
 - **Automated tests — addressed.** This was originally raised here as *"no automated tests for TTL output"*: the only test file was a CRA stub and validation happened manually against example files. A phased suite landed in v2026.07.0, including the high-value round-trip coverage suggested here — parse a real reference export, regenerate, re-parse, compare — and found two genuine defects immediately, one of which had been silently dropping data on re-import since a predicate rename. All eight phases, P0–P7, are complete: at v2026.09.4 the suite stands at **751 tests across 61 files**, plus three Playwright journeys against a live stack, and every file is held to an **80% branch floor enforced by the runner**. The UI layer this bullet once named as untested is covered: `DMNTab.jsx` 98.34% branches, `importHandler.js` 100% statements, `ttlGenerator.js` 94.89% and `parseTTL.enhanced.js` 94.50% statements. The remaining weakness is narrower and specific: `App.jsx` clears the branch floor at 81.48% but reads **53.70% functions** — whole handlers no test calls, which a branch floor does not see. See [Testing](testing.md).
 

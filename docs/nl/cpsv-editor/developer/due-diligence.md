@@ -38,7 +38,7 @@ Formuliergebaseerde authoring van CPSV-AP 3.2.0-conforme dienstbeschrijvingen. T
 | Kosten / Output | Dienstkosten en outputbeschrijvingen (ingebed in het tabblad Dienst) | CV |
 | Wijzigingslog | Versiegeschiedenis | Eigen formaat |
 
-Aanvullende mogelijkheden: TTL-import met volledige round-trip trust (parseTTL_enhanced.js, ~770 regels), TTL-export met live voorbeeldweergave, formuliervalidatie, CPRMV JSON-import en een "alles wissen"-reset.
+Aanvullende mogelijkheden: TTL-import met volledige round-trip trust (`parseTTL.enhanced.js`, ~810 regels), TTL-export met live voorbeeldweergave, formuliervalidatie, CPRMV JSON-import en een "alles wissen"-reset.
 
 ### 2 — Leveranciersintegratie
 
@@ -62,7 +62,7 @@ Bij het openen van de dialoog draait ook een **adviserende pre-publicatie SHACL-
 
 ### 4 — DMN-integratie & Operaton-deployment
 
-Het DMN-tabblad (`DMNTab.jsx`, ~1520 regels) behandelt de volledige levenscyclus van beslismodel­integratie. De workflow doorloopt vier stadia: valideren → deployen → testen → concepten genereren.
+Het DMN-tabblad (`DMNTab.jsx`, ~1840 regels) behandelt de volledige levenscyclus van beslismodel­integratie. De workflow doorloopt vier stadia: valideren → deployen → testen → concepten genereren.
 
 **Uploaden & Valideren.** Upload een `.dmn`-bestand of laad een ingebouwd voorbeeld. Bij upload parseert de editor de DMN-XML client-side (DOMParser) om de primaire beslissleutel te extraheren (met overslaan van `p_*`-constante parameters), detecteert alle testbare beslissingen in een DRD, en genereert automatisch een request-body vanuit `<inputData>`-elementen met slimme type-inferentie (datums krijgen willekeurige geboorte­datums, numerieke waarden standaard 0, booleans false). Tegelijkertijd roept de editor het gedeelde LDE-backend-endpoint `POST /v1/dmns/validate` aan voor vijflaagse syntactische validatie (`dmn-validation.service.ts`, ~950 regels, met libxmljs2):
 
@@ -90,7 +90,7 @@ Validatieresultaten (fouten, waarschuwingen, info per laag) worden inline weerge
 
 De DMN-inhoud wordt ingebed in de TTL-output als `cprmv:DecisionModel`-triples, en het tabblad Organisatie ondersteunt validatiestatustracking (niet-gevalideerd / in-review / gevalideerd / afgewezen) met metadata over wie heeft gevalideerd en wanneer.
 
-**Koppeling met kerneditor:** Gemiddeld. DMN-metadata (deploystatus, testresultaten, validatie) is onderdeel van de editor-state. De automatisch gegenereerde concepten voeden het tabblad Concepten. De TTL-export bevat DMN-blokken. De syntactische validatie is afhankelijk van het gedeelde LDE-backend (`POST /v1/dmns/validate`). De Operaton REST API-interactie en DMN XML-parsing (`dmnHelpers.js`) zijn echter op zichzelf staande utilities.
+**Koppeling met kerneditor:** Gemiddeld. DMN-metadata (deploystatus, testresultaten, validatie) is onderdeel van de editor-state. De automatisch gegenereerde concepten voeden het tabblad Concepten. De TTL-export bevat DMN-blokken. De syntactische validatie is afhankelijk van het gedeelde LDE-backend (`POST /v1/dmns/validate`). Deployen en evalueren lopen ook via die backend (`/v1/dmns/deploy`, `/v1/dmns/evaluate/{key}`), zodat het tabblad niet meer rechtstreeks met Operaton communiceert. DMN XML-parsing (`dmnHelpers.js`) blijft een op zichzelf staande utility.
 
 ### 5 — DSO → DMN deep-link import
 
@@ -104,16 +104,16 @@ De `useDsoImport`-hook (`src/hooks/useDsoImport.js`, v1.9.6) verwerkt een deep-l
 
 | Laag | Technologie |
 |---|---|
-| Frontend | React 19, Create React App (verouderd — zie hieronder), Tailwind CSS, Lucide-iconen |
+| Frontend | React 19, Vite, Tailwind CSS, Lucide-iconen |
 | Statusbeheer | React hooks (`useEditorState`, `useArrayHandlers`), geen externe state-library |
 | Build & lint | Vite, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
-| Testen | Vitest, `@testing-library/react`, Playwright — 763 tests in 62 bestanden bij v2026.09.7, plus 3 end-to-end-journeys ([Testing](testing.md)) |
+| Testen | Vitest, `@testing-library/react`, Playwright — 776 tests in 62 bestanden bij v2026.10.0, plus 4 end-to-end-journeys ([Testing](testing.md)) |
 | TTL-parsing | Eigen handgeschreven parser (geen RDF-library-afhankelijkheid) |
 | DMN-parsing | Browser DOMParser (XML) |
 | Externe API's | TriplyDB REST + SPARQL, Operaton REST (Camunda-compatibel), RONL SPARQL-vocabulaire |
 | Backend-afhankelijkheid | Gedeelde Express-server (Linked Data Explorer-repo) voor CORS-geproxyde SPARQL-queries, TriplyDB-service-updates en DMN-syntactische validatie (libxmljs2) |
 | Hosting | Azure Static Web Apps (acc-branch → acceptatie, main → productie) |
-| CI/CD | GitHub Actions: lint, tests en de productiebuild op de runner (Node 24.20.0 uit `.nvmrc`), geüpload naar Azure Static Web Apps met `skip_app_build`; een dagelijkse dependency-audit en een SBOM per release ([Deployment](deployment.md)) |
+| CI/CD | GitHub Actions: lint, tests en de productiebuild op de runner (Node 24.21.0 uit `.nvmrc`), geüpload naar Azure Static Web Apps met `skip_app_build`; een dagelijkse dependency-audit en een SBOM per release ([Deployment](deployment.md)) |
 
 ---
 
@@ -123,9 +123,9 @@ De `useDsoImport`-hook (`src/hooks/useDsoImport.js`, v1.9.6) verwerkt een deep-l
 
 **Wat te beoordelen:**
 
-- **Geen RDF-library.** TTL-parsing en -generatie zijn volledig handgeschreven (~770 + ~200 regels). Dit werkt maar is fragiel voor randgevallen. Evalueer of het introduceren van een lichtgewicht RDF/JS-library (bijv. N3.js) de onderhoudslast zou verlagen versus de kosten van migratie.
+- **Geen RDF-library.** TTL-parsing en -generatie zijn volledig handgeschreven (een parser van ~810 regels en een generator van ~1640 regels). Dit werkt maar is fragiel voor randgevallen. Evalueer of het introduceren van een lichtgewicht RDF/JS-library (bijv. N3.js) de onderhoudslast zou verlagen versus de kosten van migratie.
 
-- **App.js-orkestratie.** De hoofd-`App.js` (1143 regels) is gedeeltelijk gemodulariseerd: datastatus leeft in `useEditorState`, array-CRUD-operaties in `useArrayHandlers`, TTL-importlogica in `importHandler.js` en TTL-generatie in `ttlGenerator.js`. Wat in App.js overblijft is UI-orkestratie (tabweergave, bericht-/statusbeheer), de publicatieworkflow (~300 regels stap-voor-stap voortgangsregistratie) en code die status aan child componenten koppelt. Verdere extractiedoelen: de publicatie-handler zou een custom hook kunnen worden (`usePublishWorkflow`), en de tabnavigatie + berichtensysteem kan worden gescheiden van de data wiring.
+- **App.jsx-orkestratie.** De hoofd-`App.jsx` (1243 regels) is gedeeltelijk gemodulariseerd: datastatus leeft in `useEditorState`, array-CRUD-operaties in `useArrayHandlers`, TTL-importlogica in `importHandler.js` en TTL-generatie in `ttlGenerator.js`. Wat in App.jsx overblijft is UI-orkestratie (tabweergave, bericht-/statusbeheer), de publicatieworkflow (~300 regels stap-voor-stap voortgangsregistratie) en code die status aan child componenten koppelt. Verdere extractiedoelen: de publicatie-handler zou een custom hook kunnen worden (`usePublishWorkflow`), en de tabnavigatie + berichtensysteem kan worden gescheiden van de data wiring.
 
 - **Geautomatiseerde tests — opgelost.** Dit werd hier oorspronkelijk aangemerkt als *"geen geautomatiseerde tests voor TTL-output"*: het enige testbestand was een CRA-stub en validatie gebeurde handmatig via voorbeeldbestanden. In v2026.07.0 is een gefaseerde testsuite opgeleverd, inclusief de hier voorgestelde round-trip-dekking — een echte referentie-export inlezen, opnieuw genereren, opnieuw inlezen en vergelijken — en die legde direct twee werkelijke defecten bloot, waarvan er één sinds een hernoeming van een predicaat stilzwijgend gegevens liet wegvallen bij herimport. Alle acht fasen, P0–P7, zijn afgerond: bij v2026.09.4 telt de suite **751 tests in 61 bestanden**, plus drie Playwright-journeys tegen een draaiende stack, en voor elk bestand geldt een **80%-branchdrempel die de testrunner zelf afdwingt**. De UI-laag die hier ooit als ongetest werd genoemd, is gedekt: `DMNTab.jsx` 98,34% branches, `importHandler.js` 100% statements, `ttlGenerator.js` 94,89% en `parseTTL.enhanced.js` 94,50% statements. De resterende zwakte is smaller en specifiek: `App.jsx` haalt de branchdrempel met 81,48%, maar komt op **53,70% functions** — complete handlers die geen test aanroept, en die een branchdrempel niet ziet. Zie [Testing](testing.md).
 
@@ -135,7 +135,7 @@ De `useDsoImport`-hook (`src/hooks/useDsoImport.js`, v1.9.6) verwerkt een deep-l
 
 - **Separatiemogelijkheid.** De vier domeinen (editor, leverancier, publicatie, DMN) zijn losjes gekoppeld via de gedeelde editor-state. Een modulaire architectuur — of als aparte routes/lazy-loaded modules binnen de SPA (Single Page Application), of als onafhankelijke micro-frontends die een TTL-datacontract delen — zou de onderhoudbaarheid verbeteren en onafhankelijke release-cycli mogelijk maken. Een eerste stap in die richting is gezet: sinds v2026.09.2 worden de vier zwaarste tabbladen — `ChangelogTab`, `CPRMVTab`, `DMNTab` en `VendorTab` — lazy geladen, waardoor de entry-chunk van 685,71 naar 392,74 kB ging.
 
-- **Create React App.** Het React-team heeft CRA officieel als verouderd aangemerkt op 14 februari 2025. Het blijft werken in onderhoudsmodus (een definitieve versie is gepubliceerd met React 19-ondersteuning), maar het zal geen nieuwe functies, prestatieverbeteringen of actieve beveiligingsupdates ontvangen. Het React-team beveelt migratie aan naar een framework (Next.js, React Router) of een moderne build-tool (Vite, Parcel, Rsbuild). Aangezien de Linked Data Explorer reeds Vite gebruikt, zou migratie van de CPSV Editor naar Vite de tooling binnen het RONL-ecosysteem gelijktrekken en de afhankelijkheid van een niet meer onderhouden build-tool wegnemen.
+- **Create React App — opgelost.** Deze review raadde migratie weg van CRA aan, dat het React-team op 14 februari 2025 als verouderd aanmerkte en dat geen nieuwe functies, prestatieverbeteringen of actieve beveiligingsupdates meer ontvangt. Die migratie naar **Vite is uitgevoerd in v2026.09.1**, in vier afzonderlijk terug te draaien fasen, met de P0–P4-suite als regressievangnet, precies zoals hier voorgesteld. `npm audit` daalde van 52 naar 10 kwetsbaarheden en productiebuilds van ongeveer 30 seconden naar minder dan twee. Zie [Testing](testing.md).
 
 ---
 

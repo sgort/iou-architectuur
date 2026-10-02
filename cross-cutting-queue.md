@@ -26,9 +26,9 @@ So a sync records it here instead of acting on it.
 
 ## Pending
 
-Eight items are pending: two carried over from the weekly pass of 27 September 2026, and six queued
-by the RONL Business API component sync of 28 September. Everything queued on 24 and 26 September
-was verified against source at `a7fe76f` / `0143ea2` / `3c44b9e` and drained (see the table below).
+Each section below was queued by one run and waits for the next weekly pass, which verifies
+every entry against source before draining it. Everything queued on 24 and 26 September was
+drained by the pass of 27 September (see the table at the end).
 
 ### 27 September 2026 — carried over from the weekly pass
 
@@ -226,6 +226,44 @@ Read at `origin/main` = `ae06c9e` (Promote to Production run #5, all four deploy
     Bears on: `doc-architecture/openapi-rendering.md` (says the RBA banner and Test Request work only on
     the production docs tier). The same sentence in the leading HTML comment of
     `ronl-business-api/reference/api-specification.md` was corrected on 30 September 2026.
+
+### 2 October 2026 — CPSV Editor v2026.09.7 → v2026.10.0 (production, `719683b`)
+
+Read at `origin/main` = `719683b` (Deploy PROD (white-sky) #104); `origin/acc` `acac6b3` holds the same tree.
+
+1. **The CPSV Editor's Node literals moved to 24.21.0.**
+   Evidence: `c65c698` — `.nvmrc`, `dependency-audit.yml:60`, `sbom.yml:56` and `zizmor.yml:71`, together. All three
+   repositories' audit and SBOM workflows now name 24.21.0 (RBA moved in `fc50fed`, item 2 of the 30 September entry).
+   Node 24.21.0 bundles npm 11.19, so the cooldown claim still holds.
+   Bears on: `supply-chain.md` (the `.nvmrc` table's CPSV row, "24.20.0 in the CPSV Editor" for the zizmor literal,
+   "24.20.0 in all three" for the audit and SBOM literals, the npm-bundling row), `ictu-dependency-guideline.md`
+   (the Node evidence for R2/R3).
+
+2. **zizmor-action v0.6.4 reached the CPSV Editor, with its register row moved on the bump branch.**
+   Evidence: `10b6805` (pin `cc914d7f…`), `79475ce` (the `SECURITY-PIPELINE.md` row, on Renovate's PR #166).
+   The same hand step the Linked Data Explorer and the RONL Business API needed — the register drift is now
+   observed in all three.
+   Bears on: `supply-chain.md` (the register-habit section, which cites only the other two).
+
+3. **The CPSV Editor's `main` now has a ruleset; classic protection is gone on both branches.**
+   Evidence: `gh api repos/sgort/ttl-editor/rulesets` — `main promotion gate` (id `24227117`), created
+   30 September 2026, active, no bypass actors: pull request (merge commits only), `audit` + `scan` required,
+   deletion and non-fast-forward blocked. `branches/main/protection` and `branches/acc/protection` both answer 404.
+   `acc supply-chain gate` (`21728745`) keeps its checks and now sets `require_extra_approval_for_unattributed_changes`.
+   With item 5 of the 30 September entry, all three repositories now gate `main` with a ruleset requiring
+   `audit` + `scan`, and none keeps classic protection.
+   Bears on: `branch-protection.md` (the CPSV `main` cell — "classic branch protection, not a ruleset" — and the
+   "requires no status check" sentences), `ictu-dependency-guideline.md`, `ci-posture-deck.md`,
+   `supply-chain.md#adoption-status`. Source-side: the CPSV `SECURITY-PIPELINE.md:111` still says "`main` still
+   requires nothing, as decided in #131".
+
+4. **The fourth end-to-end journey cannot run without the stack it does not need.**
+   Evidence: `06ac5e7` adds `e2e/amsterdam-reimport-journey.spec.js`, which needs neither Operaton nor the
+   backend; `e2e/global-setup.js` probes both for every run and throws "Nothing was run" when either is down.
+   Measured 2 October 2026: 4 of 4 journeys pass against a live stack.
+   Bears on: `code-standards.md` and the weekly `tests:` row (e2e count 3 → 4 for the CPSV Editor).
+
+Nothing else cross-cutting surfaced: no `.husky`, `renovate.json` or `package.json` script changed in the range.
 
 ## Drained
 
