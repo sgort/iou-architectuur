@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # Import & Export TTL
 
 ---
@@ -30,7 +34,7 @@ The import handles vocabulary variants gracefully — properties expressed with 
 
 ## Round-trip editing
 
-Importing a file that was previously exported from the editor produces identical output on re-export. This makes the editor suitable for collaborative workflows where a file passes between multiple team members, each adding or editing different sections.
+Importing a file that was previously exported from the editor produces identical output on re-export, apart from the export timestamps the generator stamps on each download. This makes the editor suitable for collaborative workflows where a file passes between multiple team members, each adding or editing different sections.
 
 ---
 
@@ -40,17 +44,18 @@ If the imported Turtle file contains DMN entities (`cprmv:DecisionModel`, `cpsv:
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: DMN tab showing the blue "DMN data imported" notice with the preserved block summary and the "Clear Imported DMN Data" button](../../assets/screenshots/cpsv-editor-dmn-imported.png)
-  <figcaption>MN tab showing the blue "DMN data imported" notice with the preserved block summary and the "Clear Imported DMN Data" button</figcaption>
+  <figcaption>DMN tab showing the blue "DMN data imported" notice with the preserved block summary and the "Clear Imported DMN Data" button</figcaption>
 </figure>
 
 The DMN tab displays a preservation notice showing what was found. The preserved blocks are appended to every subsequent export — they are not editable through the form interface. On export a conformance-only pass (v1.10.2) makes additive/repointing edits to the Decision Rules (injecting missing `dct:title`/`dct:description`, repointing a `cpsv:implements` that targets the service to the legal resource); no preserved triples are removed, so deployed decision-model metadata is protected from accidental modification during collaborative editing.
 
 **To clear the preserved DMN data and start fresh:**
 
-1. Click **Clear Imported DMN Data** in the DMN tab.
-2. Confirm the action in the dialog.
-3. The tab returns to normal upload mode.
-4. Upload a new `.dmn` file and proceed with the standard DMN workflow.
+1. Click **Clear Imported DMN Data** in the DMN tab. The data is cleared at once — there is no confirmation dialog.
+2. The tab returns to normal upload mode.
+3. Upload a new `.dmn` file and proceed with the standard DMN workflow.
+
+Clearing removes more than the preserved blocks. The Concepts tab is emptied as well, because its concepts were generated from the DMN the file carried, and the DMN's validation status (shown on the Organization tab) returns to *Not Validated*, with the validator, date and note cleared.
 
 ---
 

@@ -11,7 +11,7 @@ component: CPSV Editor
 ```
 src/
 ├── components/tabs/
-│   └── DMNTab.jsx                    # Main UI (900+ lines)
+│   └── DMNTab.jsx                    # Main UI (1,836 lines)
 │       • File upload + card display
 │       • Syntactic validation panel
 │       • API configuration
@@ -22,11 +22,13 @@ src/
 │       • Import preservation notice
 │
 ├── utils/
-│   ├── dmnHelpers.js                 # DMN TTL generation utilities (370 lines)
-│   └── parseTTL.enhanced.js          # DMN block capture on import (523 lines)
+│   ├── dmnHelpers.js                 # DMN parsing and extraction helpers (685 lines)
+│   └── constants.js                  # EMPTY_DMN_DATA, CPRMV_RULE_BASE
 │
-└── config/
-    └── vocabularies_config.js        # DMN entity type detection
+├── config/
+│   └── vocabularies.config.js        # DMN entity type detection
+│
+└── parseTTL.enhanced.js              # DMN block capture on import (811 lines)
 ```
 
 ---
@@ -56,8 +58,23 @@ dmnData: {
   // Import preservation (v1.5.1+)
   importedDmnBlocks: string | null,  // Raw Turtle lines preserved verbatim
   isImported: boolean,
+
+  // Validation status
+  validationStatus: string,     // 'not-validated' when empty
+  validatedBy: string,
+  validatedAt: string,
+  validationNote: string,
 }
 ```
+
+The empty shape is a single constant, `EMPTY_DMN_DATA` in `src/utils/constants.js`,
+holding all sixteen fields. All three places that clear DMN data spread it: the
+**Clear** button on an uploaded file (`handleClearFile`), the **Clear Imported DMN
+Data** button on a TTL that arrived carrying a DMN block (both in `DMNTab.jsx`), and
+**Clear All** (`clearAllData` in `src/hooks/useEditorState.js`), which overrides
+`apiEndpoint` with `https://operaton.open-regels.nl/engine-rest` to return the tab to
+its first-run default rather than to blank. All three also empty the Concepts tab,
+since its concepts were generated from the DMN being cleared.
 
 ---
 
@@ -163,28 +180,47 @@ The collapsible layer rows follow the same pattern as the Linked Data Explorer's
 
 ### Detection
 
-`vocabularies_config.js` detects DMN entities before regular entities to avoid misclassification:
+`vocabularies.config.js` detects DMN entities before regular entities to avoid misclassification:
 
 ```javascript
 export const detectEntityType = (line) => {
   // DMN detection FIRST
   if (line.includes('a cprmv:DecisionModel')) return 'dmnModel';
   if (line.includes('a cpsv:Input'))          return 'dmnInput';
+  if (line.includes('a cpsv:Output'))         return 'dmnOutput';  // not cv:Output
   if (line.includes('a cprmv:DecisionRule'))  return 'dmnRule';
+
+  // ...RuleSet / RuleMethod...
+
+  // A ConceptScheme is its own type, so it closes a DMN section
+  if (line.includes('a skos:ConceptScheme'))  return 'conceptScheme';
 
   // Regular entity detection below...
 };
 ```
 
+`skos:ConceptScheme` needs its own type because a line that detects as nothing is
+treated as a continuation of the current section: inside a DMN section the scheme
+would be swallowed into the preserved block, while the generator emits its own copy
+too.
+
 ### Capture
 
-`parseTTL.enhanced.js` captures DMN lines verbatim when detected:
+`parseTTL.enhanced.js` captures DMN lines verbatim when detected. Before it does, it
+re-types a `cprmvRule` whose subject is not under `CPRMV_RULE_BASE`
+(`https://cprmv.open-regels.nl/rules/`): the [cell-level grounding](cell-level-grounding.md)
+layer types its cell resources, minted concepts and citation stubs `a cprmv:Rule`
+as well, and those belong to the preserved DMN block, not to the policy rules.
 
 ```javascript
 let inDmnSection = false;
 let dmnLines = [];
 
-if (['dmnModel', 'dmnInput', 'dmnRule'].includes(detectedType)) {
+if (detectedType === 'cprmvRule' && !isCprmvPolicyRule(currentSubject)) {
+  detectedType = 'dmnRule';
+}
+
+if (['dmnModel', 'dmnInput', 'dmnOutput', 'dmnRule'].includes(detectedType)) {
   if (!inDmnSection) {
     inDmnSection = true;
     parsed.hasDmnData = true;
@@ -289,8 +325,9 @@ const outputs = liveOutputs.length
 
 ## Cell-level legislative grounding
 
-`extractRulesFromDMN` also reads each decision-table cell's id, FEEL text and
-`dct:source`/`cprmv:sourceQuote`/`cprmv:isBasedOn` groundings into
+`extractRulesFromDMN` also reads each decision-table cell's id, FEEL text,
+`dct:source`/`cprmv:sourceQuote`/`cprmv:isBasedOn` groundings and
+`cprmv:conceptName`/`cprmv:conceptType` into
 `rule.inputEntries`/`outputEntries`, which `ttlGenerator.js` publishes as
 per-cell `cprmv:Rule` resources. Building it surfaced — and fixed — a
 namespace defect that had silently broken *every* selector-based DMN lookup

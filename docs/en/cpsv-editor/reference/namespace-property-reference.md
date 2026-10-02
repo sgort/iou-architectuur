@@ -296,9 +296,12 @@ existing `cprmv:hasPart`, so no new classes or shapes are introduced.
 | `dct:source` | id or URI | The annotation or concept the cell derives from |
 | `cprmv:sourceQuote` | literal | The quoted text fragment the grounding rests on |
 | `cprmv:isBasedOn` | URI or JCI string | The citation |
+| `cprmv:conceptName` | literal | Name of the concept the cell is grounded in |
+| `cprmv:conceptType` | literal | Type of that concept (e.g. `Juridisch relevant feit`) |
 
 A numbered family (`dct:source1`, `cprmv:sourceQuote1`, `cprmv:isBasedOn1`,
-`…2`, …) grounds compound cells whose conjuncts need separate citations.
+`…2`, …) grounds compound cells whose conjuncts need separate citations. The
+two concept attributes are not numbered: they describe the cell as a whole.
 
 **Emitted in the Turtle:**
 
@@ -310,6 +313,8 @@ A numbered family (`dct:source1`, `cprmv:sourceQuote1`, `cprmv:isBasedOn1`,
 | `cprmv:isBasedOn` | cell / concept resource | **Object property** with `sh:class cprmv:Rule` — the target must itself be typed `cprmv:Rule`, so external citation URIs get a minted stub |
 | `cprmv:sourceQuote` | cell resource | Emitted with `dct:source` when the cell carries a quote |
 | `dct:source` | cell / concept resource | The originating annotation or concept, as a URI |
+| `skos:prefLabel` | cell resource | From `cprmv:conceptName`; plain literal. On a compound cell, on the parent only |
+| `dct:type` | cell resource | From `cprmv:conceptType`; plain literal. On a compound cell, on the parent only |
 
 Two conformance rules are easy to get wrong and are worth restating:
 `cprmv:id` is mandatory on **every** `cprmv:Rule` this layer mints, including

@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # Import, Export & Live Preview
 
 ---
@@ -12,6 +16,8 @@ The import system uses vocabulary configuration to recognise entities by their R
 
 **DMN preservation.** When a Turtle file contains DMN blocks (`cprmv:DecisionModel`, `cpsv:Input`, `cprmv:DecisionRule`), those blocks are detected and preserved verbatim in the exported output. The DMN tab displays an imported-state notice. On re-export the preserved blocks are appended after a conformance-only normalisation pass (v1.10.2) that injects missing `dct:title`/`dct:description` on Decision Rules and repoints a `cpsv:implements` that targets the service to the legal resource — additive edits only, so deployed decision logic is never modified.
 
+Preservation also covers the [cell-level grounding](../developer/cell-level-grounding.md) layer. A published export types four different things `a cprmv:Rule` — the Policy tab's own rules, and the grounding layer's cell resources, minted concepts and citation stubs. On import only subjects under the CPRMV rule base (`https://cprmv.open-regels.nl/rules/`) become Policy rules; every other `cprmv:Rule` is treated as part of the DMN block and preserved verbatim, so the grounding survives the round trip instead of arriving in the Policy tab as rules nobody wrote. A `skos:ConceptScheme` likewise closes the DMN section rather than being swallowed into it, so a round trip no longer adds an extra scheme block (v2026.10.0).
+
 **IRI safety.** Generated NL-SBB concept URIs, `dct:subject` links and `skos:exactMatch` values are sanitised so whitespace becomes underscores and IRI-illegal characters are percent-encoded (v1.10.2). A downloaded `.ttl` therefore parses under a strict (SHACL) parser and re-imports cleanly.
 
 ---
@@ -20,7 +26,7 @@ The import system uses vocabulary configuration to recognise entities by their R
 
 Clicking **Download TTL** generates the complete Turtle output for all tabs and triggers a browser download. The filename is derived from the service identifier.
 
-The export always includes the full set of namespace declarations, all populated entities, and — when present — the preserved DMN blocks. Export and re-import of the same file produces identical output (round-trip fidelity).
+The export always includes the full set of namespace declarations, all populated entities, and — when present — the preserved DMN blocks. Export and re-import of the same file produces identical output, apart from the export timestamps the generator stamps on each download (round-trip fidelity). An end-to-end test asserts this on the published Amsterdam export: it imports the file, exports it, imports that and exports again, and the second export matches the first byte for byte once the timestamps are blanked.
 
 ### CPRMV vocabulary version (0.4.1 / 0.3.2)
 

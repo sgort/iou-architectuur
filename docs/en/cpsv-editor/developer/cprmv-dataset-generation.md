@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # CPRMV RuleSet / Dataset Generation
 
 !!! note "Target version is selectable since v1.10.5"
@@ -119,7 +123,10 @@ the [SHACL note](#shacl-no-dcat-dataset)). The flat
 Deterministic subject URI shared by the wrapper emitter (to build the `hasPart` list) and
 the Rule emitter (to emit matching subjects), so the list members always resolve to real
 `cprmv:Rule` nodes. Uses `sanitizeRuleIdPath(rule.ruleIdPath)` when available, else
-`{rulesetId}_{ruleId}`. Pattern: `https://cprmv.open-regels.nl/rules/{identifier}`.
+`{rulesetId}_{ruleId}`. Pattern: `https://cprmv.open-regels.nl/rules/{identifier}`. The
+base is the constant `CPRMV_RULE_BASE` in `src/utils/constants.js`, shared with the TTL
+parser — on import it is what tells a policy rule apart from the other resources an export
+types `cprmv:Rule` (see below).
 
 When **several rules share a `ruleIdPath`** — a range's bounds (*"meer dan € 59.782, doch
 minder dan € 251.233"*) or multiple maxima (*"per maand"* / *"per kalenderjaar"*) — the
@@ -287,6 +294,12 @@ ruleSet:    { acceptedTypes: ['cprmv:RuleSet'],    canonicalType: 'cprmv:RuleSet
 ruleMethod: { acceptedTypes: ['cprmv:RuleMethod'], canonicalType: 'cprmv:RuleMethod' },
 cprmvRule:  { acceptedTypes: ['cprmv:Rule'],       canonicalType: 'cprmv:Rule' },
 ```
+
+On import, only subjects under `CPRMV_RULE_BASE` become policy rules. Anything else typed
+`cprmv:Rule` — the [cell-level grounding](cell-level-grounding.md) layer's cell resources,
+minted concepts and citation stubs, which carry that type because `cprmv:isBasedOn`
+requires a `cprmv:Rule` object — is re-typed as a DMN entity and preserved verbatim with
+the DMN block.
 
 On export the RuleSet/RuleMethod blocks are regenerated deterministically from each rule's
 `cprmv:rulesetId`, so single-trip round-tripping produces equivalent output.

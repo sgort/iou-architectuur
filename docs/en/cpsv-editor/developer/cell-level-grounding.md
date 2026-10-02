@@ -51,25 +51,38 @@ the XML. Two namespaces are declared on `<dmn:definitions>`:
     xmlns:dct="http://purl.org/dc/terms/">
 ```
 
-Each grounded cell then carries up to three attributes:
+Each grounded cell then carries up to five attributes — three that ground it,
+and two that name the concept it is grounded in:
 
 | Attribute | Meaning |
 |---|---|
 | `dct:source` | The annotation or concept id this cell was derived from |
 | `cprmv:sourceQuote` | The quoted text fragment the grounding rests on |
 | `cprmv:isBasedOn` | The citation — a full URL, or a bare JuriConnect (JCI) reference |
+| `cprmv:conceptName` | The name of the concept the cell is grounded in |
+| `cprmv:conceptType` | That concept's type, for example `Juridisch relevant feit` |
 
 ```xml
 <inputEntry id="ie1a"
             dct:source="apt-1"
             cprmv:sourceQuote="Woonadres"
-            cprmv:isBasedOn="https://lokaleregelgeving.overheid.nl/CVDR1/1">
+            cprmv:isBasedOn="https://lokaleregelgeving.overheid.nl/CVDR1/1"
+            cprmv:conceptName="natuurlijk persoon heeft woonadres"
+            cprmv:conceptType="Juridisch relevant feit">
   <dmn:text>"Amsterdam"</dmn:text>
 </inputEntry>
 ```
 
-Cells carrying none of the three are **ungrounded**, which is the normal case
-— wildcards and cross-decision references have nothing to cite.
+The two concept attributes come from the knowledge-domain export
+(`HvA_annotaties.xml`), where a `<textannotation>` carries `@concept` pointing
+at a `<concept>`. The concept is the authority for the name — every concept in
+that export has one, where only a tenth of the annotations do — so both
+attributes describe the concept however the cell happens to reference it.
+
+Cells carrying none of the three grounding attributes are **ungrounded**, which
+is the normal case — wildcards and cross-decision references have nothing to
+cite. A concept name or type on an ungrounded cell is not published: there is
+no cell resource to carry it.
 
 ### Compound cells
 
@@ -91,13 +104,23 @@ attribute family** deploys cleanly with no upper bound. That is what shipped:
 
 The reader scans `dct:source1`/`cprmv:sourceQuote1`/`cprmv:isBasedOn1`, then
 `…2`, and so on, stopping at the first index where none of the three is
-present.
+present. The concept attributes are not numbered: they describe the cell as a
+whole, so a compound cell carries at most one `cprmv:conceptName` and one
+`cprmv:conceptType`.
+
+!!! warning "A quoteless source is read as a concept id"
+    The kind of source is inferred from the presence of a quote: a
+    `dct:source` (numbered or not) with a matching `cprmv:sourceQuote` is an
+    annotation id, and one without is a concept id. An annotation id therefore
+    cannot be recorded without its quote — it would be published as
+    `?type=CPT&id=<annotation id>`, which does not resolve. Where no quote is
+    available, record the citation without the annotation id.
 
 !!! note "Grounding attributes are inert to evaluation"
     They are extension attributes in foreign namespaces, so Operaton ignores
     them. This was confirmed empirically rather than assumed: after grounding
-    was applied, the 100-case MC/DC suite still passed 100/100 against the
-    redeployed model.
+    was applied, the Amsterdam model's 100-case rule-coverage suite (one case
+    per rule) still passed 100/100 against the redeployed model.
 
 ---
 
@@ -107,12 +130,13 @@ present.
 table. `extractCellGroundings(entryEl)` returns an array of
 `{ source, sourceQuote, isBasedOn }` — empty for an ungrounded cell, one entry
 for the shorthand form, N for the numbered form. `extractCell(entryEl)` wraps
-that together with the cell's own `id` and its FEEL text, and
+that together with the cell's own `id`, its FEEL text, and the concept's
+`conceptName` and `conceptType` (each `null` when absent), and
 `extractRulesFromDMN` attaches the results to each rule as `inputEntries` and
 `outputEntries`.
 
 The cell's `id` matters: it is the stable key the published cell URI is built
-from. The iKnow re-export in this release gives every `<inputEntry>` and
+from. The iKnow re-export gives every `<inputEntry>` and
 `<outputEntry>` its own id for exactly this reason — keying off the id rather
 than column position keeps URIs stable when columns are reordered. A
 positional fallback covers sources that emit no per-cell ids.
@@ -203,6 +227,34 @@ A compound cell composes the two forms with a nested list:
     cprmv:hasPart ( <…/cell/ie2b/grounding/1> <…/cell/ie2b/grounding/2> ) .
 ```
 
+### The concept's name and type
+
+A cell carrying `cprmv:conceptName` or `cprmv:conceptType` emits them as
+`skos:prefLabel` and `dct:type` on the cell resource, ahead of its grounding:
+
+```turtle
+<…/rules/DecisionRule_1/cell/ie1a> a cprmv:Rule ;
+    cprmv:id "DecisionRule_1-cell-ie1a" ;
+    skos:prefLabel "natuurlijk persoon heeft woonadres" ;
+    dct:type "Juridisch relevant feit" ;
+    dct:source <https://hva.pna-web.com/hva/?type=APT&id=apt-1> ;
+    cprmv:sourceQuote "Woonadres" ;
+    cprmv:isBasedOn <https://lokaleregelgeving.overheid.nl/CVDR1/1> .
+```
+
+On a compound cell they stay on the parent resource, next to its
+`cprmv:hasPart` list, and are not repeated on the individual groundings.
+
+### On import
+
+Every resource this layer mints — cell, sub-grounding, concept and citation
+stub — is typed `cprmv:Rule`, but none of them is a policy rule. On import the
+parser treats only subjects under `CPRMV_RULE_BASE`
+(`https://cprmv.open-regels.nl/rules/`) as policy rules; anything
+else typed `cprmv:Rule` is re-typed as a DMN entity and preserved verbatim in
+the DMN block, so the grounding survives a round trip intact. See
+[Vocabulary Configuration](vocabulary-configuration.md).
+
 ### Citation resolution
 
 `cprmv:isBasedOn` values are passed through when they are already full URLs,
@@ -257,14 +309,40 @@ covered by shapes that already exist.
 
 ## Verification
 
-- 12 tests in `src/utils/ttlGenerator.cellGrounding.test.js` cover emission,
-  concept dedup, compound nesting and the conformance rules; further tests in
-  `dmnHelpers.test.js` cover the reader. See [Testing](testing.md).
+- 18 tests in `src/utils/ttlGenerator.cellGrounding.test.js` cover emission,
+  concept dedup, compound nesting, the concept name and type, and the
+  conformance rules; further tests in `dmnHelpers.test.js` cover the reader.
+  See [Testing](testing.md).
 - End-to-end against the real Amsterdam HvA model: grounding applied,
   deployed, evaluated, and published live through the editor with zero DMN
-  evaluation issues and zero SHACL validation issues.
-- The 100-case MC/DC suite passes unchanged after grounding, confirming the
-  attributes stay inert to FEEL evaluation.
+  evaluation issues and zero SHACL validation issues. With the concept names
+  and types added, the model still deploys to Operaton with all 25 decisions,
+  and the generated Turtle validates against all three SHACL layers.
+- The 100-case rule-coverage suite (one case per rule) passes 100/100
+  unchanged after grounding, confirming the attributes stay inert to FEEL
+  evaluation. MC/DC — a pair of cases per condition — is the candidate method
+  [DMN-AP NL proposes for §4.4](https://github.com/sgort/ttl-editor/blob/main/docs/dmn-ap-nl-proposal.md),
+  to be tested on Participatiewet art. 36.
+
+### The Amsterdam model
+
+In `examples/organizations/amsterdam/`, all six grounded cells on Rule 1 carry
+the concept's name and type, taken from the `@concept` link in
+`HvA_annotaties.xml`. Following that link also gives `_outputentry_15` a
+citation it did not have (artikel 3). Citations added by hand earlier are
+never overwritten. `_inputentry_152` resolves to two annotations citing
+different articles (1 and 4); both are recorded through the numbered family
+rather than chosen between, so the cell emits a three-part `cprmv:hasPart` —
+the concept plus one citation each — and the choice is left to the modellers.
+
+Grounding the rest of the decision requirements graph is not mechanical. Of
+762 cells, 385 are groundable, under 80 columns; matching the columns to
+concepts gives 0 exact matches and 10 clear winners, leaving roughly 70% of
+groundable cells with no defensible automatic answer. So
+`testCases/concept-grounding-worklist.csv` lists up to three ranked candidates
+per column, with an empty `confirmed_concept_id` column for a modeller to fill
+in, and no grounding is applied from it: a wrong citation on a condition it
+does not govern is worse than none.
 
 ---
 

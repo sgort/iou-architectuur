@@ -12,7 +12,7 @@ component: CPSV Editor
 
 **To run the editor locally:**
 
-- Node.js 14 or higher
+- Node.js 24.21.0, the version pinned in the repository's `.nvmrc`
 - npm
 
 ---
@@ -34,7 +34,7 @@ To build a production bundle:
 npm run build
 ```
 
-The `build/` directory contains the static files ready for deployment.
+The `dist/` directory contains the static files ready for deployment.
 
 ---
 
@@ -79,4 +79,4 @@ If you have an existing `.ttl` file:
 
 ## Clearing the editor
 
-Click **Clear** in the header to reset all fields. A confirmation dialog prevents accidental data loss.
+Click **Clear All** in the header to reset all fields. A confirmation dialog — **Clear All Fields?** — prevents accidental data loss; confirm with **Clear All Data**.

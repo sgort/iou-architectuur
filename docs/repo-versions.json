@@ -1,19 +1,20 @@
 {
-  "docs_built": "2026-09-30",
+  "docs_built": "2026-10-02",
   "last_patch": {
-    "date": "2026-09-30",
+    "date": "2026-10-02",
     "kind": "Component sync",
-    "summary": "RONL Business API v2026.09.15 in production, with v2026.09.14 and v2026.09.13: the Caseworker board shows where a task stands in its process, every operation is documented and checked against a real response, /v1/m2m answers only allow-listed clients, and the endpoint reference gives way to the API Specification.",
+    "summary": "CPSV Editor v2026.10.0 in production: a published export survives import, export and import again, Clear Imported DMN Data also clears its concepts, grounded cells name their concept, and the DMN-AP NL proposal is linked.",
     "previous": {
-      "date": "2026-09-28",
+      "date": "2026-09-30",
       "kind": "Component sync",
-      "summary": "RONL Business API v2026.09.13 on acceptance: Flevoland employees sign in through Entra ID brokered by Keycloak, a swimlane task shows every document it carries, and deployed-BPMN derivations are cached by definition id so a redeploy is visible."
+      "summary": "RONL Business API v2026.09.15 in production, with v2026.09.14 and v2026.09.13: the Caseworker board shows where a task stands in its process, every operation is documented and checked against a real response, /v1/m2m answers only allow-listed clients, and the endpoint reference gives way to the API Specification."
     },
     "open_findings": {
       "label": "iou-architectuur#105",
       "url": "https://github.com/sgort/iou-architectuur/issues/105"
     }
   },
+
 
   "repositories": [
     {
@@ -44,16 +45,16 @@
     {
       "name": "CPSV Editor",
       "icon": "✏️",
-      "version": "v2026.09.7",
+      "version": "v2026.10.0",
       "environment": "prod",
-      "commit": "7d154ba...",
-      "commit_date": "2026-09-26",
+      "commit": "719683b...",
+      "commit_date": "2026-10-01",
       "build": {
-        "sha": "7d154ba",
-        "run": 102,
-        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/36253030787"
+        "sha": "719683b",
+        "run": 104,
+        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/36860635642"
       },
-      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/7d154ba50d9457851f358b470f90c5884bd95cc3",
+      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/719683b4edc2081e3f94ea3056db894666ad732d",
       "ci_repo": "https://github.com/sgort/ttl-editor"
     },
     {

@@ -284,6 +284,8 @@ executable, citable linked data, 286 test cases against a live engine, three pas
 documented end to end, and a defect catalogue that anyone adopting the profile can use as
 a conformance checklist.
 
+These questions are now written down as [**DMN-AP NL**](https://github.com/sgort/ttl-editor/blob/main/docs/dmn-ap-nl-voorstel.md) — a proposed Dutch application profile for OMG DMN, addressed to Forum Standaardisatie as owner of the CPRMV specification — which sets out five conformance areas, proposes a sixth (§4.6) requiring each grounded rule to cite its provision as a JuriConnect reference, and asks for a fourth modelling pass on Participatiewet article 36 to demonstrate the profile before anyone is asked to adopt it.
+
 One gap cannot be closed from this side alone: findings land with three different
 addressees, and there is **no agreed route back** to any of them.
 
@@ -299,6 +301,7 @@ Each pass is recorded in full in the CPSV Editor repository:
 | A worked example, the largest | [Amsterdam `CHANGELOG.md`](https://github.com/sgort/ttl-editor/blob/main/examples/organizations/amsterdam/CHANGELOG.md) and [its validation write-up](https://github.com/sgort/ttl-editor/blob/main/examples/organizations/amsterdam/testCases/test-cases-validation-hva.md) |
 | Cell-level legal grounding at scale | [SZW validation write-up](https://github.com/sgort/ttl-editor/blob/main/examples/organizations/szw/testCases/test-cases-validation-pw.md) |
 | A model that had to be re-derived, not patched | [Den Haag validation write-up](https://github.com/sgort/ttl-editor/blob/main/examples/organizations/den%20haag/testCases/test-cases-validation-alo.md) |
+| The three questions as a proposed standard, DMN-AP NL | [`docs/dmn-ap-nl-voorstel.md`](https://github.com/sgort/ttl-editor/blob/main/docs/dmn-ap-nl-voorstel.md) (Dutch) and [`docs/dmn-ap-nl-proposal.md`](https://github.com/sgort/ttl-editor/blob/main/docs/dmn-ap-nl-proposal.md) (English) |
 
 ---
 

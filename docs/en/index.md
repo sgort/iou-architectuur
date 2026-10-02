@@ -159,13 +159,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.09.7** · *September 2026*
+-   **✏️ CPSV Editor — v2026.10.0** · *October 2026*
 
     ---
 
-    **What ships is what was tested, and each release keeps its bill of materials**
+    **A published export survives its own round trip**
 
-    The production bundle is now built on the runner, from the tree `npm ci` installed and on the Node the tests ran on, and uploaded with `skip_app_build` — until now Oryx rebuilt it inside a floating container, so the code that passed the tests and the code that shipped were different builds. Node is one exact version, 24.20.0 from `.nvmrc`, and production moved up from 22.22.0 ([Deployment](cpsv-editor/developer/deployment.md)). Every release now commits a CycloneDX SBOM of its production dependencies, a daily audit reads the lockfiles of both `acc` and `main`, and npm itself observes the 14-day cooldown Renovate already kept. Renovate never offers a major's X.0.0, ubuntu 26.04 is deferred on record, a lockfile out of step with `package.json` fails under its own name, and the build check is now required on `acc`. The editor itself is unchanged; the [suite](cpsv-editor/developer/testing.md) still stands at 763 tests, all passing.
+    Importing a published export no longer turns its [cell-level grounding](cpsv-editor/developer/cell-level-grounding.md) into Policy rules: a cell resource, a minted concept or a citation stub is typed `cprmv:Rule` too, and only subjects under the CPRMV rule base are now read as rules — the rest stay in the preserved DMN block, and a ConceptScheme no longer doubles on every republish. A fourth end-to-end journey drives the Amsterdam export through import, export and import again and requires the two exports to match. Clear Imported DMN Data now also clears the concepts it generated. Amsterdam's grounded cells name their concept (`skos:prefLabel`, `dct:type`), taken from the annotation export, and a survey of the rest of the model ends in a work list rather than guessed citations. A Dutch application profile for DMN, DMN-AP NL, is proposed to Forum Standaardisatie. Node moves to 24.21.0, and the [suite](cpsv-editor/developer/testing.md) stands at 776 tests and four end-to-end journeys, all passing.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 

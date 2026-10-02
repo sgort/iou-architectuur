@@ -8,6 +8,26 @@ component: CPSV Editor
 
 ## Changelog
 
+### v2026.10.0 — A Published Export Survives Its Own Round Trip (October 2026)
+
+> The grounding it preserves: [Cell-Level Grounding](cell-level-grounding.md). The import rules: [DMN Implementation](dmn-implementation.md). Measured suites: [Testing](testing.md). The proposal for the standard: [DMN to Linked Data Workflow](../user-guide/dmn-workflow.md).
+
+**`cprmv:Rule` is read by subject, not by type.** In a published export, `a cprmv:Rule` types four different things: policy rules, but also DMN cell resources, minted concepts and citation stubs, because `cprmv:isBasedOn` requires its object to be a `cprmv:Rule`. The importer treated all four as Norms & Standards rules: importing the Amsterdam export turned 24 grounding resources into 24 empty Policy-tab rules and dropped them from the preserved DMN block, and a republish wrote them back as `rules/incomplete_<id>`, compounding on every cycle. Now only subjects under the CPRMV rule base become policy rules; anything else typed `cprmv:Rule` is re-typed as a DMN entity and preserved verbatim with the rest of the export. `CPRMV_RULE_BASE` lives in `utils/constants.js` and is shared by the generator and the parser, so import and export cannot drift apart. Three new tests assert values rather than parse-to-parse agreement — that agreement had been the blind spot, because both parses agreed on the same wrong answer.
+
+**A ConceptScheme no longer doubles on every republish.** `detectEntityType` returned null for `skos:ConceptScheme`, so it never closed a DMN section: once the grounding resources were preserved as DMN entities, the scheme that followed was swallowed into the preserved block while the generator emitted its own copy too — one extra scheme per round trip. It now has a type of its own.
+
+**A published export survives import, export and import again — and a test says so.** A fourth end-to-end journey imports the published Amsterdam export, writes it back, imports that and writes it back again, and requires the second export to equal the first with export timestamps blanked. That assertion is what caught the ConceptScheme regression above. The journey needs neither Operaton nor the backend, and the regenerated export is pinned as a fixture, so a published artefact that cannot survive a round trip fails the build.
+
+**Clear Imported DMN Data also clears the concepts it generated.** After importing a TTL that carries DMN data, clearing it reset the DMN but left the Concepts tab populated with inputs and outputs the service no longer had, ready to be republished. Three reset sites each held their own copy of the cleared shape, and they had drifted apart — 9, 16 and 12 fields, only two of which cleared the concepts. One `EMPTY_DMN_DATA` constant now serves all three, so Clear and Clear All also reset the validation status, validator, timestamp and note.
+
+**Amsterdam's grounded cells name their concept.** The concept-annotation export links each annotation to a concept, so a cell grounded at either end reaches the other: all six grounded cells on Rule 1 gain the concept's name and type, emitted as `skos:prefLabel` and `dct:type` on the cell resource, with the concept as the authority for the name. One output cell gains a citation it never had, hand-added citations are never overwritten, and one cell's two conflicting citations are both recorded, for the modellers to settle. The enriched model deploys with all 25 decisions, passes its 100 test cases and validates against all three SHACL layers. Extending grounding to the rest of the decision model was surveyed and left as a work list: of 762 cells, 385 are groundable, but matching the DMN's variable names to the annotation export's Dutch phrases gives no exact matches and ten clear winners, so a ranked candidate list waits for a modeller rather than a script guessing — a wrong citation is worse than none.
+
+**DMN-AP NL is proposed to Forum Standaardisatie.** Three questions that modelling three regulations raised cannot be settled by an implementer, because each is about what the standard should require. The repository now carries a proposed Dutch application profile on OMG DMN, in Dutch and English, with five conformance areas and a fourth modelling pass on Participatiewet article 36 to test it — including whether MC/DC can establish that every condition can change an outcome, which the three completed passes, at rule coverage, did not.
+
+**Also in this release.** Node moves to 24.21.0, in `.nvmrc` and the dependency-audit, SBOM and zizmor workflows together; `zizmor-action` moves to v0.6.4 with its register row in `SECURITY-PIPELINE.md` updated on the same branch. Vite 8.3.0, `lucide-react` 1.47.0, Prettier 3.9.7, `lint-staged` 17.5.1, `@testing-library/dom` 10.4.2, `@babel/parser` 8.0.5, `autoprefixer` 10.6.1 and a scheduled lock-file refresh.
+
+---
+
 ### v2026.09.7 — What Ships Is What Was Tested, and Each Release Keeps Its Bill of Materials (September 2026)
 
 > How it deploys now: [Deployment](deployment.md). The mechanism across repositories: [Supply-Chain Pinning](../../contributing/supply-chain.md) and [ICTU Dependency Guideline](../../contributing/ictu-dependency-guideline.md). Measured suites: [Testing](testing.md). No change in the editor itself — the release is CI and supply-chain work.
@@ -263,6 +283,12 @@ The step goes in the **`audit` job**, not the deploy workflows — those carry `
 **The DMN tab's Base URL follows `REACT_APP_OPERATON_URL` in development.** `apiConfig.baseUrl` now reads that variable, falling back to the production instance, instead of hardcoding the shared Operaton URL — without it, local development silently pointed at the shared ACC/PROD engine rather than a local Docker container.
 
 **Amsterdam HvA reference DMN: deploy blockers, FEEL fixes and a 100-case MC/DC suite.** The `HvA_full_dmn_export.dmn` reference export was brought to a deployable, evaluable state, and the fixes double as standing guidance for DMN authors — see the [DMN Tab](../user-guide/dmn-tab.md) tips and [DMN Testing](../user-guide/dmn-testing.md) troubleshooting. Deployment was blocked by a missing `camunda:historyTimeToLive` and 48 unescaped `&` characters in `knowledgeSource` URLs. Evaluation was blocked by multi-word FEEL bare names — Operaton's feel-scala engine consumes only the first word and throws `FEEL/SCALA-01008` — and by `<dmn:output>` elements declaring only `label` and no `name`, which makes evaluation throw a blank, unlogged exception. Malformed rule cells (`not -` on boolean columns, `not(null) -` on string columns, bare `and`-joined comparisons, and an unparenthesised `not "met partner"`) were rewritten, and two decisions that defaulted to `hitPolicy="UNIQUE"` while carrying a wildcard default rule were corrected to `FIRST`. A test suite now covers every one of the 99 rules across all 25 decisions with one empirically-verified case each (100 cases, run live), and `extract-legal-sources.py` resolves each decision's `authorityRequirement` → `knowledgeSource` links against the annotation registry — 97 of 99 resolve cleanly across 14 source documents and 23 distinct JuriConnect citations.
+
+!!! note "Correction, October 2026"
+    The 100 cases are **rule coverage** — one case per rule — not MC/DC, as the Amsterdam
+    validation document itself says. MC/DC is the candidate method the DMN-AP NL
+    proposal (v2026.10.0) puts forward for its §4.4, to be tested on Participatiewet
+    article 36.
 
 ---
 
@@ -580,6 +606,8 @@ Initial release. React + Tailwind CSS web application. Five-tab interface: Servi
 | Release SBOM (CycloneDX), committed and uploaded | v2026.09.7 |
 | Daily dependency audit of `acc` and `main` | v2026.09.7 |
 | ACC build check required on `acc` | v2026.09.7 |
+| Published exports survive import → export → import, read by subject against the CPRMV rule base | v2026.10.0 |
+| [Cell grounding names its concept](cell-level-grounding.md) (`skos:prefLabel`, `dct:type`) | v2026.10.0 |
 
 ---
 
