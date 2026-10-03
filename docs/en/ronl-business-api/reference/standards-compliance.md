@@ -24,7 +24,7 @@ The root banner's `security.compliance` list (`BIO`, `NEN 7510`, `AVG/GDPR`, `eI
 
 ## API design rules
 
-The NL API Design Rules are applied as a Spectral lint of the published description `/v1/openapi.json`, against a vendored copy of the 2.2.1 ruleset, in both backend workflows. Every rule gates except the recorded deviations: `nlgov:semver` is off because releases are CalVer, and the three problem-details rules are off because errors use the API's own `{ success, error }` envelope rather than `application/problem+json`. See [API Design — Published description](../features/api-design.md#published-description).
+The NL API Design Rules are applied as a Spectral lint of the published description `/v1/openapi.json`, against a vendored copy of the 2.2.1 ruleset, in both backend workflows. Every rule gates except the recorded deviations: `nlgov:semver` is off because releases are CalVer, and `nlgov:use-problem-schema` is off for the one response that is an HTML page for a person rather than an API error — the stub ValidSign ceremony's failed signing. See [API Design — Published description](../features/api-design.md#published-description).
 
 | Rule | Applied in RONL |
 |---|---|
@@ -32,8 +32,10 @@ The NL API Design Rules are applied as a Spectral lint of the published descript
 | **API-20**: Major version in URI | `/v1/*`; the OpenAPI `servers` entry carries `/v1` |
 | **API-48**: No trailing slashes | No documented path ends in a slash, which Spectral checks. Express's default routing still answers a request with a trailing slash |
 | **API-51** (`/core/publish-openapi`): Publish an OpenAPI description | `GET /v1/openapi.json` — OpenAPI 3.1, open to every origin, advertised as `documentation` in the root banner |
-| **API-53**: Hide implementation details | Operaton's REST API is not exposed directly; the backend serves its own smaller surface. Process instance, definition and task ids are Operaton's own, and a failed process start reports Operaton's error message and the engine URL. The citizen start form shows that detail on screen outside production only; the production build shows a generic message |
+| **API-53**: Hide implementation details | Operaton's REST API is not exposed directly; the backend serves its own smaller surface. Process instance, definition and task ids are Operaton's own, and a failed process start reports Operaton's error message and the engine URL, in the problem's `details` and `engine` extension members. The citizen start form shows that detail on screen outside production only; the production build shows a generic message |
 | **API-54**: Plural/singular naming | Not uniform. The execution core is singular (`/v1/process`, `/v1/task`, `/v1/decision`); other mounts use plural collections (`/v1/edocs/documents`, `/v1/pa/dossiers`, `/v1/public/processen`) |
+| **`/core/error-handling/problem-details`**: Errors as RFC 9457 problem details | Every 4xx and 5xx is `application/problem+json` with `type`, `status`, `title`, `detail` and `instance`, plus a `code` extension member; the one exception is the stub ValidSign ceremony's HTML failure page |
+| **`/core/error-handling/invalid-input`**: A 400 for invalid input | Every write, and every read or delete that takes parameters, documents a `400`; a body that does not parse answers `400 MALFORMED_BODY` on any operation |
 | **API-57**: Version header in responses | `API-Version` on every response, carrying the CalVer release (e.g. `2026.09.12`) |
 
 Reference: [Nederlandse API Strategie](https://docs.geostandaarden.nl/api/API-Strategie/)
@@ -63,10 +65,11 @@ Reference: [Nederlandse API Strategie](https://docs.geostandaarden.nl/api/API-St
 | Express | MIT |
 | React | MIT |
 | PostgreSQL | PostgreSQL Licence |
-| Redis | BSD 3-Clause |
+| Redis, local development (`redis:7.2-alpine`, Redis 7.2) | BSD 3-Clause |
+| Azure Cache for Redis, acceptance and production (Redis 6.0) | BSD 3-Clause (open-source Redis, run as a managed Azure service) |
 | Caddy | Apache 2.0 |
 
-The API's own dependencies use government-compatible open source licences. The running service also relies on proprietary services: the backend does not boot without an Anthropic API key, and it is hosted on Azure App Service.
+The API's own dependencies use government-compatible open source licences. Redis is held below 7.4 on purpose: from 7.4 its releases are licensed RSALv2/SSPLv1 rather than BSD 3-Clause. The running service also relies on proprietary services: the backend does not boot without an Anthropic API key, and it is hosted on Azure App Service.
 
 ---
 

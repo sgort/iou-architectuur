@@ -21,11 +21,11 @@ This page documents the three distinct ways to access Operaton within the RONL e
 │  (web UI)        │  (native REST)       │  (/v1/m2m/*)          │
 ├──────────────────┼──────────────────────┼───────────────────────┤
 │  operaton-doc    │  operaton-doc        │  RONL Business API    │
-│  directly        │  directly            │  → operaton-doc       │
+│  directly        │  directly            │  → main engine        │
 └──────────────────┴──────────────────────┴───────────────────────┘
 ```
 
-The key insight: Patterns 1 and 2 talk **directly to Operaton**. Pattern 3 talks to the **RONL Business API**, which in turn proxies to Operaton. These are not interchangeable — the path structures, authentication mechanisms, and response shapes are all different.
+The key insight: Patterns 1 and 2 talk **directly to Operaton**. Pattern 3 talks to the **RONL Business API**, which in turn proxies to Operaton — to the main engine (`OPERATON_BASE_URL`) the tenant-scoped routes use, not to `operaton-doc`. These are not interchangeable — the path structures, authentication mechanisms, and response shapes are all different.
 
 ---
 
@@ -107,11 +107,11 @@ The RONL Business API exposes a curated subset of Operaton operations through it
 | `GET /task` | `GET /v1/m2m/task` |
 | `GET /task/{id}` | `GET /v1/m2m/task/:id` |
 | `GET /process-instance` | `GET /v1/m2m/process` |
-| `POST /history/process-instance` | `GET /v1/m2m/process/history` |
+| `POST /history/process-instance` | `POST /v1/m2m/process/history` (the `GET` spelling still answers, deprecated, with a `Deprecation` header) |
 | `POST /decision-definition/key/:key/evaluate` | `POST /v1/m2m/decision/:key/evaluate` |
 | `GET /process-instance/:id/variables` | `GET /v1/m2m/process/:id/variables` |
 
-There is no `/v1/m2m/process-instance`, `/v1/m2m/process-definition`, or `/v1/m2m/history` — these `engine-rest` paths have no equivalent in the M2M layer.
+There is no `/v1/m2m/process-instance`, `/v1/m2m/process-definition`, or `/v1/m2m/history` — these `engine-rest` paths have no equivalent in the M2M layer. Because Pattern 3 reaches the main engine, it sees the same definitions and instances as the caseworker routes, across every organisation.
 
 The `M2M_ALLOWED_OPERATIONS` constant in `m2m.routes.ts` acts as a curation gate — any operation not in the list returns `403 OPERATION_NOT_PERMITTED` regardless of what Operaton supports. This is intentional: it gives platform operators control over what M2M callers can do without changing authentication or deployment configuration. It is the second of two gates: `M2M_ALLOWED_CLIENTS` decides who may call the surface at all, and `M2M_ALLOWED_OPERATIONS` what an admitted caller may do.
 

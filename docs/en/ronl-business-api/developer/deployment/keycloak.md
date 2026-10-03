@@ -394,57 +394,35 @@ Follow the same steps using `deployment/vm/keycloak/prod/` and hostname `keycloa
 
 ## Realm import
 
-The `ronl-realm.json` is imported on the first container start via the `--import-realm` flag in `docker-compose.yml`. It configures:
+`docker-compose.yml` starts Keycloak with `--import-realm` and mounts `ronl-realm.json` into `/opt/keycloak/data/import/`. Keycloak imports the file only when the realm `ronl` does not exist yet — on a new environment's first start. It configures:
 
 - **Realm `ronl`** with brute-force protection
-- **Client `ronl-business-api`** with PKCE and CORS settings
-- **Protocol mappers:**
-  - `municipality` (user attribute)
-  - `roles` (realm roles)
-  - `loa` (assurance level - user attribute)
-- **Test users** with per-municipality attributes
-- **Token lifespans:**
-  - Access token: 15 minutes
-  - SSO session: 30 minutes
-  - Refresh token: 30 minutes
+- **Client `ronl-business-api`** (public) and the machine-to-machine clients
+- **Protocol mappers** for the tenant (`municipality`, `organisation_type`), the assurance level (`loa`), the realm roles, the employee id and the signer's name and e-mail address
+- **Realm roles** and **test users** with per-municipality attributes
+- **Token lifespans:** access token 15 minutes, SSO session idle 30 minutes, SSO session max 10 hours
 
-### Re-importing the realm
+The full contents are listed in [Keycloak Realm Configuration](../../reference/keycloak-realm.md).
 
-After modifying `config/keycloak/ronl-realm.json`:
+### Changing the realm on ACC and PROD
 
-!!! note "v2.6.0 — RIP Phase 1 roles"
-    This release adds two realm roles (`infra-projectteam`, `infra-medewerker`) and one test user (`test-infra-flevoland`). Re-import the realm on both ACC and PROD before deploying the updated frontend and backend.
+ACC and PROD are **not** re-imported after `config/keycloak/ronl-realm.json` changes. Once a realm exists, an import either skips what is already there or, with `--override true`, replaces the realm and discards what the environment configured by hand — redirect URIs, web origins, client secrets, the Entra identity provider, and the roles granted to employees.
+
+Changes reach those realms through the admin REST API instead, with the idempotent scripts in `scripts/`:
+
+| Change | Script |
+|---|---|
+| New realm roles, such as `rip-*` or `besluit-*` | `keycloak-add-rip-roles.sh`, with `ROLE_PREFIX` for roles other than `rip-` |
+| The `email`, `given_name` and `family_name` token claims for ValidSign | `keycloak-add-token-claim-mappers.sh` |
+| The Entra ID identity provider for Flevoland | `keycloak-add-entra-idp.sh` |
 
 ```bash
-# On localhost root dir
-scp config/keycloak/ronl-realm.json user@your-vm:~/keycloak/acc/ or /prod/
-
-# On the VM, for ACC
-# Copy the updated realm file to the container
-docker cp ~/keycloak/acc/ronl-realm.json keycloak-acc:/tmp/ronl-realm.json
-
-# Import with override
-docker exec keycloak-acc /opt/keycloak/bin/kc.sh import \
-  --file /opt/keycloak/data/import/ronl-realm.json \
-  --override true
-
-# Restart to apply
-cd ~/keycloak/acc
-docker compose restart keycloak-acc
-
-# On the VM, for PROD
-# Copy the updated realm file to the container
-docker cp ~/keycloak/prod/ronl-realm.json keycloak-prod:/tmp/ronl-realm.json
-
-# Import with override
-docker exec keycloak-prod /opt/keycloak/bin/kc.sh import \
-  --file /opt/keycloak/data/import/ronl-realm.json \
-  --override true
-
-# Restart to apply
-cd ~/keycloak/prod
-docker compose restart keycloak-prod
+# From a checkout of ronl-business-api, in Git Bash. Creates the five besluit-* roles;
+# GRANT_USER empty grants them to nobody (its default is test-infra-flevoland).
+KEYCLOAK_URL=https://acc.keycloak.open-regels.nl ROLE_PREFIX=besluit- GRANT_USER=   bash scripts/keycloak-add-rip-roles.sh
 ```
+
+Each script prompts for the Keycloak admin password when `ADMIN_PASSWORD` is unset; `keycloak-add-rip-roles.sh` and `keycloak-add-entra-idp.sh` also accept `--dry-run`. Test users and per-user roles are added in the admin console. See [Entra ID — Rolling out to an environment](entra-id.md#rolling-out-to-an-environment) for the order in which to run them.
 
 ---
 

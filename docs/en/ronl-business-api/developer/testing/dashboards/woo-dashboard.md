@@ -15,12 +15,13 @@ reassurance.
 
 ## Frontend
 
-Re-derived on **30 September 2026** at `ae06c9e` (v2026.09.15). The frontend
-package was measured the same day — 120 files, 1318 tests, all passing — but
-Vitest's console reports only that total, so the counts below are taken from
-the source, each test file parsed with its `.each` tables expanded; summed
-over the whole package the method gives exactly the runner's 1318. The figures
-this page carried before were derived on 30 August.
+Re-derived on **3 October 2026** at `0625d48` (v2026.10.0), where every count
+and coverage figure below is the same as on 30 September — v2026.10.0 did not
+touch this board. The frontend package was measured the same day — 124 files,
+1378 tests, all passing — but Vitest's console reports only that total, so the
+counts below are taken from the source, each test file parsed with its `.each`
+tables expanded; summed over the whole package the method gives exactly the
+runner's 1378.
 
 | Area | Files | Tests |
 |---|---:|---:|
@@ -49,7 +50,7 @@ this page carried before were derived on 30 August.
 `woo.data.test.ts` (+4) and `WooDashboard.test.tsx` (+3) grew in v2026.09.15's
 branch-margin work; the other counts are as they were on 28 September.
 
-Coverage on 30 September: `components/WooDashboard`
+Coverage on 3 October, as on 30 September: `components/WooDashboard`
 **98.26 / 94.78 / 98.52 / 98.57** and `pages/woo` **99.13 / 100 / 100 / 99** —
 the latter up from 96.55 / 84.12 / 94.44 / 98.01.
 
@@ -71,8 +72,10 @@ the latter up from 96.55 / 84.12 / 94.44 / 98.01.
 ## E2E
 
 **None.** There is no Playwright spec that drives this board — verified against
-`packages/frontend/e2e/` on 30 August 2026 and again at `ae06c9e` on
-30 September, not inferred from a changelog. It is
+`packages/frontend/e2e/` on 30 August 2026, at `ae06c9e` on 30 September and
+in the full frontend run of 3 October, whose 28 tests include none that
+drives this board (`login-redirect` only checks that `test-woo-flevoland`
+lands on it) — not inferred from a changelog. It is
 now the only board in that position; see
 [Coverage per board](../e2e.md#coverage-per-board).
 

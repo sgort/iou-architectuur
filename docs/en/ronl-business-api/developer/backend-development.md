@@ -33,6 +33,7 @@ packages/backend/
     │   ├── process.routes.ts     # /v1/process
     │   ├── decision.routes.ts    # /v1/decision
     │   ├── task.routes.ts        # /v1/task
+    │   ├── besluitvorming.routes.ts  # /v1/besluitvorming: active and completed besluiten
     │   ├── brp.routes.ts, hr.routes.ts, capacity.routes.ts, public.routes.ts
     │   ├── rip.routes.ts, edocs.routes.ts, doccle.routes.ts, validsign.routes.ts
     │   └── admin.routes.ts, m2m.routes.ts, mcp.routes.ts
@@ -45,6 +46,7 @@ packages/backend/
     ├── middleware/
     │   ├── version.middleware.ts # API-Version response header
     │   ├── audit.middleware.ts   # Audit entry per request, and auditLog()
+    │   ├── error.middleware.ts   # 404, body-parser refusals, the last error handler, the rate-limit 429
     │   └── tenant.middleware.ts  # Municipality claim extraction and validation
     ├── auth/
     │   ├── jwt.middleware.ts     # JWT validation, role and assurance-level guards
@@ -52,10 +54,11 @@ packages/backend/
     ├── pa-monitoring/            # Policy analysis: /v1/pa routers, sources, curation
     ├── media-aggregator/         # /v1/media-aggregator
     ├── rip-swimlane/             # BPMN swimlane parsing: Infra-board phases and any laned process
+    │   └── __fixtures__/         # RIP processes; awb/ (Awb-phase processes); declared/ (processes that declare their own phases)
     ├── mcp-servers/              # eDOCS, LDE and TriplyDB MCP servers
     ├── services/                 # Operaton, audit, eDOCS, ValidSign, Doccle, … plus llm/, mcp/, document/
     ├── types/                    # audit.types.ts, auth.types.ts
-    └── utils/                    # config, cors-origin, client-ip, logger, errors, …
+    └── utils/                    # config, cors-origin, client-ip, logger, errors, problem (sendProblem), …
 ```
 
 Tests sit beside the file they cover as `*.test.ts`.
@@ -68,7 +71,7 @@ Middleware is registered in this order in `src/index.ts`:
 
 1. `helmet()` — security headers (CSP, HSTS), only when `config.security.helmetEnabled`
 2. `cors()` — `origin` is `corsOriginCallback(...)`; see [CORS](#cors)
-3. `rateLimit()` — one global limiter, skipped for the ValidSign callback path, which has its own
+3. `rateLimit()` — one global limiter, skipped for the ValidSign callback path, which has its own; its 429 is `rateLimitHandler` from `error.middleware.ts`
 4. `express.json({ limit: '1mb' })` — wrapped so the ValidSign callback path skips it and parses its own body
 5. `express.urlencoded({ limit: '1mb' })`
 6. Request logging — method, path, query, IP, user agent
@@ -76,8 +79,10 @@ Middleware is registered in this order in `src/index.ts`:
 8. `auditMiddleware` — writes an audit entry once the response is sent
 9. The root router at `/` — the service banner
 10. The route registry — `app.use(mount, router)` for each entry of `routes/registry.ts`, in array order
-11. 404 handler — `NOT_FOUND`
-12. Error handler — `INTERNAL_ERROR`, with the message hidden when `NODE_ENV` is `production`
+11. `notFoundHandler` from `error.middleware.ts` — `404 NOT_FOUND`
+12. `errorHandler` from `error.middleware.ts` — a body the parser refused answers `400 MALFORMED_BODY` (does not parse), `413 PAYLOAD_TOO_LARGE` (over the limit) or `INVALID_BODY` (any other body-parser refusal, keeping its 4xx status); anything else is `500 INTERNAL_ERROR`, with the message hidden when `NODE_ENV` is `production`
+
+Every error the API sends, these included, is RFC 9457 problem details, written with `sendProblem` from `utils/problem.ts` (`buildProblem` gives the body alone). The one exception is the stub ValidSign ceremony's failed signing, an HTML page. See [API Design — Error handling](../features/api-design.md#error-handling).
 
 JWT validation (`jwt.middleware.ts`) is applied per router or per route, not globally. Public endpoints (e.g. `GET /v1/health`) do not require authentication.
 
@@ -92,9 +97,11 @@ A route is one entry in `src/routes/registry.ts`. That array drives three things
 ```typescript
 import { Router, Request, Response } from 'express';
 import { jwtMiddleware } from '@auth/jwt.middleware';
-import logger from '@utils/logger';
+import { createLogger } from '@utils/logger';
+import { sendProblem } from '@utils/problem';
 
 const router = Router();
+const logger = createLogger('myfeature-routes');
 
 router.use(jwtMiddleware);
 
@@ -102,8 +109,14 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     res.json({ success: true, data: { ... } });
   } catch (error) {
-    logger.error('myfeature error', error);
-    res.status(500).json({ success: false, error: { code: 'ERROR', message: String(error) } });
+    logger.error('myfeature error', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    sendProblem(res, req, {
+      status: 500,
+      code: 'MYFEATURE_FAILED',
+      detail: 'Failed to load myfeature',
+    });
   }
 });
 
@@ -162,13 +175,15 @@ For configuration and live-mode switchover, see [Copilot Studio — eDOCS OAuth 
  
 ## M2M route group
  
-`m2m.routes.ts` exposes 18 Operaton operations to machine-to-machine clients without tenant scoping. It applies `jwtMiddleware` and then `requireM2mClient` — `tenantMiddleware` is intentionally absent.
+`m2m.routes.ts` exposes 18 Operaton operations, on 19 routes, to machine-to-machine clients without tenant scoping — process history answers both `POST /v1/m2m/process/history` and a deprecated `GET` that sends a `Deprecation` header. It applies `jwtMiddleware` and then `requireM2mClient` — `tenantMiddleware` is intentionally absent.
 
 `requireM2mClient` admits only a token whose `azp` is on `M2M_ALLOWED_CLIENTS` (comma-separated; default `operaton-mcp-client`). Every person in the realm holds a token for the `ronl-business-api` audience, so a valid token is not enough: anything else, a person's token included, gets `403 M2M_CLIENT_NOT_ALLOWED` before any engine call.
 
 A `M2M_ALLOWED_OPERATIONS` constant at the top of the file controls which operations are active. Commenting out an entry returns `403 OPERATION_NOT_PERMITTED` for that operation with no other code changes required.
 
-The route group gets its own `OperatonService` built from `config.operaton.m2mBaseUrl`. That value is `OPERATON_M2M_BASE_URL`, or `https://operaton-doc.open-regels.nl/engine-rest` when the variable is unset, so the `: operatonService` branch below is reached only if the config default is removed:
+A start refuses a body that sets `municipality` or `originTenantId`, and a task completion one that sets `municipality`, `originTenantId` or `applicantId`: both answer `400 RESERVED_VARIABLE`, with the refused names in a `reserved` extension member, before any engine call.
+
+The route group uses the main engine. `config.operaton.m2mBaseUrl` is `OPERATON_M2M_BASE_URL`, empty when the variable is unset — which it is on every tier — so the `: operatonService` branch below is the one taken. Setting the variable points M2M at a different engine on purpose:
  
 ```typescript
 const m2mOperatonService = config.operaton.m2mBaseUrl

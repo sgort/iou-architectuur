@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # BRP API Endpoints - API Reference
 
 **Base URL (ACC):** `https://acc.api.open-regels.nl/v1`  
@@ -10,15 +14,16 @@
 
 1. [Authentication](#authentication)
 2. [POST /brp/personen](#post-brppersonen)
-3. [POST /brp/verblijfplaatshistorie](#post-brpverblijfplaatshistorie) (Future)
-4. [Error Responses](#error-responses)
-5. [Test Data & BSN Mapping](#test-data-bsn-mapping)
+3. [Error Responses](#error-responses)
+4. [Test Data & BSN Mapping](#test-data-bsn-mapping)
+
+`POST /v1/brp/personen` is the only BRP operation the API serves. It forwards the request body to the Haal Centraal BRP mock at `https://brp-api-mock.open-regels.nl/haalcentraal/api/brp`.
 
 ---
 
 ## Authentication
 
-All BRP endpoints require a valid JWT token from Keycloak.
+The endpoint requires a valid JWT token from Keycloak. It checks the token and nothing else: no role, tenant or assurance-level check applies.
 
 ### Request Headers
 
@@ -36,22 +41,17 @@ Content-Type: application/json
   "bsn": "999992235",
   "municipality": "utrecht",
   "loa": "hoog",
-  "roles": ["citizen"],
+  "realm_access": { "roles": ["citizen"] },
   "exp": 1771757983
 }
 ```
 
-**Required Claims:**
+The backend reads `sub`, `municipality`, `loa` and the realm roles into the request's user, but the BRP route does not act on them. The BSN to query comes from the request body, not from the token.
 
-- `sub` - User identifier (UUID)
-- `municipality` - Tenant identifier
-- `loa` - Level of Assurance (must be "hoog" for timeline access)
-- `roles` - Must include "citizen" or "caseworker"
+The frontend picks that BSN from the token:
 
-**Optional Claims:**
-
-- `preferred_username` - Used for test BSN mapping
-- `bsn` - Burgerservicenummer (production only, from DigiD)
+- `bsn` - Burgerservicenummer, when the token carries one (DigiD)
+- `preferred_username` - otherwise, mapped to a test BSN (see [Test Data & BSN Mapping](#test-data-bsn-mapping))
 
 ---
 
@@ -221,21 +221,26 @@ POST /v1/brp/personen
 
 ### Response - Error
 
+Errors are RFC 9457 problem details (`application/problem+json`). When the BRP API answers a 4xx, the endpoint answers with that same status, code `BRP_API_ERROR`, and the upstream body in a `details` extension member:
+
 ```json
 {
-  "success": false,
-  "error": {
-    "code": "BRP_API_ERROR",
-    "message": "BRP API returned an error",
-    "details": {
-      "type": "https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4",
-      "title": "Persoon niet gevonden",
-      "status": 404,
-      "detail": "De gevraagde resource is niet gevonden"
-    }
-  }
+  "details": {
+    "type": "https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4",
+    "title": "Persoon niet gevonden",
+    "status": 404,
+    "detail": "De gevraagde resource is niet gevonden"
+  },
+  "type": "about:blank",
+  "status": 404,
+  "title": "Brp api error",
+  "detail": "BRP API returned an error",
+  "instance": "/v1/brp/personen",
+  "code": "BRP_API_ERROR"
 }
 ```
+
+The upstream body above is illustrative; `details` carries whatever the BRP API returned.
 
 ### Example Request (cURL)
 
@@ -282,7 +287,7 @@ const response = await fetch('https://acc.api.open-regels.nl/v1/brp/personen', {
 
 const data = await response.json();
 
-if (data.success) {
+if (response.ok) {
   const person = data.data.personen[0];
   console.log('Person:', person.naam.volledigeNaam);
   console.log('Age:', person.leeftijd);
@@ -346,118 +351,31 @@ const fetchPerson = async (bsn: string, token: string): Promise<PersonState | nu
 
 ### Rate Limits
 
-- **Per User:** 100 requests per hour
-- **Per Tenant:** 1000 requests per hour
-- **Burst:** 10 requests per second
+The endpoint has no limit of its own. It shares the API's global limiter: by default 1,000 requests per minute per client IP (`RATE_LIMIT_MAX_REQUESTS`, `RATE_LIMIT_WINDOW_MS`). The limiter sends the standard `RateLimit-*` headers, not `X-RateLimit-*`.
 
-Rate limit headers in response:
+### Logging
 
-```http
-X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 95
-X-RateLimit-Reset: 1771760000
-```
-
-### Audit Logging
-
-All requests are logged with:
-
-- `userId` - From JWT sub claim
-- `tenantId` - From JWT municipality claim
-- `timestamp` - Request timestamp
-- `bsn` - Queried BSN (masked in logs: `999-99-2235`)
-- `result` - "success" or "error"
-- `duration` - Request duration in ms
-
-Logs retained for 7 years per AVG/GDPR compliance.
-
----
-
-## POST /brp/verblijfplaatshistorie
-
-**Status:** 🚧 Future Implementation
-
-Fetch address history for a person.
-
-### Endpoint
-
-```
-POST /v1/brp/verblijfplaatshistorie
-```
-
-### Request Body
-
-```json
-{
-  "type": "RaadpleegMetPeriode",
-  "burgerservicenummer": ["999992235"],
-  "datumVan": "2000-01-01",
-  "datumTot": "2023-12-31"
-}
-```
-
-### Response - Success
-
-```json
-{
-  "success": true,
-  "data": {
-    "verblijfplaatshistorie": [
-      {
-        "datumVan": {
-          "datum": "2020-05-15",
-          "langFormaat": "15 mei 2020"
-        },
-        "datumTot": {
-          "datum": "2023-08-20",
-          "langFormaat": "20 augustus 2023"
-        },
-        "verblijfadres": {
-          "straat": "Kalverstraat",
-          "huisnummer": 92,
-          "postcode": "1012 PH",
-          "woonplaats": "Amsterdam"
-        },
-        "gemeenteVanInschrijving": {
-          "code": "0363",
-          "omschrijving": "Amsterdam"
-        }
-      }
-    ]
-  }
-}
-```
+- A successful lookup writes the audit entry `brp.personen.fetch`, which records the queried BSN on purpose; a failed one writes the same action with the error.
+- The application log never carries the request body, the upstream body or a BSN: it records the user, the tenant, the query type and how many BSNs were asked for.
 
 ---
 
 ## Error Responses
 
-### Standard Error Format
+### Problem details
 
-```json
-{
-  "success": false,
-  "error": {
-    "code": "ERROR_CODE",
-    "message": "Human-readable error message",
-    "details": {}
-  }
-}
-```
+Every error is RFC 9457 problem details, served as `application/problem+json`: `type` (`about:blank`), `status`, `title` (derived from the code), `detail` and `instance` (the request path), plus a `code` extension member. See [API Design — Error handling](../features/api-design.md#error-handling).
 
 ### Error Codes
 
 | HTTP Status | Code | Description | Solution |
 |-------------|------|-------------|----------|
-| 400 | `INVALID_REQUEST` | Malformed request body | Check request format |
+| 400 | `MALFORMED_BODY` | The request body is not valid JSON | Check request format |
+| 401 | `MISSING_TOKEN` | No `Authorization: Bearer` header | Send the token |
 | 401 | `INVALID_TOKEN` | JWT token invalid or expired | Re-authenticate |
-| 403 | `INSUFFICIENT_PERMISSIONS` | User lacks required roles | Check user roles in Keycloak |
-| 403 | `INSUFFICIENT_ASSURANCE` | LoA too low (not "hoog") | Upgrade to DigiD with higher LoA |
-| 404 | `PERSON_NOT_FOUND` | BSN not found in BRP | Verify BSN number |
-| 406 | `NOT_ACCEPTABLE` | Missing Accept header | Add `Accept: application/json` |
-| 429 | `RATE_LIMIT_EXCEEDED` | Too many requests | Wait and retry after `X-RateLimit-Reset` |
-| 500 | `BRP_API_ERROR` | External BRP API failure | Retry or contact support |
-| 503 | `SERVICE_UNAVAILABLE` | Backend service down | Check system status |
+| 4xx | `BRP_API_ERROR` | The BRP API refused the request; the status is the BRP API's own, its body is in `details` | Check the query against the BRP API |
+| 429 | `RATE_LIMIT_EXCEEDED` | Too many requests | Wait and retry after the `RateLimit-Reset` seconds |
+| 5xx | `BRP_API_ERROR` | The BRP API failed or could not be reached; the status is the BRP API's own, or `500` when there was no response | Retry or contact support |
 
 ### Example Error Responses
 
@@ -465,41 +383,27 @@ POST /v1/brp/verblijfplaatshistorie
 
 ```json
 {
-  "success": false,
-  "error": {
-    "code": "INVALID_TOKEN",
-    "message": "Token validation failed"
-  }
+  "type": "about:blank",
+  "status": 401,
+  "title": "Invalid token",
+  "detail": "Token validation failed",
+  "instance": "/v1/brp/personen",
+  "code": "INVALID_TOKEN"
 }
 ```
 
-#### 403 Insufficient Assurance
+#### BRP API unreachable
+
+When the call to the BRP API fails without a response, `detail` carries the error message and there is no `details` member:
 
 ```json
 {
-  "success": false,
-  "error": {
-    "code": "INSUFFICIENT_ASSURANCE",
-    "message": "Assurance level 'hoog' or higher required"
-  }
-}
-```
-
-#### 404 Person Not Found
-
-```json
-{
-  "success": false,
-  "error": {
-    "code": "BRP_API_ERROR",
-    "message": "BRP API returned an error",
-    "details": {
-      "type": "https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4",
-      "title": "Persoon niet gevonden",
-      "status": 404,
-      "detail": "De persoon met opgegeven burgerservicenummer is niet gevonden"
-    }
-  }
+  "type": "about:blank",
+  "status": 500,
+  "title": "Brp api error",
+  "detail": "timeout of 10000ms exceeded",
+  "instance": "/v1/brp/personen",
+  "code": "BRP_API_ERROR"
 }
 ```
 
@@ -507,11 +411,12 @@ POST /v1/brp/verblijfplaatshistorie
 
 ```json
 {
-  "success": false,
-  "error": {
-    "code": "RATE_LIMIT_EXCEEDED",
-    "message": "Rate limit exceeded. Try again after 1771760000"
-  }
+  "type": "about:blank",
+  "status": 429,
+  "title": "Rate limit exceeded",
+  "detail": "Too many requests, please try again later",
+  "instance": "/v1/brp/personen",
+  "code": "RATE_LIMIT_EXCEEDED"
 }
 ```
 
@@ -521,18 +426,20 @@ POST /v1/brp/verblijfplaatshistorie
 
 ### Test Environment BSN Mapping
 
-In development and ACC environments, test users are mapped to BSN numbers via their Keycloak username.
+A token without a `bsn` claim is mapped to a test BSN by its Keycloak username, in the frontend's `services/bsn.mapping.ts`.
 
 #### Available Test Personas
 
 | Username | BSN | Municipality | Description |
 |----------|-----|--------------|-------------|
 | `test-citizen-utrecht` | 999992235 | utrecht | Wessel Kooyman (45 jaar, getrouwd, 3 kinderen) |
+| `test-caseworker-utrecht` | 999992235 | utrecht | Same persona |
 | `test-citizen-amsterdam` | 999992235 | amsterdam | Same persona, Amsterdam tenant |
 | `test-citizen-rotterdam` | 999992235 | rotterdam | Same persona, Rotterdam tenant |
 | `test-citizen-denhaag` | 999992235 | denhaag | Same persona, Den Haag tenant |
+| `test-citizen-flevoland` | 999992235 | flevoland | Same persona, Flevoland tenant |
 
-**Note:** All test users currently map to the same persona (Wessel Kooyman). In future, additional personas with different life situations will be added.
+**Note:** All mapped test users share one persona (Wessel Kooyman). Any other username without a `bsn` claim gets no BSN.
 
 ### Test BSN: 999992235 (Wessel Kooyman)
 
@@ -582,36 +489,25 @@ The test persona has 3 major life events:
 const bsn = user.bsn; // From JWT claim
 ```
 
-**Test/ACC Environment:**
+**Without a `bsn` claim** (`packages/frontend/src/services/bsn.mapping.ts`):
 ```typescript
-// BSN derived from username or municipality
-function getUserBSN(user) {
-  // 1. Check JWT for BSN (production)
-  if (user.bsn) return user.bsn;
-  
-  // 2. Map by username (test users)
-  const usernameMapping = {
-    'test-citizen-utrecht': '999992235',
-    'test-citizen-amsterdam': '999992235',
-    // ... other mappings
-  };
-  
-  if (user.preferred_username in usernameMapping) {
-    return usernameMapping[user.preferred_username];
+export function getUserBSN(user: {
+  sub: string;
+  preferred_username?: string;
+  bsn?: string;
+}): string | null {
+  // If BSN is in the JWT (production with DigiD), use it
+  if (user.bsn) {
+    return user.bsn;
   }
-  
-  // 3. Fallback to municipality mapping
-  const municipalityMapping = {
-    'utrecht': '999992235',
-    'amsterdam': '999992235',
-    // ... other mappings
-  };
-  
-  if (user.municipality in municipalityMapping) {
-    return municipalityMapping[user.municipality];
+
+  // For test users, map username to BSN
+  if (user.preferred_username && user.preferred_username in testUserBSNMapping) {
+    return testUserBSNMapping[user.preferred_username];
   }
-  
-  return null; // No BSN available
+
+  console.warn('No BSN found for user', user.preferred_username ?? '(no username)');
+  return null;
 }
 ```
 
@@ -633,20 +529,16 @@ To add a new test persona:
 
 ### Data Protection
 
-- **TLS 1.3** - All communication encrypted in transit
 - **JWT Validation** - Backend validates signature, expiry, audience
-- **BSN Masking** - BSN masked in logs: `999-99-2235`
-- **Audit Trail** - All access logged for 7 years
-- **Rate Limiting** - Prevents abuse and DoS attacks
+- **No BSN in the application log** - neither the request body nor the upstream body is logged
+- **Audit Trail** - Every lookup is audited, with the queried BSN; nothing purges audit records
+- **Rate Limiting** - The API's global limiter applies
 
 ### Privacy (AVG/GDPR)
 
-- **Purpose Limitation** - BRP data used only for timeline feature
-- **Data Minimization** - Only request fields actually needed
-- **Access Control** - Users can only access their own data
-- **Retention** - No BRP data stored, only audit logs (7 years)
-- **Right to Access** - Users can request their audit logs
-- **Right to Erasure** - Audit logs anonymized on request
+- **Data Minimization** - The caller chooses the `fields`; request only those actually needed
+- **No server-side subject check** - The endpoint answers for any BSN in the request body; it is the frontend that queries the signed-in user's own BSN
+- **Retention** - No BRP data is stored by the API; only the audit entries are kept
 
 ### Production Checklist
 
@@ -663,26 +555,6 @@ Before going to production with real DigiD:
 - [ ] BRP API credentials secured in Azure Key Vault
 - [ ] Monitoring alerts configured for errors
 - [ ] Privacy impact assessment (DPIA) completed
-
----
-
-## Changelog
-
-### February 2026 - Initial Release
-
-**Added:**
-
-- `POST /v1/brp/personen` endpoint for person data retrieval
-- JWT authentication with Keycloak
-- Audit logging for all BRP requests
-- BSN mapping for test environment
-- Rate limiting per user and tenant
-
-**Future:**
-
-- `POST /v1/brp/verblijfplaatshistorie` for address history
-- Additional test personas with diverse life situations
-- Caching layer for BRP responses (5 min TTL)
 
 ---
 

@@ -50,7 +50,7 @@ Two operations additionally require a minimum level of assurance, checked agains
 
 Every authenticated caller carries a tenant identifier (the `municipality` claim) and an organisation type in their token. Tenancy decides which organisation's cases a signed-in caller can reach. The same mechanism applies whether a deployment serves one organisation or several.
 
-**The tenant must be present.** On the process, task, decision, capacity, HR, RIP, ValidSign and policy-analysis routes, a tenant step runs after authentication and rejects a token that carries no tenant identifier with `403 MISSING_TENANT`. `ENABLE_TENANT_ISOLATION=false` switches this presence check off; it does not switch off any of the checks below.
+**The tenant must be present.** On the process, task, decision, capacity, besluitvorming, HR, RIP, ValidSign and policy-analysis routes, a tenant step runs after authentication and rejects a token that carries no tenant identifier with `403 MISSING_TENANT`. `ENABLE_TENANT_ISOLATION=false` switches this presence check off; it does not switch off any of the checks below.
 
 **One label decides access.** Every tenant decision on a process instance or task is made in one module, `auth/tenant-access.ts`, and reads one value: the instance's `municipality` process variable. Operaton's own tenant-id on the deployment is never compared against. The checks fail closed and answer the same way:
 
@@ -70,7 +70,7 @@ The stamped `municipality` always comes from this rule, never from the request b
 - The six process reads — status, variables, historic variables, activity history, lineage and decision document — are allowed to the owning tenant, or to the case's own applicant (the caller whose user id matches `applicantId`). A citizen whose case went to another tenant's deployment can therefore still follow it.
 - Cancelling an instance (`DELETE`) and every task operation are allowed to the owning tenant only.
 
-**The label cannot be rewritten.** `municipality`, `originTenantId` and `applicantId` are reserved: a user task completion that includes any of them is refused with `400 RESERVED_VARIABLE` before anything reaches Operaton. The machine-to-machine routes under `/v1/m2m` are trusted system actors: they run without the tenant step, and their completion route does not apply this check.
+**The label cannot be rewritten.** `municipality`, `originTenantId` and `applicantId` are reserved: a user task completion that includes any of them is refused with `400 RESERVED_VARIABLE` before anything reaches Operaton. The machine-to-machine routes under `/v1/m2m` run without the tenant step, but they guard the label too: their task completion refuses the same three variables, and their process start refuses `municipality` and `originTenantId`, both with `400 RESERVED_VARIABLE`. An M2M start may set `applicantId`, since a machine may start a case on a citizen's behalf.
 
 **Only allow-listed clients reach `/v1/m2m`.** Every person in the realm holds a token for the `ronl-business-api` audience, so a valid token proves nothing about the caller being a machine. After token validation, the M2M routes check the token's `azp` — the client it was issued to — against `M2M_ALLOWED_CLIENTS` (default `operaton-mcp-client`). A token from any other client, every person's token included, or one with no `azp` at all, is refused with `403 M2M_CLIENT_NOT_ALLOWED` before any engine call.
 

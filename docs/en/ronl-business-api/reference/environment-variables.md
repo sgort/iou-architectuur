@@ -97,9 +97,9 @@ component: RONL Business API
  
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `OPERATON_M2M_BASE_URL` | No | `https://operaton-doc.open-regels.nl/engine-rest` | Base URL for a dedicated Operaton instance used by M2M routes only. The default applies when unset, so M2M routes never fall back to `OPERATON_BASE_URL` |
-| `OPERATON_M2M_USERNAME` | No | — | Basic auth username for the M2M Operaton instance |
-| `OPERATON_M2M_PASSWORD` | No | — | Basic auth password for the M2M Operaton instance |
+| `OPERATON_M2M_BASE_URL` | No | — | Override: a different Operaton engine for the M2M routes. Unset — as on every tier — `/v1/m2m` uses the main engine, `OPERATON_BASE_URL` |
+| `OPERATON_M2M_USERNAME` | No | — | Basic auth username for the override engine; when unset, `OPERATON_USERNAME` is used, so set it together with the URL |
+| `OPERATON_M2M_PASSWORD` | No | — | Basic auth password for the override engine; when unset, `OPERATON_PASSWORD` is used |
 | `M2M_ALLOWED_CLIENTS` | No | `operaton-mcp-client` | Comma-separated Keycloak client ids allowed to call `/v1/m2m`, matched against the token's `azp`. A token from any other client — every person's token included — is refused with `403 M2M_CLIENT_NOT_ALLOWED`. Adding a consumer means adding its client id here; nothing changes in Keycloak |
 
 ### eDOCS

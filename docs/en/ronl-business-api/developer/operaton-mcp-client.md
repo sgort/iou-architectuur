@@ -16,7 +16,7 @@ There are two distinct authentication hops in this pattern:
 
 1. **Caller → RONL Business API** — the `operaton-mcp-client` Keycloak client obtains a JWT via OAuth 2.0 Client Credentials and presents it as `Authorization: Bearer <token>`. In `m2m.routes.ts`, `jwtMiddleware` validates the token and `requireM2mClient` then admits it only when its `azp` is on `M2M_ALLOWED_CLIENTS` (default `operaton-mcp-client`). Every person in the realm also holds a token for the `ronl-business-api` audience, so a valid token alone is not enough: any other token, a caseworker's or citizen's included, gets `403 M2M_CLIENT_NOT_ALLOWED` before any engine call. `tenantMiddleware` is intentionally absent, so no `municipality` claim is required or expected.
 
-2. **RONL Business API → Operaton** — the backend calls Operaton using **basic auth** via a dedicated `OperatonService` instance, configured from `OPERATON_M2M_BASE_URL`, `OPERATON_M2M_USERNAME`, and `OPERATON_M2M_PASSWORD`. `OPERATON_M2M_BASE_URL` defaults to `https://operaton-doc.open-regels.nl/engine-rest` in `config.ts`, so the `: operatonService` fallback in the code below is not reached while that default stands:
+2. **RONL Business API → Operaton** — the backend calls the main engine, the same `OPERATON_BASE_URL` engine and basic-auth credentials the tenant-scoped routes use. `OPERATON_M2M_BASE_URL` is empty unless set, and it is unset on every tier, so the code below takes the `: operatonService` branch. Setting it — with `OPERATON_M2M_USERNAME` and `OPERATON_M2M_PASSWORD` — points M2M at a different engine on purpose:
 ```typescript
 const m2mOperatonService = config.operaton.m2mBaseUrl
   ? new OperatonService(
@@ -52,7 +52,7 @@ RONL Business API (acc.api.open-regels.nl)
     │  requireM2mClient: azp on M2M_ALLOWED_CLIENTS, else 403
     │  no tenantMiddleware — no organisation filter
     ▼
-Operaton (operaton-doc.open-regels.nl)
+Operaton (the main engine, OPERATON_BASE_URL)
 ```
 
 ---
@@ -80,9 +80,14 @@ The token endpoint for production will be `https://keycloak.open-regels.nl/realm
 
 ## M2M — Operaton
 
-`packages/backend/src/routes/m2m.routes.ts` registers 18 operations under `/v1/m2m`: ten process, six task and two decision operations. Every one of them passes `jwtMiddleware` and `requireM2mClient`; none passes `tenantMiddleware`, so the surface is deliberately cross-tenant: it lists and acts on process instances and tasks of every organisation.
+`packages/backend/src/routes/m2m.routes.ts` registers 18 operations on 19 routes under `/v1/m2m`: ten process, six task and two decision operations, with process history answering on two routes. Every one of them passes `jwtMiddleware` and `requireM2mClient`; none passes `tenantMiddleware`, so the surface is deliberately cross-tenant: it lists and acts on process instances and tasks of every organisation.
 
-The operations, their parameters, request bodies, response shapes and error codes are described in the OpenAPI document, under the **Machine-to-machine** tag of the [API Specification](../reference/api-specification.md), with the `m2mOAuth` (client credentials) security scheme. Two details worth knowing before reading it: `POST /v1/m2m/process/:key/start` answers `200` where its `/v1` twin answers `201`, and it keeps a caller's `businessKey` verbatim rather than prefixing it with an organisation.
+The operations, their parameters, request bodies, response shapes and error codes are described in the OpenAPI document, under the **Machine-to-machine** tag of the [API Specification](../reference/api-specification.md), with the `m2mOAuth` (client credentials) security scheme. Details worth knowing before reading it:
+
+- `POST /v1/m2m/process/:key/start` answers `200` where its `/v1` twin answers `201`, and it keeps a caller's `businessKey` verbatim rather than prefixing it with an organisation.
+- Process history is `POST /v1/m2m/process/history`, its body forwarded to Operaton as the history query. `GET /v1/m2m/process/history` still answers, but is deprecated: it sends `Deprecation: @1790985600` (3 October 2026), and a body on a `GET` is dropped by many clients and proxies, which then receive the unfiltered history.
+- A start refuses a body that sets `municipality` or `originTenantId`, and a task completion one that sets `municipality`, `originTenantId` or `applicantId`. Both answer `400 RESERVED_VARIABLE` with the refused names in a `reserved` member, before any engine call. A start may carry `applicantId`: a machine may start a case on a citizen's behalf.
+- Errors are RFC 9457 problem details; branch on the `code` member.
 
 ### Test script
 
@@ -118,9 +123,13 @@ TARGET=acc CLIENT_SECRET=<secret> bash scripts/test-m2m-routes.sh
 
 - Token obtained; `azp` is the client ID, `aud` contains `ronl-business-api`, `municipality` is absent
 - The read operations return HTTP 200 (404 accepted for `form-schema`, `start-form`, `decision-document` and `historic-variables`, whose resource may not exist in the deployment); a 404 on `GET /v1/m2m/decision/:key` skips both decision checks
+- `POST /v1/m2m/process/history` answers `200` and applies its filter: a query by process definition key returns only instances of that key (skipped when the engine has no history yet)
+- The deprecated `GET /v1/m2m/process/history` answers with `Deprecation: @1790985600`
 - Write lifecycle, skipped with a note when `LIFECYCLE_KEY` cannot be started:
     - start answers `200`, keeps the `businessKey` verbatim, labels the case's `municipality` with the instance's own `tenantId`, sets no `originTenantId`, and accepts wrapped `{ value, type }` variables as well as plain ones
+    - a start that sets `municipality` answers `400` with code `RESERVED_VARIABLE`
     - a claim without a body assigns the token subject; re-claiming for the same user answers `200`; claiming a held task for another user answers `500` and leaves the assignee unchanged; a `userId` in the body overrides the token subject
+    - a completion that sets `municipality` answers `400 RESERVED_VARIABLE` and leaves the task open
     - complete answers `200` with `completed: true`; completing the same task again answers `500`
     - delete answers `200` with the instance id; cancelling it again answers `500`
     - no test instance is left running
@@ -152,18 +161,16 @@ All 18 operations are listed today. A disabled operation returns `403 OPERATION_
 
 ---
 
-## Dedicated Operaton instance
+## Operaton engine
 
-The M2M routes talk to their own Operaton engine, separate from the `OPERATON_BASE_URL` engine the tenant-scoped routes use.
+The M2M routes use the main engine — the `OPERATON_BASE_URL` engine the tenant-scoped routes use — on every tier. The three `OPERATON_M2M_*` variables are an override for pointing M2M at a different engine on purpose; none of them is set on any tier.
 
 | Variable | Required | Description |
 |---|---|---|
-| `OPERATON_M2M_BASE_URL` | No | Base URL for the M2M Operaton instance. Defaults to `https://operaton-doc.open-regels.nl/engine-rest`; it does not fall back to `OPERATON_BASE_URL`. |
-| `OPERATON_M2M_USERNAME` | No | Basic auth username for the M2M instance |
-| `OPERATON_M2M_PASSWORD` | No | Basic auth password for the M2M instance |
+| `OPERATON_M2M_BASE_URL` | No | Override: a different engine for `/v1/m2m`. Unset, the M2M routes use `OPERATON_BASE_URL`. |
+| `OPERATON_M2M_USERNAME` | No | Basic auth username for the override engine. When unset, `OperatonService` falls back silently to `OPERATON_USERNAME`, so set it together with the URL |
+| `OPERATON_M2M_PASSWORD` | No | Basic auth password for the override engine; same fallback, to `OPERATON_PASSWORD` |
 | `M2M_ALLOWED_CLIENTS` | No | Comma-separated Keycloak client ids, matched against the token's `azp`, that may call `/v1/m2m`. Defaults to `operaton-mcp-client`. Adding a consumer means adding its client id here; nothing changes in Keycloak. |
-
-On ACC, the M2M routes are pointed at `https://operaton-doc.open-regels.nl/engine-rest`.
 
 ---
 
@@ -218,17 +225,17 @@ curl -s https://acc.api.open-regels.nl/v1/m2m/process \
 
 ```bash
 curl -s -X POST \
-  https://acc.api.open-regels.nl/v1/m2m/decision/TreeFellingDecision/evaluate \
+  https://acc.api.open-regels.nl/v1/m2m/decision/AwbCompletenessCheck/evaluate \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"variables": {"treeDiameter": 45, "protectedArea": false}}' \
+  -d '{"variables": {"productType": "TreeFellingPermit"}}' \
   | jq .
 ```
 
 ### 6. Get process history (body forwarded to Operaton)
 
 ```bash
-curl -s -X GET \
+curl -s -X POST \
   https://acc.api.open-regels.nl/v1/m2m/process/history \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
@@ -240,7 +247,7 @@ curl -s -X GET \
 
 ```bash
 curl -s https://acc.api.open-regels.nl/v1/task \
-  -H "Authorization: Bearer $TOKEN" | jq .error
+  -H "Authorization: Bearer $TOKEN" | jq .code
 ```
 
-Expected: `MISSING_TENANT` — the token carries no `municipality` claim so `tenantMiddleware` rejects it, confirming the original caseworker routes remain fully isolated.
+Expected: `"MISSING_TENANT"`, the `code` of a `403` problem — the token carries no `municipality` claim so `tenantMiddleware` rejects it, confirming the original caseworker routes remain fully isolated.

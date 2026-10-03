@@ -2,7 +2,7 @@
 component: RONL Business API
 ---
 
-# ValidSign-ondertekening van fasegoedkeuring
+# ValidSign-ondertekening
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.

@@ -27,6 +27,8 @@ component: RONL Business API
 
 ### Waar sta ik
 
+#### A process's own phases
+
 ### Processtappen
 
 ---
@@ -37,9 +39,23 @@ component: RONL Business API
 
 ## Claiming and completing a task
 
+### Ondertekenen
+
 ---
 
 ## The assistant
+
+---
+
+## Besluitvorming
+
+### Who does what
+
+### Preparing a besluit
+
+### How a besluit runs
+
+### Lopende and Afgeronde besluiten
 
 ---
 

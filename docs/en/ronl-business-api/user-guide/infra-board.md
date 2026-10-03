@@ -66,23 +66,40 @@ the board.
 The flow, from a project leader's point of view:
 
 1. **Claim the task.** An unclaimed task shows the claim button as usual.
-2. **The signing panel replaces the form.** It prepares the document, then opens
-   the signing ceremony in the panel itself.
-3. **Sign.** The panel watches for completion on its own.
-4. **The task completes.** The signed document and its evidence summary are
-   archived to the project's eDOCS workspace, and the process moves on.
+2. **The board checks whether the task is signed.** For a moment it shows
+   *Ondertekening controleren…* instead of a form, so a task that must be signed
+   is never offered the ordinary approval form.
+3. **The signing panel replaces the form.** It reads *Deze taak vereist een
+   digitale handtekening.* Choose **Onderteken nu** to open the signing
+   ceremony in the panel itself, or **Stuur per e-mail** to have the request
+   emailed to you and sign elsewhere, for example on your phone.
+4. **Sign.** The panel watches for completion on its own.
+5. **The task completes.** The signed document and its evidence summary are
+   archived in eDOCS, and the process moves on.
 
 You do not complete the task by hand — it completes when the signature lands.
+
+**Declining also completes the task.** If you decline in the ceremony, the
+panel says *De ondertekenaar is niet akkoord gegaan met dit document.*, the
+task is completed for you as not approved, the board refreshes its list, and
+the process follows its "niet akkoord" path.
+
+Your account needs an email address to sign. Without one the panel says so and
+offers no retry: only an administrator can add it.
 
 !!! note "If the panel looks stuck after you have signed"
     The panel polls for the result, and a signature can complete through either
     the platform's callback or a periodic sweep. If it has not resolved after a
     minute or so, reload the page: the status is read fresh, not held in the
-    panel.
+    panel. When the status cannot be read three times in a row, the panel says
+    so itself — *De status van de ondertekening kon niet worden opgehaald.* —
+    and asks you to reload.
 
 For how this works underneath — the signing platform, the environment locks, and
 what happens if the callback never arrives — see
-[ValidSign phase-approval signing](../developer/validsign-signing.md).
+[ValidSign signing](../developer/validsign-signing.md). The same panel appears in
+the caseworker task inbox for a task that must be signed — see
+[Caseworker](caseworker.md).
 
 ---
 

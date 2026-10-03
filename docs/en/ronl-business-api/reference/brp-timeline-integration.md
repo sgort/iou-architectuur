@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # BRP Timeline Integration - Technical Architecture
 
 ---
@@ -122,9 +126,9 @@ PersonalDataPanel re-renders with historical data
 
 1. Accepts authenticated frontend requests
 2. Validates JWT tokens
-3. Logs all requests for audit
+3. Audits each lookup, while keeping the BSN out of the application log
 4. Forwards to BRP API
-5. Returns sanitized responses
+5. Wraps the BRP answer in `{ success: true, data }`, and answers errors as RFC 9457 problem details
 
 ### Route Implementation
 
@@ -136,54 +140,60 @@ import axios from 'axios';
 import jwtMiddleware from '../auth/jwt.middleware';
 import { auditLog } from '../middleware/audit.middleware';
 import { createLogger } from '../utils/logger';
+import { sendProblem } from '../utils/problem';
 
 const router = express.Router();
 const logger = createLogger('brp-routes');
 
 const BRP_API_BASE_URL = 'https://brp-api-mock.open-regels.nl/haalcentraal/api/brp';
 
+/**
+ * POST /v1/brp/personen
+ * Proxy to BRP API to avoid CORS issues in frontend
+ */
 router.post('/personen', jwtMiddleware, async (req: Request, res: Response) => {
   try {
-    // Log request
+    // Never log req.body or an upstream body: both carry BSNs (#241). The audit
+    // log below records the subject on purpose; the application log must not.
+    const query = req.body as { type?: string; burgerservicenummer?: unknown };
     logger.info('BRP personen request', {
       userId: req.user?.userId,
       tenantId: req.user?.tenantId,
-      requestBody: req.body,
+      queryType: query?.type,
+      bsnCount: Array.isArray(query?.burgerservicenummer) ? query.burgerservicenummer.length : 0,
     });
 
-    // Forward to BRP API
+    // Forward request to BRP API - match curl headers exactly
     const response = await axios.post(`${BRP_API_BASE_URL}/personen`, req.body, {
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
-        'Accept': 'application/json',
+        Accept: 'application/json', // ✅ BE EXPLICIT
       },
       timeout: 10000,
-      validateStatus: (status) => status < 500,
+      validateStatus: (status) => status < 500, // ✅ Don't throw on 4xx
     });
 
-    // Check response status
+    // Check if response was successful
     if (response.status >= 400) {
+      const upstreamCode = (response.data as { code?: unknown } | undefined)?.code;
       logger.error('BRP API returned error', {
         status: response.status,
-        data: response.data,
+        upstreamCode: typeof upstreamCode === 'string' ? upstreamCode : undefined,
       });
-      
-      return res.status(response.status).json({
-        success: false,
-        error: {
-          code: 'BRP_API_ERROR',
-          message: 'BRP API returned an error',
-          details: response.data,
-        },
+
+      return sendProblem(res, req, {
+        status: response.status,
+        code: 'BRP_API_ERROR',
+        detail: 'BRP API returned an error',
+        extensions: { details: response.data },
       });
     }
 
-    // Audit log success
+    // Log successful request
     auditLog(req, 'brp.personen.fetch', 'success', {
       bsn: req.body.burgerservicenummer?.[0],
     });
 
-    // Return data
     res.json({
       success: true,
       data: response.data,
@@ -192,33 +202,29 @@ router.post('/personen', jwtMiddleware, async (req: Request, res: Response) => {
     logger.error('BRP API request failed', {
       error: error instanceof Error ? error.message : 'Unknown error',
       userId: req.user?.userId,
+      upstreamStatus: axios.isAxiosError(error) ? error.response?.status : undefined,
     });
 
     auditLog(req, 'brp.personen.fetch', 'error', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
 
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'BRP_API_ERROR',
-        message: 'BRP API request failed',
-      },
-    });
+    const statusCode = axios.isAxiosError(error) ? error.response?.status || 500 : 500;
+    const message = axios.isAxiosError(error)
+      ? error.response?.data?.message || error.message
+      : 'BRP API request failed';
+
+    sendProblem(res, req, { status: statusCode, code: 'BRP_API_ERROR', detail: message });
   }
 });
 
 export default router;
 ```
 
-**Registration in `packages/backend/src/index.ts`:**
+**Registration in `packages/backend/src/routes/registry.ts`:** `index.ts` mounts every entry of `routeRegistry`, in array order.
 
 ```typescript
-import brpRoutes from './routes/brp.routes';
-
-// ... other routes ...
-
-app.use('/v1/brp', brpRoutes);
+{ mount: '/v1/brp', router: brpRoutes, advertiseAs: 'brp', summary: 'Personal records lookup' },
 ```
 
 ---
@@ -377,51 +383,43 @@ In production, BSN comes from DigiD via Keycloak. For testing, we map usernames 
 ```typescript
 /**
  * Maps Keycloak test usernames to BSN numbers for BRP API demo
+ * In production, BSN should come from DigiD via Keycloak user attributes
  */
-const testUserBSNMapping: Record<string, string> = {
-  'test-citizen-utrecht': '999992235',      // Wessel Kooyman
-  'test-citizen-amsterdam': '999992235',
-  'test-citizen-rotterdam': '999992235',
-  'test-citizen-denhaag': '999992235',
-  'test-caseworker-utrecht': '999992235',
-  'test-caseworker-amsterdam': '999992235',
-  'test-caseworker-rotterdam': '999992235',
-  'test-caseworker-denhaag': '999992235',
+
+export const testUserBSNMapping: Record<string, string> = {
+  'test-citizen-utrecht': '999992235', // Wessel Kooyman
+  'test-caseworker-utrecht': '999992235', // Same person for demo
+  'test-citizen-amsterdam': '999992235', // For now, same test data
+  'test-citizen-rotterdam': '999992235', // For now, same test data
+  'test-citizen-denhaag': '999992235', // For now, same test data
+  'test-citizen-flevoland': '999992235', // For now, same test data
 };
 
 /**
- * Municipality fallback mapping (when preferred_username missing)
+ * Get BSN for current user
+ * First tries user.bsn attribute from JWT
+ * Falls back to username mapping for test users
  */
-const municipalityBSNMapping: Record<string, string> = {
-  'utrecht': '999992235',
-  'amsterdam': '999992235',
-  'rotterdam': '999992235',
-  'denhaag': '999992235',
-};
-
-export function getUserBSN(user: { 
-  sub: string; 
-  preferred_username?: string; 
-  bsn?: string; 
-  municipality?: string;
+export function getUserBSN(user: {
+  sub: string;
+  preferred_username?: string;
+  bsn?: string;
 }): string | null {
-  // 1. Production: BSN from DigiD in JWT
+  // If BSN is in the JWT (production with DigiD), use it
   if (user.bsn) {
     return user.bsn;
   }
 
-  // 2. Test: Username mapping
+  // For test users, map username to BSN
   if (user.preferred_username && user.preferred_username in testUserBSNMapping) {
     return testUserBSNMapping[user.preferred_username];
   }
 
-  // 3. Fallback: Municipality mapping
-  if (user.municipality && user.municipality in municipalityBSNMapping) {
-    console.log(`Using municipality-based BSN mapping for ${user.municipality}`);
-    return municipalityBSNMapping[user.municipality];
-  }
-
-  console.warn('No BSN found for user', user);
+  // No BSN available. Logs the username only, not the whole claims object:
+  // this branch cannot carry a BSN (it is the one where there isn't one), but
+  // `user` also holds `sub` and whatever else the token brought, and none of
+  // that is needed to explain the warning.
+  console.warn('No BSN found for user', user.preferred_username ?? '(no username)');
   return null;
 }
 ```
@@ -433,16 +431,15 @@ export function getUserBSN(user: {
 ### Authentication & Authorization
 
 1. **JWT Validation** - All `/v1/brp/personen` requests require valid JWT token
-2. **User Context** - BSN derived from authenticated user (no arbitrary BSN queries)
-3. **Audit Logging** - All BRP requests logged with userId, tenantId, timestamp
-4. **Rate Limiting** - Inherited from Business API rate limits (per-tenant)
+2. **User Context** - The frontend derives the BSN from the authenticated user. The backend does not check it: the route answers for any BSN in the request body
+3. **Audit Logging** - Each lookup is audited as `brp.personen.fetch`, with the queried BSN; the application log carries neither the request body nor the upstream body
+4. **Rate Limiting** - The Business API's global limiter applies
 
 ### Privacy
 
 - **No Data Storage** - Timeline calculations done client-side, no persistence
-- **Personal Data Only** - Users can only access their own BRP data
 - **Encrypted Transit** - All communication over HTTPS
-- **Audit Trail** - 7-year retention for compliance (AVG/GDPR)
+- **Audit Trail** - No retention period is applied; nothing purges audit records
 
 ### DigiD Integration
 
@@ -501,16 +498,15 @@ try {
 
 ### Backend
 
+A BRP answer of 4xx is passed on with its own status, code `BRP_API_ERROR` and the upstream body in a `details` extension member. A thrown error — a 5xx, a timeout, no connection — ends in the `catch`, which answers with the upstream status (or `500`) and the message as `detail`:
+
 ```typescript
-// Axios errors from BRP API
-if (axios.isAxiosError(error)) {
-  const status = error.response?.status || 500;
-  const message = error.response?.data?.message || error.message;
-  return res.status(status).json({
-    success: false,
-    error: { code: 'BRP_API_ERROR', message },
-  });
-}
+const statusCode = axios.isAxiosError(error) ? error.response?.status || 500 : 500;
+const message = axios.isAxiosError(error)
+  ? error.response?.data?.message || error.message
+  : 'BRP API request failed';
+
+sendProblem(res, req, { status: statusCode, code: 'BRP_API_ERROR', detail: message });
 ```
 
 ### Common Errors

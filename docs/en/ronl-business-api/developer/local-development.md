@@ -48,7 +48,7 @@ they run are `#!/usr/bin/env bash` scripts using bash arrays:
 
 | Script | Runs |
 |---|---|
-| `postinstall` | `bash scripts/write-deps-marker.sh`, so **`npm ci` and `npm install` themselves need bash** |
+| `postinstall` | `bash scripts/write-deps-marker.sh`, so **`npm ci` and `npm install` themselves need bash**; on `npm install --package-lock-only`, which installs nothing, it writes no marker |
 | `deps:check` | `bash scripts/check-deps.sh` |
 | `docker:check` | `bash scripts/check-docker.sh` |
 | `dev` | `deps:check`, then `docker:check`, then the dev servers |
@@ -138,16 +138,16 @@ committed `.env.development` files (see [Front-end configuration](#front-end-con
 |---|---|
 | `NODE_EXTRA_CA_CERTS`, `NODE_TLS_REJECT_UNAUTHORIZED=0` | Both ship **commented out**; leave them so unless you sit behind a corporate proxy that intercepts TLS. There, point `NODE_EXTRA_CA_CERTS` at your own copy of the proxy's CA file — the proper fix. `NODE_TLS_REJECT_UNAUTHORIZED=0` is a development-only workaround that switches off TLS certificate checking for every outbound HTTPS call the backend makes: Keycloak JWKS, Operaton, BRP, the LLM providers |
 | `ANTHROPIC_API_KEY` | Must be **non-empty**, or the backend refuses to start with `Configuration validation failed: ANTHROPIC_API_KEY is required`. The shipped placeholder passes the check in development; the AI assistant works only with a real key |
-| `OPERATON_BASE_URL` | Keep `http://localhost:8081/engine-rest` with `OPERATON_USERNAME`/`OPERATON_PASSWORD` = `demo`/`demo`. `OPERATON_M2M_BASE_URL` points at the same local engine |
+| `OPERATON_BASE_URL` | Keep `http://localhost:8081/engine-rest` with `OPERATON_USERNAME`/`OPERATON_PASSWORD` = `demo`/`demo`. `OPERATON_M2M_BASE_URL` ships commented out; leave it so, and `/v1/m2m` uses this same engine |
 | `DATABASE_URL` | `postgresql://audit_user:audit_password@localhost:5432/audit_logs`, the database and user the Postgres container creates on first start |
 | `LDE_MCP_ENABLED` | Ships `true`, with `LDE_DATABASE_URL` pointing at `lde_assets` as `lde_user`/`lde_password`. `init-databases.sql` creates that database and role, but empty: the schema belongs to the Linked Data Explorer, so the provider connects and has nothing to read, and the assistant's LDE tools answer with an error when called. A `postgres-data` volume created before the script had that block has no `lde_assets` at all — see [Postgres](#the-docker-stack) below. Set the flag to `false` if you do not need the LDE tools |
 
 !!! danger "An unset Operaton URL reaches the shared engine"
     `OPERATON_BASE_URL` has a default, and it is not local: without the key the
-    backend talks to `https://operaton.open-regels.nl/engine-rest`, and
-    `OPERATON_M2M_BASE_URL` falls back to `https://operaton-doc.open-regels.nl/engine-rest`.
-    Keep both keys in your `.env`, so local process starts and E2E runs land on
-    your own engine.
+    backend talks to `https://operaton.open-regels.nl/engine-rest`, and so does
+    `/v1/m2m`, which uses `OPERATON_BASE_URL` whenever `OPERATON_M2M_BASE_URL` is
+    unset. Keep `OPERATON_BASE_URL` in your `.env`, so local process starts and
+    E2E runs land on your own engine.
 
 Other defaults worth knowing:
 
@@ -193,7 +193,7 @@ the digests current (`docker:pinDigests` in `renovate.json`).
 | `postgres` | `ronl-postgres` | `postgres:16-alpine` | 5432 | Volume `postgres-data` |
 | `operaton-init` | `ronl-operaton-init` | `alpine:3.24.2` | — | Runs once and exits |
 | `operaton` | `ronl-operaton` | `operaton/operaton:2.1.5` | 8081 → 8080 | Volume `operaton-data` |
-| `redis` | `ronl-redis` | `redis:7-alpine` | 6379 | Volume `redis-data`, append-only file on |
+| `redis` | `ronl-redis` | `redis:7.2-alpine` | 6379 | Volume `redis-data`, append-only file on |
 
 **Keycloak** runs `start-dev --import-realm` with admin account `admin`/`admin`.
 It waits for Postgres to report healthy, stores its data in Postgres
@@ -295,7 +295,8 @@ npm run dev
 `npm run dev` runs three steps in order, and stops at the first one that fails:
 
 1. **`deps:check`** (`scripts/check-deps.sh`) compares `package-lock.json` with
-   the snapshot the last install left in `node_modules`. It parses both files
+   the snapshot the last install left in `node_modules` (a lockfile-only
+   install, `npm install --package-lock-only`, leaves none). It parses both files
    and ignores this repository's own package version numbers, so a release bump
    does not trip it and line endings do not matter. When a third-party
    dependency has changed, it stops and tells you to run **`npm ci`**, with a
@@ -407,9 +408,10 @@ A healthy local stack answers `200`. This response was captured from the local s
 ```
 
 - `status` is `healthy` only when **Keycloak and Operaton** are both up; then
-  the endpoint answers `200`. Otherwise it is `degraded`, `success` is `false`,
-  and the endpoint answers **`503`**. A down dependency carries an `error`
-  field instead of `latency`.
+  the endpoint answers `200`. Otherwise it answers **`503`** as problem details
+  (`application/problem+json`, code `SERVICE_DEGRADED`), with the same report,
+  its `status` `degraded`, under the `data` extension member. A down dependency
+  carries an `error` field instead of `latency`.
 - `cache` is Redis. It is reported but never makes the check fail.
 - `build` is `null` in a working tree; the deploy workflow fills it in.
 - `environment` comes from `DEPLOYMENT_ENV`, falling back to `NODE_ENV`.
@@ -465,8 +467,9 @@ Staff get `403 TENANT_MISMATCH` when they start another tenant's process; see
 answers `201` with `processInstanceId`, `businessKey`, `status` and
 `startTime`.
 
-Before the fixtures are deployed, both calls fail, and the start's
-`error.details` carries Operaton's own message. This start call has not been
+Before the fixtures are deployed, both calls fail. The start answers
+`500 PROCESS_START_FAILED` as problem details, whose `details` member carries
+Operaton's own message and `engine` the engine it was sent to. This start call has not been
 run end to end for this page.
 
 ---
