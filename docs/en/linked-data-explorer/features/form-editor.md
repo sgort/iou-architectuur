@@ -43,15 +43,16 @@ Actions available on each form:
 
 ## Example forms
 
-The Form Editor seeds 22 example forms from `public/examples/`, listed in `EXAMPLE_FORMS` in `FormEditor.tsx`. They belong to the same bundles as the BPMN Modeler's example processes:
+The Form Editor seeds 36 example forms from `public/examples/`, listed in `EXAMPLE_FORMS` in `FormEditor.tsx`. They belong to the same bundles as the BPMN Modeler's example processes:
 
 | Bundle | Organization | Forms |
 |---|---|---|
-| Kapvergunning (AWB tree felling permit) | `flevoland` | start, caseworker review, notify applicant |
+| Kapvergunning (AWB tree felling permit) | `flevoland` | start, caseworker review, notify applicant, *aanvullende gegevens* (missing information) |
 | Thuisbatterij subsidy | `flevoland` | start, caseworker review, notify applicant, *aanvullende gegevens* (missing information) |
-| Zorgtoeslag | `toeslagen` | notify applicant, provisional start, provisional review, final settlement review |
+| Zorgtoeslag | `toeslagen` | notify applicant, provisional start, *aanvullende gegevens* (missing information), provisional review, final settlement review |
 | DvTP consent | `bzk` | start, info, decision |
 | HR capacity claim (Dutch) | `flevoland` | eight forms, from intake to financial reservation |
+| [Besluitvorming onder gedelegeerde bevoegdheid](besluitvorming-gedelegeerd-bundle.md) (Dutch) | `flevoland` | twelve forms, from choosing a template to archiving the decision |
 
 Seeding is versioned. On mount, `FormEditor.tsx` compares each example's entry in `EXAMPLE_VERSIONS` (`utils/exampleVersions.ts`) with the version recorded in this browser's `localStorage`; when the recorded version is lower or absent, it re-fetches the `.form` file and overwrites the stored record. A first visit therefore seeds all of them, and a later version bump re-seeds only the forms whose number moved.
 

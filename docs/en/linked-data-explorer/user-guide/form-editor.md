@@ -12,7 +12,7 @@ The Form Editor lets you design Camunda Forms visually and export them as `.form
 
 Click the **Form Editor** icon (layout template / grid icon) in the left sidebar. The editor opens with the form list on the left and the canvas area on the right.
 
-On your first visit, the bundled example forms are pre-loaded automatically — Kapvergunning, Thuisbatterij, Zorgtoeslag, DvTP consent and HR capacity claim. Open the **Kapvergunning Start** example to see a complete citizen-facing form before creating your own.
+On your first visit, the bundled example forms are pre-loaded automatically — Kapvergunning, Thuisbatterij, Zorgtoeslag, DvTP consent, HR capacity claim and Besluitvorming (a decision under delegated authority). Open the **Kapvergunning Start** example to see a complete citizen-facing form before creating your own.
 
 ---
 

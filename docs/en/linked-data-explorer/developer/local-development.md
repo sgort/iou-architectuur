@@ -344,8 +344,7 @@ npm run test:scripts   # the repository scripts' own tests
 
 [Testing](testing.md) has the suites, their current counts, the contract subset and the CI gate.
 
-!!! warning "`npm run test:scripts` fails on Windows"
-    `scripts/promotion-targets.test.mjs` resolves the script it runs with `new URL(...).pathname`, which yields `/C:/…` on Windows. Its four command-line checks therefore fail there, while it passes on Linux CI (24 checks). Because `test:scripts` chains the two files with `&&`, `dso-dossier.test.mjs` then never runs. It passes on its own: `node scripts/dso-dossier.test.mjs` (24 checks). Measured 26 September 2026.
+`npm run test:scripts` runs on Windows as well as Linux: both harnesses print `PASS: 24 checks` (measured on Windows, 4 October 2026).
 
 ### Git hooks
 
@@ -354,7 +353,7 @@ Husky installs two hooks:
 | Hook | Runs |
 |---|---|
 | `pre-commit` | `npx lint-staged`: `prettier --write` and `eslint --fix` on staged files in `packages/frontend/**` (`js`, `jsx`, `ts`, `tsx`, `json`, `css`, `md`) and `packages/backend/src/**/*.ts` |
-| `pre-push` | `npm run deps:check`, then `npm run lint`, then `npm run check-format` |
+| `pre-push` | `npm run deps:check`, then `npm run check-rip-bpmn`, then `npm run lint`, then `npm run check-format` |
 
 When a hook fails, fix what it names. Never bypass it.
 
@@ -369,8 +368,10 @@ The root `package.json` also defines these scripts:
 | `deps:check` | `bash scripts/check-deps.sh`: checks the installed dependencies against the lockfile and warns about npm older than 11.10 |
 | `check-supply-chain` | `node scripts/check-supply-chain.mjs` |
 | `sbom` | `node scripts/write-sbom.mjs`: writes a software bill of materials |
-| `test:scripts` | Tests `promotion-targets.mjs` and `dso-dossier.mjs` (see the warning above) |
+| `test:scripts` | Tests `promotion-targets.mjs` and `dso-dossier.mjs`: `node scripts/promotion-targets.test.mjs && node scripts/dso-dossier.test.mjs` |
 | `check-mirror` | `bash scripts/check-mirror.sh`: compares `acc` and `main` on `origin` with the `gitlab` mirror. It prints the push command for any drift and never pushes. |
+| `check-rip-bpmn` | `node scripts/check-rip-bpmn-copies.mjs`: compares the `e2e-fixtures/flevoland/` copies of the twelve RIP phase models byte for byte with their source under `examples/organizations/flevoland/`, and checks the source files against the sha256 fingerprints in `rip-bpmn-fingerprints.json`. `--write` regenerates the fingerprints and refreshes the `e2e-fixtures` copies. `pre-push` runs it. |
+| `e2e:deploy-fixtures` | `node scripts/deploy-e2e-fixtures.mjs`: deploys the `e2e-fixtures/` bundle through the local LDE backend (`LDE_URL`, default `http://localhost:3001`): the shared decisions without a tenant, then each manifest process with its sub-processes, forms and documents under its tenant. It refuses an LDE backend that deploys to an Operaton that is not on this machine. It is a deploy helper, not a test runner. |
 | `authorities:generate` | `node scripts/generate-dso-authorities.mjs` |
 | `dso:dossier` | `node scripts/dso-dossier.mjs` |
 | `build` / `preview` | Builds the frontend or previews the build |
@@ -384,7 +385,7 @@ In `packages/backend`, `docker:check`, `build:openapi`, `lint:openapi`, `test:co
 `acc` accepts changes only through a pull request. The `acc supply-chain gate` ruleset blocks direct pushes, force-pushes and deletion. It requires a pull request, merged with a merge commit, and these status checks: `audit`, `scan`, `deploy`, `Build and Deploy Frontend` and `Build and Deploy ROPA Site`.
 
 1. Create a branch from `acc` and push it.
-2. Open a pull request into `acc`. The backend workflow's `deploy` job runs lint, the OpenAPI lint, typecheck, the full test suite and the build on the pull request, and skips its deploy steps. The frontend and RoPA site workflows build from the pull request.
+2. Open a pull request into `acc`. The backend workflow's `deploy` job runs lint, the OpenAPI lint, typecheck, the full test suite and the build on the pull request, and skips its deploy steps. It does so only when the pull request touches `packages/backend/`, the root `package.json` or `package-lock.json`, `.nvmrc` or the workflow itself. A pull request that changes only `e2e-fixtures/`, `examples/` or `packages/frontend/public/examples/` runs no backend tests, although the backend's fixture and bundle tests read those files. Run `npm test -w packages/backend` yourself for such a change. The frontend and RoPA site workflows build from the pull request.
 3. Merge the pull request. The push to `acc` deploys the backend, frontend and RoPA site to ACC. Each of these workflows filters on the paths it deploys.
 
 Production follows the same pattern. A pull request from `acc` into `main` (the `main promotion gate` ruleset requires `audit` and `scan`), and its merge runs `promote-to-production.yml`, which deploys the backend first and the two sites after it. See [Deployment](deployment.md).

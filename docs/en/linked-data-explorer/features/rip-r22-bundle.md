@@ -83,43 +83,50 @@ One per green *"Format …"* box in the specification. A Format there and a `.do
 | `rip-ontwerptoelichting.document` | `Task_OpstellenConceptVO` |
 | `rip-bevindingenformulier.document` | `Task_BesprekenConceptVO` |
 | `rip-hoeveelheidsbepaling.document` | `Task_OpstellenDefinitiefVO` |
-| `rip-objectenboom.document` | *(deliberately unattached — see below)* |
+| `rip-objectenboom.document` | `Task_OpstellenConceptVO` |
 
 Zone keys are `signOff` and `contactInformation`, camelCase, from the start — unlike R2.1's templates, which shipped with `signoff` and `contactInfo`, keys `DocumentZones` never declares, leaving their signature blocks silently unrendered until v2026.08.4 repaired them.
 
-!!! important "`ronl:documentRef` is single-valued, so one task carries at most one template"
+!!! note "One task, two templates"
     `Task_OpstellenConceptVO` produces both the Ontwerptoelichting and the
-    Objectenboom, and its one slot went to the Ontwerptoelichting.
-    `rip-objectenboom` therefore ships and imports normally but carries **no
-    task badge** in the Modeler. Its reference is maintained in Relatics
-    instead. This is a limitation of the attribute, not an oversight in the
-    bundle.
+    Objectenboom, and carries both:
+    `ronl:documentRef="rip-ontwerptoelichting,rip-objectenboom"`. The attribute
+    holds a comma-separated list, so the Modeler badge on that task reads
+    **2 documents**, and the Deploy modal includes both templates in the
+    bundle. See [BPMN Modeler → Document template linking](bpmn-modeler.md#document-template-linking).
 
 ---
 
 ## Deploying the bundle
 
-Deployment is identical to any other bundle — see [Deploying the bundle](rip-phase1-bundle.md#deploying-the-bundle) on the R2.1 page. Select the bundle directory in the Deploy modal and all fifteen resources are posted to Operaton in one multipart request.
+Deployment is identical to any other bundle — see [Deploying the bundle](rip-phase1-bundle.md#deploying-the-bundle) on the R2.1 page. Open `RipR22Process.bpmn` in the BPMN Modeler and click **Deploy**; all fifteen resources go through the LDE backend to Operaton as one deployment.
 
 ---
 
 ## The mirrored copy
 
-Every RIP bundle exists **twice** on disk:
+The R2.2 bundle files exist **twice** in this repository, and its BPMN a third time downstream:
 
 | Path | Role |
 |---|---|
 | `examples/organizations/flevoland/rip-phase-22/` | the authored source |
-| `e2e-fixtures/flevoland/` | the mirror the E2E suite imports and deploys |
+| `e2e-fixtures/flevoland/` | the mirror that is imported and deployed for end-to-end testing |
+| ronl-business-api `packages/backend/src/rip-swimlane/__fixtures__/` | parser fixtures for the RONL Business API's swimlane derivation (BPMN only) |
 
-Nothing stopped the two drifting, and they had. A parity test now asserts that every file in a mirrored bundle is byte-identical to its twin; a new bundle opts in by adding an entry to `MIRRORED_BUNDLES`.
+Two checks keep the copies in step:
 
-!!! warning "The parity test does not run on a pull request"
-    The backend deploy workflow triggers on push, not on `pull_request`, so no
-    pull request runs these tests. A parity break surfaces on `acc` **after**
-    merge, where `npm test` gates the deploy step — leaving a red acceptance
-    branch and no deployment. Edit both copies together, or run the backend
-    suite locally before opening the pull request.
+- **The parity test** (`packages/backend/src/example-fixture-parity.test.ts`) asserts that every file in a mirrored bundle is byte-identical to its twin in `e2e-fixtures/`. A bundle opts in by adding an entry to `MIRRORED_BUNDLES`; R2.1 and R2.2 do.
+- **`npm run check-rip-bpmn`** (`scripts/check-rip-bpmn-copies.mjs`) covers the BPMNs of all RIP phases. It compares each `e2e-fixtures/` copy byte for byte with its source, and checks every authoring BPMN against the sha256 fingerprints in `rip-bpmn-fingerprints.json`, a file committed identically in both repositories so the RONL Business API can enforce the same thing in its own CI. After an intended edit, `node scripts/check-rip-bpmn-copies.mjs --write` regenerates the fingerprints, refreshes the `e2e-fixtures/` copies, and names the command that refreshes the RONL Business API's fixtures. The pre-push hook runs this check; no CI workflow does.
+
+!!! warning "A pull request that changes only bundle files runs no backend tests"
+    The backend workflow runs on every pull request to `acc`, but its
+    `changes` job skips the test job unless the pull request touches
+    `packages/backend/`, the workflow file, `.nvmrc`, `package.json` or
+    `package-lock.json`. `examples/`, `e2e-fixtures/` and
+    `packages/frontend/public/examples/` are not in that pattern, so a pull
+    request that edits only bundle files never runs the parity test. Edit both
+    copies together, and run the backend suite and `npm run check-rip-bpmn`
+    locally before opening the pull request.
 
 ---
 
@@ -129,3 +136,4 @@ Nothing stopped the two drifting, and they had. A parity test now asserts that e
 - [BPMN Modeler](bpmn-modeler.md) — the Deploy modal and the `ronl:*` attributes
 - [Document Composer](document-composer.md) — how `.document` templates and their zones work
 - [Testing](../developer/testing.md) — the fixture and parity suites
+- [Besluitvorming onder gedelegeerde bevoegdheid](besluitvorming-gedelegeerd-bundle.md) — the delegated-decision bundle, which pairs a document with a signature

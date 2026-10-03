@@ -57,7 +57,7 @@ The only committed `staticwebapp.config.json` is the public ROPA site's, in `pac
 
 ## Backend deployment
 
-The backend builds TypeScript and runs on Azure App Service (Linux, Node.js 22). Both backend workflows run the same steps:
+The backend builds TypeScript and runs on Azure App Service (Linux, `NODE|24-lts`), building and testing on the Node version pinned in `.nvmrc` (24.21.0). Both backend workflows run the same steps:
 
 ```
 merge into acc (ACC)   /   called by the promotion (production)

@@ -34,6 +34,7 @@ Defined in `packages/frontend/src/types/document.types.ts`. Key interfaces:
 interface DocumentTemplate {
   id: string;
   name: string;
+  description?: string;
   processKey?: string;       // Operaton process definition key
   serviceId?: string;        // Chain Composer service identifier (informational)
   schemaVersion: number;     // currently 1
@@ -43,7 +44,9 @@ interface DocumentTemplate {
   createdAt: string;
   updatedAt: string;
   readonly?: boolean;
-  status?: 'example' | 'wip';
+  status?: 'example' | 'wip' | 'e2e';
+  language?: 'en' | 'nl' | 'de';
+  organization?: string;
 }
 
 interface DocumentZones {
@@ -99,18 +102,26 @@ DocumentService.deleteTemplate(id: string): void
 
 ## Example document seeding
 
-The seed document (`Kapvergunning Beschikking`) is stored at `public/examples/flevoland/kapvergunning-beschikking.document` and loaded on first launch via `exampleVersions.ts`:
+The example templates are defined inline in `DocumentComposer/defaultTemplates.ts` and listed in `DEFAULT_TEMPLATES`, eight in all:
 
-```typescript
-export const EXAMPLE_VERSIONS: Record<string, number> = {
-  'kapvergunning-beschikking': 1,
-  // ...
-};
-```
+| Template id | Name |
+|---|---|
+| `example_treefelling_beschikking` | Kapvergunning Beschikking (Example) |
+| `example_zorgtoeslag_provisional_beschikking` | Zorgtoeslag Voorlopige Beschikking (Example) |
+| `example_zorgtoeslag_final_beschikking` | Zorgtoeslag Definitieve Beschikking (Example) |
+| `example_dvtp_consent_receipt` | DvTP Toestemmingsbewijs (Example) |
+| `board-decision-notification-nl` | HR — Directiebesluit-notificatie (Voorbeeld, NL) |
+| `capacity-claim-handover-nl` | HR — Overdracht capaciteitsclaim (Voorbeeld, NL) |
+| `thuisbatterij_subsidie_beschikking` | Subsidie Thuisbatterij Beschikking |
+| `besluit-gb-besluit` | Besluit onder gedelegeerde bevoegdheid |
 
-The app checks `localStorage` key `linkedDataExplorer_exampleVersions`. If the stored version for a key is lower than `EXAMPLE_VERSIONS[key]`, the example file is re-fetched and written (as `readonly: true`, `status: 'example'`). This allows updating example content for existing users by incrementing the version number — no `localStorage` clear required.
+On mount, `DocumentComposer.tsx` saves every entry of `DEFAULT_TEMPLATES` whose id is not yet in `localStorage`. Seeding goes by presence, not by version: `exampleVersions.ts` plays no part here, and a template already stored in a browser is never overwritten by a newer default.
 
-**Developer workflow:** edit the example in `public/examples/flevoland/`, mirror the change to `examples/organizations/flevoland/`, increment the version in `exampleVersions.ts`, commit.
+Every example carries `status: 'example'`, which blocks deletion. All of them are `readonly: false` except `example_dvtp_consent_receipt`, which is `readonly: true`: **Save** is disabled for it, and **Save As** creates an editable copy.
+
+Some templates mirror a `.document` file that is deployed with a bundle. `thuisbatterij_subsidie_beschikking` is kept in step with `public/examples/flevoland/thuisbatterij_subsidie_beschikking.document`, and `besluit-gb-besluit` with `public/examples/flevoland/besluitvorming-gedelegeerd/besluit-gb-besluit.document` — the copy the LDE deploys and the RONL Business API renders for signing. The copy is inline because the Vite dev server rejects imports from `public/`; `defaultTemplates.test.ts` pins the inline copy and the file as identical.
+
+**Developer workflow:** edit the template in `defaultTemplates.ts`; where it mirrors a deployed `.document` file, change that file in the same commit.
 
 ---
 
@@ -171,31 +182,36 @@ if (elementType === 'bpmn:UserTask') {
 }
 ```
 
-Selecting a template writes:
+`ronl:documentRef` holds a comma-separated list of template ids, because one task can produce several documents. `utils/documentRefs.ts` reads and writes it: `parseDocumentRefs` splits on commas, trims whitespace and drops blanks; `formatDocumentRefs` joins the ids with a comma, or returns `undefined` for an empty list so that the attribute is removed rather than left empty. A BPMN with a single id needs no migration.
+
+The selector, labelled **Link decision templates**, shows each attached template as a removable chip. The select below it is an add action: choosing a template appends its id (`-- Add a template --`), and once every template is attached the select is disabled (`-- All templates attached --`). Every change writes the whole list:
 
 ```typescript
 modeling.updateProperties(element, {
-  'ronl:documentRef': templateId,
+  'ronl:documentRef': formatDocumentRefs(ids),
 });
 ```
 
-Selecting the blank option sets `ronl:documentRef` to `undefined` (removes the attribute).
+A chip for an id that has no template in this browser shows the id instead of a name, so an attachment from an imported BPMN stays visible.
 
 ### Document badge overlay
 
 The purple document badge is rendered in `BpmnCanvas.tsx` in the `element.changed` handler, immediately after the green form badge:
 
 ```typescript
-const documentRef = element.businessObject.get('ronl:documentRef');
-if (documentRef) {
-  overlays.add(element.id, 'document-linked', {
-    position: { bottom: -36, left: leftOffset }, // below the form badge
-    html: `<div class="document-linked-badge" title="${documentRef}">📄 ${documentRef}</div>`,
-  });
-}
+const documentRefs = parseDocumentRefs(element.businessObject.get('ronl:documentRef'));
+if (documentRefs.length === 0) return;
+const label =
+  documentRefs.length === 1 ? documentRefs[0] : `${documentRefs.length} documents`;
+overlays.add(element.id, 'document-linked', {
+  position: { bottom: -36, left: leftOffset }, // below the form badge
+  html: `<div class="document-linked-badge" title="${documentRefs.join(', ')}">📄 ${label}</div>`,
+});
 ```
 
-The badge is positioned 36px below the element (vs. 22px for the form badge), so both badges are visible simultaneously without overlapping.
+With one document the badge names it; with several it reads **N documents** and the tooltip lists every id. The badge is positioned 36px below the element (vs. 22px for the form badge), so both badges are visible simultaneously without overlapping.
+
+When a process is deployed, the bundle collects document ids from both `ronl:documentRef` and `ronl:signatureRef`, splitting each list, and includes the matching templates from local storage as `.document` resources. A referenced template that is not in local storage is reported in the deploy dialog and blocks the deploy.
 
 ---
 

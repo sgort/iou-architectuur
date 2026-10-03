@@ -40,7 +40,7 @@ R2.2 preceded it, and R5.3 closed the ladder in v2026.09.2.
 | Phase | Subject | Nodes | Flows | Lanes | Forms | Docs |
 |---|---|--:|--:|--:|--:|--:|
 | [R2.1](rip-phase1-bundle.md) | Projectdefinitie en voorbereiding VO | 19 | 21 | 9 | 12 | 3 |
-| [R2.2](rip-r22-bundle.md) | Voorlopig ontwerp | 17 | 21 | 4 | 9 | 4 |
+| [R2.2](rip-r22-bundle.md) | Voorlopig ontwerp | 17 | 21 | 4 | 9 | 5 |
 | R2.3 | VO-raming | 22 | 23 | 9 | 12 | 6 |
 | R2.4 | DO en -raming | 29 | 33 | 6 | 18 | 9 |
 | R3.1 | Opstellen bestek en tekeningen | 25 | 31 | 4 | 12 | 6 |
@@ -54,9 +54,10 @@ R2.2 preceded it, and R5.3 closed the ladder in v2026.09.2.
 
 !!! note "Counted from the BPMN, not from the release notes"
     Every figure above was derived by parsing the twelve `RipR*Process.bpmn` files at
-    the v2026.09.2 release commit — flow nodes (tasks, events and gateways),
+    the v2026.10.0 release commit — flow nodes (tasks, events and gateways),
     `sequenceFlow` elements, `lane` elements, distinct `camunda:formRef`/`formKey`
-    values, and distinct `ronl:documentRef`/`ronl:signatureRef` values.
+    values, and distinct `ronl:documentRef`/`ronl:signatureRef` ids, a
+    comma-separated `ronl:documentRef` counting each of its ids.
 
     They agree with the release notes everywhere the notes state a figure, with one
     exception: **R2.3 has 22 flow nodes, where the notes say 21.** The file is the
@@ -173,10 +174,12 @@ definition's own deployment, unique by construction, so tenanted and untenanted 
 coexist and no deployment history has to be destroyed.
 
 Every `camunda:formRef` in the processes the Modeler seeds from `public/examples/` binds
-this way, the Thuisbatterij bundle included. The only `"latest"` references left in the repository's BPMN files are the
-reference copies under `examples/organizations/flevoland/thuisbatterij/` and
-`examples/organizations/ind/`, which are not seeded: most of their form keys match no
-`.form` file in the repository.
+this way, the Thuisbatterij bundle included. The only `"latest"` references left in the repository's BPMN files are in
+`examples/organizations/flevoland/thuisbatterij/` and `examples/organizations/ind/`,
+which are not seeded. The Thuisbatterij folder is a superseded reference copy: its
+`README.md` marks it as drifted and not deployed, and names the maintained definitions,
+`public/examples/flevoland/ThuisbatterijSubsidieAanvraagProcess.bpmn` and its
+`e2e-fixtures/` copy.
 
 ---
 
@@ -191,5 +194,8 @@ phase-exit approval silently rendered an ordinary form instead of the signing pa
 !!! warning "Already-deployed definitions do not heal themselves"
     `public/examples` is seeded into `localStorage` and re-fetched only when its
     version rises. After a change to the seeded bundles you need a frontend deploy and
-    a page load that re-seeds; the `e2e-fixtures` copies must be re-imported through
-    the Modeler before an end-to-end run exercises them.
+    a page load that re-seeds. The `e2e-fixtures` copies are deployed with
+    `npm run e2e:deploy-fixtures`, which sends every bundle in
+    `e2e-fixtures/manifest.json` through the local LDE backend, the way a Modeler
+    deploy would, and refuses to run when that backend deploys to an Operaton
+    that is not on the local machine.

@@ -67,7 +67,7 @@ The methods read/write the entire array on each call. There is no batching or in
 
 ## `FormEditor.tsx` — seeding logic
 
-`EXAMPLE_FORMS` at the top of `FormEditor.tsx` lists 22 example forms — id, display name, description, path under `public/examples/`, `language` and `organization`. On mount, a `useEffect` seeds them by version rather than by presence:
+`EXAMPLE_FORMS` at the top of `FormEditor.tsx` lists 36 example forms — id, display name, description, path under `public/examples/`, `language` and `organization`. On mount, a `useEffect` seeds them by version rather than by presence:
 
 ```typescript
 for (const def of EXAMPLE_FORMS) {

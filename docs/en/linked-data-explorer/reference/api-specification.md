@@ -5,9 +5,12 @@ component: Linked Data Explorer
 # API Specification
 
 <!--
-  Provenance banner. /v1/openapi.json carries no version of its own, so the
-  version and build are read from /v1/health, which reports both for the very
-  service that just served the document.
+  Provenance banner. /v1/openapi.json carries info.version, taken from the
+  backend's package.json at build time, but no environment and no build. The
+  banner therefore reads /v1/health, which reports the version, environment
+  and build of the running process. The document is read lazily, so for a
+  moment after a zip deploy it can come from a newer artifact than the process
+  /v1/health describes.
 
   Unlike /v1/openapi.json — a public mount with wildcard CORS — /v1/health goes
   through the CORS_ORIGIN allowlist. Both deployed documentation tiers are on

@@ -17,7 +17,7 @@ The Document Composer lets you author formal government decision documents (*bes
 
 The Composer uses the same three-panel layout convention as the BPMN Modeler and Chain Builder.
 
-- **Left panel** — Document list. Shows all documents stored in `localStorage` with create, rename, delete, and **Save as…** actions. An **EXAMPLE** badge marks the read-only seed document; user-created documents carry a **WIP** badge.
+- **Left panel** — Document list. Shows all documents stored in `localStorage` with create, rename, delete, and **Save as…** actions. An **EXAMPLE** badge marks the eight seeded example templates, which cannot be deleted; user-created documents carry a **WIP** badge.
 - **Centre panel** — Zone canvas. Renders the document zones in A4-style layout. Blocks are dragged onto zones from the left panel's Content library, and can be reordered or moved between zones by dragging.
 - **Right panel** — Bindings. Links `{{placeholder}}` tokens in rich-text blocks to Operaton process variable keys. Only visible when a document is active.
 
@@ -83,7 +83,7 @@ Each binding records:
 
 Document templates are stored in PostgreSQL via the LDE backend, cached locally in `localStorage` for instant synchronous access. On editor load, the service fetches the authoritative list from `GET /v1/assets/documents` and replaces the local cache.
 
-Example templates (`readonly: true`) are seeded from `defaultTemplates.ts` on the frontend and are never written to the database.
+Example templates are seeded from `defaultTemplates.ts` on the frontend when their id is not yet in `localStorage`. Seeding saves them like any other template, so the editable examples are written to the database as well. The one read-only example, `example_dvtp_consent_receipt`, stays in `localStorage` only.
 
 See [Asset Storage](../developer/asset-storage.md) for the full architecture.
 
@@ -108,7 +108,7 @@ See [Multilingualism](multilingualism.md) for the architectural overview.
 
 ## BPMN Modeler integration
 
-A **Link decision template** selector is injected into the BPMN properties panel for every `UserTask` element. Selecting a document template writes `ronl:documentRef` to the BPMN XML. A purple badge appears below the element on the canvas, distinct from the green form badge (📝) and the amber DMN badge.
+A **Link decision templates** selector is injected into the BPMN properties panel for every `UserTask` element. A task can carry several templates: each one attached appears as a removable chip, and `ronl:documentRef` holds their ids as a comma-separated list. A purple badge appears below the element on the canvas, distinct from the green form badge (📝) and the amber DMN badge; it names the template, or reads **N documents** when several are attached.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: BPMN canvas showing a UserTask with all three badges: amber DMN badge, green form badge, and purple document badge stacked below the element](../../assets/screenshots/linked-data-explorer-bpmn-document-badge.png)

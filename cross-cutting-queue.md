@@ -304,6 +304,58 @@ Read at `origin/main` = `0625d48` (Promote to Production #6); `origin/acc` `0e3e
    comment. The 28 September item on the Keycloak admin scripts: `47cea9f` (#252) keeps secrets out of argv in
    all three scripts and deletes removed mappers.
 
+### 4 October 2026 — Linked Data Explorer v2026.09.8 → v2026.10.0 (production, `71a8236`)
+
+Read at `origin/main` = `71a8236` (Promote to Production #3); `origin/acc` `9e0d18e` holds the same tree.
+
+1. **LDE #119 is closed and continues as three focused issues — repoint every link to it.**
+   Evidence: #119 ("Dependency management: close the gaps against ICTU's guideline") closed on 3 October 2026,
+   superseded by #248 (R9 — show reviewers the transitive changes in the lockfile on dependency pull requests),
+   #249 (R5 — `npm audit signatures` in CI, and a decision on an internal registry or proxy) and #250 (R1, R11 —
+   criteria for adding a dependency, and a quarterly maintenance review). Read each issue before mapping: the
+   recommendation each covers is the analysis's reading, not yet checked against the rubric.
+   Bears on: every contributing page that links #119 as the live tracker — `ictu-dependency-guideline.md`
+   (two places), `branch-protection.md` (the R9 reference → #248), `controls.md`, `supply-chain.md`. The
+   assessment's open-item wording should name the three new issues.
+
+2. **The LDE daily audit made its first production catch.**
+   Evidence: #240 (opened 30 September, closed 3 October) — two highs in `brace-expansion` and one in
+   `http-cache-semantics`. `7dcfdea` (lockfile maintenance) cleared `brace-expansion`; `be5bc99` (#251) overrides
+   `libxmljs2`'s `node-gyp` to `^13.0.2` (`package.json:61-65`), dropping `make-fetch-happen` and taking the
+   backend production install from 349 packages to 271. With RBA's #303 on the same day, both repositories'
+   audits have now caught something real.
+   Bears on: `ictu-dependency-guideline.md` (R10), `dependency-scanning.md`, any "349 packages" figure.
+
+3. **All three repositories' audit and SBOM workflows now name Node 24.21.0.**
+   Evidence: `5eda128` — `dependency-audit.yml:60`, `sbom.yml:56`. Completes item 2 of 30 September and item 1 of
+   2 October. Bears on: `supply-chain.md` (the Node literals).
+
+4. **`check-rip-bpmn` is a new gate — in pre-push only, as is RBA's twin.**
+   Evidence: `.husky/pre-push:6`, `package.json:26`; RBA's `check-swimlane-fixtures` is in RBA's `.husky/pre-push`
+   and likewise in no workflow. The script's header says each repository enforces it "in ITS ci" — neither does.
+   Bears on: `code-standards.md` (hook contents; the list of hooks a worktree skips), the 28 September item on the
+   fingerprint contract.
+
+5. **The E2E fixture deploy moved to the LDE.**
+   Evidence: `cd68cca` — `scripts/deploy-e2e-fixtures.mjs` (`package.json:27`, `npm run e2e:deploy-fixtures`),
+   local-only and in no workflow; RBA keeps a shim. Bears on: whichever contributing page describes the
+   cross-repository fixture contract.
+
+6. **The deps marker is still unguarded in the LDE.** `scripts/write-deps-marker.mjs` has no
+   `npm_config_package_lock_only` check at `71a8236`, and `be5bc99` was made with `npm install --package-lock-only`.
+   Confirms item 2 of 3 October.
+
+7. **LDE `SECURITY-PIPELINE.md` now says "eleven workflows"**, its backend workflow comments say `NODE|24-lts`, and
+   `.npmrc` says Node 24.21.0 bundles npm 11.19 — the iou-architectuur#105 items landed. Re-count when draining.
+
+8. **`code-standards.md` advises `npm install` in a worktree**, where the LDE's ci-posture document and
+   `~/.claude/CLAUDE.md` say `npm ci`; its list of hooks a worktree skips should gain `check-rip-bpmn`.
+
+9. **A fixture- or example-only pull request runs no backend tests.**
+   Evidence: `azure-backend-acc.yml:81` — the `changes` pattern excludes `examples/`, `e2e-fixtures/` and
+   `packages/frontend/public/examples/`; PR #235 reported `deploy: SKIPPED`. So the bundle, parity and fixture
+   tests never gate the changes they exist to check. Bears on: `code-standards.md` (the CI section).
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

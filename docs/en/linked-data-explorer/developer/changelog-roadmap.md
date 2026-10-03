@@ -8,6 +8,28 @@ component: Linked Data Explorer
 
 ## Changelog
 
+### v2026.10.0 — A Besluit Under Delegated Authority, and Every Awb Example in Swimlanes (October 2026)
+
+> The new bundle: [Besluitvorming onder gedelegeerde bevoegdheid](../features/besluitvorming-gedelegeerd-bundle.md). Lanes, phases and documents in the Modeler: [BPMN Modeler](bpmn-modeler.md). How the RONL Business API shows it: [Caseworker](../../ronl-business-api/user-guide/caseworker.md#besluitvorming) and [BPMN Design Criteria](../../ronl-business-api/reference/bpmn-design-criteria.md). Measured suites: [Testing](testing.md).
+
+**Besluitvorming onder gedelegeerde bevoegdheid, as an example bundle.** The Modeler and Form Editor now seed a process in which a medewerker prepares a besluit under delegated authority: six lanes, six declared phases, a FIRST-hit routing DMN that sends a besluit to escalation, a memorandum or signing, twelve forms and a besluit document. The RONL Business API starts it from its Caseworker dashboard and signs it through ValidSign. A declined signature now escalates to the bevoegde bestuursautoriteit instead of looping back, and a bundle test pins the model, its forms and its routing.
+
+**The kapvergunning and zorgtoeslag processes are drawn in swimlanes.** `AwbShellProcess`, `TreeFellingPermitSubProcess` and the three zorgtoeslag processes are pools with lanes and Dutch names — their ids are unchanged — and their *aanvullende gegevens* task now links a missing-information form that exists and deploys with the process. The Awb shells and their subprocesses mark their steps with `ronl:awbPhase`, so the Business API's caseworker stepper can place a task in its Awb phase.
+
+**The HR capacity claim declares its own phases.** The Dutch process gets a lane per role and eight phases declared with `ronl:phases`, and resolves the shared routing DMN without a tenant, so it reaches the decision from any organisation.
+
+**A task can carry several documents.** `ronl:documentRef` takes a comma-separated list: the Modeler shows the linked templates as chips, adds more from a select, and badges a task with the document's name or *N documents*. The deploy dialog collects every document a model names — through `documentRef` and `signatureRef` — and R2.2's *Opstellen concept VO* now carries the Objectenboom beside the Ontwerptoelichting.
+
+**The RIP models are checked across three copies.** The twelve RIP models exist in the examples, in the E2E fixture bundle and as parser fixtures in the Business API; `npm run check-rip-bpmn` compares them byte for byte and against recorded fingerprints before every push. The E2E fixture bundle now deploys from this repository, through the local backend, with `npm run e2e:deploy-fixtures`.
+
+**The deploy dialog opens above the canvas.** It sat beneath the BPMN canvas's context pad, which bpmn-js stacks high; it now stacks above it.
+
+**The last production high is gone.** The daily dependency audit found two highs in `brace-expansion`, cleared by the weekly lockfile refresh, and one in `http-cache-semantics`, reachable through `libxmljs2`'s build tooling: overriding its `node-gyp` to version 13 drops that chain, and the backend's production install shrinks from 349 packages to 271. Frontend and backend dependency updates ride along.
+
+**Also in this release.** `test:scripts` runs on Windows again, and both of its harnesses pass there. A Thuisbatterij reference folder the repository had already written off now says so in a README. The dependency-audit and SBOM workflows name Node 24.21.0, matching `.nvmrc`. The dependency-management tracker #119 is closed and continues as three focused issues: #248 (transitive changes on dependency pull requests), #249 (signature verification and a registry decision) and #250 (criteria for adding a dependency, and a quarterly review).
+
+---
+
 ### v2026.09.8 — Every Release Ships Its Own SBOM, and the Tree Is Audited Daily (September 2026)
 
 > How a release reaches production: [Deployment](deployment.md#how-a-promotion-reaches-production). The mechanism across repositories: [Supply-Chain Pinning](../../contributing/supply-chain.md) and [ICTU Dependency Guideline](../../contributing/ictu-dependency-guideline.md). Measured suites: [Testing](testing.md).

@@ -7,14 +7,14 @@ component: Linked Data Explorer
 **A React-based SPARQL visualization and query tool for exploring Dutch Government Data (Regels Overheid)**
 
 🌐 **Live application:** [linkeddata.open-regels.nl](https://linkeddata.open-regels.nl)  
-🧪 **Acceptance environment:** [acc.linkeddate.open-regels.nl](https://acc.linkeddata.open-regels.nl)
+🧪 **Acceptance environment:** [acc.linkeddata.open-regels.nl](https://acc.linkeddata.open-regels.nl)
 
 [![Deployed on Azure Static Web Apps](https://img.shields.io/badge/Azure-Static_Web_Apps-blue?logo=microsoft-azure)](https://linkeddata.open-regels.nl)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-19.2-61dafb?logo=react)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-6.2-646cff?logo=vite)](https://vitejs.dev/)
-[![Node.js](https://img.shields.io/badge/Node.js-22-339933?logo=node.js)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-4.18-000000?logo=express)](https://expressjs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19.3-61dafb?logo=react)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-6.4-646cff?logo=vite)](https://vitejs.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-24-339933?logo=node.js)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-4.22-000000?logo=express)](https://expressjs.com/)
 ![License](https://img.shields.io/badge/License-EUPL--1.2-yellow.svg)
 
 ---
@@ -77,7 +77,7 @@ See also: [CPSV Editor documentation](../cpsv-editor/index.md).
 | **Production** | [linkeddata.open-regels.nl](https://linkeddata.open-regels.nl) | [backend.linkeddata.open-regels.nl](https://backend.linkeddata.open-regels.nl) |
 | **Acceptance** | [acc.linkeddata.open-regels.nl](https://acc.linkeddata.open-regels.nl) | [acc.backend.linkeddata.open-regels.nl](https://acc.backend.linkeddata.open-regels.nl) |
 | **Branch** | `main` / `acc` | `main` / `acc` |
-| **Platform** | Azure Static Web Apps | Azure App Service (Linux, Node.js 22) |
+| **Platform** | Azure Static Web Apps | Azure App Service (Linux, Node.js 24) |
 
 ---
 
@@ -85,14 +85,14 @@ See also: [CPSV Editor documentation](../cpsv-editor/index.md).
 
 | Layer | Technology | Version |
 |---|---|---|
-| Frontend framework | React | 19.2.3 |
-| Language | TypeScript | 5.8.x |
-| Build tool | Vite | 6.2.x |
-| Graph visualisation | D3.js | 7.9.x |
-| BPMN editor | bpmn-js | 18.12.0 |
-| Form editor | @bpmn-io/form-js | 1.20.x |
-| Drag-and-drop | dnd-kit | 6.x / 10.x |
-| Backend framework | Node.js + Express | 22 / 4.18.x |
+| Frontend framework | React | 19.3.0 |
+| Language | TypeScript | 5.9.3 |
+| Build tool | Vite | 6.4.3 |
+| Graph visualisation | D3.js | 7.9.0 |
+| BPMN editor | bpmn-js | 18.28.0 |
+| Form editor | @bpmn-io/form-js | 1.26.1 |
+| Drag-and-drop | dnd-kit (core / sortable) | 6.3.1 / 10.0.0 |
+| Backend framework | Node.js + Express | 24 / 4.22.3 |
 | DMN engine | Operaton | — |
 | Knowledge graph | TriplyDB | — |
 | Package structure | npm workspaces | monorepo |

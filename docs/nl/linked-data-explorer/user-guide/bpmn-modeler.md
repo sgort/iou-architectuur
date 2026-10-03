@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # BPMN Modeler
 
 !!! info "Documentatie in ontwikkeling"
@@ -31,6 +35,10 @@
 
 ---
 
+## Linking a UserTask to document templates
+
+---
+
 ## Deploying to Operaton
 
 ---
@@ -43,8 +51,16 @@
 
 ---
 
-## Saving and exporting
+## Storage
 
 ---
 
 ## The Tree Felling Permit example
+
+---
+
+## AWB shell and subprocess examples
+
+---
+
+## Standalone examples
