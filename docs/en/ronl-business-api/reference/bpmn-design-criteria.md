@@ -148,9 +148,11 @@ Recommended values:
 
 ---
 
-## Lanes and `ronl:awbPhase`: the caseworker process view
+## Lanes and phase markers: the caseworker process view
 
-The caseworker board shows where an open task stands in its process — the Awb-phase stepper ("Waar sta ik"), the steps per role, and the whole process as a swimlane — only for processes whose deployed BPMN carries the information. The backend reads it with `parseSwimlane()` in `packages/backend/src/rip-swimlane/bpmn-swimlane.ts`, served by `GET /v1/process/definition/key/:key/swimlane`; nothing about a process is configured anywhere else.
+The caseworker board shows where an open task stands in its process — the phase stepper ("Waar sta ik"), the steps per role, and the whole process as a swimlane — only for processes whose deployed BPMN carries the information. The backend reads it with `parseSwimlane()` in `packages/backend/src/rip-swimlane/bpmn-swimlane.ts`, served by `GET /v1/process/definition/key/:key/swimlane`; nothing about a process is configured anywhere else.
+
+The stepper shows one of two phase schemes, and a process uses exactly one: the Awb phases, marked with [`ronl:awbPhase`](#ronlawbphase), or phases the process declares itself, marked with [`ronl:phase`](#a-processs-own-phases-ronlphases-ronlphaselabel-ronlphase). The model the endpoint returns carries the scheme as `phaseSet` (`scheme` `awb` or `bpmn`, a `label`, and the ordered `phases`) and every node's phase code as `phase`; both are absent when the process has no valid marker.
 
 ### Lanes
 
@@ -194,6 +196,35 @@ The values are exactly those of `AWB_PHASES` in `@ronl/shared`. Phases 4 and 5 a
 
 - **An unmarked node inherits.** It takes the latest phase among its forward predecessors, so a join after an optional step (payment) lands in the later phase. Back edges — the flows that close a rework loop — are excluded, so a loop cannot pull an earlier step into a later phase. Marking the first node of each phase is therefore enough.
 - **No markers, no stepper.** A process with no valid marker gets no phases, and the board hides the stepper. A task in an unmarked subprocess takes the phase of the call activity that started it, walking up the call chain.
+
+On the board the eyebrow names the legal phase number, *Waar sta ik · Awb-fase 4+5 · stap 4 van 8*, and the caption under the stepper reads *Fase 4+5 · Behandeling en besluit*. Archiving has no phase number: the eyebrow names it (*Awb-fase Archivering*) and the caption reads *Archiefwet · Archivering*.
+
+### A process's own phases: `ronl:phases`, `ronl:phaseLabel`, `ronl:phase`
+
+A process that does not follow the Awb declares its phases on `<bpmn:process>` and marks nodes with `ronl:phase`. *Besluitvorming onder gedelegeerde bevoegdheid* does this:
+
+```xml
+<bpmn:process id="GedelegeerdBesluitProcess"
+  name="Besluitvorming onder gedelegeerde bevoegdheid"
+  ronl:phases="voorbereiding:Voorbereiding;toetsing:Advies en toetsing;memorandum:Memorandum;ondertekening:Ondertekening;escalatie:Escalatie;registratie:Registratie en archivering"
+  ronl:phaseLabel="Fase"
+  ...>
+  <bpmn:startEvent id="StartEvent_Besluit" name="Besluit voorbereiden" ronl:phase="voorbereiding">
+  ...
+  <bpmn:userTask id="Task_AdviesToetsing" name="Advies en toetsing" ronl:phase="toetsing" ...>
+```
+
+| Attribute | On | Meaning |
+|---|---|---|
+| `ronl:phases` | `<bpmn:process>` | The phases in order, as `code:Name` entries separated by `;` |
+| `ronl:phaseLabel` | `<bpmn:process>` | The word before a phase's position, `Fase` when absent |
+| `ronl:phase` | a flow node | The code of the phase that begins at this node |
+
+- **The order of `ronl:phases` is the stepper's order**, and a phase is referred to by its position: the stepper labels the second phase *Fase 2*, the eyebrow reads *Waar sta ik · Fase 2 · stap 2 van 6*, and the caption *Fase 2 · Advies en toetsing*. The codes are identifiers and never appear on screen.
+- **An unusable entry is skipped, not guessed at**: one without a code or a name, or one repeating an earlier code. Only the first `:` separates code from name, so a name may itself contain a colon. When no usable entry remains, the process is read as an Awb process.
+- **A marker must name a declared code.** A `ronl:phase` value that is not in `ronl:phases` is ignored without a warning, like an unknown `ronl:awbPhase` value.
+- **The two schemes never mix.** Once `ronl:phases` declares a usable phase, `ronl:awbPhase` is not read anywhere in the process; without it, `ronl:phase` is not read.
+- Inheritance, rework loops, subprocesses and "no markers, no stepper" work as for `ronl:awbPhase` above, so marking the first node of each phase is enough.
 
 ### Other attributes the view reads
 

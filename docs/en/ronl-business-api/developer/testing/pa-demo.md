@@ -37,14 +37,23 @@ wired into CI.
     running in which nothing in this package moved. The duration made its point
     a third time: `Duration 8.16s`, against 19.62s for the same bytes.
 
+    **And on 3 October 2026** for v2026.10.0 (`main` at `0625d48`), in the
+    working checkout on `acc` at `0e3eed8`, with
+    `npm run test:serial --workspace=packages/pa-demo` on Node 22.23.2 — the
+    first pass on the Node `.nvmrc` names: **19 files · 106 tests · all
+    passing**, coverage **93.47 / 95.65 / 85.00 / 92.85** and every per-area
+    row unchanged again, with `git diff ae06c9e 0625d48 -- packages/pa-demo/src`
+    empty. `Duration 35.65s` this time, because the run had file parallelism
+    off — the fourth duration for the same bytes, and the least comparable.
+
 **At a glance:**
 
 | | |
 |---|---|
 | Runner | Vitest 4 + jsdom, coverage via v8 |
-| Files / tests | 19 / 106 |
-| Wall time | 19.62 s |
-| Playwright | 11 tests in `e2e/plato-demo.spec.ts`, **runs in CI** |
+| Files / tests | 19 / 106 (3 October 2026) |
+| Duration | 35.65 s serially on 3 October; 8.16 s to 19.62 s in parallel runs before that |
+| Playwright | 11 tests in `e2e/plato-demo.spec.ts`, **runs in CI** — 11 passed, 10.2s, on 3 October |
 
 ---
 
@@ -153,11 +162,11 @@ real selectors, which would have opened exactly that hole.
 
 `packages/pa-demo/e2e/plato-demo.spec.ts` — **11 tests**, Chromium only.
 
-!!! note "Not re-run on 24 September 2026"
-    The spec file was confirmed present and unchanged at `86af73e`, but the
-    suite itself was not executed in this pass either: its last measurement
-    still stands at **30 August 2026 — 11 passed, 14.7s**. See
-    [E2E & live smoke](e2e.md).
+!!! note "Re-run on 3 October 2026: 11 passed, 10.2s"
+    Run locally on 3 October 2026 for v2026.10.0, with seven workers:
+    **11 passed in 10.2s**, every test between 2.9s and 6.8s.
+    The spec is unchanged since `86af73e`. The previous local measurement was
+    **30 August 2026 — 11 passed, 14.7s**. See [E2E & live smoke](e2e.md).
 
 This is the one Playwright suite in the repository that **runs in CI**, as a
 blocking step of `azure-pa-demo-acc.yml`, before the build — the acc workflow
@@ -208,7 +217,8 @@ the latter proven load-bearing by a red probe with the agenda mock disabled.
 
 ## Coverage
 
-Re-derived on 24 September 2026 from the run's own `coverage-summary.json`.
+Re-derived on 24 September 2026 from the run's own `coverage-summary.json`,
+and reproduced row for row from the 3 October run's `coverage-final.json`.
 
 | Area | Files | Stmts | Branch | Funcs | Lines |
 |---|---:|---:|---:|---:|---:|

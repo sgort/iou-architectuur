@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Operaton MCP-client
 
 !!! info "Documentatie in ontwikkeling"
@@ -33,7 +37,7 @@
 
 ---
 
-## Dedicated Operaton-instantie
+## Operaton-engine
 
 ---
 

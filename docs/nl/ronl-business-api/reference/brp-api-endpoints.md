@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # BRP API-endpoints - API-referentie
 
 !!! info "Documentatie in ontwikkeling"
@@ -19,10 +23,6 @@
 
 ---
 
-## POST /brp/verblijfplaatshistorie
-
----
-
 ## Foutmeldingen
 
 ---
@@ -32,10 +32,6 @@
 ---
 
 ## Beveiligingsoverwegingen
-
----
-
-## Wijzigingslogboek
 
 ---
 

@@ -9,44 +9,58 @@ of `npm test`, and **one of the three runs in CI**.
 
 | Suite | Where | Specs | Tests | In CI? | Last measured |
 |---|---|---:|---:|---|---|
-| Frontend Playwright | `packages/frontend/e2e/` | **11** | **27**, and now a floor | No | **30 Aug — 27 passed, 1.9m** |
-| Public-site Playwright | `packages/public-site/e2e/` | 1 | **6** | No | **30 Aug — 6 passed, 26.5s** |
-| **PA-demo Playwright** | `packages/pa-demo/e2e/` | 1 | **11** | **Yes** — `azure-pa-demo-acc.yml` | **30 Aug — 11 passed, 14.7s** |
+| Frontend Playwright | `packages/frontend/e2e/` | **11** | **28** | No | **3 Oct — 27 passed, 1 skipped, 2.8m** |
+| Public-site Playwright | `packages/public-site/e2e/` | 1 | **6** | No | **3 Oct — 6/6 serially, 7.8s; 2 timeouts in the parallel run** |
+| **PA-demo Playwright** | `packages/pa-demo/e2e/` | 1 | **11** | **Yes** — `azure-pa-demo-acc.yml` | **3 Oct — 11 passed, 10.2s** |
 | Live smoke scripts | `scripts/*.sh` | 4 scripts | — | No | never run for these pages |
 
-**44 end-to-end tests, all three suites green**, measured on 30 August 2026
-against `acc` at `15dfbf9` with a full local stack running. That was the first
-pass in which all three were run together rather than described from
-configuration, and it is still the last.
+**45 end-to-end tests, all three suites green — the frontend with one
+journey skipping itself by design, and the public site green serially.**
+Measured on **3 October 2026** for v2026.10.0 (`main` at `0625d48`), from the
+working checkout on `acc` at `0e3eed8`, against the full local stack the
+developer already had running; nothing was started or stopped for the run.
+It is the first pass since 30 August 2026 in which the three were run rather
+than described from configuration.
 
-!!! warning "Not re-run on 30 September — and still understating the frontend suite"
-    The unit suites were re-measured for v2026.09.15 (`main` at `ae06c9e`) on
-    30 September; the Playwright suites were **not**, for the sixth pass
-    running — this time by choice, rather than run against ACC. Every count in
-    this page's tables dates from 30 August and is repeated unchanged rather
-    than re-derived — a measured number is worth more stale than a guess is
-    fresh. Two of the three suites need services these passes deliberately did
-    not start.
+!!! success "Re-run on 3 October — the frontend count is a total again"
+    Every pass from 12 to 30 September left the Playwright suites alone, and
+    the 27-test frontend figure they repeated was measured when there were ten
+    specs, so it could not include `thuisbatterij-journey.spec.ts`. On
+    3 October the runner collected **28 tests across the eleven specs** —
+    27 passed and one skipped:
 
-    **The inventory, re-checked at `ae06c9e` straight from the spec tree, is
-    thirteen specs**: eleven in `packages/frontend/e2e/`, plus
-    `packages/pa-demo/e2e/plato-demo.spec.ts` and
-    `packages/public-site/e2e/publiek.spec.ts`. The count is unchanged since
-    v2026.09.11: **neither v2026.09.14 nor v2026.09.15 added or removed a
-    spec**. `thuisbatterij-journey.spec.ts` arrived in v2026.09.11, after the
-    only run of this suite measured here, so the 27-test frontend figure —
-    measured when there were ten — **cannot** include it. Read 27 as a floor
-    rather than a total until the suite is run again. The workflow wiring is
-    unchanged too: the pa-demo spec runs in `azure-pa-demo-acc.yml` and only
-    there, and no workflow runs the other two.
+    - **`thuisbatterij-journey`** ran for the first time on these pages:
+      **1 test, passed, 8.4s**.
+    - **`rip-r21-journey`** skipped itself, by one of its two runtime guards:
+      the local stack signs with the real ValidSign
+      (`VALIDSIGN_STUB_MODE=false`), and the journey will not request a binding
+      signature, so it refuses before sending a package and creates nothing.
+      See [below](#frontend-playwright-suite).
+
+    **The public-site suite went red once and green serially, and is recorded
+    that way.** Run with its config's default workers — six on that machine —
+    it returned **4 passed, 2 failed**: both search-journey tests
+    (`publiek.spec.ts:6` and `:27`) timed out after 10s waiting for the
+    search-result filter checkbox to appear. Re-run with `--workers=1` against
+    the same running backend, it passed **6/6 in 7.8s**. *6/6 serially; 2
+    timeouts in the parallel run* — not a defect until it fails on its own;
+    see [Public-site Playwright suite](#public-site-playwright-suite).
+
+    **The inventory is thirteen specs**, unchanged since v2026.09.11: eleven in
+    `packages/frontend/e2e/`, plus `packages/pa-demo/e2e/plato-demo.spec.ts`
+    and `packages/public-site/e2e/publiek.spec.ts`. v2026.10.0 changed no
+    spec, no `playwright.config.ts` and no helper:
+    `git diff ae06c9e 0625d48 -- 'packages/*/e2e'` is empty. The workflow
+    wiring is unchanged too: the pa-demo spec runs in `azure-pa-demo-acc.yml`
+    and only there, and no workflow runs the other two.
 
     The eleven: `caseworker-journey`, `infra-board-journey`, `login-redirect`,
     `pa-live-authoring`, `pa-mock-journey`, `protected-route`,
-    `rip-r21-journey`, `smoke`, `tenant-isolation`, **`thuisbatterij-journey`**,
+    `rip-r21-journey`, `smoke`, `tenant-isolation`, `thuisbatterij-journey`,
     `zorgtoeslag-journey`.
 
-    **v2026.09.14 changed three specs and the login helper, none in its test
-    count** — read from the source at `ae06c9e`, not run:
+    **History: v2026.09.14 changed three specs and the login helper, none in
+    its test count** — read from the source at `ae06c9e`:
 
     - **`e2e/helpers/auth.ts` matches the medewerker login button exactly**
       (`9f54e82`). v2026.09.13 added *"Inloggen met uw Flevoland-account"* to
@@ -65,10 +79,9 @@ configuration, and it is still the last.
       [below](#frontend-playwright-suite).
 
     The three `playwright.config.ts` files are unchanged between `86af73e` and
-    `ae06c9e`, and `e2e/global-setup.ts` changed only in v2026.09.13, when its
+    `0625d48`, and `e2e/global-setup.ts` changed only in v2026.09.13, when its
     fix messages began naming `npm run e2e:deploy-fixtures` — see
-    [What each suite needs running](#what-each-suite-needs-running), which is
-    current as of 30 September even though the counts above are not.
+    [What each suite needs running](#what-each-suite-needs-running).
 
 ### What each suite needs running
 
@@ -78,7 +91,8 @@ anything locally — it is what separates a suite you can start cold from one th
 will fail its preconditions.
 
 Re-read at `86af73e` on 24 September 2026; the configs are unchanged at
-`2443adc` (v2026.09.12), `963fe24` (v2026.09.13) and `ae06c9e` (v2026.09.15).
+`2443adc` (v2026.09.12), `963fe24` (v2026.09.13), `ae06c9e` (v2026.09.15) and
+`0625d48` (v2026.10.0).
 
 | Config | Declares `webServer`? | Has a `globalSetup`? | What must already be up |
 |---|---|---|---|
@@ -134,16 +148,18 @@ Four things follow from that table:
 
 !!! warning "Count these with the runner, never with `grep`"
     A static count of top-level `test(` across the eleven frontend specs gives
-    **24** at `86af73e`, and still 24 at `2443adc` and at `ae06c9e`. The
-    runner reported **27** across ten of them on 30 August. `login-redirect.spec.ts` alone declares one `test(` and runs
-    five, because the cases are parameterised — and `rip-r21-journey.spec.ts`
-    contains **two** `test.skip(true, reason)` calls *inside* test bodies,
-    runtime skips that a naive grep reads as skipped declarations. Neither is
-    visible from the source text.
+    **24** at `86af73e`, and still 24 at `2443adc`, `ae06c9e` and `0625d48`.
+    The runner reported **27** across ten of them on 30 August, and **28**
+    across all eleven on 3 October. `login-redirect.spec.ts` alone declares
+    one `test(` and runs five, because the cases are parameterised — and
+    `rip-r21-journey.spec.ts` contains **two** `test.skip(true, reason)` calls
+    *inside* test bodies, runtime skips that a naive grep reads as skipped
+    declarations, and one of which fired on 3 October. Neither is visible
+    from the source text.
 
-    This is why `thuisbatterij-journey.spec.ts` is listed above without a test
-    count rather than with the 1 its source shows. The only honest way to fill
-    that cell is to run the suite.
+    This is why `thuisbatterij-journey.spec.ts` was listed without a test count
+    until it was run, rather than with the 1 its source shows. The runner
+    agreed on 3 October, but only the run could say so.
 
 !!! note "The public-site suite needs the backend, and says nothing useful without it"
     Run with no backend on `:3002`, three of its six fail on timeouts — the two
@@ -151,6 +167,16 @@ Four things follow from that table:
     results. That is an unmet dependency, not a regression: the same specs at the
     same commit pass 6/6 once the backend is up. Re-running serially reproduces
     the same three, so it is not contention either.
+
+    **3 October was the other case, and the check told them apart.** With the
+    backend up, the default parallel run failed **two** — the two
+    search-journey tests, waiting 10s for the filter checkbox — while the
+    detail-page axe scan, which also needs search results, passed. Re-run
+    serially it was 6/6 in 7.8s. A missing backend fails the same three
+    serially and in parallel; this failed two in parallel only. That is
+    consistent with contention, not with an absent dependency, and a
+    parallel-only failure is not a defect until it fails on its own —
+    recorded as *6/6 serially; 2 timeouts in the parallel run*.
 
 The PA-demo suite is covered on its own page — see
 [PA-demo suite](pa-demo.md#the-playwright-suite). It is in CI because it needs
@@ -244,7 +270,8 @@ What the real deployer does, and what it needs:
 
     Only then does `npm run test:e2e --workspace=@ronl/frontend` get past its
     own preconditions. That list is the whole reason this suite is not in CI,
-    and the reason its figures on this page are a month old.
+    and the reason its figures went unmeasured from 30 August until a pass on
+    3 October found the stack already up.
 
 ---
 
@@ -257,25 +284,25 @@ The single worker is deliberate: two specs race to claim an identically-named
 task for the same caseworker against the shared local Operaton engine, so the
 suite trades parallelism for correctness.
 
-The directory held **27 tests across 10 specs** when it was last run, in one
-pass on 30 August 2026 against `acc` at `15dfbf9`: **27 passed, 1.9m**, no
-failures, no flakes, nothing skipped. It holds **eleven specs** at `86af73e`,
-at `2443adc` and at `ae06c9e`, so the 27 is a floor — see the warning at the
-top of this page.
+**Measured 3 October 2026: 28 tests across 11 specs — 27 passed, 1 skipped,
+2.8m**, one worker, against the developer's already-running local stack.
+Nothing failed and nothing was retried. The previous run, on 30 August 2026
+against `acc` at `15dfbf9`, was 27 tests across the 10 specs there were then:
+27 passed, 1.9m.
 
-| Spec | Tests | Covers |
-|---|---:|---|
-| `infra-board-journey.spec.ts` | 7 | The Infra-board, including a full sweep asserting no failed request and no console error |
-| `pa-mock-journey.spec.ts` | 5 | PA cockpit mock mode against the real store |
-| `login-redirect.spec.ts` | 5 | Role-based landing, parameterised per role |
-| `protected-route.spec.ts` | 3 | Route guards |
-| `pa-live-authoring.spec.ts` | 2 | Authoring against the live backend and a real database |
-| `rip-r21-journey.spec.ts` | 1 | **The R2.1 phase, all twelve tasks, ending in the signing panel** |
-| `caseworker-journey.spec.ts` | 1 | The caseworker journey end to end |
-| `zorgtoeslag-journey.spec.ts` | 1 | The zorgtoeslag journey |
-| `tenant-isolation.spec.ts` | 1 | Tenant scoping |
-| `smoke.spec.ts` | 1 | Boot and render |
-| **`thuisbatterij-journey.spec.ts`** | *not yet measured* | **New in v2026.09.11.** A third deep two-persona journey: a citizen applies for a Thuisbatterij subsidy, the six-decision `RechtEnHoogteSubsidieThuisbatterij` DRD evaluates, and the caseworker reviews the resulting task |
+| Spec | Tests | 3 October | Covers |
+|---|---:|---|---|
+| `infra-board-journey.spec.ts` | 7 | 7 passed | The Infra-board, including a full sweep asserting no failed request and no console error |
+| `pa-mock-journey.spec.ts` | 5 | 5 passed | PA cockpit mock mode against the real store |
+| `login-redirect.spec.ts` | 5 | 5 passed | Role-based landing, parameterised per role |
+| `protected-route.spec.ts` | 3 | 3 passed | Route guards |
+| `pa-live-authoring.spec.ts` | 2 | 2 passed | Authoring against the live backend and a real database |
+| `rip-r21-journey.spec.ts` | 1 | **skipped** — real ValidSign on the stack | **The R2.1 phase, all twelve tasks, ending in the signing panel** |
+| `caseworker-journey.spec.ts` | 1 | passed, 24.5s | The caseworker journey end to end |
+| `zorgtoeslag-journey.spec.ts` | 1 | passed, 6.1s | The zorgtoeslag journey |
+| `tenant-isolation.spec.ts` | 1 | passed, 11.5s | Tenant scoping |
+| `smoke.spec.ts` | 1 | passed | Boot and render |
+| **`thuisbatterij-journey.spec.ts`** | **1** | **passed, 8.4s — first measurement** | **New in v2026.09.11.** A third deep two-persona journey: a citizen applies for a Thuisbatterij subsidy, the six-decision `RechtEnHoogteSubsidieThuisbatterij` DRD evaluates, and the caseworker reviews the resulting task |
 
 !!! note "The thuisbatterij journey accepts both task names — edited in v2026.09.12"
     `0e71fd3`, *"match the Thuisbatterij tasks by their Dutch names as well"*,
@@ -291,9 +318,9 @@ top of this page.
 
     Accepting both rather than switching to the new names is deliberate, and the
     commit says why: the journey should pass on engines still running the old
-    definitions and on those running the new ones. The test count is unchanged — one `test()` — and the
-    spec has still never been run by these pages, so its row stays *not yet
-    measured*. Read from the spec at `2443adc`, not run.
+    definitions and on those running the new ones. The test count is
+    unchanged — one `test()`. Read from the spec at `2443adc`; the spec was
+    first run by these pages on 3 October 2026, and passed.
 
 !!! note "Three more specs accept the Dutch names, and the login helper matches exactly — v2026.09.14"
     linked-data-explorer redrew the Kapvergunning and Zorgtoeslag processes in
@@ -318,7 +345,8 @@ top of this page.
     page's new *"Inloggen met uw Flevoland-account"* button made the substring
     match ambiguous and Playwright's strict mode refused to click either. Every
     spec that signs a medewerker in goes through that helper. Test counts are
-    unchanged in all four files; read from the source at `ae06c9e`, not run.
+    unchanged in all four files; read from the source at `ae06c9e`, and all
+    four passed when run on 3 October.
 
 !!! note "What the thuisbatterij journey is actually guarding"
     Read from the spec at `86af73e`, not run; the passage below is unchanged at `2443adc`. Its processes deploy under
@@ -407,31 +435,48 @@ There was one at v2026.09.9; the second arrived in `097ff84`, *"skip rather than
 fail where a tier signs for real"* — a tier with real signing configured cannot
 complete the journey's approval task, and skipping with a reason is the honest
 outcome there rather than a red run. Neither skipped in the 30 August
-measurement, which predates both.
+measurement, which predates both. **On 3 October the second one fired**, on a
+local stack configured with `VALIDSIGN_STUB_MODE=false`, and logged:
+
+```text
+[rip-r21-journey] SKIPPED — local dev stack signs with the real ValidSign
+(VALIDSIGN_STUB_MODE=false), and this journey will not request a binding
+signature. Nothing was created — the refusal happens before
+POST /task/:id/package. Run it against a target where VALIDSIGN_STUB_MODE=true.
+```
+
+That is the outcome the commit designed for, and it is why the run reads
+*27 passed, 1 skipped* rather than 28 passed. It also means the R2.1 work —
+and v2026.10.0's signing changes, the panel now shared with the caseworker
+inbox and signing state kept per task — was not driven in a browser by this
+pass. A run against a target in stub mode is what would.
 
 ### Coverage per board
 
-The 27 tests do not spread evenly, and four of the eleven specs belong to no
+The 28 tests do not spread evenly, and four of the eleven specs belong to no
 board at all. This table is the one to check before claiming a board has or
 lacks end-to-end coverage — the per-board pages defer to it.
 
 | Board | Specs | Tests | Which |
 |---|---:|---:|---|
-| [Infra-board](dashboards/infra-board.md) | 2 | **8** | `infra-board-journey` (7, the shell), `rip-r21-journey` (1, the work) |
+| [Infra-board](dashboards/infra-board.md) | 2 | **8** | `infra-board-journey` (7, the shell), `rip-r21-journey` (1, the work — skipped on 3 October, see above) |
 | [PA cockpit](dashboards/pa-cockpit.md) | 2 | **7** | `pa-mock-journey` (5), `pa-live-authoring` (2) |
-| [Caseworker](dashboards/caseworker.md) | 3 | **2 + thuisbatterij** | `caseworker-journey` (1), `zorgtoeslag-journey` (1), `thuisbatterij-journey` (not yet measured) — all three matching the Dutch task names as well as the English ones since v2026.09.14 |
+| [Caseworker](dashboards/caseworker.md) | 3 | **3** | `caseworker-journey` (1), `zorgtoeslag-journey` (1), `thuisbatterij-journey` (1) — all three matching the Dutch task names as well as the English ones since v2026.09.14 |
 | [Woo-dashboard](dashboards/woo-dashboard.md) | 0 | **0** | — |
 | *No single board* | 4 | **10** | `login-redirect` (5), `protected-route` (3), `tenant-isolation` (1), `smoke` (1) |
 
-The last row is the reason a naive per-board sum does not reach 27:
-authentication redirects, route guards, tenant scoping and the boot smoke test
-cut across every board and belong to none.
+The last row is the reason a naive per-board sum of the boards alone does not
+reach 28: authentication redirects, route guards, tenant scoping and the boot
+smoke test cut across every board and belong to none.
 
 The Caseworker row is the one that moved: `thuisbatterij-journey.spec.ts` is a
-third deep journey ending in a caseworker review task, and it landed after the
-only pass in which this suite was run. Its test count is left blank rather than
-guessed — it declares a single `test()`, but the warning below is exactly about
-not trusting that reading.
+third deep journey ending in a caseworker review task. It landed after the
+30 August run, and until 3 October its count was left blank rather than
+guessed from the single `test()` it declares — the warning above is exactly
+about not trusting that reading. The run confirmed it: one test.
+
+No spec drives Besluitvorming, the caseworker section v2026.10.0 added; it is
+covered by unit tests only — see [Caseworker](dashboards/caseworker.md#e2e).
 
 !!! warning "Re-derive this table from the spec directory, not from the release being synced"
     The Infra-board specs landed on 24 August 2026 and this documentation
@@ -524,14 +569,27 @@ Covered on [Public site suite](public-site.md#playwright-suite) — six tests
 including three axe-core accessibility scans, and the one suite here that
 starts its own dev server.
 
-Its own tests were last counted on 30 August; the timing and pass figures on
-[Public site suite](public-site.md#playwright-suite) date from 19 August and
-were re-run for none of v2026.08.23, v2026.09.7, v2026.09.9, v2026.09.11,
-v2026.09.12, v2026.09.13 or v2026.09.15. The package's unit suite has grown
-four times since (**33 files, 265 tests** on 30 September 2026, up from 32 and
-235), so the six E2E tests are an inventory figure, not a fresh result. The
-inventory itself was re-checked at `ae06c9e`: still one spec, unchanged since
-`2443adc`, still in no workflow.
+**Re-run on 3 October 2026**, for the first time since 30 August, against the
+developer's already-running backend — and the one suite in this pass that went
+red before it went green:
+
+| Run | Workers | Result | Time |
+|---|---:|---|---:|
+| Default (`fullyParallel: true`, no `workers` set) | 6 | **4 passed, 2 failed** — `publiek.spec.ts:6` *search → filter → detail → back preserves the filtered URL* and `:27` *a deep link with filters pre-applied renders those filters checked*, each a `TimeoutError` after 10s waiting for `getByRole('checkbox', { name: /Regel/ })` | 17.2s |
+| `--workers=1` | 1 | **6 passed** | 7.8s |
+
+**Recorded as 6/6 serially, with 2 timeouts in the parallel run — not as a
+defect.** Both failures are the same wait in the two tests that need a
+filtered result list; the detail-page axe scan, which also needs search
+results, passed in the same parallel run, and the serial run passed all six
+against the same backend. That is consistent with contention, not with a
+missing backend (which fails three, serially too), and nothing failed on its
+own. It is worth
+watching rather than dismissing: if this suite is wired into CI — see
+[Overview → Roadmap](overview.md#roadmap) — that 10-second wait under
+parallel workers is the first thing the run will test. The spec is unchanged
+since `2443adc` and still in no workflow. See
+[Public site suite](public-site.md#playwright-suite).
 
 ---
 
@@ -543,14 +601,14 @@ cases (one of them only data it created itself), and need real credentials for
 some tiers.
 
 **These were not run for this page.** They are described from their
-configuration and specs only.
+configuration and source only — `test-m2m-routes.sh` read at `0625d48`.
 
 | Script | Covers | Mutates? |
 |---|---|---|
 | `test-smoke-live.sh` | Cross-app health: Operaton, Keycloak, LDE, TriplyDB, CPRMV, media store, eDOCS reach/status, MCP layer | No |
 | `test-edocs-live.sh` | eDOCS workspace and document lifecycle — see [eDOCS — Live Testing](edocs-live-testing.md) | Yes |
 | `test-doccle-live.sh` | Doccle sender API — see [Doccle — Live Testing](doccle-live-testing.md) | Yes — not yet live-tested, still `DOCCLE_STUB_MODE=true` in every run so far |
-| `test-m2m-routes.sh` | The active `/v1/m2m` operations: the reads, `decision.evaluate`, and — since v2026.09.14 (#214) — a write lifecycle of start, claim, complete and delete. Local by default, reading the seeded client secret from the realm file; `TARGET=acc` needs an explicit `CLIENT_SECRET` | Yes, but only its own: the lifecycle starts two instances and removes both, and never writes to an instance it did not create |
+| `test-m2m-routes.sh` | The active `/v1/m2m` operations: the reads, `decision.evaluate`, and — since v2026.09.14 (#214) — a write lifecycle of start, claim, complete and delete. Since v2026.10.0 it also asserts that **`POST /v1/m2m/process/history` filters** — a request filtered on one `processDefinitionKey` must return at least one instance and none of another key, since a dropped filter answers 200 with the whole history (#263); that the deprecated **`GET` answers with `Deprecation: @1790985600`**; and that **start and complete refuse a caller-supplied `municipality` with `400 RESERVED_VARIABLE`** (#261), the refused completion leaving the task open for the real one. Its tenant-isolation check reads the problem's `code`. Local by default, reading the seeded client secret from the realm file; `TARGET=acc` needs an explicit `CLIENT_SECRET`, and on ACC the M2M surface now uses ACC's main engine (#262) | Yes, but only its own: the lifecycle starts two instances and removes both, and never writes to an instance it did not create — if the reserved-variable guard on start ever failed, the stray instance is cancelled at once |
 
 ```bash
 bash scripts/test-smoke-live.sh                                     # local, full run

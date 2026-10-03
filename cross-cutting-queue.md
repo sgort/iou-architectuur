@@ -265,6 +265,45 @@ Read at `origin/main` = `719683b` (Deploy PROD (white-sky) #104); `origin/acc` `
 
 Nothing else cross-cutting surfaced: no `.husky`, `renovate.json` or `package.json` script changed in the range.
 
+### 3 October 2026 — RONL Business API v2026.09.15 → v2026.10.0 (production, `0625d48`)
+
+Read at `origin/main` = `0625d48` (Promote to Production #6); `origin/acc` `0e3eed8` holds the same tree.
+
+1. **The daily dependency audit made its first real production catch.**
+   Evidence: on 3 October 2026 the audit on `acc` failed on a high advisory in `braces` (GHSA-vfj7-8cjw-p6xm, no
+   patched release), opening #303; `c48b2cd` (#305) made `@tailwindcss/typography` a devDependency, which leaves
+   `braces` dev-only. #307 opened for `main` and closed after the promotion. Gate: `dependency-audit.yml:84,99`.
+   Bears on: `dependency-scanning.md` (the section on what the audit has caught), `ictu-dependency-guideline.md` (R10).
+
+2. **The deps-marker fix exists only in the RONL Business API.**
+   Evidence: `6673eee` (#288) — `scripts/write-deps-marker.sh:15-25` exits when `npm_config_package_lock_only` is
+   true. The Linked Data Explorer's and the CPSV Editor's `scripts/write-deps-marker.mjs` on `origin/acc` have no
+   such guard, so a lockfile-only install there still rewrites the marker.
+   Bears on: `code-standards.md` (the `deps:check` description), `skills-and-boundaries.md`.
+
+3. **Both API components now answer RFC 9457 problem details, and RBA's lint gates the rules.**
+   Evidence: `81a6c49` (#216); `.spectral.yaml:20-32` — the three nlgov problem-details rules are on, with one
+   override (the ValidSign stub ceremony's HTML 500). The Linked Data Explorer did the same in its #131.
+   Bears on: `doc-architecture/openapi-rendering.md`, and any contributing page that lists ADR deviations.
+
+4. **Local Redis is held at 7.2 by digest, for its licence.**
+   Evidence: `c69b8ea` — `docker-compose.yml:114` pins `redis:7.2-alpine@sha256:29e8589c…` (Redis 7.2.16,
+   BSD-3-Clause); 7.4 and later are RSALv2/SSPLv1. Not verified: whether `renovate.json` holds Redis below 7.4 —
+   if not, a Renovate bump would change the licence silently.
+   Bears on: `supply-chain.md` (the images pinned by digest).
+
+5. **The SBOM count is stale.** `ictu-dependency-guideline.md` says "two per repository"; the RONL Business API
+   now has six committed release SBOMs (2026.09.11 to 2026.10.0). Re-count all three when draining.
+
+6. **`/v1/m2m` uses the main engine on every tier.**
+   Evidence: `9509046` (#262) — `m2m.routes.ts:14-23`; `docs/promote-ACC-to-PROD.md` §4.4 says the
+   `OPERATON_M2M_*` settings are unset on both tiers (deleting them on production is an App Service write).
+   Bears on: `development-workflow/overview.md`, only if it describes promotion steps.
+
+7. **Additions to earlier entries.** The 30 September item on the conformance teardown: `ee5bb54` fixed the
+   comment. The 28 September item on the Keycloak admin scripts: `47cea9f` (#252) keeps secrets out of argv in
+   all three scripts and deletes removed mappers.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

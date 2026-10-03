@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Timeline Implementation - Developer Guide
 
 ---
@@ -251,9 +255,10 @@ if (deathDate && targetDate >= deathDate) {
  */
 router.post('/verblijfplaatshistorie', jwtMiddleware, async (req: Request, res: Response) => {
   try {
+    // Never log req.body or an upstream body: both carry BSNs.
     logger.info('BRP verblijfplaatshistorie request', {
       userId: req.user?.userId,
-      requestBody: req.body,
+      tenantId: req.user?.tenantId,
     });
 
     // Forward to BRP verblijfplaatshistorie API
@@ -271,18 +276,13 @@ router.post('/verblijfplaatshistorie', jwtMiddleware, async (req: Request, res: 
     );
 
     if (response.status >= 400) {
-      logger.error('BRP API returned error', {
+      logger.error('BRP API returned error', { status: response.status });
+
+      return sendProblem(res, req, {
         status: response.status,
-        data: response.data,
-      });
-      
-      return res.status(response.status).json({
-        success: false,
-        error: {
-          code: 'BRP_API_ERROR',
-          message: 'BRP API returned an error',
-          details: response.data,
-        },
+        code: 'BRP_API_ERROR',
+        detail: 'BRP API returned an error',
+        extensions: { details: response.data },
       });
     }
 
@@ -299,12 +299,10 @@ router.post('/verblijfplaatshistorie', jwtMiddleware, async (req: Request, res: 
       error: error instanceof Error ? error.message : 'Unknown error',
     });
 
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'BRP_API_ERROR',
-        message: 'Verblijfplaatshistorie request failed',
-      },
+    sendProblem(res, req, {
+      status: 500,
+      code: 'BRP_API_ERROR',
+      detail: 'Verblijfplaatshistorie request failed',
     });
   }
 });

@@ -2,16 +2,14 @@
 component: RONL Business API
 ---
 
-# ValidSign phase-approval signing
+# ValidSign signing
 
-A project leader signs a RIP phase-exit approval without leaving the Infra-board. The signed PDF and its evidence summary are archived into the project's eDOCS workspace, and the Operaton user task completes only once the signature has landed.
+A user signs the document of a BPMN user task without leaving the board they work on: a project leader signs a RIP phase-exit approval on the Infra-board, a gemachtigde ondertekenaar signs a besluit in the caseworker task inbox. The signed PDF and its evidence summary are archived in eDOCS, and the Operaton user task completes only once the signature has landed.
 
 The feature is **opt-in from the process model**: it activates on a user task that carries `ronl:signatureRef`, and returns nothing for a task without it — which is every ordinary task.
 
 !!! info "Verified against source"
-    Read on `main` at `10bcf8b`, 20 September 2026 (v2026.09.9). The feature
-    itself arrived in v2026.08.36; the callback's authentication was corrected
-    against a live platform in v2026.09.8.
+    Read on `main` at `0625d48`, 3 October 2026 (v2026.10.0).
 
 !!! success "Acceptance signs for real"
     Acceptance has been **live since 14 September 2026** — a real ceremony
@@ -31,9 +29,34 @@ The Linked Data Explorer's [R2.1 bundle](../../linked-data-explorer/features/rip
                ronl:signatureRef="rip-pdp">
 ```
 
-The backend resolves that attribute from a named BPMN user task to the document template deployed alongside the process. Where it is present, the Infra-board renders the signing panel in place of the task's ordinary form.
+*Besluitvorming onder gedelegeerde bevoegdheid* does the same on the task that signs the besluit:
+
+```xml
+<bpmn:userTask id="Task_Onderteken"
+               name="Onderteken het besluit"
+               camunda:formRef="besluit-gb-ondertekenen"
+               ronl:signatureRef="besluit-gb-besluit"
+               camunda:candidateGroups="besluit-ondertekenaar">
+```
+
+The backend resolves that attribute from a named BPMN user task to the document template deployed alongside the process. Where it is present, the task view renders the signing panel in place of the task's ordinary form — **every task view**: the Infra-board's project detail and the caseworker task inbox both ask `useTaskSignature` (`packages/frontend/src/components/signing/`) whether a task signs, and both render the same `SigningPanel`. Until the answer is in, the view shows *Ondertekening controleren…* rather than either the form or the panel, because the form would let a signature task be approved without signing. A failed lookup falls back to the form.
 
 That is the whole switch. A single attribute in a model the LDE deploys turns on a feature implemented entirely here.
+
+---
+
+## Configuring a process for signing
+
+Any process signs a task through ValidSign without code in the Business API:
+
+1. **Give the user task `ronl:signatureRef="<document id>"`.** The LDE bundles that `.document` into the deployment.
+2. **Give the document a `signOff` zone.** ValidSign's signature field is anchored at its first line; without it there is nothing to sign.
+3. **Keep a `camunda:formRef` on the task as the fallback.** It is shown when the signing spec cannot be fetched, and it must set `approvalStatus` (`approved` / `rejected`) as signing does.
+4. **Branch on `approvalStatus` after the task.** Signing completes the task server-side, writing `approvalStatus` and the `validsign*` variables.
+
+**Signing state is per task.** The `validsign*` variables are process variables, so they outlive the task that created them. The package route therefore also records `validsignTaskId`, and a task reads another task's `validsign*` variables as status `none`. A process that loops back to a new signing task after a declined signature starts afresh there, while a second package for the **same** task is still refused with `409 VALIDSIGN_PACKAGE_EXISTS`. A package without a recorded task id is taken at face value.
+
+**Archive names come from the template and the case.** The package route records the template's id and name (`validsignTemplateId`, `validsignTemplateName`), and the completion archives the signed PDF as `<templateId>-<businessKey>-signed.pdf` and the evidence summary as `<templateId>-<businessKey>-evidence.pdf`, titled `<businessKey> — <template name> (ondertekend) — getekend document` and `… — bewijsoverzicht`. A package without a recorded template falls back to `ondertekend-document` and *Ondertekend document*, and an instance without a business key to the package id. Both documents are uploaded to eDOCS as standalone documents under the department `EDOCS_DEPARTMENT`, not into a workspace.
 
 ---
 
@@ -60,20 +83,23 @@ The ValidSign licence is **production-only — there is no sandbox tenant, and t
 
 ---
 
-## The five routes, across two routers
+## The routes, across two routers
 
 | Route | Router | Auth |
 |---|---|---|
-| `GET /v1/validsign/task/:taskId/spec` | main | JWT |
-| `POST /v1/validsign/task/:taskId/package` | main | JWT |
-| `GET /v1/validsign/task/:taskId/status` | main | JWT |
+| `GET /v1/validsign/task/:taskId/spec` | main | JWT + tenant |
+| `POST /v1/validsign/task/:taskId/package` | main | JWT + tenant |
+| `GET /v1/validsign/task/:taskId/status` | main | JWT + tenant |
 | `POST /v1/validsign/callback` | **pre-auth** | shared key, in any of five forms |
-| `GET`+`POST /v1/validsign/stub/ceremony/:packageId` | **pre-auth** | capability URL (stub only) |
+| `GET /v1/validsign/stub/ceremony/:packageId` | **pre-auth** | capability URL (stub only; `404` in live mode) |
+| `POST /v1/validsign/stub/ceremony/:packageId/sign` | **pre-auth** | capability URL (stub only; `404` in live mode) |
+| `GET /v1/validsign/ceremony/complete` | **pre-auth** | none |
 
-Two of the five sit **outside** JWT middleware, and neither is an oversight:
+The three task routes check the tenant before anything is looked up, sent or written: a task belongs to the organisation named by its process instance's `municipality` variable. The other four sit **outside** JWT middleware, and none is an oversight:
 
 - **The callback** is posted by ValidSign's cloud, which holds no Keycloak token. It is verified against a shared key instead — see [What the callback accepts](#what-the-callback-accepts).
 - **The stub ceremony** loads in an iframe, and an iframe cannot carry a bearer token.
+- **The ceremony landing page** is a static confirmation the backend can serve after a ceremony. It is not the hand-over target — that is the Infra-board — and reveals nothing.
 
 ### The ceremony URL is a capability
 
@@ -82,7 +108,7 @@ Stub package ids were originally **sequential**. On any internet-reachable deplo
 !!! warning "Do not run stub mode on acceptance from any commit before this fix"
     The change landed in v2026.08.36. Earlier commits carry the guessable ids.
 
-Both pre-auth routes share a rate limiter — 60 requests per minute — keyed on the **client IP**, not the secret header. The header is attacker-controlled, so keying on it would hand out a fresh budget per request. Keying on IP also means ValidSign's callbacks and a browser's ceremony traffic never land in the same bucket, so ceremony traffic cannot exhaust the budget the callbacks rely on.
+The callback and the two stub ceremony routes share a rate limiter — 60 requests per minute — keyed on the **client IP**, not the secret header. The header is attacker-controlled, so keying on it would hand out a fresh budget per request. Keying on IP also means ValidSign's callbacks and a browser's ceremony traffic never land in the same bucket, so ceremony traffic cannot exhaust the budget the callbacks rely on.
 
 ---
 
@@ -223,6 +249,7 @@ See [Testing](testing/overview.md) for the measured suite figures.
 ## Related
 
 - [RIP R2.1 Bundle](../../linked-data-explorer/features/rip-phase1-bundle.md) — where `ronl:signatureRef` is set
-- [Infra-board](../user-guide/infra-board.md) — the board the panel appears on
+- [Infra-board](../user-guide/infra-board.md) and [Caseworker](../user-guide/caseworker.md) — the boards the panel appears on
+- [Frontend Development](frontend-development.md) — how a task view chooses between the form and the panel
 - [Security & Compliance](../features/security-compliance.md) — the wider posture
 - [Testing](testing/overview.md) — measured suite figures

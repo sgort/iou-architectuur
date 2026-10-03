@@ -8,6 +8,28 @@ component: RONL Business API
 
 ## Changelog
 
+## v2026.10.0 — Every Error Is Problem Details, and a Besluit Is Prepared and Signed From the Dashboard (October 2026)
+
+> The error shape: [API Design](../features/api-design.md). The new board section: [Caseworker](../user-guide/caseworker.md). Signing: [ValidSign signing](validsign-signing.md). Declared phases: [BPMN Design Criteria](../reference/bpmn-design-criteria.md). The machine API: [Operaton MCP Client](operaton-mcp-client.md). Measured suites: [Testing](testing/overview.md).
+
+**Every error is RFC 9457 problem details — a breaking change for `/v1/m2m` callers.** Every 4xx and 5xx now answers `application/problem+json` with `type`, `status`, `title`, `detail` and `instance`, plus a `code` extension member, instead of `{ success: false, error: { code, message } }`: `error.code` is now `code`, and `error.message` is `detail`. On a failed process start the engine URL moves from `error.instance` to an `engine` extension, because `instance` is now the request path. Success responses keep `{ success: true, data }`. A malformed JSON body now answers 400 `MALFORMED_BODY` (and an oversized one 413) instead of 500, and the 404, catch-all and rate-limit handlers live in one tested `error.middleware.ts`. In the OpenAPI description a `Problem` schema replaces `ErrorEnvelope`, every operation documents its 400, and the NL API Design Rules' three problem-details rules now gate the lint. The dashboards are unchanged — an axios interceptor turns a problem back into the `ApiResponse` shape they read — and the public site reads `detail` (#216).
+
+**Besluitvorming onder gedelegeerde bevoegdheid starts from the dashboard.** Unlike the citizen-initiated requests, this process is begun by a medewerker: **Besluitvorming → Besluit voorbereiden**, restricted to `besluit-indiener`, starts `GedelegeerdBesluitProcess`. Five realm roles, one per human swimlane — `besluit-indiener`, `-jurist`, `-bestuursautoriteit`, `-ondertekenaar` and `-registratie` — come with two Flevoland test users, and `test-caseworker-flevoland` gains `besluit-indiener`. A rail item appears only when the tenant lists it, so Flevoland's tenant sections gained the entry the role alone could not show. Acceptance and production do not re-import the realm: the roles are created there with `keycloak-add-rip-roles.sh`.
+
+**Lopende and Afgeronde besluiten.** Two rail items below *Besluit voorbereiden*, for every `besluit-*` role, list the tenant's running and completed besluiten from `GET /v1/besluitvorming/active` and `/completed`. A running besluit shows its current step; a completed one its outcome — *ondertekend*, or *geëscaleerd — genomen/afgewezen*, where the bestuursautoriteit's decision wins over the declined signature that led there.
+
+**Signing appears in every task view, with its state kept per task.** The signing panel moved out of the Infra-board into a shared component, behind a hook every task view asks whether a task signs through ValidSign — so the caseworker inbox shows it too, and a process turns signing on with `ronl:signatureRef` alone. Until the answer is in, a view shows *Ondertekening controleren…* rather than the fallback form, which would let a signature task be approved without signing. Signing state is recorded per task, so a later signing task in the same instance no longer opens as declined, and a late signature completes the task that sent the package. Signed documents are archived under names built from the template and the case's business key.
+
+**A process can declare its own phases.** The caseworker stepper knew only the eight Awb phases. A process can now declare its own in its BPMN — `ronl:phases`, an optional `ronl:phaseLabel`, and `ronl:phase` on the node that starts each phase — and a process without the declaration reads as before through `ronl:awbPhase`; the two schemes never mix. The stepper, *Waar sta ik*, the overlay and the inbox hint all read the model's phase set, so a new process needs nothing from the Business API.
+
+**`/v1/m2m`: one engine, history by `POST`, no access labels.** Machine-to-machine calls used a separate Operaton engine on acceptance and production; with `OPERATON_M2M_BASE_URL` unset they now use the main engine on every tier (#262). With one engine the guards matter more: an M2M task completion refuses `municipality`, `originTenantId` and `applicantId` with 400 `RESERVED_VARIABLE`, as `/v1` does, and an M2M start refuses a caller-supplied `municipality` or `originTenantId`, so the deployed tenant is the only source of the label (#261). The history query took its filter as a `GET` body, which clients, proxies and generated SDKs drop — silently returning the whole history; it is now `POST /v1/m2m/process/history`, and the `GET` answers for one more release with an RFC 9745 `Deprecation` header (#263).
+
+**The Keycloak admin scripts keep secrets out of the process list.** The admin password reaches `curl` on stdin and the bearer token through a `0600` config file in a temporary directory removed on exit. `keycloak-add-entra-idp.sh` now deletes mappers removed from its JSON and fails on any it does not know — before, a removed role mapper went on granting its role while the run reported success (#252).
+
+**Also in this release.** A lockfile-only install no longer rewrites the dependency marker, so `deps:check` stops reporting a stale `node_modules` as in sync (#288). The daily dependency audit made its first production catch — a high advisory in `braces` with no patched release, reachable only because `@tailwindcss/typography`, a build-time plugin, sat in the frontend's dependencies; it is now a devDependency (#303). Local Redis is pinned to 7.2, the last BSD-3-Clause line (the previous pin resolved to 7.4, which is RSALv2/SSPLv1). A conformance-log comment names the checker that actually runs.
+
+---
+
 ## v2026.09.15 — Every File Clears an 85% Branch Margin (September 2026)
 
 > Measured suites: [Testing](testing/overview.md) and [Coverage](testing/coverage.md).
@@ -1583,6 +1605,11 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 | `/v1/m2m` restricted to allow-listed clients | v2026.09.14 |
 | Link-preview cards per environment; acceptance kept out of search engines | v2026.09.14 |
 | Every file at 85% branches or above, five points over the floor | v2026.09.15 |
+| [Every error answered as RFC 9457 problem details; the problem-details rules gate](../features/api-design.md) | v2026.10.0 |
+| [Besluitvorming onder gedelegeerde bevoegdheid — dashboard start, Lopende and Afgeronde besluiten](../user-guide/caseworker.md) | v2026.10.0 |
+| [ValidSign signing in every task view, signing state per task](validsign-signing.md) | v2026.10.0 |
+| [A process declares its own phases (`ronl:phases`)](../reference/bpmn-design-criteria.md) | v2026.10.0 |
+| `/v1/m2m` on the main engine; history by `POST`; access labels refused | v2026.10.0 |
 
 !!! note "This table has a gap"
     Rows run from v1.0.0 to v3.0.7 and then jump to the September 2026 entries

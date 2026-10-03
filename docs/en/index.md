@@ -139,13 +139,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.09.15** · *September 2026*
+-   **⚙️ RONL Business API — v2026.10.0** · *October 2026*
 
     ---
 
-    **The caseworker sees the process, and every operation is documented and checked**
+    **Every error is problem details, and a besluit is prepared, signed and followed from the dashboard**
 
-    In the [Caseworker](ronl-business-api/user-guide/caseworker.md)'s Taken inbox, a task whose process is drawn in lanes now shows where it stands: its Awb phase on an eight-step stepper, its steps grouped per role with *jouw rol* marked, and the whole swimlane in an overview opened from the task or from ⌘K. The [OpenAPI description](ronl-business-api/reference/api-specification.md) now covers every operation, `/v1/m2m` included, and every documented operation is compared against a real response in the test run. `/v1/m2m` answers only allow-listed clients, the BRP proxy no longer writes BSNs into its log lines, and a failed citizen start explains why outside production. Links to the werkomgeving and the public site unfurl as preview cards, with acceptance marked and kept out of search engines, and v2026.09.15 gives every file an 85% branch margin. Both releases, and v2026.09.13's Flevoland sign-in, are in production.
+    Every 4xx and 5xx now answers RFC 9457 `application/problem+json` — `type`, `status`, `title`, `detail` and `instance`, with the familiar `code` kept beside them — and the NL API Design Rules' problem-details rules now gate the [OpenAPI description](ronl-business-api/reference/api-specification.md); the dashboards are unchanged, but external `/v1/m2m` callers must adapt. On the [Caseworker](ronl-business-api/user-guide/caseworker.md) board an indiener starts *Besluitvorming onder gedelegeerde bevoegdheid* from **Besluitvorming → Besluit voorbereiden**, and everyone in the process follows it under **Lopende** and **Afgeronde besluiten**. The [ValidSign](ronl-business-api/developer/validsign-signing.md) signing panel now appears in the caseworker inbox as well as on the Infra-board, with its state kept per task, so a process turns signing on with `ronl:signatureRef` alone — and a process can declare its own phases for the stepper with `ronl:phases`. `/v1/m2m` uses the main engine, refuses access labels and takes its history query as `POST`. The [suites](ronl-business-api/developer/testing/overview.md) stand at 4,731 tests, all passing.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

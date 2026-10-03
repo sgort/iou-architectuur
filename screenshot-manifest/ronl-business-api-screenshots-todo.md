@@ -1,9 +1,28 @@
 # RONL Business API — screenshots to capture
 
-!!! note "Nothing outstanding — reviewed 30 September 2026 for v2026.09.15"
-    Rows 11 and 12 were captured on acceptance on 30 September 2026, on a laned,
-    `ronl:awbPhase`-marked Thuisbatterij task. Rows 9 and 10 from v2026.09.13 were
-    replaced in `19fc36c` on 28 September 2026.
+!!! note "Nothing outstanding — reviewed 3 October 2026 for v2026.10.0"
+    Rows 13, 14 and 15 were captured on acceptance on 3 October 2026, as
+    `test-besluit-flevoland` on a running besluit. Rows 11 and 12 still hold.
+
+## Sync v2026.09.15 → v2026.10.0 — three NEW
+
+Reviewed on 3 October 2026 for **v2026.10.0**, in production. All three rows are for the
+Caseworker board, which gains a section of its own:
+
+| # | Status | File | Embedding page | What it must show | Trigger |
+|---|---|---|---|---|---|
+| 13 | ✅ **NEW** (3 Oct) | `ronl-business-api-caseworker-besluiten.png` | `user-guide/caseworker.md` § Besluitvorming | The rail's **Besluitvorming** group — *Besluit voorbereiden*, *Lopende besluiten*, *Afgeronde besluiten* — with **Lopende besluiten** open and one record expanded: onderwerp, key · type · amount, the current-step badge, and the details the besluit carries (here Voorgesteld besluit and Motivering) | v2026.10.0 — besluitvorming onder gedelegeerde bevoegdheid |
+| 14 | ✅ **NEW** (3 Oct) | `ronl-business-api-caseworker-declared-phases.png` | `user-guide/caseworker.md` § Waar sta ik | A `GedelegeerdBesluitProcess` task: *Waar sta ik* with the process's own six phases (*Fase n · …*, *stap n van 6*), and the *Fase n* hint in the Taken list | v2026.10.0 — process-declared phases (`ronl:phases`) |
+| 15 | ✅ **NEW** (3 Oct) | `ronl-business-api-caseworker-declared-phases-swimlanes.png` | `user-guide/caseworker.md` § The process overview | The process overview for the same task: the six named phases above the swimlane, *Advies en toetsing* current, and the lanes the user works in marked **jouw rol** | v2026.10.0 — process-declared phases; added by the user while capturing |
+
+**Capture on acceptance, as `test-besluit-flevoland`** (or `test-caseworker-flevoland`,
+which now holds `besluit-indiener`), with at least one besluit started so that
+*Lopende besluiten* is not empty and a task in the process exists for rows 14 and 15.
+
+**Considered and not captured:** the signing panel in the caseworker inbox, for the
+reason recorded on 30 August 2026 — a useful capture needs a real ceremony in flight,
+and acceptance signs for real; the RFC 9457 error shape and the `/v1/m2m` changes
+(no surface).
 
 ## Sync v2026.09.13 → v2026.09.15 — one REPLACE, one NEW
 

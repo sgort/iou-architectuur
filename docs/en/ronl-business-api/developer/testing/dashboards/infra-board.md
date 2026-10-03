@@ -4,30 +4,51 @@ component: RONL Business API
 
 # Infra-board — tests
 
-**Frontend: 18 files · 252 tests. E2E: 2 specs · 8 tests.**
+**Frontend: 19 files · 259 tests**, including the shared signing panel.
+**E2E: 2 specs · 8 tests** — 7 passed and 1 skipped on 3 October 2026.
 
 The infra-board is well covered at the unit level — `src/pages/infra-board` is
 at **100%** statements, functions and lines and 98.47% branches, the
-best-covered substantial area in the frontend — and it is the **only board with
-two Playwright specs**: one driving the shell, one driving the work that
-happens inside it.
+best-covered substantial area in the frontend — and its **two Playwright
+specs** divide the board between them: one driving the shell, one driving the
+work that happens inside it.
 
 ---
 
 ## Frontend
 
-Re-derived on **30 September 2026** at `ae06c9e` (v2026.09.15). The frontend
-package was measured the same day — 120 files, 1318 tests, all passing — but
+Re-derived on **3 October 2026** at `0625d48` (v2026.10.0). The frontend
+package was measured the same day — 124 files, 1378 tests, all passing — but
 Vitest's console reports only that total, so the counts below are taken from
 the source, each test file parsed with its `.each` tables expanded; summed
-over the whole package the method gives exactly the runner's 1318. The figures
-this page carried before were derived on 30 August.
+over the whole package the method gives exactly the runner's 1378.
 
 | Area | Files | Tests |
 |---|---:|---:|
 | `pages/infra-board` (data and pure logic) | 6 | 108 |
-| `components/InfraBoardDashboard` | 11 | 126 |
+| `components/InfraBoardDashboard` | 9 | 108 |
 | `pages/InfraBoardDashboard.test.tsx` | 1 | 18 |
+| **`components/signing`** (the signing panel, shared with the caseworker inbox) | 3 | 25 |
+
+!!! note "The signing panel moved to `components/signing/`, and is counted here once"
+    Until v2026.10.0 `SigningPanel` and its tests lived in
+    `components/InfraBoardDashboard/`. v2026.10.0 moved them to the shared
+    `components/signing/`, behind a `useTaskSignature` hook that every task
+    view asks whether a task signs through ValidSign, so the caseworker inbox
+    renders the same panel — see the
+    [signing feature](../../validsign-signing.md). The directory's tests are
+    counted **once, on this page**, where the panel started, and not on the
+    [Caseworker](caseworker.md) page as well:
+
+    | File | Tests | Covers |
+    |---|---:|---|
+    | `signing/SigningPanel.test.tsx` | 16 | The panel an approval task renders in place of a form; since v2026.10.0 it tells its host once about a decline, so the task list can move on (15 on 30 September, in `InfraBoardDashboard/`) |
+    | `signing/useTaskSignature.test.ts` | 5 | **New.** Loading until the signing spec arrives; no fetch without a task; no spec when the fetch fails or answers `success: false`, so the caller falls back to the form; and never the previous task's spec after switching tasks |
+    | `signing/resolveSigningUrl.test.ts` | 4 | Resolving the signing ceremony's URL — moved unchanged |
+
+    Coverage on 3 October: `components/signing` **93.1 / 88.75 / 95.65 /
+    96.11**, with `SigningPanel.tsx` at 85.93% branches and the other two
+    files at 100 on all four.
 
 !!! note "The phase swimlane's tests moved to `components/process/`"
     `PhaseSwimlane.test.tsx` lived in `components/InfraBoardDashboard/` until
@@ -44,10 +65,9 @@ this page carried before were derived on 30 August.
 | `pages/infra-board/infra-board.data.test.ts` | 34 | The board's data module |
 | `components/InfraBoardDashboard/PhaseDetail.test.tsx` | 31 | Phase detail view |
 | `pages/infra-board/rip-model.test.ts` | 26 | The RIP phase model |
-| `components/InfraBoardDashboard/ProjectDetail.test.tsx` | 20 | Project detail, with the shared phase stepper and swimlane |
+| `components/InfraBoardDashboard/ProjectDetail.test.tsx` | 21 | Project detail, with the shared phase stepper and swimlane, and the shared signing panel through `useTaskSignature` — since v2026.10.0 showing neither form nor panel while the signing spec is still loading (20 on 30 September) |
 | `pages/InfraBoardDashboard.test.tsx` | 18 | The page container |
 | `pages/infra-board/rail-stats.test.ts` | 15 | Rail statistics |
-| `components/InfraBoardDashboard/SigningPanel.test.tsx` | 15 | The [signing panel](../../validsign-signing.md) an approval task renders |
 | `components/InfraBoardDashboard/InfraSectionRouter.test.tsx` | 14 | Section routing |
 | `pages/infra-board/rip-phases.catalog.test.ts` | 14 | The twelve-phase catalogue |
 | `components/InfraBoardDashboard/FaseladderOverview.test.tsx` | 11 | Faseladder overview |
@@ -57,13 +77,14 @@ this page carried before were derived on 30 August.
 | `pages/infra-board/modes.config.test.ts` | 9 | Mode configuration |
 | `components/InfraBoardDashboard/MijnDag.test.tsx` | 6 | The "Mijn Dag" section |
 | `components/InfraBoardDashboard/InfraDock.test.tsx` | 4 | The dock |
-| `components/InfraBoardDashboard/resolveSigningUrl.test.ts` | 4 | Resolving the signing ceremony's URL |
 | `components/InfraBoardDashboard/InfraNoAccessPanel.test.tsx` | 1 | The no-access panel |
 
-Coverage on 30 September: `pages/infra-board` **100 / 98.47 / 100 / 100**, and
-`components/InfraBoardDashboard` 95.06 / 89.37 / 93.71 / 96.14 — up from
-94.06 / 88.43 / 90.25 / 95.12 on 28 September, over twelve source files now
-that `PhaseSwimlane.tsx` has moved out.
+Coverage on 3 October: `pages/infra-board` **100 / 98.47 / 100 / 100**, and
+`components/InfraBoardDashboard` 95.34 / 89.91 / 92.59 / 95.85 — against
+95.06 / 89.37 / 93.71 / 96.14 on 30 September, over ten source files now that
+`SigningPanel.tsx` and `resolveSigningUrl.ts` have moved out as
+`PhaseSwimlane.tsx` did before them. `ProjectDetail.tsx`, which now hosts the
+shared panel, went 89.28 → 83.33 functions.
 
 The gap between those two rows is the usual one: the pure data and model
 modules are exhaustively covered, while the components carry the
@@ -73,17 +94,19 @@ modules are exhaustively covered, while the components carry the
 
 ## E2E
 
-**Two specs, eight tests.** Measured 30 August 2026 against `acc` at `15dfbf9`
-as part of the full frontend run: 27 tests, all passing, 1.9m.
+**Two specs, eight tests.** Measured **3 October 2026** as part of the full
+frontend run against the developer's already-running local stack: 27 passed,
+1 skipped, 2.8m. Before that, 30 August 2026 against `acc` at `15dfbf9`: all
+27 passing, 1.9m.
 
-| Spec | Tests | Covers |
-|---|---:|---|
-| `infra-board-journey.spec.ts` | 7 | The shell |
-| `rip-r21-journey.spec.ts` | 1 | The work |
+| Spec | Tests | 3 October | Covers |
+|---|---:|---|---|
+| `infra-board-journey.spec.ts` | 7 | 7 passed | The shell |
+| `rip-r21-journey.spec.ts` | 1 | **skipped, by its own guard** | The work |
 
 These eight are the largest per-board share of the frontend suite — see
 [Coverage per board](../e2e.md#coverage-per-board) for how they sit against the
-other nineteen.
+other twenty.
 
 **`infra-board-journey.spec.ts`** drives the board itself: opening on Mijn dag
 with all three werkmodi available, each werkmodus reaching its own surface and
@@ -100,9 +123,23 @@ spec covers the shell, this one covers the work. It signs in as
 twelve tasks — the last of which now renders the
 [signing panel](../../validsign-signing.md) rather than a form.
 
-It carries a `test.skip(true, reason)` **inside** the test body, which skips the
-run when its preconditions are not met and logs the reason first. It did not
-skip in this measurement.
+It carries two `test.skip(true, reason)` calls **inside** the test body, which
+skip the run when its preconditions are not met and log the reason first. It
+did not skip on 30 August, which predates both. **On 3 October it did**, and
+said why before creating anything:
+
+```text
+[rip-r21-journey] SKIPPED — local dev stack signs with the real ValidSign
+(VALIDSIGN_STUB_MODE=false), and this journey will not request a binding
+signature. Nothing was created — the refusal happens before
+POST /task/:id/package. Run it against a target where VALIDSIGN_STUB_MODE=true.
+```
+
+That is the guard doing its job, not a gap in the run: a stack configured for
+real signing cannot complete the journey's approval task without a binding
+signature, and the spec refuses before it sends a package. So the R2.1 work
+has not been driven end to end by these pages since 30 August; that needs a
+run against a target in stub mode.
 
 !!! warning "This page said *none* for six days"
     Both specs landed on **24 August 2026**. This page, its at-a-glance line and

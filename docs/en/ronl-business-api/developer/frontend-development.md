@@ -44,15 +44,15 @@ packages/frontend/src/
 │   └── changelog-data.ts          # Changelog content
 ├── components/
 │   ├── process/                   # The process view, shared by the Infra-board and the Taken inbox
-│   │   ├── PhaseStepper.tsx       # Phase stepper (RIP phases or Awb phases)
+│   │   ├── PhaseStepper.tsx       # Phase stepper (RIP phases, or a process's phase set)
 │   │   ├── PhaseSwimlane.tsx      # SVG BPMN swimlane
-│   │   ├── ProcessWhere.tsx       # "Waar sta ik": compact Awb stepper under the task header
+│   │   ├── ProcessWhere.tsx       # "Waar sta ik": compact phase stepper under the task header
 │   │   ├── ProcessLaneSteps.tsx   # "Processtappen per rol"
 │   │   ├── ProcessOverlay.tsx     # Modal: full stepper, breadcrumb, legend, swimlane
 │   │   ├── useTaskProcessContext.ts  # Loads a task's call chain, histories and models
 │   │   ├── processContext.ts      # buildProcessContext: pure assembly, engine-ordered history
 │   │   ├── laneSteps.ts           # Derivations behind "Processtappen per rol"
-│   │   ├── awbStepper.ts          # Awb phases as stepper phases
+│   │   ├── phaseSet.ts            # A model's phase set as stepper phases; phaseRef, captions
 │   │   ├── swimlaneText.ts        # Condition expressions as readable flow labels
 │   │   ├── process-view.css       # Stepper and swimlane styles, scoped under .pbd
 │   │   └── caseworker-process.css # Caseworker additions (one-line rules; not prettier-formatted)
@@ -66,7 +66,9 @@ packages/frontend/src/
 │   │                              #   capacity claim, DVTP, IOU, Audit, Gereedschap, McpChat,
 │   │                              #   Profiel, Rollen, …) and TaskFormViewer.tsx
 │   ├── InfraBoardDashboard/       # Infra-board sections: Portfolio, ProjectDetail, PhaseDetail,
-│   │                              #   MijnDag, FaseladderOverview, SigningPanel, router, dock
+│   │                              #   MijnDag, FaseladderOverview, router, dock
+│   ├── signing/                   # ValidSign signing, shared by every task view: SigningPanel,
+│   │                              #   useTaskSignature, resolveSigningUrl, signing-panel.css
 │   ├── WooDashboard/              # Woo sections: Overzicht, Verzoeken, Proces, Publicatie,
 │   │                              #   Register, Bezwaar, Tijdigheid, router, dock, charts
 │   ├── PADashboardV2/             # PA dock and section router for the host
@@ -91,7 +93,8 @@ packages/frontend/src/
 │   └── brp.types.ts
 ├── utils/
 │   ├── buildInfo.ts               # "build <sha> · #<run>", or "local build"
-│   └── formatDate.ts              # Shared date formatter
+│   ├── formatDate.ts              # Shared date formatter
+│   └── problem.ts                 # RFC 9457 problem details → the ApiResponse error shape
 ├── test/                          # Vitest setup and fixtures
 └── indexHtml.test.ts              # index.html and the .env.<mode> files agree
 packages/frontend/public/
@@ -310,9 +313,7 @@ export default keycloak;
 
 After any successful authentication, `sessionStorage.removeItem('selected_idp')` is called before `navigateAfterLogin()` chooses where to go: a stored `post_login_redirect` the caller's roles allow, otherwise the default board — Woo, then Infra-board, then PA-Cockpit, then Caseworker, falling through to `/dashboard/citizen`.
 
-Token refresh is handled automatically by the Keycloak JS adapter. The adapter refreshes the access token before the 15-minute expiry as long as the SSO session remains active.
-
-**Token refresh** is still handled automatically by the adapter before the 15-minute expiry.
+**Token refresh** is done by the frontend, not by the adapter on a timer, and only while the SSO session remains active. Two places call `keycloak.updateToken()`: the API client before every request (see [API client](#api-client)), and `SessionExpiryWarning` on real interaction — typing, clicking, scrolling or moving the mouse, at most once per 30 seconds — once fewer than 180 seconds remain, so filling in a long form without any API call does not let the token run out. Below 120 seconds the warning modal appears; **Sessie verlengen** forces a refresh and falls back to `keycloak.login()` when the session is gone.
 
 ---
 
@@ -338,20 +339,50 @@ All Tailwind utility classes and component styles reference these custom propert
 
 ## API client
 
-`services/api.ts` wraps Axios and adds the JWT bearer token to every request:
+`services/api.ts` wraps Axios in two interceptors. The request interceptor refreshes the token when fewer than 120 seconds remain and adds it as the bearer token:
 
 ```typescript
-const client = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+const api = axios.create({
+  baseURL: API_BASE_URL, // import.meta.env.VITE_API_URL
 });
 
-client.interceptors.request.use((config) => {
-  config.headers.Authorization = `Bearer ${keycloak.token}`;
+api.interceptors.request.use(async (config) => {
+  if (keycloak.authenticated) {
+    try {
+      await keycloak.updateToken(120);
+    } catch {
+      keycloak.login();
+      return Promise.reject(new Error('Session expired'));
+    }
+  }
+  if (keycloak.token) {
+    config.headers.Authorization = `Bearer ${keycloak.token}`;
+  }
   return config;
 });
 ```
 
-If a request returns HTTP 401 (token expired between refresh cycles), the interceptor triggers a silent Keycloak refresh and retries.
+When the refresh fails — the SSO session is gone — the request is not sent and the browser goes to `keycloak.login()`. **A `401` is not retried**: there is no response-side refresh, so a request that comes back `401` fails like any other error.
+
+The response interceptor normalises error bodies. The backend answers every 4xx and 5xx with RFC 9457 problem details (`application/problem+json`); `toApiResponse` in `utils/problem.ts` rewrites such a body, once, into the `ApiResponse` error shape the components read:
+
+```typescript
+api.interceptors.response.use(undefined, (error: unknown) => {
+  if (axios.isAxiosError(error) && error.response) {
+    error.response.data = toApiResponse(error.response.data);
+  }
+  return Promise.reject(error);
+});
+```
+
+| Problem member | Becomes |
+|---|---|
+| `code` | `error.code` (`ERROR` when absent) |
+| `detail` | `error.message` |
+| `details` (extension) | `error.details` |
+| `engine` (extension, the Operaton base URL on a failed process start) | `error.instance` |
+
+The problem's own members are kept beside `success: false` and `error`, so an extension survives — the health call reads the report from `data` on a `503`. A body that is not a problem passes through unchanged, and success responses keep `{ success: true, data }`. Call sites that use `fetch` rather than Axios — the MCP chat stream among them — read the message with `problemMessage(body, fallback)`: the problem's `detail`, else a legacy envelope's `error.message`, else the fallback.
 
 ---
 
@@ -523,7 +554,7 @@ Renders the start form for a BPMN process in the citizen dashboard.
 
 On mount: calls `businessApi.process.startForm(processKey)` to fetch the schema. On submit: calls `businessApi.process.start(processKey, formData)`. Extracts `businessKey` from the response (falls back to `processInstanceId`).
 
-When the start fails, `StartFailure` carries what came back: `cause` is the backend's own explanation (`error.details`, else `error.message` — Operaton's message when the engine refused) or a thrown error's message, and `instance` is the engine base URL the backend targeted. Either may be absent. The viewer logs `Process start failed` with the process key and both fields to the browser console **on every tier, production included**, and then calls `onError`; whether the detail reaches the screen is the caller's decision.
+When the start fails, `StartFailure` carries what came back: `cause` is the backend's own explanation (`error.details`, else `error.message` — Operaton's message when the engine refused) or a thrown error's message, and `instance` is the engine base URL the backend targeted. Both come from the problem body through the [response interceptor](#api-client): `error.details` is the problem's `details` extension and `error.instance` its `engine` extension — not the problem's own `instance`, which is the request path. Either may be absent. The viewer logs `Process start failed` with the process key and both fields to the browser console **on every tier, production included**, and then calls `onError`; whether the detail reaches the screen is the caller's decision.
 
 The citizen dashboard (`Dashboard.tsx`) renders it with `StartFailureNotice` under each of its three start forms. The headline is the same on every tier — *De aanvraag kon niet worden ingediend. Probeer het opnieuw.* — and below it the notice shows **Oorzaak** and **Operaton** unless the Vite build mode is `production` (#171). `build:prod` builds with `--mode production`, `build:acc` — acceptance and its pull-request previews — with `--mode acceptance`, and the dev server runs as `development`, so only the production build hides the cause.
 
@@ -540,7 +571,9 @@ Renders the form for a claimed task in the caseworker dashboard.
 | `onCompleted` | `() => void` | Called after successful task completion |
 | `onError` | `() => void` | Called on API or form error |
 
-On mount: calls `businessApi.process.startForm(processKey)` to fetch the schema. On submit: calls `businessApi.process.start(processKey, formData)`. Extracts `businessKey` from the response (falls back to `processInstanceId`). On 404 or 415 from the API, sets `status = 'no-form'` and renders "Geen formulier beschikbaar voor dit proces." — the service cannot be started. On unmount, calls `form.destroy()` to release the `@bpmn-io/form-js` instance.
+On mount: calls `businessApi.task.formSchema(taskId)` to fetch the task's form and imports it with `variables` as its data. On submit: calls `businessApi.task.complete(taskId, data)`, then `onCompleted` or `onError`. When the task has no form — an unsuccessful answer, or a 404 or 415 from the API — it sets `status = 'no-form'` and renders a plain **Taak voltooien** button that completes the task with no variables. On unmount, calls `form.destroy()` to release the `@bpmn-io/form-js` instance.
+
+A task view asks `useTaskSignature(taskId)` (`components/signing/`) first, and renders `TaskFormViewer` only when the task needs no signature. While the answer is out it shows *Ondertekening controleren…* rather than either, because the form would let a signature task be approved without signing; a task whose BPMN carries `ronl:signatureRef` gets `SigningPanel` instead, and a failed lookup falls back to the form. The Taken inbox and the Infra-board's `ProjectDetail` both work this way — see [ValidSign signing](validsign-signing.md).
 
 ### `DecisionViewer`
 
@@ -580,16 +613,23 @@ together.
 
 | Part | Component | Renders when |
 |---|---|---|
-| **Waar sta ik** — compact Awb stepper under the task header | `ProcessWhere` | The task's process has lanes **and** the task has an Awb phase |
+| **Waar sta ik** — compact phase stepper under the task header | `ProcessWhere` | The task's process has lanes **and** the task has a phase |
 | **Processtappen per rol** — history and what comes next, grouped by lane | `ProcessLaneSteps` | The task's process has lanes |
 | The overlay — full stepper, `Hoofdproces › Deelproces` breadcrumb, legend, swimlane | `ProcessOverlay` | Opened from either part above, or from ⌘K |
 
 Without lanes, or when the context failed to load, the inbox shows the
-flat list of activity-history steps it has always shown. The Awb
-phase comes from `ronl:awbPhase` markers in the BPMN; a task in a subprocess
-without markers takes the phase of the call activity that started it, walking
-up the chain. With no phase at all, `ProcessWhere` renders nothing. See [BPMN
-design criteria](../reference/bpmn-design-criteria.md) for what a model needs.
+flat list of activity-history steps it has always shown. The phase comes from
+the swimlane model: its `phaseSet` is either the built-in Awb table, selected by
+`ronl:awbPhase` markers, or the phases the process declares itself in
+`ronl:phases`, selected by `ronl:phase` markers, and each node carries the
+`phase` code it belongs to. A task in a subprocess without markers takes the
+phase — and the phase set — of the call activity that started it, walking up
+the chain. With no phase at all, `ProcessWhere` renders nothing. Its eyebrow
+reads `Waar sta ik · <label> <ref> · stap <n> van <total>`: `phaseRef` gives the
+legal phase number for Awb (*Awb-fase 4+5*) and the position for a declared set
+(*Fase 2*), and the caption under the stepper is the phase's `codeLabel` and
+name (*Fase 2 · Advies en toetsing*). See [BPMN design
+criteria](../reference/bpmn-design-criteria.md) for what a model needs.
 
 ### Loading a task's context
 
@@ -618,8 +658,9 @@ give: Operaton runs a call activity, its child's start event and the child's
 first automated steps in one transaction, often in the same millisecond. So each
 instance's own entries are ordered by time and a child's entries are spliced in
 directly after the call activity that started it. From that list it derives a
-node status per process, the call chain, the task's Awb phase and `hasLanes`.
-`laneSteps.ts`, `awbStepper.ts` and `swimlaneText.ts` hold the remaining
+node status per process, the call chain, the task's phase with the phase set it
+belongs to, and `hasLanes`.
+`laneSteps.ts`, `phaseSet.ts` and `swimlaneText.ts` hold the remaining
 derivations as pure functions, so the rules are unit-tested and the components
 only render.
 

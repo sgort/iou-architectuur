@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # BPMN Design Criteria
 
 !!! info "Documentatie in ontwikkeling"
@@ -36,6 +40,18 @@
 ---
 
 ## `camunda:historyTimeToLive`
+
+---
+
+## Lanes and phase markers: the caseworker process view
+
+### Lanes
+
+### `ronl:awbPhase`
+
+### A process's own phases: `ronl:phases`, `ronl:phaseLabel`, `ronl:phase`
+
+### Other attributes the view reads
 
 ---
 

@@ -4,17 +4,33 @@ component: RONL Business API
 
 # Public site suite
 
-`packages/public-site`, Vitest with jsdom. **33 files · 265 tests · all
-passing · 24.09s.**
+`packages/public-site`, Vitest with jsdom. **34 files · 275 tests · all
+passing · 76.58s** without file parallelism.
 
-!!! success "Re-measured at v2026.09.15: one new file, thirty new tests"
-    Re-run on **30 September 2026** for v2026.09.15 (`main` at `ae06c9e`), in
-    the working checkout on `acc` at `142d909`, a tree identical to
-    `ae06c9e`: **33 files · 265 tests · all passing · 24.09s**, coverage
-    **96.60 / 97.34 / 95.07 / 97.17**, against 32 · 235 and
-    95.92 / 96.31 / 95.07 / 96.41 on 28 September.
+!!! success "Re-measured at v2026.10.0: one new file, ten new tests"
+    Re-run on **3 October 2026** for v2026.10.0 (`main` at `0625d48`), in the
+    working checkout on `acc` at `0e3eed8`, a tree identical to `0625d48`,
+    with `npm run test:serial --workspace=packages/public-site` on
+    Node 22.23.2: **34 files · 275 tests · all passing · `Duration 76.58s`**,
+    coverage **96.68 / 97.40 / 95.09 / 97.23**, against 33 · 265 and
+    96.60 / 97.34 / 95.07 / 97.17 on 30 September. The duration is a serial
+    run's and not comparable with the 24.09s parallel figure of 30 September.
 
-    Two changes account for all of it. **v2026.09.14's link previews**
+    One change accounts for all of it: **v2026.10.0's problem details** (#216).
+    The backend now answers every error as RFC 9457
+    `application/problem+json`, and the site reads the message from a
+    problem's `detail`. `src/lib/problem.test.ts` is new, **9 tests** —
+    `problemMessage` returning a problem's `detail`, still reading a legacy
+    envelope's `error.message`, and falling back for anything else — and
+    `lib/api.test.ts` gained one, 13 → **14**. `lib/problem.ts` is at 100 on
+    all four measures; `lib/api.ts` reads 96.55% branches, against 97.29% on
+    30 September.
+
+!!! note "History: re-measured at v2026.09.15, one new file, thirty new tests"
+    Measured on 30 September 2026 for v2026.09.15: **33 files · 265 tests**,
+    against 32 · 235 on 28 September.
+
+    Two changes accounted for all of it. **v2026.09.14's link previews**
     (`6c3fe10`) added `src/indexHtml.test.ts` — the Open Graph and robots tags
     in `index.html`, filled per build mode from the committed `.env` files, 23
     tests — and three cases to `scripts/prerender.test.ts`, which now reads the
@@ -27,13 +43,13 @@ passing · 24.09s.**
     stubbed, taking that file from 83.78% branches to 97.29%.
 
 The public site is the auth-free search and rule-catalogue package, measured
-with `npm test --workspace=@ronl/public-site`, coverage included, on Node
-24.14.1 / npm 11.11.0 (`.nvmrc` names 22.23.2). The suite has grown in every
-recent window — 30 files and 204 tests at v2026.09.5, 31 and 225 at
+with `npm run test:serial --workspace=packages/public-site`, coverage
+included, on Node 22.23.2, the version `.nvmrc` names. The suite has grown in
+every recent window — 30 files and 204 tests at v2026.09.5, 31 and 225 at
 v2026.09.7, 32 and 231 at v2026.09.9, 32 and 235 at v2026.09.11 through
-v2026.09.13, **33 and 265 now**.
+v2026.09.13, 33 and 265 at v2026.09.15, **34 and 275 now**.
 
-Coverage is **96.60% statements · 97.34% branches · 95.07% functions · 97.17%
+Coverage is **96.68% statements · 97.40% branches · 95.09% functions · 97.23%
 lines**, and the package passes the per-file 80% branch floor that its
 `vite.config.ts` enforces rather than merely records: no file in it is below the
 line, and since v2026.09.15 none is below 85 either. The lowest by branches are
@@ -53,8 +69,8 @@ line, and since v2026.09.15 none is below 85 either. The lowest by branches are
 
 ## Inventory
 
-**Re-derived on 30 September 2026** at `ae06c9e`. The Files column accounts for
-all **33** files and the Tests column sums to **265**, the runner's total. The
+**Re-derived on 3 October 2026** at `0625d48`. The Files column accounts for
+all **34** files and the Tests column sums to **275**, the runner's total. The
 per-area test counts are taken from the source — each test file parsed, with
 `it.each` tables and the `describe.each` in `indexHtml.test.ts` expanded —
 because this pass used Vitest's console reporter, which prints only the
@@ -64,7 +80,7 @@ table exactly at `963fe24`.
 | Area | Files | Tests | Covers |
 |---|---:|---:|---|
 | `src/pages` | 16 | 137 | Includes a full `herkomst/` provenance-explorer sub-area (`HerkomstExplorer`, `HerkomstTrace`, `HerkomstChip`, `HerkomstBackground`, `herkomstConcepts`, `herkomstData`, `herkomstScroll`, `herkomstTrail` — 8 files) plus the generic `SectionIndex` / `Regelcatalogus` / `Results` / **`Detail` (25)** / `Woordenboek` / static pages |
-| `src/lib` | 7 | 49 | `slug` (kept identical to the backend's slugifier by design), `useQueryState` (URL-backed filters), `search` (`highlight()`), `api` (the typed `/v1/public/*` client, 13 — three new in v2026.09.15 for its base-URL fallbacks), `sectionHits` (`mapToHits()`), `prerenderedData` (the seeded-render reader), `buildInfo` |
+| `src/lib` | 8 | 59 | `slug` (kept identical to the backend's slugifier by design), `useQueryState` (URL-backed filters), `search` (`highlight()`), `api` (the typed `/v1/public/*` client, 14 — three new in v2026.09.15 for its base-URL fallbacks, one in v2026.10.0), **`problem` (9, new in v2026.10.0** — reading the message from an RFC 9457 problem's `detail`, or a legacy envelope's `error.message`), `sectionHits` (`mapToHits()`), `prerenderedData` (the seeded-render reader), `buildInfo` |
 | `scripts/` | 2 | 24 | `prerender.test.ts` (14 — `escapeHtml`, `readSiteEnv` per build mode, `buildRobots`, `buildSitemap`, `injectIntoShell`), `check-bundle.test.ts` (10 — the build-time gate that fails if any auth or telemetry string ships in the bundle) |
 | `src/components` | 4 | 23 | `chrome` (7), `Footer` (7), `StatusTag` (5, new in v2026.09.9), `TechDetails` (4) |
 | **`src/indexHtml.test.ts`** | 1 | 23 | **New in v2026.09.14.** The link-preview and robots tags in `index.html` as `vite build --mode <mode>` writes them, for production, acceptance, development and test (five tests each), plus the fixed Dutch copy, the title and the card image's size |
@@ -75,9 +91,11 @@ table exactly at `963fe24`.
 !!! success "Both columns are current, and they sum"
     Earlier versions of this page carried a Files column from one date and a
     Tests column from 19 August that summed to 134 against a measured 225, with
-    a warning attached. Re-derived, the columns agree: 33 files, **265** tests.
-    Against 24 September, `src/pages` is unchanged at 137; `src/lib` gained 3,
-    `scripts/` 3 and `src/components` 1, and `indexHtml.test.ts` is new with 23.
+    a warning attached. Re-derived, the columns agree: 34 files, **275** tests.
+    Against 30 September, only `src/lib` moved — 7 files and 49 tests to
+    **8 and 59**, `problem.test.ts` and one case in `api.test.ts`. Between
+    24 and 30 September, `src/lib` gained 3, `scripts/` 3 and
+    `src/components` 1, and `indexHtml.test.ts` arrived with 23.
 
     The prerender test runs in the `node` environment rather than jsdom since
     v2026.09.14: `prerender.ts` now reads the `.env` files through Vite's
@@ -104,15 +122,16 @@ table exactly at `963fe24`.
     palette, and it is the kind of regression a snapshot test would happily
     wave through.
 
-Per-area coverage was also re-derived on 30 September and reconciles to the
+Per-area coverage was also re-derived on 3 October and reconciles to the
 package total — see [Coverage](coverage.md#public-site-by-area).
 
 The statement-to-branch gap this package was once known for is gone. It was the
 widest of the five at 16.4 points, 86.82% statements against 70.39% branches.
-Today branches sit **above** statements — 97.34% against 96.60% — which is
+Today branches sit **above** statements — 97.40% against 96.68% — which is
 what a campaign against a per-file *branch* floor looks like once it lands. The
 margin had narrowed from 0.63 of a point to 0.39 by 28 September; the
-`lib/api.ts` work widened it again, to 0.74.
+`lib/api.ts` work widened it again, to 0.74 on 30 September, and it is 0.72
+now.
 
 ---
 
@@ -125,18 +144,30 @@ preservation, a deep link with pre-applied filters, keyboard-only navigation,
 and three axe-core accessibility scans (home, results, a detail page) asserting
 no critical or serious violations.
 
-!!! warning "These figures date from 19 August and were not re-run for v2026.09.15"
-    **Measured 19 August 2026 against v2026.08.19: 6 tests, 6 passed, 0 failed,
-    0 flaky, 0 skipped, 8.9s.**
+!!! warning "Re-run on 3 October 2026: 6/6 serially, 2 timeouts in the parallel run"
+    **Measured 3 October 2026 for v2026.10.0**, against the developer's
+    already-running backend, the first run since 30 August:
 
-    They were not re-measured on 12 September, not on 20 or 24 September, and
-    **not on 30 September 2026 either** — running them needs a live backend,
-    and each of those passes deliberately ran nothing that required the stack.
-    The package has changed underneath them four times since, so take the six
-    as an inventory figure rather than as a result. What *was* re-checked at
-    `ae06c9e` is the inventory itself: `e2e/publiek.spec.ts` is still the one
-    spec, unchanged since `2443adc`, and it still runs in no workflow. These
-    remain the oldest figures on these pages.
+    - **Default run, six parallel workers: 4 passed, 2 failed, 17.2s.** Both
+      failures were the search-journey tests — `publiek.spec.ts:6`
+      (*search → filter → detail → back preserves the filtered URL*) and
+      `:27` (*a deep link with filters pre-applied renders those filters
+      checked*) — and both the same `TimeoutError`: 10s waiting for
+      `getByRole('checkbox', { name: /Regel/ }).first()` to be visible.
+    - **Re-run with `--workers=1`: 6 passed, 7.8s**, against the same backend.
+
+    Recorded that way — **6/6 serially, 2 timeouts in the parallel run** — and
+    not as a defect: nothing failed on its own, and the detail-page axe scan,
+    which needs search results as much as the two that failed, passed in the
+    parallel run. A missing backend fails three, serially as well (see below).
+    The config sets `fullyParallel: true` and no `workers`, so a default run
+    takes Playwright's default worker count — six on that machine — and
+    `retries` is 2 in CI and 0 locally. The spec is unchanged since `2443adc`
+    and still runs in no workflow.
+
+    Before this, the figures were **19 August 2026, against v2026.08.19: 6 tests,
+    6 passed, 0 failed, 0 flaky, 0 skipped, 8.9s**, and a 30 August inventory
+    count of six.
 
 Unlike the frontend suite, Playwright starts its own dev server for this package
 — `playwright.config.ts` declares a `webServer` running `npm run dev` on
@@ -148,7 +179,8 @@ fail on timeouts without it.
 Setting `E2E_BASE_URL` skips starting the local server entirely and points
 `baseURL` at an already-deployed site instead, which is how the suite is used
 for post-deploy verification against ACC. Re-read from the config at `86af73e`
-on 24 September 2026 and unchanged at `ae06c9e`: `webServer` on `:5175`, no `globalSetup` of
+on 24 September 2026 and unchanged at `ae06c9e` and `0625d48`: `webServer` on
+`:5175`, no `globalSetup` of
 any kind, and the backend dependency stated in the config's own header comment
 rather than checked before the run.
 

@@ -243,6 +243,13 @@ the issue step is skipped there.
 - **It fails on a high or critical advisory in production dependencies**
   (`--omit=dev`) on either branch. Everything else — lower severities and
   dev-only advisories — is reported but does not fail it.
+- **Where a package is declared decides whether it counts.** The audit follows
+  `dependencies`, not what reaches the bundle. A build-time tool listed there
+  drags its whole tree into production: `@tailwindcss/typography` under the
+  frontend's `dependencies` made `braces` (GHSA-vfj7-8cjw-p6xm, no patched
+  release) a production advisory through `tailwindcss`, `chokidar` and
+  `micromatch`. The plugin is therefore a `devDependency`, like `tailwindcss`
+  itself; declare any build-only package the same way.
 - **Findings are grouped by advisory, not by package.** `npm audit` reports one
   entry per affected package, so one advisory on a widely used package reads as
   dozens of findings; `audit-tree.mjs` collapses them.

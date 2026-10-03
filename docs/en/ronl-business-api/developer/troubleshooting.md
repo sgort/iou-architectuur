@@ -131,11 +131,12 @@ curl http://localhost:3002/v1/health | jq .
 ```
 
 The endpoint answers `200` with `data.status` `"healthy"` when Keycloak and
-Operaton are both up, and `503` with `"degraded"` otherwise:
+Operaton are both up. Otherwise it answers `503` as problem details
+(`application/problem+json`) with code `SERVICE_DEGRADED`, and the full health
+report under the `data` extension member, its `status` `"degraded"`:
 
 ```json
 {
-  "success": false,
   "data": {
     "status": "degraded",
     "dependencies": {
@@ -143,9 +144,18 @@ Operaton are both up, and `503` with `"degraded"` otherwise:
       "operaton": { "status": "down", "error": "<the connection error>" },
       "cache": { "status": "up" }
     }
-  }
+  },
+  "type": "about:blank",
+  "status": 503,
+  "title": "Service degraded",
+  "detail": "A required dependency is unavailable",
+  "instance": "/v1/health",
+  "code": "SERVICE_DEGRADED"
 }
 ```
+
+The report under `data` is abridged here; it carries the same fields as a
+healthy answer.
 
 The full response shape is on [Local Development — Verifying the setup](local-development.md#verifying-the-setup).
 
@@ -207,19 +217,20 @@ Check the backend terminal for a stack trace. Common causes:
 
 **Symptom:**
 ```
-POST /v1/decision/berekenrechtenhoogtezorg/evaluate → 500
+POST /v1/decision/zorgtoeslag_resultaat/evaluate → 500
 {
-  "success": false,
-  "error": {
-    "code": "DECISION_EVALUATION_FAILED",
-    "message": "DMN configuratiefout in beslissingstabel 'berekenrechtenhoogtezorg': meerdere regels zijn tegelijk van toepassing, maar het trefriebeleid (hit policy) staat slechts één treffer toe. Neem contact op met de beheerder."
-  }
+  "type": "about:blank",
+  "status": 500,
+  "title": "Decision evaluation failed",
+  "detail": "DMN configuratiefout in beslissingstabel 'zorgtoeslag_resultaat': meerdere regels zijn tegelijk van toepassing, maar de hit policy staat slechts één treffer toe. Neem contact op met de beheerder.",
+  "instance": "/v1/decision/zorgtoeslag_resultaat/evaluate",
+  "code": "DECISION_EVALUATION_FAILED"
 }
 ```
 
 **Cause:** The DMN decision table uses the default `UNIQUE` hit policy, which requires exactly one rule to match per evaluation. When multiple disqualifying conditions are true simultaneously (e.g. both `betalingsregeling = true` and `detentie = true`), two rules match and Operaton throws a runtime exception. Operaton surfaces this as `"Exception while evaluating decision with key 'null'"` — the `'null'` refers to the internal rule key that could not be resolved, not to the decision key itself.
 
-**Fix:** Open `BerekenRechtEnHoogteZorg.dmn` in Camunda Modeler and set the hit policy on the decision table to `FIRST`:
+**Fix:** Open the decision's DMN file in Camunda Modeler and set the hit policy on the decision table to `FIRST`:
 ```xml
 <decisionTable id="decisionTable" hitPolicy="FIRST">
 ```
@@ -237,13 +248,13 @@ Also correct the `Null` literals in all disqualifying output entries — the FEE
 
 After editing, redeploy the DMN to Operaton via the Camunda Modeler deploy feature or the Operaton REST API.
 
-**Error message routing:** The `operaton.service.ts` catch block detects this specific error pattern and throws a descriptive `Error` instead of re-throwing the raw axios exception. `decision.routes.ts` propagates that message as `error.message` in the 500 response body. The frontend `api.ts` reads `error.response.data` on a 500 and returns it as a structured `ApiResponse`, so `Dashboard.tsx` renders `result.error.message` directly. Citizens see a neutral notification; caseworkers see the technical message.
+**Error message routing:** The `operaton.service.ts` catch block detects this specific error pattern and throws a descriptive `Error` instead of re-throwing the raw axios exception. `decision.routes.ts` sends that message as the `detail` of a `500 DECISION_EVALUATION_FAILED` problem. The frontend's response interceptor in `api.ts` maps the problem back to an `ApiResponse`, with `detail` as `error.message`. The calculator in `Dashboard.tsx` does not show it: a citizen sees the neutral notice "De berekening kon niet worden afgerond. Probeer het opnieuw." and the message is visible only in the response body.
 
 #### Other causes
 
 1. Open browser DevTools → **Network tab**
-2. Find the request to `/v1/decision/berekenrechtenhoogtezorg/evaluate`
-3. Check the response body — the `error.message` field identifies the cause
+2. Find the request to `/v1/decision/zorgtoeslag_resultaat/evaluate`
+3. Check the response body — the problem's `detail` member identifies the cause
 4. Common causes: `aud` claim missing from token (see JWT audience fix above), Operaton service unreachable (check health endpoint), invalid input variable types
 
 ---
