@@ -304,7 +304,7 @@ Read at `origin/main` = `0625d48` (Promote to Production #6); `origin/acc` `0e3e
    comment. The 28 September item on the Keycloak admin scripts: `47cea9f` (#252) keeps secrets out of argv in
    all three scripts and deletes removed mappers.
 
-### 4 October 2026 — Linked Data Explorer v2026.09.8 → v2026.10.0 (production, `71a8236`)
+### 3 October 2026 — Linked Data Explorer v2026.09.8 → v2026.10.0 (production, `71a8236`)
 
 Read at `origin/main` = `71a8236` (Promote to Production #3); `origin/acc` `9e0d18e` holds the same tree.
 

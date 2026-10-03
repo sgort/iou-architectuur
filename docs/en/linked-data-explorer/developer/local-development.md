@@ -344,7 +344,7 @@ npm run test:scripts   # the repository scripts' own tests
 
 [Testing](testing.md) has the suites, their current counts, the contract subset and the CI gate.
 
-`npm run test:scripts` runs on Windows as well as Linux: both harnesses print `PASS: 24 checks` (measured on Windows, 4 October 2026).
+`npm run test:scripts` runs on Windows as well as Linux: both harnesses print `PASS: 24 checks` (measured on Windows, 3 October 2026).
 
 ### Git hooks
 

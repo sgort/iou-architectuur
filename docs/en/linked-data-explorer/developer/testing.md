@@ -13,7 +13,7 @@ before that the repository had no test files at all and `npm test` exited 1 with
 !!! info "Figures on this page are measured, not estimated"
     The headline counts, package coverage, per-area tables, per-file coverage
     and command results below were produced by running the suites against
-    **v2026.10.0** on **4 October 2026**, at `9e0d18e` on `acc` — the same tree
+    **v2026.10.0** on **3 October 2026**, at `9e0d18e` on `acc` — the same tree
     as `71a8236` on `main`, so ACC and production both run what was measured.
     The runs used the working checkout, with `npm run deps:check` reporting the
     installed dependencies in step with the lockfile, on **Node 24.21.0**, the
@@ -178,7 +178,7 @@ both workspaces with `--workspaces --if-present`.
 | `node scripts/promotion-targets.test.mjs` | The promotion decision script alone | 1 | 24 checks | — |
 | `node scripts/dso-dossier.test.mjs` | The dossier renderer alone | 1 | 24 checks | — |
 
-Times are the runner's own figures from the 4 October 2026 measurement. The
+Times are the runner's own figures from the 3 October 2026 measurement. The
 backend row was measured with `npx jest --coverage --runInBand`, one file at a
 time; `npm test` runs Jest with its default workers, so its time will differ.
 `npm run test:scripts` passes on Windows as well as Linux:
@@ -231,7 +231,7 @@ will never run in the fast loop.
 At v2026.10.0 that is **27 files and 762 tests**, all passing: **724 tests from
 `src/routes`** and **38 from `src/openapi`**, the same as at v2026.09.6, when it
 ran in 30.0 seconds against 89.6 for the full backend suite. Jest reported
-35.2 seconds for it on 4 October 2026. It is the loop to use while editing
+35.2 seconds for it on 3 October 2026. It is the loop to use while editing
 `openapi.yaml` or a route.
 
 **There is no frontend contract subset.** `packages/frontend` defines no
@@ -493,7 +493,7 @@ a DOM. Uses `@testing-library/react`, `jest-dom`, `user-event`, `jsdom` and
     bundle test (17).
 
     Both tables were regenerated at v2026.10.0, from the JSON reports of the
-    4 October 2026 runs.
+    3 October 2026 runs.
 
     **The previous revision of this table did not.** Its rows summed to 573
     against a stated total of 1020, because they had been gathered per area at
@@ -576,7 +576,7 @@ place for the next uncovered branch to land, was given margin in v2026.09.6 and
 now reads 85.71%; `utils/outboundUrl.ts` sits just above it at 85.48%.
 
 The per-file figures in this section are **from the v2026.10.0 measurement**
-of 4 October 2026, taken from each run's own coverage report: the coverage map
+of 3 October 2026, taken from each run's own coverage report: the coverage map
 in Jest's JSON report for the backend, and Vitest's `coverage-final.json` for
 the frontend. One row moved this release: `BpmnCanvas.tsx`, which v2026.10.0
 changed, gained two branches and went from 86.18% of 181
