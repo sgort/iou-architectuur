@@ -169,13 +169,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.09.8** · *September 2026*
+-   **🔍 Linked Data Explorer — v2026.10.0** · *October 2026*
 
     ---
 
-    **A promotion deploys in order, and every release carries its own SBOM**
+    **A besluit under delegated authority as an example bundle, and every Awb example drawn in swimlanes**
 
-    A push to `main` used to start three production deploys at once, and on the v2026.09.6 promotion the ROPA site finished before the backend had even begun building. [One promotion workflow](linked-data-explorer/developer/deployment.md#how-a-promotion-reaches-production) now decides what changed, deploys the backend first and releases the two sites only once it has succeeded; its path rules live in a tested script, and a promotion pull request still previews the real production site, by decision. Every deploy check now runs instead of the first failure hiding the rest, and `build-info.json` is read at start-up, closing a false pass in the very gate that proves a new build is serving. Each release now commits a CycloneDX SBOM, dependencies are audited daily on both `acc` and `main`, a lockfile that disagrees with `package.json` fails under its own name, and Renovate never offers a major's X.0.0. In the Modeler, both Thuisbatterij processes gain swimlanes and Dutch names, and "Aanvullende gegevens opvragen" finally has a form that can be deployed. The [suites](linked-data-explorer/developer/testing.md) stand at 3083 tests, all passing.
+    The Modeler and Form Editor now seed [*Besluitvorming onder gedelegeerde bevoegdheid*](linked-data-explorer/features/besluitvorming-gedelegeerd-bundle.md): six lanes, six declared phases, a FIRST-hit routing DMN, twelve forms and a besluit the [RONL Business API](ronl-business-api/user-guide/caseworker.md#besluitvorming) prepares and signs through ValidSign — and a declined signature escalates to the bevoegde bestuursautoriteit. The kapvergunning and zorgtoeslag processes are drawn in swimlanes with Dutch names and a missing-information form that deploys with them; the Awb shells mark their phases with `ronl:awbPhase`, and the HR capacity claim declares its own eight. A task can carry several documents, a pre-push check keeps the twelve RIP models identical across their three copies, and overriding `libxmljs2`'s `node-gyp` cleared the last production high the daily audit had raised. The [suites](linked-data-explorer/developer/testing.md) stand at 3,123 tests, all passing.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

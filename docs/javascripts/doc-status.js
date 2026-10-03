@@ -137,13 +137,25 @@
     if (patch.previous) {
       html += "<p>Before that: " + patchLine(patch.previous) + "</p>";
     }
-    if (patch.open_findings && patch.open_findings.url) {
+    // One issue, or a list of them when a pass covered several components.
+    var findings = [].concat(patch.open_findings || []).filter(function (f) {
+      return f && f.url;
+    });
+    if (findings.length) {
       html +=
-        '<p>Open findings — what the patches found in the component repositories and left for them to fix: <a href="' +
-        escapeHtml(patch.open_findings.url) +
-        '" target="_blank" rel="noopener">' +
-        escapeHtml(patch.open_findings.label) +
-        "</a></p>";
+        "<p>Open findings — what the patches found in the component repositories and left for them to fix: " +
+        findings
+          .map(function (f) {
+            return (
+              '<a href="' +
+              escapeHtml(f.url) +
+              '" target="_blank" rel="noopener">' +
+              escapeHtml(f.label) +
+              "</a>"
+            );
+          })
+          .join(" · ") +
+        "</p>";
     }
     return html + "</div>";
   }

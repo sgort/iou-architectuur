@@ -4,11 +4,11 @@ component: Linked Data Explorer
 
 # BPMN Modeler
 
-The BPMN Modeler is a full BPMN 2.0 process editor integrated into the Linked Data Explorer. It lets you design government service workflows visually, link `BusinessRuleTask` elements to DMN decision models or DRD chains, link `UserTask` and `StartEvent` elements to Camunda Forms authored in the Form Editor, and deploy the complete bundle — BPMN, subprocess BPMNs, and forms — to Operaton in a single operation.
+The BPMN Modeler is a full BPMN 2.0 process editor integrated into the Linked Data Explorer. It lets you design government service workflows visually, link `BusinessRuleTask` elements to DMN decision models or DRD chains, link `UserTask` and `StartEvent` elements to Camunda Forms authored in the Form Editor, link `UserTask` elements to document templates authored in the Document Composer, and deploy the complete bundle — BPMN, subprocess BPMNs, forms and document templates — to Operaton in a single operation.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: BPMN Modeler showing the Tree Felling Permit example with properties panel open](../../assets/screenshots/linked-data-explorer-bpmn-modeler.png)
-  <figcaption>BPMN Modeler showing the Tree Felling Permit example with properties panel open</figcaption>
+  ![Screenshot: BPMN Modeler showing the Tree Felling Permit example — the Kapvergunning subprocess drawn in the pool Kapvergunning - Behandeling en besluit, with the lanes Behandelaar and Systeem and Dutch element names such as Kapvergunning beoordelen (APV) and Herplantplicht beoordelen — with the properties panel open](../../assets/screenshots/linked-data-explorer-bpmn-modeler.png)
+  <figcaption>BPMN Modeler showing the Kapvergunning subprocess in its Behandelaar and Systeem lanes, with the properties panel open</figcaption>
 </figure>
 
 ---
@@ -33,8 +33,8 @@ The Linked Data Explorer models government service workflows as two-layer BPMN c
 
 Shell processes are top-level entries. Their subprocesses are indented beneath them with a tree connector. Standalone processes — those with no parent-child relationship — appear as top-level entries without indentation.
 
-!!! note "Automatic shell/subprocess linking (v1.9.2)"
-    Uploaded BPMN processes that form a shell/subprocess pair are now linked automatically: a process containing Call Activity elements is classified as a **shell**, and any process whose BPMN process ID is targeted by a shell's call-activity becomes its **subprocess**. Classification runs both on fresh imports and retroactively on startup, so processes uploaded as standalone before this release are reclassified without needing a re-upload.
+!!! note "Automatic shell/subprocess linking"
+    Uploaded BPMN processes that form a shell/subprocess pair are linked automatically: a process containing Call Activity elements is classified as a **shell**, and any process whose BPMN process ID is targeted by a shell's call-activity becomes its **subprocess**. Classification runs both on fresh imports and on startup, so a process stored as standalone is reclassified without needing a re-upload.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: BPMN Modeler process list showing AWB Generic Process with Tree Felling Permit indented below it as a subprocess, and AWB Zorgtoeslag with its two subprocesses indented below it](../../assets/screenshots/linked-data-explorer-bpmn-process-hierarchy.png)
@@ -47,8 +47,8 @@ Each process card carries one or more badges:
 
 | Badge | Colour | Meaning |
 |---|---|---|
-| `EXAMPLE` | Blue | Seeded read-only example — cannot be deleted |
-| `WIP` | Amber | Work in progress — user-authored |
+| `EXAMPLE` | Blue | Seeded example — editable, but cannot be deleted |
+| `WIP` | Amber | Work in progress, such as the seeded Migration & Asylum Procedure |
 | `SHELL` | Violet | AWB shell process — calls one or more subprocesses via a Call Activity |
 | `SUB` | Teal | Subprocess — called by a shell via its `calledElement` attribute |
 
@@ -73,7 +73,14 @@ User-created and imported processes default to `standalone`. The BPMN `<process 
 | AWB Zorgtoeslag — Provisional Entitlement | `shell` | — |
 | Zorgtoeslag — Provisional Entitlement | `subprocess` | `AwbZorgtoeslagProcess` |
 | Zorgtoeslag — Final Settlement | `subprocess` | `AwbZorgtoeslagProcess` |
+| Subsidie Thuisbatterij Flevoland | `shell` | — |
+| Thuisbatterijsubsidie — Beoordeling recht en hoogte | `subprocess` | `ThuisbatterijSubsidieAanvraagProcess` |
+| DvTP — Flow A: Toestemming geven | `standalone` | — |
+| Beheer capaciteitsclaim — proces (NL) | `standalone` | — |
+| Besluitvorming onder gedelegeerde bevoegdheid (NL) | `standalone` | — |
 | Migration & Asylum Procedure | `standalone` | — |
+
+The list shows each seeded example with the suffix *(Example)*, or *(Voorbeeld, NL)* for the two Dutch ones. The Awb shells and subprocesses are drawn as pools with lanes — **Aanvrager**, **Behandelaar** and **Systeem** in a shell, **Behandelaar** and **Systeem** in a subprocess — and carry Dutch element names. The Dutch HR capacity claim has eight lanes; *Besluitvorming onder gedelegeerde bevoegdheid* has six and is described on its own page, [Besluitvorming onder gedelegeerde bevoegdheid](besluitvorming-gedelegeerd-bundle.md).
 
 ---
 
@@ -118,6 +125,8 @@ camunda:formRefBinding="latest"
 
 `camunda:formRefBinding="latest"` instructs Operaton to always resolve the most recently deployed version of that form ID, eliminating the need for version pinning.
 
+The seeded examples use `camunda:formRefBinding="deployment"` instead, written by hand. `latest` looks the form key up across the whole engine, so once the same form is deployed under more than one tenant Operaton cannot choose and fails with `ENGINE-03109`; `deployment` resolves the form from the process definition's own deployment, which is unambiguous. Change the binding by hand when a process is deployed under an organization whose forms also exist elsewhere.
+
 A **green badge** appears below the element on the canvas once a form is linked, showing the form ID. The badge colour distinguishes form links (green) from DMN decision links (blue).
 
 To remove a form link, open the **Link to Form** dropdown and select the blank option at the top.
@@ -126,30 +135,43 @@ To remove a form link, open the **Link to Form** dropdown and select the blank o
 
 ## Document template linking
 
-When a `UserTask` is selected, the properties panel shows a **Link decision template** dropdown below the form selector. The dropdown lists every document template saved in the Document Composer's `localStorage`.
+When a `UserTask` is selected, the properties panel shows a **Link decision templates** section below the form selector. A task can carry **several** document templates, because one step can produce more than one deliverable.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: BPMN properties panel for a UserTask showing the Link decision template dropdown with the Kapvergunning Beschikking template selected, and the purple info card below confirming the selection](../../assets/screenshots/linked-data-explorer-bpmn-document-template-selector.png)
-  <figcaption>Link decision template dropdown in the UserTask properties panel</figcaption>
+  ![Screenshot: BPMN properties panel for a UserTask under Link decision templates, showing two attached templates as purple chips, each with its name, documentRef and a remove button, the select below reading -- Add a template --, and on the canvas the task's purple badge reading 2 documents](../../assets/screenshots/linked-data-explorer-bpmn-document-template-selector.png)
+  <figcaption>A task with two document templates attached: two chips, the "-- Add a template --" select, and a "2 documents" badge on the canvas</figcaption>
 </figure>
 
-Selecting a template writes `ronl:documentRef` to the BPMN XML and renders a **purple badge** (📄) beneath the element on the canvas. The badge is positioned below the green form badge so all three linked artefacts are visible simultaneously:
+- **Attached templates** appear as chips, each showing the template's name and id, with a **✕** button that removes it. A template id this browser does not know is shown as its bare id rather than hidden.
+- **The select below the chips adds a template.** It lists only the templates saved in the Document Composer that are not yet attached, under **-- Add a template --**, and reads **-- All templates attached --** once none are left.
+
+The Modeler writes the attached ids to `ronl:documentRef` as a comma-separated list — `ronl:documentRef="rip-ontwerptoelichting,rip-objectenboom"` — and removes the attribute when the last chip is removed. A BPMN with a single id is a list of one, so existing processes need no change.
+
+A **purple badge** (📄) appears beneath the element on the canvas, below the green form badge. With one template it shows the template id; with several it reads **N documents**, and hovering it lists every id. Each badge colour stands for one kind of link:
 
 | Badge colour | Artefact type | Attribute written |
 |---|---|---|
-| Amber | DMN / DRD decision | `camunda:decisionRef` |
+| Blue | DMN / DRD decision | `camunda:decisionRef` |
 | Green | Camunda Form | `camunda:formRef` |
-| **Purple** | **Document template** | **`ronl:documentRef`** |
+| **Purple** | **Document templates** | **`ronl:documentRef`** |
 
-Document template linking is only available for `UserTask` elements (not `StartEvent`).
+Document template linking is only available for `UserTask` elements (not `StartEvent`). The purple badge is drawn only on a user task that also has a form linked.
 
-!!! note "`ronl:signatureRef` is hand-authored, not written by the Modeler"
-    A fourth `ronl:*` attribute exists on user tasks — `ronl:signatureRef` — but
-    the Modeler neither reads nor writes it and shows no badge for it. It is set
-    by hand in the BPMN and consumed by the RONL Business API, which replaces the
-    task's plain approval form with a ValidSign signing ceremony where the
-    attribute is present. See
-    [RIP R2.1 Bundle](rip-phase1-bundle.md#the-phase-exit-approval-is-signed).
+!!! note "Hand-authored `ronl:*` attributes"
+    Several `ronl:*` attributes are set by hand in the BPMN: the Modeler keeps
+    them through a save but offers no control for them and shows no badge for
+    them.
+
+    - **`ronl:signatureRef`** on a user task names a document template. For
+      that task the RONL Business API offers a ValidSign signing ceremony for
+      the document in place of the task's plain form. The deploy modal bundles
+      that template like any other. See [ValidSign signing](../../ronl-business-api/developer/validsign-signing.md)
+      and [RIP R2.1 Bundle](rip-phase1-bundle.md#the-phase-exit-approval-is-signed).
+    - **`ronl:awbPhase`**, **`ronl:phases`**, **`ronl:phaseLabel`** and
+      **`ronl:phase`** declare a process's phases and mark the node that starts
+      each one. The RONL Business API reads them to draw the caseworker's phase
+      stepper — see [Lanes and phase markers](../../ronl-business-api/reference/bpmn-design-criteria.md#lanes-and-phase-markers-the-caseworker-process-view).
+      A Modeler control for them is [LDE issue #242](https://github.com/sgort/linked-data-explorer/issues/242).
 
 See [Document Composer](document-composer.md) for how to create and manage document templates.
 
@@ -160,29 +182,30 @@ See [Document Composer](document-composer.md) for how to create and manage docum
 The **Deploy** button in the Modeler toolbar opens a deploy modal that collects all resources needed for a complete Operaton deployment:
 
 1. The currently open BPMN file
-2. Any subprocess BPMNs referenced via `calledElement` attributes (resolved recursively from saved processes)
+2. The subprocess BPMNs the open process calls through a `calledElement` attribute, matched against saved processes by their BPMN process id
 3. All `.form` files whose `id` matches a `camunda:formRef` found anywhere in the bundle
+4. All `.document` files whose id is named by a `ronl:documentRef` — which can list several per task — or by a `ronl:signatureRef`, anywhere in the bundle
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Deploy modal showing the bundled resources list — main BPMN, two subprocess BPMNs, and three .form files — with the line naming the Operaton it deploys to, and the Deploy button](../../assets/screenshots/linked-data-explorer-bpmn-deploy-modal.png)
-  <figcaption>Deploy modal listing the complete bundle before sending to Operaton</figcaption>
+  ![Screenshot: Deploy modal over the Kapvergunning swimlane canvas, listing seven resources — two BPMN files, four .form files and one .document file — with the Board ownership and Organization sections, an amber warning that the bundle mixes the languages en and nl, the line naming the Operaton it deploys to, and the Deploy button](../../assets/screenshots/linked-data-explorer-bpmn-deploy-modal.png)
+  <figcaption>Deploy modal listing the seven resources of the Kapvergunning bundle — and warning that they are tagged in two languages</figcaption>
 </figure>
 
-All resources are sent in a single multipart `POST` to Operaton. Because the BPMN and its forms share one deployment ID, `camunda:formRef` resolves correctly at runtime — no separate form deployment step is needed.
+The browser sends the bundle in one request to the Linked Data Explorer backend, which posts every resource to Operaton in a single multipart deployment. Because the BPMN, its forms and its document templates share one deployment, `camunda:formRef` resolves correctly at runtime — no separate form deployment step is needed.
 
 The modal provides:
 
-- **Board ownership** *(required, v1.9.9)* — the owning board, auto-detected from the process's candidate groups (infra/rip → Infra-board, caseworker/hr → Caseworker) and overridable. The choice is stamped onto the deployed BPMN as a process-level `camunda:property boardOwner`, persisted on the `process_definitions` record (`board_owner` column), and exposed via `/bundles/public` for downstream consumers (ronl-business-api Procesbibliotheek and archive split)
-- **Operaton target** — *named, not chosen* (v2026.09.5). A line reading *Deploys to …* says which Operaton the process will reach. The backend always deploys to its own configured Operaton with its own credentials, so the modal no longer offers an endpoint URL, username or password — whoever opened the modal could previously point a deployment, and credentials for it, at any host
+- **Board ownership** *(required)* — the owning board, auto-detected from the process's candidate groups (infra/rip → Infra-board, caseworker/hr → Caseworker) and overridable. The choice is stamped onto the deployed BPMN as a process-level `camunda:property boardOwner`, persisted on the `process_definitions` record (`board_owner` column), and exposed via `/bundles/public` for downstream consumers (ronl-business-api Procesbibliotheek and archive split)
+- **Operaton target** — *named, not chosen*. A line reading *Deploys to …* says which Operaton the process will reach. The backend always deploys to its own configured Operaton with its own credentials, so the modal offers no endpoint URL, username or password
 - **Resource list** — shows exactly what will be included before you commit
-- **Organization** *(required, v2026.08.1)* — the deploy will not submit without one. It is sent to Operaton as its native **tenant-id** (`POST /deployment/create`'s `tenant-id` field), closing the gap where a process could be deployed with no tenant at all and stay invisible to every tenant-scoped lookup made against it afterwards
+- **Organization** *(required)* — taken from the process's `ronl:organization`, set in the sidebar's **Organization** field; the deploy will not submit without one. It is sent to Operaton as its native **tenant-id** (`POST /deployment/create`'s `tenant-id` field), so no process is deployed without a tenant and left invisible to tenant-scoped lookups
 - **Deploy button** — disabled after a successful deployment to prevent accidental re-deploy
-- **Recording result** *(v2026.09.5)* — the backend records the deployed process in the same request, so it appears on the caseworker dashboard and the public site. If that record could not be written, the result shows as a **warning** rather than a tick: the deployment itself succeeded and cannot be undone, but the process will not appear on the dashboard or the public site until it is saved and deployed again. Before v2026.09.5 the browser made that write separately and silently dropped its failures, so a deploy could report success while the process stayed invisible everywhere
+- **Recording result** — the backend records the deployed process in the same request, so it appears on the caseworker dashboard and the public site. If that record could not be written, the result shows as a **warning** rather than a tick: the deployment itself succeeded and cannot be undone, but the process will not appear on the dashboard or the public site until it is saved and deployed again
 
-If a `camunda:formRef` references a form ID that is not found in `localStorage`, it is listed as an unmatched reference. The deployment still proceeds, but that form will not resolve at runtime.
+If a `camunda:formRef`, `ronl:documentRef` or `ronl:signatureRef` names a form or document template that is not in local storage, the modal lists it under **⛔ Referenced resources are missing from local storage** and **Deploy stays disabled** until it is imported in the Form Editor or the Document Composer: a bundle without it is one the engine cannot resolve at runtime.
 
-!!! note "Board-owner injection preserves BPMN schema order (v1.9.11)"
-    When a `<bpmn:process>` already carries a `<bpmn:documentation>` child, the `boardOwner` property is inserted **after** it — `injectBoardOwner` skips past any leading `<documentation>` element(s) before locating or creating `extensionElements`, so the resulting XML stays schema-valid (documentation must precede extensionElements). Deploy failures also now surface Operaton's actual response body rather than a generic Axios message.
+!!! note "Board-owner injection preserves BPMN schema order"
+    When a `<bpmn:process>` already carries a `<bpmn:documentation>` child, the `boardOwner` property is inserted **after** it — `injectBoardOwner` skips past any leading `<documentation>` element(s) before locating or creating `extensionElements`, so the resulting XML stays schema-valid (documentation must precede extensionElements). A failed deploy shows the error the backend reports rather than a generic message.
 
 ---
 
@@ -247,11 +270,18 @@ When the deploy modal opens, LDE walks the bundle resources (shell BPMN + subpro
 
 The check sits alongside the existing RoPA-missing warning, both rendered between the resource list and the resource count.
 
+The seeded Kapvergunning bundle shows it, as in the [deploy modal figure](#one-click-deploy) above: its processes are untagged, but `kapvergunning-aanvullende-gegevens` is tagged `nl` while the bundle's other forms — `kapvergunning-start`, `tree-felling-review`, `awb-notify-applicant` — and `example_treefelling_beschikking` are tagged `en`. Untagged artefacts never count, so the warning names exactly the tags that disagree; retagging one side, or untagging it, clears it.
+
 ---
 
 ## Tree Felling Permit example
 
-On first launch, the Modeler auto-creates the **Tree Felling Permit** example process, demonstrating a complete municipal workflow: application submission, two `BusinessRuleTask` elements linked to DMN decision models (`TreeFellingDecision`, `ReplacementTreeDecision`), an exclusive gateway routing to permit granted or rejected outcomes. The example is protected from deletion and serves as a reference for process designers.
+The **Tree Felling Permit** example is the Kapvergunning subprocess `TreeFellingPermitSubProcess`, seeded with the other examples on first launch. The AWB Generic Process shell calls it through its Call Activity *Fase 4+5: Behandeling en besluit*, once the application is complete. It is drawn in the pool *Kapvergunning - Behandeling en besluit* with two lanes:
+
+- **Systeem** — the start event *Start behandeling*; two `BusinessRuleTask` elements linked to DMN decision models, *Kapvergunning beoordelen (APV)* (`TreeFellingDecision`) and *Herplantplicht beoordelen* (`ReplacementTreeDecision`); the script task *Definitief besluit kapvergunning vaststellen*; the exclusive gateway *Vergunning verleend?* and the two script tasks that set the decision variables, *Besluitvariabelen zetten: Verleend* and *Besluitvariabelen zetten: Geweigerd*; and the single end event *Besluit gereed*
+- **Behandelaar** — the user task *Beoordeling behandelaar: besluit kapvergunning*, with the form `tree-felling-review` and the document template `example_treefelling_beschikking`
+
+The example cannot be deleted and serves as a reference for process designers.
 
 ---
 
@@ -259,14 +289,14 @@ On first launch, the Modeler auto-creates the **Tree Felling Permit** example pr
 
 The Modeler targets Operaton, the open-source fork of Camunda 7 CE. It uses `camunda-bpmn-moddle` for namespace support since no `operaton-bpmn-moddle` package exists yet. Operaton accepts both `camunda:` and `operaton:` namespace attributes, ensuring compatibility.
 
-The Modeler targets Operaton, the open-source fork of Camunda 7 CE. It uses `camunda-bpmn-moddle` for namespace support since no `operaton-bpmn-moddle` package exists yet. The `camunda:formRef` and `camunda:formRefBinding` attributes used for form linking are also accepted by Operaton under the `camunda:` namespace.
-
 ---
 
 ## Related documentation
 
 - [Form Editor](form-editor.md) — creating and managing Camunda Forms in the LDE
-- [RONL Business API — Dynamic Forms](../../../ronl-business-api/features/dynamic-forms.md) — how deployed forms are fetched and rendered at runtime in MijnOmgeving
+- [RONL Business API — Dynamic Forms](../../ronl-business-api/features/dynamic-forms.md) — how deployed forms are fetched and rendered at runtime in MijnOmgeving
 - [API Specification](../reference/api-specification.md) — the Linked Data Explorer's `POST /v1/dmns/process/deploy` endpoint this button calls
 - [Document Composer](document-composer.md) — authoring decision document templates
 - [Document Composer user guide](../user-guide/document-composer.md) — step-by-step workflow
+- [Besluitvorming onder gedelegeerde bevoegdheid](besluitvorming-gedelegeerd-bundle.md) — the example with six lanes, declared phases, a routing DMN and a signed besluit
+- [RONL Business API — BPMN Design Criteria](../../ronl-business-api/reference/bpmn-design-criteria.md#lanes-and-phase-markers-the-caseworker-process-view) — how lanes and phase markers drive the caseworker process view

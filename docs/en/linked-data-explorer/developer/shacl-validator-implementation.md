@@ -139,7 +139,7 @@ The routes are registered under `/v1/shacl`, so the full paths are `POST /v1/sha
 ```
 
 !!! note
-    The runtime requires Node ≥ 20.19 / 22, because the emitted CommonJS uses `require()` on these ESM packages. Azure App Service runs Node 22, so this is satisfied in all environments.
+    The runtime requires Node ≥ 20.19 / 22, because the emitted CommonJS uses `require()` on these ESM packages. Azure App Service runs Node 24 (`NODE|24-lts`), so this is satisfied in all environments.
 
 ### Shape layers
 

@@ -31,7 +31,7 @@ On **delete**, each service:
 1. Removes the record from `localStorage` immediately.
 2. Fires a background `DELETE /v1/assets/{type}/:id`.
 
-Example assets (`readonly: true`) are never written to the backend. They are seeded on the frontend from static files in `public/examples/` and `defaultTemplates.ts`.
+Examples are seeded on the frontend from static files in `public/examples/` and from `defaultTemplates.ts`, and carry `status: 'example'`. Seeding saves them through the same service call as a user edit, so every example with `readonly: false` is written to the backend too. Only records with `readonly: true` are never written: the BPMN example `example_dvtp_toestemming` and the document template `example_dvtp_consent_receipt`. Hydration keeps those two from `localStorage` and takes everything else from the server.
 
 ---
 
@@ -66,7 +66,7 @@ CREATE TABLE process_definitions (
   called_element         VARCHAR(255),
   linked_dmn_templates   TEXT[]       NOT NULL DEFAULT '{}',
   status                 VARCHAR(20)  NOT NULL DEFAULT 'wip'
-                           CHECK (status IN ('example', 'wip')),
+                           CHECK (status IN ('example', 'wip', 'e2e')),
   readonly               BOOLEAN      NOT NULL DEFAULT FALSE,
   schema_version         INTEGER      NOT NULL DEFAULT 1,
   deployed_at            TIMESTAMPTZ,
@@ -76,6 +76,8 @@ CREATE TABLE process_definitions (
   deployed_documents     TEXT[]       NOT NULL DEFAULT '{}',
   language               VARCHAR(2),                         -- v1.6.0
   organization           VARCHAR(100),                        -- v1.6.0
+  board_owner            VARCHAR(50),
+  shell_id               VARCHAR(255),
   created_at             TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
   updated_at             TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
@@ -184,10 +186,13 @@ interface BpmnProcess {
   updatedAt: string;
   linkedDmnTemplates: string[];
   readonly?: boolean;
-  status?: 'example' | 'wip';
+  status?: 'example' | 'wip' | 'e2e';
   bpmnProcessId?: string;                               // <process id="..."> from XML
   processRole?: 'shell' | 'subprocess' | 'standalone'; // hierarchy role
   calledElement?: string;                               // parent shell's bpmnProcessId
+  shellId?: string;                                     // local record id of the owning shell
+  language?: 'en' | 'nl' | 'de';
+  organization?: string;
 }
 ```
 

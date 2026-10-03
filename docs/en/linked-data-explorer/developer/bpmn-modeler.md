@@ -18,7 +18,10 @@ packages/frontend/src/components/BpmnModeler/
 ├── ProcessList.tsx            process list (left), CRUD operations
 ├── DmnTemplateSelector.tsx    DMN/DRD dropdown for BusinessRuleTask linking
 ├── FormTemplateSelector.tsx   Form dropdown for UserTask / StartEvent linking
-├── DocumentTemplateSelector.tsx  Document template dropdown for UserTask linking  ← new in v1.1.0
+├── DocumentTemplateSelector.tsx  document template chips and "add" select for UserTask linking
+├── RopaSelector.tsx           RoPA record selector, in the footer pinned below the process list
+├── DsoActiviteitSelector.tsx  DSO activiteit URN selector, in the same footer
+├── ronlModdleDescriptor.json  registers the ronl: attributes bpmn-js reads as properties
 └── BpmnModeler.css            custom styles for canvas rendering fixes and badge overlays
 
 packages/frontend/src/
@@ -26,7 +29,9 @@ packages/frontend/src/
 │   ├── bpmnService.ts         localStorage CRUD for BpmnProcess records
 │   └── formService.ts         localStorage CRUD for FormSchema records (shared with FormEditor)
 └── utils/
-    └── bpmnTemplates.ts       default BPMN XML templates (new process, example)
+    ├── bpmnTemplates.ts       default BPMN XML templates (new process, example)
+    ├── documentRefs.ts        parse and format the comma-separated ronl:documentRef list
+    └── exampleVersions.ts     EXAMPLE_VERSIONS, the seed version registry
 ```
 
 ---
@@ -36,17 +41,26 @@ packages/frontend/src/
 `BpmnCanvas.tsx` manages the bpmn-js modeler instance lifecycle:
 
 ```typescript
-const modeler = new Modeler({
+const modeler = new BpmnModeler({
   container: containerRef.current,
+  additionalModules: [
+    BpmnPropertiesPanelModule,
+    BpmnPropertiesProviderModule,
+    CamundaPlatformPropertiesProviderModule,
+  ],
   moddleExtensions: {
     camunda: camundaModdleDescriptor,
+    ronl: ronlModdleDescriptor,
   },
 });
 
 await modeler.importXML(xml);
 const canvas = modeler.get('canvas');
 canvas.zoom('fit-viewport');
+refreshDmnOverlays();
 ```
+
+The badge overlays are drawn by `refreshDmnOverlays()`, which runs after the import and again on every `commandStack.changed` event.
 
 `camunda-bpmn-moddle` is used instead of an Operaton equivalent because no `operaton-bpmn-moddle` package exists. Operaton accepts both `camunda:` and `operaton:` namespace attributes, so `camunda:` is safe to use and ensures compatibility with the broader Camunda 7 tooling ecosystem.
 
@@ -148,16 +162,23 @@ modeling.updateProperties(element, {
 
 ## Form badge overlay
 
-When any `UserTask` or `StartEvent` has `camunda:formRef` set, `BpmnCanvas.tsx` renders a green badge overlay below the element using the bpmn-js `overlays` service. This is applied on `import.done` and on every `element.changed` event.
+When any `UserTask` or `StartEvent` has `camunda:formRef` set, `BpmnCanvas.tsx` renders a green badge overlay using the bpmn-js `overlays` service, in `refreshDmnOverlays()` — after the import and on every `commandStack.changed` event.
 
 ```typescript
+// UserTask: on the task's bottom edge
+overlays.add(element.id, 'form-linked', {
+  position: { bottom: 8, left: leftOffset },
+  html: `<div class="form-linked-badge" title="${formRef}">📝 ${formRef}</div>`,
+});
+
+// StartEvent: below the event, with the narrower --start variant
 overlays.add(element.id, 'form-linked', {
   position: { bottom: -22, left: leftOffset },
-  html: `<div class="form-linked-badge" title="${formRef}">📝 ${formRef}</div>`,
+  html: `<div class="form-linked-badge form-linked-badge--start" title="${formRef}">📝 ${formRef}</div>`,
 });
 ```
 
-The badge offset uses `leftOffset = Math.round((element.width - badgeWidth) / 2)` to centre the badge horizontally beneath the element. A separate CSS class `form-linked-badge--start` applies smaller font/padding for `StartEvent` elements, which have a narrower default width.
+The badge offset uses `leftOffset = Math.round((element.width - badgeWidth) / 2)` to centre the badge horizontally on the element, with a badge width of 130 for a task and 110 for a start event. The CSS class `form-linked-badge--start` applies a smaller font, padding and maximum width for `StartEvent` elements, which have a narrower default width.
 
 Styles are defined in `BpmnModeler.css`:
 
@@ -185,9 +206,16 @@ Styles are defined in `BpmnModeler.css`:
 
 `DocumentTemplateSelector` is a React component injected into the bpmn-js properties panel when a `UserTask` is selected (not `StartEvent`). It reads available document templates from `DocumentService` and writes `ronl:documentRef` to the element via the bpmn-js `modeling` API. It follows the identical injection pattern as `FormTemplateSelector`.
 
+`ronl:documentRef` holds a **list**: one template id, or several separated by commas, because a task can produce more than one deliverable. `utils/documentRefs.ts` reads and writes it:
+
+- `parseDocumentRefs(value)` splits on commas, trims each id and drops blanks, so a hand-edited `"a, b"` reads the same as `"a,b"`;
+- `formatDocumentRefs(ids)` joins the cleaned ids with a comma, or returns `undefined` for an empty list, which makes `modeling.updateProperties` remove the attribute rather than write an empty string.
+
+A BPMN with a single id needs no migration: it is a list of one.
+
 ### Injection
 
-Inside the `selectionChanged` listener in `BpmnCanvas.tsx`, after the `FormTemplateSelector` is mounted for a `UserTask`, the document selector is appended immediately below it:
+In `BpmnCanvas.tsx`, when the selection changes to a `UserTask`, the document selector is appended to the properties panel immediately below the `FormTemplateSelector`:
 
 ```typescript
 // UserTask only — not StartEvent
@@ -200,30 +228,35 @@ if (elementType === 'bpmn:UserTask') {
 
   const docRoot = ReactDOM.createRoot(docSelectorContainer);
   docRoot.render(
-    
+    <DocumentTemplateSelector
+      element={selectedElement}
+      modeling={modeling}
+      selectedDocumentRef={currentDocumentRef}
+    />
   );
 }
 ```
 
 `cleanupReactRoots()` unmounts all injected React roots (form and document) when the selection changes.
 
-### Writing and clearing the attribute
+### Attaching and removing templates
 
-Selecting a template:
+The control is headed **Link decision templates**. Each attached template is a chip showing its name, its description and `processKey` where the template has them, and its id, with a **✕** button that removes it. An id that matches no template in this browser — a BPMN that references a template this browser has not been seeded with — shows as its bare id rather than being hidden.
 
-```typescript
-modeling.updateProperties(element, {
-  'ronl:documentRef': templateId,
-});
-```
+Below the chips, a select adds a template. It offers only the templates not yet attached, under the placeholder **-- Add a template --**; once every template is attached it reads **-- All templates attached --** and is disabled. The select is an add action rather than the state itself, so removing one of three templates is a click on its chip rather than a ctrl-click in a multi-select.
 
-Selecting the blank option:
+Both actions write the whole list back:
 
 ```typescript
-modeling.updateProperties(element, {
-  'ronl:documentRef': undefined,
-});
+const write = (ids: string[]) => {
+  setSelectedIds(ids);
+  modeling.updateProperties(element, {
+    'ronl:documentRef': formatDocumentRefs(ids), // undefined when the list is empty
+  });
+};
 ```
+
+When no templates exist at all, the control shows *No documents available — create one in the Document Composer.* instead.
 
 ---
 
@@ -236,19 +269,22 @@ overlays.remove({ type: 'document-linked' });
 
 // ...inside the elementRegistry.forEach loop, after the form badge check:
 if (element.type === 'bpmn:UserTask') {
-  const documentRef = element.businessObject.get('ronl:documentRef');
-  if (documentRef) {
-    const badgeWidth = 130;
-    const leftOffset = Math.round((element.width - badgeWidth) / 2);
-    overlays.add(element.id, 'document-linked', {
-      position: { bottom: -36, left: leftOffset }, // below the form badge at -22
-      html: `📄 ${documentRef}`,
-    });
-  }
+  const documentRefs = parseDocumentRefs(element.businessObject.get('ronl:documentRef'));
+  if (documentRefs.length === 0) return;
+  const badgeWidth = 130;
+  const leftOffset = Math.round((element.width - badgeWidth) / 2);
+  const label =
+    documentRefs.length === 1 ? documentRefs[0] : `${documentRefs.length} documents`;
+  overlays.add(element.id, 'document-linked', {
+    position: { bottom: -36, left: leftOffset }, // below the form badge
+    html: `<div class="document-linked-badge" title="${documentRefs.join(', ')}">📄 ${label}</div>`,
+  });
 }
 ```
 
-The badge offset is `bottom: -36` (vs. `bottom: -22` for the form badge), so both badges stack below the element without overlapping.
+One document is named on the badge. Several would not fit, so the badge reads **N documents** and its `title` tooltip lists every id.
+
+The badge offset is `bottom: -36`, below the form badge, so both badges show without overlapping. The form badge's block runs first and returns from the loop callback when the task has no `camunda:formRef`, so a user task shows a document badge only when it also has a form.
 
 ### CSS
 
@@ -275,11 +311,12 @@ Defined in `BpmnModeler.css`:
 
 | Overlay type | CSS class | Colour | `bottom` offset |
 |---|---|---|---|
-| `dmn-linked` | `.dmn-linked-badge` | Blue (`#2563eb`) | `8` (inside element) |
-| `form-linked` | `.form-linked-badge` | Green (`#16a34a`) | `-22` (below element) |
-| `document-linked` | `.document-linked-badge` | Violet (`#7c3aed`) | `-36` (below form badge) |
+| `dmn-linked` | `.dmn-linked-badge` | Blue (`#2563eb`) | `8` (on the business rule task's bottom edge) |
+| `form-linked` on a `UserTask` | `.form-linked-badge` | Green (`#16a34a`) | `8` (on the task's bottom edge) |
+| `form-linked` on a `StartEvent` | `.form-linked-badge` + `.form-linked-badge--start` | Green (`#16a34a`) | `-22` (below the event) |
+| `document-linked` | `.document-linked-badge` | Violet (`#7c3aed`) | `-36` (below the form badge) |
 
-`refreshDmnOverlays()` calls `overlays.remove({ type: 'document-linked' })` before re-adding, so stale badges are cleared on every `element.changed` event.
+`refreshDmnOverlays()` removes all three overlay types before re-adding them, so stale badges are cleared on every `commandStack.changed` event.
 
 ---
 
@@ -305,9 +342,29 @@ const allFormRefs = new Set([
 
 // 4. Match form refs against FormService.getForms() by schema.id
 const forms = allFormRefs → matched FormSchema records
+
+// 5. Extract document ids from ronl:documentRef AND ronl:signatureRef in
+//    main + subprocess XMLs, splitting each documentRef list on commas
+const extractDocumentRefs = (bpmnXml: string) => [
+  ...new Set(
+    [
+      ...bpmnXml.matchAll(/ronl:documentRef="([^"]+)"/g),
+      ...bpmnXml.matchAll(/ronl:signatureRef="([^"]+)"/g),
+    ].flatMap((m) => parseDocumentRefs(m[1]))
+  ),
+];
+
+// 6. Match document ids against DocumentService.getTemplates() by id
+const documents = allDocumentRefs → matched DocumentTemplate records
 ```
 
-Unmatched form refs (referenced in BPMN but not in localStorage) are passed to the modal as `unmatchedForms` for display.
+`ronl:signatureRef` is read alongside `ronl:documentRef` because a signature task can bind its template through `signatureRef` alone; the template must still travel with the deployment. A `documentRef` list is split rather than matched whole, so a task with two documents contributes two ids.
+
+References that match nothing in local storage are passed to the modal as `unmatchedForms` and `unmatchedDocuments`. The modal lists them by name under **⛔ Referenced resources are missing from local storage** and **disables Deploy** while any remain, alongside the board-owner and organization guards: a bundle without them is one the engine cannot resolve at runtime.
+
+### Stacking
+
+The modal's overlay sits at `z-[1100]`, not the `z-50` the app's other dialogs use. It is the only dialog that opens over a bpmn-js canvas, and bpmn-js brings its own stacking: `diagram-js.css` puts the context pad at 100, the popup menu at 200 and the hover tooltip at 1000, and `properties-panel.css` puts its tooltip and FEEL editor popup at 1001. At `z-50` a selected task's context pad sat on top of the modal and stayed clickable through the backdrop; 1100 clears them all. `BpmnCanvas.test.tsx` pins the class.
 
 ### API call
 
@@ -329,11 +386,11 @@ await fetch(`${API_BASE_URL}/api/dmns/process/deploy`, {
 });
 ```
 
-The request names **no Operaton target and no credentials**. Since v2026.09.5 the modal no longer offers an Operaton URL, username or password; it names the Operaton the backend deploys to instead.
+The request names **no Operaton target and no credentials**. The modal offers no Operaton URL, username or password; it names the Operaton the backend deploys to instead.
 
 The call still uses the legacy `/api/dmns/...` alias, which the backend serves through the `/v1` handler with a `Deprecation` header.
 
-**The backend records the bundle in the same request.** The response's `data` carries `deploymentId` and a `bundleRecorded` flag, with `bundleRecordingError` when the write did not land. A deploy Operaton has accepted is a success either way — it cannot be undone — so a failed recording shows as a **warning**, saying the process will not appear on the dashboard or the public site until it is saved and deployed again. Before v2026.09.5 the browser made that write itself, as a second request that was unawaited, whose failure was swallowed, and which was skipped altogether when local storage held no matching identifier. An error response is read with `getProblemDetail()`, since errors are RFC 9457 problem details.
+**The backend records the bundle in the same request.** The response's `data` carries `deploymentId` and a `bundleRecorded` flag, with `bundleRecordingError` when the write did not land. A deploy Operaton has accepted is a success either way — it cannot be undone — so a failed recording shows as a **warning**, saying the process will not appear on the dashboard or the public site until it is saved and deployed again. The browser makes no second write of its own. An error response is read with `getProblemDetail()`, since errors are RFC 9457 problem details.
 
 ### Backend endpoint
 
@@ -342,8 +399,11 @@ The call still uses the legacy `/api/dmns/...` alias, which the backend serves t
 - Main BPMN: field name = `${processKey}.bpmn`
 - Subprocess BPMNs: field name = the subprocess filename
 - Forms: field name = `${formId}.form`
+- Document templates: field name = `${documentId}.document`
 
-Processes deploy **only to the configured Operaton**. `deployProcess()` always uses the shared client, built from `OPERATON_BASE_URL` and carrying `OPERATON_API_KEY`, so Operaton credentials stay on the backend. For older frontends, an `operatonUrl` equal to the configured one is still accepted; any other answers `400`, and `operatonUsername` and `operatonPassword` are ignored. All three fields are deprecated. Until v2026.09.5 a URL in the request body made the backend build a new client for that host, with optional Basic Auth — an Operaton target, and credentials for it, chosen by whoever sent the request.
+The organization goes in Operaton's native `tenant-id` field.
+
+Processes deploy **only to the configured Operaton**. `deployProcess()` always uses the shared client, built from `OPERATON_BASE_URL` and carrying `OPERATON_API_KEY`, so Operaton credentials stay on the backend. For older frontends, an `operatonUrl` equal to the configured one is still accepted; any other answers `400`, and `operatonUsername` and `operatonPassword` are ignored. All three fields are deprecated.
 
 After Operaton accepts the deployment, the route finds the stored process by the id in the BPMN — or creates a minimal row when none exists — and stamps it as deployed, recording the Operaton actually used. Saving a process takes `bpmnProcessId` from the saved XML, so renaming the process id no longer leaves a stale value that makes the next deploy create a second row.
 
@@ -376,9 +436,9 @@ const loadOptions = async () => {
 
 The dropdown renders two `<optgroup>` elements: "🔗 DRDs (Unified Chains)" and "📋 Single DMNs". Selection auto-populates `camunda:decisionRef` and suggests a `camunda:resultVariable` value (derived from the decision title, camelCased).
 
-### DmnTemplateSelector pre-selection fix
+### DmnTemplateSelector pre-selection
 
-Before v1.0.0, opening the properties panel for a `BusinessRuleTask` that already had `camunda:decisionRef` set would show an empty dropdown. The fix reads `currentDecisionRef` from `businessObject.get('camunda:decisionRef')` and passes it as `selectedDecisionRef` to `DmnTemplateSelector`, which initialises its `useState` from that prop.
+Opening the properties panel for a `BusinessRuleTask` that already has `camunda:decisionRef` set shows that decision selected. `BpmnCanvas.tsx` reads `currentDecisionRef` from `businessObject.get('camunda:decisionRef')` and passes it as `selectedDecisionRef` to `DmnTemplateSelector`, which initialises its `useState` from that prop.
 
 ---
 
@@ -386,7 +446,7 @@ Before v1.0.0, opening the properties panel for a `BusinessRuleTask` that alread
 
 `bpmnService.ts` stores processes as `BpmnProcess` records in PostgreSQL via the backend, using `localStorage` as a synchronous read cache. See [Asset Storage](asset-storage.md) for the full write-through cache and hydration architecture.
 
-The `BpmnProcess` type includes three relationship fields added in v1.3.0:
+The `BpmnProcess` type includes three relationship fields:
 ```typescript
 interface BpmnProcess {
   // ... existing fields ...
@@ -418,17 +478,19 @@ The backend additionally exposes `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId`
 
 ### ronlModdleDescriptor.json
 
-`ronlModdleDescriptor.json` registers all custom `ronl:` extensions against bpmn-js so the attributes survive `saveXML()` serialisation. Without registration, bpmn-js silently strips unknown namespaced attributes on every save.
+`ronlModdleDescriptor.json` registers `ronl:` extensions against bpmn-js, under the namespace `http://ronl.nl/schema/1.0`, so bpmn-js reads and writes them as typed properties of the element — which is what lets `businessObject.get('ronl:documentRef')` and `modeling.updateProperties` work on them.
 
-The descriptor currently declares five type entries:
+The descriptor declares five type entries:
 
-| Type | Extends | Attribute | Added in |
-|---|---|---|---|
-| `DocumentRefMixin` | `bpmn:UserTask` | `documentRef` | v1.1.0 |
-| `RopaRefMixin` | `bpmn:Process` | `ropaRef` | v1.4.0 |
-| `DsoActiviteitMixin` | `bpmn:Process` | `dsoActiviteitUrn` | v1.5.0 |
-| `LanguageMixin` | `bpmn:Process` | `language` | v1.6.0 |
-| `OrganizationMixin` | `bpmn:Process` | `organization` | v1.6.0 |
+| Type | Extends | Attribute |
+|---|---|---|
+| `DocumentRefMixin` | `bpmn:UserTask` | `documentRef` — one or more template ids, comma-separated |
+| `RopaRefMixin` | `bpmn:Process` | `ropaRef` |
+| `DsoActiviteitMixin` | `bpmn:Process` | `dsoActiviteitUrn` |
+| `LanguageMixin` | `bpmn:Process` | `language` |
+| `OrganizationMixin` | `bpmn:Process` | `organization` |
+
+**Not every `ronl:` attribute is registered.** `ronl:signatureRef`, `ronl:awbPhase`, `ronl:phases`, `ronl:phaseLabel` and `ronl:phase` are absent from the descriptor. They are written by hand in the BPMN, and a round trip through the Modeler keeps them as unknown attributes: they survive a save, but the Modeler offers no control for them and nothing checks their values. Registering the phase attributes and giving them a properties-panel editor and pre-deploy checks is [LDE issue #242](https://github.com/sgort/linked-data-explorer/issues/242).
 
 Each entry has the same shape, e.g. for `LanguageMixin`:
 ```json
@@ -475,65 +537,79 @@ In all cases it first checks for `xmlns:ronl=` in the XML and injects the namesp
 
 ## Example process seeding
 
-On mount, `BpmnModeler.tsx` runs a versioned seed effect. For each example defined in `EXAMPLE_VERSIONS`, if the stored version is lower than the current version the file is re-fetched from `public/examples/` and the record is overwritten in `localStorage`.
+On mount, `BpmnModeler.tsx` runs a versioned seed effect. For each example defined in `EXAMPLE_VERSIONS` (`utils/exampleVersions.ts`), if the stored version is lower than the current version the file is re-fetched from `public/examples/` and the record is overwritten in `localStorage`. The Migration & Asylum record is the exception: it is inline XML, written only when no record with its id exists, and has no version.
 
-Seeded records carry `status: 'example'`, which is what the list badges key on. **They are not read-only.** Of the ten records the seed effect writes, exactly one — `wip_asylum_migration` — sets `readonly: true`; the other nine set `readonly: false`.
+The seed effect writes **eleven** records. Ten carry `status: 'example'`, which is what the **EXAMPLE** badge and the disabled delete button key on; `wip_asylum_migration` carries `status: 'wip'`. **Status is not read-only.** Exactly one record — `example_dvtp_toestemming` — sets `readonly: true`; the other ten, `wip_asylum_migration` among them, set `readonly: false`.
 
-That distinction is load-bearing, because `readonly` — not `status` — is what gates the backend write: `BpmnService.saveProcess` persists to `localStorage` first and then returns early for a readonly record without ever POSTing to `/v1/assets/bpmn`. So nine of the ten seeded examples *are* written to the backend when saved, and `hydrateFromServer` merges the readonly one back from local storage rather than from the server. A user's edit to a seeded example also survives only until the next version bump: the seed overwrites the stored record whenever `EXAMPLE_VERSIONS` moves past it.
+That distinction is load-bearing, because `readonly` — not `status` — is what gates the backend write: `BpmnService.saveProcess` persists to `localStorage` first and then returns early for a readonly record without ever POSTing to `/v1/assets/bpmn`. So ten of the eleven seeded records *are* written to the backend when saved, and `hydrateFromServer` merges the readonly DvTP record back from local storage rather than from the server. A user's edit to a seeded example also survives only until the next version bump: the seed overwrites the stored record whenever `EXAMPLE_VERSIONS` moves past it.
 
 The current example processes and their roles:
 
-| Seed ID | `processRole` | `bpmnProcessId` | `calledElement` |
-|---|---|---|---|
-| `example_awb_process` | `shell` | `AwbShellProcess` | — |
-| `example_tree_felling` | `subprocess` | `TreeFellingPermitSubProcess` | `AwbShellProcess` |
-| `example_awb_zorgtoeslag` | `shell` | `AwbZorgtoeslagProcess` | — |
-| `example_zorgtoeslag_provisional` | `subprocess` | `ZorgtoeslagProvisionalSubProcess` | `AwbZorgtoeslagProcess` |
-| `example_zorgtoeslag_final` | `subprocess` | `ZorgtoeslagFinalSubProcess` | `AwbZorgtoeslagProcess` |
-| `example_hr_capacity_nl` | `standalone` | `ManagementCapacityClaimProcess` | — |
-| `example_thuisbatterij_aanvraag` | `shell` | `ThuisbatterijSubsidieAanvraagProcess` | — |
-| `example_thuisbatterij_decision` | `subprocess` | `ThuisbatterijSubsidieDecisionSubProcess` | `ThuisbatterijSubsidieAanvraagProcess` |
-| `wip_asylum_migration` | `standalone` | `Process_Migratie_en_Asiel` | — |
+| Seed ID | `processRole` | `bpmnProcessId` | `calledElement` | Organization | Version |
+|---|---|---|---|---|---|
+| `example_awb_process` | `shell` | `AwbShellProcess` | — | `flevoland` | 7 |
+| `example_tree_felling` | `subprocess` | `TreeFellingPermitSubProcess` | `AwbShellProcess` | `flevoland` | 10 |
+| `example_awb_zorgtoeslag` | `shell` | `AwbZorgtoeslagProcess` | — | `toeslagen` | 6 |
+| `example_zorgtoeslag_provisional` | `subprocess` | `ZorgtoeslagProvisionalSubProcess` | `AwbZorgtoeslagProcess` | `toeslagen` | 8 |
+| `example_zorgtoeslag_final` | `subprocess` | `ZorgtoeslagFinalSubProcess` | `AwbZorgtoeslagProcess` | `toeslagen` | 7 |
+| `example_thuisbatterij_aanvraag` | `shell` | `ThuisbatterijSubsidieAanvraagProcess` | — | `flevoland` | 2 |
+| `example_thuisbatterij_decision` | `subprocess` | `ThuisbatterijSubsidieDecisionSubProcess` | `ThuisbatterijSubsidieAanvraagProcess` | `flevoland` | 2 |
+| `example_dvtp_toestemming` | `standalone` | `DvtpToestemmingGevenProcess` | — | `bzk` | 3 |
+| `example_hr_capacity_nl` | `standalone` | `ManagementCapacityClaimProcess` | — | `flevoland` | 4 |
+| `example_besluit_gb` | `standalone` | `GedelegeerdBesluitProcess` | — | `flevoland` | 2 |
+| `wip_asylum_migration` | `standalone` | `Process_Migratie_en_Asiel` | — | `ind` | — |
 
-**The Thuisbatterij bundle joined the seed in v2026.09.6.** Its files sat in
-`public/examples/flevoland/` and stopped there — fetchable by URL, invisible in the app, with
-no entry in the version registry, no seeding block, no form definitions and no document
-template. It was the only bundle in `public/examples` with no way into the UI, which left
-deploying it a file-shuffling exercise rather than the Modeler flow kapvergunning and
-zorgtoeslag already have. Both records carry `organization: 'flevoland'`, and the decision
-subprocess declares `shellId` alongside `calledElement`.
+Every subprocess record declares `shellId` alongside `calledElement`. `example_besluit_gb` lists `GedelegeerdBesluitRoute` as its linked DMN; see [Besluitvorming onder gedelegeerde bevoegdheid](../features/besluitvorming-gedelegeerd-bundle.md) for the bundle.
 
-Both Thuisbatterij processes are drawn as a pool with lanes and carry Dutch element names;
-their element ids are the ones they always had, so nothing that references them by id changes.
-The main process sits in the pool *Subsidie Thuisbatterij Flevoland - Hoofdproces* with the
-lanes **Aanvrager**, **Behandelaar** and **Systeem**. The decision subprocess sits in the pool
-*Thuisbatterijsubsidie - Beoordeling recht en hoogte* with only **Behandelaar** and
-**Systeem** — it has no applicant-facing step.
+### Lanes and Dutch names
 
-The user task *Aanvullende gegevens opvragen (Awb 4:5)* (`Task_RequestMissingInfo`) opens the
-form-js form `thuisbatterij-aanvullende-gegevens` with `camunda:formRefBinding="deployment"`.
-That form carries the `supplementReceived` checkbox the next gateway, *Aanvulling ontvangen?*,
-branches on. The task used to point at an embedded HTML form
-(`embedded:deployment:awb-missing-info-form.html`) that was never part of the bundle, so
-nothing could set `supplementReceived`. The form is seeded as the Form Editor example
-`example_thuisbatterij_missing_info`, and the `e2e-fixtures/manifest.json` entry for
-`ThuisbatterijSubsidieAanvraagProcess` lists it beside the start and notification forms.
-In `utils/exampleVersions.ts`, `example_thuisbatterij_aanvraag` and
-`example_thuisbatterij_decision` stand at version 2, so the Modeler replaces copies seeded
-before the redraw; `example_thuisbatterij_missing_info` starts at 1.
+Every Awb process is drawn as a pool with lanes and carries Dutch element names. Their element ids are the ones they always had, so nothing that references them by id changes.
+
+| Process | Pool | Lanes |
+|---|---|---|
+| `AwbShellProcess` | *Awb Algemene wet bestuursrecht - Generiek proces* | Aanvrager, Behandelaar, Systeem |
+| `TreeFellingPermitSubProcess` | *Kapvergunning - Behandeling en besluit* | Behandelaar, Systeem |
+| `AwbZorgtoeslagProcess` | *Awb Zorgtoeslag - Voorlopige toekenning* | Aanvrager, Behandelaar, Systeem |
+| `ZorgtoeslagProvisionalSubProcess` | *Zorgtoeslag — Beoordeling voorlopige aanspraak* | Behandelaar, Systeem |
+| `ZorgtoeslagFinalSubProcess` | *Zorgtoeslag — Definitieve vaststelling* | Behandelaar, Systeem |
+| `ThuisbatterijSubsidieAanvraagProcess` | *Subsidie Thuisbatterij Flevoland - Hoofdproces* | Aanvrager, Behandelaar, Systeem |
+| `ThuisbatterijSubsidieDecisionSubProcess` | *Thuisbatterijsubsidie - Beoordeling recht en hoogte* | Behandelaar, Systeem |
+
+A subprocess has no applicant-facing step, so it has no Aanvrager lane.
+
+In each of the three Awb shells — kapvergunning, zorgtoeslag and Thuisbatterij — the user task *Aanvullende gegevens opvragen (Awb 4:5)* (`Task_RequestMissingInfo`) opens a form-js form with `camunda:formRefBinding="deployment"`. The form carries the `supplementReceived` checkbox the next gateway, *Aanvulling ontvangen?*, branches on.
+
+| Shell | Form | Form Editor seed |
+|---|---|---|
+| `AwbShellProcess` | `kapvergunning-aanvullende-gegevens` | `example_kapvergunning_missing_info` |
+| `AwbZorgtoeslagProcess` | `zorgtoeslag-aanvullende-gegevens` | `example_zorgtoeslag_missing_info` |
+| `ThuisbatterijSubsidieAanvraagProcess` | `thuisbatterij-aanvullende-gegevens` | `example_thuisbatterij_missing_info` |
+
+The `e2e-fixtures/manifest.json` entry for each shell lists its missing-information form beside the start and notification forms.
+
+### Phase markers
+
+The examples carry the phase attributes the RONL Business API reads to draw the caseworker's phase stepper. They are hand-authored: the Modeler has no control for them yet ([LDE issue #242](https://github.com/sgort/linked-data-explorer/issues/242)).
+
+- **The Awb shells** mark the node that starts each Awb phase with `ronl:awbPhase` — `1`, `2`, `3`, `4+5`, `6`, `7`, `8` and `archivering` — and each Awb subprocess marks its start event with `4+5`. See [`ronl:awbPhase`](../../ronl-business-api/reference/bpmn-design-criteria.md#ronlawbphase).
+- **The Dutch HR capacity claim** (`ManagementCapacityClaimProcess.nl.bpmn`) declares its own eight phases with `ronl:phases` and `ronl:phaseLabel`, marks the node that starts each with `ronl:phase`, and is drawn in eight lanes. Its business rule task `Task_DetermineRouting` carries `decisionRefTenantId="${null}"`, so it resolves the shared `CapacityClaimRouting` DMN untenanted.
+- **Besluitvorming onder gedelegeerde bevoegdheid** declares six phases the same way.
+
+See [A process's own phases](../../ronl-business-api/reference/bpmn-design-criteria.md#a-processs-own-phases-ronlphases-ronlphaselabel-ronlphase) and [Lanes and phase markers](../../ronl-business-api/reference/bpmn-design-criteria.md#lanes-and-phase-markers-the-caseworker-process-view) for how the RONL Business API reads them.
 
 !!! warning "A tenanted process cannot see an untenanted DMN"
     Operaton resolves a business rule task's `decisionRef` **inside the process instance's own
     tenant**. A process deployed under tenant-id `flevoland` therefore cannot reach a DMN
     deployed without one, and the engine refuses to instantiate it at all — surfacing as a 500
     from process start and an unexplained *"De aanvraag kon niet worden ingediend"* on the ACC
-    citizen dashboard. Kapvergunning was broken this way; Thuisbatterij had the same defect one
-    step further in, pinned to a tenant id. `decisionRefTenantId="${null}"` points them back at
-    the shared untenanted DMNs.
+    citizen dashboard. `decisionRefTenantId="${null}"` points a business rule task back at the
+    shared untenanted DMN. Every business rule task in the kapvergunning, Zorgtoeslag provisional,
+    Thuisbatterij, HR capacity and besluitvorming examples carries it; those in
+    `ZorgtoeslagFinalSubProcess` and the DvTP process do not.
 
-    `EXAMPLE_VERSIONS` was bumped for `example_awb_process`, `example_tree_felling`,
-    `example_awb_zorgtoeslag` and `example_zorgtoeslag_provisional` in the same change —
-    without the bump the seed skips re-saving, and every existing user keeps the broken copy.
+    A change to a seeded file reaches existing users only when its `EXAMPLE_VERSIONS` entry is
+    bumped with it — without the bump the seed skips re-saving, and every existing user keeps
+    the old copy.
 
 After the seed effect, a separate hydration effect runs `BpmnService.hydrateFromServer()` to merge any user-authored processes stored in PostgreSQL into the local list.
 
@@ -590,7 +666,7 @@ function applyRonlAttr(xml: string, attr: string, value: string | undefined): st
 
 After saving a shell, `handleSaveProcess` walks `processes` for subprocesses where `processRole === 'subprocess'` and the record links back to this shell. The link is matched on **`shellId` where the record has one**, falling back to `calledElement === shell.bpmnProcessId` for records saved before `shellId` existed — two shell records can share a `bpmnProcessId` (an `e2e-fixtures` copy deliberately keeps a seeded example's production Operaton key), so matching on that string alone would cascade one shell's `language` and `organization` onto an unrelated shell's subprocess. For each match, the shell's `language` and `organization` are applied to the subprocess XML (via `applyRonlAttr`) and to the in-memory `BpmnProcess` fields, then persisted via `BpmnService.saveProcess` in sequence. The propagation triggers on every shell save when the shell has either field set, regardless of whether the user touched the footer in this session — the architectural rule "shell wins" must hold across editing sessions.
 
-Idempotent: subprocesses already aligned on both fields are skipped (no `updatedAt` bump, no backend write). Records marked `readonly` are skipped — which in practice means only `wip_asylum_migration`, since the seeded example subprocesses are **not** read-only and do receive the propagation. RoPA and DSO are NOT propagated — each subprocess has its own RoPA record and DSO context.
+Idempotent: subprocesses already aligned on both fields are skipped (no `updatedAt` bump, no backend write). Records marked `readonly` are skipped. The only seeded readonly record is `example_dvtp_toestemming`, a standalone process, so in practice no seeded subprocess is skipped: the seeded example subprocesses are **not** read-only and do receive the propagation. RoPA and DSO are NOT propagated — each subprocess has its own RoPA record and DSO context.
 
 ---
 
@@ -610,6 +686,8 @@ After changes to any BPMN Modeler component:
 - [ ] BusinessRuleTask selected — DMN/DRD dropdown appears and loads
 - [ ] DRD selected — purple info card shows chain composition
 - [ ] Single DMN selected — blue info card shows identifier
+- [ ] UserTask with a form — attach two document templates: two chips, the badge reads **2 documents**, removing a chip updates the badge
+- [ ] Deploy modal — lists every `.document` named by `ronl:documentRef` and `ronl:signatureRef`; a missing form or document disables Deploy
 - [ ] Scroll to zoom — wheel event zooms without requiring Ctrl
 - [ ] Fit to viewport — canvas centres diagram
 - [ ] No rendering artifacts during drag — no black circles or stray lines

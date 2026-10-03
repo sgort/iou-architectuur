@@ -74,19 +74,19 @@ You can also add bindings manually without using Discover Variables — fill in 
 
 - **Save** (canvas toolbar) — persists the document to `localStorage`. The button is disabled when there are no unsaved changes.
 - **Save as…** — creates a copy of the current document with a new name. Useful for creating variant templates.
-- **Export .document** — downloads the template as a JSON file. The exported file can be imported into another LDE instance by copying it to `public/examples/` (developer workflow only).
+- **Export .document** — downloads the template as a JSON file. The exported file can be loaded into another LDE instance with the **Import .document file** button (upload icon) in the document list.
 
 ---
 
-## Working with the example document
+## Working with the example documents
 
-The **Kapvergunning Beschikking** example is read-only (EXAMPLE badge). It demonstrates a complete, production-style beschikking template linked to the `AwbShellProcess` process key. To customise it:
+The Composer seeds eight example templates, each marked with the EXAMPLE badge. **Kapvergunning Beschikking (Example)** (`example_treefelling_beschikking`) demonstrates a complete, production-style beschikking template linked to the `AwbShellProcess` process key. The others cover the Zorgtoeslag provisional and final decisions, the DvTP consent receipt, two Dutch HR capacity documents, the Subsidie Thuisbatterij decision and the delegated decision **Besluit onder gedelegeerde bevoegdheid**.
+
+Examples cannot be deleted. Every example except **DvTP Toestemmingsbewijs (Example)** can be edited and saved in place; that one is read-only. To build your own variant of any example:
 
 1. Open the example document.
 2. Click **Save as…** and give the copy a name.
 3. Edit the copy freely.
-
-The example document cannot be renamed or deleted.
 
 ---
 
@@ -96,8 +96,9 @@ Once your document is saved, switch to the **BPMN Modeler**:
 
 1. Open or create a process.
 2. Click a `UserTask` element to open its properties.
-3. Scroll down to **Link decision template**. Your saved document appears in the dropdown.
-4. Select it. A purple badge (📄) appears below the `UserTask` on the canvas, and `ronl:documentRef` is written to the BPMN XML.
+3. Scroll down to **Link decision templates** and pick your saved document from the **-- Add a template --** dropdown.
+4. The document appears as a chip above the dropdown, and a purple badge (📄) appears below the `UserTask` on the canvas. `ronl:documentRef` is written to the BPMN XML.
+5. To attach a second document to the same task, pick it from the dropdown as well. The badge then reads **2 documents** and lists both ids in its tooltip. Remove a document with the **✕** on its chip.
 
 The badge is distinct from the green form badge (📝) and the amber DMN badge so you can confirm all three links at a glance.
 
