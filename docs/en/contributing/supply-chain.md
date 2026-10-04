@@ -25,8 +25,9 @@ verified:
     Business API, the tracker
     [linked-data-explorer#119](https://github.com/sgort/linked-data-explorer/issues/119)
     closed into three issues, and Skosmos, the last floating image tag in the RONL Business
-    API, now resolves by digest. The local Redis is held at 7.2 for its licence, and since
-    #313 a Renovate rule enforces the hold. The 19 September batch — the runner
+    API, now resolves by digest. The local Redis is held at 7.2 for its licence, and a Renovate
+    rule has enforced the hold since
+    [ronl-business-api#313](https://github.com/sgort/ronl-business-api/pull/313). The 19 September batch — the runner
     builds what ships, one exact Node version per repository, pinned runner images, a
     package-manager cooldown, build checks required on `acc` — still stands, and its
     superseded reasoning is still kept below, marked as history.
