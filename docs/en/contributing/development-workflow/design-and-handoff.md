@@ -1,5 +1,9 @@
 ---
 scope: cross-cutting
+verified:
+  date: 2026-10-04
+  against:
+    RONL Business API: "5c6e716"
 ---
 
 # Design & Handoff
@@ -40,6 +44,14 @@ against the wrong data.
 specifies into the real source files and leave the folder untracked, or remove it
 before the final commit. It has done its job once implementation starts; it does not
 belong in the commit history alongside it.
+
+An untracked folder is still in the working tree, though, where a whole-tree format check
+reaches it. **The RONL Business API keeps `*-handoff/` out of Prettier**: since
+29 September 2026 its `.prettierignore` lists the pattern, so `format` does not rewrite
+the design team's files and `check-format` — which runs in `pre-push` — does not fail on
+them. One handoff folder is nevertheless tracked there: `docs/pa-demo-social-handoff/`,
+fourteen files committed on 25 August 2026, before that ignore existed. The CPSV Editor
+and the Linked Data Explorer track no handoff folder and have no such ignore entry.
 
 From here, implementation itself is [Working with Claude Code](working-with-claude-code.md),
 the next page in this subsection.

@@ -1,13 +1,13 @@
 {
-  "docs_built": "2026-10-03",
+  "docs_built": "2026-10-04",
   "last_patch": {
-    "date": "2026-10-03",
-    "kind": "Component sync",
-    "summary": "RONL Business API and Linked Data Explorer v2026.10.0, both in production. RONL Business API: every error is RFC 9457 problem details, besluitvorming onder gedelegeerde bevoegdheid on the Caseworker board, ValidSign signing in every task view, process-declared phases, and /v1/m2m on the main engine. Linked Data Explorer: the besluitvorming example bundle, the Awb examples in swimlanes with Dutch names, several documents per task, and the RIP models checked across three copies.",
+    "date": "2026-10-04",
+    "kind": "Weekly pass",
+    "summary": "The contributing pages re-checked against all three acc heads, and the ICTU dependency-guideline scores for 4 October: TTL 35, LDE 34, RBA 33. All three main branches are now gated by a ruleset, the LDE tracker #119 continues as #248–#250, and both daily audits made their first real production catch.",
     "previous": {
-      "date": "2026-10-02",
+      "date": "2026-10-03",
       "kind": "Component sync",
-      "summary": "CPSV Editor v2026.10.0 in production: a published export survives import, export and import again, Clear Imported DMN Data also clears its concepts, grounded cells name their concept, and the DMN-AP NL proposal is linked."
+      "summary": "RONL Business API and Linked Data Explorer v2026.10.0, both in production. RONL Business API: every error is RFC 9457 problem details, besluitvorming onder gedelegeerde bevoegdheid on the Caseworker board, ValidSign signing in every task view, process-declared phases, and /v1/m2m on the main engine. Linked Data Explorer: the besluitvorming example bundle, the Awb examples in swimlanes with Dutch names, several documents per task, and the RIP models checked across three copies."
     },
     "open_findings": [
       {
@@ -17,9 +17,19 @@
       {
         "label": "linked-data-explorer#254",
         "url": "https://github.com/sgort/linked-data-explorer/issues/254"
+      },
+      {
+        "label": "linked-data-explorer#255",
+        "url": "https://github.com/sgort/linked-data-explorer/issues/255"
+      },
+      {
+        "label": "ttl-editor#194",
+        "url": "https://github.com/sgort/ttl-editor/issues/194"
       }
     ]
   },
+
+
 
 
 

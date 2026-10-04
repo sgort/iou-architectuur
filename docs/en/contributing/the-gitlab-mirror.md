@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-27
+  date: 2026-10-04
   against:
-    CPSV Editor: "a7fe76f"
-    Linked Data Explorer: "0143ea2"
-    RONL Business API: "702a4f2"
+    CPSV Editor: "4cba989"
+    Linked Data Explorer: "9e0d18e"
+    RONL Business API: "5c6e716"
 ---
 
 # The GitLab Mirror
@@ -48,11 +48,13 @@ Two were checked again on 19 September 2026, after their promotions that day, an
 were in sync: the Linked Data Explorer with `acc` at `379cbab` and `main` at `ec4792f`,
 the CPSV Editor with `acc` at `a37bace` and `main` at `2723db1`.
 
-**The check itself was re-read from all three repositories on 27 September 2026** and is
+**The check itself was re-read from all three repositories on 4 October 2026** and is
 unchanged since it landed. On the same day, by `git ls-remote` against both remotes, all
-three mirrors were in sync after that week's promotions: the CPSV Editor at `a7fe76f` /
-`7d154ba`, the Linked Data Explorer at `0143ea2` / `4148c9a`, the RONL Business API at
-`3c44b9e` / `2443adc` (`acc` / `main`). A tick is still *synced at the last check*.
+three mirrors were in sync after that week's promotions: the CPSV Editor at `4cba989` /
+`719683b`, the Linked Data Explorer at `9e0d18e` / `71a8236`, the RONL Business API at
+`5c6e716` / `0625d48` (`acc` / `main`). On 27 September 2026 they had been in sync at
+`a7fe76f` / `7d154ba`, `0143ea2` / `4148c9a` and `3c44b9e` / `2443adc`. A tick is still
+*synced at the last check*.
 
 **Two of the three release procedures run a second check straight after this one** — the
 CPSV Editor's since v2026.09.6 and the RONL Business API's since v2026.09.11.
@@ -67,6 +69,16 @@ Editor's derives each from its deploy workflow's file name, and the RONL Busines
 whose workflow names carry no hostname, and whose apps span two subscriptions — finds
 them by `repositoryUrl` across every subscription the login can read. The Linked Data
 Explorer has no such check.
+
+**The RONL Business API's check strips the carriage returns `az` writes on Windows.** The
+Azure CLI on Windows ends every `-o tsv` line with `\r\n`, and the check feeds those
+values back into later calls, so each subscription id and resource group carried a
+trailing `\r` and every call built from them failed. On 26 September 2026 that reported
+three items NOT CHECKED straight after a fresh `az login`, and the script exited 1 on a
+login that was fine. Since `80e34a2` an `az()` wrapper in `scripts/check-previews.sh`
+strips them and keeps the exit status; it shipped in v2026.09.13 and has been on `main`
+since the v2026.09.14 promotion. The CPSV Editor's `check-previews.sh` has no such guard, though it too reads
+`-o tsv` output back into later calls.
 
 A tick is *synced at the last check*, not *kept in sync*. The RONL Business API's mirror
 had never been audited before 12 September, and both branches turned out to be strict

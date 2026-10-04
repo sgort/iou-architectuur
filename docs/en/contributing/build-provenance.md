@@ -1,18 +1,18 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-27
+  date: 2026-10-04
   against:
-    CPSV Editor: "a7fe76f"
-    Linked Data Explorer: "0143ea2"
-    RONL Business API: "702a4f2"
+    CPSV Editor: "4cba989"
+    Linked Data Explorer: "9e0d18e"
+    RONL Business API: "5c6e716"
 ---
 
 # Build Provenance
 
 !!! info "Verification status"
-    All four implementations were re-checked on **27 September 2026**, against
-    `a7fe76f`, `0143ea2` and `3c44b9e`, by reading every workflow that carries the
+    All four implementations were re-checked on **4 October 2026**, against
+    `4cba989`, `9e0d18e` and `5c6e716`, by reading every workflow that carries the
     `env:` block — eight files, unchanged in number.
 
     **The two columns that used to be the odd ones out no longer are.** Until
@@ -74,11 +74,13 @@ commit share it. The run number is what makes the pair unique per artifact.
 number, and every deploy in one promotion shares it: on 27 September 2026 the Linked
 Data Explorer's production frontend bundle and its backend's `/v1/health` both read
 `build 4148c9a · #2`, and the RONL Business API's public-site bundle and backend both
-read `2443adc` and `3` — Promote to Production runs #2 and #3. The pair is still unique
+read `2443adc` and `3` — Promote to Production runs #2 and #3. On 4 October 2026 the two
+backends read `build 71a8236 · #3` and `0625d48` with run `6`, the latest promotion in
+each. The pair is still unique
 per promotion, which is what it is for; it now names *which promotion* rather than
 *which execution of that deploy workflow*. Acceptance is unchanged — its workflows are
 not called — and so is the CPSV Editor, whose production workflow still triggers itself
-(`build 7d154ba · #102`).
+(its latest run, `Deploy PROD` #104, built `719683b` on 1 October 2026).
 
 ---
 

@@ -610,7 +610,7 @@ production change `73a6764` made anywhere: `lib/api.ts` reads
 `vi.stubEnv`. `lib/api.ts` itself went from 83.78% branches — the lowest file
 in the package from v2026.09.11 to v2026.09.13 — to 97.29% then, and reads
 **96.55%** on 3 October; the arms left cannot occur in Node and are tracked in
-#294. The lowest files by branches are `lib/useQueryState.ts` and
+[#294](https://github.com/sgort/ronl-business-api/issues/294). The lowest files by branches are `lib/useQueryState.ts` and
 `pages/herkomst/HerkomstTrace.tsx`, both at 87.50%.
 
 The new `src/indexHtml.test.ts` adds no row: it tests `index.html`'s

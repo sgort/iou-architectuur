@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-27
+  date: 2026-10-04
   against:
-    CPSV Editor: "a7fe76f"
-    Linked Data Explorer: "0143ea2"
-    RONL Business API: "702a4f2"
+    CPSV Editor: "4cba989"
+    Linked Data Explorer: "9e0d18e"
+    RONL Business API: "5c6e716"
 ---
 
 # Contributing to IOU Architecture
@@ -187,10 +187,11 @@ release cycle.
     repository's build and deploy checks. In practice that means **a merge request whose
     tests fail cannot be merged into `acc`**.
 
-    Two of the three also gate `main`, but with **fewer** checks than `acc`, not the same
-    ones: no `main` requires a build or a test anywhere — in the Linked Data Explorer and
-    the RONL Business API, production is deployed by a promotion workflow on the push to
-    `main`, not on the pull request. See
+    All three also gate `main` (the CPSV Editor since 30 September 2026), each with a
+    ruleset requiring a pull request plus `audit` and `scan`: **fewer** checks than `acc`,
+    not the same ones — no `main` requires a build or a test anywhere. In the Linked Data
+    Explorer and the RONL Business API, production is deployed by a promotion workflow on
+    the push to `main`, not on the pull request. See
     [Branch Protection](branch-protection.md) for what each branch requires, and the
     [controls index](controls.md) for where every control holds.
 

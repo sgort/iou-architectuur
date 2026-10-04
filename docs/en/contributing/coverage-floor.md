@@ -1,26 +1,33 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-27
+  date: 2026-10-04
   against:
-    CPSV Editor: "a7fe76f"
-    Linked Data Explorer: "0143ea2"
-    RONL Business API: "702a4f2"
+    CPSV Editor: "4cba989"
+    Linked Data Explorer: "9e0d18e"
+    RONL Business API: "5c6e716"
 ---
 
 # The Coverage Floor
 
-!!! info "What was re-checked on 27 September 2026, and what was not"
+!!! info "What was re-checked on 4 October 2026, and what was not"
     The **CI, ruleset and environment claims** on this page were re-checked on
-    27 September 2026 against `a7fe76f`, `0143ea2` and `3c44b9e`: which workflows run
+    4 October 2026 against `4cba989`, `9e0d18e` and `5c6e716`: which workflows run
     the suites, on which triggers, which checks each branch requires, and what each
     deployment environment demands. The floor has been blocking on `acc` in all three
-    since 19 September 2026.
+    since 19 September 2026. Every `main` now requires `audit` and `scan`, and none
+    requires a build or a test.
 
     **The percentages and file counts below were not re-measured on that date.** They
     were measured on 12 September 2026 against `f5bae6a`, `be6bc54` and `311d732`, the
     RONL Business API's by running all five suites with coverage rather than reading a
     record. They are a dated measurement, and this note is the honest version of that.
+    One later measurement changes the picture they give of the RONL Business API: on
+    3 October 2026, at v2026.10.0, no file there was below 80% branches, but the 85% margin
+    its coverage page recorded for every file on 30 September no longer holds —
+    `CaseworkerDashboard/BesluitOverzichtSection.tsx` reads **80.43%**, one uncovered
+    branch from failing. See its
+    [coverage page](../ronl-business-api/developer/testing/coverage.md).
 
 *A per-file 80% branch-coverage floor, and what it took to enforce it in three
 repositories*
@@ -70,10 +77,11 @@ functions floor at the same number would have failed **31 files**:
 `public-site/TopBar.tsx` is the illustration: **100% branches, 66% functions**.
 The two measure different things and are not interchangeable.
 
-That count is the one taken when the floor landed, and it is the count the five
-runner configs still carry in their comments. Re-measured at v2026.09.9 on
-20 September 2026 it is **26** — the work since has closed five of them, without
-anyone setting out to. The current figure, per workspace, is on the application's
+That count is the one taken when the floor landed. Re-measured at v2026.09.9 on
+20 September 2026 it was **26** — the work since had closed five of them, without
+anyone setting out to — and the five runner configs now carry that figure in their own
+comments, *"measured 28 September 2026"*: frontend 10, pa-cockpit 8, pa-demo 5,
+public-site 3, backend 0 (`391b1a8`; the backend's `jest.config.js` states the total). The current figure, per workspace, is on the application's
 own [coverage page](../ronl-business-api/developer/testing/coverage.md); where the
 two disagree, the measured one wins.
 
@@ -324,6 +332,9 @@ comment. The CPSV Editor has not yet, and arrived at the same position by a
 different route: its three lowest files — `useDsoImport.js` 80.39%,
 `ConceptsTab.jsx` 80.55%, `ChangelogTab.jsx` 80.70% — are each one uncovered
 branch from failing, and the ratchet's pins that used to absorb a slip are gone.
+The RONL Business API closed it on 28 September 2026, when `391b1a8` took its three files
+at exactly 80.00% to 100%, and its 30 September reading had every file above 85%; on 3 October
+v2026.10.0 brought a new one in at 80.43%, as the note at the top of this page records.
 
 **The first uncovered branch added to any of them turns CI red on an otherwise
 unrelated change.** That is the floor working as designed, but it is worth meeting
@@ -380,9 +391,10 @@ caught it.
     *reports success*, is what made the ruleset edit possible; see
     [how a path-filtered workflow became requireable](branch-protection.md#how-a-path-filtered-workflow-became-requireable).
 
-    **On `main` the old sentence still stands.** No `main` ruleset in any of the three
-    names a build or a test, so a promotion carrying a coverage regression is stopped by
-    the deploy, not by the merge.
+    **On `main` the old sentence still stands.** Every `main` ruleset now requires
+    `audit` and `scan` — the CPSV Editor's since 30 September 2026 — but none names a
+    build or a test, so a promotion carrying a coverage regression is stopped by the
+    deploy, not by the merge.
 
 !!! warning "The fix is not identical, and the difference matters before copying one into the other"
     The Linked Data Explorer's backend workflow **deploys to Azure**, so its

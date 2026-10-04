@@ -554,6 +554,57 @@ assessments:
           advisory on `main`, and the promotion that removed `keycloak-connect`
           cleared it. Five alerts remain open, none dismissed with a reason.
 
+  - date: 2026-10-04
+    kind: measured
+    heads:
+      TTL: 4cba989
+      LDE: 9e0d18e
+      RBA: 5c6e716
+    note: >-
+      The week the daily audit earned its place: it failed on a production
+      high in the Linked Data Explorer from 30 September and in the RONL
+      Business API on 3 October, and both were fixed by shrinking the
+      production tree rather than by waiting for an upstream patch. All three
+      `main` branches are now gated by a ruleset, the tracker that held the
+      remaining work closed into three open issues, and the last floating
+      container tag in the RONL Business API resolves by digest.
+    scores:
+      TTL: [1, 4, 3, 4, 0, 4, 5, 5, 4, 4, 1]
+      LDE: [1, 4, 3, 4, 0, 4, 5, 4, 4, 4, 1]
+      RBA: [2, 4, 3, 4, 0, 4, 4, 4, 3, 4, 1]
+    changes:
+      - component: RBA
+        recommendation: R2
+        from: 3
+        to: 4
+        why: >-
+          Skosmos on the VM now runs `:latest@sha256:c5855698…`, pinned by
+          Renovate (#198), so no image in the repository floats on a tag. The
+          VM's Keycloak `23.0` and Postgres `16-alpine` name a version but
+          carry no digest (#196, open) — counted against R3 and R4, not here.
+      - component: LDE
+        recommendation: R10
+        from: 3
+        to: 4
+        why: >-
+          The daily audit caught a production high for real: it failed from
+          30 September, opened #240, and closed it on 3 October once the
+          weekly lockfile refresh and a `node-gyp` 13 override for `libxmljs2`
+          (#251) took `brace-expansion` and `http-cache-semantics` out of the
+          production tree — the release SBOM fell from 416 to 370 components.
+          The `@tiptap/core` medium has waited a month on the Tiptap 3 major,
+          which a stricter reading holds against it.
+      - component: RBA
+        recommendation: R10
+        from: 3
+        to: 4
+        why: >-
+          The audit opened #303 for a `braces` high at 10:24 on 3 October, and
+          it closed at 11:45 after #305 made `@tailwindcss/typography` the
+          build-time devDependency it is; #307 covered `main` until the
+          promotion. Four alerts stay open, none dismissed, now tracked in
+          #311 — the reason a stricter reading keeps 3.
+
 # The test work of the same period, which the guideline above barely scores.
 # Counted from the tree at each weekly commit: files whose name ends in
 # `.test.*` or `.spec.*`, end-to-end specs under an `e2e/` directory, the
@@ -588,3 +639,7 @@ tests:
     TTL: {files: 65, e2e: 3, ci: 2, workflows: 7, floor: true}
     LDE: {files: 146, e2e: 0, ci: 5, workflows: 11, floor: true}
     RBA: {files: 314, e2e: 13, ci: 8, workflows: 13, floor: true}
+  - date: 2026-10-04
+    TTL: {files: 66, e2e: 4, ci: 2, workflows: 7, floor: true}
+    LDE: {files: 148, e2e: 0, ci: 5, workflows: 11, floor: true}
+    RBA: {files: 334, e2e: 13, ci: 8, workflows: 13, floor: true}
