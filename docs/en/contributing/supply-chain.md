@@ -1,30 +1,35 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-27
+  date: 2026-10-04
   against:
-    CPSV Editor: "a7fe76f"
-    Linked Data Explorer: "0143ea2"
-    RONL Business API: "702a4f2"
+    CPSV Editor: "4cba989"
+    Linked Data Explorer: "9e0d18e"
+    RONL Business API: "5c6e716"
 ---
 
 # Supply-Chain Pinning
 
 !!! info "Verification status"
-    All three repositories' claims were re-checked on **27 September 2026**, against
-    `a7fe76f`, `0143ea2` and `3c44b9e`: every `uses:` reference listed and counted,
+    All three repositories' claims were re-checked on **4 October 2026**, against
+    `4cba989`, `9e0d18e` and `5c6e716`: every `uses:` reference listed and counted,
     rulesets read from the API, `.nvmrc`, `.npmrc` and every `runs-on:` read from the
     workflow files, and `renovate.json` read rule by rule.
 
-    **The week to 26 September moved production and monitoring rather than pinning.**
-    The Linked Data Explorer and the RONL Business API now deploy production through a
-    single `promote-to-production.yml` on a push to `main`; the RONL Business API's
-    backend deploys from CI, from the lockfile; the Linked Data Explorer moved to Node 24;
-    every `audit` job checks that the lockfile matches `package.json`; and Renovate no
-    longer proposes an npm `X.0.0`. The 19 September batch — the runner builds what ships,
-    one exact Node version per repository, pinned runner images, a package-manager
-    cooldown, build checks required on `acc` — still stands, and its superseded reasoning
-    is still kept below, marked as history.
+    **The week to 3 October made the gates uniform.** A ruleset now gates `main` in all
+    three — the RONL Business API's `main` gained `scan` on 29 September, and the CPSV
+    Editor's `main` got its first ruleset on 30 September, the same day its `acc` ruleset
+    began restricting the merge method and blocking deletion and force-pushes. The CPSV
+    Editor moved to Node 24.21.0, so the pinned Node is 24.21.0 in every workflow. The daily
+    audit made its first production catches in the Linked Data Explorer and the RONL
+    Business API, the tracker
+    [linked-data-explorer#119](https://github.com/sgort/linked-data-explorer/issues/119)
+    closed into three issues, and Skosmos, the last floating image tag in the RONL Business
+    API, now resolves by digest. The local Redis is held at 7.2 for its licence, and since
+    #313 a Renovate rule enforces the hold. The 19 September batch — the runner
+    builds what ships, one exact Node version per repository, pinned runner images, a
+    package-manager cooldown, build checks required on `acc` — still stands, and its
+    superseded reasoning is still kept below, marked as history.
 
 Nothing a pipeline downloads or executes may float. No `latest`, no empty
 versions — a hash, digest or verified checksum wherever one exists.
@@ -88,7 +93,7 @@ problem rather than solving it).
 
 | Repository | Pinned workflows | `audit` gate | Renovate | `acc` ruleset |
 |---|:---:|:---:|:---:|:---:|
-| **CPSV Editor** (`ttl-editor`) — pilot | ✅ | ✅ | ✅ | ✅ `acc supply-chain gate` |
+| **CPSV Editor** (`ttl-editor`) — pilot | ✅ | ✅ | ✅ | ✅ `acc supply-chain gate`, and `main promotion gate` on `main` |
 | **RONL Business API** | ✅ | ✅ | ✅ | ✅ `acc supply-chain gate`, and `main promotion gate` on `main` |
 | **Linked Data Explorer** | ✅ | ✅ | ✅ | ✅ `acc supply-chain gate`, and `main promotion gate` on `main` |
 | **IOU Architecture Docs** (this site) | ❌ | ❌ | ❌ | ❌ |
@@ -112,8 +117,8 @@ flattening:
 | Action references pinned | 17 / 17 | 39 / 39 | 31 / 31² |
 | Workflows carrying them | 7 | 13 | 11 |
 | Action majors | **v7** (since v2026.09.0) | **v7** | **v7** (since v2026.09.2) |
-| Blocks deletion / non-fast-forward | no | **yes** (since v2026.09.7) | **yes** |
-| Merge method restricted *in the ruleset* | no — repository setting only | **yes** | **yes** |
+| Blocks deletion / non-fast-forward | **yes** (since 30 September 2026) | **yes** (since v2026.09.7) | **yes** |
+| Merge method restricted *in the ruleset* | **yes** (since 30 September 2026) | **yes** | **yes** |
 | `skip_app_build` | **set on both deploy steps** | **set on all six deploy steps** | **set on both frontend deploy steps** |
 | Backend deployed by CI | n/a | **yes** — `az webapp deploy` over OIDC, since 20 September 2026¹ | **yes** — `azure/webapps-deploy` |
 
@@ -141,7 +146,8 @@ other two followed. The two `ropa-site` workflows are the remaining exception an
 correctly so — that package is a static `index.html` plus a `staticwebapp.config.json`,
 with nothing to build.
 
-**Two of the three gate `main` as well.** The Linked Data Explorer's
+**All three gate `main` as well** — the CPSV Editor since 30 September 2026, the last to do
+so (see below). The Linked Data Explorer's
 `main promotion gate` ruleset was created on 9 September 2026, before the first promotion
 pull request was opened: deletion and non-fast-forward blocked, a pull request with merge
 commits only, `audit` and `scan` required, zero bypass actors. It mirrored the `acc`
@@ -154,12 +160,13 @@ ruleset back after writing it**; the create response's shape does not show the
 defaults it filled in.
 
 **That mirroring ended on 19 September 2026.** The build and deploy checks were added to
-`acc` and not to `main`, so `acc` now requires strictly more in both repositories, and a
-promotion pull request is held to less than the pull requests it carries. That is
+`acc` and not to `main`, so `acc` now requires strictly more in all three repositories, and
+a promotion pull request is held to less than the pull requests it carries. That is
 deliberate rather than an oversight: no production deploy check reports on every promotion
 pull request — the Linked Data Explorer's production site workflows keep a path-filtered
 `pull_request` trigger, and its backend, like all four of the RONL Business API's
-production workflows, now runs only when `promote-to-production.yml` calls it — and a
+production workflows, now runs only when `promote-to-production.yml` calls it; the CPSV
+Editor's `Deploy PROD (white-sky)` keeps `paths-ignore` on its trigger — and a
 required check that never reports wedges a pull request permanently — see
 [how a path-filtered workflow became requireable](branch-protection.md#how-a-path-filtered-workflow-became-requireable).
 
@@ -167,8 +174,9 @@ The RONL Business API created its own `main promotion gate` on 12 September 2026
 the same pattern and for a sharper reason: until that day `main` carried only classic
 protection — a pull request required, **zero** required status checks,
 `allow_force_pushes` on and `enforce_admins` off — so the branch that deploys production
-was the *less* protected of its two. It requires `audit` and **still not `scan`**, which
-its `acc` ruleset has required since 19 September 2026. The original reason, that a
+was the *less* protected of its two. It required `audit` alone at first, and since
+29 September 2026 `scan` as well, which its `acc` ruleset had required since 19 September.
+The original reason, that a
 required check that never reports on a pull request wedges it permanently, still holds for
 production, in a new shape. Since 23 September 2026 the four `*-prod` workflows have no
 `push` or `pull_request` trigger at all: `promote-to-production.yml` calls them as reusable
@@ -176,38 +184,42 @@ workflows on a push to `main`, deciding which to run in `scripts/promotion-targe
 no production check ever reports on a promotion pull request. The four `*-acc` workflows do
 trigger on `pull_request`, and their checks are required.
 
-That leaves the CPSV Editor as the one repository whose ruleset targets
-`refs/heads/acc` only, so its `main` is not covered by the guarantees an `acc` pull
-request gets. That is a decision rather than a gap: its `main` requires a pull request but no status checks,
-weighed and kept on 11 September 2026
-([ttl-editor#131](https://github.com/sgort/ttl-editor/issues/131)). The argument against
-it stands, and is worth keeping in view — the promotion pull request is the one carrying
-changes into production, and *"already checked on `acc`"* is true of the commits, not of
-the merge. If it is revisited, `audit` and `scan` are the two that could be required
-today: both trigger on every pull request, so neither can go missing on any base. The
-deploy check cannot, as `main` stands — `Deploy PROD (white-sky)` keeps `paths-ignore`
-on its `pull_request` trigger, so a documentation-only promotion never starts it, and a
-required check that never reports wedges the pull request. **That constraint is no longer
-structural, only unapplied**: the `changes`-job pattern that made the `acc` deploy checks
-requireable on 19 September 2026 would work here too, and was simply not extended to the
-production workflows. See
+The CPSV Editor was the last. Until 30 September 2026 its ruleset targeted
+`refs/heads/acc` only, and its `main` required a pull request but no status checks — a
+decision weighed and kept on 11 September 2026
+([ttl-editor#131](https://github.com/sgort/ttl-editor/issues/131)), on the argument that
+`main` is promoted from `acc`, whose commits already passed the checks. The argument against
+it was that the promotion pull request is the one carrying changes into production, and
+*"already checked on `acc`"* is true of the commits, not of the merge. Since 30 September
+its own `main promotion gate` requires a pull request with merge commits only, `audit` and
+`scan`, blocks deletion and non-fast-forward pushes, and has zero bypass actors. Both
+checks trigger on every pull request, so neither can go missing on any base. By the
+repository's own account (`SECURITY-PIPELINE.md` at `4cba989`), #131's reasoning held for
+the deploy job but not for `audit` and `scan`. The deploy check is still not required on
+`main`: `Deploy PROD (white-sky)` keeps `paths-ignore` on its `pull_request` trigger, so a
+documentation-only promotion never starts it, and a required check that never reports
+wedges the pull request. **That constraint is no longer structural, only unapplied**: the
+`changes`-job pattern that made the `acc` deploy checks requireable on 19 September 2026
+would work here too, and was simply not extended to the production workflows. See
 [how a path-filtered workflow became requireable](branch-protection.md#how-a-path-filtered-workflow-became-requireable).
 
-The rulesets are also not identical in shape, which the table's last two rows
-record. The CPSV Editor's is now the only one that does not block branch deletion and
-non-fast-forward pushes; the RONL Business API's `acc` gained both on 12 September 2026,
-a month after its `main` got them — two rulesets in one repository differing in a way
-nobody had decided. And while all three end up allowing merge commits only,
-two of them say so *in the ruleset* while the CPSV Editor relies on the
-repository-level setting alone — see
-[Merge method](branch-protection.md#the-merge-method-is-a-setting-not-a-rule). All three reach the
-same place; only two are belt *and* braces.
+The rulesets' shape is now uniform, which the table's last two rows record. All six — `acc`
+and `main` in each repository — restrict the merge method to merge commits *in the ruleset*,
+block branch deletion and non-fast-forward pushes, and carry zero bypass actors. That has
+been true only since 30 September 2026, when the CPSV Editor's `acc` ruleset was narrowed to
+merge commits and then gained both blocks; until then it relied on the repository-level
+merge setting alone, and was the one ruleset that allowed deletion and force-pushes. The
+RONL Business API's `acc` had gained both blocks on 12 September 2026, a month after its
+`main` got them — two rulesets in one repository differing in a way nobody had decided. See
+[Merge method](branch-protection.md#the-merge-method-is-a-setting-not-a-rule). No branch in
+the three keeps classic branch protection: the protection endpoint answers 404 for all six,
+so the rulesets are the whole gate.
 
-Ruleset shapes re-verified on 27 September 2026 for all three, with
+Ruleset shapes re-verified on 4 October 2026 for all three, with
 `gh api repos/<owner>/<repo>/rules/branches/<branch>` — which reports the effective rules
 from every ruleset at once, where reading one ruleset, or the classic protection endpoint
 alone, gives the wrong answer. Pin counts were re-derived the same day by listing `uses:`
-references at `a7fe76f`, `0143ea2` and `3c44b9e`.
+references at `4cba989`, `9e0d18e` and `5c6e716`.
 
 **This documentation repository is a known gap, deliberately deferred.** Its
 `requirements.txt` uses `>=` floors for five of six packages and its workflow
@@ -416,7 +428,7 @@ It came from an incident: in the RONL Business API, three Renovate pull requests
 back to back without rebasing, each green against its own base, and left `acc` with a
 lockfile matching no `package.json`. The step's stated limit is the one that incident
 turned on — it checks each pull request's own merge commit, and no ruleset here requires a
-branch to be up to date (`strict_required_status_checks_policy` is `false` in all five), so
+branch to be up to date (`strict_required_status_checks_policy` is `false` in all six), so
 dependency pull requests are merged one at a time, each rebased onto the merged `acc`
 first.
 
@@ -509,7 +521,7 @@ What it covers is narrower than it looks, and each limit was measured rather tha
 | **`npm ci` ignores it by design** ([npm/cli#9281](https://github.com/npm/cli/issues/9281)) | CI only ever runs `npm ci`, so **CI cannot fail on the cooldown** — and cannot enforce it either. The setting governs `npm install`, `npm update` and lock-file maintenance |
 | **npm older than 11.10 ignores it silently** | No warning, no error, no effect. Whether a repository is covered therefore depends on which npm its Node bundles |
 | **Node 22.23.2 bundles npm 10.9.8** | So the **RONL Business API is not covered by its own setting** on a machine following `.nvmrc` — and its Node 24 move is deferred on record until its App Services switch |
-| **Node 24.20.0 and 24.21.0 both bundle npm 11.19** | So the **CPSV Editor and, since its move to 24.21.0 on 23 September 2026, the Linked Data Explorer are** covered |
+| **Node 24.21.0 bundles npm 11.19** (as 24.20.0 did) | So the **Linked Data Explorer, on 24.21.0 since 23 September 2026, and the CPSV Editor, on 24.21.0 since 30 September (`c65c698`), are** covered |
 | `scripts/check-deps.sh` warns on npm below 11.10 | At every dev-server start and every push, in all three — the gap is surfaced rather than left to be discovered |
 
 The cooldown may be skipped for an urgent security fix, as the guideline allows: set the
@@ -621,7 +633,7 @@ the version the tests ran on, and the version that shipped. Both are closed.
 
 | Repository | `.nvmrc` | Read by | The shipped bundle is built on |
 |---|---|---|---|
-| **CPSV Editor** | **`24.20.0`** | both Static Web Apps workflows, via `node-version-file` | the same — built on the runner, uploaded with `skip_app_build: true` |
+| **CPSV Editor** | **`24.21.0`** (from `24.20.0` on 30 September 2026) | both Static Web Apps workflows, via `node-version-file` | the same — built on the runner, uploaded with `skip_app_build: true` |
 | **Linked Data Explorer** | **`24.21.0`** (from `22.23.2` on 23 September 2026) | all four deploy workflows that install Node, and the promotion's `changes` job — the two ROPA site workflows upload static files and set up no Node | the same |
 | **RONL Business API** | **`22.23.2`** | all eight deploy workflows | the same |
 
@@ -666,7 +678,7 @@ round: its `engines.node` moved to `>=22.23.2` in the change that took `.nvmrc` 
 `24.21.0`, so the declared floor sits a major below the version it builds and ships on.
 
 **One deliberate exception in each, and it is not the shared file.** Every `zizmor.yml`
-sets its own exact literal — `24.20.0` in the CPSV Editor, `24.21.0` in the other two —
+sets its own exact literal — `24.21.0` in all three —
 deliberately separate from `.nvmrc`, because its `renovate-config-validator` step needs
 Node 24 whatever the application runs on. `renovate` declares `engines.node ^24.11.0`, and
 npm accepts a mismatch with a warning rather than refusing, so the validator had been
@@ -674,12 +686,13 @@ running unsupported and green. That pin is load-bearing and must not be swept in
 shared file; in the CPSV Editor and the Linked Data Explorer it happens to equal `.nvmrc`
 today, which is coincidence rather than coupling, and in the RONL Business API, on
 `22.23.2`, it is the whole point. The daily `dependency-audit.yml` and `sbom.yml` carry a
-third literal, `24.20.0` in all three, for a related reason: they read `main` as well as
+third literal, `24.21.0` in all three (since 26 September in the RONL Business API and the
+Linked Data Explorer, 30 September in the CPSV Editor), for a related reason: they read `main` as well as
 `acc`, and the two need not share an `.nvmrc`. Renovate's `node` manager maintains all of
 them.
 
-**What still floats, and what is now decided rather than open.** Checked on 27 September
-2026 at `a7fe76f`, `0143ea2` and `3c44b9e`:
+**What still floats, and what is now decided rather than open.** Checked on 4 October
+2026 at `4cba989`, `9e0d18e` and `5c6e716`:
 
 - **The App Service runtime can be pinned to a major and no further — decided, not open.**
   `az webapp list-runtimes --os linux` offers exactly `NODE|22-lts`, `NODE|24-lts` and
@@ -689,7 +702,7 @@ them.
   pull-request check runs against an App Service, so nothing enforces that order. The
   RONL Business API's two stay on `NODE|22-lts` against `.nvmrc` `22.23.2`, with Node 24
   deferred in `renovate.json` until they switch. The Linked Data Explorer's moved to
-  `NODE|24-lts` for its `.nvmrc` `24.21.0`. All four were read from Azure on 27 September
+  `NODE|24-lts` for its `.nvmrc` `24.21.0`. All four were read from Azure on 4 October
   2026. The Linked Data Explorer's backend is the exception to "switch first, then merge": `libxmljs2` builds
   against NAN rather than N-API, so its binary is bound to one major, and between the
   switch and a rebuilt deploy the backend cannot load it. Since 23 September both of its
@@ -699,18 +712,30 @@ them.
   been enough: both said so while DMN validation was broken for every user.
 - **Container images the repository does not apply.** The RONL Business API's local
   `docker-compose.yml` now pins all five images by tag **and** digest, and Renovate
-  maintains them (`docker:pinDigests`). The compose files under `deployment/vm/`, which
-  the Keycloak and Skosmos VMs run, are deliberately not pinned yet — no workflow applies
-  them — and still carry `quay.io/natlibfi/skosmos:latest`, `postgres:16-alpine` and
-  `quay.io/keycloak/keycloak:23.0` without a digest
-  ([#196](https://github.com/sgort/ronl-business-api/issues/196), open).
+  maintains them (`docker:pinDigests`). One of the five is held back on purpose: Redis runs
+  `redis:7.2-alpine@sha256:29e8589c…` (`docker-compose.yml:114`, `c69b8ea`), the last Redis
+  line under the BSD-3-Clause licence — 7.4 and later are RSALv2/SSPLv1. Renovate holds it there: since
+  [ronl-business-api#313](https://github.com/sgort/ronl-business-api/pull/313) (4 October
+  2026), a `renovate.json` rule keeps the `redis` docker image to the 7.0–7.2 tags
+  (`allowedVersions` `/^7\.[0-2](\.|-|$)/`, docker datasource only, since the backend's npm
+  client is also called `redis`), with the licence reason in its description. 7.2's digest
+  updates still arrive; 7.4 and 8 are never proposed. Before that rule, the hold was only a
+  compose comment, and the Dependency Dashboard
+  ([#16](https://github.com/sgort/ronl-business-api/issues/16)) already listed a 7.4 update
+  waiting out its cooldown. The compose files under `deployment/vm/`, which the Keycloak and Skosmos
+  VMs run, are not applied by any workflow. Skosmos has been pinned by digest since
+  30 September 2026 — `quay.io/natlibfi/skosmos:latest@sha256:c5855698…`, by Renovate in
+  `62c05a7` ([#198](https://github.com/sgort/ronl-business-api/pull/198)) — so the tag still
+  reads `latest` but the image no longer floats. The two Keycloak compose files, acceptance
+  and production, still carry `postgres:16-alpine` and `quay.io/keycloak/keycloak:23.0`
+  without a digest ([#196](https://github.com/sgort/ronl-business-api/issues/196), open).
 
 Two more were on that list until 19 September 2026 and are now closed:
 
 - **The runner image**, which ran on `ubuntu-latest` in every job — 6 in the CPSV Editor,
   12 in the Linked Data Explorer, 13 in the RONL Business API — and moved whenever GitHub
   moved it. **Every job in all three now names `ubuntu-24.04`**: 9, 18 and 20 jobs
-  respectively on 27 September 2026, the counts having grown with the `changes` jobs that
+  respectively on 4 October 2026, the counts having grown with the `changes` jobs that
   made the build checks requireable, the daily audit and SBOM jobs, and the promotion
   workflows. (Counted by `runs-on:`. The promotion's reusable-workflow calls are jobs that
   take their runner from the workflow they call, so a job count including them reads 9, 21
@@ -737,9 +762,12 @@ root `.npmrc` cannot reach either. Its own register keeps the exception open on 
 that ground: *"The exception closes when they are retired, not when the workflow lands."*
 
 [ICTU Dependency Guideline](ictu-dependency-guideline.md) records these against the
-recommendations they miss, and
-[linked-data-explorer#119](https://github.com/sgort/linked-data-explorer/issues/119) tracks
-the work.
+recommendations they miss. Both open items — the VM images and the break-glass scripts —
+belong to the RONL Business API: they are tracked in
+[ronl-business-api#196](https://github.com/sgort/ronl-business-api/issues/196) and in its
+register's exception. The cross-repository tracker that used to hold them,
+[linked-data-explorer#119](https://github.com/sgort/linked-data-explorer/issues/119), closed
+on 3 October 2026.
 
 **zizmor validates pin _format_, never pin _truth_.** A wrong or hostile digest
 with a plausible `# v7.0.1` comment passes zizmor, Prettier and human review
@@ -775,20 +803,20 @@ which **shipped in September 2026 and now runs in all three repositories** — s
     easy to falsify as a digest**, and neither the audit nor review catches it.
 
     It was reconciled in v2026.08.34 and matches today at **39 `uses:`
-    references across 13 workflows**, digests agreeing — re-counted on 27 September
-    2026 at `3c44b9e`, the count having grown with the Semgrep workflow, `azure/login`
+    references across 13 workflows**, digests agreeing — re-counted on 4 October
+    2026 at `5c6e716`, the count having grown with the Semgrep workflow, `azure/login`
     for the OIDC backend deploy, and the daily-audit, SBOM and promotion workflows. That first
     reconciliation was manual and prompted by a docs review rather than by any check
     in the repository, which is the argument for the preflight rather than against it.
     The preflight now exists and blocks in all three, so "the register matches the
     workflows" is checked on every pull request rather than assumed.
 
-    One inconsistency survives inside that register, in prose rather than in the
-    table: its *Keeping this register true* section still quotes the old
-    `30 uses: references across 9 workflows` headline. The check reads the first
-    match in the file and so still binds on the real headline and stays green — but
-    two numbers in one document disagree, and that is worth fixing in the repository
-    rather than here.
+    One inconsistency survived inside that register until 29 September 2026, in prose
+    rather than in the table: its *Keeping this register true* section quoted the old
+    `30 uses: references across 9 workflows` headline. The check reads the first match
+    in the file, so it bound on the real headline and stayed green while two numbers in
+    one document disagreed. `537fc2f` fixed it in the repository: the section now reads
+    `39 uses: references across 13 workflows` (`SECURITY-PIPELINE.md:455` at `5c6e716`).
 
 **A deploy secret can be wrong in a way no check here sees.** Piping a credential from the
 Azure CLI straight into `gh secret set` — `az staticwebapp secrets list … -o tsv | gh secret
@@ -800,7 +828,9 @@ naming neither the token nor the app
 read back to confirm it. That repository now carries `scripts/set-secret.sh`, which reads
 the value from stdin only, strips surrounding whitespace, and reports the byte count it
 stored. It is a script to remember to use, not a gate, and the other two repositories do not
-carry it.
+carry it. Its three Keycloak admin scripts were hardened in the same spirit on 3 October 2026
+(`47cea9f`): the admin password now reaches `curl` on stdin and the bearer token through a
+`0600` config file, so neither appears in a process list.
 
 ---
 
@@ -967,7 +997,12 @@ The Linked Data Explorer exercised this twice — on the `checkout` v7.0.1 and
 `setup-node` v7.0.0 bumps — before promoting its step. In both, the register moved
 on the bump's own branch, the check went green there, and the pull request merged
 green. That is the evidence its promotion rested on, and the RONL Business API's
-`zizmor-action` v0.6.4 bump supplied the same evidence there on 12 September 2026.
+`zizmor-action` v0.6.4 bump supplied the same evidence there on 12 September 2026. The CPSV
+Editor's own `zizmor-action` v0.6.4 bump did the same on 30 September 2026
+([ttl-editor#166](https://github.com/sgort/ttl-editor/pull/166)): Renovate's commit
+`10b6805` and the register row `79475ce` sat on Renovate's branch together, `audit`, `scan`
+and `Build and deploy ACC` passed there, and it merged green. The habit is now on record in
+all three.
 
 !!! danger "If it proves flaky the answer is `--offline`, never `continue-on-error`"
     The known cost is a network call inside a required job. `--offline` drops the

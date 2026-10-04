@@ -1,25 +1,25 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-27
+  date: 2026-10-04
   against:
-    CPSV Editor: "a7fe76f"
-    Linked Data Explorer: "0143ea2"
-    RONL Business API: "702a4f2"
+    CPSV Editor: "4cba989"
+    Linked Data Explorer: "9e0d18e"
+    RONL Business API: "5c6e716"
 ---
 
 # Code Standards
 
 !!! info "Verification status"
-    All three repositories' claims were re-checked on **27 September 2026**, against
-    `a7fe76f`, `0143ea2` and `3c44b9e`: rulesets read from the API per ruleset, workflow
-    files enumerated and their steps, triggers, filters, runners and pins read from
-    source, both hook files read from each repository, and the merge-commit settings read
-    from each repository.
+    All three repositories' claims were re-checked on **4 October 2026**, against
+    `4cba989`, `9e0d18e` and `5c6e716`: rulesets read from the API per ruleset, workflow
+    files enumerated and their steps, triggers and filters read from source, and both
+    hook files read from each repository.
 
-    **What moved is production.** In the Linked Data Explorer and the RONL Business API
-    a push to `main` no longer starts the production deploys directly: one promotion
-    workflow calls them in order, backend first. The rulesets did not move.
+    **What moved is the hooks and `main`.** Since 28 September 2026 the Linked Data
+    Explorer's and the RONL Business API's `pre-push` also run a BPMN fingerprint check,
+    so the three hooks no longer gate the same things. And since 30 September 2026 the
+    CPSV Editor holds `main` to a ruleset too, so all three now gate it.
 
 This page covers three application repositories — CPSV Editor (`ttl-editor`), Linked
 Data Explorer, and RONL Business API — that share a common tooling convention:
@@ -49,8 +49,10 @@ across multiple packages; CPSV Editor is a single package.
 
 At the root, the four names line up. Underneath, they don't. RONL Business API's root
 `check-format` isn't a workspace fan-out at all — it runs `prettier --check` directly
-against the whole tree (`**/*.{ts,tsx,json,md}`), so it reaches every package in one
-pass regardless of what each package calls its own script. Linked Data Explorer's root
+against the whole tree (`**/*.{ts,tsx,json,md}`, with `--ignore-path .gitignore
+--ignore-path .prettierignore`), so it reaches every package in one pass regardless of
+what each package calls its own script. Since 29 September 2026 that `.prettierignore`
+excludes `*-handoff/`, so a design handoff folder is neither reformatted nor checked. Linked Data Explorer's root
 `check-format` instead runs `npm run check-format --workspaces --if-present`, which
 invokes *whichever workspace defines a script of that exact name* and silently omits
 any that don't, because `--if-present` treats a missing script as nothing to do rather
@@ -71,23 +73,57 @@ the root's.
 
 ## Git hooks
 
-All three repositories wire the same two hooks through Husky, and they gate the same
-two things everywhere: staged-file linting and formatting on commit, full linting and
-formatting on push.
+All three repositories wire the same two hooks through Husky. The `pre-commit` hook is
+identical everywhere; the `pre-push` hook was too until 28 September 2026, when the
+Linked Data Explorer and the RONL Business API each added a BPMN fingerprint check to
+theirs.
 
-- **`pre-commit`** runs `lint-staged`, formatting and linting only the files staged for
-  that commit (via `prettier --write` and ESLint's `--fix` — through each affected
+- **`pre-commit`** runs `npx lint-staged`, formatting and linting only the files staged
+  for that commit (via `prettier --write` and ESLint's `--fix` — through each affected
   workspace's `lint:fix` in the RONL Business API, directly in the other two).
 - **`pre-push`** first checks the installed dependencies against the lockfile —
   `npm run deps:check`, the first line of the hook in all three repositories since
-  mid-September 2026 — and stops with `npm ci` named when they differ. Only then does
-  it run the full lint and format-check across the repository (RONL Business API's
-  `pre-push` also rebuilds the shared package and runs a type check first, since its
-  packages depend on it). The dependency check is there because a fast-forward brings
-  lockfile changes in and installs nothing: on 14 September 2026 a RONL Business API
-  clone still had Prettier 3.8.1 installed after the lockfile moved to 3.9.6, and its
-  push failed `check-format` on seven correctly formatted files, with nothing in the
-  output pointing at the install.
+  mid-September 2026 — and stops with `npm ci` named when they differ. What runs after
+  it differs per repository:
+
+    | Repository | `pre-push`, after `deps:check` |
+    |---|---|
+    | CPSV Editor | `lint`, `check-format` |
+    | Linked Data Explorer | `check-rip-bpmn`, `lint`, `check-format` |
+    | RONL Business API | build `@ronl/shared`, `check-swimlane-fixtures`, `type-check`, `lint`, `check-format` |
+
+    The RONL Business API rebuilds the shared package first because its other packages
+    depend on it. The dependency check is there because a fast-forward brings lockfile
+    changes in and installs nothing: on 14 September 2026 a RONL Business API clone still
+    had Prettier 3.8.1 installed after the lockfile moved to 3.9.6, and its push failed
+    `check-format` on seven correctly formatted files, with nothing in the output
+    pointing at the install.
+
+    **`deps:check` can report in sync over a stale install in two of the three.** It
+    compares the lockfile with a copy that `postinstall` writes into `node_modules` after
+    each install. Only the RONL Business API's `scripts/write-deps-marker.sh` skips that
+    write on a lockfile-only install (`npm install --package-lock-only`, which installs
+    nothing; [#288](https://github.com/sgort/ronl-business-api/issues/288)). The CPSV
+    Editor's and the Linked Data Explorer's `scripts/write-deps-marker.mjs` still rewrite
+    the marker then, so the check passes while `node_modules` is behind.
+
+**The BPMN fingerprint contract.** The twelve RIP phase BPMNs are authored in the Linked
+Data Explorer and copied twice: into its own `e2e-fixtures/`, and into the RONL Business
+API's swimlane parser fixtures. `rip-bpmn-fingerprints.json`, committed byte-identical
+in both repositories, records a sha256 for each of the twelve. The Linked Data
+Explorer's `scripts/check-rip-bpmn-copies.mjs` (`npm run check-rip-bpmn`) compares the
+`e2e-fixtures/` copies byte for byte against their source and checks the authoring
+files against the fingerprints. The RONL Business API's
+`scripts/check-swimlane-fixtures.mjs` (`npm run check-swimlane-fixtures`) checks its
+twelve fixtures against the fingerprints and, when a sibling Linked Data Explorer
+checkout is present (`LDE_PATH` overrides where), byte-compares them against it too. Its
+`--sync` copies the Linked Data Explorer's files over the fixtures, and refuses when a
+fixture agrees with its fingerprint but differs from that checkout — the checkout is then
+the stale side — unless `--force` is given. Both checks run in `pre-push` only, in no workflow at either
+head, although the Linked Data Explorer script's header describes each side enforcing it
+"in ITS ci". The seven Awb fixtures under
+`packages/backend/src/rip-swimlane/__fixtures__/awb/` are outside the contract: the
+check matches only `RipRNNProcess.bpmn`.
 
 **None of the three repositories' git hooks run the test suite.** Neither `pre-commit`
 nor `pre-push` invokes `npm test` anywhere. A passing hook is not evidence your change
@@ -110,14 +146,19 @@ without blocking the promotion. See [What blocks a merge](#what-blocks-a-merge) 
     pointing at a `.husky/_` directory that does not exist in it. Git does not warn about
     a missing hooks path: it finds no hook and runs none. **Every commit and every push
     from that worktree skips `lint-staged`, `deps:check`, lint and `check-format`
-    entirely**, and the first sign is CI failing on something a hook would have caught
-    locally — or, worse, nothing failing at all, because the formatting check lives in a
-    workflow the branch did not touch.
+    entirely** — and with them the Linked Data Explorer's `check-rip-bpmn` and the RONL
+    Business API's shared build, `check-swimlane-fixtures` and `type-check`. The first
+    sign is CI failing on something a hook would have caught locally — or, worse, nothing
+    failing at all, because the formatting check lives in a workflow the branch did not
+    touch, and the two fingerprint checks run in no workflow, so CI never catches those.
 
     Recorded as [ttl-editor#159](https://github.com/sgort/ttl-editor/issues/159), and true
-    in all three. Working in a worktree means running `npm run lint`,
-    `npm run check-format` and `npm run deps:check` by hand before pushing, or running
-    `npm install` in the worktree so `prepare` regenerates `.husky/_`. This is also why
+    in all three; the issue was closed on 3 October 2026 once the CPSV Editor's README
+    and the Linked Data Explorer's CI posture document said what to do about it. Working
+    in a worktree means running `npm run lint`, `npm run check-format` and
+    `npm run deps:check` by hand before pushing, or running `npm ci` in the worktree so
+    `prepare` regenerates `.husky/_` — `npm ci` rather than `npm install`, which
+    re-resolves versions instead of installing what the lockfile records. This is also why
     the assistant's working rules forbid `--no-verify` and hook edits outright — a gate
     that can vanish this quietly is one nobody should be disarming deliberately as well.
 
@@ -131,14 +172,14 @@ before then CI and the hooks left the same gap, and RONL Business API's public-s
 package had the only real test gate anywhere.
 
 **RONL Business API** — **thirteen** workflows: an acc/prod pair for each of **four**
-deployable packages, the supply-chain `audit`, since v2026.09.7 the Semgrep `scan`, and
-since v2026.09.11–12 three more: `promote-to-production.yml`, which is what a push to
-`main` starts and which calls the four production workflows in order, the daily
+deployable packages, the supply-chain `audit`, since v2026.09.7 the Semgrep `scan`,
+since v2026.09.10 `promote-to-production.yml`, which is what a push to `main` starts and
+which calls the four production workflows in order, and since v2026.09.12 the daily
 `dependency-audit` and the release `sbom`:
 
 | Workflow pair | Lint | Type-check | Tests | Notes |
 |---|:---:|:---:|:---:|---|
-| `azure-backend-*` | ✅ | – | ✅ | Builds, uploads the artifact, and since v2026.09.11 deploys it over OIDC (`azure/login` then `az webapp deploy`), then waits until `/v1/health` reports the deployed commit. The four deploy steps are skipped on a pull request. Also lints the OpenAPI document |
+| `azure-backend-*` | ✅ | – | ✅ | Builds, uploads the artifact, and since v2026.09.10 deploys it over OIDC (`azure/login` then `az webapp deploy`), then waits until `/v1/health` reports the deployed commit. The four deploy steps are skipped on a pull request. Also lints the OpenAPI document. Since 29 September 2026 ([#269](https://github.com/sgort/ronl-business-api/issues/269)) the backend's `npm test` and `test:serial` end with `scripts/check-conformance-coverage.cjs`, which fails when the OpenAPI document holds an operation no test compared against a real response — so both backend workflows run it |
 | `azure-frontend-*` | ✅ | – | ✅ | Also runs `npm run test:perf`, the wall-clock budget, as a step of its own |
 | `azure-publicsite-*` | ✅ | ✅ | ✅ | Its build additionally gates on a prerender and a bundle-cleanliness check |
 | `azure-pa-demo-*` | ✅ | ✅ | ✅ | The acc workflow also installs Chromium and runs the Playwright E2E suite before the bundle gate; the production one does not |
@@ -175,9 +216,19 @@ recorded exception stops the deploy. The routes are held to that description by 
 test step, which validates every response against it.
 The two `ropa-site` workflows run neither, and correctly so: that package is a static
 `index.html` plus a `staticwebapp.config.json`, with no build and no test script to run.
+**The backend's fixture tests gate nothing for a fixture-only change.** The acceptance
+backend workflow decides relevance with the pattern
+`^(\.nvmrc$|packages/backend/|\.github/workflows/azure-backend-acc\.yml$|package-lock\.json$|package\.json$)`,
+which leaves out `examples/`, `e2e-fixtures/` and `packages/frontend/public/examples/`.
+A pull request that changes only examples or fixtures therefore runs no backend suite,
+so `e2e-fixtures.test.ts`, `e2e-fixture-decisions.test.ts`,
+`example-fixture-parity.test.ts` and `public-example-fixture-parity.test.ts` — the tests
+that guard exactly those files — do not run on it. Pull request #235 shows it: the
+backend deploy was skipped, and only the frontend suite ran, because the change also
+touched `packages/frontend/`.
 
 **Both backends are now deployed by CI.** The Linked Data Explorer's end in
-`azure/webapps-deploy` with a publish profile; since v2026.09.11 the RONL Business API's
+`azure/webapps-deploy` with a publish profile; since v2026.09.10 the RONL Business API's
 end in `azure/login` over OIDC and `az webapp deploy` — OIDC because SCM basic auth is
 disabled on both of its App Services, so a publish profile would be refused. The hand-run
 deploy scripts remain there as break-glass only. **Since v2026.09.2 the Linked Data
@@ -200,7 +251,7 @@ accumulated invisibly, because nothing in the repository ran `tsc` at all.** `bu
 ESLint; `test` is Vitest. None of the three typechecks, so a type error could reach
 `acc` and deploy. A `typecheck` script now exists at the root and in both workspaces.
 
-**In the Linked Data Explorer (v2026.09.7) and the RONL Business API (v2026.09.11) a push
+**In the Linked Data Explorer (v2026.09.7) and the RONL Business API (v2026.09.10) a push
 to `main` no longer deploys anything directly.** `promote-to-production.yml` starts on
 every push to `main` — deliberately with no path filter, because it is what decides which
 deploys are needed — and calls the production workflows as reusable workflows: a
@@ -311,8 +362,8 @@ branch **requires**, what the rulesets carry beyond them, and how merge method i
 enforced are on [Branch Protection](branch-protection.md). The short version, because it
 is the fact most often got wrong — and because it reversed on 19 September 2026: on
 `acc`, every repository now requires `audit`, `scan` and its build and deploy checks, so
-a red test blocks the merge. On `main` no repository requires a build or a test, and the
-CPSV Editor's `main` requires no status check at all.
+a red test blocks the merge. On `main` every repository requires `audit` and `scan` and
+nothing else — no build and no test.
 
 ### Supply-chain hardening
 
@@ -347,10 +398,10 @@ nothing in CI noticing.
 The rollout is not identical across the three. All three are now on the v7 action
 majors — RONL Business API first, the CPSV Editor since v2026.09.0, and the Linked Data
 Explorer since v2026.09.2, which retired its last `actions/checkout` at v3.7.0 on the
-way. **The CPSV Editor is now the only one whose `main` is ungated**, by decision; the
-Linked Data Explorer and the RONL Business API both hold a promotion pull request to a
-ruleset of its own — a pull request plus `audit`, and `scan` in the Linked Data Explorer —
-which is fewer checks than `acc` requires, and no build.
+way. **All three now hold `main` to a "main promotion gate" ruleset**, the CPSV Editor
+since 30 September 2026: a pull request (merge commits only) plus `audit` and `scan`, with
+no bypass actors — fewer checks than `acc` requires, and no build. None of the three has
+classic branch protection on `acc` or `main`; the rulesets are the whole of it.
 
 [Supply-Chain Pinning](supply-chain.md) covers the mechanism, what the gate deliberately
 does not protect, and the order to copy the four artifacts into the next repository. The

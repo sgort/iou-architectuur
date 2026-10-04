@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-27
+  date: 2026-10-04
   against:
-    CPSV Editor: "a7fe76f"
-    Linked Data Explorer: "0143ea2"
-    RONL Business API: "702a4f2"
+    CPSV Editor: "4cba989"
+    Linked Data Explorer: "9e0d18e"
+    RONL Business API: "5c6e716"
 ---
 
 # Skills & Boundaries
@@ -69,9 +69,11 @@ precisely the test.
 
 The assistant operates inside a set of recorded boundaries: things it will not do
 unprompted, and approvals it will not infer from an earlier one. `~/.claude/CLAUDE.md`
-is the authority for the full set — **fourteen rules** as of 27 September 2026 — and is
-not reproduced here in full, because a copy would drift. The set has grown five times since
-the 2026-08-19 consolidation, most recently on 26 September, and will grow again; treat any count on this page as a
+is the authority for the full set — **sixteen rules** as of 4 October 2026 — and is
+not reproduced here in full, because a copy would drift. The set has grown since the
+2026-08-19 consolidation, most recently on 30 September, when two were added:
+suppressing Semgrep false positives in code rather than in the Semgrep UI, and changing
+an Azure App Service setting. It will grow again; treat any count on this page as a
 snapshot, and the file as the authority. The boundaries most visible to a day-to-day
 contributor:
 
@@ -124,7 +126,11 @@ contributor:
     collides with the boundary above. `npm ci`, not `npm install` — the latter
     re-resolves version ranges instead of installing what the lockfile records. This is
     the same check `pre-push` runs first in all three repositories; see
-    [Code Standards — Git hooks](../code-standards.md#git-hooks).
+    [Code Standards — Git hooks](../code-standards.md#git-hooks). It has one blind spot:
+    a lockfile-only install (`npm install --package-lock-only`) installs nothing, but in
+    the CPSV Editor and the Linked Data Explorer it still rewrites the marker the check
+    compares against, so the check can report in sync over a stale install. Only the
+    RONL Business API skips the marker on a lockfile-only install.
 - **Create a branch before implementing.** Integration branches (`acc`, `main`) are
   not worked on directly — direct changes there are hard to isolate and review.
 - **No git worktrees unless asked.** Recorded on 26 September 2026, after a

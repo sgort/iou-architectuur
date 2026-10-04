@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-27
+  date: 2026-10-04
   against:
-    CPSV Editor: "a7fe76f"
-    Linked Data Explorer: "0143ea2"
-    RONL Business API: "702a4f2"
+    CPSV Editor: "4cba989"
+    Linked Data Explorer: "9e0d18e"
+    RONL Business API: "5c6e716"
 ---
 
 # Branch Protection
@@ -19,13 +19,22 @@ how a merge is allowed to land. The checks themselves are documented on their ow
 the [Coverage Floor](coverage-floor.md) — and the
 [controls index](controls.md) is the one-page summary of where each holds.
 
-All three repositories' rulesets were read from the API again on 27 September 2026 and
-had not moved since 19 September, when **all three `acc` rulesets** gained the build and
-deploy checks: each now requires the build and deploy
+All three repositories' rulesets were read from the API again on 4 October 2026. On
+19 September **all three `acc` rulesets** gained the build and deploy checks: each now
+requires the build and deploy
 checks alongside `audit` and `scan`, so a red test suite blocks a merge to `acc` rather
-than only stopping the deploy. The `main` rulesets did not move. What made that possible
+than only stopping the deploy. What made that possible
 was not a ruleset edit alone — see
 [How a path-filtered workflow became requireable](#how-a-path-filtered-workflow-became-requireable).
+Four things moved since the read of 27 September:
+
+- the RONL Business API's `main promotion gate` requires `scan` as well as `audit`, since
+  29 September 2026;
+- the CPSV Editor has a `main promotion gate` of its own, created on 30 September 2026;
+- the CPSV Editor's `acc` ruleset restricts merges to merge commits and blocks deletion
+  and non-fast-forward pushes, also since 30 September 2026;
+- classic branch protection is gone from all six branches — the protection API answers
+  404 for each — so the rulesets are the whole gate.
 
 ## What blocks a merge
 
@@ -45,22 +54,23 @@ is rejected outright** in all three repositories, including for releases and inc
 for the repository owner. Linked Data Explorer adopted the same ruleset in v2026.08.7;
 all three are named `acc supply-chain gate` and carry zero bypass actors.
 
-They are not identical in shape. Read per ruleset from the API on 27 September 2026:
+They are not identical in shape. Read per ruleset from the API on 4 October 2026:
 
 | | `acc` | `main` |
 |---|---|---|
-| CPSV Editor | pull request, `audit`, `scan`, `Build and deploy ACC` | a pull request, no status checks — classic branch protection, not a ruleset |
+| CPSV Editor | pull request, `audit`, `scan`, `Build and deploy ACC`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward — `main promotion gate`, since 30 September 2026 |
 | Linked Data Explorer | pull request, `audit`, `scan`, `deploy`, `Build and Deploy Frontend`, `Build and Deploy ROPA Site`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward |
-| RONL Business API | pull request, `audit`, `scan`, `build`, `Build and Deploy ACC Frontend`, `Build and Deploy ACC PA Demo`, `Build and Deploy ACC Public Site`, deletion, non-fast-forward | pull request, `audit`, deletion, non-fast-forward |
+| RONL Business API | pull request, `audit`, `scan`, `build`, `Build and Deploy ACC Frontend`, `Build and Deploy ACC PA Demo`, `Build and Deploy ACC Public Site`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward |
 
-**Two of the three now gate `main`.** The Linked Data Explorer's `main promotion gate`
+**All three now gate `main`.** The Linked Data Explorer's `main promotion gate`
 came first, on 9 September 2026; the RONL Business API created its own on 12 September,
 before the promotion pull request was opened, layered over a classic protection under
 which an administrator could push to `main` directly — so the branch that deploys
-production had been the *less* protected of its two. That classic protection is still
-configured, force pushes allowed, and it is the ruleset's zero bypass actors and
-non-fast-forward rule that now close it. The Linked Data Explorer's `main` likewise
-still carries a classic protection, without admin enforcement, beneath its ruleset.
+production had been the *less* protected of its two. The CPSV Editor followed on
+30 September 2026. No branch keeps a classic protection any more: the ones beneath the
+Linked Data Explorer's and the RONL Business API's `main` rulesets are gone, and the
+protection API answers 404 on all six branches. The rulesets' zero bypass actors and
+non-fast-forward rule are what close a direct push.
 
 **Each `main` ruleset used to mirror its `acc` twin, and no longer does.** Until
 19 September the two differed in exactly one parameter:
@@ -68,26 +78,28 @@ still carries a classic protection, without admin enforcement, beneath its rules
 `main`, because a promotion carries commits under several author identities against a
 ruleset requiring zero approvals, and the flag would demand an approval nobody can give.
 That difference stands. What joined it is the build checks, which were added to `acc`
-only — so `acc` now requires strictly more than `main` does in both repositories, and
-the RONL Business API's `main` still requires `audit` alone, without `scan`. Read the
+only — so `acc` now requires strictly more than `main` does in all three. Read the
 table rather than assuming symmetry.
 
-The CPSV Editor's `main` requires a pull request but no status checks — **decided and
-kept**, not overlooked
+Until 30 September 2026 the CPSV Editor's `main` required a pull request but no status
+checks, by decision
 ([ttl-editor#131](https://github.com/sgort/ttl-editor/issues/131)): `main` is promoted
-from `acc`, whose commits already passed `audit` and `scan`. See
+from `acc`, and its production deploy check is path-filtered, so requiring it would wedge
+a documentation-only promotion. Since then its `main` requires `audit` and `scan`, whose
+workflows run on every pull request with no path filter — #131's reasoning held for the
+deploy check, and still keeps that one off, but not for those two. See
 [Supply-Chain Pinning](supply-chain.md#adoption-status) for the argument on both sides.
 
 **`scan` is now required on `acc` in all three.** The RONL Business API was the last
 holdout: its scan ran on every pull request while the baseline from its first
 authenticated scan was triaged, on the reasoning that a gate required before its baseline
 is triaged is a gate that gets bypassed in its first week. The triage finished, and the
-promotion was — as predicted — a ruleset edit that touched no file. Its `main` still
-requires `audit` alone.
+promotion was — as predicted — a ruleset edit that touched no file.
 
 Merge strategy is enforced by repository settings rather than by convention: all three
 disable squash and rebase merges, leaving merge commits only, with
-`delete_branch_on_merge` enabled. Both alternatives rewrite commit hashes — rebase
+`delete_branch_on_merge` enabled. All six rulesets allow merge commits only as well — the
+last of them, the CPSV Editor's two, since 30 September 2026. Both alternatives rewrite commit hashes — rebase
 deceptively so, since it preserves the commit count — and a changelog entry that cites
 commits by SHA is orphaned either way.
 
@@ -115,16 +127,15 @@ three site suites, whose `changes` patterns do not name the root lockfile, and r
 the backend's.
 
 **No ruleset requires a branch to be up to date before merging**
-(`strict_required_status_checks_policy: false` in all five). Every required check is
+(`strict_required_status_checks_policy: false` in all six). Every required check is
 therefore green against the pull request's own base, not against the `acc` it merges
 into. On 25 September 2026 three RONL Business API dependency pull requests
 (#221–#223), each green, merged back to back into a lockfile that matched no
 `package.json`. The `audit` job's lockfile-sync step now names that failure on the next
 pull request; it cannot prevent it.
 
-**On `main` it is still advice.** The Linked Data Explorer's `main promotion gate`
-requires `audit` and `scan`; the RONL Business API's requires `audit`; the CPSV Editor's
-`main` requires no status check at all. The deploy checks were deliberately not added
+**On `main` a red suite is still advice.** All three `main promotion gate` rulesets
+require `audit` and `scan`, and nothing else: no build, no test. The deploy checks were deliberately not added
 there, and the reason now differs by repository. In the Linked Data Explorer and the RONL
 Business API, production deploys run from a push to `main` through
 `promote-to-production.yml`, not on the promotion pull request: the RONL Business API's
@@ -142,7 +153,7 @@ a risk basis: new runtime packages, new origins, downgrades and licence changes.
 half is now met on `acc`; **none of the three has tooling for that lockfile review yet.**
 The scores are on [ICTU Dependency Guideline](ictu-dependency-guideline.md), recommendation
 R9, and the work is tracked in
-[linked-data-explorer#119](https://github.com/sgort/linked-data-explorer/issues/119).
+[linked-data-explorer#248](https://github.com/sgort/linked-data-explorer/issues/248).
 
 ## How a path-filtered workflow became requireable
 
@@ -193,8 +204,7 @@ bypass actors**:
   checks** — the full list is in the table above
 - `pull_request` → `required_approving_review_count: 0`
 
-The Linked Data Explorer and the RONL Business API each have a twin, `main promotion
-gate`, on `main` — see [Adoption status](supply-chain.md#adoption-status).
+All three have a twin, `main promotion gate`, on `main` — see [Adoption status](supply-chain.md#adoption-status).
 
 Both rules are needed *together*. Requiring the check alone would still let a
 direct push to `acc` bypass the gate entirely.

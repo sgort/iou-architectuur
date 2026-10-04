@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-27
+  date: 2026-10-04
   against:
-    CPSV Editor: "a7fe76f"
-    Linked Data Explorer: "0143ea2"
-    RONL Business API: "702a4f2"
+    CPSV Editor: "4cba989"
+    Linked Data Explorer: "9e0d18e"
+    RONL Business API: "5c6e716"
 ---
 
 # Dependency Scanning
@@ -29,8 +29,8 @@ workflow, required in the rulesets.
 | Repository | Semgrep `scan` | Required on | Lock-file maintenance |
 |---|---|---|---|
 | **Linked Data Explorer** | ✅ since v2026.09.3 | **`acc` and `main`** | ✅ with a slot kept for it |
-| **CPSV Editor** | ✅ since v2026.09.3 — the pilot | **`acc`** — `main` ungated by decision | ✅ since v2026.09.4 |
-| **RONL Business API** | ✅ since v2026.09.7 | **`acc`** since 19 September 2026 — `main` still requires `audit` alone | ✅ since v2026.09.7 |
+| **CPSV Editor** | ✅ since v2026.09.3 — the pilot | **`acc` and `main`** — `main` since 30 September 2026 | ✅ since v2026.09.4 |
+| **RONL Business API** | ✅ since v2026.09.7 | **`acc` and `main`** — `acc` since 19 September 2026, `main` since 29 September 2026 | ✅ since v2026.09.7 |
 
 **The RONL Business API's `scan` ran without being required for a fortnight**, and the
 reason is worth keeping because it is the pattern to copy: its first authenticated scan
@@ -104,10 +104,14 @@ Four decisions in the file are worth keeping when it is copied:
 ### The CPSV Editor, which piloted it
 
 The CPSV Editor adopted the same workflow first, in v2026.09.3, and it is **required on
-`acc` only**. Its `main` requires a pull request and no status checks at all — decided
-and kept rather than overlooked, because `main` is promoted from `acc`, whose commits
-already passed `audit` and `scan`
-([ttl-editor#131](https://github.com/sgort/ttl-editor/issues/131)). A single package, it
+`acc` and, since 30 September 2026, on `main`**, where the new `main promotion gate` ruleset
+requires `audit` and `scan`. Until then `main` required a pull request and no status checks
+at all, by decision: `main` is promoted from `acc`, whose commits already passed `audit` and
+`scan`, and a required check that never reports wedges a pull request
+([ttl-editor#131](https://github.com/sgort/ttl-editor/issues/131)). By the repository's own
+account, that reasoning held for the path-filtered deploy job but not for `audit` and `scan`,
+whose workflows run on every pull request; the deploy check is still not required on
+`main`. A single package, it
 needed neither of the Linked Data Explorer's filter fixes: its deploy workflows use
 `paths-ignore` for documentation only, so a lockfile change already builds and deploys,
 and it has no group rules to multiply a refresh into three pull requests.
@@ -187,7 +191,11 @@ Linked Data Explorer carries **ten** such lines at `0143ea2`, five of them
 `detect-non-literal-regexp`. The RONL Business API took the same approach on 24 September
 2026, for the first time — *"No nosemgrep annotation existed in this repository before"* —
 annotating fifteen false positives on fourteen lines, each with its own reason; with one
-added later the same day for its public OpenAPI route, it carries fifteen at `3c44b9e`.
+added later the same day for its public OpenAPI route, it carried fifteen at `3c44b9e`. Three
+more came on 30 September 2026 (`c395696`), in the Open Graph check scripts —
+`detect-non-literal-regexp` in the frontend's `scripts/check-og.mjs`, and
+`path-join-resolve-traversal` and `detect-non-literal-regexp` in the public site's — so it
+carries eighteen at `5c6e716`. The Linked Data Explorer's ten are unchanged at `9e0d18e`.
 
 That change also recorded the lesson that belongs next to every "0 findings" claim: *"The
 first scan used --config=p/javascript and reported 0 findings. Running it against the
@@ -289,17 +297,36 @@ Semgrep's, and it deliberately passes moderates and development-only advisories.
 itself on its first scheduled runs: on 25 and 26 September it passed in the CPSV Editor and
 the Linked Data Explorer and failed in the RONL Business API, on an `adm-zip` high that was
 gone from `acc` and still on `main` — the version production ran. The promotion that
-removed `keycloak-connect` cleared it.
+removed `keycloak-connect` cleared it
+([ronl-business-api#208](https://github.com/sgort/ronl-business-api/issues/208)).
+
+It has caught two more since, and in both the fix was to shrink the production tree rather
+than wait for an upstream patch:
+
+- **The Linked Data Explorer, 30 September – 3 October 2026**
+  ([#240](https://github.com/sgort/linked-data-explorer/issues/240)): `brace-expansion` and
+  `http-cache-semantics`, reached through `libxmljs2`'s `node-gyp`. `http-cache-semantics` has
+  no patched release, so a lockfile refresh (`7dcfdea`) and an override giving `libxmljs2`
+  `node-gyp` 13 (`be5bc99`) removed the chain; by the commit's record the backend's production
+  install went from 349 packages to 271.
+- **The RONL Business API, 3 October 2026**: a `braces` high, opened as
+  [#303](https://github.com/sgort/ronl-business-api/issues/303) at 10:24 and closed at 11:45,
+  once `@tailwindcss/typography` became the build-time devDependency it is (`c48b2cd`, #305);
+  [#307](https://github.com/sgort/ronl-business-api/issues/307) held `main` until the
+  promotion cleared it the same afternoon.
+
+Of the three repositories, only the CPSV Editor's audit has not yet failed for a real
+reason; every scheduled run there has passed.
 
 Dependabot *alerts* still watch the default branch only, which is `acc` in all three, so
-the daily audit is what now sees `main`. Read from the API on 27 September 2026, with the
-20 September figures beside them:
+the daily audit is what now sees `main`. Read from the API on 4 October 2026, with the
+27 September figures beside them:
 
-| Repository | Open alerts | On 20 September | Dismissed with a reason |
+| Repository | Open alerts | On 27 September | Dismissed with a reason |
 |---|:-:|:-:|:-:|
 | CPSV Editor | **0** | 0 | 0 |
-| Linked Data Explorer | **3** — `qs` ×2, `@tiptap/core`, all medium | 3 | 0 |
-| RONL Business API | **5** — `minimatch` high (development scope), `qs` ×2 and `react-router` ×2 medium | 8 | 0 |
+| Linked Data Explorer | **2** — `@tiptap/core` medium, `dompurify` low | 3 | 0 |
+| RONL Business API | **4** — `minimatch` high (development scope), `react-router` ×2 medium, `dompurify` low | 5 | 0 |
 
 **The RONL Business API's drop is what lock-file maintenance does on its first run.** It
 was enabled on 12 September 2026 and had not yet had a Monday; the refresh that followed
@@ -314,23 +341,31 @@ and a `chromedriver` pulled at the floating tag `latest` out of the tree with it
 ICTU's guideline asks for each finding to be mitigated **or explicitly accepted**. Two were
 dismissed with a written reason on 24 September — the RONL Business API's `adm-zip` and
 `elliptic`, neither with a patched version — and both closed as fixed the same day, when
-`keycloak-connect` went. None of the eight open today is dismissed, so each is still
-neither mitigated nor accepted; every one waits on a major queued behind Dependency
-Dashboard approval (Express 5, Tiptap 3, React Router 7, a `typescript-eslint` major).
+`keycloak-connect` went. None of the six open today is dismissed, so each is still neither
+mitigated nor accepted. Four wait on a major queued behind Dependency Dashboard approval —
+Tiptap 3 in the Linked Data Explorer, React Router 7 and a `typescript-eslint` major in the
+RONL Business API — while the two `dompurify` lows have a patch release, 3.4.16. The `qs`
+alerts, and with them the need for Express 5, are gone. In the RONL Business API the triage
+is tracked in [#311](https://github.com/sgort/ronl-business-api/issues/311).
 
 Two further gaps belonged with this one, and one has closed. **Every release now carries an
 SBOM**, since 26 September 2026: `scripts/write-sbom.mjs`, a `/bump-release` step, writes a
 CycloneDX 1.5 bill of the production dependencies from the lockfile to
-`docs/sbom/<name>-<version>.cdx.json`, and `sbom.yml` checks on each push to `main` that
-the committed file still matches the lockfile it describes. Committed so far: the CPSV
-Editor's 2026.09.6 (backfilled) and 2026.09.7, the Linked Data Explorer's 2026.09.7 and
-2026.09.8, the RONL Business API's 2026.09.11 and 2026.09.12. Nothing yet re-analyses them
-when a new advisory lands. The other gap stands: **every resolved package comes straight
-from the public registry** — 566 in the CPSV Editor's lockfile, 1,463 in the Linked Data
-Explorer's, 1,499 in the RONL Business API's on 27 September 2026, all from
-`registry.npmjs.org` — with no proxy in between and no provenance or signature check. (The
-only entries resolving elsewhere are the workspace links each monorepo makes to its own
-packages.) That one is an ICTU infrastructure question before it is a repository one.
+`docs/sbom/<name>-<version>.cdx.json`. On each push to `main`, `sbom.yml` runs
+`write-sbom.mjs --verify-release`, which fails only if the released version has no SBOM: a
+promotion carries commits merged after the release, so lockfile drift is reported as a
+warning and the job still passes. The strict match — the committed file describes the
+lockfile exactly — is `--check`, which belongs where the release is cut. Committed so far:
+the CPSV Editor's 2026.09.6 (backfilled), 2026.09.7 and 2026.10.0; the Linked Data
+Explorer's 2026.09.7, 2026.09.8 and 2026.10.0; the RONL Business API's 2026.09.11 to
+2026.09.15 and 2026.10.0. Nothing yet re-analyses them when a new advisory lands. The other
+gap stands: **every resolved package comes straight from the public registry** — 566 in the
+CPSV Editor's lockfile, 1,527 in the Linked Data Explorer's, 1,497 in the RONL Business
+API's at `4cba989`, `9e0d18e` and `5c6e716`, all from `registry.npmjs.org` — with no proxy
+in between and no provenance or signature check. (The only entries resolving elsewhere are
+the workspace links each monorepo makes to its own packages: 2 and 6.) That one is an ICTU
+infrastructure question before it is a repository one, and it is tracked in
+[linked-data-explorer#249](https://github.com/sgort/linked-data-explorer/issues/249).
 
 Whether Semgrep Cloud re-evaluates a stored scan against advisories published after it ran is
 not established, so it is not counted here as monitoring. The scores these gaps earn against
@@ -340,8 +375,9 @@ ICTU's guideline are on [ICTU Dependency Guideline](ictu-dependency-guideline.md
 
 - **semgrep.dev is now in the merge path.** The rulesets that require `scan` carry
   **zero bypass actors**, so if semgrep.dev is unreachable or `SEMGREP_APP_TOKEN` is
-  revoked, merges stop until a ruleset is edited — on `acc` in **all three** repositories
-  since 19 September 2026, and on `main` in the Linked Data Explorer.
+  revoked, merges stop until a ruleset is edited — on `acc` and `main` in **all three**
+  repositories: on every `acc` since 19 September 2026, on the RONL Business API's `main`
+  since 29 September and on the CPSV Editor's since 30 September.
   `check-supply-chain` accepted an analogous risk for
   the GitHub API — but the GitHub API is a dependency of the platform anyway, and
   semgrep.dev is not. It is a genuinely new class of outage.

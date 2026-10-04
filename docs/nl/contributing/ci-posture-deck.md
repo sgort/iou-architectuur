@@ -41,7 +41,7 @@ rapid prototyping.
       uitgeleverde build; de bouw gebeurt op de runner in plaats van in een
       leverancierscontainer.
     - **De statusvoetnoot.** De genoemde commits zijn de koppen van 12 september. De
-      huidige `acc`-koppen zijn `1868087` en `0e7733e`.
+      huidige `acc`-koppen zijn `4cba989` en `9e0d18e`.
 
     De gevraagde beslissing verandert hier niet door: de leveringspijplijn onder het
     prototypingspoor bestaat nog steeds niet.

@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-27
+  date: 2026-10-04
   against:
-    CPSV Editor: "a7fe76f"
-    Linked Data Explorer: "0143ea2"
-    RONL Business API: "702a4f2"
+    CPSV Editor: "4cba989"
+    Linked Data Explorer: "9e0d18e"
+    RONL Business API: "5c6e716"
 ---
 
 # Technology Stack
@@ -33,6 +33,18 @@ another width and their borders drifted. JetBrains Mono draws them at column wid
 and it is vendored because Google Fonts' subsets omit that range.
 `hooks/code_glyphs.py` warns at build time when a box diagram uses a character the
 font cannot draw — in practice, emoji.
+
+`mkdocs.yml` registers three build hooks: `hooks/repo_versions.py` (see
+[the page metadata header](#the-page-metadata-header) below), `hooks/code_glyphs.py`,
+and `hooks/kpi_charts.py`. The last renders the weekly ICTU assessment series from
+`docs/data/ictu-assessments.yml` at build time: a page leaves a placeholder such as
+`<!-- ictu:totals -->` on a line of its own, and the hook replaces it with a table or an
+inline SVG chart — `scores`, `totals`, `movement`, `heatmap`, `changes`, `tests` and
+`testgates`, all used on the
+[ICTU dependency guideline](../ictu-dependency-guideline.md) page. The charts are inline
+SVG coloured from Material's CSS variables rather than a JavaScript library, so they add
+no script origin and follow dark mode. A missing or malformed data file does not fail
+the build: the placeholder becomes an admonition saying so.
 
 ```mermaid
 graph LR
@@ -115,7 +127,7 @@ mean.
 A contributing page makes claims about repository configuration — workflows,
 `SECURITY-PIPELINE.md`, `renovate.json`, runner configs and their thresholds. **Most
 changes to those produce no new build.** Every frontend deploy workflow is
-path-filtered, as read on 27 September 2026:
+path-filtered, as read on 4 October 2026:
 
 | Repository | The frontend build fires on | Does not fire on |
 |---|---|---|
@@ -256,6 +268,8 @@ Both build with MkDocs and publish to Azure Static Web Apps.
 The Azure DevOps pipeline used to fire on every push to `acc` and on pull requests against it, which is what made `acc` the acceptance branch in practice. It now carries `trigger: none` and `pr: none`, so it runs only when someone starts it by hand. Pushing to `acc` therefore deploys nothing on its own today — but the pipeline is still there, and re-enabling it is a two-line change.
 
 The GitHub remote is not the only one: this repository is also pushed to Azure DevOps (`flevoland`) and to the open-regels GitLab instance. Only the first two run anything.
+
+A third Azure DevOps pipeline, `pipeline/publish-to-github.yml`, deploys no site. It runs on a tag matching `pub/v*` — a plain `v*` tag triggers nothing — exports a sanitised snapshot of that tag (`pipeline/scripts/sanitize.sh`, with the paths `.gitattributes` marks `export-ignore` left out), and after a manual approval on the ADO environment `GitHub-Public` pushes it to the public repository [ProvincieFlevoland/IOU-architectuur](https://github.com/ProvincieFlevoland/IOU-architectuur), with the `pub/` prefix dropped from the tag. `pipeline/publish-github.md` describes the procedure.
 
 Both builds run `mkdocs build --verbose`, not `--strict`, so a broken internal link or a page missing from the nav produces a warning rather than failing the deploy. Run `mkdocs build --strict` locally before pushing if you want that caught.
 

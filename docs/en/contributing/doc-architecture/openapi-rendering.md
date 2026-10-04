@@ -1,10 +1,10 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-27
+  date: 2026-10-04
   against:
-    Linked Data Explorer: "0143ea2"
-    RONL Business API: "702a4f2"
+    Linked Data Explorer: "9e0d18e"
+    RONL Business API: "5c6e716"
 ---
 
 # OpenAPI Rendering
@@ -71,7 +71,7 @@ which reports the version, the environment and the build (commit and workflow ru
 of the very service that just served the document:
 
 ```
-Rendered from acceptance · version 2026.09.8 · build 0143ea2 · #299 · read … UTC
+Rendered from acceptance · version 2026.10.0 · build 9e0d18e · #342 · read … UTC
 ```
 
 The two services shape `/v1/health` differently, and each page's script reads its
@@ -123,12 +123,13 @@ and does not depend on either documentation tier being allowlisted — a third
 party could render the same document.
 
 `/v1/health` does **not** get that treatment. It goes through the allowlist, and
-the two acceptance backends allowlist different things. The Linked Data Explorer's
-allowlists both deployed documentation tiers. The RONL Business API's allowlists
-only the production tier, `https://iou-architectuur.open-regels.nl`. Neither
-allowlists `localhost`. So the Linked Data Explorer's banner shows on both deployed
-tiers, while the RONL Business API's banner, and its Test Request, work only on the
-production documentation site. Under `mkdocs serve`, neither banner shows.
+both acceptance backends now allowlist both deployed documentation tiers —
+`https://iou-architectuur.open-regels.nl` and
+`https://acc.iou-architectuur.open-regels.nl`. Neither allowlists `localhost`. So
+both banners show on both deployed tiers; under `mkdocs serve`, neither shows. The
+RONL Business API's allowlist named only the production tier until its acceptance
+App Service's `CORS_ORIGIN` gained the acceptance documentation origin on
+30 September 2026.
 
 ### Test Request targets acceptance, deliberately
 
@@ -147,18 +148,16 @@ public documentation page is a different proposition from an endpoint someone
 has to write a request to reach, so production stays locked to its own
 frontend.
 
-The RONL Business API's document is different on both counts. It declares two
+The RONL Business API's document is different on both counts. It declares three
 security schemes — `bearerAuth`, a Keycloak-issued JWT that applies to every
-operation by default, and `mediaAggregatorKey` — so Test Request against it needs a
-token for most operations. And because its acceptance allowlist echoes only the
-production documentation origin, Test Request works only from
-`iou-architectuur.open-regels.nl`: from the acceptance documentation site the
-preflight gets no `Access-Control-Allow-Origin` and the browser refuses the call.
-Adding `https://acc.iou-architectuur.open-regels.nl` to that App Service's
-`CORS_ORIGIN` would change that.
+operation by default, `mediaAggregatorKey`, and since 28 September 2026 `m2mOAuth`,
+an OAuth2 client-credentials scheme for the machine-to-machine surface — so Test
+Request against it needs a token for most operations. And since 30 September 2026
+its acceptance `CORS_ORIGIN` includes `https://acc.iou-architectuur.open-regels.nl`,
+so Test Request works from both documentation tiers.
 
 Measured against the Linked Data Explorer's acceptance backend on 16 September 2026
-(and identically again on 27 September), varying only the
+(and identically again on 27 September and 4 October), varying only the
 `Origin` header on `GET /v1/health`:
 
 | `Origin` sent | Status | `Access-Control-Allow-Origin` |
@@ -168,18 +167,21 @@ Measured against the Linked Data Explorer's acceptance backend on 16 September 2
 | `https://acc.linkeddata.open-regels.nl` | 200 | echoed |
 | `http://localhost:8000` | 200 | absent |
 
-Measured against the RONL Business API's acceptance backend on 27 September 2026:
+Measured against the RONL Business API's acceptance backend on 4 October 2026:
 
 | `Origin` sent | Status | `Access-Control-Allow-Origin` |
 |---|---|---|
 | `https://iou-architectuur.open-regels.nl` | 200 | echoed |
-| `https://acc.iou-architectuur.open-regels.nl` | 200 | absent (preflight too) |
+| `https://acc.iou-architectuur.open-regels.nl` | 200 | echoed (preflight 204, echoed) |
 | `http://localhost:8000` | 200 | absent |
+
+On 27 September 2026 the acceptance documentation origin's row read *absent
+(preflight too)*; it changed with the `CORS_ORIGIN` update of 30 September.
 
 Both halves of
 [linked-data-explorer#145](https://github.com/sgort/linked-data-explorer/issues/145)
-made that possible: a disallowed origin no longer answers `500`, and both
-documentation tiers are allowlisted on the acceptance App Service.
+made the Linked Data Explorer's table possible: a disallowed origin no longer answers
+`500`, and both documentation tiers are allowlisted on the acceptance App Service.
 
 ---
 
@@ -223,7 +225,8 @@ comparison is worth recording, because the trade it revealed is not obvious.
 | Redoc / Swagger UI / Scalar | 1 each | ~1 KB each |
 
 Build-time rendering wins decisively on search: it emits real HTML that MkDocs
-indexes, so a schema name like `ErrorEnvelope` becomes findable through site
+indexes, so a schema name like `ErrorEnvelope` (at the time; the Linked Data
+Explorer's errors are now RFC 9457 `Problem` objects) becomes findable through site
 search. The client-side renderers contribute nothing but the page's own prose.
 Scalar was chosen knowing that cost, for a presentation that reads as an API
 console and for a Test Request control that build-time HTML cannot offer at all.
@@ -232,7 +235,8 @@ Two constraints found during that trial are worth keeping in mind for any future
 renderer:
 
 - **A renderer shipping its own stylesheet needs it vendored** if the CSP is
-  ever enforced, since `style-src 'self'` admits no CDN.
+  ever enforced, since `style-src` admits `'self'`, `'unsafe-inline'` and
+  `https://fonts.googleapis.com` only — no CDN such as jsDelivr.
 - **The iframe-based MkDocs plugins** (`mkdocs-swagger-ui-tag`,
   `mkdocs-redoc-tag`) are a trap: they work on localhost and would be blocked in
   production by `X-Frame-Options: DENY` — again, once the header is actually

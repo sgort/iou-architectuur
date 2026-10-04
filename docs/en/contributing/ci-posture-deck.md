@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-09-27
+  date: 2026-10-04
   against:
-    CPSV Editor: "a7fe76f"
-    Linked Data Explorer: "0143ea2"
-    RONL Business API: "702a4f2"
+    CPSV Editor: "4cba989"
+    Linked Data Explorer: "9e0d18e"
+    RONL Business API: "5c6e716"
 ---
 
 # CI Posture Across Repos — Slide Deck
@@ -33,21 +33,27 @@ which is a different question and the one a decision needs answered.
     A batch of supply-chain work landed on all three `acc` branches on **19 September
     2026**, and more since, after this deck was exported. The slides and their
     descriptions below are left exactly as the PDF states them, because a transcription
-    that drifts from its source is worse than a dated one. Five of their claims are now
+    that drifts from its source is worse than a dated one. Six of their claims are now
     out of date:
 
     - **Required checks.** The slides say `audit` and `scan` are required on `acc`. All
       three `acc` rulesets now also require the build and deploy checks, so a red test
       suite blocks the merge — see
       [Branch Protection](branch-protection.md#what-the-rulesets-still-do-not-require).
+    - **The CPSV Editor's `main`.** Slide 2's *"required checks on main: None — decided,
+      issue 131"* and slide 5's *"main in the Explorer only, the CPSV Editor's main ungated
+      by decision"* no longer hold. Since 30 September 2026 the CPSV Editor's `main`
+      requires `audit` and `scan`; only its deploy check stays off, for #131's reason.
     - **Scope.** The deck covers two applications and notes the RONL Business API runs
       the same five controls out of scope. Its `scan` is now required on `acc` too, so
       the three are aligned on that control rather than two of three.
     - **What ships.** Slide 4's clean-up argument predates the move to building on the
       runner; in both applications the tested build is now the shipped build.
     - **The status footnote.** Its commits, `f5bae6a`/`be6bc54` and `f7fe80f`/`daa4816`,
-      are the 12 September heads. The current `acc` heads are `a7fe76f` and `0143ea2`,
-      and each `main` carries the same tree.
+      are the 12 September heads. The current `acc` heads are `4cba989` and `9e0d18e`.
+      The Linked Data Explorer's `main`, `71a8236`, carries the same tree as its `acc`; the
+      CPSV Editor's, `719683b`, does not — its `acc` carries two documentation and test
+      pull requests (#192, #193) not yet promoted.
     - **How production deploys.** In the Linked Data Explorer a push to `main` now
       starts one ordered *Promote to Production* workflow, which deploys the backend
       before the sites, rather than each deploy workflow firing on its own. See
@@ -108,7 +114,8 @@ The [controls index](controls.md) carries the same five rows across all three ap
       decision. It differed in one respect when the deck was exported: its `scan` ran on
       every pull request but was deliberately not a required check while its first scan's
       435 findings were triaged. Since 19 September it is required on `acc`, alongside
-      `audit` and the build and deploy checks; its `main` still requires `audit` alone. See the
+      `audit` and the build and deploy checks, and since 29 September 2026 its `main`
+      requires `audit` and `scan`. See the
       [controls index](controls.md).
     - **The Norm Editor is shaped differently** again — GitLab CI, its own hook directory,
       and none of these controls. See
@@ -157,9 +164,10 @@ reach a deployment on a six-month merge rather than the day it is written.** Spe
 prototyping track is preserved precisely by not letting that track be the thing that ships.
 
 The middle row of *What it buys* reads more sharply next to slide 2's table: **the five
-controls becoming gates on a deployment** is precisely what the CPSV Editor's `main` does
-not have today, by decision — and the delivery pipeline is where that decision would be
-revisited.
+controls becoming gates on a deployment** is still not what any `main` has today. Since
+30 September 2026 `audit` and `scan` gate the CPSV Editor's `main` merge as they gate the
+other two; what no `main` has is a build or test gate, by decision — and the delivery
+pipeline is where that decision would be revisited.
 
 ---
 
@@ -189,7 +197,7 @@ release now notices.
 ## Verified against the repositories
 
 The deck's status claims were re-checked on **12 September 2026** rather than taken on
-trust, and re-read against the current `acc` heads on **27 September 2026**:
+trust, and re-read against the current `acc` heads on **4 October 2026**:
 
 - **The rulesets were read from the API**, per branch, with
   `gh api repos/<owner>/<repo>/rules/branches/<branch>`, which reports the effective rules
@@ -197,14 +205,18 @@ trust, and re-read against the current `acc` heads on **27 September 2026**:
 
     | | `acc` | `main` |
     |---|---|---|
-    | CPSV Editor | pull request, `audit`, `scan`, `Build and deploy ACC` | no ruleset rules — a pull request only, by decision ([#131](https://github.com/sgort/ttl-editor/issues/131)) |
+    | CPSV Editor | pull request, `audit`, `scan`, `Build and deploy ACC`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward |
     | Linked Data Explorer | pull request, `audit`, `scan`, `deploy`, `Build and Deploy Frontend`, `Build and Deploy ROPA Site`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward |
-    | RONL Business API | pull request, `audit`, `scan`, `build`, `Build and Deploy ACC Frontend`, `Build and Deploy ACC PA Demo`, `Build and Deploy ACC Public Site`, deletion, non-fast-forward | pull request, `audit`, deletion, non-fast-forward |
+    | RONL Business API | pull request, `audit`, `scan`, `build`, `Build and Deploy ACC Frontend`, `Build and Deploy ACC PA Demo`, `Build and Deploy ACC Public Site`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward |
 
     On 12 September, when the deck was exported, the `acc` rows read `audit` + `scan` for
     the first two and `audit` alone for the third, and each `main` mirrored its `acc`.
     The build checks and the RONL Business API's `scan` were added on 19 September, to
-    `acc` only.
+    `acc` only. The RONL Business API's `main` gained `scan` on 29 September; on
+    30 September the CPSV Editor's `main`, until then a pull request only by decision
+    ([#131](https://github.com/sgort/ttl-editor/issues/131)), gained a ruleset requiring
+    `audit` and `scan`, and its `acc` ruleset gained the deletion and non-fast-forward
+    rules.
 
 - **The pin counts were re-derived** by counting `uses:` references on each `acc` head rather
   than read from a register: the CPSV Editor 17 of 17 across seven workflows, the Linked
@@ -216,14 +228,17 @@ trust, and re-read against the current `acc` heads on **27 September 2026**:
   **four** workflows when the deck was exported; v2026.09.6 moved its two preview-closing
   steps into a workflow of their own, and v2026.09.7 added the daily dependency audit and
   the release SBOM.
-- **`acc` and `main` carry the same code in both applications the deck covers** — as they
-  did on 12 September, when the deck's footnote named the promotion commits `f5bae6a` and
-  `be6bc54`. On 27 September they are `7d154ba` (the CPSV Editor) and `4148c9a` (the Linked
-  Data Explorer), each the same tree as its `acc` head.
+- **`acc` and `main` carried the same code in both applications the deck covers** on
+  12 September, when the deck's footnote named the promotion commits `f5bae6a` and
+  `be6bc54`, and on 27 September. On 4 October the `main` heads are `719683b` (the CPSV
+  Editor), which is not the same tree as its `acc` head `4cba989` — two documentation and
+  test pull requests, #192 and #193, wait on `acc` for the next promotion — and `71a8236`
+  (the Linked Data Explorer), the same tree as its `acc` head `9e0d18e`.
 - **Production has run in both**: at the deck's export, the CPSV Editor's *Deploy PROD* at
   `f5bae6a` as run 94 and the Linked Data Explorer's *Deploy Frontend to Production* at
-  `be6bc54` as run 44; on 27 September, *Deploy PROD* #102 at `7d154ba`, and the Linked
-  Data Explorer's *Promote to Production* #2 at `4148c9a` — which since v2026.09.7 is the
+  `be6bc54` as run 44; on 4 October the latest are *Deploy PROD* #104 at `719683b`
+  (1 October), and the Linked Data Explorer's *Promote to Production* #3 at `71a8236`
+  (3 October) — which since v2026.09.7 is the
   one workflow a push to its `main` deploys through. The deck's
   *"confirmed by eye — 9 Sep"* refers to the first builds, `#88` and `#39`.
 

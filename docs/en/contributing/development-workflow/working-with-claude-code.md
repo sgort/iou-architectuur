@@ -1,5 +1,11 @@
 ---
 scope: cross-cutting
+verified:
+  date: 2026-10-04
+  against:
+    CPSV Editor: "4cba989"
+    Linked Data Explorer: "9e0d18e"
+    RONL Business API: "5c6e716"
 ---
 
 # Working with Claude Code
@@ -9,20 +15,21 @@ once a change (with or without a handoff package behind it) reaches Claude Code.
 
 ## The plugin set
 
-**Five** plugins are installed and enabled at **user level**, so they apply in every
-repository and every session. They come from two marketplaces: Anthropic's
-`claude-plugins-official`, and `thedotmack` for `claude-mem`.
+**Five** plugins are installed at **user level**, so they apply in every repository and
+every session — and **three** of them are enabled: `claude-mem`, `superpowers` and
+`semgrep`. `github` and `typescript-lsp` are installed but disabled. They come from two
+marketplaces: Anthropic's `claude-plugins-official`, and `thedotmack` for `claude-mem`.
 
-| Plugin | Version | What it contributes |
-|---|---|---|
-| [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.12.1 | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
-| [`superpowers`](https://github.com/obra/superpowers) | 6.4.1 | The brainstorm → plan → execute structure for multi-step work, and a TDD skills library |
-| `github` | `fa59bc903774` | The official GitHub MCP server: issues, pull requests, reviews, repository search |
-| `semgrep` | 2.3.0 | Scans generated code for security findings — SAST, secrets, and supply-chain |
-| `typescript-lsp` | 1.0.0 | TypeScript/JavaScript language server: go-to-definition, find references, error checking |
+| Plugin | Version | Enabled | What it contributes |
+|---|---|:---:|---|
+| [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.12.1 | ✅ | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
+| [`superpowers`](https://github.com/obra/superpowers) | 6.4.1 | ✅ | The brainstorm → plan → execute structure for multi-step work, and a TDD skills library |
+| `github` | `d182ca456ca0` | – | The official GitHub MCP server: issues, pull requests, reviews, repository search |
+| `semgrep` | 2.3.0 | ✅ | Scans generated code for security findings — SAST, secrets, and supply-chain |
+| `typescript-lsp` | 1.0.0 | – | TypeScript/JavaScript language server: go-to-definition, find references, error checking |
 
 !!! note "Versions in that table are a snapshot, not a contract"
-    The table shows the re-read of 27 September 2026, recorded last below. It was
+    The table shows the re-read of 4 October 2026, recorded last below. It was
     first read from `~/.claude/plugins/installed_plugins.json` on 12 September 2026,
     and already moved twice while this page was being written. `claude-mem`'s
     marketplace was configured with `autoUpdate: true` when this page was first
@@ -57,19 +64,25 @@ repository and every session. They come from two marketplaces: Anthropic's
     `lastUpdated`, are all dated 23 July 2026, so whatever produced the 13.24.x
     readings in between has left no trace in either file.
 
-!!! warning "Enabled is not the same as reachable"
-    Both MCP-backed plugins can be enabled and still fail to connect in a given
-    session — `github` on a malformed authorization header, `semgrep` on a cached
-    connection failure. The session reports this at startup; treat a plugin's
-    presence in this table as *configured*, not as *available right now*. The
-    `gh` CLI is the fallback for anything the `github` plugin would have done.
+    **Re-read on 4 October 2026, and for the first time not every plugin is enabled.**
+    Five plugins are still installed, all at user scope, from the same two marketplaces,
+    but `~/.claude/settings.json` now lists `github` and `typescript-lsp` as disabled
+    under `enabledPlugins`; when they were disabled is not established here. `github`
+    moved `fa59bc903774` → `d182ca456ca0` (last updated 3 October); every other version
+    is unchanged, and `thedotmack` still reads `autoUpdate: false`.
 
-    This is not a one-off: the `github` plugin failed to connect again on
-    4 September 2026, with the same malformed-authorization-header error, and the
-    v2026.09.0 documentation sync used `gh api` throughout instead. It failed the
-    same way on 11 September 2026, and that day's sync did the same. A capability
-    you can only reach half the time is one you should have a fallback for. It failed
-    the same way again on 27 September 2026.
+!!! warning "Enabled is not the same as reachable"
+    An enabled MCP-backed plugin can still fail to connect in a given session —
+    `semgrep` on a cached connection failure, for one. The session reports this at
+    startup; treat a plugin's presence in this table as *configured*, not as
+    *available right now*.
+
+    The `github` plugin is now disabled, so the `gh` CLI is the route for anything it
+    would have done, not merely the fallback. Before that it was the fallback often: the
+    plugin failed to connect on 4 September 2026 with a malformed-authorization-header
+    error, and the v2026.09.0 documentation sync used `gh api` throughout instead; it
+    failed the same way on 11 and 27 September 2026. A capability you can only reach
+    half the time is one you should have a fallback for.
 
 Two notes on that table, because both are easy to get wrong:
 
@@ -93,10 +106,11 @@ Two notes on that table, because both are easy to get wrong:
   still resolve 5.9.3, and `ttl-editor` — now built with Vite, with no `react-scripts`
   — resolves 6.0.3, transitively, with no `typescript` in its own `package.json`. The
   Norm Editor has no `typescript` dependency, and this documentation repository is
-  Python/MkDocs, so the plugin does nothing in either. **On the maintainer's
-  workstation, as of 27 September 2026, `typescript-language-server` is not on the
-  `PATH` at all** — so the plugin is enabled and does nothing anywhere until the server
-  is installed as described above.
+  Python/MkDocs, so the plugin would do nothing in either. **As of 4 October 2026 the
+  plugin is disabled, and on the maintainer's workstation `typescript-language-server`
+  is still not on the `PATH`** — so enabling it again would do nothing anywhere until
+  the server is installed as described above. The lockfile readings hold at the
+  4 October heads: 5.9.3 in the first two, 6.0.3 in `ttl-editor`.
 
 `semgrep` deserves a specific mention: it is the assistant-side counterpart to the
 [supply-chain gate](../supply-chain.md) in CI. One scans what is being written, the
