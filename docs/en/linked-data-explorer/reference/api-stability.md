@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # API Stability Contract — `/v1/norms` and `/v2/norms`
 
 This document is the binding stability contract for consumers of `/v1/norms` and `/v2/norms`. It defines what consumers can rely on, how to detect change efficiently, and what kinds of changes warrant a major version bump.
@@ -41,9 +45,10 @@ with `400 INVALID_PARAM`.
 `dataset_versions` lists the version-less records, and `[0]` is the most
 recently published of them, not necessarily the record of the period in force.
 
-**Caching.** The ETag is strong and covers three things: the dataset metadata
-of the selected periods, the resolved `valid_on`, and a digest of the content of
-the selected rules. A correction within a period (a higher `rulesetid_index`)
+**Caching.** The ETag is strong and covers the dataset metadata of the
+selected periods, the request parameters (`endpoint`, `rulesetid`,
+`cprmv_version` and the resolved `valid_on`, plus a marker that keeps v2 ETags
+apart from v1 ones), and a digest of the content of the selected rules. A correction within a period (a higher `rulesetid_index`)
 therefore changes the ETag, and so does midnight, even when nothing was
 republished, because a new period may have come into force. `Last-Modified` is
 omitted when it would be later than the response (a period not yet started),
@@ -67,13 +72,13 @@ This contract is aimed at **G2G consumers** — other Dutch government services 
 
 ## The four versioning layers
 
-`/v1/norms` carries four distinct version numbers, each describing a different layer of stability:
+Each `/vN/norms` carries four distinct version numbers, each describing a different layer of stability:
 
 | Layer | Where | What it tracks | When it changes |
 |-------|-------|----------------|-----------------|
-| **API contract** | URL path `/v1/` | The schema and shape consumers code against | Breaking changes only (warrants `/v2/`) |
+| **API contract** | URL path `/v1/`, `/v2/` | The schema and shape consumers code against | Breaking changes only (warrants a new major path) |
 | **Dataset versions** | `data.dataset_versions` envelope map | Per-rulesetid publication snapshots | Each BWB ruleset on its own cadence; map carries the latest version per rulesetid present in the response |
-| **CPRMV vocabulary** | `?cprmv_version=` request param ↔ `data.cprmv_version` envelope field | Which CPRMV vocabulary version the response is requested in and emitted as | **Consumer-selected** per request (`0.3.0` default, `0.3.2`, `0.4.1`); the namespace of the data follows the selection |
+| **CPRMV vocabulary** | `?cprmv_version=` request param ↔ `data.cprmv_version` envelope field | Which CPRMV vocabulary version the response is requested in and emitted as | **Consumer-selected** per request (`0.3.0`, `0.3.2`, `0.4.1`; default `0.3.0` on v1, `0.4.1` on v2); the namespace of the data follows the selection |
 | **Backend service** | `API-Version` HTTP header | The deployed backend code | Each backend release (operational, not a contract signal) |
 
 Only the first three are part of the consumer contract. The `API-Version` header is informational — useful for support tickets, not for cache invalidation or schema discrimination.
@@ -125,16 +130,17 @@ The `cprmv_version` envelope field echoes the version requested via `?cprmv_vers
 - `0.3.0` / `0.3.2` → `https://cprmv.open-regels.nl/<version>/…`
 - `0.4.1` → `https://standaarden.open-regels.nl/standards/cprmv/0.4.1#…`
 
-Stability within v1: **the default (`0.3.0`) response shape and its predicate URIs do not change.** Requesting a different `cprmv_version` is an explicit opt-in to that namespace — not a breaking change to the default contract. A consumer that never sends the parameter is unaffected by new versions being added to the supported set. A future change that altered the **default** version, or the predicate URIs of the **default** version, would be released as `/v2/norms`.
+Stability within v1: **the default (`0.3.0`) response shape and its predicate URIs do not change.** Requesting a different `cprmv_version` is an explicit opt-in to that namespace — not a breaking change to the default contract. A consumer that never sends the parameter is unaffected by new versions being added to the supported set. A change to the **default** version, or to the predicate URIs of the **default** version, needs a new major path: that is `/v2/norms`, whose default is `0.4.1`.
 
 !!! warning "Experimental versions — `0.3.2` and `0.4.1` are not part of the v1 guarantee"
-    Only the default **`0.3.0`** is covered by this stability contract. **`0.3.2` and `0.4.1`
-    are experimental / preview:** their response shape, predicate URIs, `dataset_versions`
-    semantics (e.g. the 0.4.1 `cprmv:RuleSet`/`validFrom` model and its
-    [cache caveat](#detecting-publications)) and even their availability may change — or be
-    withdrawn — **without** a `/v2/norms` and outside the additive-evolution promise above.
-    Build long-term G2G integrations against the default; treat `?cprmv_version=0.3.2` /
-    `0.4.1` as opt-in until a version is explicitly promoted into this contract.
+    On `/v1/norms`, only the default **`0.3.0`** is covered by this stability contract.
+    **`0.3.2` and `0.4.1` are experimental / preview on v1:** their response shape,
+    predicate URIs, `dataset_versions` semantics (e.g. the 0.4.1 `cprmv:RuleSet`/`validFrom`
+    model and its [cache caveat](#detecting-publications)) and even their availability on
+    v1 may change — or be withdrawn — **without** a new major path and outside the
+    additive-evolution promise above. This applies to v1 only: on `/v2/norms`, `0.4.1` is
+    the contract default (see [`/v2/norms`](#v2norms)). Build long-term G2G integrations
+    against `/v2/norms`.
 
 ## Per-rulesetid dataset versioning
 

@@ -116,17 +116,11 @@ The R2.2 bundle files exist **twice** in this repository, and its BPMN a third t
 Two checks keep the copies in step:
 
 - **The parity test** (`packages/backend/src/example-fixture-parity.test.ts`) asserts that every file in a mirrored bundle is byte-identical to its twin in `e2e-fixtures/`. A bundle opts in by adding an entry to `MIRRORED_BUNDLES`; R2.1 and R2.2 do.
-- **`npm run check-rip-bpmn`** (`scripts/check-rip-bpmn-copies.mjs`) covers the BPMNs of all RIP phases. It compares each `e2e-fixtures/` copy byte for byte with its source, and checks every authoring BPMN against the sha256 fingerprints in `rip-bpmn-fingerprints.json`, a file committed identically in both repositories so the RONL Business API can enforce the same thing in its own CI. After an intended edit, `node scripts/check-rip-bpmn-copies.mjs --write` regenerates the fingerprints, refreshes the `e2e-fixtures/` copies, and names the command that refreshes the RONL Business API's fixtures. The pre-push hook runs this check; no CI workflow does.
+- **`npm run check-rip-bpmn`** (`scripts/check-rip-bpmn-copies.mjs`) covers the BPMNs of all RIP phases. It compares each `e2e-fixtures/` copy byte for byte with its source, and checks every authoring BPMN against the sha256 fingerprints in `rip-bpmn-fingerprints.json`, a file committed identically in both repositories so the RONL Business API can enforce the same thing in its own CI. After an intended edit, `node scripts/check-rip-bpmn-copies.mjs --write` regenerates the fingerprints, refreshes the `e2e-fixtures/` copies, and names the command that refreshes the RONL Business API's fixtures. The pre-push hook runs this check, and so does the required `audit` job of the supply-chain workflow (`zizmor.yml`), so nothing reaches `acc` or `main` around it.
 
-!!! warning "A pull request that changes only bundle files runs no backend tests"
-    The backend workflow runs on every pull request to `acc`, but its
-    `changes` job skips the test job unless the pull request touches
-    `packages/backend/`, the workflow file, `.nvmrc`, `package.json` or
-    `package-lock.json`. `examples/`, `e2e-fixtures/` and
-    `packages/frontend/public/examples/` are not in that pattern, so a pull
-    request that edits only bundle files never runs the parity test. Edit both
-    copies together, and run the backend suite and `npm run check-rip-bpmn`
-    locally before opening the pull request.
+The same fingerprint file also covers two models outside the RIP ladder that the RONL Business API keeps as parser fixtures because they declare their own phases: `GedelegeerdBesluitProcess.bpmn` and `ManagementCapacityClaimProcess.bpmn` (`DECLARED_PHASE_MODELS` in the script). They have no `e2e-fixtures/` copy; the check compares only their fingerprints.
+
+A pull request that changes only bundle files still runs the backend suite: the acceptance backend workflow's (`azure-backend-acc.yml`) path filter and its `changes` pattern include `examples/`, `e2e-fixtures/` and `packages/frontend/public/examples/`, so the parity, fixture and bundle tests run whenever the files they check change. Edit both copies together, and run `npm run check-rip-bpmn` before pushing.
 
 ---
 

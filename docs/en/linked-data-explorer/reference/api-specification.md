@@ -48,6 +48,10 @@ declares right now. Every `/v1` route is described — the backend's tests fail
 when one is not. **Test Request** calls acceptance and never production, on
 purpose.
 
+This reference renders `/v1/openapi.json`. The `/v2` routes, `GET /v2/norms`,
+have their own document at `/v2/openapi.json`; see the
+[stability contract](api-stability.md#v2norms) for what `/v2/norms` returns.
+
 For base URLs, the `/api/*` legacy aliases and the error format, see
 [Backend Architecture](../developer/backend.md#api-versioning). For how this
 page is wired and what it depends on at run time, see

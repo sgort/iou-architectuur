@@ -50,7 +50,7 @@ Untagged artefacts always match the `All languages` filter — they only disappe
 
 The cleanest way to add a translated sibling is to drop a properly-named file into the importer.
 
-1. Save your translated file with a language suffix: `<artefact-id>.<lang>.<ext>` — e.g. `capacity-claim-intake.nl.form`, `MyProcess.de.bpmn`, `decision-letter.nl.document`.
+1. Save your translated file with a language suffix: `<artefact-id>.<lang>.<ext>` — e.g. `intake-form.nl.form`, `MyProcess.de.bpmn`, `decision-letter.nl.document`.
 2. Click the upload icon in the editor's list panel.
 3. Select the file (or multiple files at once for a whole bundle).
 4. The imported artefact is automatically tagged with the inferred language. Set the organization in the footer if the file doesn't already carry it.
@@ -104,7 +104,7 @@ A reference bundle demonstrates end-to-end multilingualism.
 1. Open the BPMN Modeler. Find **Beheer capaciteitsclaim — proces (Voorbeeld, NL)** under the FLEVOLAND group, marked with both `EXAMPLE` and Dutch language.
 2. Open it. The canvas shows the translated process in eight lanes, among them *Manager*, *Directie* and *Systeem*: tasks like *Overleggen en classificeren*, *Formatieclaim opstellen*, *Directiebesluit*, gateway labels like *Type aanvraag?* and flow labels like *formatie* / *inhuur* / *akkoord* / *afgewezen*. The process also declares eight phases (`ronl:phases`), which the RONL Business API shows as a stepper in its caseworker process view; the Modeler has no panel for them, so they are visible only in the XML.
 3. Open one of its linked forms (e.g. *HR — Overleggen en classificeren (Voorbeeld, NL)*). Every label, description, and option label is in Dutch.
-4. Now open the **CapacityClaimRouting** DMN. Note that the variable keys (`requestType`, `department`, `decisionRoute`, `advisoryGroup`) are still English. The same DMN serves both the English and Dutch sibling BPMNs — this is what stable English DMN keys buy you. The Dutch BPMN calls it with `camunda:decisionRefTenantId="${null}"`, so it resolves the DMN deployed without a tenant; the English sibling, which is not seeded into the Modeler, has neither the lanes, the phases nor that setting.
+4. Now open the **CapacityClaimRouting** DMN. Note that the variable keys (`requestType`, `department`, `decisionRoute`, `advisoryGroup`) are still English. The DMN's keys stay English while the process around it is Dutch — this is what stable English DMN keys buy you: a translation never touches the decision logic. The Dutch BPMN calls it with `camunda:decisionRefTenantId="${null}"`, so it resolves the DMN deployed without a tenant.
 
 The bundle is the canonical example of how to do this for your own translations.
 

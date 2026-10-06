@@ -1,33 +1,23 @@
 {
-  "docs_built": "2026-10-04",
+  "docs_built": "2026-10-06",
   "last_patch": {
-    "date": "2026-10-04",
-    "kind": "Weekly pass",
-    "summary": "The contributing pages re-checked against all three acc heads, and the ICTU dependency-guideline scores for 4 October: TTL 35, LDE 34, RBA 33. All three main branches are now gated by a ruleset, the LDE tracker #119 continues as #248–#250, and both daily audits made their first real production catch.",
+    "date": "2026-10-06",
+    "kind": "Component sync",
+    "summary": "Linked Data Explorer v2026.10.1 in production: /v2/norms answers which norms are in force on a date, /v1/norms is deprecated, the Modeler binds forms to their deployment, and CI runs the fixture tests and a lockfile review. Every finding the earlier patches filed — ronl-business-api#312, linked-data-explorer#254 and #255, ttl-editor#194 — has been fixed in its repository; this sync filed one new display finding.",
     "previous": {
-      "date": "2026-10-03",
-      "kind": "Component sync",
-      "summary": "RONL Business API and Linked Data Explorer v2026.10.0, both in production. RONL Business API: every error is RFC 9457 problem details, besluitvorming onder gedelegeerde bevoegdheid on the Caseworker board, ValidSign signing in every task view, process-declared phases, and /v1/m2m on the main engine. Linked Data Explorer: the besluitvorming example bundle, the Awb examples in swimlanes with Dutch names, several documents per task, and the RIP models checked across three copies."
+      "date": "2026-10-04",
+      "kind": "Weekly pass",
+      "summary": "The contributing pages re-checked against all three acc heads, and the ICTU dependency-guideline scores for 4 October: TTL 35, LDE 34, RBA 33. All three main branches are now gated by a ruleset, the LDE tracker #119 continues as #248–#250, and both daily audits made their first real production catch."
     },
     "open_findings": [
       {
-        "label": "ronl-business-api#312",
-        "url": "https://github.com/sgort/ronl-business-api/issues/312"
-      },
-      {
-        "label": "linked-data-explorer#254",
-        "url": "https://github.com/sgort/linked-data-explorer/issues/254"
-      },
-      {
-        "label": "linked-data-explorer#255",
-        "url": "https://github.com/sgort/linked-data-explorer/issues/255"
-      },
-      {
-        "label": "ttl-editor#194",
-        "url": "https://github.com/sgort/ttl-editor/issues/194"
+        "label": "linked-data-explorer#270",
+        "url": "https://github.com/sgort/linked-data-explorer/issues/270"
       }
     ]
   },
+
+
 
 
 
@@ -79,16 +69,16 @@
     {
       "name": "Linked Data Explorer",
       "icon": "🔍",
-      "version": "v2026.10.0",
+      "version": "v2026.10.1",
       "environment": "prod",
-      "commit": "71a8236...",
-      "commit_date": "2026-10-03",
+      "commit": "dd4728d...",
+      "commit_date": "2026-10-06",
       "build": {
-        "sha": "71a8236",
-        "run": 3,
-        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/37134335624"
+        "sha": "dd4728d",
+        "run": 4,
+        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/37472357224"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/71a823661e4a9d43140fad506b0fc1a3339cd074",
+      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/dd4728dd3429f6804c94fbcf6c951bfeef40151d",
       "ci_repo": "https://github.com/sgort/linked-data-explorer"
     },
     {

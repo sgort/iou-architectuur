@@ -12,7 +12,7 @@ This guide sets up the Linked Data Explorer on a workstation: the frontend, the 
 
 | Requirement | Why |
 |---|---|
-| **Node.js 24.21.0** | The version `.nvmrc` names, and the one CI builds and tests on. `package.json` accepts `>=22.23.2`. |
+| **Node.js 24.21.0** | The version `.nvmrc` names, and the one CI builds and tests on. `package.json` requires `>=24.21.0`, at the root and in `packages/backend`. |
 | **npm 11.10 or newer** (recommended) | `.npmrc` sets `min-release-age=14`, a 14-day cooldown on newly published versions. Older npm ignores the setting without a warning, so `scripts/check-deps.sh` warns at every dev-server start and push when npm is older than 11.10. |
 | **bash on `PATH`** | The root scripts run `bash scripts/check-deps.sh`, and the backend's `dev` script runs `bash scripts/check-docker.sh`. |
 | **Docker** | The backend's Docker check calls `docker info` and `docker inspect` from that bash. |
@@ -157,7 +157,7 @@ npm run dev            # terminal 2: frontend
 | URL | Service |
 |---|---|
 | `http://localhost:3000` | Frontend (Vite also binds `0.0.0.0` and prints a Network address) |
-| `http://localhost:3001` | Backend: root page, `/v1`, `/v1/health`, `/v1/openapi.json` |
+| `http://localhost:3001` | Backend: root page, `/v1`, `/v1/health`, `/v1/openapi.json`, and the `/v2` routes `/v2/norms` and `/v2/openapi.json` |
 
 ### The checks that run first
 
@@ -165,7 +165,7 @@ npm run dev            # terminal 2: frontend
 
 **Backend startup.** The backend's `npm run dev` runs these steps in order:
 
-1. `predev` (`build:openapi`) regenerates `openapi/openapi.json` from `openapi/openapi.yaml`. The JSON is generated and gitignored.
+1. `predev` (`build:openapi`) regenerates both OpenAPI documents: `openapi/openapi.json` from `openapi/openapi.yaml`, and `openapi/openapi.v2.json` from `openapi/openapi.v2.yaml`. Both JSON files are generated and gitignored.
 2. `scripts/check-docker.sh` checks that the Docker daemon answers and that `ronl-postgres` and `ronl-operaton` are running. A container with a health check must report `healthy`. Each container gets a green, yellow (running, not yet healthy) or red (not running or missing) line. If any container is not ready, the script exits non-zero and prints:
 
     ```text
@@ -207,7 +207,7 @@ The response has this shape (values abbreviated):
 ```json
 {
   "name": "Linked Data Explorer Backend",
-  "version": "2026.09.8",
+  "version": "2026.10.1",
   "environment": "development",
   "build": { "sha": "", "shortSha": "", "run": "", "isTracked": false, "label": "local build" },
   "status": "healthy",
@@ -307,7 +307,7 @@ npx serve .
 !!! warning "Opening from `file://` calls production"
     A page opened directly from disk has an empty hostname, so it falls through to the production backend and does not use your local one. Use `npx serve .` to test against local data.
 
-CORS does not get in the way: `middleware/cors.middleware.ts` answers the public mounts listed in `utils/publicPaths.ts` (`/v1/ropa/public`, `/v1/bundles/public` and `/v1/openapi.json`) with `origin: '*'` for `GET` and `OPTIONS`, whatever `CORS_ORIGIN` holds.
+CORS does not get in the way: `middleware/cors.middleware.ts` answers the public mounts listed in `utils/publicPaths.ts` (`/v1/ropa/public`, `/v1/bundles/public`, `/v1/openapi.json` and `/v2/openapi.json`) with `origin: '*'` for `GET` and `OPTIONS`, whatever `CORS_ORIGIN` holds.
 
 ---
 
@@ -323,7 +323,7 @@ CORS does not get in the way: `middleware/cors.middleware.ts` answers the public
 | RoPA seed | Run manually: `npx ts-node … src/db/seed-ropa.ts` | Run manually. No workflow runs it. |
 | `ropa-site` API base | `http://localhost:3001`, derived from the hostname | `https://acc.backend.linkeddata.open-regels.nl`, derived from the hostname |
 | `ropa-site` hosting | `npx serve .` | Azure Static Web Apps, deployed by `azure-ropa-site-acc.yml` on a push to `acc` that touches `packages/ropa-site/**` |
-| CORS for public routes | `origin: '*'` for the three public mounts, regardless of `CORS_ORIGIN` | Same |
+| CORS for public routes | `origin: '*'` for the four public mounts, regardless of `CORS_ORIGIN` | Same |
 | `build` in `/v1/health` | `local build` | `build <sha> · #<run>` |
 
 ---
@@ -339,12 +339,12 @@ npm run lint           # ESLint in every workspace
 npm run lint:fix
 npm run format         # Prettier, writing
 npm run check-format   # Prettier, checking only
-npm run test:scripts   # the repository scripts' own tests
+npm run test:scripts   # two of the repository scripts' own test harnesses
 ```
 
 [Testing](testing.md) has the suites, their current counts, the contract subset and the CI gate.
 
-`npm run test:scripts` runs on Windows as well as Linux: both harnesses print `PASS: 24 checks` (measured on Windows, 3 October 2026).
+`npm run test:scripts` runs on Windows as well as Linux: both harnesses print `PASS: 24 checks` (measured on Windows, 6 October 2026). The third harness, `node scripts/lockfile-diff.test.mjs`, has no npm script; CI runs it in the `lockfile-review` job.
 
 ### Git hooks
 
@@ -368,9 +368,10 @@ The root `package.json` also defines these scripts:
 | `deps:check` | `bash scripts/check-deps.sh`: checks the installed dependencies against the lockfile and warns about npm older than 11.10 |
 | `check-supply-chain` | `node scripts/check-supply-chain.mjs` |
 | `sbom` | `node scripts/write-sbom.mjs`: writes a software bill of materials |
+| `sbom:check` | `node scripts/write-sbom.mjs --check`: exits 1 when the committed SBOM for the current version is missing or no longer matches the lockfile. `sbom.yml` runs the same check on the release pull request. |
 | `test:scripts` | Tests `promotion-targets.mjs` and `dso-dossier.mjs`: `node scripts/promotion-targets.test.mjs && node scripts/dso-dossier.test.mjs` |
 | `check-mirror` | `bash scripts/check-mirror.sh`: compares `acc` and `main` on `origin` with the `gitlab` mirror. It prints the push command for any drift and never pushes. |
-| `check-rip-bpmn` | `node scripts/check-rip-bpmn-copies.mjs`: compares the `e2e-fixtures/flevoland/` copies of the twelve RIP phase models byte for byte with their source under `examples/organizations/flevoland/`, and checks the source files against the sha256 fingerprints in `rip-bpmn-fingerprints.json`. `--write` regenerates the fingerprints and refreshes the `e2e-fixtures` copies. `pre-push` runs it. |
+| `check-rip-bpmn` | `node scripts/check-rip-bpmn-copies.mjs`: compares the `e2e-fixtures/flevoland/` copies of the twelve RIP phase models byte for byte with their source under `examples/organizations/flevoland/`, and checks the source files against the sha256 fingerprints in `rip-bpmn-fingerprints.json`. The fingerprints also cover two declared-phase models, `GedelegeerdBesluitProcess.bpmn` and `ManagementCapacityClaimProcess.bpmn`. `--write` regenerates the fingerprints and refreshes the `e2e-fixtures` copies. `pre-push` runs it, and so does the required `audit` job in CI. |
 | `e2e:deploy-fixtures` | `node scripts/deploy-e2e-fixtures.mjs`: deploys the `e2e-fixtures/` bundle through the local LDE backend (`LDE_URL`, default `http://localhost:3001`): the shared decisions without a tenant, then each manifest process with its sub-processes, forms and documents under its tenant. It refuses an LDE backend that deploys to an Operaton that is not on this machine. It is a deploy helper, not a test runner. |
 | `authorities:generate` | `node scripts/generate-dso-authorities.mjs` |
 | `dso:dossier` | `node scripts/dso-dossier.mjs` |
@@ -382,10 +383,10 @@ In `packages/backend`, `docker:check`, `build:openapi`, `lint:openapi`, `test:co
 
 ## Getting a change to ACC
 
-`acc` accepts changes only through a pull request. The `acc supply-chain gate` ruleset blocks direct pushes, force-pushes and deletion. It requires a pull request, merged with a merge commit, and these status checks: `audit`, `scan`, `deploy`, `Build and Deploy Frontend` and `Build and Deploy ROPA Site`.
+`acc` accepts changes only through a pull request. The `acc supply-chain gate` ruleset blocks direct pushes, force-pushes and deletion. It requires a pull request, merged with a merge commit, and these status checks: `audit`, `scan`, `deploy`, `Build and Deploy Frontend`, `Build and Deploy ROPA Site` and `lockfile-review`. `lockfile-review` reports what a pull request changes in `package-lock.json`. It succeeds at once when the lockfile is unchanged, and fails on a package from a non-npmjs origin or without an integrity hash.
 
 1. Create a branch from `acc` and push it.
-2. Open a pull request into `acc`. The backend workflow's `deploy` job runs lint, the OpenAPI lint, typecheck, the full test suite and the build on the pull request, and skips its deploy steps. It does so only when the pull request touches `packages/backend/`, the root `package.json` or `package-lock.json`, `.nvmrc` or the workflow itself. A pull request that changes only `e2e-fixtures/`, `examples/` or `packages/frontend/public/examples/` runs no backend tests, although the backend's fixture and bundle tests read those files. Run `npm test -w packages/backend` yourself for such a change. The frontend and RoPA site workflows build from the pull request.
+2. Open a pull request into `acc`. The backend workflow's `deploy` job runs lint, the OpenAPI lint, typecheck, the full test suite and the build on the pull request, and skips its deploy steps. It does so only when the pull request touches `packages/backend/`, the root `package.json` or `package-lock.json`, `.nvmrc`, the workflow itself, or `e2e-fixtures/`, `examples/` or `packages/frontend/public/examples/`, which the backend's fixture and bundle tests read. The frontend and RoPA site workflows build from the pull request.
 3. Merge the pull request. The push to `acc` deploys the backend, frontend and RoPA site to ACC. Each of these workflows filters on the paths it deploys.
 
 Production follows the same pattern. A pull request from `acc` into `main` (the `main promotion gate` ruleset requires `audit` and `scan`), and its merge runs `promote-to-production.yml`, which deploys the backend first and the two sites after it. See [Deployment](deployment.md).

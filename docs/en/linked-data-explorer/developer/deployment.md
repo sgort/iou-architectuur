@@ -20,8 +20,8 @@ The Linked Data Explorer has eleven GitHub Actions workflows. Six deploy — one
 | `azure-frontend-production.yml` | called by the promotion; pull requests into `main` (production preview) | Azure Static Web Apps (production) |
 | `azure-ropa-site-prod.yml` | called by the promotion; pull requests into `main` (production preview) | Azure Static Web Apps — public ROPA site (production) |
 | `semgrep.yml` | every pull request; push to `acc` and `main` | — (Semgrep Code and Supply Chain, job `scan`) |
-| `zizmor.yml` | every pull request; push to `acc` and `main` | — (supply-chain audit, job `audit`) |
-| `sbom.yml` | push to `main`; manual; pull requests touching the SBOM tooling | — (release SBOM) |
+| `zizmor.yml` | every pull request; push to `acc` and `main` | — (supply-chain audit: jobs `audit`, and on pull requests `lockfile-review` and `lockfile-review-comment`) |
+| `sbom.yml` | push to `main`; manual; pull requests touching the SBOM tooling or `docs/sbom/**` (the release pull request) | — (release SBOM) |
 | `dependency-audit.yml` | daily at 05:17 UTC; manual; pull requests touching the audit | — (audits `acc` and `main`) |
 
 The production backend job declares `environment: production`. Its only protection rule is a branch policy; it has **no required reviewer**. The reviewer was removed on 24 September 2026 ([#210](https://github.com/sgort/linked-data-explorer/issues/210)): it gated the one production deploy that already carried the most automated checks, while both production site workflows deployed with no approval at all. What orders the production deploys now is the promotion itself — see [How a promotion reaches production](#how-a-promotion-reaches-production).
@@ -62,18 +62,18 @@ The backend builds TypeScript and runs on Azure App Service (Linux, `NODE|24-lts
 ```
 merge into acc (ACC)   /   called by the promotion (production)
   npm ci (backend package only)
-  lint · lint the OpenAPI description · typecheck · unit tests
+  lint · lint the OpenAPI descriptions · typecheck · unit tests
   npm run build                        (tsc → dist/)
-  prepare the deployment package       (dist/, the SHACL shapes, deploy/build-info.json)
+  prepare the deployment package       (dist/, the SHACL shapes, both OpenAPI documents, deploy/build-info.json)
   Azure Web Apps deploy
   health check
-  verify v1 endpoints                  (build, shape layers, OpenAPI version, native binding — see below)
+  verify v1 endpoints                  (build, shape layers, OpenAPI versions, native binding — see below)
 ```
 
 **ACC:** `https://acc.backend.linkeddata.open-regels.nl`
 **Production:** `https://backend.linkeddata.open-regels.nl`
 
-**The OpenAPI description gates the deploy.** `npm run lint:openapi` builds `openapi/openapi.json` from `openapi/openapi.yaml` and lints it with Spectral against the NL API Design Rules 2.2.1 before anything is built.
+**The OpenAPI descriptions gate the deploy.** `npm run lint:openapi` builds `openapi/openapi.json` from `openapi/openapi.yaml` and `openapi/openapi.v2.json` from `openapi/openapi.v2.yaml`, and lints both with Spectral against the NL API Design Rules 2.2.1 before anything is built. The packaging step copies both documents into `deploy/openapi/` and fails when either is missing or empty, so `/v1/openapi.json` and `/v2/openapi.json` cannot ship answering `500`.
 
 **The deployment package carries its own provenance.** The workflow writes `deploy/build-info.json` — the commit SHA, the run number and the run id — into the artifact, and `/v1/health` reports it as a `build` block. `version` and the `API-Version` header still name the release.
 
@@ -192,16 +192,18 @@ The site jobs are named **Build and Deploy Production Frontend** and **Build and
 
 | Ruleset | Branch | Pull request | Required checks |
 |---|---|---|---|
-| `acc supply-chain gate` | `acc` | required, 0 approvals, merge commits only | `audit`, `scan`, `deploy`, `Build and Deploy Frontend`, `Build and Deploy ROPA Site` |
+| `acc supply-chain gate` | `acc` | required, 0 approvals, merge commits only | `audit`, `scan`, `deploy`, `Build and Deploy Frontend`, `Build and Deploy ROPA Site`, `lockfile-review` |
 | `main promotion gate` | `main` | required, 0 approvals, merge commits only | `audit`, `scan` |
 
 Both also block deleting the branch and non-fast-forward pushes.
 
 ### Supporting workflows
 
-- **`sbom.yml`** runs on every push to `main`. It generates the CycloneDX SBOM from the lockfile, checks with `--verify-release` that the committed `docs/sbom/` file for the released version exists, and uploads the SBOM as an artifact kept for 90 days. The committed copy is the durable one.
+- **`sbom.yml`** runs on every push to `main`. It generates the CycloneDX SBOM from the lockfile, checks with `--verify-release` that the committed `docs/sbom/` file for the released version exists, and uploads the SBOM as an artifact kept for 90 days. The committed copy is the durable one. On a pull request it runs the strict `--check` instead — the committed file must match the lockfile exactly — but only when the pull request changes this version's SBOM file, which is the release bump ([#255](https://github.com/sgort/linked-data-explorer/issues/255)); on any other pull request the committed file belongs to an earlier release and the check is skipped.
 - **`dependency-audit.yml`** runs daily at 05:17 UTC and audits both `acc` and `main`. A high or critical advisory in production dependencies fails it and opens — or updates — a tracking issue, which it closes once the audit is clean.
 - **zizmor's lockfile step.** `zizmor.yml` runs `npm ci --dry-run --ignore-scripts`, so a `package-lock.json` that no longer matches `package.json` fails under its own name rather than inside a later install.
+- **The RIP phase-model check.** The `audit` job also runs `npm run check-rip-bpmn`, so the RIP BPMN copies and fingerprints are checked in the required job, not only in the pre-push hook.
+- **`lockfile-review`.** On every pull request, `zizmor.yml` compares `package-lock.json` with the base branch's using `scripts/lockfile-diff.mjs` and the policy in `lockfile-review.json`, after running the script's own test, `scripts/lockfile-diff.test.mjs`. It reports what moved — new packages, origins, downgrades, licences, install scripts — in the job summary, and `lockfile-review-comment` posts that report on the pull request. It fails only on a blocking finding — an entry resolved from anywhere but `https://registry.npmjs.org/`, or one without an integrity hash — or when a lockfile cannot be read. It passes at once when the lockfile is unchanged, which is what lets it be a required check on `acc`.
 
 ### A promotion, as it ran
 
@@ -217,7 +219,7 @@ The backend workflows do not stop at a health check, because the health check pa
 
 - **`build.sha` equals the commit this run deployed** — so a deploy that left the old artifact serving fails instead of passing. `/v1/health` is read up to twelve times, fifteen seconds apart; the window is about three minutes, because a 34-second window was measured to give up 14 seconds before a new build came up.
 - **`shacl.complete` is `true`** — every SHACL shape layer loaded. Read in the same loop.
-- **`/v1/openapi.json` describes the running release** — its `info.version` equals the `version` `/v1/health` reports, retried up to five times.
+- **`/v1/openapi.json` and `/v2/openapi.json` describe the running release** — the `info.version` of each equals the `version` `/v1/health` reports, retried up to five times.
 - **The libxmljs2 native binding loads on the deployed app.** The step posts a small DMN to `POST /v1/dmns/validate` and fails only when the base layer reports a native-load error — a message matching `NODE_MODULE_VERSION` or `was compiled against` — never because the DMN is invalid. The packaging step already proves the binding loads on the runner; this proves it on the host, where on 23 September 2026 a stale `.node` file broke DMN validation for every user while health, `build.sha` and the shape layers all reported fine.
 
 Each failed attempt logs the values it read. **Every assertion runs.** Since v2026.09.7 a failed check sets `checks_failed` and the step fails at the end, naming each failure, instead of exiting at the first one — on the v2026.09.6 promotion the version comparison failed first, and the native-binding check below it never ran.
@@ -230,6 +232,8 @@ At each release, once both environments are deployed, run these against ACC and 
 |---|---|---|
 | Backend health | `GET /v1/health` | `status: healthy`, the release `version`, and a `build` label naming the deployed commit |
 | OpenAPI description | `GET /v1/openapi.json` | `info.version` is the release; the path count matches the release notes |
+| v2 OpenAPI description | `GET /v2/openapi.json` | `info.version` is the release |
+| v1 norms deprecation | `GET /v1/norms` | `Deprecation: @1793491200`, `Sunset: Wed, 01 Nov 2028 00:00:00 GMT` and `Link: </v2/norms>; rel="successor-version"` headers |
 | Outbound guard | `GET /v1/dmns?endpoint=https://169.254.169.254/latest/meta-data/` | `400`, `application/problem+json`, `code: INVALID_INPUT` — an internal address is refused before any request is made |
 | Malformed body | `POST /v1/dmns/validate` with the body `{"bad` | `400`, `application/problem+json`, `code: MALFORMED_BODY` |
 | CSP collector | `POST /v1/csp-reports`, `Content-Type: application/csp-report` | `204` |

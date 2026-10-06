@@ -84,7 +84,7 @@ For BPMN shells, saving propagates the shell's `language` and `organization` to 
 
 ## Filename-based language inference on import
 
-Drop a `.bpmn`, `.form`, or `.document` file with a language suffix in its name (e.g. `capacity-claim-intake.nl.form`) into the import button — LDE picks up the suffix and tags the imported artefact automatically. Order of precedence:
+Drop a `.bpmn`, `.form`, or `.document` file with a language suffix in its name (e.g. `intake-form.nl.form`) into the import button — LDE picks up the suffix and tags the imported artefact automatically. Order of precedence:
 
 1. Language baked into the file (`ronl:language` in BPMN XML, top-level `language` key in form/document JSON)
 2. Filename suffix `.<lang>.<ext>`
@@ -113,13 +113,12 @@ The HR-capacity Dutch bundle is the multi-language reference bundle:
 
 - `Beheer capaciteitsclaim — proces (Voorbeeld, NL)` — 1 BPMN, 8 forms, 2 documents
 - All artefacts tagged `language=nl`, `organization=flevoland`
-- Same `CapacityClaimRouting` DMN serves both the English and Dutch siblings — variable keys (`requestType`, `decisionRoute`, `advisoryGroup`, etc.) stay stable English; only labels and option text are translated
-- All `formRef` and `documentRef` values in the Dutch BPMN are suffixed `-nl` to point at the Dutch siblings
+- The shared `CapacityClaimRouting` DMN keeps its variable keys (`requestType`, `decisionRoute`, `advisoryGroup`, etc.) in stable English; only labels and option text are Dutch
+- The files sit directly under `public/examples/flevoland/HR-capacity/` with no language infix in their names (`ManagementCapacityClaimProcess.bpmn`, `capacity-claim-intake.form`, …); their ids keep the `-nl` suffix, so every `formRef` and `documentRef` in the BPMN names a `…-nl` id
 - The Dutch BPMN has eight lanes and declares eight phases (`ronl:phases`, with a `ronl:phase` marker on the node where each begins), which the RONL Business API reads for its caseworker process view — see [BPMN Design Criteria → A process's own phases](../../ronl-business-api/reference/bpmn-design-criteria.md#a-processs-own-phases-ronlphases-ronlphaselabel-ronlphase)
 - Its routing task resolves the shared `CapacityClaimRouting` decision without a tenant (`camunda:decisionRefTenantId="${null}"`), so it uses the DMN deployed without a tenant even when the process itself is deployed under one
-- The English sibling under `examples/organizations/flevoland/HR-capacity/en/` has no lanes, no phases and no tenant setting on its decision reference, and is not seeded into the Modeler
 
-Open the BPMN under FLEVOLAND, walk the canvas, open the linked forms — every label, description, button, and option label is in Dutch; behind the scenes the variable keys and DMN logic are unchanged from the English version.
+Open the BPMN under FLEVOLAND, walk the canvas, open the linked forms — every label, description, button, and option label is in Dutch; behind the scenes the variable keys and DMN logic stay English.
 
 ---
 

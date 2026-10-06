@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # API-stabiliteitscontract — `/v1/norms` en `/v2/norms`
 
 Dit document is het bindende stabiliteitscontract voor afnemers van `/v1/norms` en `/v2/norms`. Het definieert waar afnemers op kunnen vertrouwen, hoe wijzigingen efficiënt te detecteren zijn, en welke soorten wijzigingen een major versie-update rechtvaardigen.
@@ -42,9 +46,10 @@ dragen, bevat `dataset_versions` de records zonder versie, en is `[0]` de
 meest recent gepubliceerde daarvan, niet noodzakelijk het record van de
 geldende periode.
 
-**Caching.** De ETag is strong en dekt drie dingen: de datasetmetadata van de
-gekozen perioden, de gebruikte `valid_on` en een digest van de inhoud van de
-gekozen regels. Een correctie binnen een periode (een hogere
+**Caching.** De ETag is strong en dekt de datasetmetadata van de gekozen
+perioden, de requestparameters (`endpoint`, `rulesetid`, `cprmv_version` en de
+gebruikte `valid_on`, plus een markering die v2-ETags van v1-ETags
+onderscheidt) en een digest van de inhoud van de gekozen regels. Een correctie binnen een periode (een hogere
 `rulesetid_index`) verandert dus de ETag, en middernacht ook, zelfs als er
 niets opnieuw is gepubliceerd, want er kan een nieuwe periode zijn ingegaan.
 `Last-Modified` ontbreekt wanneer die na het moment van het antwoord zou liggen
@@ -68,13 +73,13 @@ Dit contract richt zich op **G2G-afnemers** — andere Nederlandse overheidsdien
 
 ## De vier versielagen
 
-`/v1/norms` draagt vier verschillende versienummers, elk voor een andere stabiliteitslaag:
+Elke `/vN/norms` draagt vier verschillende versienummers, elk voor een andere stabiliteitslaag:
 
 | Laag | Locatie | Wat het bijhoudt | Wanneer het verandert |
 |------|---------|-------------------|------------------------|
-| **API-contract** | URL-pad `/v1/` | Het schema en de vorm waar afnemers tegen aan coderen | Uitsluitend breaking changes (rechtvaardigt `/v2/`) |
+| **API-contract** | URL-pad `/v1/`, `/v2/` | Het schema en de vorm waar afnemers tegen aan coderen | Uitsluitend breaking changes (rechtvaardigt een nieuw major pad) |
 | **Dataset-versies** | `data.dataset_versions`-envelopmap | Publicatie-snapshots per rulesetid | Elke BWB-regelset met eigen cadans; de map bevat de meest recente versie per rulesetid in het antwoord |
-| **CPRMV-vocabulaire** | `?cprmv_version=`-requestparameter ↔ `data.cprmv_version`-envelopveld | In welke CPRMV-vocabulaireversie de respons wordt gevraagd en uitgeleverd | **Door de afnemer gekozen** per request (`0.3.0` default, `0.3.2`, `0.4.1`); de namespace van de data volgt de keuze |
+| **CPRMV-vocabulaire** | `?cprmv_version=`-requestparameter ↔ `data.cprmv_version`-envelopveld | In welke CPRMV-vocabulaireversie de respons wordt gevraagd en uitgeleverd | **Door de afnemer gekozen** per request (`0.3.0`, `0.3.2`, `0.4.1`; default `0.3.0` op v1, `0.4.1` op v2); de namespace van de data volgt de keuze |
 | **Backend-service** | `API-Version` HTTP-header | De uitgerolde backendcode | Bij elke backendrelease (operationeel, geen contractsignaal) |
 
 Alleen de eerste drie maken deel uit van het afnemerscontract. De `API-Version`-header is informatief — bruikbaar voor supporttickets, niet voor cache-invalidatie of schema-onderscheid.
@@ -126,17 +131,17 @@ Het envelopveld `cprmv_version` echoot de versie die via `?cprmv_version=` is ge
 - `0.3.0` / `0.3.2` → `https://cprmv.open-regels.nl/<versie>/…`
 - `0.4.1` → `https://standaarden.open-regels.nl/standards/cprmv/0.4.1#…`
 
-Stabiliteit binnen v1: **de default-respons (`0.3.0`) en zijn predicate-URI's veranderen niet.** Een andere `cprmv_version` opvragen is een expliciete opt-in voor die namespace — geen breaking change aan het default-contract. Een afnemer die de parameter nooit meestuurt, wordt niet geraakt door nieuwe versies in de ondersteunde set. Een toekomstige wijziging die de **default**-versie verandert, of de predicate-URI's van de **default**-versie, zou worden uitgebracht als `/v2/norms`.
+Stabiliteit binnen v1: **de default-respons (`0.3.0`) en zijn predicate-URI's veranderen niet.** Een andere `cprmv_version` opvragen is een expliciete opt-in voor die namespace — geen breaking change aan het default-contract. Een afnemer die de parameter nooit meestuurt, wordt niet geraakt door nieuwe versies in de ondersteunde set. Een wijziging van de **default**-versie, of van de predicate-URI's van de **default**-versie, vraagt een nieuw major pad: dat is `/v2/norms`, met `0.4.1` als default.
 
 !!! warning "Experimentele versies — `0.3.2` en `0.4.1` vallen niet onder de v1-garantie"
-    Alleen de default **`0.3.0`** valt onder dit stabiliteitscontract. **`0.3.2` en `0.4.1` zijn
-    experimenteel / preview:** hun responsvorm, predicate-URI's, `dataset_versions`-semantiek
-    (bijv. het 0.4.1-`cprmv:RuleSet`/`validFrom`-model en de
-    [cachekanttekening](#publicaties-detecteren)) en zelfs hun beschikbaarheid kunnen wijzigen —
-    of worden ingetrokken — **zonder** een `/v2/norms` en buiten de additieve-evolutiebelofte
-    hierboven. Bouw langetermijn-G2G-integraties tegen de default; behandel
-    `?cprmv_version=0.3.2` / `0.4.1` als opt-in totdat een versie expliciet in dit contract wordt
-    opgenomen.
+    Op `/v1/norms` valt alleen de default **`0.3.0`** onder dit stabiliteitscontract.
+    **`0.3.2` en `0.4.1` zijn op v1 experimenteel / preview:** hun responsvorm,
+    predicate-URI's, `dataset_versions`-semantiek (bijv. het 0.4.1-`cprmv:RuleSet`/`validFrom`-model
+    en de [cachekanttekening](#publicaties-detecteren)) en zelfs hun beschikbaarheid op v1
+    kunnen wijzigen — of worden ingetrokken — **zonder** een nieuw major pad en buiten de
+    additieve-evolutiebelofte hierboven. Dit geldt alleen voor v1: op `/v2/norms` is `0.4.1`
+    de contractdefault (zie [`/v2/norms`](#v2norms)). Bouw langetermijn-G2G-integraties
+    tegen `/v2/norms`.
 
 ## Datasetversiebeheer per rulesetid
 

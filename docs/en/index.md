@@ -169,13 +169,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.10.0** · *October 2026*
+-   **🔍 Linked Data Explorer — v2026.10.1** · *October 2026*
 
     ---
 
-    **A besluit under delegated authority as an example bundle, and every Awb example drawn in swimlanes**
+    **The norms in force on a date, at `/v2/norms`**
 
-    The Modeler and Form Editor now seed [*Besluitvorming onder gedelegeerde bevoegdheid*](linked-data-explorer/features/besluitvorming-gedelegeerd-bundle.md): six lanes, six declared phases, a FIRST-hit routing DMN, twelve forms and a besluit the [RONL Business API](ronl-business-api/user-guide/caseworker.md#besluitvorming) prepares and signs through ValidSign — and a declined signature escalates to the bevoegde bestuursautoriteit. The kapvergunning and zorgtoeslag processes are drawn in swimlanes with Dutch names and a missing-information form that deploys with them; the Awb shells mark their phases with `ronl:awbPhase`, and the HR capacity claim declares its own eight. A task can carry several documents, a pre-push check keeps the twelve RIP models identical across their three copies, and overriding `libxmljs2`'s `node-gyp` cleared the last production high the daily audit had raised. The [suites](linked-data-explorer/developer/testing.md) stand at 3,123 tests, all passing.
+    [`/v2/norms`](linked-data-explorer/reference/api-stability.md#v2norms) answers which norms apply on a given date: per ruleset, the period in force on `valid_on` — today in Amsterdam by default — in CPRMV 0.4.1, with an ETag that also catches a correction made within a period, and its own OpenAPI document at `/v2/openapi.json`. `/v1/norms` is deprecated from 1 November 2026, with a sunset on 1 November 2028, and says so in `Deprecation`, `Sunset` and `Link` headers. The Modeler binds forms to their deployment, the Kapvergunning bundle is Dutch throughout, and the English HR-capacity variant is gone. CI now runs the fixture tests and the RIP fingerprint check, every dependency pull request gets a lockfile review, and a release pull request must carry an SBOM that matches its lockfile. The [suites](linked-data-explorer/developer/testing.md) stand at 3,234 tests, all passing.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

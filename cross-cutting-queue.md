@@ -44,6 +44,48 @@ drained by the pass of 27 September, and everything queued from 27 September to 
    80% floor. The pass did not run the suites; the next one that measures coverage should restate the
    margin on `coverage-floor.md`. (Was 30 September RONL Business API item 6, second half.)
 
+### 6 October 2026 — Linked Data Explorer v2026.10.0 → v2026.10.1 (production, `dd4728d`)
+
+Read at `origin/main` = `dd4728d` (Promote to Production #4); `origin/acc` `85f484d` holds the same tree.
+
+1. **The fingerprint checks now run in CI, in both repositories.**
+   Evidence: LDE `zizmor.yml:180` runs `check-rip-bpmn` in the required `audit` job (a424e95); RBA `origin/acc`
+   `zizmor.yml:190` runs `check-swimlane-fixtures`. Both now also cover the declared-phase models
+   (LDE `DECLARED_PHASE_MODELS`, 61ad418; RBA `__fixtures__/declared/`). Was iou-architectuur's finding on
+   linked-data-explorer#254 items 5 and 11 and ronl-business-api#312.
+   Bears on: `code-standards.md` (the "pre-push only, in no workflow" paragraph and the fingerprint-contract scope).
+
+2. **A fixture- or example-only pull request now runs the LDE backend suite.**
+   Evidence: `azure-backend-acc.yml:38-40,91` — paths and `PATTERN` include `examples/`, `e2e-fixtures/` and
+   `packages/frontend/public/examples/` (#257). Bears on: `code-standards.md` (the quoted old pattern and "gate nothing").
+
+3. **`lockfile-review` is required on `acc` in all three repositories — ICTU R9.**
+   Evidence: the `lockfile-review` job in each `zizmor.yml` (LDE `:239`, RBA `:285`, TTL `:246`); live rules on
+   `acc` list `lockfile-review` beside the existing checks in all three (read 6 October 2026). linked-data-explorer#248
+   closed on 6 October. Bears on: `branch-protection.md` (the R9 "no tooling" paragraph and the ruleset table),
+   `ictu-dependency-guideline.md` (R9 row, the #248 link as open; a score to reconsider), `controls.md`,
+   `supply-chain.md`.
+
+4. **A release pull request's SBOM is checked strictly, in all three repositories.**
+   Evidence: `sbom.yml` runs `write-sbom.mjs --check` on a pull request that changes the version's SBOM
+   (LDE `:81-104`; RBA and TTL `:101-104`), and each `package.json` has `sbom:check` (#255, closed 5 October).
+   Bears on: `dependency-scanning.md` (the paragraph saying the strict check runs nowhere; the SBOM list gains LDE
+   2026.10.1 — re-count all three).
+
+5. **The LDE serves a second public OpenAPI document at `/v2/openapi.json`.**
+   Evidence: c5165d6 — `registry.ts`, `publicPaths.ts:15-20`; both documents linted (`lint:openapi`) and smoke-checked
+   by the deploy. The documentation site's API Specification page still renders only `/v1/openapi.json` and points to
+   the second. Bears on: `doc-architecture/openapi-rendering.md`.
+
+6. **The LDE raised its engines floor rather than widening it.**
+   Evidence: root and backend `package.json` `engines.node` `>=24.21.0` (v2026.10.1); RBA stays `>=22`.
+   Bears on: `supply-chain.md` (the "floors are widened, not bumped" sentences).
+
+7. **A CPSV Editor page repeats a claim `/v2/norms` has overtaken — for the next CPSV sync, not a contributing page.**
+   Evidence: `docs/en/cpsv-editor/developer/cprmv-dataset-generation.md:344-352` says a stale `/v1/norms` response
+   lasts "up to max-age (1 h)" and plans a publication timestamp. On v1 a same-date correction keeps its ETag, so a
+   revalidating client can get 304 indefinitely; `/v2/norms` signs a digest of the rules instead (517cd71).
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

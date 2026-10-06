@@ -66,15 +66,7 @@ Select a **UserTask** or **StartEvent** on the canvas. The properties panel show
 3. A confirmation card appears below the dropdown showing the form name and the resulting `camunda:formRef` value.
 4. A **green badge** appears below the element on the canvas, confirming the link.
 
-The dropdown writes `camunda:formRef` and `camunda:formRefBinding="latest"` into the BPMN XML. `binding: latest` means Operaton always uses the most recently deployed version of that form — you do not need to pin a specific version.
-
-!!! warning "Under an organization, `latest` can be ambiguous"
-    `latest` looks the form key up across the whole engine. Once the same form is
-    deployed under more than one organization (tenant), Operaton cannot choose and
-    refuses with `ENGINE-03109`. The seeded examples therefore use
-    `camunda:formRefBinding="deployment"`, which takes the form from the process's
-    own deployment. The dropdown always writes `latest`; to use `deployment`, edit
-    the attribute in the BPMN XML by hand.
+The dropdown writes `camunda:formRef` and `camunda:formRefBinding="deployment"` into the BPMN XML, the binding every seeded example uses. `deployment` takes the form from the process's own deployment, which the deploy modal ships together with the BPMN, so the form resolves even when the same form key is deployed under several organizations (tenants). There is nothing to edit by hand.
 
 To unlink a form, open the dropdown and select the blank option at the top.
 
@@ -112,12 +104,12 @@ The modal also has a required **Board ownership** section. It auto-detects the o
     Decision models referenced via `camunda:decisionRef` on `BusinessRuleTask` elements are **not** included in this deployment. DMNs reach Operaton through a separate path: they are published to TriplyDB by the [CPSV Editor](../../cpsv-editor/index.md) and deployed to Operaton from there. The BPMN process resolves `camunda:decisionRef` at runtime against whatever is already deployed — as long as the DMN key matches, no additional action is needed here. A process deployed under an organization reaches a shared DMN deployed without one only when its business rule task carries `camunda:decisionRefTenantId="${null}"`, as the seeded examples do.
  
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Deploy modal showing the bundle's seven resources — two BPMN files, four forms and a document — with an amber warning that the bundle mixes languages, plus the required Board ownership section with the auto-detected board and an override control, the line naming the Operaton it deploys to, and a Deploy button at the bottom](../../assets/screenshots/linked-data-explorer-bpmn-deploy-modal.png)
-  <figcaption>Deploy modal showing the complete bundle and the Board ownership section before committing to Operaton</figcaption>
+  ![Screenshot: Deploy modal showing the bundle's seven resources — two BPMN files, four forms and a document — with an amber warning that the bundle mixes languages, plus the required Board ownership section with the auto-detected board and an override control, the line naming the Operaton it deploys to, and a Deploy button at the bottom. Captured at v2026.10.0, when the seeded Kapvergunning bundle still mixed en and nl; it is all nl now and no longer shows that warning](../../assets/screenshots/linked-data-explorer-bpmn-deploy-modal.png)
+  <figcaption>Deploy modal showing the complete Kapvergunning bundle and the Board ownership section before committing to Operaton, captured at v2026.10.0</figcaption>
 </figure>
 
 1. Review the resource list. A form or document template the process references but this browser does not have is listed under **⛔ Referenced resources are missing from local storage**, and **Deploy** stays disabled until you import it in the Form Editor or the Document Composer.
-2. Read any amber warning. **Bundle mixes languages** means the artefacts carry more than one `ronl:language` tag — in the figure, the seeded Kapvergunning bundle, whose new missing-information form is tagged `nl` and the rest `en`. It does not stop the deploy, but a deployed bundle should be one language: retag or untag the odd one out first. A missing `ronl:ropaRef` gets a warning of the same kind.
+2. Read any amber warning. **Bundle mixes languages** means the artefacts carry more than one language tag — a process's `ronl:language`, or the language of a form or document template; untagged artefacts do not count. It does not stop the deploy, but a deployed bundle should be one language: retag or untag the odd one out first. A missing `ronl:ropaRef` gets a warning of the same kind.
 3. Check the **Board ownership** section — accept the auto-detected board or override it. A board owner is required to deploy.
 4. Check the **Organization**. It comes from the sidebar's **Organization** field once the process is saved, and it is **required** — the deploy will not submit without one. It is sent to Operaton as the deployment's tenant-id, so a process deployed without it would be invisible to any tenant-scoped lookup made later.
 5. Check the line **Deploys to …**, which names the Operaton the process will reach. You do not choose it here: the backend always deploys to its own configured Operaton, with its own credentials.
