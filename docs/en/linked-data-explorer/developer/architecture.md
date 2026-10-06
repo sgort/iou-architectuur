@@ -97,7 +97,7 @@ src/
     └── logger.ts         Winston structured logging
 ```
 
-The request and response shapes of every `/v1` route are in the [API Specification](../reference/api-specification.md), built from `packages/backend/openapi/openapi.yaml`; the `/v2` routes are described in `openapi/openapi.v2.yaml`, served at `/v2/openapi.json`.
+The request and response shapes of every `/v1` route are in the [API Specification (v1)](../reference/api-specification.md), built from `packages/backend/openapi/openapi.yaml`; the `/v2` routes are in the [API Specification (v2)](../reference/api-specification-v2.md), built from `openapi/openapi.v2.yaml` and served at `/v2/openapi.json`.
 
 Legacy `/api/*` routes exist with deprecation headers for backward compatibility. New work uses `/v1/*`; `/v2/norms` succeeds the deprecated `/v1/norms`.
 

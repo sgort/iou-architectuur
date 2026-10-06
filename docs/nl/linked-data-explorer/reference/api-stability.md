@@ -17,7 +17,8 @@ Dit document is het bindende stabiliteitscontract voor afnemers van `/v1/norms` 
 ## `/v2/norms`
 
 `/v2/norms` beantwoordt de vraag die afnemers werkelijk stellen: _welke normen
-gelden op deze datum?_
+gelden op deze datum?_ De volledige beschrijving staat op
+[API Specification (v2)](api-specification-v2.md), uit `/v2/openapi.json`.
 
 |                         | `/v1/norms`                                                          | `/v2/norms`                                                |
 | ----------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------- |

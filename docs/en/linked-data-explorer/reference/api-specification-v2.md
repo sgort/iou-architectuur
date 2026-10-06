@@ -2,17 +2,19 @@
 component: Linked Data Explorer
 ---
 
-# API Specification (v1)
+# API Specification (v2)
 
 <!--
-  Provenance banner. /v1/openapi.json carries info.version, taken from the
-  backend's package.json at build time, but no environment and no build. The
+  Provenance banner. /v2/openapi.json, like /v1/openapi.json, carries
+  info.version, taken from the backend's package.json at build time, but no
+  environment and no build. Health has no /v2 route, so the banner reads
+  /v1/health — the same running process serves both documents. The
   banner therefore reads /v1/health, which reports the version, environment
   and build of the running process. The document is read lazily, so for a
   moment after a zip deploy it can come from a newer artifact than the process
   /v1/health describes.
 
-  Unlike /v1/openapi.json — a public mount with wildcard CORS — /v1/health goes
+  Unlike /v2/openapi.json — a public mount with wildcard CORS — /v1/health goes
   through the CORS_ORIGIN allowlist. Both deployed documentation tiers are on
   it; localhost is not, so under `mkdocs serve` this banner stays hidden. That
   is intended: it degrades to nothing rather than to an error.
@@ -44,13 +46,14 @@ component: Linked Data Explorer
 </script>
 
 Fetched live from the acceptance API, so it always shows what the service
-declares right now. Every `/v1` route is described — the backend's tests fail
+declares right now. Every `/v2` route is described — the backend's tests fail
 when one is not. **Test Request** calls acceptance and never production, on
 purpose.
 
-This reference renders `/v1/openapi.json`. The `/v2` routes have their own
-document, rendered the same way on [API Specification (v2)](api-specification-v2.md);
-see the [stability contract](api-stability.md#v2norms) for what `/v2/norms` returns.
+This reference renders `/v2/openapi.json`. The `/v1` routes have their own
+document, rendered the same way on [API Specification (v1)](api-specification.md);
+`/v1/norms` is deprecated in favour of `/v2/norms` — see the
+[stability contract](api-stability.md#v2norms).
 
 For base URLs, the `/api/*` legacy aliases and the error format, see
 [Backend Architecture](../developer/backend.md#api-versioning). For how this
@@ -59,7 +62,7 @@ page is wired and what it depends on at run time, see
 
 <script
   id="api-reference"
-  data-url="https://acc.backend.linkeddata.open-regels.nl/v1/openapi.json"
-  data-configuration='{"layout":"classic","withDefaultFonts":false,"hideDownloadButton":false,"showSidebar":true,"servers":[{"url":"https://acc.backend.linkeddata.open-regels.nl/v1","description":"Acceptance"}]}'>
+  data-url="https://acc.backend.linkeddata.open-regels.nl/v2/openapi.json"
+  data-configuration='{"layout":"classic","withDefaultFonts":false,"hideDownloadButton":false,"showSidebar":true,"servers":[{"url":"https://acc.backend.linkeddata.open-regels.nl/v2","description":"Acceptance"}]}'>
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference@1.68.0/dist/browser/standalone.js"></script>

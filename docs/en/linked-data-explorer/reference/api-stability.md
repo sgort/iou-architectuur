@@ -17,7 +17,8 @@ This document is the binding stability contract for consumers of `/v1/norms` and
 ## `/v2/norms`
 
 `/v2/norms` answers the question consumers actually ask: _which norms are in
-force on this date?_
+force on this date?_ Its full description renders on
+[API Specification (v2)](api-specification-v2.md), from `/v2/openapi.json`.
 
 |                         | `/v1/norms`                                                 | `/v2/norms`                                        |
 | ----------------------- | ----------------------------------------------------------- | -------------------------------------------------- |

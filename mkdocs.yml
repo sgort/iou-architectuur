@@ -340,7 +340,8 @@ nav:
         - DMN Validation Reference: linked-data-explorer/reference/dmn-validation-reference.md
         - SHACL Validation Reference: linked-data-explorer/reference/shacl-validation-reference.md
         - API Stability: linked-data-explorer/reference/api-stability.md
-        - API Specification: linked-data-explorer/reference/api-specification.md
+        - API Specification (v1): linked-data-explorer/reference/api-specification.md
+        - API Specification (v2): linked-data-explorer/reference/api-specification-v2.md
         - RONL Ontology: linked-data-explorer/reference/ronl-ontology.md
 
   - 📜 CPRMV API:
