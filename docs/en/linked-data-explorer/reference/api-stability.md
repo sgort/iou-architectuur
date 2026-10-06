@@ -3,7 +3,7 @@
 This document is the binding stability contract for consumers of `/v1/norms` and `/v2/norms`. It defines what consumers can rely on, how to detect change efficiently, and what kinds of changes warrant a major version bump.
 
 !!! warning "`/v1/norms` is deprecated — use `/v2/norms`"
-    `/v1/norms` is deprecated as of **1 November 2026** and will be removed on
+    `/v1/norms` is deprecated from **1 November 2026** and will be removed on
     **1 November 2028** (24 months, per the [deprecation policy](#deprecation-policy)).
     Every v1 response carries `Deprecation: @1793491200`,
     `Sunset: Wed, 01 Nov 2028 00:00:00 GMT` and
@@ -37,10 +37,21 @@ rejected). `applicable_date` is refused with a 400 that points to `valid_on`.
 `rulesetid` or `cprmv_version` sent as an array (`?rulesetid[]=X`) is answered
 with `400 INVALID_PARAM`.
 
-**Caching.** As on v1, plus: the ETag covers the resolved `valid_on`, so it
-changes at midnight even when nothing was republished — a new period may
-have come into force. Without `valid_on`, `max-age` never reaches past the
-next midnight in Europe/Amsterdam.
+**Dataset versions.** For 0.3.x rulesets whose records carry no version,
+`dataset_versions` lists the version-less records, and `[0]` is the most
+recently published of them, not necessarily the record of the period in force.
+
+**Caching.** The ETag is strong and covers three things: the dataset metadata
+of the selected periods, the resolved `valid_on`, and a digest of the content of
+the selected rules. A correction within a period (a higher `rulesetid_index`)
+therefore changes the ETag, and so does midnight, even when nothing was
+republished, because a new period may have come into force. `Last-Modified` is
+omitted when it would be later than the response (a period not yet started),
+so consumers should revalidate with `If-None-Match`; when it is sent,
+`If-Modified-Since` is ignored (RFC 9110 §13.2.2). There is no pre-query 304 for `rulesetid`
+requests on v2: the 304 check runs after the rules query, because the digest
+needs the rules. Without `valid_on`, `max-age` never reaches past the next
+midnight in Europe/Amsterdam.
 
 **Stability.** Within v2, the default (`0.4.1`) response shape, its
 predicate URIs and the `valid_on` semantics do not change; the v2 default
@@ -200,13 +211,14 @@ The server returns `304 Not Modified` with no body when nothing in the response 
 ETag and `Last-Modified` are computed from `published_at`, not `version`; the `version` field is informational metadata for human and UI consumption. For `0.3.0`/`0.3.2`, `published_at` is `dct:issued`, which updates on every publication event and is therefore a reliable change signal (a legacy `null` `version` does not make the data uncacheable).
 
 !!! warning "0.4.1 cache caveat"
-    For `cprmv_version=0.4.1`, `published_at` equals `cprmv:validFrom` (the applicable date),
+    On `/v1/norms` with `cprmv_version=0.4.1`, `published_at` equals `cprmv:validFrom` (the applicable date),
     because the 0.4.1 RuleSet has no `dct:issued`. A re-publish that **keeps the same
     `validFrom`** but corrects rule values does **not** change ETag/`Last-Modified`, so a
-    cached response may be served until `max-age` (1 h) expires. Consumers needing
-    correction-level freshness on `0.4.1` should not rely solely on conditional requests
-    within that window. `0.3.x` is unaffected (`dct:issued` advances on every publish). A
-    planned fix emits a publication timestamp on the 0.4.1 RuleSet.
+    cached response keeps being revalidated as unchanged on **`/v1/norms`**: the ETag does not
+    change until a later period is published. Consumers needing correction-level freshness on
+    `0.4.1` should use [`/v2/norms`](#v2norms), whose ETag also covers the content of the
+    selected rules, so a correction within a period changes it. `0.3.x` is unaffected
+    (`dct:issued` advances on every publish).
 
 #### Partial-coverage behaviour
 
@@ -232,7 +244,7 @@ The following would break the v2 contract and would be released as `/v3/norms`, 
 With the introduction of `/v2/norms`:
 
 - `/v1/norms` remains available for **at least 24 months** after `/v2/norms` is published
-- During deprecation, `/v1/norms` responses include `Deprecation: @1793491200` (1 November 2026) and `Sunset: Wed, 01 Nov 2028 00:00:00 GMT` headers per RFC 8594, and a `Link: </v2/norms>; rel="successor-version"` header
+- During deprecation, `/v1/norms` responses include `Deprecation: @1793491200` (1 November 2026) and `Sunset: Wed, 01 Nov 2028 00:00:00 GMT` headers (`Deprecation` per RFC 9745, `Sunset` per RFC 8594), and a `Link: </v2/norms>; rel="successor-version"` header
 - Active consumers will be notified via the IOU Architecture documentation site and the changelog
 
 ## Quick reference for consumers
@@ -240,7 +252,7 @@ With the introduction of `/v2/norms`:
 | Question | Answer |
 |----------|--------|
 | Can I cache a rule's values indefinitely? | Yes, keyed by `(rulesetid, applicable_date, rulesetid_index)` |
-| How do I detect new publications efficiently? | Use `If-None-Match` with the previous `ETag` — `304` means nothing changed |
+| How do I detect new publications efficiently? | Use `If-None-Match` with the previous `ETag` — `304` means nothing changed (on `/v1/norms` with `cprmv_version=0.4.1`, a correction within a period is not detected; use `/v2/norms`) |
 | Which `cprmv_version` should I request? | On `/v2/norms`, omit it for the stable default (`0.4.1`). On the deprecated `/v1/norms`, the default is `0.3.0`, where the editor no longer publishes new periods. |
 | How do I get the norms in force on a date? | `GET /v2/norms?valid_on=YYYY-MM-DD`; omit `valid_on` for today. |
 | What if a rulesetid is missing from `dataset_versions`? | That ruleset has no version record yet (a `cprmv:Dataset` for 0.3.x / a `cprmv:RuleSet` for 0.4.1); do not cache |

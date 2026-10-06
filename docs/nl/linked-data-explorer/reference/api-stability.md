@@ -37,10 +37,22 @@ die naar `valid_on` verwijst. `rulesetid`, `cprmv_version` en `endpoint`
 werken zoals op v1; op beide versies wordt een `rulesetid` of `cprmv_version`
 die als array binnenkomt (`?rulesetid[]=X`) beantwoord met `400 INVALID_PARAM`.
 
-**Caching.** Als op v1, plus: de ETag dekt de gebruikte `valid_on`, dus hij
-verandert om middernacht, ook als er niets opnieuw is gepubliceerd — er kan
-een nieuwe periode zijn ingegaan. Zonder `valid_on` reikt `max-age` nooit
-voorbij de eerstvolgende middernacht in Europe/Amsterdam.
+**Datasetversies.** Voor 0.3.x-regelsets waarvan de records geen versie
+dragen, bevat `dataset_versions` de records zonder versie, en is `[0]` de
+meest recent gepubliceerde daarvan, niet noodzakelijk het record van de
+geldende periode.
+
+**Caching.** De ETag is strong en dekt drie dingen: de datasetmetadata van de
+gekozen perioden, de gebruikte `valid_on` en een digest van de inhoud van de
+gekozen regels. Een correctie binnen een periode (een hogere
+`rulesetid_index`) verandert dus de ETag, en middernacht ook, zelfs als er
+niets opnieuw is gepubliceerd, want er kan een nieuwe periode zijn ingegaan.
+`Last-Modified` ontbreekt wanneer die na het moment van het antwoord zou liggen
+(een periode die nog niet is begonnen); revalideer daarom met `If-None-Match`; wordt die meegestuurd, dan wordt
+`If-Modified-Since` genegeerd (RFC 9110 §13.2.2). Op v2 is er geen
+304 vóór de query voor `rulesetid`-requests: de 304-check draait na de
+rules-query, omdat de digest de regels nodig heeft. Zonder `valid_on` reikt
+`max-age` nooit voorbij de eerstvolgende middernacht in Europe/Amsterdam.
 
 **Stabiliteit.** Binnen v2 veranderen de vorm van het default-antwoord
 (`0.4.1`), de predicaat-URI's en de betekenis van `valid_on` niet; de
@@ -201,13 +213,14 @@ De server retourneert `304 Not Modified` zonder body wanneer er sinds de laatste
 ETag en `Last-Modified` worden berekend uit `published_at`, niet uit `version`; het veld `version` is informatieve metadata voor menselijke en UI-consumptie. Voor `0.3.0`/`0.3.2` is `published_at` gelijk aan `dct:issued`, dat bij elke publicatiegebeurtenis wordt bijgewerkt en daarmee een betrouwbaar wijzigingssignaal is (een legacy-`null` voor `version` maakt de data niet on-cachebaar).
 
 !!! warning "0.4.1-cachekanttekening"
-    Voor `cprmv_version=0.4.1` is `published_at` gelijk aan `cprmv:validFrom` (de toepasselijke
+    Op `/v1/norms` met `cprmv_version=0.4.1` is `published_at` gelijk aan `cprmv:validFrom` (de toepasselijke
     datum), omdat de 0.4.1-RuleSet geen `dct:issued` heeft. Een herpublicatie die **dezelfde
     `validFrom` behoudt** maar regelwaarden corrigeert, verandert de ETag/`Last-Modified`
-    **niet**, dus een gecachete respons kan tot `max-age` (1 u) worden geserveerd. Afnemers die
-    op `0.4.1` correctie-actuele data nodig hebben, moeten binnen dat venster niet uitsluitend op
-    conditionele requests vertrouwen. `0.3.x` wordt niet geraakt (`dct:issued` loopt op bij elke
-    publicatie). Een geplande fix emit een publicatietijdstempel op de 0.4.1-RuleSet.
+    **niet**, dus een gecachete respons blijft op **`/v1/norms`** als ongewijzigd gevalideerd: de ETag
+    verandert pas als een latere periode wordt gepubliceerd. Afnemers die op `0.4.1`
+    correctie-actuele data nodig hebben, gebruiken [`/v2/norms`](#v2norms), waarvan de ETag ook
+    de inhoud van de gekozen regels dekt, zodat een correctie binnen een periode hem wijzigt.
+    `0.3.x` wordt niet geraakt (`dct:issued` loopt op bij elke publicatie).
 
 #### Gedrag bij gedeeltelijke dekking
 
@@ -233,7 +246,7 @@ Het volgende zou het v2-contract doorbreken en zou worden uitgebracht als `/v3/n
 Met de introductie van `/v2/norms`:
 
 - `/v1/norms` blijft beschikbaar gedurende **ten minste 24 maanden** na publicatie van `/v2/norms`
-- Tijdens de uitfasering bevatten `/v1/norms`-responsen de headers `Deprecation: @1793491200` (1 november 2026) en `Sunset: Wed, 01 Nov 2028 00:00:00 GMT` conform RFC 8594, plus een `Link: </v2/norms>; rel="successor-version"`-header
+- Tijdens de uitfasering bevatten `/v1/norms`-responsen de headers `Deprecation: @1793491200` (1 november 2026) en `Sunset: Wed, 01 Nov 2028 00:00:00 GMT` (`Deprecation` conform RFC 9745, `Sunset` conform RFC 8594), plus een `Link: </v2/norms>; rel="successor-version"`-header
 - Actieve afnemers worden geïnformeerd via de documentatiesite van het IOU Architectuur en de changelog
 
 ## Snelle referentie voor afnemers
@@ -241,7 +254,7 @@ Met de introductie van `/v2/norms`:
 | Vraag | Antwoord |
 |-------|----------|
 | Mag ik de waarden van een regel onbeperkt cachen? | Ja, gekeyd op `(rulesetid, applicable_date, rulesetid_index)` |
-| Hoe detecteer ik nieuwe publicaties efficiënt? | Gebruik `If-None-Match` met de vorige `ETag` — `304` betekent dat er niets is gewijzigd |
+| Hoe detecteer ik nieuwe publicaties efficiënt? | Gebruik `If-None-Match` met de vorige `ETag` — `304` betekent dat er niets is gewijzigd (op `/v1/norms` met `cprmv_version=0.4.1` wordt een correctie binnen een periode niet gedetecteerd; gebruik `/v2/norms`) |
 | Welke `cprmv_version` moet ik opvragen? | Op `/v2/norms`: laat hem weg voor de stabiele default (`0.4.1`). Op het uitgefaseerde `/v1/norms` is de default `0.3.0`, waarin de editor geen nieuwe perioden meer publiceert. |
 | Hoe krijg ik de normen die op een datum gelden? | `GET /v2/norms?valid_on=JJJJ-MM-DD`; laat `valid_on` weg voor vandaag. |
 | Wat als een rulesetid ontbreekt in `dataset_versions`? | Die regelset heeft nog geen versierecord (een `cprmv:Dataset` voor 0.3.x / een `cprmv:RuleSet` voor 0.4.1); niet cachen |
