@@ -206,6 +206,16 @@ Runs a SPARQL query against a caller-supplied endpoint. **Every query the fronte
 
 ### Norms
 
+#### `GET /v2/norms`
+
+```
+GET /v2/norms?valid_on={YYYY-MM-DD}&rulesetid={ruleset}&cprmv_version={0.3.0|0.3.2|0.4.1}&endpoint={url}
+```
+
+The norms in force on `valid_on` (default: today, Europe/Amsterdam), in CPRMV `0.4.1` unless another version is requested. Per ruleset, the rules of the latest period starting on or before `valid_on`. Same envelope as v1 plus `valid_on`; `dataset_versions` is narrowed to the selected periods. Implemented as `getNormsInForce` in `norms.service.ts` (the date selection runs in code, not SPARQL) and `norms.v2.routes.ts`; described in `openapi/openapi.v2.yaml`, served at `/v2/openapi.json`. See the [stability contract](../reference/api-stability.md#v2norms).
+
+`/v1/norms` below is deprecated (sunset 2028-11-01) and carries `Deprecation`, `Sunset` and `Link` headers.
+
 ```
 GET /v1/norms?endpoint={url}&rulesetid={ruleset}&applicable_date={YYYY-MM-DD}&cprmv_version={0.3.0|0.3.2|0.4.1}
 ```
@@ -321,6 +331,8 @@ Dataset metadata is cached in-memory for 60 seconds, keyed by endpoint URL **and
 | `rulesetid`       | Exact-match filter on `cprmv:rulesetId` (e.g. `BWBR0015703`). Must match `/^[A-Za-z0-9_-]+$/` or the request is rejected with `400 INVALID_PARAM`.                   |
 | `applicable_date` | Filter on the dated segment of `cprmv:ruleIdPath` (e.g. `2026-01-01` matches paths containing `_2026-01-01_`). Must match `/^\d{4}-\d{2}-\d{2}$/` or `400`.          |
 | `cprmv_version`   | CPRMV vocabulary version to query and emit: one of `0.3.0`, `0.3.2`, `0.4.1` (else `400 INVALID_PARAM`). Defaults to `0.3.0`. Selects the `cprmv:` namespace and the metadata model (`cprmv:Dataset` vs `cprmv:RuleSet`) — see the **CPRMV version selection** subsection above. |
+
+A `rulesetid` or `cprmv_version` that arrives as an array (`?rulesetid[]=X`) is rejected with `400 INVALID_PARAM`, on `/v1/norms` and `/v2/norms` alike.
 
 Validated filter values are applied as SPARQL `FILTER` clauses server-side: exact-match on `?rulesetId` and `CONTAINS(STR(?ruleIdPath), "_<date>_")`. Filters are interpolated only after passing the regex gate, making SPARQL injection impossible. `cprmv_version` selects a namespace rather than a filter, so it is validated against the supported set rather than a character-class regex.
 

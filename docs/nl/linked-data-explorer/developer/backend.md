@@ -196,6 +196,16 @@ Voert een SPARQL-query uit tegen een door de aanroeper opgegeven endpoint. **Elk
 
 ### Normen
 
+#### `GET /v2/norms`
+
+```
+GET /v2/norms?valid_on={YYYY-MM-DD}&rulesetid={ruleset}&cprmv_version={0.3.0|0.3.2|0.4.1}&endpoint={url}
+```
+
+De normen die gelden op `valid_on` (default: vandaag, Europe/Amsterdam), in CPRMV `0.4.1` tenzij een andere versie wordt gevraagd. Per regelset de regels van de laatste periode die op of vóór `valid_on` begint. Dezelfde envelop als v1 plus `valid_on`; `dataset_versions` is beperkt tot de geselecteerde perioden. Geïmplementeerd als `getNormsInForce` in `norms.service.ts` (de datumselectie draait in code, niet in SPARQL) en `norms.v2.routes.ts`; beschreven in `openapi/openapi.v2.yaml`, geserveerd op `/v2/openapi.json`. Zie het [stabiliteitscontract](../reference/api-stability.md#v2norms).
+
+`/v1/norms` hieronder is uitgefaseerd (sunset 2028-11-01) en stuurt `Deprecation`-, `Sunset`- en `Link`-headers mee.
+
 ```
 GET /v1/norms?endpoint={url}&rulesetid={ruleset}&applicable_date={YYYY-MM-DD}&cprmv_version={0.3.0|0.3.2|0.4.1}
 ```
@@ -311,6 +321,8 @@ Dataset-metadata wordt 60 seconden in-memory gecached, gekeyd op endpoint-URL **
 | `rulesetid`       | Filter op exact-match van `cprmv:rulesetId` (bijv. `BWBR0015703`). Moet voldoen aan `/^[A-Za-z0-9_-]+$/`, anders wordt de request afgewezen met `400 INVALID_PARAM`.  |
 | `applicable_date` | Filter op het gedateerde segment van `cprmv:ruleIdPath` (bijv. `2026-01-01` matcht paden die `_2026-01-01_` bevatten). Moet voldoen aan `/^\d{4}-\d{2}-\d{2}$/` of `400`. |
 | `cprmv_version`   | CPRMV-vocabulaireversie om te bevragen en uit te leveren: een van `0.3.0`, `0.3.2`, `0.4.1` (anders `400 INVALID_PARAM`). Default `0.3.0`. Selecteert de `cprmv:`-namespace en het metadatamodel (`cprmv:Dataset` vs `cprmv:RuleSet`) — zie de subsectie **CPRMV-versieselectie** hierboven. |
+
+Een `rulesetid` of `cprmv_version` die als array binnenkomt (`?rulesetid[]=X`) wordt afgewezen met `400 INVALID_PARAM`, op zowel `/v1/norms` als `/v2/norms`.
 
 Gevalideerde filterwaarden worden server-side toegepast als SPARQL `FILTER`-clauses: exact-match op `?rulesetId` en `CONTAINS(STR(?ruleIdPath), "_<date>_")`. Filters worden pas geïnterpoleerd na het passeren van de regex-poort, waardoor SPARQL-injectie onmogelijk is.
 

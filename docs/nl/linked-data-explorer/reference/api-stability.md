@@ -1,10 +1,58 @@
-# API-stabiliteitscontract — `/v1/norms`
+# API-stabiliteitscontract — `/v1/norms` en `/v2/norms`
 
-Dit document is het bindende stabiliteitscontract voor afnemers van `/v1/norms`. Het definieert waar afnemers op kunnen vertrouwen, hoe wijzigingen efficiënt te detecteren zijn, en welke soorten wijzigingen een major versie-update rechtvaardigen.
+Dit document is het bindende stabiliteitscontract voor afnemers van `/v1/norms` en `/v2/norms`. Het definieert waar afnemers op kunnen vertrouwen, hoe wijzigingen efficiënt te detecteren zijn, en welke soorten wijzigingen een major versie-update rechtvaardigen.
+
+!!! warning "`/v1/norms` is uitgefaseerd — gebruik `/v2/norms`"
+    `/v1/norms` is uitgefaseerd per **1 november 2026** en verdwijnt op
+    **1 november 2028** (24 maanden, volgens het [uitfaseringsbeleid](#uitfaseringsbeleid)).
+    Elk v1-antwoord bevat `Deprecation: @1793491200`,
+    `Sunset: Wed, 01 Nov 2028 00:00:00 GMT` en
+    `Link: </v2/norms>; rel="successor-version"`. Tot de sunset gedraagt v1
+    zich precies zoals hieronder beschreven.
+
+## `/v2/norms`
+
+`/v2/norms` beantwoordt de vraag die afnemers werkelijk stellen: _welke normen
+gelden op deze datum?_
+
+|                         | `/v1/norms`                                                          | `/v2/norms`                                                |
+| ----------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Default `cprmv_version` | `0.3.0`                                                              | `0.4.1`                                                    |
+| Datumparameter          | `applicable_date`: exacte match op de **begindatum** van een periode | `valid_on`: de normen die op die datum **gelden**          |
+| Zonder datum            | alle perioden van alle regelsets                                     | geldend **vandaag** (Europe/Amsterdam)                     |
+| `dataset_versions`      | alle records van elke regelset in het antwoord                       | de records van de geldende periode                         |
+| Envelop                 | —                                                                    | voegt `valid_on` toe, de datum waarvoor het antwoord geldt |
+
+**Selectie.** Per regelset geeft `/v2/norms` de regels van de laatste periode
+waarvan de begindatum (`applicable_date`) op of vóór `valid_on` ligt. Een
+periode blijft gelden tot dezelfde regelset een latere publiceert.
+Regelsets waarvan alle perioden na `valid_on` beginnen, ontbreken. Een
+antwoord mengt dus perioden: op 2026-08-15 bevat het BWBR0002471 vanaf
+2026-02-21, BWBR0015711 vanaf 2026-01-01 en de regelsets waarvan de periode
+op 2026-07-01 begint.
+
+**Parameters.** `valid_on` moet een bestaande kalenderdatum zijn
+(`2026-02-30` wordt geweigerd). `applicable_date` wordt geweigerd met een 400
+die naar `valid_on` verwijst. `rulesetid`, `cprmv_version` en `endpoint`
+werken zoals op v1; op beide versies wordt een `rulesetid` of `cprmv_version`
+die als array binnenkomt (`?rulesetid[]=X`) beantwoord met `400 INVALID_PARAM`.
+
+**Caching.** Als op v1, plus: de ETag dekt de gebruikte `valid_on`, dus hij
+verandert om middernacht, ook als er niets opnieuw is gepubliceerd — er kan
+een nieuwe periode zijn ingegaan. Zonder `valid_on` reikt `max-age` nooit
+voorbij de eerstvolgende middernacht in Europe/Amsterdam.
+
+**Stabiliteit.** Binnen v2 veranderen de vorm van het default-antwoord
+(`0.4.1`), de predicaat-URI's en de betekenis van `valid_on` niet; de
+defaultversie van v2 verandert pas met een `/v3/norms`. `0.3.0` en `0.3.2`
+blijven op v2 selecteerbaar, zonder die garantie. De primaire sleutel
+`(rulesetid, applicable_date, rulesetid_index)` en de regels voor additieve
+evolutie hieronder gelden voor v2 net als voor v1. De OpenAPI-beschrijving
+staat op `/v2/openapi.json`.
 
 ## Doelgroep
 
-Dit contract richt zich op **G2G-afnemers** — andere Nederlandse overheidsdiensten die `/v1/norms` integreren om `cprmv:Rule`-paden en normen af te nemen. Externe afnemers kunnen op basis van dit contract langetermijnintegraties bouwen zonder vrees voor breuk binnen v1.
+Dit contract richt zich op **G2G-afnemers** — andere Nederlandse overheidsdiensten die `/v1/norms` of `/v2/norms` integreren om `cprmv:Rule`-paden en normen af te nemen. Externe afnemers kunnen op basis van dit contract langetermijnintegraties bouwen zonder vrees voor breuk binnen een major versie.
 
 ## De vier versielagen
 
@@ -27,6 +75,9 @@ Alleen de eerste drie maken deel uit van het afnemerscontract. De `API-Version`-
     wijziging binnen v1.
 
 ## Stabiliteitsbelofte binnen v1
+
+!!! note "Reikwijdte"
+    Deze sectie en de volgende beschrijven het uitgefaseerde `/v1/norms`. `/v2/norms` wordt gedekt door de sectie [`/v2/norms`](#v2norms) hierboven.
 
 ### Primaire-sleutelsemantiek
 
@@ -168,9 +219,9 @@ Wanneer **een** rulesetid in de respons een versierecord mist (een `cprmv:Datase
 
 Rationale: we kunnen een wijziging in een niet-versie-gebonden regelset niet betrouwbaar detecteren. Een 304 retourneren in dat geval zou het risico van verouderde data opleveren, dus vertellen we afnemers altijd opnieuw op te halen. Naarmate meer BWB-regelsets worden gepubliceerd met versiemetadata, treedt caching geleidelijk in werking voor queries die uitsluitend versie-gebonden regelsets bestrijken.
 
-## Wat rechtvaardigt `/v2/norms`
+## Wat rechtvaardigt `/v3/norms`
 
-Het volgende zou het v1-contract doorbreken en zou worden uitgebracht als `/v2/norms`, terwijl `/v1/norms` levend wordt gehouden gedurende een uitfaseringsperiode:
+Het volgende zou het v2-contract doorbreken en zou worden uitgebracht als `/v3/norms`, terwijl `/v2/norms` levend wordt gehouden gedurende een uitfaseringsperiode. Dezelfde regels zijn de reden dat de v1-default (`0.3.0`) niet ter plekke kon veranderen en `/v2/norms` is geïntroduceerd:
 
 - Een bestaand veld verwijderen of hernoemen
 - Het type of de semantiek van een bestaand veld wijzigen
@@ -179,10 +230,10 @@ Het volgende zou het v1-contract doorbreken en zou worden uitgebracht als `/v2/n
 
 ## Uitfaseringsbeleid
 
-Wanneer `/v2/norms` uiteindelijk wordt geïntroduceerd:
+Met de introductie van `/v2/norms`:
 
 - `/v1/norms` blijft beschikbaar gedurende **ten minste 24 maanden** na publicatie van `/v2/norms`
-- Tijdens de uitfasering bevatten `/v1/norms`-responsen de headers `Deprecation: <date>` en `Sunset: <date>` conform RFC 8594
+- Tijdens de uitfasering bevatten `/v1/norms`-responsen de headers `Deprecation: @1793491200` (1 november 2026) en `Sunset: Wed, 01 Nov 2028 00:00:00 GMT` conform RFC 8594, plus een `Link: </v2/norms>; rel="successor-version"`-header
 - Actieve afnemers worden geïnformeerd via de documentatiesite van het IOU Architectuur en de changelog
 
 ## Snelle referentie voor afnemers
@@ -191,7 +242,8 @@ Wanneer `/v2/norms` uiteindelijk wordt geïntroduceerd:
 |-------|----------|
 | Mag ik de waarden van een regel onbeperkt cachen? | Ja, gekeyd op `(rulesetid, applicable_date, rulesetid_index)` |
 | Hoe detecteer ik nieuwe publicaties efficiënt? | Gebruik `If-None-Match` met de vorige `ETag` — `304` betekent dat er niets is gewijzigd |
-| Welke `cprmv_version` moet ik opvragen? | Laat hem weg voor de stabiele default (`0.3.0`). Stuur `?cprmv_version=0.3.2` of `0.4.1` alleen als u die namespace specifiek wilt — deze zijn **experimenteel** en vallen **niet** onder de v1-garantie (kunnen wijzigen/ingetrokken worden zonder `/v2/`). Alleen de vorm en predicate-URI's van de default zijn contractstabiel binnen v1. |
+| Welke `cprmv_version` moet ik opvragen? | Op `/v2/norms`: laat hem weg voor de stabiele default (`0.4.1`). Op het uitgefaseerde `/v1/norms` is de default `0.3.0`, waarin de editor geen nieuwe perioden meer publiceert. |
+| Hoe krijg ik de normen die op een datum gelden? | `GET /v2/norms?valid_on=JJJJ-MM-DD`; laat `valid_on` weg voor vandaag. |
 | Wat als een rulesetid ontbreekt in `dataset_versions`? | Die regelset heeft nog geen versierecord (een `cprmv:Dataset` voor 0.3.x / een `cprmv:RuleSet` voor 0.4.1); niet cachen |
 | Wat betekent `Cache-Control: no-cache` hier? | Ten minste één rulesetid in uw query is niet versie-gebonden — telkens opnieuw ophalen |
 | Wat betekent `version: null`? | Legacy-data gepubliceerd vóór CPSV editor v1.10.5 — de niet-primaire versie was onbekend. Actuele data versioneert **elke** regelset, dus `null` is zeldzaam. `published_at` blijft gezaghebbend voor wijzigingsdetectie (met de [0.4.1-kanttekening](#publicaties-detecteren)). |

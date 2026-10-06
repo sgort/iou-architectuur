@@ -1,10 +1,58 @@
-# API Stability Contract — `/v1/norms`
+# API Stability Contract — `/v1/norms` and `/v2/norms`
 
-This document is the binding stability contract for consumers of `/v1/norms`. It defines what consumers can rely on, how to detect change efficiently, and what kinds of changes warrant a major version bump.
+This document is the binding stability contract for consumers of `/v1/norms` and `/v2/norms`. It defines what consumers can rely on, how to detect change efficiently, and what kinds of changes warrant a major version bump.
+
+!!! warning "`/v1/norms` is deprecated — use `/v2/norms`"
+    `/v1/norms` is deprecated as of **1 November 2026** and will be removed on
+    **1 November 2028** (24 months, per the [deprecation policy](#deprecation-policy)).
+    Every v1 response carries `Deprecation: @1793491200`,
+    `Sunset: Wed, 01 Nov 2028 00:00:00 GMT` and
+    `Link: </v2/norms>; rel="successor-version"`. Until the sunset, v1 behaves
+    exactly as described below.
+
+## `/v2/norms`
+
+`/v2/norms` answers the question consumers actually ask: _which norms are in
+force on this date?_
+
+|                         | `/v1/norms`                                                 | `/v2/norms`                                        |
+| ----------------------- | ----------------------------------------------------------- | -------------------------------------------------- |
+| Default `cprmv_version` | `0.3.0`                                                     | `0.4.1`                                            |
+| Date parameter          | `applicable_date`: exact match on a period's **start** date | `valid_on`: the norms **in force** on that date    |
+| Date omitted            | every period of every ruleset                               | in force **today** (Europe/Amsterdam)              |
+| `dataset_versions`      | every record of each ruleset in the response                | the records of the period in force                 |
+| Envelope                | —                                                           | adds `valid_on`, the date the response answers for |
+
+**Selection.** For each ruleset, `/v2/norms` returns the rules of the latest
+period whose start date (`applicable_date`) is on or before `valid_on`. A
+period stays in force until the same ruleset publishes a later one. Rulesets
+whose periods all start after `valid_on` are absent. A response therefore
+mixes periods: on 2026-08-15 it holds BWBR0002471 from 2026-02-21,
+BWBR0015711 from 2026-01-01 and the rulesets whose period starts on
+2026-07-01.
+
+**Parameters.** `valid_on` must be a real calendar date (`2026-02-30` is
+rejected). `applicable_date` is refused with a 400 that points to `valid_on`.
+`rulesetid`, `cprmv_version` and `endpoint` behave as on v1; on both versions a
+`rulesetid` or `cprmv_version` sent as an array (`?rulesetid[]=X`) is answered
+with `400 INVALID_PARAM`.
+
+**Caching.** As on v1, plus: the ETag covers the resolved `valid_on`, so it
+changes at midnight even when nothing was republished — a new period may
+have come into force. Without `valid_on`, `max-age` never reaches past the
+next midnight in Europe/Amsterdam.
+
+**Stability.** Within v2, the default (`0.4.1`) response shape, its
+predicate URIs and the `valid_on` semantics do not change; the v2 default
+version changes only with a `/v3/norms`. `0.3.0` and `0.3.2` remain
+selectable on v2 without that guarantee. The primary key
+`(rulesetid, applicable_date, rulesetid_index)` and the additive-evolution
+rules below hold for v2 as for v1. The OpenAPI description is at
+`/v2/openapi.json`.
 
 ## Audience
 
-This contract is aimed at **G2G consumers** — other Dutch government services integrating `/v1/norms` to consume `cprmv:Rule` paths and norms. External consumers can build long-term integrations against this contract without fear of breakage within v1.
+This contract is aimed at **G2G consumers** — other Dutch government services integrating `/v1/norms` or `/v2/norms` to consume `cprmv:Rule` paths and norms. External consumers can build long-term integrations against this contract without fear of breakage within a major version.
 
 ## The four versioning layers
 
@@ -27,6 +75,9 @@ Only the first three are part of the consumer contract. The `API-Version` header
     change within v1.
 
 ## Stability promise within v1
+
+!!! note "Scope"
+    This section and the ones that follow describe the deprecated `/v1/norms`. `/v2/norms` is covered by the [`/v2/norms`](#v2norms) section above.
 
 ### Primary key semantics
 
@@ -167,9 +218,9 @@ When **any** rulesetid in the response lacks a version record (a `cprmv:Dataset`
 
 Rationale: we cannot reliably detect a change in an unversioned ruleset. Returning a 304 in that case would risk serving stale data, so we tell consumers to always refetch. As more BWB rulesets are published with version metadata, caching kicks in progressively for queries that span only versioned rulesets.
 
-## What warrants `/v2/norms`
+## What warrants `/v3/norms`
 
-The following would break the v1 contract and would be released as `/v2/norms`, with `/v1/norms` kept alive for a deprecation window:
+The following would break the v2 contract and would be released as `/v3/norms`, with `/v2/norms` kept alive for a deprecation window. The same rules are why the v1 default (`0.3.0`) could not change in place and `/v2/norms` was introduced instead:
 
 - Removing or renaming an existing field
 - Changing the type or semantics of an existing field
@@ -178,10 +229,10 @@ The following would break the v1 contract and would be released as `/v2/norms`, 
 
 ## Deprecation policy
 
-When `/v2/norms` is eventually introduced:
+With the introduction of `/v2/norms`:
 
 - `/v1/norms` remains available for **at least 24 months** after `/v2/norms` is published
-- During deprecation, `/v1/norms` responses include `Deprecation: <date>` and `Sunset: <date>` headers per RFC 8594
+- During deprecation, `/v1/norms` responses include `Deprecation: @1793491200` (1 November 2026) and `Sunset: Wed, 01 Nov 2028 00:00:00 GMT` headers per RFC 8594, and a `Link: </v2/norms>; rel="successor-version"` header
 - Active consumers will be notified via the IOU Architecture documentation site and the changelog
 
 ## Quick reference for consumers
@@ -190,7 +241,8 @@ When `/v2/norms` is eventually introduced:
 |----------|--------|
 | Can I cache a rule's values indefinitely? | Yes, keyed by `(rulesetid, applicable_date, rulesetid_index)` |
 | How do I detect new publications efficiently? | Use `If-None-Match` with the previous `ETag` — `304` means nothing changed |
-| Which `cprmv_version` should I request? | Omit it for the stable default (`0.3.0`). Send `?cprmv_version=0.3.2` or `0.4.1` only if you specifically want that namespace — these are **experimental** and **not** covered by the v1 guarantee (may change/withdraw without `/v2/`). Only the default's shape and predicate URIs are contract-stable within v1. |
+| Which `cprmv_version` should I request? | On `/v2/norms`, omit it for the stable default (`0.4.1`). On the deprecated `/v1/norms`, the default is `0.3.0`, where the editor no longer publishes new periods. |
+| How do I get the norms in force on a date? | `GET /v2/norms?valid_on=YYYY-MM-DD`; omit `valid_on` for today. |
 | What if a rulesetid is missing from `dataset_versions`? | That ruleset has no version record yet (a `cprmv:Dataset` for 0.3.x / a `cprmv:RuleSet` for 0.4.1); do not cache |
 | What does `Cache-Control: no-cache` mean here? | At least one rulesetid in your query is unversioned — refetch every time |
 | What does `version: null` mean? | Legacy data published before CPSV editor v1.10.5 — its non-primary version was unknown. Current data versions **every** ruleset, so `null` is rare. `published_at` remains authoritative for change detection (with the [0.4.1 caveat](#detecting-publications)). |
