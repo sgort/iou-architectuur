@@ -74,8 +74,11 @@ Read at `origin/main` = `dd4728d` (Promote to Production #4); `origin/acc` `85f4
 
 5. **The LDE serves a second public OpenAPI document at `/v2/openapi.json`.**
    Evidence: c5165d6 — `registry.ts`, `publicPaths.ts:15-20`; both documents linted (`lint:openapi`) and smoke-checked
-   by the deploy. The documentation site's API Specification page still renders only `/v1/openapi.json` and points to
-   the second. Bears on: `doc-architecture/openapi-rendering.md`.
+   by the deploy. Since 6 October the documentation site renders it on a second page,
+   `linked-data-explorer/reference/api-specification-v2.md` — the same Scalar setup as the v1 page, `data-url` on
+   `/v2/openapi.json`, a `servers` override on the acceptance `/v2` base (the document lists Production first), and the
+   banner still reading `/v1/health`; `GET /v2/norms` echoes the ACC docs origin, so Test Request works. Bears on:
+   `doc-architecture/openapi-rendering.md`, which describes one rendered document per component.
 
 6. **The LDE raised its engines floor rather than widening it.**
    Evidence: root and backend `package.json` `engines.node` `>=24.21.0` (v2026.10.1); RBA stays `>=22`.
