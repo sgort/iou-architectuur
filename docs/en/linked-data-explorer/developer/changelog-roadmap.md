@@ -8,6 +8,30 @@ component: Linked Data Explorer
 
 ## Changelog
 
+### v2026.10.1 — The Norms in Force on a Date, and a Lockfile Review on Every Dependency Change (October 2026)
+
+> The contract: [API Stability](../reference/api-stability.md#v2norms). How it is built: [Backend](backend.md). The Modeler fixes: [BPMN Modeler](bpmn-modeler.md). The pipeline: [Deployment](deployment.md). Measured suites: [Testing](testing.md).
+
+**`/v2/norms` answers which norms apply on a date.** `GET /v2/norms` takes `valid_on` — today in Amsterdam when left out — and returns, per ruleset, the period in force on that date: the latest one that began on or before it. It speaks CPRMV 0.4.1 by default, narrows `dataset_versions` to what the period carries, and refuses `applicable_date` with a 400 that names `valid_on` instead. A response is cacheable until Amsterdam midnight at the latest, when the answer may change.
+
+**Conditional requests that see a correction.** On `/v2/norms` the ETag signs the date and a digest of the rules themselves, so a correction made within a period changes it and a revalidating client gets the new answer rather than a 304. `Last-Modified` is never in the future, and `If-None-Match` takes precedence over `If-Modified-Since`. `/v1/norms` keeps its behaviour unchanged.
+
+**`/v1/norms` is deprecated.** Every `/v1/norms` response — errors included — carries `Deprecation` (1 November 2026), `Sunset` (1 November 2028) and a `Link` to its successor, and the OpenAPI document marks the operation deprecated.
+
+**A second OpenAPI document.** The `/v2` routes are described at `/v2/openapi.json`. Both documents are built, linted against the NL API Design Rules and shipped with the backend, the coverage gate runs once per major version, and the deploy's smoke test checks that the v2 document's version matches the running backend's.
+
+**The Modeler binds forms to their deployment.** Linking a form now writes `camunda:formRefBinding="deployment"`, which avoids ENGINE-03109 when the same form key is deployed under several tenants — nothing needs editing by hand any more. `ronl:signatureRef` is registered with the moddle descriptor, both deploy paths share one bundle module, and the example document templates re-seed by version, so a changed template reaches a browser that already holds the old one.
+
+**The Kapvergunning bundle is Dutch throughout.** Its forms, its beschikking and its runtime texts are now Dutch, so the bundle no longer mixes languages; the English HR-capacity variant is removed, and the Dutch one stands alone.
+
+**CI runs what the hooks run.** The backend workflow now also runs on changes to the examples and E2E fixtures, so the bundle, parity and fixture tests gate the changes they exist to check, and the required `audit` job runs `check-rip-bpmn`, which now also fingerprints the two declared-phase models the RONL Business API keeps as fixtures.
+
+**A lockfile review on every dependency change.** A new `lockfile-review` job reads a `package-lock.json` change as data and comments on the pull request what it contains: packages added, removed and updated, and — as prompts for the reviewer, never failures — licence changes, new packages outside the licence allow-list in `lockfile-review.json`, new install scripts and downgrades. It fails only on a package resolved from outside the npm registry or recorded without an integrity hash, and it is required on `acc`.
+
+**Also in this release.** A release pull request must carry an SBOM that matches its lockfile (`sbom:check`, run when the pull request changes that version's SBOM); `engines.node` is raised to `>=24.21.0`; and the weekly lockfile refresh.
+
+---
+
 ### v2026.10.0 — A Besluit Under Delegated Authority, and Every Awb Example in Swimlanes (October 2026)
 
 > The new bundle: [Besluitvorming onder gedelegeerde bevoegdheid](../features/besluitvorming-gedelegeerd-bundle.md). Lanes, phases and documents in the Modeler: [BPMN Modeler](bpmn-modeler.md). How the RONL Business API shows it: [Caseworker](../../ronl-business-api/user-guide/caseworker.md#besluitvorming) and [BPMN Design Criteria](../../ronl-business-api/reference/bpmn-design-criteria.md). Measured suites: [Testing](testing.md).

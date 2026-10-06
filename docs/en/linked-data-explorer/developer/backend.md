@@ -15,9 +15,9 @@ The backend is a Node.js/Express TypeScript API. It sits between the React front
 | Production | `https://backend.linkeddata.open-regels.nl/v1` |
 | Acceptance | `https://acc.backend.linkeddata.open-regels.nl/v1` |
 
-All endpoints follow `/v1/*`. The release version is included in every response via the `API-Version` header — `API-Version: 2026.09.6` on acceptance and `2026.09.5` on production at the time of writing, since the two environments can be a release apart — following Dutch Government API Design Rules API-20 and API-57.
+All endpoints follow `/v1/*`, except `/v2/norms` and its description, `/v2/openapi.json`, which take the same hosts with `/v2`. The release version is included in every response via the `API-Version` header — `API-Version: 2026.10.1` on both environments at the time of writing (6 October 2026), though the two can be a release apart — following Dutch Government API Design Rules API-20 and API-57.
 
-**The contract is published.** `GET /v1/openapi.json` serves an OpenAPI 3.1 description of every `/v1` route, built from `packages/backend/openapi/openapi.yaml`. It is the reference for request and response shapes; the [API Specification](../reference/api-specification.md) page renders it. `/v1/openapi.json` is one of three public mounts served to any origin (see [Security](#security)), so any client can read it.
+**The contract is published.** `GET /v1/openapi.json` serves an OpenAPI 3.1 description of every `/v1` route, built from `packages/backend/openapi/openapi.yaml`. `GET /v2/openapi.json` does the same for the `/v2` routes, built from `openapi/openapi.v2.yaml` (`OPENAPI_V2_JSON_PATH` in `openapi/document.ts`, mounted through the route registry). They are the reference for request and response shapes; the [API Specification](../reference/api-specification.md) page renders the v1 document. Both are among the four public mounts served to any origin (see [Security](#security)), so any client can read them.
 
 **Legacy `/api/*` aliases** still answer for backward compatibility, and carry a `Deprecation` header and a `Link` header naming the `/v1` successor. They are to be removed in v2.0.0.
 
@@ -66,7 +66,7 @@ Returns service health: TriplyDB and Operaton latency checks, the SHACL shape la
 
 `version` names the release; `build` names the commit and workflow run, read from the `deploy/build-info.json` the deploy workflow writes into the artifact. `build` is tracked only when both `sha` and `run` are present — a missing or malformed file reports a local build and never affects `status`.
 
-`utils/buildInfo.ts` reads `build-info.json` **once, at module load**, the same moment `version` is bound from `package.json`, so the two cannot disagree: a stale process can only report the build it started with. The read is deliberately not lazy. A zip deploy overwrites `build-info.json` while the previous process is still serving and restarts it afterwards, so a read on first use let the old process report the new `build.sha` — a false pass in the deploy gate, seen on the v2026.09.6 production promotion, where `build.sha` showed the new commit while `version` still read 2026.09.5. Eager reading closes that since v2026.09.7. `/v1/openapi.json` stays lazy on purpose: it reads its document on the first request and caches it, but does not cache a failed read, so a document that is not built yet is retried and surfaces as a `500` rather than being remembered as broken.
+`utils/buildInfo.ts` reads `build-info.json` **once, at module load**, the same moment `version` is bound from `package.json`, so the two cannot disagree: a stale process can only report the build it started with. The read is deliberately not lazy. A zip deploy overwrites `build-info.json` while the previous process is still serving and restarts it afterwards, so a read on first use let the old process report the new `build.sha` — a false pass in the deploy gate, seen on the v2026.09.6 production promotion, where `build.sha` showed the new commit while `version` still read 2026.09.5. Eager reading closes that since v2026.09.7. `/v1/openapi.json` and `/v2/openapi.json` stay lazy on purpose (both come from `createOpenApiRouter`, the v2 one with `readOpenApiV2Document`): each reads its document on the first request and caches it, but does not cache a failed read, so a document that is not built yet is retried and surfaces as a `500` rather than being remembered as broken.
 
 The deploy workflows wait until `build.sha` equals the commit they deployed and `shacl.complete` is `true` before they pass; see [Post-deployment verification](deployment.md#post-deployment-verification).
 
@@ -206,6 +206,16 @@ Runs a SPARQL query against a caller-supplied endpoint. **Every query the fronte
 
 ### Norms
 
+#### `GET /v2/norms`
+
+```
+GET /v2/norms?valid_on={YYYY-MM-DD}&rulesetid={ruleset}&cprmv_version={0.3.0|0.3.2|0.4.1}&endpoint={url}
+```
+
+The norms in force on `valid_on` (default: today, Europe/Amsterdam), in CPRMV `0.4.1` unless another version is requested. Per ruleset, the rules of the latest period starting on or before `valid_on`. Same envelope as v1 plus `valid_on`; `dataset_versions` is narrowed to the selected periods. Implemented as `getNormsInForce` in `norms.service.ts` (the date selection runs in code, not SPARQL) and `norms.v2.routes.ts`; described in `openapi/openapi.v2.yaml`, served at `/v2/openapi.json`. See the [stability contract](../reference/api-stability.md#v2norms).
+
+`/v1/norms` below is deprecated (sunset 2028-11-01) and carries `Deprecation`, `Sunset` and `Link` headers.
+
 ```
 GET /v1/norms?endpoint={url}&rulesetid={ruleset}&applicable_date={YYYY-MM-DD}&cprmv_version={0.3.0|0.3.2|0.4.1}
 ```
@@ -273,7 +283,7 @@ Three per-entry fields:
 | `title`        | `dct:title`                   | Primary ruleset only — the editor only knows the human title of the service's `legalResource`. `null` for non-primary rulesets. |
 
 !!! warning "0.4.1 cache caveat"
-    For `cprmv_version=0.4.1`, `published_at` equals `cprmv:validFrom` (the applicable date), not a publication timestamp. Re-publishing a RuleSet **with the same `validFrom`** but changed rule values does **not** change the ETag/`Last-Modified`, so a cached `0.4.1` response can be served for up to `max-age` (1 h) after a same-date correction. `0.3.x` does not have this caveat (`dct:issued` advances on every publish). A future fix is to emit `dct:issued`/`prov:generatedAtTime` on the 0.4.1 RuleSet.
+    On `/v1/norms` with `cprmv_version=0.4.1`, `published_at` equals `cprmv:validFrom` (the applicable date), not a publication timestamp. Re-publishing a RuleSet **with the same `validFrom`** but changed rule values does **not** change the ETag/`Last-Modified`, so a client that revalidates a cached `0.4.1` response keeps getting `304 Not Modified`: the v1 ETag does not change until a later period is published. `/v2/norms` does not have this caveat, because its ETag also signs a digest of the selected rules (`digestRules` in `utils/etag.ts`), so a correction within a period changes it. `0.3.x` does not have it either (`dct:issued` advances on every publish).
 
 **CPRMV version selection (`?cprmv_version=`)**
 
@@ -298,7 +308,7 @@ Last-Modified: Fri, 15 May 2026 07:45:36 GMT
 Cache-Control: public, max-age=3600
 ```
 
-The `ETag` is an opaque 8-hex hash over every `(version, published_at)` pair in `dataset_versions` plus all request parameters that affect the response shape. `title` is deliberately excluded — informational only, and a title-only update would arrive as a new `dct:issued` anyway. `Last-Modified` is the maximum `published_at` across *all* records in the response (not just the first per ruleset), so a consumer's `If-Modified-Since` returns `304 Not Modified` only when nothing in their query has been republished.
+The `ETag` is an opaque 8-hex hash over every `(version, published_at)` pair in `dataset_versions` plus all request parameters that affect the response shape. On `/v2/norms` the ETag also signs the resolved `valid_on`, an `api: 'v2'` marker and a 16-hex digest of the selected rules. `title` is deliberately excluded — informational only, and a title-only update would arrive as a new `dct:issued` anyway. `Last-Modified` is the maximum `published_at` across *all* records in the response (not just the first per ruleset), so a consumer's `If-Modified-Since` returns `304 Not Modified` only when nothing in their query has been republished.
 
 Conditional requests are honoured via Express's `req.fresh`:
 
@@ -321,6 +331,8 @@ Dataset metadata is cached in-memory for 60 seconds, keyed by endpoint URL **and
 | `rulesetid`       | Exact-match filter on `cprmv:rulesetId` (e.g. `BWBR0015703`). Must match `/^[A-Za-z0-9_-]+$/` or the request is rejected with `400 INVALID_PARAM`.                   |
 | `applicable_date` | Filter on the dated segment of `cprmv:ruleIdPath` (e.g. `2026-01-01` matches paths containing `_2026-01-01_`). Must match `/^\d{4}-\d{2}-\d{2}$/` or `400`.          |
 | `cprmv_version`   | CPRMV vocabulary version to query and emit: one of `0.3.0`, `0.3.2`, `0.4.1` (else `400 INVALID_PARAM`). Defaults to `0.3.0`. Selects the `cprmv:` namespace and the metadata model (`cprmv:Dataset` vs `cprmv:RuleSet`) — see the **CPRMV version selection** subsection above. |
+
+A `rulesetid` or `cprmv_version` that arrives as an array (`?rulesetid[]=X`) is rejected with `400 INVALID_PARAM`, on `/v1/norms` and `/v2/norms` alike.
 
 Validated filter values are applied as SPARQL `FILTER` clauses server-side: exact-match on `?rulesetId` and `CONTAINS(STR(?ruleIdPath), "_<date>_")`. Filters are interpolated only after passing the regex gate, making SPARQL injection impossible. `cprmv_version` selects a namespace rather than a filter, so it is validated against the supported set rather than a character-class regex.
 
@@ -502,7 +514,7 @@ findSemanticEquivalences(endpoint: string): Promise<SemanticEquivalence[]>
 
 The `findEnhancedChainLinks` query uses a `BIND(IF(...))` pattern to categorise each link as `exact`, `semantic`, or `both`, then expands `both` entries into two separate records post-query. This is the mechanism described in [Enhanced Validation](enhanced-validation.md).
 
-A separate `norms.service.ts` handles the `cprmv:Rule` publish-format query backing `/v1/norms`. It builds the query dynamically — filter clauses (rulesetid exact-match, applicable date `CONTAINS`) are injected only after upstream regex validation — then aggregates parent/child rows into nested objects with deterministic key ordering matching `cprmv-example.json`.
+A separate `norms.service.ts` handles the `cprmv:Rule` publish-format query backing `/v1/norms`. It builds the query dynamically — filter clauses (rulesetid exact-match, applicable date `CONTAINS`) are injected only after upstream regex validation — then aggregates parent/child rows into nested objects with deterministic key ordering matching `cprmv-example.json`. The same file holds the `/v2/norms` selection: `selectInForce` picks, per ruleset, the latest period starting on or before `valid_on`; `narrowDatasetVersions` narrows `dataset_versions` to that period's records; and `getNormsInForce` runs the v1 rules query without a date filter and applies both, so the date never reaches SPARQL. What the two route versions share — input validation, cache headers and the JSON envelope — lives in `routes/norms.shared.ts`, so they cannot drift apart on those parts.
 
 ---
 
@@ -659,7 +671,7 @@ cannot permanently block a retry.
 
 **HTTP headers** — [Helmet](https://helmetjs.github.io/) is configured to set comprehensive security headers on all responses, including `Content-Security-Policy`, `X-Content-Type-Options`, `X-Frame-Options`, and `Strict-Transport-Security`.
 
-**CORS** — only origins listed in `CORS_ORIGIN` are permitted. In production this is restricted to `https://linkeddata.open-regels.nl` and `https://cpsv.open-regels.nl`; acceptance also admits both tiers of the IOU architecture documentation site. Any other origin gets an ordinary response with no `Access-Control-Allow-Origin` header, which the browser then refuses — **except on the three public read-only mounts**, `/v1/ropa/public`, `/v1/bundles/public` and `/v1/openapi.json`, which answer any origin for `GET` and `OPTIONS` by design. `isPublicPath` matches those mounts or a path below them, never a sibling route that shares the prefix; see [RoPA Records — the public routes](ropa-records.md#public-route-v1ropapublic).
+**CORS** — only origins listed in `CORS_ORIGIN` are permitted. In production this is restricted to `https://linkeddata.open-regels.nl` and `https://cpsv.open-regels.nl`; acceptance also admits both tiers of the IOU architecture documentation site. Any other origin gets an ordinary response with no `Access-Control-Allow-Origin` header, which the browser then refuses — **except on the four public read-only mounts**, `/v1/ropa/public`, `/v1/bundles/public`, `/v1/openapi.json` and `/v2/openapi.json`, which answer any origin for `GET` and `OPTIONS` by design. `isPublicPath` matches those mounts or a path below them, never a sibling route that shares the prefix; see [RoPA Records — the public routes](ropa-records.md#public-route-v1ropapublic).
 
 **Input validation** — request inputs are checked before any service call, and a failure answers `400 INVALID_INPUT` naming the fields at fault rather than surfacing as a 500 from a downstream system. Request body size is limited to 10 MB.
 
@@ -688,10 +700,10 @@ The API follows the [Dutch Government API Design Rules](https://publicatie.centr
 
 | Rule   | Description                 | Implementation                         |
 | ------ | --------------------------- | -------------------------------------- |
-| API-20 | Major version in URI        | `/v1/*` endpoints                      |
+| API-20 | Major version in URI        | `/v1/*` and `/v2/*` endpoints          |
 | API-57 | Version header in responses | `API-Version: <release>` on every response |
 | API-16 | Use OpenAPI for documentation | OpenAPI 3.1 description (v2026.09.5) |
-| API-51 | Publish the OpenAPI document at a standard location | `/v1/openapi.json` (v2026.09.5) |
+| API-51 | Publish the OpenAPI document at a standard location | `/v1/openapi.json` (v2026.09.5), `/v2/openapi.json` (v2026.10.1) |
 | API-05 | Use nouns for resources     | `dmns`, `chains`, `health`             |
 | API-54 | Plural/singular naming      | Correct usage throughout               |
 | API-48 | No trailing slashes         | Enforced in routing                    |
@@ -699,5 +711,4 @@ The API follows the [Dutch Government API Design Rules](https://publicatie.centr
 
 **Language note (API-04)** — technical endpoint names (`health`, `version`) follow international convention in English. Business resource names (`dmns`, `chains`) follow the source data. Dutch variable names (e.g., `geboortedatum`) are preserved as-is from the DMN definitions.
 
-**Checked in CI.** `npm run lint:openapi` lints the published description with Spectral against the NL API Design Rules 2.2.1 in both backend deploy workflows. Errors follow the rules' problem-details requirements (`nlgov:problem-*`). Where the API departs from a rule, the exception is recorded per path in `openapi/.spectral.yaml` rather than switched off globally.
-| API-10         | Resource collections with pagination   | v1.0.0         |
+**Checked in CI.** `npm run lint:openapi` builds both published descriptions, `openapi.json` and `openapi.v2.json`, and lints them with Spectral against the NL API Design Rules 2.2.1 in both backend deploy workflows. Errors follow the rules' problem-details requirements (`nlgov:problem-*`). Where the API departs from a rule, the exception is recorded per path in `openapi/.spectral.yaml` rather than switched off globally. One such exception is `nlgov:query-keys-camel-case` on `GET /v2/norms` (`openapi.v2.json#/paths/~1norms/get`): it keeps v1's snake_case query keys and adds `valid_on` in the same style, matching the snake_case members of the response. The coverage gate (`src/openapi/coverage.test.ts`) runs once per major version, so every route served under `/v1` or `/v2` must be described in that version's document, and every described operation must be served.

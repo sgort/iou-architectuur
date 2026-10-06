@@ -83,7 +83,7 @@ Each binding records:
 
 Document templates are stored in PostgreSQL via the LDE backend, cached locally in `localStorage` for instant synchronous access. On editor load, the service fetches the authoritative list from `GET /v1/assets/documents` and replaces the local cache.
 
-Example templates are seeded from `defaultTemplates.ts` on the frontend when their id is not yet in `localStorage`. Seeding saves them like any other template, so the editable examples are written to the database as well. The one read-only example, `example_dvtp_consent_receipt`, stays in `localStorage` only.
+Example templates are seeded from `defaultTemplates.ts` on the frontend, and refreshed by version: when a template's entry in `EXAMPLE_VERSIONS` is higher than the version the browser has recorded, the shipped copy overwrites the stored one, local edits included. Seeding saves them like any other template, so the editable examples are written to the database as well. The one read-only example, `example_dvtp_consent_receipt`, stays in `localStorage` only.
 
 See [Asset Storage](../developer/asset-storage.md) for the full architecture.
 

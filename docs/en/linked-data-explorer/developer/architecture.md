@@ -70,35 +70,36 @@ The backend is a structured Express application following the Dutch Government A
 ```
 src/
 ├── index.ts              entry point: middleware, route mounting, server startup
-├── routes/               one file per route group, mounted under /v1 by routes/index.ts
+├── routes/               one file per route group, mounted under /v1 and /v2 by routes/index.ts
 │   ├── registry.ts       the route topology, described once (the root page reads it)
-│   ├── health · openapi · dmn · chain · template · process · shacl · norms
+│   ├── health · openapi · dmn · chain · template · process · shacl
+│   ├── norms (/v1) · norms.v2 (/v2) · norms.shared (validation, cache headers, envelope)
 │   ├── triplydb · vendor · dso · edocs · cache · cspReports
 │   └── assets · assets.public · ropa · ropa.public
 ├── services/             one per external system or domain: sparql, operaton,
 │                         orchestration, triplydb, dso, edocs, vendor, norms, template,
 │                         dmn-validation, shacl-validation, assets, ropa, externalTaskWorker
 ├── db/                   pg pool, idempotent migrations, row mappers
-├── openapi/              document.ts serves the built description; testing/ holds the
-│                         helpers that validate route responses against it
+├── openapi/              document.ts reads the built v1 and v2 descriptions; testing/ holds the
+│                         helpers that validate route responses against them
 ├── middleware/
-│   ├── cors.middleware.ts      allowlist, plus wildcard for the three public mounts
+│   ├── cors.middleware.ts      allowlist, plus wildcard for the four public mounts
 │   ├── error.middleware.ts     central RFC 9457 problem-details handler
-│   └── version.middleware.ts   API-Version header
+│   └── version.middleware.ts   API-Version header; Deprecation/Sunset/Link on /v1/norms
 └── utils/
     ├── outboundUrl.ts    route-level checks on caller-supplied endpoints
     ├── outboundHttp.ts   the guarded axios client for caller-chosen hosts
     ├── problem.ts        builds problem-details responses
     ├── validation.ts     body validators for the asset and ROPA upserts
-    ├── publicPaths.ts    the three mounts served to any origin
+    ├── publicPaths.ts    the four mounts served to any origin
     ├── buildInfo.ts      reads deploy/build-info.json for /v1/health
     ├── config.ts         environment configuration
     └── logger.ts         Winston structured logging
 ```
 
-The request and response shapes of every route are in the [API Specification](../reference/api-specification.md), built from `packages/backend/openapi/openapi.yaml`.
+The request and response shapes of every `/v1` route are in the [API Specification](../reference/api-specification.md), built from `packages/backend/openapi/openapi.yaml`; the `/v2` routes are described in `openapi/openapi.v2.yaml`, served at `/v2/openapi.json`.
 
-Legacy `/api/*` routes exist with deprecation headers for backward compatibility. All new work uses `/v1/*`.
+Legacy `/api/*` routes exist with deprecation headers for backward compatibility. New work uses `/v1/*`; `/v2/norms` succeeds the deprecated `/v1/norms`.
 
 ---
 

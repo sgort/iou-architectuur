@@ -181,6 +181,9 @@ which are not seeded. The Thuisbatterij folder is a superseded reference copy: i
 `public/examples/flevoland/ThuisbatterijSubsidieAanvraagProcess.bpmn` and its
 `e2e-fixtures/` copy.
 
+The Modeler's **Link to Form** dropdown writes the same binding, so a form linked in the
+Modeler binds to its own deployment too — see [Form linking](bpmn-modeler.md#form-linking).
+
 ---
 
 ## Deploying a phase

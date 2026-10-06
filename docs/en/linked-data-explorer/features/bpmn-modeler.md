@@ -120,12 +120,10 @@ Selecting a form writes two attributes to the BPMN XML:
 
 ```xml
 camunda:formRef="kapvergunning-start"
-camunda:formRefBinding="latest"
+camunda:formRefBinding="deployment"
 ```
 
-`camunda:formRefBinding="latest"` instructs Operaton to always resolve the most recently deployed version of that form ID, eliminating the need for version pinning.
-
-The seeded examples use `camunda:formRefBinding="deployment"` instead, written by hand. `latest` looks the form key up across the whole engine, so once the same form is deployed under more than one tenant Operaton cannot choose and fails with `ENGINE-03109`; `deployment` resolves the form from the process definition's own deployment, which is unambiguous. Change the binding by hand when a process is deployed under an organization whose forms also exist elsewhere.
+`camunda:formRefBinding="deployment"` resolves the form from the process definition's own deployment, which is unambiguous because the deploy modal ships the BPMN and its forms together. Every seeded example uses the same binding. The alternative, `latest`, looks the form key up across the whole engine, so once the same form is deployed under more than one tenant Operaton cannot choose and fails with `ENGINE-03109`.
 
 A **green badge** appears below the element on the canvas once a form is linked, showing the form ID. The badge colour distinguishes form links (green) from DMN decision links (blue).
 
@@ -182,13 +180,13 @@ See [Document Composer](document-composer.md) for how to create and manage docum
 The **Deploy** button in the Modeler toolbar opens a deploy modal that collects all resources needed for a complete Operaton deployment:
 
 1. The currently open BPMN file
-2. The subprocess BPMNs the open process calls through a `calledElement` attribute, matched against saved processes by their BPMN process id
+2. The subprocess BPMNs the open process calls through a `calledElement` attribute, matched against saved processes by their BPMN process id. A called element that no saved process provides is left out, and Operaton reports it when the process starts
 3. All `.form` files whose `id` matches a `camunda:formRef` found anywhere in the bundle
 4. All `.document` files whose id is named by a `ronl:documentRef` — which can list several per task — or by a `ronl:signatureRef`, anywhere in the bundle
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Deploy modal over the Kapvergunning swimlane canvas, listing seven resources — two BPMN files, four .form files and one .document file — with the Board ownership and Organization sections, an amber warning that the bundle mixes the languages en and nl, the line naming the Operaton it deploys to, and the Deploy button](../../assets/screenshots/linked-data-explorer-bpmn-deploy-modal.png)
-  <figcaption>Deploy modal listing the seven resources of the Kapvergunning bundle — and warning that they are tagged in two languages</figcaption>
+  ![Screenshot: Deploy modal over the Kapvergunning swimlane canvas, listing seven resources — two BPMN files, four .form files and one .document file — with the Board ownership and Organization sections, an amber warning that the bundle mixes the languages en and nl, the line naming the Operaton it deploys to, and the Deploy button. Captured at v2026.10.0, when the Kapvergunning bundle still mixed en and nl; its forms and beschikking are all tagged nl now, so that warning no longer appears for it](../../assets/screenshots/linked-data-explorer-bpmn-deploy-modal.png)
+  <figcaption>Deploy modal listing the seven resources of the Kapvergunning bundle, captured at v2026.10.0, when the bundle still mixed en and nl</figcaption>
 </figure>
 
 The browser sends the bundle in one request to the Linked Data Explorer backend, which posts every resource to Operaton in a single multipart deployment. Because the BPMN, its forms and its document templates share one deployment, `camunda:formRef` resolves correctly at runtime — no separate form deployment step is needed.
@@ -270,7 +268,7 @@ When the deploy modal opens, LDE walks the bundle resources (shell BPMN + subpro
 
 The check sits alongside the existing RoPA-missing warning, both rendered between the resource list and the resource count.
 
-The seeded Kapvergunning bundle shows it, as in the [deploy modal figure](#one-click-deploy) above: its processes are untagged, but `kapvergunning-aanvullende-gegevens` is tagged `nl` while the bundle's other forms — `kapvergunning-start`, `tree-felling-review`, `awb-notify-applicant` — and `example_treefelling_beschikking` are tagged `en`. Untagged artefacts never count, so the warning names exactly the tags that disagree; retagging one side, or untagging it, clears it.
+The seeded Thuisbatterij bundle shows it: its two processes are untagged, but `awb-notify-applicant-thuisbatterij` is tagged `en` while the bundle's other forms — `recht-en-hoogte-subsidie-thuisbatterij`, `thuisbatterij-aanvullende-gegevens`, `thuisbatterij-subsidie-review` — and `thuisbatterij_subsidie_beschikking` are tagged `nl`, so the modal warns that the bundle mixes `en, nl`. Untagged artefacts never count, so the warning names exactly the tags that disagree; retagging one side, or untagging it, clears it.
 
 ---
 

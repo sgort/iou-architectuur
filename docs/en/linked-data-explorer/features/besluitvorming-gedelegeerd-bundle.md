@@ -127,6 +127,8 @@ The Modeler's deploy modal follows both attributes, so the document travels with
 
 The bundle has no `e2e-fixtures/` copy and no E2E journey; it is checked by its bundle test.
 
+Its BPMN is nonetheless copied downstream: the RONL Business API keeps `GedelegeerdBesluitProcess.bpmn` as a parser fixture for a process that declares its own phases. `npm run check-rip-bpmn` therefore fingerprints it in `rip-bpmn-fingerprints.json`, in the pre-push hook and the required CI `audit` job, so an edit to the BPMN fails that check until `node scripts/check-rip-bpmn-copies.mjs --write` records the new fingerprint, and the RONL Business API's fixture is refreshed with the command it prints. See [RIP R2.2 Bundle → The mirrored copy](rip-r22-bundle.md#the-mirrored-copy).
+
 ---
 
 ## The bundle test

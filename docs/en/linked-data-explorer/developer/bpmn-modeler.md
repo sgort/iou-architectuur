@@ -30,6 +30,7 @@ packages/frontend/src/
 │   └── formService.ts         localStorage CRUD for FormSchema records (shared with FormEditor)
 └── utils/
     ├── bpmnTemplates.ts       default BPMN XML templates (new process, example)
+    ├── deployBundle.ts        findProcessId, resolveSubProcesses, collectBundleRefs: the deploy bundle
     ├── documentRefs.ts        parse and format the comma-separated ronl:documentRef list
     └── exampleVersions.ts     EXAMPLE_VERSIONS, the seed version registry
 ```
@@ -140,7 +141,7 @@ When the user selects a form:
 ```typescript
 modeling.updateProperties(element, {
   'camunda:formRef': schemaId,        // the schema.id from the FormSchema JSON
-  'camunda:formRefBinding': 'latest',
+  'camunda:formRefBinding': 'deployment', // the process's own deployment; 'latest' fails with ENGINE-03109 across tenants
   'camunda:formKey': undefined,       // clears any legacy HTML formKey
 });
 ```
@@ -326,37 +327,29 @@ The deploy modal is triggered by the **Deploy** button in the canvas toolbar. `B
 
 ### Resource collection
 
+The bundle is computed in `utils/deployBundle.ts`. Its three helpers are shared by both handlers in `BpmnCanvas.tsx` — `handleOpenDeployModal`, which lists the bundle, and `handleDeploy`, which sends it — so the two cannot drift apart:
+
 ```typescript
 // 1. Save current BPMN to get latest XML
 const { xml } = await modelerRef.current.saveXML({ format: true });
 
-// 2. Extract subprocess calledElement references (recursive)
-const calledElements = extractCalledElements(xml);
-// → match against saved BpmnProcess records by process/@id
+// 2. The process key: the <process> id, under any namespace prefix
+const processKey = findProcessId(xml) ?? 'process';
 
-// 3. Extract all camunda:formRef values from main + subprocess XMLs
-const allFormRefs = new Set([
-  ...extractFormRefs(xml),
-  ...subProcessXmls.flatMap(sp => extractFormRefs(sp.xml)),
-]);
+// 3. One level of subprocesses: each calledElement in the open process,
+//    matched against saved BpmnProcess records by process id
+const subProcessXmls = resolveSubProcesses(xml, BpmnService.getProcesses());
 
-// 4. Match form refs against FormService.getForms() by schema.id
-const forms = allFormRefs → matched FormSchema records
+// 4. camunda:formRef ids, and document ids from ronl:documentRef (split on
+//    commas) AND ronl:signatureRef, across the open process and its
+//    subprocesses, once each
+const { formRefs, documentRefs } = collectBundleRefs(xml, subProcessXmls);
 
-// 5. Extract document ids from ronl:documentRef AND ronl:signatureRef in
-//    main + subprocess XMLs, splitting each documentRef list on commas
-const extractDocumentRefs = (bpmnXml: string) => [
-  ...new Set(
-    [
-      ...bpmnXml.matchAll(/ronl:documentRef="([^"]+)"/g),
-      ...bpmnXml.matchAll(/ronl:signatureRef="([^"]+)"/g),
-    ].flatMap((m) => parseDocumentRefs(m[1]))
-  ),
-];
-
-// 6. Match document ids against DocumentService.getTemplates() by id
-const documents = allDocumentRefs → matched DocumentTemplate records
+// 5. Match form refs against FormService.getForms() by schema.id,
+//    document ids against DocumentService.getTemplates() by id
 ```
+
+`findProcessId` looks the process element up with `getElementsByTagNameNS('*', 'process')`, so it matches the prefixed `<bpmn:process>` that bpmn-js emits. `resolveSubProcesses` ignores a stored record's status; that is safe because an `e2e-fixtures` subprocess carries its own `…E2E` key that no example shell names, which `public-example-fixture-parity.test.ts` enforces. A called element no stored process provides is left out, and the engine reports it at start. `deployBundle.test.ts` covers the three helpers.
 
 `ronl:signatureRef` is read alongside `ronl:documentRef` because a signature task can bind its template through `signatureRef` alone; the template must still travel with the deployment. A `documentRef` list is split rather than matched whole, so a task with two documents contributes two ids.
 
@@ -484,13 +477,15 @@ The descriptor declares five type entries:
 
 | Type | Extends | Attribute |
 |---|---|---|
-| `DocumentRefMixin` | `bpmn:UserTask` | `documentRef` — one or more template ids, comma-separated |
+| `DocumentRefMixin` | `bpmn:UserTask` | `documentRef` — one or more template ids, comma-separated; `signatureRef` — the one template a signature task signs |
 | `RopaRefMixin` | `bpmn:Process` | `ropaRef` |
 | `DsoActiviteitMixin` | `bpmn:Process` | `dsoActiviteitUrn` |
 | `LanguageMixin` | `bpmn:Process` | `language` |
 | `OrganizationMixin` | `bpmn:Process` | `organization` |
 
-**Not every `ronl:` attribute is registered.** `ronl:signatureRef`, `ronl:awbPhase`, `ronl:phases`, `ronl:phaseLabel` and `ronl:phase` are absent from the descriptor. They are written by hand in the BPMN, and a round trip through the Modeler keeps them as unknown attributes: they survive a save, but the Modeler offers no control for them and nothing checks their values. Registering the phase attributes and giving them a properties-panel editor and pre-deploy checks is [LDE issue #242](https://github.com/sgort/linked-data-explorer/issues/242).
+`ronl:signatureRef` is registered, but the Modeler offers no control for it: it is written by hand in the BPMN. `ronlModdleDescriptor.test.ts` reads `documentRef` and `signatureRef` on a user task as typed properties, because an unregistered attribute still round-trips, parked in `$attrs`, and a missing registration would otherwise fail silently.
+
+**Not every `ronl:` attribute is registered.** `ronl:awbPhase`, `ronl:phases`, `ronl:phaseLabel` and `ronl:phase` are absent from the descriptor. They are written by hand in the BPMN, and a round trip through the Modeler keeps them as unknown attributes: they survive a save, but the Modeler offers no control for them and nothing checks their values. Registering the phase attributes and giving them a properties-panel editor and pre-deploy checks is [LDE issue #242](https://github.com/sgort/linked-data-explorer/issues/242).
 
 Each entry has the same shape, e.g. for `LanguageMixin`:
 ```json
@@ -547,8 +542,8 @@ The current example processes and their roles:
 
 | Seed ID | `processRole` | `bpmnProcessId` | `calledElement` | Organization | Version |
 |---|---|---|---|---|---|
-| `example_awb_process` | `shell` | `AwbShellProcess` | — | `flevoland` | 7 |
-| `example_tree_felling` | `subprocess` | `TreeFellingPermitSubProcess` | `AwbShellProcess` | `flevoland` | 10 |
+| `example_awb_process` | `shell` | `AwbShellProcess` | — | `flevoland` | 8 |
+| `example_tree_felling` | `subprocess` | `TreeFellingPermitSubProcess` | `AwbShellProcess` | `flevoland` | 11 |
 | `example_awb_zorgtoeslag` | `shell` | `AwbZorgtoeslagProcess` | — | `toeslagen` | 6 |
 | `example_zorgtoeslag_provisional` | `subprocess` | `ZorgtoeslagProvisionalSubProcess` | `AwbZorgtoeslagProcess` | `toeslagen` | 8 |
 | `example_zorgtoeslag_final` | `subprocess` | `ZorgtoeslagFinalSubProcess` | `AwbZorgtoeslagProcess` | `toeslagen` | 7 |
@@ -592,7 +587,7 @@ The `e2e-fixtures/manifest.json` entry for each shell lists its missing-informat
 The examples carry the phase attributes the RONL Business API reads to draw the caseworker's phase stepper. They are hand-authored: the Modeler has no control for them yet ([LDE issue #242](https://github.com/sgort/linked-data-explorer/issues/242)).
 
 - **The Awb shells** mark the node that starts each Awb phase with `ronl:awbPhase` — `1`, `2`, `3`, `4+5`, `6`, `7`, `8` and `archivering` — and each Awb subprocess marks its start event with `4+5`. See [`ronl:awbPhase`](../../ronl-business-api/reference/bpmn-design-criteria.md#ronlawbphase).
-- **The Dutch HR capacity claim** (`ManagementCapacityClaimProcess.nl.bpmn`) declares its own eight phases with `ronl:phases` and `ronl:phaseLabel`, marks the node that starts each with `ronl:phase`, and is drawn in eight lanes. Its business rule task `Task_DetermineRouting` carries `decisionRefTenantId="${null}"`, so it resolves the shared `CapacityClaimRouting` DMN untenanted.
+- **The Dutch HR capacity claim** (`HR-capacity/ManagementCapacityClaimProcess.bpmn`) declares its own eight phases with `ronl:phases` and `ronl:phaseLabel`, marks the node that starts each with `ronl:phase`, and is drawn in eight lanes. Its business rule task `Task_DetermineRouting` carries `decisionRefTenantId="${null}"`, so it resolves the shared `CapacityClaimRouting` DMN untenanted.
 - **Besluitvorming onder gedelegeerde bevoegdheid** declares six phases the same way.
 
 See [A process's own phases](../../ronl-business-api/reference/bpmn-design-criteria.md#a-processs-own-phases-ronlphases-ronlphaselabel-ronlphase) and [Lanes and phase markers](../../ronl-business-api/reference/bpmn-design-criteria.md#lanes-and-phase-markers-the-caseworker-process-view) for how the RONL Business API reads them.

@@ -120,9 +120,9 @@ Open `RipR21Process.bpmn` in the BPMN Modeler and click **Deploy**. The modal re
 
 ## The mirrored copy
 
-This bundle exists twice in the repository — authored under `examples/organizations/flevoland/rip-phase-21/`, imported and deployed from `e2e-fixtures/flevoland/` — and its BPMN a third time, as a parser fixture in the RONL Business API. A parity test asserts that the two repository copies are byte-identical, and the pair opts in through `MIRRORED_BUNDLES`. `npm run check-rip-bpmn`, run by the pre-push hook, compares the `e2e-fixtures/` BPMN with its source and checks the source against the fingerprints both repositories share.
+This bundle exists twice in the repository — authored under `examples/organizations/flevoland/rip-phase-21/`, imported and deployed from `e2e-fixtures/flevoland/` — and its BPMN a third time, as a parser fixture in the RONL Business API. A parity test asserts that the two repository copies are byte-identical, and the pair opts in through `MIRRORED_BUNDLES`. `npm run check-rip-bpmn`, run by the pre-push hook and by the required CI `audit` job, compares the `e2e-fixtures/` BPMN with its source and checks the source against the fingerprints both repositories share.
 
-That test earns its place: the ValidSign attribute in v2026.08.6 was added to the mirror only, and the parity test failed from that commit until the copies were reconciled. See [RIP R2.2 Bundle → The mirrored copy](rip-r22-bundle.md#the-mirrored-copy) for both checks, and for why a pull request that changes only bundle files runs neither.
+That test earns its place: the ValidSign attribute in v2026.08.6 was added to the mirror only, and the parity test failed from that commit until the copies were reconciled. See [RIP R2.2 Bundle → The mirrored copy](rip-r22-bundle.md#the-mirrored-copy) for both checks.
 
 ---
 
