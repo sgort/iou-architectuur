@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # The FLINT Frame Model
 
 Everything the Norm Editor produces is built from **frames**. A frame is a structured
@@ -27,7 +31,7 @@ graph TB
     ACT -->|actor / recipient| AGENT
     ACT -->|object| OBJECT
     CD -->|duty| DUTY
-    CD -->|claimant / holder| AGENT
+    CD -->|claimant / duty holder| AGENT
 
     style ACT fill:#c0b3ff
     style CD fill:#c0b3ff
@@ -76,10 +80,10 @@ which effect*. It has the following named roles:
 | Creates | facts (subtype *agent*, *action*, or *object*) | many |
 | Terminates | facts (subtype *agent*, *action*, or *object*) | many |
 
-An act's label is generated automatically in the form
+An act's short name is generated automatically in the form
 `[action] [object] [actor] [recipient]`, with placeholders such as `<actor>` shown for roles
-that are not yet filled. The interpreter can switch off automatic labelling and type a custom
-label.
+that are not yet filled. Typing a name of one's own stops the generation; clearing the field
+starts it again.
 
 ### Claim-duty
 
@@ -89,17 +93,21 @@ A **Claim-duty** is a relation expressing an obligation between parties:
 |---|---|
 | Duty | a fact (subtype *duty*) |
 | Claimant | a fact (subtype *agent*) — the party that can claim |
-| Holder | a fact (subtype *agent*) — the party that bears the duty |
+| Duty holder | a fact (subtype *agent*) — the party that bears the duty |
+
+A claim-duty's short name is not generated; the interpreter types it.
 
 ---
 
 ## How roles are filled
 
-A role is filled by attaching a fact to it. The editor offers two ways to do this:
+A role is filled by attaching a fact to it. After clicking **Select** next to the role, the
+editor offers two ways to do this:
 
-1. **From the source** — with a role active, highlight a fragment in the text. A fact of the
-   correct subtype is created automatically and slotted into the role.
-2. **From an existing frame** — click an existing fact chip to reuse it in the role.
+1. **From the source** — highlight a fragment in the text. A fact is created automatically
+   and slotted into the role.
+2. **From an existing frame** — click an existing fact in the Frames list to reuse it in the
+   role. Only facts can be picked.
 
 When a role expects exactly one subtype (for example the *action* role only accepts *action*
 facts), the editor assigns that subtype to the new fact for you.
@@ -108,10 +116,12 @@ facts), the editor assigns that subtype to the new fact for you.
 
 ## Frame identity and reuse
 
-Each frame has a stable unique identifier. Because roles reference facts **by identity**, the
-same fact can appear in several frames, and deleting a fact automatically removes every
-reference to it across all acts, claim-duties, and boolean constructs. This keeps an
-interpretation internally consistent as it grows.
+Each frame has a stable unique identifier, shown at the bottom of its form with a button to
+copy it. Because roles reference facts **by identity**, the same fact can appear in several
+frames, and deleting a fact automatically removes the references to it from the roles of acts
+and claim-duties, from acts' *Creates* lists, and from boolean constructs. A fact listed under
+an act's *Terminates* is the exception: it stays listed there until the interpreter removes
+it.
 
 ---
 
@@ -119,8 +129,7 @@ interpretation internally consistent as it grows.
 
 Any frame can carry **comments** — free-text notes recording why an interpretation choice was
 made. Comments are stored with the frame (as `rdfs:comment` in the RDF output) and are visible
-to reviewers. The NLP assistant also writes its recommended role as a comment when it creates
-an agent fact.
+to reviewers.
 
 See the [Frame Types & Roles reference](../reference/frame-types-and-roles.md) for the exact
 icon, colour, and allowed-subtype matrix used throughout the interface.

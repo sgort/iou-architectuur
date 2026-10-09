@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Environment Variables
 
 !!! info "Documentatie in ontwikkeling"
@@ -19,8 +23,8 @@
 
 ---
 
-## Build-time frontend variables
+## Deployment (`deploy.sh`) variables
 
 ---
 
-## Deployment (`deploy.sh`) variables
+## Helper script variables

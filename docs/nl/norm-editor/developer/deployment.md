@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Deployment
 
 !!! info "Documentatie in ontwikkeling"
@@ -21,9 +25,21 @@
 
 ## Resources created by `deploy.sh`
 
+### DNS
+
 ### Prerequisites
 
-### Deploy
+---
+
+## First deployment
+
+---
+
+## Forcing a new revision
+
+---
+
+## The NLP model share
 
 ---
 

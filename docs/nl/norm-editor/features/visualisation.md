@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Frame Visualisation
 
 !!! info "Documentatie in ontwikkeling"
@@ -11,14 +15,18 @@
 
 ---
 
-## List view
+## The View interpretation tab
+
+### Frames
+
+### Network
+
+### Details
 
 ---
 
-## Network view
+## Frames in the Interpret sources tab
 
-### Filtering
+### List
 
----
-
-## Switching views
+### Network

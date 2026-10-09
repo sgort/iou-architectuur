@@ -149,13 +149,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
--   **🖍️ Norm Editor — v2026.09.1** · *September 2026*
+-   **🖍️ Norm Editor — v2026.09.15-2** · *September 2026*
 
     ---
 
-    **A choice of NLP model, and a test suite to go with it**
+    **The IOU style, three panes to interpret in, and the dependencies between acts**
 
-    Role detection is no longer fixed to one model at deploy time: `nlp-api` carries a registry of [selectable models](norm-editor/features/nlp-assistance.md#choosing-a-model) and the Act frame form gained a dropdown to pick one, with the response echoing the model actually used so a caller can tell a fallback from a hit. Model files moved out of the service image onto mounted storage, so adding one no longer means rebuilding. July filled the other gap: [automated tests](norm-editor/developer/testing.md) across all five services and a GitLab CI pipeline that blocks the image build when they fail — this component had none before.
+    The editor now looks like the rest of IOU, with its six steps as tabs. [Interpreting sources](norm-editor/user-guide/interpreting-sources.md) puts the source text, the frames and a frame editor side by side, under a status bar that says what the editor expects next, and [View interpretation](norm-editor/features/visualisation.md) links acts to the acts that need what they create, with a details panel for each. Deployments are now per environment with a shared registry and DNS zone. The [suites](norm-editor/developer/testing.md) stand at 127 tests: 125 pass, and two `wrap_up_api` comparisons fail on a fresh install for a reason not yet found.
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     

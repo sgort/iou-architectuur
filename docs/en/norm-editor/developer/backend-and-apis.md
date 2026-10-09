@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Backend & API Services
 
 Behind the frontend sit four services: a Node.js **backend** that brokers TriplyDB, and three
@@ -21,6 +25,7 @@ reads its Triply credentials and endpoints from environment variables.
 | `POST /api/getTasksFromTriply` | SPARQL query listing `calc:Task` graphs (iri, title, date, editor) |
 | `POST /api/getTask` | Export a task graph **plus every graph it `calc:involves`** (its interpretation and sources) as TriG |
 | `POST /api/saveTaskAtTriply` | Parse incoming TriG and upload to TriplyDB, **skipping graphs that already exist** |
+| `GET /api/nlp/models` | Meant to list the model directories under `MODEL_PATH`; **fails on every call** at this release, and the GUI does not use it — see [API Endpoints](../reference/api-endpoints.md#get-apinlpmodels) |
 
 The save path is deliberately conservative: it loads the existing graph names, removes any
 already-present graphs from the local store, and only imports what is new — so re-saving never
@@ -42,7 +47,10 @@ over HTTP. It uses Flask with CORS enabled and serves a Swagger UI at `/swagger`
 - The model's raw labels (`O`, `V`, `ACTOR`, `OBJ`, `REC`) are mapped to those friendly names,
   and word-piece tokens (`##`) are merged back into whole words.
 
-The model lives under `bertje_2022_e4/`. It is trained on Dutch text and is intended for
+The models are not in the repository or the image: the service loads them from
+`MODEL_PATH` (`/mnt/models`, a mounted directory — see
+[Deployment](deployment.md#the-nlp-model-share)), where the default model is the
+`bertje_2022_e4/` directory. It is trained on Dutch text and is intended for
 sentence- or fragment-sized inputs because of the transformer token limit. See
 [NLP Assistance](../features/nlp-assistance.md).
 

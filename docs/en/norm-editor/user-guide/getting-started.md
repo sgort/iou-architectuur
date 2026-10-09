@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Getting Started
 
 This guide gets you from nothing to a running Norm Editor and your first interpretation.
@@ -40,29 +44,37 @@ For frontend-only development with hot reload, see
 
 ---
 
-## The five-step workflow
+## The six tabs
 
-The editor opens on a stepper. You move through it from left to right:
+The editor has a two-tier header. The top bar carries the title, a **What's new** button that
+opens the changelog, a **GitLab** link to the repository, and the **load** and **save**
+buttons. Below it, a row of tabs takes you through the work from left to right:
 
-1. **Define a task** — say who you are and what you are interpreting.
+1. **Set task** — say who you are and what you are interpreting.
 2. **Collect sources** — load documents and pick the sentences in scope.
 3. **Interpret sources** — highlight text and build frames.
-4. **Validate interpretations** *(planned)*.
-5. **Perform task** *(planned)*.
+4. **View interpretation** — see the acts and claim-duties as a network, and inspect any
+   frame's roles, conditions, and dependencies.
+5. **Make interpretations executable** — not available yet; the tab shows a "Coming soon"
+   page.
+6. **Execute task** — not available yet; the tab shows a "Coming soon" page.
 
-A banner at the top of the stepper lets you **save** and **load** an interpretation at any
-point, so you never lose work between sessions.
+You can click any tab at any time. The load and save buttons sit in the header, so you can
+save or reopen an interpretation from every tab and never lose work between sessions.
 
 ---
 
 ## Your first interpretation in brief
 
-1. On **step 1**, fill in *Editor*, *Label*, and *Description*, then click **Continue**.
-2. On **step 2**, add a source, tick the sentences you care about, and click **Continue**.
-3. On **step 3**, highlight a phrase, choose **Fact**, **Act**, or **Claim-duty**, and start
-   building. For an act, use the role pencils to mark which fact is the actor, action, object,
-   and recipient.
-4. Use the **save** banner to download your interpretation as JSON or to push it to TriplyDB.
+1. On **Set task**, fill in *Editor*, *Label*, and *Description*, then click **Continue**.
+2. On **Collect sources**, add a source, tick the sentences you care about, and click
+   **Continue**.
+3. On **Interpret sources**, highlight a phrase, choose **Fact**, **Act**, or **Claim-duty**, and
+   start building. For an act, click **Select** next to a role to mark which fact is the actor,
+   action, object, and recipient.
+4. Open **View interpretation** to check how your acts depend on each other.
+5. Use the **save** button in the header to download your interpretation as JSON or to push it
+   to TriplyDB.
 
 Each step has its own detailed page:
 

@@ -1,8 +1,13 @@
+---
+component: Norm Editor
+---
+
 # Saving and Loading
 
 Your work can be saved as a local file or pushed to TriplyDB, and reopened later from either.
-The **save / load banner** runs across the top of the stepper, so these actions are available
-at every step.
+The **load** and **save** buttons sit in the top bar of the header, so these actions are
+available on every tab. Each opens a menu with a *Locally* section (**JSON**, **RDF**) and a
+*Remotely* section (**Triply**).
 
 ---
 
@@ -13,8 +18,8 @@ You have three options:
 | Save as | Result |
 |---|---|
 | **JSON** | Downloads the interpretation as a `.json` file with a timestamped name. This is the editor's native format and the fastest, most reliable round trip. |
-| **TriG** | Converts the interpretation to RDF (via the wrap-up service) and downloads a `.trig` file — suitable for sharing as Linked Data. |
-| **TriplyDB** | Converts to RDF and uploads it to the TriplyDB knowledge graph. |
+| **RDF** | Converts the interpretation to RDF (via the wrap-up service) and downloads a `.trig` file — suitable for sharing as Linked Data. |
+| **Triply** | Converts to RDF and uploads it to the TriplyDB knowledge graph. |
 
 When saving to TriplyDB, only graphs that are not already present online are uploaded, so
 re-saving an interpretation will not create duplicates.
@@ -29,12 +34,13 @@ re-saving an interpretation will not create duplicates.
 
 You can reopen an interpretation in three ways:
 
-- **From a JSON file** — upload a previously saved `.json` interpretation.
-- **From RDF** — load a TriG/Turtle interpretation, which the unwrap service converts back
-  into editor frames.
-- **From TriplyDB** — open the task retrieval panel, pick a task from the list (each shows its
-  title, editor, and date), and the editor pulls the task together with its sources and
-  reopens it on the interpretation step.
+- **JSON** — upload a previously saved `.json` interpretation. The editor then opens the
+  **Interpret sources** tab.
+- **RDF** — upload a `.trig` interpretation, which the unwrap service converts back into
+  editor frames. The editor then opens the **Interpret sources** tab.
+- **Triply** — a dialog lists the tasks in TriplyDB (title, creator, and date). Select one and
+  click **Retrieve task**; the editor pulls the task together with its sources. The current
+  tab stays open, so switch to **Interpret sources** to continue the work.
 
 Loading restores everything: the task details, the source documents (including which sentences
 were selected and which headings were collapsed), all frames and their roles, the boolean

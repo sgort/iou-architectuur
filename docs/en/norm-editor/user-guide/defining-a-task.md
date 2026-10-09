@@ -1,7 +1,12 @@
+---
+component: Norm Editor
+---
+
 # Defining a Task
 
 A **task** is the container for one interpretation. It records who is doing the work and what
-they are interpreting. This is step 1 of the workflow.
+they are interpreting. You define it on the **Set task** tab, the first of the editor's
+tabs.
 
 ---
 
@@ -33,5 +38,6 @@ IRIs yourself — the editor handles them.
 
 !!! tip "Reopening an existing task"
     If you want to continue earlier work rather than start fresh, skip this step and use the
-    **load** banner (or the task retrieval panel) to open a saved task. Its editor, label, and
-    description are restored automatically. See [Saving and loading](saving-and-loading.md).
+    **load** button in the header to open a saved interpretation or a task from TriplyDB. Its
+    editor, label, and description are restored automatically. See
+    [Saving and loading](saving-and-loading.md).

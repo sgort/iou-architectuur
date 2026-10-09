@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Source Annotation
 
 The heart of the editor is the link between **text** and **frames**. An interpretation is not
@@ -79,7 +83,7 @@ every snippet in between.
 | Situation | Result |
 |---|---|
 | A **role is active** in an act or claim-duty (e.g. *actor*) and you highlight text | A fact of the correct subtype is created and dropped straight into the role — no panel appears |
-| **No role is active** and you highlight text | A small panel appears offering to create a Fact, Act, or Claim-duty frame, or to add the selection to an existing frame |
+| **No role is active** and you highlight text | A small panel appears, quoting the selected text and offering to create a Fact, Act, or Claim-duty frame, or to add the selection to an existing frame |
 | You click an **existing annotation** in the text | A list of the annotations covering that fragment opens, so you can jump to or edit their frames |
 
 ---
@@ -94,11 +98,13 @@ positions are recalculated whenever annotations change or an interpretation is l
 
 ---
 
-## Scroll-to-source
+## Show in source
 
-From a frame's editor, *scroll to source* brings the relevant sentence into view in the
-source panel and smoothly scrolls to it, so the interpreter can always see the text a frame
-came from. The source panel itself can be collapsed to give the frames more room.
+From a frame's editor, **Show in source** switches the source pane to the document the frame
+came from and smoothly scrolls the frame's first sentence into view, so the interpreter can
+always see the text a frame came from. The button is disabled for a frame that is not linked
+to source text yet. The source pane itself can be folded into a narrow rail to give the frames
+more room.
 
 For the on-disk shape of annotations and snippets, see the
 [Interpretation JSON Format reference](../reference/interpretation-json-format.md).

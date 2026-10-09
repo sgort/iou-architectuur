@@ -72,6 +72,18 @@ Uploads a task to TriplyDB, skipping graphs that already exist online.
 **Request** `{ "task": "<trig string>" }`
 **Response** `{ "message": "Task saved!" }` on success (HTTP 200).
 
+### `GET /api/nlp/models`
+
+Meant to list the model directories under `MODEL_PATH` as `{ "models": [...] }`.
+
+!!! warning "Fails on every call"
+    The handler reads `os.environ.get("MODEL_PATH")`, but `os` is not defined in the Node.js
+    backend, so every request throws a `ReferenceError`. The backend uses Express 4, which
+    does not catch a rejected async handler: the request gets no response, and under Node's
+    default handling of unhandled rejections (the backend image runs Node 24) the backend
+    process stops. The GUI does not call this endpoint; the model list it offers is fixed in
+    the frontend.
+
 ---
 
 ## nlp-api
@@ -156,8 +168,6 @@ TriplyDB.
 
 ## Notes
 
-- The frontend sends an `X-API-KEY` header (from the `X_API_KEY` build variable) on the
-  `predict` and `process_and_save` calls.
 - CORS is enabled on the backend and the Python services.
 - Error responses follow the usual HTTP status codes (`401`, `404`, `500`); the frontend
   surfaces them through an alert widget.

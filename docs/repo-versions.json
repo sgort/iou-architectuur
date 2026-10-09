@@ -3,7 +3,7 @@
   "last_patch": {
     "date": "2026-10-09",
     "kind": "Component sync",
-    "summary": "RONL Business API v2026.10.1 in production: citizen services follow the deployments, Gemeente Heusden and the Heusdenpas, a landing page per organisation, and people acting in eDOCS as themselves. It found that the release SBOM checks cannot fail in CI.",
+    "summary": "RONL Business API v2026.10.1 in production: citizen services follow the deployments, Gemeente Heusden and the Heusdenpas, a landing page per organisation, and people acting in eDOCS as themselves; it found that the release SBOM checks cannot fail in CI. Norm Editor 2026.09.15-2: the IOU style, three panes to interpret in, the dependencies between acts, and deployments per environment; it found that the release tags were never pushed and the GUI image build likely fails.",
     "previous": {
       "date": "2026-10-06",
       "kind": "Component sync",
@@ -15,6 +15,10 @@
         "url": "https://github.com/sgort/ronl-business-api/issues/354"
       },
       {
+        "label": "regels/editor#1",
+        "url": "https://git.open-regels.nl/regels/editor/-/work_items/1"
+      },
+      {
         "label": "linked-data-explorer#274",
         "url": "https://github.com/sgort/linked-data-explorer/issues/274"
       },
@@ -24,16 +28,6 @@
       }
     ]
   },
-
-
-
-
-
-
-
-
-
-
   "repositories": [
     {
       "name": "RONL Business API",
@@ -53,11 +47,11 @@
     {
       "name": "Norm Editor",
       "icon": "🖍️",
-      "version": "2026.09.1",
+      "version": "2026.09.15-2",
       "environment": "prod",
-      "commit": "46e44c8...",
-      "commit_date": "2026-09-01",
-      "repo_url": "https://git.open-regels.nl/regels/editor/-/commit/46e44c8e9f1f0e47a28659831e5743bcf4088647",
+      "commit": "c47096b...",
+      "commit_date": "2026-09-15",
+      "repo_url": "https://git.open-regels.nl/regels/editor/-/commit/c47096b794af11e937bbf5970b136d1507d4f2c7",
       "ci_repo": "https://git.open-regels.nl/regels/editor"
     },
     {

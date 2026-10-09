@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Norm Editor
 
 The **Norm Editor** (also known as the *Regeleditor*) is a web application for creating
@@ -12,8 +16,8 @@ form fields; the editor builds the FLINT graph behind the scenes and serialises 
 through a dedicated conversion service.
 
 !!! info "Names you will encounter"
-    The product is titled **Norm Editor** in its README, the frontend package is named
-    `regel-gui`, and the running Quasar application identifies itself as the **Regel Editor**.
+    The product is titled **Norm Editor** in its README and in the application header, the
+    browser tab reads **Norm Editor - RONL**, and the frontend package is named `regel-gui`.
     These all refer to the same component. This documentation uses *Norm Editor*.
 
 ---
@@ -28,11 +32,12 @@ expresses norms as **acts** (who may do what, under which preconditions, with wh
 **facts** (the concepts the acts refer to), and **claim-duty relations** (who owes what to
 whom).
 
-The Norm Editor is the **authoring tool** for that model. It guides an interpreter through a
-five-stage process — define a task, collect sources, interpret the sources, validate, and
-perform — of which the first three are fully implemented. Along the way it offers an optional
-machine-learning assistant that suggests the actor, action, object, and recipient of an act
-directly from the Dutch source text.
+The Norm Editor is the **authoring tool** for that model. It is organised in six tabs — *Set
+task*, *Collect sources*, *Interpret sources*, *View interpretation*, *Make interpretations
+executable*, and *Execute task* — of which the first four are implemented; the last two show a
+"Coming soon" page. Along the way it offers an optional machine-learning assistant that
+suggests the actor, action, object, and recipient of an act directly from the Dutch source
+text.
 
 ---
 

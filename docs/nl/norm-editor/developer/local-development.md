@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Local Development
 
 !!! info "Documentatie in ontwikkeling"
@@ -16,6 +20,10 @@
 ---
 
 ## Full stack with Docker Compose
+
+---
+
+## NLP models
 
 ---
 
