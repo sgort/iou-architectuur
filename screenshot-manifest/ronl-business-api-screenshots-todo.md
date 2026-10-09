@@ -1,8 +1,25 @@
 # RONL Business API — screenshots to capture
 
-!!! note "Nothing outstanding — reviewed 3 October 2026 for v2026.10.0"
-    Rows 13, 14 and 15 were captured on acceptance on 3 October 2026, as
-    `test-besluit-flevoland` on a running besluit. Rows 11 and 12 still hold.
+!!! note "Nothing outstanding — reviewed 9 October 2026 for v2026.10.1"
+    Rows 16–20 were captured the same day. Row 20 shows the Keycloak login form on its
+    own rather than beside the landing page; the figure's text says so. Rows 11–15 still hold.
+
+## Sync v2026.10.0 → v2026.10.1 — two REPLACE, three NEW (captured)
+
+Reviewed on 9 October 2026 for **v2026.10.1**, in production.
+
+| # | Status | File | Embedding page | What it must show | Trigger |
+|---|---|---|---|---|---|
+| 16 | ✅ **REPLACE** (9 Oct) | `ronl-business-api-landing-page.png` | `user-guide/getting-started.md` | The Flevoland landing grid, signed out, with the **Flevoland-account** button beside **Openen** on Caseworker, PA-Cockpit and Infra-board (none on Woo-dashboard) | v2026.10.1 — boards open with the Flevoland account |
+| 17 | ✅ **NEW** (9 Oct) | `ronl-business-api-tenant-landing-heusden.png` | `user-guide/getting-started.md` § Organisation landing pages | `mijn.open-regels.nl/heusden`: logo, Heusden colours and background, **Inloggen als medewerker**, the DigiD link | v2026.10.1 — a landing page per organisation |
+| 18 | ✅ **NEW** (9 Oct) | `ronl-business-api-citizen-diensten.png` | `user-guide/citizen-portal.md` | Diensten as a citizen: the service cards the organisation offers, no Mijn toestemming tab (e.g. `test-citizen-heusden`: Zorgtoeslag and Heusdenpas) | v2026.10.1 — citizen services from the deployments |
+| 19 | ✅ **NEW** (9 Oct) | `ronl-business-api-heusdenpas-start.png` | `user-guide/citizen-portal.md` | The Heusdenpas start form with **Vul in met een testgeval** open | v2026.10.1 — the Heusdenpas |
+| 20 | ✅ **REPLACE** (9 Oct) | `ronl-theme-consistency.png` | `developer/deployment/keycloak.md` | The current landing page beside the Keycloak login form without the Flevoland (Entra ID) button (shown only once `keycloak-add-entra-idp.sh` has been re-run on that realm) | v2026.10.1 — the Entra button hidden on the login form |
+
+**Considered and not captured:** the **Geen toegang** dialog — it needs an account
+without the board's role, and the capturing account holds them all, so the page
+describes it in prose; the caseworker decline message (a transient confirmation);
+the link previews (other apps); eDOCS as the person and the CI work (no surface).
 
 ## Sync v2026.09.15 → v2026.10.0 — three NEW
 

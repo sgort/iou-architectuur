@@ -9,17 +9,17 @@ acceptance/production pair for each of four packages; two scanning workflows —
 the supply-chain `audit` gate and a Semgrep `scan`; two that watch dependencies
 rather than a commit — the daily `dependency-audit` and the release SBOM; and the
 **promotion workflow** that orchestrates the four production deploys. They hold
-**twenty-four jobs**. Twenty of them choose a runner, and every one of those
+**twenty-six jobs**. Twenty-two of them choose a runner, and every one of those
 names `ubuntu-24.04`, never `ubuntu-latest`; the other four are the promotion's
-calls into the production workflows, whose own jobs are among the twenty. That
+calls into the production workflows, whose own jobs are among the twenty-two. That
 label is one GitHub moves to a new Ubuntu release on its own schedule, so
 pinning it means a change of OS release arrives as a diff here rather than
 silently. The label pins the *release*, not the image — GitHub
 rebuilds the image about weekly, and a hosted runner cannot pin it by digest.
 
 !!! info "`acc` and `main` carry the same thirteen files, and deliberately different shapes"
-    Re-verified on 30 September 2026 (v2026.09.15): `origin/acc` at `142d909`
-    and `origin/main` at `ae06c9e` carry an identical tree, `.github/workflows/`
+    Re-verified on 9 October 2026 (v2026.10.1): `origin/acc` at `0ea4985`
+    and `origin/main` at `ebec288` carry an identical tree, `.github/workflows/`
     included.
     `main` was once four workflows behind and carried none of the pinning or
     gating described below — closing that gap was a CI-alignment programme that
@@ -38,7 +38,7 @@ rebuilds the image about weekly, and a hosted runner cannot pin it by digest.
 
 | File | Trigger | Target | Deploys? |
 |---|---|---|---|
-| `zizmor.yml` | PR, push to `acc`/`main` | — | No — the `audit` gate |
+| `zizmor.yml` | PR, push to `acc`/`main` | — | No — the `audit` gate, and `lockfile-review` on pull requests |
 | `semgrep.yml` | PR, push to `acc`/`main` | — | No — the `scan` job |
 | `dependency-audit.yml` | schedule (05:17 UTC daily), `workflow_dispatch`, PR touching its own files | — | No — the `dependency-audit` job |
 | `sbom.yml` | push to `main`, `workflow_dispatch`, PR touching the SBOM tooling | — | No — the `release-sbom` job |
@@ -163,7 +163,7 @@ run on a pull request only when it touches their own tooling.
 
 ### `audit` — the required check
 
-`zizmor.yml` has one job, and it runs **nine steps, all of them blocking**:
+`zizmor.yml` has three jobs: `audit`, and the two [`lockfile-review`](#lockfile-review-what-a-lockfile-change-contains) jobs. `audit` runs **ten steps, all of them blocking**:
 
 | # | Step | What it does |
 |---|---|---|
@@ -172,12 +172,13 @@ run on a pull request only when it touches their own tooling.
 | 3 | Run zizmor | Workflow static analysis, with zizmor itself pinned to `1.29.0` — maintained by Renovate, which maps the action to the image `ghcr.io/zizmorcore/zizmor`, not bumped by hand |
 | 4 | Validate `renovate.json` | `renovate-config-validator --strict` |
 | 5 | Lockfile matches `package.json` | `npm ci --dry-run --ignore-scripts` — resolves and validates without writing `node_modules` |
-| 6 | `npm ci` | So the three steps below run *this* repository's tooling rather than a version named in the workflow |
+| 6 | `npm ci` | So the four steps below run *this* repository's tooling rather than a version named in the workflow |
 | 7 | `npm run check-format` | Prettier, via the root script the pre-push hook also runs |
-| 8 | `npm run check-shared` | [`@ronl/shared` holds declarations, not logic](shared-package.md#kept-declarations-only) |
-| 9 | `npm run check-supply-chain` | Every digest resolved against the GitHub API, and the register in `SECURITY-PIPELINE.md` compared against the workflows |
+| 8 | `npm run check-swimlane-fixtures` | The swimlane parser fixtures against the fingerprints `linked-data-explorer` commits identically — see [Local development](local-development.md) |
+| 9 | `npm run check-shared` | [`@ronl/shared` holds declarations, not logic](shared-package.md#kept-declarations-only) |
+| 10 | `npm run check-supply-chain` | Every digest resolved against the GitHub API, and the register in `SECURITY-PIPELINE.md` compared against the workflows |
 
-Steps 4 through 9 carry `if: always()`. That makes them run *after* an earlier
+Steps 4 through 10 carry `if: always()`. That makes them run *after* an earlier
 failure, so one run reports on every half of the policy instead of stopping at
 the first — it does **not** make them non-blocking. The job still fails.
 
@@ -188,9 +189,11 @@ finding appears only in the log while every check reads *success*.
 `check-supply-chain` ran that way from its adoption until v2026.09.7 promoted it
 to blocking.
 
-Step 7 is in this job rather than in a deploy workflow for the same reason step 8
-is: `audit` has no paths filter and is the required check, so a
-documentation-only pull request reaches it too.
+Steps 7, 8 and 9 are in this job rather than in a deploy workflow or a workspace
+suite for one reason: `audit` has no paths filter and is the required check, so
+every pull request reaches it — a documentation-only one too, and one made with
+`--no-verify` or in the GitHub UI, which skips the pre-push hook that also runs
+the fixture check.
 
 Step 5 exists because a lockfile out of step with `package.json` was already
 detectable, but only as an `EUSAGE` error inside the formatter's `npm ci`, where
@@ -204,6 +207,38 @@ the wrong reason. Its limit is stated beside it: the check runs on the pull
 request's merge commit, so it proves the lockfile consistent with *that* base,
 not with a base that moves afterwards. **Merge dependency pull requests one at a
 time, each rebased onto the merged `acc` first.**
+
+### `lockfile-review` — what a lockfile change contains
+
+A dependency pull request shows its reviewer the direct change
+(`prettier ^3.9.7 → ^3.9.8`); what moves is `package-lock.json`, and nobody
+reads that diff. `zizmor.yml` therefore carries two more jobs, which run on
+pull requests only:
+
+- **`lockfile-review`** runs code from the head ref — `scripts/lockfile-diff.mjs`
+  and the lockfile — with a **read-only** token. It first runs the script's own
+  tests (`scripts/lockfile-diff.test.mjs`), then compares `package-lock.json`
+  with the base commit's as data; it never runs npm and never installs. When the
+  lockfile is unchanged it succeeds at once. The report goes to the job summary.
+- **`lockfile-review-comment`** holds the `pull-requests: write` token and runs
+  no repository code at all: it posts the report as one sticky comment on the
+  pull request, updating it on every push. It runs only for branches in this
+  repository — a fork's token is read-only — and not for a run a newer push
+  superseded.
+
+Two findings **fail** the check, over the whole head lockfile however an entry
+arrived: a package not resolved from `https://registry.npmjs.org/`, and a
+package without an integrity hash (bundled dependencies excepted, since their
+parent's tarball carries the integrity). Everything else is a **review prompt**
+in the comment, never a failure: a licence change, a new package whose licence
+is not on the allow-list in `lockfile-review.json` at the repository root, a new
+install script, and a downgrade. A lockfile or configuration the script cannot
+use exits 2, which never reads as clean.
+
+`lockfile-review` is a **required status check on `acc`**. It can be: this
+workflow has no paths filter, so the check reports on every pull request, and an
+unchanged lockfile passes at once. `main` does not require it — see [Required
+checks and branch rules](#required-checks-and-branch-rules).
 
 ### `scan` — Semgrep, required on `acc` and `main`
 
@@ -276,26 +311,48 @@ the issue step is skipped there.
 ### `release-sbom` — an SBOM for every release
 
 A promotion to `main` is the release here: there are no tags and no GitHub
-Releases. Each release keeps a CycloneDX SBOM of its **production** dependencies
-in two copies, because neither is enough alone:
+Releases. Each release keeps a CycloneDX SBOM of its **production** dependencies,
+committed as `docs/sbom/<name>-<version>.cdx.json` and written by `npm run sbom`
+(`scripts/write-sbom.mjs`) with `npm sbom --package-lock-only --omit=dev`. It
+describes the lockfile rather than whatever is in `node_modules`. `npm run sbom`
+is a bump-release step, after the version bump, since the filename carries the
+version. This copy answers a question about a version that shipped a year ago.
 
-- **Committed**, as `docs/sbom/<name>-<version>.cdx.json`, written by `npm run
-  sbom` (`scripts/write-sbom.mjs`) with `npm sbom --package-lock-only --omit=dev`.
-  It describes the lockfile rather than whatever is in `node_modules`. `npm run
-  sbom` is a bump-release step, after the version bump, since the filename carries
-  the version. This copy answers a question about a version that shipped a year
-  ago.
-- **Uploaded** by `sbom.yml` as a workflow artifact, which a scanner can fetch
-  without a checkout. A public repository keeps artifacts ninety days at most,
-  which is why the committed copy exists.
+The script has four modes: writing; `--check`, strict — the file must exist and
+match the lockfile, exit 1 otherwise; `--verify-release` — a missing file fails,
+drift only warns; and `--print-path`. Both comparisons ignore `serialNumber` and
+`metadata.timestamp`, which change on every run. `npm run sbom:check` runs the
+strict check locally.
 
-The script has three modes: writing; `--check`, strict — the file must exist and
-match — for where the release is cut; and `--verify-release`, which `sbom.yml`
-runs on a push to `main`: a missing document fails, drift only warns, because a
-promotion carries every commit merged into `acc` since the release was cut. Both
-comparisons ignore `serialNumber` and `metadata.timestamp`, which change on every
-run. Node is pinned as the same `'24.21.0'` literal as the daily audit, for the
-same reason.
+`sbom.yml` runs one job, `release-sbom`, on Node `'24.21.0'` — the same literal
+as the daily audit, for the same reason:
+
+| # | Step | When |
+|---|---|---|
+| 1 | Checkout | Always |
+| 2 | Set up Node `24.21.0` | Always |
+| 3 | **Generate the SBOM** — `node scripts/write-sbom.mjs` | Always |
+| 4 | `--verify-release` | A push to `main` |
+| 5 | `--check`, when the pull request changes the version's SBOM file (a release bump); skipped otherwise | A pull request touching the SBOM tooling |
+| 6 | Upload `docs/sbom/*.cdx.json` as a workflow artifact, kept ninety days | After the steps above |
+
+!!! warning "Neither check can fail in CI"
+    Step 3 runs **before** steps 4 and 5, and it rewrites
+    `docs/sbom/<name>-<version>.cdx.json` in the runner's workspace from the
+    lockfile. Both checks then compare that freshly written file with a document
+    generated from the same lockfile — the file with itself — so they always
+    report *matches the lockfile*. The committed SBOM is never compared with
+    anything in CI, and the artifact step 6 uploads is the regenerated file, not
+    the committed one.
+
+    The difference is real. The committed `ronl-business-api-2026.10.1.cdx.json`
+    was generated with npm 10.9.9 (the npm bundled with Node 22.23.3, recorded in
+    its `metadata.tools`) and lists 423 components. npm 11 generates 409
+    components from the same lockfile: the release pull request's run used npm
+    11.19.0, generated 409 and reported a match. Run locally with npm 11, `npm
+    run sbom:check` fails against the committed file. Which npm writes the SBOM
+    changes its content, so an SBOM is comparable only with one generated by the
+    same npm.
 
 ---
 
@@ -306,7 +363,7 @@ v2026.09.7 eight workflows asked for `node-version: '20'` — building the
 deployed artifact on a major the host does not run.
 
 - The **eight deploy workflows** read `node-version-file: .nvmrc`.
-- `.nvmrc` carries an exact `22.23.2`.
+- `.nvmrc` carries an exact `22.23.3`, which bundles npm 10.9.9.
 - The root `engines.node` is `>=22`, and `engines.npm` is `>=10.0.0`.
 - `dependency-audit.yml` and `sbom.yml` name an exact `'24.21.0'`: they read
   lockfiles — both branches', in the audit's case — and should not change Node
@@ -325,9 +382,9 @@ deployed artifact on a major the host does not run.
 
 !!! note "`engines` is a floor, not the runtime — and Renovate no longer raises it"
     Renovate's `rangeStrategy bump` applies to `engines` as well as to
-    dependencies, and it once raised `engines.node` to `>=22.23.2` and
-    `engines.npm` to `>=10.9.9` — a floor **no Node 22 release satisfies**,
-    since 22.23.2 bundles npm 10.9.8. Nothing enforces `engines` here, so a
+    dependencies, and under `bump` it raises `engines.node` and `engines.npm`
+    to the newest versions it sees — once to an npm floor that no Node 22
+    release then bundled. Nothing enforces `engines` here, so a
     raised floor produces `EBADENGINE` warnings on a slightly older toolchain
     and drifts the root away from `packages/backend` and App Service's
     `NODE|22-lts`. `engines` now uses `rangeStrategy widen`, which leaves a
@@ -343,7 +400,7 @@ Two majors are held by a Renovate rule that sets `enabled: false` and carries,
 in its `description`, the reason and the condition that ends it:
 
 - **Node 24.** Both App Services run `NODE|22-lts` against an `.nvmrc` of
-  `22.23.2`, so the tree is consistent today; taking 24 in `.nvmrc` alone would
+  `22.23.3`, so the tree is consistent today; taking 24 in `.nvmrc` alone would
   build the backend on a major the host does not run. The rule ends by
   **switching both App Services to `NODE|24-lts` first**, then removing the rule
   in the same change as the `.nvmrc` bump. App Service offers the runtime at the
@@ -390,7 +447,7 @@ matters:
 |---|---|
 | npm **11.10 or newer** | Honours it on `install` and `update` |
 | `npm ci` | **Ignores it on purpose** — so CI, which only ever runs `npm ci`, cannot fail on it |
-| npm **10.9.8** (bundled with Node 22.23.2) | Ignores it *without a warning* — which is why `scripts/check-deps.sh` warns when npm is older than 11.10 |
+| npm **10.9.9** (bundled with Node 22.23.3) | Ignores it *without a warning* — which is why `scripts/check-deps.sh` warns when npm is older than 11.10 |
 | The backend deploy | Not covered: it installs in its own `deploy/` folder, and npm reads a project `.npmrc` only from the project root |
 
 An urgent security fix may skip the cooldown, as the guideline allows — set the
@@ -408,9 +465,9 @@ and a failing test blocks the deploy.
 | Workflow | Lint | Type-check | Tests | Extra gates |
 |---|:---:|:---:|:---:|---|
 | `azure-backend-*` | ✅ | – | ✅ | Lints the OpenAPI document; verifies `dist/index.js` exists, packages from the lockfile, then deploys and verifies the deploy took effect |
-| `azure-frontend-*` | ✅ | – | ✅ | `@ronl/pa-cockpit`'s 476 tests, then a performance budget, each its own step; `check-og.mjs` on the built `index.html` |
+| `azure-frontend-*` | ✅ | – | ✅ | `@ronl/pa-cockpit`'s 515 tests, then a performance budget, each its own step; `check-og.mjs` on the built `index.html` and every tenant page |
 | `azure-publicsite-*` | ✅ | ✅ | ✅ | Prerender + bundle-cleanliness gate, inside the build; `check-og.mjs` on every built page and `robots.txt` |
-| `azure-pa-demo-*` | ✅ | ✅ | ✅ | **Playwright E2E**, then the bundle gate inside the build |
+| `azure-pa-demo-*` | ✅ | ✅ | ✅ | **Playwright E2E** (acceptance only), then the bundle gate inside the build |
 
 `@ronl/pa-cockpit` has no deploy workflow of its own — it is a library both the
 frontend and the demo consume — so until v2026.09.6 its tests ran nowhere in CI,
@@ -420,7 +477,10 @@ frontend's own suite: a break there explains a break here.
 
 `azure-pa-demo-acc.yml` is the only workflow in the repository that runs an
 end-to-end suite. It installs a Chromium browser first, since no other workflow
-here needs Playwright, and runs it **before** the build. The demo needs no
+here needs Playwright, and runs it **before** the build. The install step has
+`timeout-minutes: 10`: `--with-deps` runs `apt-get` against the runner's Ubuntu
+mirror, and a mirror that stops answering would otherwise hang the job until
+GitHub's six-hour limit; a healthy install takes about twenty seconds. The demo needs no
 backend, database or Keycloak — Playwright starts its own dev server and that is
 the whole environment. See [PA-demo suite](testing/pa-demo.md).
 
@@ -448,7 +508,14 @@ Azure/static-web-apps-deploy   (skip_app_build: true)
 `dist/` and fails the build step when its link-preview tags are not the target
 environment's: `og:url`, `og:image`, `og:title` (with its `[ACC] ` prefix on
 acceptance), the `robots` meta tag, the canonical link, an unfilled
-`%VITE_…%` placeholder, and the preview image missing from `dist/`. The public
+`%VITE_…%` placeholder, and the preview image missing from `dist/`. The
+frontend's copy also checks every single-board tenant's page
+(`dist/<id>/index.html`, written by `vite-plugin-tenant-pages.ts`): its own
+`og:url` and canonical link (`<site>/<id>`), its card
+`og-image-<id>-<acc|prod>.png`, the title prefix, the `robots` tag, and a rewrite
+for `/<id>` in the shipped `staticwebapp.config.json`. It rejects two routes
+there that differ only by a trailing slash, because Static Web Apps treats them
+as duplicates and refuses the whole configuration at upload. The public
 site's copy checks every prerendered `index.html`, expects exactly one
 canonical link per page, and compares `robots.txt` byte for byte — `Disallow:
 /` on acceptance. The unit tests prove the template and the `.env` files agree;
@@ -557,10 +624,18 @@ no longer sit on a trigger at all — they moved into a script.
 | Acceptance workflow | Paths |
 |---|---|
 | `azure-backend-acc.yml` | `packages/backend/**`, `packages/shared/**`, `package-lock.json`, `package.json`, `.nvmrc`, own file |
-| `azure-frontend-acc.yml` | `packages/frontend/**`, `packages/shared/**`, `packages/pa-cockpit/**`, `.nvmrc`, own file |
-| `azure-pa-demo-acc.yml` | `packages/pa-demo/**`, `packages/shared/**`, `packages/pa-cockpit/**`, `.nvmrc`, own file |
-| `azure-publicsite-acc.yml` | `packages/public-site/**`, `.nvmrc`, own file |
+| `azure-frontend-acc.yml` | `packages/frontend/**`, `packages/shared/**`, `packages/pa-cockpit/**`, `package-lock.json`, `package.json`, `.nvmrc`, own file |
+| `azure-pa-demo-acc.yml` | `packages/pa-demo/**`, `packages/shared/**`, `packages/pa-cockpit/**`, `package-lock.json`, `package.json`, `.nvmrc`, own file |
+| `azure-publicsite-acc.yml` | `packages/public-site/**`, `package-lock.json`, `package.json`, `.nvmrc`, own file |
 | `zizmor.yml`, `semgrep.yml` | **none, deliberately** — both scanners must run on every pull request |
+
+The root `package-lock.json` and `package.json` are in all four, because every
+workspace resolves through them: a lockfile-only change — Renovate's lock-file
+maintenance above all — moves every app's dependencies, so it builds and tests
+all four on its pull request and deploys all four on `acc` when it merges. It
+does not earn a pull-request preview: the preview decision ignores files named
+`package.json` or `package-lock.json` (see [A preview is
+opt-in](#a-preview-is-opt-in)).
 
 ### The production filters live in a script
 
@@ -576,9 +651,13 @@ directly as its `outputs:` source.
 | `pa_demo` | `packages/pa-demo/`, `packages/shared/`, `packages/pa-cockpit/`, `azure-pa-demo-prod.yml`, `.nvmrc` |
 | `public_site` | `packages/public-site/`, `azure-publicsite-prod.yml`, `.nvmrc` |
 
-Each pattern mirrors the `paths:` filter its acceptance sibling still carries,
-and the acceptance copy is the reference — the two have to be kept in step by
-hand.
+Each pattern mirrors the `paths:` filter its acceptance sibling carries, with
+one difference: only `backend` matches the root `package-lock.json` and
+`package.json`. The frontend, PA-demo and public-site patterns do not, so a
+promotion that changes nothing but the lockfile redeploys the backend and none
+of the three static sites, although acceptance built, tested and deployed all
+four from that same change. The acceptance copy is the reference — the two have
+to be kept in step by hand.
 
 Three details in it are load-bearing:
 
@@ -750,7 +829,7 @@ Releases therefore land through a pull request rather than a local fast-forward.
 | | `acc` | `main` |
 |---|---|---|
 | Ruleset | `acc supply-chain gate` | `main promotion gate` |
-| Required status checks | `audit`, `scan`, and the four build checks | `audit`, `scan` |
+| Required status checks | `audit`, `scan`, the four build checks, and `lockfile-review` | `audit`, `scan` |
 | Pull request | Required, 0 approvals, merge method `merge` only | Required, 0 approvals, merge method `merge` only |
 | `deletion` | Blocked | Blocked |
 | `non_fast_forward` | Blocked | Blocked |
@@ -760,6 +839,11 @@ Frontend**, **Build and Deploy ACC PA Demo** and **Build and Deploy ACC Public
 Site**. They were promoted together with `scan` once each of their workflows
 could report on every pull request — see [Why the `pull_request` filter moved
 into a job](#why-the-pull_request-filter-moved-into-a-job).
+
+`lockfile-review` is required on `acc` and not on `main`. It runs on a
+promotion pull request to `main` as well, since its workflow has no branch
+filter, but there it is advisory: every lockfile change reaching `main` has
+already passed it on its own pull request to `acc` — see [`lockfile-review`](#lockfile-review-what-a-lockfile-change-contains).
 
 `main` requires the two scanners — `audit`, and since 29 September 2026 `scan` —
 but none of the four build checks, and that makes it the weaker branch in this

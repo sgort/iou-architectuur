@@ -80,13 +80,13 @@ The token endpoint for production will be `https://keycloak.open-regels.nl/realm
 
 ## M2M — Operaton
 
-`packages/backend/src/routes/m2m.routes.ts` registers 18 operations on 19 routes under `/v1/m2m`: ten process, six task and two decision operations, with process history answering on two routes. Every one of them passes `jwtMiddleware` and `requireM2mClient`; none passes `tenantMiddleware`, so the surface is deliberately cross-tenant: it lists and acts on process instances and tasks of every organisation.
+`packages/backend/src/routes/m2m.routes.ts` registers 18 operations on 18 routes under `/v1/m2m`: ten process, six task and two decision operations. Every one of them passes `jwtMiddleware` and `requireM2mClient`; none passes `tenantMiddleware`, so the surface is deliberately cross-tenant: it lists and acts on process instances and tasks of every organisation.
 
 The operations, their parameters, request bodies, response shapes and error codes are described in the OpenAPI document, under the **Machine-to-machine** tag of the [API Specification](../reference/api-specification.md), with the `m2mOAuth` (client credentials) security scheme. Details worth knowing before reading it:
 
 - `POST /v1/m2m/process/:key/start` answers `200` where its `/v1` twin answers `201`, and it keeps a caller's `businessKey` verbatim rather than prefixing it with an organisation.
-- Process history is `POST /v1/m2m/process/history`, its body forwarded to Operaton as the history query. `GET /v1/m2m/process/history` still answers, but is deprecated: it sends `Deprecation: @1790985600` (3 October 2026), and a body on a `GET` is dropped by many clients and proxies, which then receive the unfiltered history.
-- A start refuses a body that sets `municipality` or `originTenantId`, and a task completion one that sets `municipality`, `originTenantId` or `applicantId`. Both answer `400 RESERVED_VARIABLE` with the refused names in a `reserved` member, before any engine call. A start may carry `applicantId`: a machine may start a case on a citizen's behalf.
+- Process history is `POST /v1/m2m/process/history`, its body forwarded to Operaton as the history query. There is no `GET` spelling: `GET /v1/m2m/process/history` answers `404`. A body on a `GET` is dropped by many clients and proxies, which would then receive the unfiltered history.
+- A start refuses a body that sets `municipality`, `originTenantId`, `edocsAuthor` or `edocsAuthorName`, and a task completion one that sets any of those or `applicantId`. The eDOCS author variables are the backend's to stamp, from a person's token on a `/v1` start or completion; a machine names no employee. Both answer `400 RESERVED_VARIABLE` with the refused names in a `reserved` member, before any engine call. A start may carry `applicantId`: a machine may start a case on a citizen's behalf.
 - Errors are RFC 9457 problem details; branch on the `code` member.
 
 ### Test script
@@ -124,7 +124,7 @@ TARGET=acc CLIENT_SECRET=<secret> bash scripts/test-m2m-routes.sh
 - Token obtained; `azp` is the client ID, `aud` contains `ronl-business-api`, `municipality` is absent
 - The read operations return HTTP 200 (404 accepted for `form-schema`, `start-form`, `decision-document` and `historic-variables`, whose resource may not exist in the deployment); a 404 on `GET /v1/m2m/decision/:key` skips both decision checks
 - `POST /v1/m2m/process/history` answers `200` and applies its filter: a query by process definition key returns only instances of that key (skipped when the engine has no history yet)
-- The deprecated `GET /v1/m2m/process/history` answers with `Deprecation: @1790985600`
+- `GET /v1/m2m/process/history` answers `404` (the `GET` spelling is removed; against an older backend this check fails, which tells you which build you are talking to)
 - Write lifecycle, skipped with a note when `LIFECYCLE_KEY` cannot be started:
     - start answers `200`, keeps the `businessKey` verbatim, labels the case's `municipality` with the instance's own `tenantId`, sets no `originTenantId`, and accepts wrapped `{ value, type }` variables as well as plain ones
     - a start that sets `municipality` answers `400` with code `RESERVED_VARIABLE`

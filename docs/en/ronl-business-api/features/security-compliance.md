@@ -28,6 +28,11 @@ Cross-origin access is governed by CORS, which is a browser control, not an acce
 
 Every protected endpoint requires a valid, signature-verified token before any request data is processed — see [Authentication & IAM](authentication-iam.md) for the full validation chain, the role checks a caller's token is subject to, and the tenant boundary that keeps one caller from reaching another tenant's resources. The cross-tenant machine-to-machine routes under `/v1/m2m` additionally require the token to have been issued to a client on `M2M_ALLOWED_CLIENTS`; any other token, a person's included, is refused with `403 M2M_CLIENT_NOT_ALLOWED`.
 
+The eDOCS routes under `/v1/edocs` are closed to citizens and to unknown machine clients: a person needs the `caseworker` or `admin` role, and a machine client must be on `EDOCS_ALLOWED_CLIENTS`. A person works in eDOCS as themselves, with the Entra ID token Keycloak stored when they signed in with their Flevoland account. The backend reads that token from Keycloak's broker endpoint with the person's own Keycloak token, so it can only ever read the tokens of the person making the request; it keeps them in memory only, per person and bounded, and never logs, returns or stores them. The bearer token the backend keeps on the request for that purpose is non-enumerable, so a log line or a copy of the request's authentication data never carries it. See [eDOCS — Live Testing](../developer/testing/edocs-live-testing.md#people-and-the-service-account).
+
+!!! warning "Accepted risk: a browser-held token can reach eDOCS as its owner"
+    The broker endpoint requires Keycloak's `read-token` role in the caller's access token, so every user holds it and `ronl-business-api`'s access tokens carry it — including the token the browser holds. A stolen Keycloak access token can therefore read its owner's stored Entra token from Keycloak's broker endpoint and reach eDOCS as that person outside the Business API's audit, for the Entra ID token's remaining life (about an hour). The stored refresh token is of no use without the client secret. The risk is accepted pending a decision on a backend-only path ([issue 325](https://github.com/sgort/ronl-business-api/issues/325)).
+
 ---
 
 ## Secrets management

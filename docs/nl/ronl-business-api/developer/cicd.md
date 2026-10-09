@@ -23,7 +23,7 @@ component: RONL Business API
 
 ---
 
-## The two scanning workflows
+## Scanning, audit and SBOM workflows
 
 ---
 

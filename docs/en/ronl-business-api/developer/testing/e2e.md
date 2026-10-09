@@ -4,25 +4,84 @@ component: RONL Business API
 
 # E2E & live smoke
 
-Three Playwright suites and four gated shell scripts. None of them runs as part
-of `npm test`, and **one of the three runs in CI**.
+Three Playwright suites and four gated shell scripts, plus a wrapper that
+runs two of them as a signed-in person. None of them runs as part of
+`npm test`, and **one of the three suites runs in CI**.
 
 | Suite | Where | Specs | Tests | In CI? | Last measured |
 |---|---|---:|---:|---|---|
-| Frontend Playwright | `packages/frontend/e2e/` | **11** | **28** | No | **3 Oct — 27 passed, 1 skipped, 2.8m** |
-| Public-site Playwright | `packages/public-site/e2e/` | 1 | **6** | No | **3 Oct — 6/6 serially, 7.8s; 2 timeouts in the parallel run** |
-| **PA-demo Playwright** | `packages/pa-demo/e2e/` | 1 | **11** | **Yes** — `azure-pa-demo-acc.yml` | **3 Oct — 11 passed, 10.2s** |
-| Live smoke scripts | `scripts/*.sh` | 4 scripts | — | No | never run for these pages |
+| Frontend Playwright | `packages/frontend/e2e/` | **15** | **47** | No | **9 Oct — 42 passed, 5 skipped, 2.6m** |
+| Public-site Playwright | `packages/public-site/e2e/` | 1 | **6** | No | **9 Oct — 6/6 serially, 6.4s; 2 timeouts in the parallel run** |
+| **PA-demo Playwright** | `packages/pa-demo/e2e/` | 1 | **11** | **Yes** — `azure-pa-demo-acc.yml` | **9 Oct — 11 passed, 8.7s** |
+| Live smoke scripts | `scripts/*.sh` | 4 scripts and a wrapper | — | No | never run for these pages |
 
-**45 end-to-end tests, all three suites green — the frontend with one
-journey skipping itself by design, and the public site green serially.**
-Measured on **3 October 2026** for v2026.10.0 (`main` at `0625d48`), from the
-working checkout on `acc` at `0e3eed8`, against the full local stack the
-developer already had running; nothing was started or stopped for the run.
-It is the first pass since 30 August 2026 in which the three were run rather
-than described from configuration.
+**64 end-to-end tests, all three suites green — the frontend with five
+tests skipping themselves by design, and the public site green serially.**
+Measured on **9 October 2026** for v2026.10.1 (`main` at `ebec288`), from the
+working checkout on `acc` at `0ea4985`, a tree identical to `ebec288`,
+against the full local stack the developer already had running; nothing was
+started or stopped for the run.
 
-!!! success "Re-run on 3 October — the frontend count is a total again"
+!!! success "Re-run on 9 October — four new specs, nineteen more tests"
+    v2026.10.1 added **four frontend specs and 19 tests**, and the runner
+    collected **47 tests across fifteen specs** — 42 passed and five
+    skipped, each skip one the spec declares:
+
+    - **`landing-single-board`** (13 tests, 9 passed, **4 skipped**) — the
+      organisation landing pages at `/amsterdam` and `/heusden`: one exact
+      *"Inloggen"*, the caseworker login in the tenant's colours, the DigiD
+      link pre-filling the tenant's test citizen, an old `/?tenant=` link
+      redirected, and an unknown or Flevoland path sent to the grid at `/`.
+      Its four *link preview* tests skip on a local target — the per-tenant
+      pages exist only in a deployed build, and the dev server serves the
+      root `index.html` for every path.
+    - **`citizen-services`** (3, passed) — the cards each test citizen sees:
+      Amsterdam exactly *Zorgtoeslag*, Heusden *Zorgtoeslag* and
+      *Heusdenpas*, Flevoland *Zorgtoeslag*, *Vergunningen* and *Subsidies* —
+      and no *Mijn toestemming* button.
+    - **`landing-access-denied`** (2, passed) — a board the role does not
+      open ends in the no-access dialog on the landing page, and the boards
+      with an Entra role offer the Flevoland account.
+    - **`heusdenpas-journey`** (1, passed, 11.8s) — Gemeente Heusden's
+      Heusdenpas end to end: `test-citizen-heusden` applies, and
+      `test-caseworker-heusden` checks completeness, reviews the outcome of
+      the untenanted SVB, SZW and Heusdenpas decisions, and informs the
+      applicant, who then sees the decided application once in *Mijn
+      aanvragen*.
+    - **`rip-r21-journey`** skipped itself again, as on 3 October: the local
+      stack signs with the real ValidSign (`VALIDSIGN_STUB_MODE=false`).
+
+    One existing spec changed: **`caseworker-journey.spec.ts`** now fills the
+    Kapvergunning forms by their Dutch labels — *Stamdiameter (cm)*,
+    *Aanvraag indienen*, *Beoordeling indienen*, *Bekendmaking bevestigen* —
+    because linked-data-explorer's fixtures translated them
+    (linked-data-explorer#254 item 1); it passed. The
+    **`required-processes`** helper behind `globalSetup` now requires **nine**
+    process definitions, the two Heusdenpas ones under tenant `heusden`, and
+    three more decisions — see
+    [Deploying the E2E fixtures](#deploying-the-e2e-fixtures).
+
+    **The public-site suite went red once and green serially again**, as on
+    3 October: four passed and the same two search-journey tests timed out in
+    its default parallel run, and it passed **6/6 in 6.4s** with
+    `--workers=1`; see
+    [Public-site Playwright suite](#public-site-playwright-suite). **pa-demo
+    passed 11/11 in 8.7s.**
+
+    **The inventory is seventeen specs**: fifteen in
+    `packages/frontend/e2e/`, plus `packages/pa-demo/e2e/plato-demo.spec.ts`
+    and `packages/public-site/e2e/publiek.spec.ts`. No `playwright.config.ts`
+    changed, and the workflow wiring is unchanged: the pa-demo spec runs in
+    `azure-pa-demo-acc.yml` and only there, and no workflow runs the other
+    two.
+
+    The fifteen: `caseworker-journey`, `citizen-services`,
+    `heusdenpas-journey`, `infra-board-journey`, `landing-access-denied`,
+    `landing-single-board`, `login-redirect`, `pa-live-authoring`,
+    `pa-mock-journey`, `protected-route`, `rip-r21-journey`, `smoke`,
+    `tenant-isolation`, `thuisbatterij-journey`, `zorgtoeslag-journey`.
+
+!!! note "History: re-run on 3 October — the frontend count is a total again"
     Every pass from 12 to 30 September left the Playwright suites alone, and
     the 27-test frontend figure they repeated was measured when there were ten
     specs, so it could not include `thuisbatterij-journey.spec.ts`. On
@@ -46,18 +105,12 @@ than described from configuration.
     timeouts in the parallel run* — not a defect until it fails on its own;
     see [Public-site Playwright suite](#public-site-playwright-suite).
 
-    **The inventory is thirteen specs**, unchanged since v2026.09.11: eleven in
-    `packages/frontend/e2e/`, plus `packages/pa-demo/e2e/plato-demo.spec.ts`
-    and `packages/public-site/e2e/publiek.spec.ts`. v2026.10.0 changed no
-    spec, no `playwright.config.ts` and no helper:
-    `git diff ae06c9e 0625d48 -- 'packages/*/e2e'` is empty. The workflow
-    wiring is unchanged too: the pa-demo spec runs in `azure-pa-demo-acc.yml`
-    and only there, and no workflow runs the other two.
-
-    The eleven: `caseworker-journey`, `infra-board-journey`, `login-redirect`,
-    `pa-live-authoring`, `pa-mock-journey`, `protected-route`,
-    `rip-r21-journey`, `smoke`, `tenant-isolation`, `thuisbatterij-journey`,
-    `zorgtoeslag-journey`.
+    **The inventory was thirteen specs** then, unchanged since v2026.09.11:
+    eleven in `packages/frontend/e2e/`, plus
+    `packages/pa-demo/e2e/plato-demo.spec.ts` and
+    `packages/public-site/e2e/publiek.spec.ts`. v2026.10.0 changed no spec, no
+    `playwright.config.ts` and no helper:
+    `git diff ae06c9e 0625d48 -- 'packages/*/e2e'` is empty.
 
     **History: v2026.09.14 changed three specs and the login helper, none in
     its test count** — read from the source at `ae06c9e`:
@@ -79,8 +132,9 @@ than described from configuration.
       [below](#frontend-playwright-suite).
 
     The three `playwright.config.ts` files are unchanged between `86af73e` and
-    `0625d48`, and `e2e/global-setup.ts` changed only in v2026.09.13, when its
-    fix messages began naming `npm run e2e:deploy-fixtures` — see
+    `ebec288`, and `e2e/global-setup.ts` changed only in v2026.09.13, when its
+    fix messages began naming `npm run e2e:deploy-fixtures`; what it requires
+    grew in v2026.10.1, through `helpers/required-processes.ts` — see
     [What each suite needs running](#what-each-suite-needs-running).
 
 ### What each suite needs running
@@ -91,8 +145,8 @@ anything locally — it is what separates a suite you can start cold from one th
 will fail its preconditions.
 
 Re-read at `86af73e` on 24 September 2026; the configs are unchanged at
-`2443adc` (v2026.09.12), `963fe24` (v2026.09.13), `ae06c9e` (v2026.09.15) and
-`0625d48` (v2026.10.0).
+`2443adc` (v2026.09.12), `963fe24` (v2026.09.13), `ae06c9e` (v2026.09.15),
+`0625d48` (v2026.10.0) and `ebec288` (v2026.10.1).
 
 | Config | Declares `webServer`? | Has a `globalSetup`? | What must already be up |
 |---|---|---|---|
@@ -147,15 +201,20 @@ Four things follow from that table:
     the machine's own CPU.
 
 !!! warning "Count these with the runner, never with `grep`"
-    A static count of top-level `test(` across the eleven frontend specs gives
-    **24** at `86af73e`, and still 24 at `2443adc`, `ae06c9e` and `0625d48`.
-    The runner reported **27** across ten of them on 30 August, and **28**
-    across all eleven on 3 October. `login-redirect.spec.ts` alone declares
-    one `test(` and runs five, because the cases are parameterised — and
-    `rip-r21-journey.spec.ts` contains **two** `test.skip(true, reason)` calls
-    *inside* test bodies, runtime skips that a naive grep reads as skipped
-    declarations, and one of which fired on 3 October. Neither is visible
-    from the source text.
+    A static count of `test(` calls across the eleven frontend specs gives
+    **24** at `86af73e`, and still 24 at `2443adc`, `ae06c9e` and `0625d48`;
+    across the fifteen at `ebec288` it gives **34**. The runner reported
+    **27** across ten of them on 30 August, **28** across eleven on 3 October,
+    and **47** across fifteen on 9 October. `login-redirect.spec.ts` alone
+    declares one `test(` and runs five, because the cases are parameterised;
+    `landing-single-board.spec.ts` declares six and runs thirteen, from loops
+    over two tenants, two paths and two redirect targets; and `citizen-services.spec.ts`
+    declares one and runs three. `rip-r21-journey.spec.ts` contains **two**
+    `test.skip(true, reason)` calls *inside* test bodies, runtime skips that a
+    naive grep reads as skipped declarations, and one of which fired on 3 and
+    9 October; `landing-single-board`'s `test.skip(isLocalTarget, …)` skips a
+    whole block, four tests, on a local target. None of that is visible from
+    the source text.
 
     This is why `thuisbatterij-journey.spec.ts` was listed without a test count
     until it was run, rather than with the 1 its source shows. The runner
@@ -168,11 +227,11 @@ Four things follow from that table:
     same commit pass 6/6 once the backend is up. Re-running serially reproduces
     the same three, so it is not contention either.
 
-    **3 October was the other case, and the check told them apart.** With the
-    backend up, the default parallel run failed **two** — the two
-    search-journey tests, waiting 10s for the filter checkbox — while the
-    detail-page axe scan, which also needs search results, passed. Re-run
-    serially it was 6/6 in 7.8s. A missing backend fails the same three
+    **3 and 9 October were the other case, and the check told them apart.**
+    With the backend up, the default parallel run failed **two** both times —
+    the two search-journey tests, waiting 10s for the filter checkbox — while
+    the detail-page axe scan, which also needs search results, passed. Re-run
+    serially it was 6/6, in 7.8s and 6.4s. A missing backend fails the same three
     serially and in parallel; this failed two in parallel only. That is
     consistent with contention, not with an absent dependency, and a
     parallel-only failure is not a defect until it fails on its own —
@@ -187,6 +246,22 @@ public-site suite needs **one** service, not five, and starts its own dev server
 already.
 
 ### Deploying the E2E fixtures
+
+!!! warning "Since v2026.10.1 the gate also needs the Heusden bundle, which this command does not deploy"
+    `e2e/helpers/required-processes.ts` now lists **nine** process definitions
+    — `HeusdenpasAanvraagProcess` and `HeusdenpasBeoordelingSubProcess` under
+    tenant `heusden` beside the seven before — and three more untenanted
+    decisions, `SVB_LeeftijdsInformatie`, `SZW_BijstandsnormInformatie` and
+    `RONL_HeusdenpasEindresultaat`. Its own comment says why they are
+    different: there is no E2E fixture variant of that bundle. They are
+    deployed from linked-data-explorer's
+    `examples/organizations/heusden/swimlanes-for-rba/`, under the same keys
+    everywhere, with Organization `heusden` for the two processes and none for
+    the three decisions. `npm run e2e:deploy-fixtures` reads only
+    `e2e-fixtures/manifest.json`, so on a fresh engine `globalSetup` will
+    refuse to start until the Heusden bundle has been deployed by hand — see
+    [Local development](../local-development.md). The 9 October run passed
+    those gates on a stack where it already was.
 
 **New in v2026.09.13**, and read at `963fe24` rather than run: the repository
 root gained a script for the one precondition the table above describes but
@@ -268,10 +343,11 @@ What the real deployer does, and what it needs:
     - a **ttl-editor** checkout beside them, for the one external decision;
     - `npx playwright install chromium`, then `npm run e2e:deploy-fixtures`.
 
-    Only then does `npm run test:e2e --workspace=@ronl/frontend` get past its
-    own preconditions. That list is the whole reason this suite is not in CI,
-    and the reason its figures went unmeasured from 30 August until a pass on
-    3 October found the stack already up.
+    Since v2026.10.1, also the Heusden bundle — see the warning at the top of
+    this section. Only then does `npm run test:e2e --workspace=@ronl/frontend`
+    get past its own preconditions. That list is the whole reason this suite
+    is not in CI, and the reason its figures went unmeasured from 30 August
+    until a pass on 3 October found the stack already up.
 
 ---
 
@@ -284,25 +360,42 @@ The single worker is deliberate: two specs race to claim an identically-named
 task for the same caseworker against the shared local Operaton engine, so the
 suite trades parallelism for correctness.
 
-**Measured 3 October 2026: 28 tests across 11 specs — 27 passed, 1 skipped,
-2.8m**, one worker, against the developer's already-running local stack.
-Nothing failed and nothing was retried. The previous run, on 30 August 2026
-against `acc` at `15dfbf9`, was 27 tests across the 10 specs there were then:
-27 passed, 1.9m.
+**Measured 9 October 2026: 47 tests across 15 specs — 42 passed, 5 skipped,
+2.6m**, one worker, against the developer's already-running local stack.
+Nothing failed and nothing was retried. The previous run, on 3 October 2026,
+was 28 tests across the 11 specs there were then: 27 passed, 1 skipped, 2.8m;
+before that, on 30 August 2026 against `acc` at `15dfbf9`, 27 tests across
+10 specs, 27 passed, 1.9m.
 
-| Spec | Tests | 3 October | Covers |
+| Spec | Tests | 9 October | Covers |
 |---|---:|---|---|
+| **`landing-single-board.spec.ts`** | **13** | **9 passed, 4 skipped** — the link-preview tests, on a local target | **New in v2026.10.1.** The organisation landing pages `/amsterdam` and `/heusden`: the single-board layout, the caseworker login in the tenant's colours, the DigiD link with the tenant's test citizen, the per-tenant link preview, and the redirects from `/?tenant=` and to the grid |
 | `infra-board-journey.spec.ts` | 7 | 7 passed | The Infra-board, including a full sweep asserting no failed request and no console error |
 | `pa-mock-journey.spec.ts` | 5 | 5 passed | PA cockpit mock mode against the real store |
 | `login-redirect.spec.ts` | 5 | 5 passed | Role-based landing, parameterised per role |
+| **`citizen-services.spec.ts`** | **3** | **3 passed** | **New in v2026.10.1.** The service cards each organisation's test citizen sees, parameterised per citizen (#344) |
 | `protected-route.spec.ts` | 3 | 3 passed | Route guards |
 | `pa-live-authoring.spec.ts` | 2 | 2 passed | Authoring against the live backend and a real database |
+| **`landing-access-denied.spec.ts`** | **2** | **2 passed** | **New in v2026.10.1.** The no-access dialog on the landing page, and the Flevoland-account button on the boards with an Entra role |
 | `rip-r21-journey.spec.ts` | 1 | **skipped** — real ValidSign on the stack | **The R2.1 phase, all twelve tasks, ending in the signing panel** |
-| `caseworker-journey.spec.ts` | 1 | passed, 24.5s | The caseworker journey end to end |
-| `zorgtoeslag-journey.spec.ts` | 1 | passed, 6.1s | The zorgtoeslag journey |
-| `tenant-isolation.spec.ts` | 1 | passed, 11.5s | Tenant scoping |
+| `caseworker-journey.spec.ts` | 1 | passed, 15.0s | The caseworker journey end to end — since v2026.10.1 through the Dutch Kapvergunning forms |
+| **`heusdenpas-journey.spec.ts`** | **1** | **passed, 11.8s** | **New in v2026.10.1.** A fourth deep two-persona journey: a Heusden citizen applies for a Heusdenpas, three untenanted decisions grant it, and the Heusden caseworker decides and informs |
+| `thuisbatterij-journey.spec.ts` | 1 | passed, 7.7s | A citizen applies for a Thuisbatterij subsidy, the six-decision `RechtEnHoogteSubsidieThuisbatterij` DRD evaluates, and the caseworker reviews the resulting task |
+| `tenant-isolation.spec.ts` | 1 | passed, 7.5s | Tenant scoping |
+| `zorgtoeslag-journey.spec.ts` | 1 | passed, 6.2s | The zorgtoeslag journey |
 | `smoke.spec.ts` | 1 | passed | Boot and render |
-| **`thuisbatterij-journey.spec.ts`** | **1** | **passed, 8.4s — first measurement** | **New in v2026.09.11.** A third deep two-persona journey: a citizen applies for a Thuisbatterij subsidy, the six-decision `RechtEnHoogteSubsidieThuisbatterij` DRD evaluates, and the caseworker reviews the resulting task |
+
+!!! note "What the Heusdenpas journey guards beyond its own service"
+    Read from the spec at `ebec288`. Every step of it submits a form with a
+    field that is **required but hidden** — the partner's date of birth for a
+    single applicant, the missing details when the application is complete,
+    the motivation when the caseworker accepts the outcome — so the journey
+    stalls on a submit that never goes through if form-js ever validates a
+    hidden field. Its applicant is single, 21 or over, without children and on
+    a Baanbrekers benefit, so the rules grant the pass automatically
+    (linked-data-explorer's verified case 6). It is also the one journey that
+    ends back on the citizen's side, checking that the decided application
+    appears **once** in *Mijn aanvragen*, not once per sub-process.
 
 !!! note "The thuisbatterij journey accepts both task names — edited in v2026.09.12"
     `0e71fd3`, *"match the Thuisbatterij tasks by their Dutch names as well"*,
@@ -445,35 +538,39 @@ signature. Nothing was created — the refusal happens before
 POST /task/:id/package. Run it against a target where VALIDSIGN_STUB_MODE=true.
 ```
 
-That is the outcome the commit designed for, and it is why the run reads
-*27 passed, 1 skipped* rather than 28 passed. It also means the R2.1 work —
-and v2026.10.0's signing changes, the panel now shared with the caseworker
-inbox and signing state kept per task — was not driven in a browser by this
-pass. A run against a target in stub mode is what would.
+That is the outcome the commit designed for, and it is why the 3 October run
+read *27 passed, 1 skipped* rather than 28 passed. **On 9 October it fired
+again**, with the same message. It also means the R2.1 work — and
+v2026.10.0's signing changes, the panel now shared with the caseworker inbox
+and signing state kept per task, and v2026.10.1's signer recorded as the
+eDOCS author — was not driven in a browser by either pass. A run against a
+target in stub mode is what would.
 
 ### Coverage per board
 
-The 28 tests do not spread evenly, and four of the eleven specs belong to no
-board at all. This table is the one to check before claiming a board has or
+The 47 tests do not spread evenly, and seven of the fifteen specs belong to
+no board. This table is the one to check before claiming a board has or
 lacks end-to-end coverage — the per-board pages defer to it.
 
 | Board | Specs | Tests | Which |
 |---|---:|---:|---|
-| [Infra-board](dashboards/infra-board.md) | 2 | **8** | `infra-board-journey` (7, the shell), `rip-r21-journey` (1, the work — skipped on 3 October, see above) |
+| [Infra-board](dashboards/infra-board.md) | 2 | **8** | `infra-board-journey` (7, the shell), `rip-r21-journey` (1, the work — skipped on 3 and 9 October, see above) |
 | [PA cockpit](dashboards/pa-cockpit.md) | 2 | **7** | `pa-mock-journey` (5), `pa-live-authoring` (2) |
-| [Caseworker](dashboards/caseworker.md) | 3 | **3** | `caseworker-journey` (1), `zorgtoeslag-journey` (1), `thuisbatterij-journey` (1) — all three matching the Dutch task names as well as the English ones since v2026.09.14 |
+| [Caseworker](dashboards/caseworker.md) | 4 | **4** | `caseworker-journey` (1), `zorgtoeslag-journey` (1), `thuisbatterij-journey` (1), `heusdenpas-journey` (1, new in v2026.10.1) — each ending in a caseworker's task; the first three match the Dutch task names as well as the English ones since v2026.09.14 |
 | [Woo-dashboard](dashboards/woo-dashboard.md) | 0 | **0** | — |
+| *Citizen portal and landing pages* | 3 | **18** | `landing-single-board` (13, four of them skipped on a local target), `citizen-services` (3), `landing-access-denied` (2) — all new in v2026.10.1 |
 | *No single board* | 4 | **10** | `login-redirect` (5), `protected-route` (3), `tenant-isolation` (1), `smoke` (1) |
 
-The last row is the reason a naive per-board sum of the boards alone does not
-reach 28: authentication redirects, route guards, tenant scoping and the boot
-smoke test cut across every board and belong to none.
+The last two rows are the reason a naive per-board sum of the boards alone
+does not reach 47. The citizen's dashboard and the organisation landing pages
+are not boards and have no board page of their own — their unit tests are
+counted on [Overview](overview.md) among the frontend files that belong to no
+board — and authentication redirects, route guards, tenant scoping and the
+boot smoke test cut across every board and belong to none.
 
-The Caseworker row is the one that moved: `thuisbatterij-journey.spec.ts` is a
-third deep journey ending in a caseworker review task. It landed after the
-30 August run, and until 3 October its count was left blank rather than
-guessed from the single `test()` it declares — the warning above is exactly
-about not trusting that reading. The run confirmed it: one test.
+The Caseworker row is the board row that moved: `heusdenpas-journey.spec.ts`
+is a fourth deep journey ending in a caseworker's decision, and the first for
+an organisation other than Flevoland and Dienst Toeslagen.
 
 No spec drives Besluitvorming, the caseworker section v2026.10.0 added; it is
 covered by unit tests only — see [Caseworker](dashboards/caseworker.md#e2e).
@@ -569,14 +666,16 @@ Covered on [Public site suite](public-site.md#playwright-suite) — six tests
 including three axe-core accessibility scans, and the one suite here that
 starts its own dev server.
 
-**Re-run on 3 October 2026**, for the first time since 30 August, against the
-developer's already-running backend — and the one suite in this pass that went
-red before it went green:
+**Re-run on 9 October 2026**, against the developer's already-running
+backend — and, as on 3 October, the one suite in the pass that went red
+before it went green, the same two tests in the same way:
 
 | Run | Workers | Result | Time |
 |---|---:|---|---:|
-| Default (`fullyParallel: true`, no `workers` set) | 6 | **4 passed, 2 failed** — `publiek.spec.ts:6` *search → filter → detail → back preserves the filtered URL* and `:27` *a deep link with filters pre-applied renders those filters checked*, each a `TimeoutError` after 10s waiting for `getByRole('checkbox', { name: /Regel/ })` | 17.2s |
-| `--workers=1` | 1 | **6 passed** | 7.8s |
+| 9 Oct, default (`fullyParallel: true`, no `workers` set) | 6 | **4 passed, 2 failed** — `publiek.spec.ts:6` *search → filter → detail → back preserves the filtered URL* and `:27` *a deep link with filters pre-applied renders those filters checked*, each a `TimeoutError` after 10s waiting for `getByRole('checkbox', { name: /Regel/ })` | 16.8s |
+| 9 Oct, `--workers=1` | 1 | **6 passed** | 6.4s |
+| 3 Oct, default | 6 | **4 passed, 2 failed** — the same two, the same wait | 17.2s |
+| 3 Oct, `--workers=1` | 1 | **6 passed** | 7.8s |
 
 **Recorded as 6/6 serially, with 2 timeouts in the parallel run — not as a
 defect.** Both failures are the same wait in the two tests that need a
@@ -585,7 +684,8 @@ results, passed in the same parallel run, and the serial run passed all six
 against the same backend. That is consistent with contention, not with a
 missing backend (which fails three, serially too), and nothing failed on its
 own. It is worth
-watching rather than dismissing: if this suite is wired into CI — see
+watching rather than dismissing — two passes a week apart now agree on
+exactly which wait gives way: if this suite is wired into CI — see
 [Overview → Roadmap](overview.md#roadmap) — that 10-second wait under
 parallel workers is the first thing the run will test. The spec is unchanged
 since `2443adc` and still in no workflow. See
@@ -598,22 +698,27 @@ since `2443adc` and still in no workflow. See
 Four gated shell scripts under `scripts/`, deliberately kept out of `npm test` —
 they hit real running services over the network, mutate real data in three
 cases (one of them only data it created itself), and need real credentials for
-some tiers.
+some tiers — and, new in v2026.10.1, a fifth that runs two of them as a
+signed-in person.
 
 **These were not run for this page.** They are described from their
-configuration and source only — `test-m2m-routes.sh` read at `0625d48`.
+configuration and source only — `test-m2m-routes.sh`, `test-smoke-live.sh`
+and `test-edocs-person.sh` read at `ebec288`.
 
 | Script | Covers | Mutates? |
 |---|---|---|
-| `test-smoke-live.sh` | Cross-app health: Operaton, Keycloak, LDE, TriplyDB, CPRMV, media store, eDOCS reach/status, MCP layer | No |
-| `test-edocs-live.sh` | eDOCS workspace and document lifecycle — see [eDOCS — Live Testing](edocs-live-testing.md) | Yes |
+| `test-smoke-live.sh` | Cross-app health: Operaton, Keycloak, LDE, TriplyDB, CPRMV, media store, eDOCS reach/status, MCP layer. Since v2026.10.1 **Tier 2b** also asks `/v1/edocs/status` as the seeded caseworker, who has no Entra identity and must be reported as such (skipped in stub mode), and an optional **Tier 2c** runs when `PERSON_TOKEN` holds a Flevoland-signed-in person's Keycloak token, passing only if eDOCS knows that person | No |
+| `test-edocs-live.sh` | eDOCS through `/v1/edocs` and through the MCP route: workspaces listed read-only, standalone documents uploaded and read back — see [eDOCS — Live Testing](edocs-live-testing.md) | Yes — every run leaves its uploaded documents behind; nothing is deleted |
 | `test-doccle-live.sh` | Doccle sender API — see [Doccle — Live Testing](doccle-live-testing.md) | Yes — not yet live-tested, still `DOCCLE_STUB_MODE=true` in every run so far |
-| `test-m2m-routes.sh` | The active `/v1/m2m` operations: the reads, `decision.evaluate`, and — since v2026.09.14 (#214) — a write lifecycle of start, claim, complete and delete. Since v2026.10.0 it also asserts that **`POST /v1/m2m/process/history` filters** — a request filtered on one `processDefinitionKey` must return at least one instance and none of another key, since a dropped filter answers 200 with the whole history (#263); that the deprecated **`GET` answers with `Deprecation: @1790985600`**; and that **start and complete refuse a caller-supplied `municipality` with `400 RESERVED_VARIABLE`** (#261), the refused completion leaving the task open for the real one. Its tenant-isolation check reads the problem's `code`. Local by default, reading the seeded client secret from the realm file; `TARGET=acc` needs an explicit `CLIENT_SECRET`, and on ACC the M2M surface now uses ACC's main engine (#262) | Yes, but only its own: the lifecycle starts two instances and removes both, and never writes to an instance it did not create — if the reserved-variable guard on start ever failed, the stray instance is cancelled at once |
+| `test-m2m-routes.sh` | The active `/v1/m2m` operations: the reads, `decision.evaluate`, and — since v2026.09.14 (#214) — a write lifecycle of start, claim, complete and delete. Since v2026.10.0 it also asserts that **`POST /v1/m2m/process/history` filters** — a request filtered on one `processDefinitionKey` must return at least one instance and none of another key, since a dropped filter answers 200 with the whole history (#263); since v2026.10.1 that the **`GET` spelling answers `404`**, removed after one deprecated release — against an older backend that check fails, which says which build you are talking to (in v2026.10.0 it asserted `Deprecation: @1790985600` instead); and that **start and complete refuse a caller-supplied `municipality` with `400 RESERVED_VARIABLE`** (#261), the refused completion leaving the task open for the real one. Its tenant-isolation check reads the problem's `code`. Local by default, reading the seeded client secret from the realm file; `TARGET=acc` needs an explicit `CLIENT_SECRET`, and on ACC the M2M surface now uses ACC's main engine (#262) | Yes, but only its own: the lifecycle starts two instances and removes both, and never writes to an instance it did not create — if the reserved-variable guard on start ever failed, the stray instance is cancelled at once |
+
+| `test-edocs-person.sh` | **New in v2026.10.1.** Not a suite of its own: it reads a Flevoland-signed-in person's Keycloak token from the clipboard (or an exported `PERSON_TOKEN`), checks it, prints only its claims, and hands it to `test-edocs-live.sh` (`live`, sections 1b and 1c) or `test-smoke-live.sh` (`smoke`, Tier 2c); `diag` asks Keycloak's broker endpoint for the person's stored Entra token — status and key names only — and shows what the backend makes of the person. Targets `local` and `acc`, and `prod` for `smoke`. See [eDOCS — Live Testing](edocs-live-testing.md) | Only through `live`, as `test-edocs-live.sh` does |
 
 ```bash
 bash scripts/test-smoke-live.sh                                     # local, full run
 CLIENT_SECRET=<secret> TARGET=acc bash scripts/test-smoke-live.sh   # against ACC
 bash scripts/test-edocs-live.sh                                     # eDOCS, mutating
+bash scripts/test-edocs-person.sh live|smoke|diag [local|acc]       # as a signed-in person
 CLIENT_SECRET=<secret> bash scripts/test-doccle-live.sh              # Doccle, mutating
 bash scripts/test-m2m-routes.sh                                     # M2M routes, local
 TARGET=acc CLIENT_SECRET=<secret> bash scripts/test-m2m-routes.sh   # M2M routes vs ACC

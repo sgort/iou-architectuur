@@ -1,15 +1,23 @@
 {
-  "docs_built": "2026-10-06",
+  "docs_built": "2026-10-09",
   "last_patch": {
-    "date": "2026-10-06",
+    "date": "2026-10-09",
     "kind": "Component sync",
-    "summary": "Linked Data Explorer v2026.10.1 in production: /v2/norms answers which norms are in force on a date, /v1/norms is deprecated, the Modeler binds forms to their deployment, and CI runs the fixture tests and a lockfile review. Every finding the earlier patches filed — ronl-business-api#312, linked-data-explorer#254 and #255, ttl-editor#194 — has been fixed in its repository; this sync filed one new display finding.",
+    "summary": "RONL Business API v2026.10.1 in production: citizen services follow the deployments, Gemeente Heusden and the Heusdenpas, a landing page per organisation, and people acting in eDOCS as themselves. It found that the release SBOM checks cannot fail in CI.",
     "previous": {
-      "date": "2026-10-04",
-      "kind": "Weekly pass",
-      "summary": "The contributing pages re-checked against all three acc heads, and the ICTU dependency-guideline scores for 4 October: TTL 35, LDE 34, RBA 33. All three main branches are now gated by a ruleset, the LDE tracker #119 continues as #248–#250, and both daily audits made their first real production catch."
+      "date": "2026-10-06",
+      "kind": "Component sync",
+      "summary": "Linked Data Explorer v2026.10.1 in production: /v2/norms answers which norms are in force on a date, /v1/norms is deprecated, the Modeler binds forms to their deployment, and CI runs the fixture tests and a lockfile review. Every finding the earlier patches filed — ronl-business-api#312, linked-data-explorer#254 and #255, ttl-editor#194 — has been fixed in its repository; this sync filed one new display finding."
     },
     "open_findings": [
+      {
+        "label": "ronl-business-api#354",
+        "url": "https://github.com/sgort/ronl-business-api/issues/354"
+      },
+      {
+        "label": "linked-data-explorer#274",
+        "url": "https://github.com/sgort/linked-data-explorer/issues/274"
+      },
       {
         "label": "linked-data-explorer#270",
         "url": "https://github.com/sgort/linked-data-explorer/issues/270"
@@ -25,20 +33,21 @@
 
 
 
+
   "repositories": [
     {
       "name": "RONL Business API",
       "icon": "⚙️",
-      "version": "v2026.10.0",
+      "version": "v2026.10.1",
       "environment": "prod",
-      "commit": "0625d48...",
-      "commit_date": "2026-10-03",
+      "commit": "ebec288...",
+      "commit_date": "2026-10-09",
       "build": {
-        "sha": "0625d48",
-        "run": 6,
-        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/37125068214"
+        "sha": "ebec288",
+        "run": 7,
+        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/37911063364"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/0625d48f3e51c3877e225327f04a1edd5de16576",
+      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/ebec2885c8502888843e82671b04061a87b8235f",
       "ci_repo": "https://github.com/sgort/ronl-business-api"
     },
     {

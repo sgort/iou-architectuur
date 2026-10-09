@@ -53,11 +53,13 @@ eDOCS DOCUVITT
 
 The RONL Business API is the OAuth 2.0 resource server. Keycloak is the authorisation server. Copilot Studio is the client.
 
+`/v1/edocs` accepts a machine client only when its client id (the token's `azp`) is on `EDOCS_ALLOWED_CLIENTS`; `copilot-studio-edocs` is on that list by default. A listed machine client acts in eDOCS as the **service account**; any other machine client is refused with `403 EDOCS_CLIENT_NOT_ALLOWED`. People reach the same routes as themselves instead — see [eDOCS — Live Testing](testing/edocs-live-testing.md#people-and-the-service-account).
+
 ---
 
 ## eDOCS routes
 
-`packages/backend/src/routes/edocs.routes.ts` registers the `/v1/edocs` surface — workspace and document lifecycle endpoints, all protected by `jwtMiddleware` (a valid Bearer token issued by Keycloak is required on every request). For the full, current endpoint list and request/response shapes, see the **Documents** tag of the [API Specification](../reference/api-specification.md); for live-tested results and known issues per endpoint, see [eDOCS — Live Testing](testing/edocs-live-testing.md).
+`packages/backend/src/routes/edocs.routes.ts` registers the `/v1/edocs` surface — workspace and document lifecycle endpoints, all protected by `jwtMiddleware` (a valid Bearer token issued by Keycloak is required on every request) and by the eDOCS access check in `edocs.access.ts`, which decides who may call and as whom eDOCS sees the call. Every data response carries a top-level `actingAs` member — `"service"` for Copilot Studio and other machine clients, `"user"` for a person acting as themselves. For the full, current endpoint list and request/response shapes, see the **Documents** tag of the [API Specification](../reference/api-specification.md); for live-tested results and known issues per endpoint, see [eDOCS — Live Testing](testing/edocs-live-testing.md).
 
 - `POST /v1/edocs/documents` requires `metadata.docName` and `metadata.department` (eDOCS `UV_AFD_NAAM`, which the DM server also demands), besides `filename` and `contentBase64`; without them it answers `400 MISSING_FIELDS`.
 
@@ -90,16 +92,19 @@ The `GET /v1/edocs/status` response indicates which mode is active:
   "data": {
     "status": "stub",
     "library": "DOCUVITT",
-    "stubMode": true
+    "baseUrl": "",
+    "stubMode": true,
+    "reachable": true,
+    "authenticated": true
   },
   "timestamp": "2026-03-14T20:32:47.462Z"
 }
 ```
 
-When connected to a live server, `status` will be `"up"` and `stubMode` will be `false`.
+When connected to a live server, `status` is `"up"` and `stubMode` is `false`; `reachable` and `authenticated` report the service account's connection, and `latencyMs` the reachability check. For a person (not a machine client such as Copilot Studio) the response adds `data.user`: whether eDOCS can be reached as them.
 
-!!! warning "Rotate the client secret before switching to live mode"
-    The `copilot-studio-edocs` Keycloak client secret currently used on ACC is acceptable while the stub is active — it provides access only to fake data. As soon as `EDOCS_STUB_MODE=false` is set and real DOCUVITT credentials are configured, generate a new client secret in the Keycloak admin console and update the Copilot Studio connector accordingly.
+!!! warning "Rotate the client secret"
+    Rotate the `copilot-studio-edocs` client secret in the Keycloak admin console whenever it may have been exposed, and always before `EDOCS_STUB_MODE=false` is set with real DOCUVITT credentials, then update the Copilot Studio connector with the new value. A secret that has appeared in a document, a chat or a log is exposed, whatever data it currently reaches.
 
 ---
 
@@ -128,7 +133,7 @@ TOKEN=$(curl -s -X POST \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "grant_type=client_credentials" \
   -d "client_id=copilot-studio-edocs" \
-  -d "client_secret=ti2rTdYKMexu4LtUeHaw2ZSp70b7nFb0" \
+  -d "client_secret=<secret>" \
   | jq -r .access_token)
 ```
 
@@ -155,6 +160,7 @@ Expected response:
 ```json
 {
   "success": true,
+  "actingAs": "service",
   "data": {
     "workspaceId": "2993896",
     "documents": [
@@ -201,6 +207,8 @@ The service implementation started from the **eDOCS REST API v1.0.0** OpenAPI sp
 
 No code changes are required. Switching to a live eDOCS server is purely a configuration change.
 
+In live mode the backend refuses to start unless `EDOCS_USER_ID`, `EDOCS_PASSWORD` and the three `ENTRA_*` settings are set: people act in eDOCS as themselves, and the backend refreshes their brokered Entra ID token with the same app registration Keycloak's `entra-flevoland` provider uses. Before the switch, run `scripts/keycloak-add-entra-idp.sh` against the environment's Keycloak, so that it stores each person's Entra tokens — see [Entra ID](deployment/entra-id.md). Each person then signs in once more with their Flevoland account.
+
 ### 1. Set the environment variables on Azure App Service
 
 ```bash
@@ -212,6 +220,9 @@ az webapp config appsettings set \
     EDOCS_LIBRARY="DOCUVITT" \
     EDOCS_USER_ID="<user-id-from-credentials>" \
     EDOCS_PASSWORD="<password-from-credentials>" \
+    ENTRA_TENANT_ID="<flevoland-tenant-id>" \
+    ENTRA_CLIENT_ID="<iou-demonstrator-client-id>" \
+    ENTRA_CLIENT_SECRET="<iou-demonstrator-client-secret>" \
     EDOCS_STUB_MODE="false"
 ```
 
@@ -219,7 +230,7 @@ Do not put these values in any `.env` file in the repository.
 
 ### 2. Restart the App Service
 
-Azure restarts the App Service automatically when Application settings are saved. Confirm the slot is back up:
+Saving Application settings does not reliably restart the App Service, and the backend reads its settings only at start-up. Check the `uptime` that `/v1/health` reports; if the app did not restart, restart it (`az webapp restart --name ronl-business-api-acc --resource-group rg-ronl-acc`) — which takes acceptance down briefly. Then confirm the slot is back up:
  
 ```bash
 az webapp show \
@@ -272,6 +283,9 @@ az webapp config appsettings set \
     EDOCS_LIBRARY="DOCUVITP" \
     EDOCS_USER_ID="<user-id-from-credentials>" \
     EDOCS_PASSWORD="<password-from-credentials>" \
+    ENTRA_TENANT_ID="<flevoland-tenant-id>" \
+    ENTRA_CLIENT_ID="<iou-demonstrator-client-id>" \
+    ENTRA_CLIENT_SECRET="<iou-demonstrator-client-secret>" \
     EDOCS_STUB_MODE="false"
 ```
 

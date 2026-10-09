@@ -10,6 +10,8 @@ Caseworker is the personal work queue for case handlers. It brings together the 
 
 On opening the board you land on the **Taken** inbox in the **Werk** mode: your tasks on the left, the one you pick on the right, so you can take up the next piece of work without hunting for it across other boards.
 
+Caseworker is also the one board of Gemeente Amsterdam, Gemeente Heusden, Dienst Toeslagen and Univé Verzekeringen, whose caseworkers open it with **Inloggen als medewerker** on their own organisation's landing page — see [Organisation landing pages](getting-started.md#organisation-landing-pages). Each organisation's caseworkers see the tasks of their own organisation's cases: at Gemeente Heusden, for example, the tasks of the Heusdenpas applications residents submit in the [citizen portal](citizen-portal.md#heusdenpas).
+
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: RONL Business API Caseworker Taken inbox with a task selected, its Awb-fase hint in the list, the Waar sta ik stepper, the folded Procesgegevens bar and the steps grouped per role](../../assets/screenshots/ronl-business-api-caseworker-board.png)
   <figcaption>Caseworker's Taken inbox — a task from a process drawn in lanes, with its Awb phase, the folded Procesgegevens bar and its steps per role</figcaption>
@@ -136,13 +138,15 @@ The panel reads **Deze taak vereist een digitale handtekening.** and offers two 
 - **Onderteken nu** prepares the request (**Ondertekenverzoek wordt voorbereid…**) and opens the ValidSign signing screen inside the panel.
 - **Stuur per e-mail** sends the request to your e-mail address instead: **Het ondertekenverzoek is per e-mail verstuurd naar** and the address, followed by **Deze taak wordt automatisch afgerond zodra er getekend is.** Coming back to the task later shows **Er staat al een ondertekenverzoek uit voor deze taak.**, and the panel does not offer a second request.
 
-There is no **Taak voltooien**: the task completes itself. Once the document is signed, **Taak voltooid.** appears and the task leaves your list. If the signer declines, the panel reads **De ondertekenaar is niet akkoord gegaan met dit document.** and the task completes as well, recording the refusal, and leaves your list; what happens next is up to the process. In Besluitvorming a declined signature does not send the besluit back for rework: it goes forward to the bevoegde bestuursautoriteit, as described under [How a besluit runs](#how-a-besluit-runs).
+There is no **Taak voltooien**: the task completes itself. Once the document is signed, **Taak voltooid.** appears and the task leaves your list. If the signer declines, the panel reads **De ondertekenaar is niet akkoord gegaan met dit document.** and the task completes as well, recording the refusal, and leaves your list; the inbox confirms it with **Niet ondertekend — het proces gaat verder via de afwijzingsroute.** What happens next is up to the process. In Besluitvorming a declined signature does not send the besluit back for rework: it goes forward to the bevoegde bestuursautoriteit, as described under [How a besluit runs](#how-a-besluit-runs).
 
 Signing needs an e-mail address on your account. Without one, the panel says **Uw account heeft geen e-mailadres geregistreerd.** and that an administrator has to add it; trying again does not help.
 
 ## The assistant
 
 **Vraag de assistent**, at the side of the board, opens the **Assistent** panel beside your work. Closing and reopening it keeps the conversation, and so does reloading the page within the same browser session. The panel can be widened or narrowed by dragging its edge.
+
+Where the platform is connected to eDOCS, the assistant can look up workspaces and documents there, and it does so with your own account: it sees what you may see in eDOCS, no more. That needs you to have signed in with **Inloggen met uw Flevoland-account**, or with the **Flevoland-account** button on a board card. Signed in another way, the assistant answers that eDOCS is only available after signing in with your Flevoland account; when your Flevoland session has expired, it says **Uw Flevoland-sessie is verlopen. Log opnieuw in om eDOCS te gebruiken.** — sign out and in again with your Flevoland account. When eDOCS itself refuses your account, the assistant says so too.
 
 ## Besluitvorming
 

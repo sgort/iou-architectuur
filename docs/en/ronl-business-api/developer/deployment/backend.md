@@ -80,7 +80,7 @@ Both backend workflows follow the same process:
 
 ```yaml
  1. Checkout code
- 2. Setup Node.js from .nvmrc (22.23.2)
+ 2. Setup Node.js from .nvmrc (22.23.3)
  3. npm ci                          (install all workspace dependencies)
  4. Build shared package            (npm run build --workspace=@ronl/shared)
  5. Lint backend                    (npm run lint in packages/backend)
@@ -205,7 +205,7 @@ running, which is the failure this exists to detect.
 App Service pins the Node runtime at the major only: `az webapp list-runtimes
 --os linux` offers `NODE|22-lts`, `NODE|24-lts` and `NODE|26`, with no exact
 version and no digest. What can be kept is the major in step with `.nvmrc`,
-which is `22.23.2`. A Node major bump therefore changes two places in a fixed
+which is `22.23.3`. A Node major bump therefore changes two places in a fixed
 order — **switch both App Services to the new `NODE|<major>-lts` first, then
 merge the `.nvmrc` bump** — because the other order builds the artifact on one
 major and runs it on another. No pull-request check runs against an App Service,

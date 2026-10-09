@@ -139,13 +139,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.10.0** · *October 2026*
+-   **⚙️ RONL Business API — v2026.10.1** · *October 2026*
 
     ---
 
-    **Every error is problem details, and a besluit is prepared, signed and followed from the dashboard**
+    **Citizen services follow the deployments, every organisation gets its own page, and eDOCS knows who is asking**
 
-    Every 4xx and 5xx now answers RFC 9457 `application/problem+json` — `type`, `status`, `title`, `detail` and `instance`, with the familiar `code` kept beside them — and the NL API Design Rules' problem-details rules now gate the [OpenAPI description](ronl-business-api/reference/api-specification.md); the dashboards are unchanged, but external `/v1/m2m` callers must adapt. On the [Caseworker](ronl-business-api/user-guide/caseworker.md) board an indiener starts *Besluitvorming onder gedelegeerde bevoegdheid* from **Besluitvorming → Besluit voorbereiden**, and everyone in the process follows it under **Lopende** and **Afgeronde besluiten**. The [ValidSign](ronl-business-api/developer/validsign-signing.md) signing panel now appears in the caseworker inbox as well as on the Infra-board, with its state kept per task, so a process turns signing on with `ronl:signatureRef` alone — and a process can declare its own phases for the stepper with `ronl:phases`. `/v1/m2m` uses the main engine, refuses access labels and takes its history query as `POST`. The [suites](ronl-business-api/developer/testing/overview.md) stand at 4,731 tests, all passing.
+    The [citizen portal](ronl-business-api/user-guide/citizen-portal.md) now offers only the services a citizen's organisation actually runs, derived from where each process is deployed — and enforced when one is started; DVTP is retired. Gemeente Heusden joins with the Heusdenpas, test cases included. Amsterdam, Heusden, Dienst Toeslagen and Univé each have a [landing page](ronl-business-api/user-guide/getting-started.md) at `mijn.open-regels.nl/<id>` with its own link preview, and a board your role does not open now explains why. People reach eDOCS as themselves through their Entra ID token, the assistant's eDOCS tools act as the caseworker, and archiving records the employee "namens". Dependency pull requests get a lockfile review, and the deprecated `GET /v1/m2m/process/history` is gone. The [suites](ronl-business-api/developer/testing/overview.md) stand at 5,069 unit tests and 59 end-to-end tests, all passing.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

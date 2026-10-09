@@ -107,7 +107,7 @@ The RONL Business API exposes a curated subset of Operaton operations through it
 | `GET /task` | `GET /v1/m2m/task` |
 | `GET /task/{id}` | `GET /v1/m2m/task/:id` |
 | `GET /process-instance` | `GET /v1/m2m/process` |
-| `POST /history/process-instance` | `POST /v1/m2m/process/history` (the `GET` spelling still answers, deprecated, with a `Deprecation` header) |
+| `POST /history/process-instance` | `POST /v1/m2m/process/history` |
 | `POST /decision-definition/key/:key/evaluate` | `POST /v1/m2m/decision/:key/evaluate` |
 | `GET /process-instance/:id/variables` | `GET /v1/m2m/process/:id/variables` |
 

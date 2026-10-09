@@ -70,6 +70,8 @@ on:
       - 'packages/shared/**'
       - 'packages/pa-cockpit/**'
       - '.github/workflows/azure-frontend-acc.yml'
+      - 'package-lock.json'
+      - 'package.json'
       - '.nvmrc'
   pull_request:
     types: [opened, synchronize, reopened, closed, labeled]
@@ -182,7 +184,10 @@ jobs:
 **Triggers:**
 
 - A push to `acc` that changes `packages/frontend/**`, `packages/shared/**`,
-  `packages/pa-cockpit/**`, `.nvmrc` or the workflow file itself.
+  `packages/pa-cockpit/**`, the root `package-lock.json` or `package.json`,
+  `.nvmrc` or the workflow file itself. The root lockfile and manifest are
+  there because every workspace resolves through them: a lockfile-only change
+  moves this app's dependencies too.
 - Every pull request to `acc`, with no path filter on the trigger: the
   `changes` job applies the same paths, so the required check **Build and
   Deploy ACC Frontend** reports on every pull request. A pull request is
@@ -227,22 +232,40 @@ Same build structure as ACC, but it is **not triggered by a branch at all**:
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/*.js", "/*.css", "/*.json", "/*.png", "/*.jpg", "/*.svg"]
+    "exclude": ["/assets/*", "/*.{css,scss,js,png,gif,ico,jpg,svg}"]
   },
-  "globalHeaders": {
-    "cache-control": "no-cache, no-store, must-revalidate"
+  "routes": [
+    {
+      "route": "/*",
+      "allowedRoles": ["anonymous"]
+    }
+  ],
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/index.html",
+      "statusCode": 200
+    }
   },
   "mimeTypes": {
     ".json": "application/json",
-    ".css": "text/css",
-    ".js": "application/javascript"
+    ".js": "text/javascript",
+    ".css": "text/css"
+  },
+  "globalHeaders": {
+    "Cache-Control": "no-cache, no-store, must-revalidate"
   }
 }
 ```
 
+This is the source file. The build adds one rewrite per single-board tenant
+ahead of these routes — `{ "route": "/amsterdam", "rewrite": "/amsterdam/index.html" }`
+and likewise for `heusden`, `toeslagen` and `unive` — so the shipped
+`dist/staticwebapp.config.json` serves each tenant's own page; see [Step 2](#step-2-github-actions-build).
+
 **What it does:**
 
-- ✅ All routes (`/`, `/auth`, `/dashboard`) → served by `index.html`
+- ✅ All app routes (`/`, `/auth`, `/dashboard/...`) → served by `index.html`
+- ✅ A tenant path (`/amsterdam`, `/heusden`, `/toeslagen`, `/unive`) → served by that tenant's `<id>/index.html`, with its own link preview
 - ✅ React Router handles routing client-side
 - ✅ Static assets excluded from fallback
 - ✅ Proper cache headers
@@ -275,12 +298,18 @@ git push origin acc
 The workflow automatically:
 
 1. Checks out code
-2. Sets up Node.js from `.nvmrc` (22.23.2)
+2. Sets up Node.js from `.nvmrc` (22.23.3)
 3. Installs dependencies with `npm ci` and builds `@ronl/shared`
 4. Lints, then runs the PA cockpit tests, the frontend tests and the
    performance budget
 5. Builds with `npm run build:acc` (or `build:prod`), reading the committed
-   `.env.acceptance` (or `.env.production`), into `packages/frontend/dist/`
+   `.env.acceptance` (or `.env.production`), into `packages/frontend/dist/`.
+   After Vite's own build, `vite-plugin-tenant-pages.ts` copies
+   `dist/index.html` once per single-board tenant into `dist/<id>/index.html`
+   with that tenant's title, description, canonical URL and Open Graph tags
+   (from its `share` entry in `tenants.json`, and the card
+   `og-image-<id>-<acc|prod>.png`), and adds one rewrite per tenant to the
+   shipped `staticwebapp.config.json`
 6. Runs `node scripts/check-og.mjs acceptance` (or `production`) against the
    built `dist/`
 
@@ -294,8 +323,11 @@ dist/
 │   └── [other assets]
 ├── og-image-acc.png           # Link-preview images (copied from public/)
 ├── og-image-prod.png
+├── og-image-<id>-{acc,prod}.png  # One pair per tenant page: amsterdam, heusden, toeslagen, unive
+├── amsterdam/index.html       # A tenant page per single-board tenant (also heusden/, toeslagen/, unive/)
+├── tenants/                   # Tenant logos (copied from public/)
 ├── tenants.json               # Municipality config (copied from public/)
-└── staticwebapp.config.json   # SPA routing (copied from public/)
+└── staticwebapp.config.json   # SPA routing, plus one rewrite per tenant page
 ```
 
 `check-og.mjs` fails the build step unless `dist/index.html` carries this
@@ -306,6 +338,14 @@ unfilled and the named image present in `dist/`. `src/indexHtml.test.ts` proves
 the template and the `.env` files agree; this step proves the file actually
 shipped is the one for its environment, because an acceptance card that
 reaches Teams or LinkedIn is cached there for days.
+
+The same check covers every tenant page: `dist/<id>/index.html` must exist with
+`og:url` and canonical `<site>/<id>`, the card `og-image-<id>-<acc|prod>.png`
+(present in `dist/`), the environment's title prefix and `robots` value, and a
+rewrite for `/<id>` in the shipped `staticwebapp.config.json`. It also fails
+when two routes there differ only by a trailing slash: Static Web Apps treats
+them as one route and refuses the whole configuration at upload, after a check
+that looked only at the HTML would have passed.
 
 ### Step 3 — Azure Deployment
 

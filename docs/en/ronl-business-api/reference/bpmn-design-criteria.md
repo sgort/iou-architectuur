@@ -124,6 +124,8 @@ The backend middleware automatically injects the following variables into every 
 
 These variables are available in all process expressions and DMN input columns. The `municipality` variable is used by the task queue to filter tasks to the correct tenant.
 
+Two more variables are stamped by the backend, never by a process: `edocsAuthor` (the employee's e-mail, or username) and `edocsAuthorName` (display name), set from the caller's token when a staff member starts a process or completes a task. Background eDOCS archiving reads them to title documents "namens …". Together with `municipality`, `originTenantId` and `applicantId` they are reserved (`RESERVED_PROCESS_VARIABLES` in `auth/tenant-access.ts`): a task completion that carries one is refused, a `/v1` start drops a sent `edocsAuthor`/`edocsAuthorName`, and an M2M start that carries one is refused. Do not use these names for your own variables.
+
 ---
 
 ## `camunda:historyTimeToLive`

@@ -8,6 +8,32 @@ component: RONL Business API
 
 ## Changelog
 
+## v2026.10.1 — Citizen Services Follow the Deployments, Every Organisation Its Own Page, and eDOCS as the Person (October 2026)
+
+> For citizens: [Citizen portal](../user-guide/citizen-portal.md). The landing pages: [Getting started](../user-guide/getting-started.md). How a service is offered and started: [Processes](../features/processes.md). eDOCS as the person: [eDOCS live testing](testing/edocs-live-testing.md) and [Entra ID](deployment/entra-id.md). The assistant: [MCP AI Assistant](mcp-ai-assistant.md). Measured suites: [Testing](testing/overview.md).
+
+**Citizen services come from a registry and from where each process is deployed.** A registry in `@ronl/shared` names the citizen services and whether each is offered across organisations — Zorgtoeslag, handled by Dienst Toeslagen — or only by the organisation that runs it. `GET /v1/process/available` derives from the latest deployment per tenant what a citizen's organisation actually offers, and the citizen dashboard shows exactly those cards; the same rule is enforced at start, so a citizen cannot start a service their organisation does not run, and an untenanted deployment never counts. The tenant features in `tenants.json` are retired, a Kapvergunning or Thuisbatterij is no longer offered to municipalities, an unknown service id is skipped rather than fatal, and DVTP is retired.
+
+**Gemeente Heusden joins, with the Heusdenpas.** Heusden is a tenant with its own theme and landing page; its citizens see the Heusdenpas beside Zorgtoeslag, and the start form offers seven test cases to fill it in. *Mijn aanvragen* now lists applications, not the sub-processes they call, and access checks read the municipality without deserialising the process variables, so a claim no longer collides with the task pane.
+
+**Every single-board organisation has its own landing page.** Amsterdam, Heusden, Dienst Toeslagen and Univé each have a page at `/<id>` with their own colours, logo, copy and link preview; old `/?tenant=` links redirect, and logging out returns you to your organisation's page. The build writes one page per organisation, with one Static Web Apps route each, and `check-og` checks every one.
+
+**A board opens with the Flevoland account, and a refused board says why.** The Caseworker, PA-Cockpit and Infra-board cards carry a **Flevoland-account** button; a board your role does not open returns you to the landing page with a dialog naming your account, the missing role and the app role to ask for. The Flevoland (Entra ID) button no longer appears on the Keycloak login form.
+
+**People act in eDOCS as themselves.** `/v1/edocs` now acts as the signed-in person — through their own eDOCS session, opened with the Entra ID token Keycloak stores for them — or as the service account for a listed machine client. Responses say which (`actingAs`), a refusal has its own code, and the new settings are validated at startup when eDOCS is live. Keycloak stores brokered Entra tokens and lets a person read their own; that exposure is an accepted risk, recorded in its own issue.
+
+**The assistant's eDOCS tools act as the caseworker.** A tool call carries the caller's token in the MCP request's metadata, never in the model's arguments, so the eDOCS look-ups run as the person; a refusal comes back as a Dutch tool error and is never retried as the service, and an expired session asks the caseworker to sign in again.
+
+**Documents record who they were made for.** The employee who acted is stamped as `edocsAuthor` and reserved against client writes; the background worker and ValidSign archive "namens" that employee, a signed document for its signer, and a person's own eDOCS write names them as author.
+
+**The findings of the v2026.10.0 documentation run are fixed.** Swimlane lane names decode character references, the decline message is neutral, `keycloak-add-rip-roles.sh` grants nothing by default outside `rip-`, the declared-phase fixtures are drift-checked, and the deprecated `GET /v1/m2m/process/history` is removed.
+
+**CI.** Every dependency pull request gets a lockfile review, required on `acc`; the frontends build and deploy on `acc` when only the lockfile changes; `check-swimlane-fixtures` runs in the `audit` job; the release pull request runs the strict SBOM check — though, because the workflow regenerates the SBOM before it checks it, neither SBOM check can fail yet ([#354](https://github.com/sgort/ronl-business-api/issues/354)); and a stuck Playwright browser install in the PA demo job times out after ten minutes.
+
+**Also in this release.** `dompurify` 3.4.16 and `@modelcontextprotocol/sdk` 1.31.0 for their advisories, the bearer token kept out of logs and copies, eDOCS caches that evict the least recently used entry, no run-time RegExp in the tenant-pages plugin, Renovate holding Redis on 7.2, `.nvmrc` 22.23.3, Prettier 3.9.9 and the lock-file refresh.
+
+---
+
 ## v2026.10.0 — Every Error Is Problem Details, and a Besluit Is Prepared and Signed From the Dashboard (October 2026)
 
 > The error shape: [API Design](../features/api-design.md). The new board section: [Caseworker](../user-guide/caseworker.md). Signing: [ValidSign signing](validsign-signing.md). Declared phases: [BPMN Design Criteria](../reference/bpmn-design-criteria.md). The machine API: [Operaton MCP Client](operaton-mcp-client.md). Measured suites: [Testing](testing/overview.md).
@@ -1610,6 +1636,13 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 | [ValidSign signing in every task view, signing state per task](validsign-signing.md) | v2026.10.0 |
 | [A process declares its own phases (`ronl:phases`)](../reference/bpmn-design-criteria.md) | v2026.10.0 |
 | `/v1/m2m` on the main engine; history by `POST`; access labels refused | v2026.10.0 |
+| [Citizen services derived from a registry and the deployments, enforced at start](../features/processes.md#citizen-services) | v2026.10.1 |
+| [A landing page per single-board organisation at `/<id>`, with its own link preview](../user-guide/getting-started.md) | v2026.10.1 |
+| [Gemeente Heusden and the Heusdenpas](../user-guide/citizen-portal.md) | v2026.10.1 |
+| [People act in eDOCS as themselves; the assistant's eDOCS tools act as the caseworker](testing/edocs-live-testing.md) | v2026.10.1 |
+| Background archiving records "namens" the employee | v2026.10.1 |
+| [A board opens with the Flevoland account, and a refused board is explained](deployment/entra-id.md) | v2026.10.1 |
+| Lockfile review required on `acc` | v2026.10.1 |
 
 !!! note "This table has a gap"
     Rows run from v1.0.0 to v3.0.7 and then jump to the September 2026 entries

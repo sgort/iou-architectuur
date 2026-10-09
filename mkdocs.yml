@@ -122,6 +122,7 @@ nav:
         - Multi-Tenant Municipality Portal: ronl-business-api/features/archive/multi-tenant-portal.md
     - User Guides:
       - Getting Started: ronl-business-api/user-guide/getting-started.md
+      - Citizen Portal: ronl-business-api/user-guide/citizen-portal.md
       - Caseworker: ronl-business-api/user-guide/caseworker.md
       - PA-Cockpit: ronl-business-api/user-guide/pa-cockpit.md
       - PA-Cockpit Demo: ronl-business-api/user-guide/pa-demo.md

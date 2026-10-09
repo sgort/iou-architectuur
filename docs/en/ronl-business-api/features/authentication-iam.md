@@ -59,9 +59,10 @@ Every authenticated caller carries a tenant identifier (the `municipality` claim
 
 **Starting a process** stamps the label. The backend first resolves which tenant the process is deployed under (see [Processes — Tenancy](processes.md#tenancy)), then applies the start rule:
 
-- Deployed untenanted, or under the caller's own tenant: the case belongs to the caller's tenant.
-- Deployed under another tenant, caller is a citizen (holds the `citizen` realm role): the case goes to the deploying tenant, and `originTenantId` records the citizen's own tenant.
-- Deployed under another tenant, caller is anyone else: refused with `403 TENANT_MISMATCH`, and no instance is created.
+- Deployed under the caller's own tenant: the case belongs to the caller's tenant.
+- Deployed untenanted (or the lookup failed): a member of staff's case belongs to their own tenant; a citizen (holder of the `citizen` realm role) is refused with `403 TENANT_MISMATCH`, since a citizen's case must belong to a tenant.
+- Deployed under another tenant, caller is a citizen and the process is a cross-tenant citizen service (see [Processes — Citizen services](processes.md#citizen-services)): the case goes to the deploying tenant, and `originTenantId` records the citizen's own tenant.
+- Deployed under another tenant, in any other case: refused with `403 TENANT_MISMATCH`, and no instance is created.
 
 The stamped `municipality` always comes from this rule, never from the request body. The start also records the caller as `applicantId` and `initiator`, with their organisation type and assurance level. The business key is kept as the caller supplied it; otherwise it is minted as `<owning organisation>-<timestamp>`. It grants nothing — access runs on `municipality`.
 
@@ -70,9 +71,16 @@ The stamped `municipality` always comes from this rule, never from the request b
 - The six process reads — status, variables, historic variables, activity history, lineage and decision document — are allowed to the owning tenant, or to the case's own applicant (the caller whose user id matches `applicantId`). A citizen whose case went to another tenant's deployment can therefore still follow it.
 - Cancelling an instance (`DELETE`) and every task operation are allowed to the owning tenant only.
 
-**The label cannot be rewritten.** `municipality`, `originTenantId` and `applicantId` are reserved: a user task completion that includes any of them is refused with `400 RESERVED_VARIABLE` before anything reaches Operaton. The machine-to-machine routes under `/v1/m2m` run without the tenant step, but they guard the label too: their task completion refuses the same three variables, and their process start refuses `municipality` and `originTenantId`, both with `400 RESERVED_VARIABLE`. An M2M start may set `applicantId`, since a machine may start a case on a citizen's behalf.
+**The label cannot be rewritten.** `municipality`, `originTenantId` and `applicantId` are reserved, and so are `edocsAuthor` and `edocsAuthorName` — the employee whose name background eDOCS archiving records as "namens", which the backend stamps from the caller's token when a member of staff starts a process, completes a task or sends a document for signing (never for a citizen). A user task completion that includes any of the five is refused with `400 RESERVED_VARIABLE` before anything reaches Operaton. A process start through `/v1` drops an `edocsAuthor` or `edocsAuthorName` the body sends and stamps the caller's own, just as it sets `municipality` itself. The machine-to-machine routes under `/v1/m2m` run without the tenant step, but they guard the label too: their task completion refuses the same five variables, and their process start refuses `municipality`, `originTenantId`, `edocsAuthor` and `edocsAuthorName`, all with `400 RESERVED_VARIABLE`. An M2M start may set `applicantId`, since a machine may start a case on a citizen's behalf.
 
 **Only allow-listed clients reach `/v1/m2m`.** Every person in the realm holds a token for the `ronl-business-api` audience, so a valid token proves nothing about the caller being a machine. After token validation, the M2M routes check the token's `azp` — the client it was issued to — against `M2M_ALLOWED_CLIENTS` (default `operaton-mcp-client`). A token from any other client, every person's token included, or one with no `azp` at all, is refused with `403 M2M_CLIENT_NOT_ALLOWED` before any engine call.
+
+**`/v1/edocs` decides who eDOCS sees.** The eDOCS routes tell a machine from a person by the token's `azp`:
+
+- A machine client — any `azp` other than the frontend's — must be on `EDOCS_ALLOWED_CLIENTS` (default `edocs-mcp-client`, `copilot-studio-edocs` and `operaton-mcp-client`) and acts in eDOCS as the service account. Any other client is refused with `403 EDOCS_CLIENT_NOT_ALLOWED`.
+- A person — a token issued to the frontend — needs the `caseworker` or `admin` role, or is refused with `403 FORBIDDEN`, and acts in eDOCS as themselves, with the Entra ID token Keycloak brokered when they signed in with their Flevoland account. Without such a token the data routes refuse with `403 EDOCS_USER_TOKEN_UNAVAILABLE`; when it has expired and cannot be renewed, with `401 EDOCS_REAUTH_REQUIRED`, and the person has to sign in with their Flevoland account again. When eDOCS itself refuses the person, the answer is `403 EDOCS_ACCESS_DENIED`.
+
+In stub mode no request reaches eDOCS, and a person is served by the stub as well. `EDOCS_ALLOW_SERVICE_FALLBACK=true` lets a person without an Entra ID token fall back to the service account, logged as an audit event; the backend refuses to start with it in production.
 
 ---
 

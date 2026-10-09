@@ -25,44 +25,80 @@ Output is written to `packages/shared/dist/`. Both `@ronl/backend` and `@ronl/fr
 
 ## Contents
 
-The shared package exports the TypeScript types used across the system. Key interfaces include:
+The shared package exports the TypeScript types used across the system, plus constant data such as the RIP and Awb phase definitions and the citizen-service registry. Key exports include:
 
-**`ApiResponse<T>`** — standard response envelope used by all backend endpoints:
+**`ApiResponse<T>`** — standard response envelope used by the backend endpoints:
 ```typescript
 interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
-  error?: { code: string; message: string; };
-  timestamp: string;
+  error?: ApiError; // { code: string; message: string; details?: string; instance?: string }
 }
 ```
 
-**`TenantConfig`** — municipality tenant configuration shape:
+**`TenantConfig`** — the tenant configuration shape:
 ```typescript
+type OrganisationType = 'municipality' | 'province' | 'national' | 'commercial';
+
 interface TenantConfig {
   id: string;
   name: string;
   displayName: string;
-  municipalityCode: string;
+  organisationType: OrganisationType;
+  municipalityCode?: string;
+  organisationCode?: string;
   theme: TenantTheme;
-  features: TenantFeatures;
   contact: TenantContact;
+  logo?: string;
   enabled: boolean;
 }
 ```
 
-**`JwtClaims`** — decoded JWT payload type for `req.user`:
+There is no per-tenant `features` list: which citizen services a tenant offers follows from `CITIZEN_SERVICES` (below) and from what is deployed under the tenant. The frontend reads `tenants.json` with its own, richer `TenantConfig` in `services/tenant.ts` (landing-page boards, logo, link preview, theme background) — see [Municipality Themes](../reference/municipality-themes.md#tenantconfig-schema).
+
+**`KeycloakUser`** — the decoded Keycloak token claims, and **`AuthenticatedUser`** — the normalised caller the backend attaches to `req.user`:
 ```typescript
-interface JwtClaims {
+interface KeycloakUser {
   sub: string;
+  name?: string;
+  email?: string;
   municipality: string;
+  organisation_type: OrganisationType;
+  loa: AssuranceLevel;
   roles: string[];
-  loa: string;
-  preferred_username: string;
-  mandate?: string;
+  mandate?: MandateInfo;
+  preferred_username?: string;
   bsn?: string;
+  employeeId?: string;
+}
+
+interface AuthenticatedUser {
+  userId: string;
+  tenantId: string;
+  organisationType: OrganisationType;
+  roles: string[];
+  assuranceLevel: AssuranceLevel;
+  mandate?: MandateInfo;
+  displayName?: string;
+  preferredUsername?: string;
+  employeeId?: string;
+  email?: string;
+  givenName?: string;
+  familyName?: string;
 }
 ```
+
+**`CITIZEN_SERVICES`** — the registry of services a citizen can apply for on the dashboard, one entry per service: its id, the process it starts, and its scope.
+```typescript
+export const CITIZEN_SERVICES = [
+  { id: 'zorgtoeslag', processKey: 'AwbZorgtoeslagProcess', scope: 'cross-tenant' },
+  { id: 'vergunningen', processKey: 'AwbShellProcess', scope: 'own-tenant' },
+  { id: 'subsidies', processKey: 'ThuisbatterijSubsidieAanvraagProcess', scope: 'own-tenant' },
+  { id: 'heusdenpas', processKey: 'HeusdenpasAanvraagProcess', scope: 'own-tenant' },
+] as const;
+```
+
+An `own-tenant` service is offered only when its process is deployed under the citizen's own tenant; a `cross-tenant` service is offered to every citizen when exactly one tenant deploys it, and that tenant handles the case (Zorgtoeslag at Dienst Toeslagen). The backend derives the dashboard's cards from it (`GET /v1/process/available`) and uses it to decide whether a citizen's start may land under another tenant than their own; the frontend gives each id its label, icon and form (`pages/citizen/citizenServiceUi.ts`). `CitizenServiceId` and `CitizenServiceScope` are derived from the same constant.
 
 ---
 
@@ -79,7 +115,7 @@ interface JwtClaims {
 A passing run reads:
 
 ```
-check-shared-declarations: 12 file(s) in packages/shared/src/ — declarations and constant data only.
+check-shared-declarations: 13 file(s) in packages/shared/src/ — declarations and constant data only.
 ```
 
 A failure names the file, the line, and where the logic should live instead. If the package ever genuinely needs runtime logic, the documented path is to give it a Vitest runner with the same per-file floor and delete the script — a deliberate change, not a workaround.

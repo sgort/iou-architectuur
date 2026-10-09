@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Frontend-ontwikkeling
 
 !!! info "Documentatie in ontwikkeling"
@@ -43,4 +47,4 @@
 
 ---
 
-## Adding a feature flag check
+## Adding a citizen service

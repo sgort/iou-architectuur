@@ -27,10 +27,13 @@ packages/frontend/src/
 ├── index.css                      # Global CSS (Tailwind base + custom properties)
 ├── vite-env.d.ts
 ├── pages/
-│   ├── LoginChoice.tsx            # Landing page: Flevoland account, DigiD, board cards
-│   ├── login-choice/              # boards.config.ts, login-portal.css
+│   ├── LoginChoice.tsx            # Landing page for / and /:tenantId: board grid or single-board page
+│   ├── login-choice/              # boards.config.ts, landing-login.ts (useLandingLogin),
+│   │                              #   single-board.copy.ts, login-portal.css
 │   ├── AuthCallback.tsx           # Keycloak check-sso, then login() with a hint
-│   ├── Dashboard.tsx              # Citizen portal (start forms, Mijn aanvragen)
+│   ├── Dashboard.tsx              # Citizen portal (Diensten, Mijn aanvragen, Tijdlijn)
+│   ├── citizen/                   # citizenServiceUi.ts (a card per citizen service),
+│   │                              #   heusdenpasTestCases.ts
 │   ├── CaseworkerDashboardV2.tsx  # Caseworker shell: auth, tenant, nav state, layout
 │   ├── caseworker-v2/             # modes.config.ts, dashboard-v2.css, regelsimulatie.css
 │   ├── InfraBoardDashboard.tsx    # Infra-board shell
@@ -63,7 +66,7 @@ packages/frontend/src/
 │   │   └── regelsimulatie/        # Simulation engine, chart and panels
 │   ├── CaseworkerDashboard/       # Sections the V2 shell routes to (Nieuws, Berichten,
 │   │                              #   RegelCatalogus, ProcesBibliotheek, HR onboarding,
-│   │                              #   capacity claim, DVTP, IOU, Audit, Gereedschap, McpChat,
+│   │                              #   capacity claim, IOU, Audit, Gereedschap, McpChat,
 │   │                              #   Profiel, Rollen, …) and TaskFormViewer.tsx
 │   ├── InfraBoardDashboard/       # Infra-board sections: Portfolio, ProjectDetail, PhaseDetail,
 │   │                              #   MijnDag, FaseladderOverview, router, dock
@@ -72,7 +75,8 @@ packages/frontend/src/
 │   ├── WooDashboard/              # Woo sections: Overzicht, Verzoeken, Proces, Publicatie,
 │   │                              #   Register, Bezwaar, Tijdigheid, router, dock, charts
 │   ├── PADashboardV2/             # PA dock and section router for the host
-│   ├── LoginChoice/               # BoardCard, BoardPreview
+│   ├── LoginChoice/               # BoardCard, BoardPreview, SingleBoardLanding,
+│   │                              #   AccessDeniedDialog (with their CSS)
 │   ├── ProcessStartFormViewer.tsx # Citizen start form (@bpmn-io/form-js)
 │   ├── StartFailureNotice.tsx     # The notice under a failed citizen start (#171)
 │   ├── DecisionViewer.tsx         # Final decision of a completed citizen process
@@ -86,7 +90,9 @@ packages/frontend/src/
 │   ├── api.ts                     # Business API client (Axios) — businessApi
 │   ├── keycloak.ts                # Keycloak JS adapter, initializeKeycloak()
 │   ├── identity-providers.ts      # FLEVOLAND_IDP, the Entra alias sent as idpHint
-│   ├── tenant.ts                  # Tenant config loading and theme application
+│   ├── tenant.ts                  # Tenant config loading, landing resolution, theme application
+│   ├── landing.ts                 # landingUrl(): the logout redirect to the tenant's own page
+│   ├── board-request.ts           # The board chosen on a landing page, carried through login
 │   ├── infra.api.ts               # Infra-board live-data hooks over businessApi
 │   └── brp.api.ts, brp.timeline.ts, bsn.mapping.ts
 ├── types/
@@ -101,10 +107,14 @@ packages/frontend/public/
 ├── tenants.json                   # Municipality configurations (loaded at runtime)
 ├── timeline-config.json
 ├── og-image-acc.png, og-image-prod.png  # Link-preview images, one per environment
+├── og-image-<id>-{acc,prod}.png   # Per single-board tenant: amsterdam, heusden, toeslagen, unive
+├── tenants/                       # Tenant logos: amsterdam/, heusden/, toeslagen/
 ├── pa/                            # PA cockpit assets
 └── staticwebapp.config.json       # Azure SWA routing configuration
 packages/frontend/scripts/
-└── check-og.mjs                   # CI gate: the built index.html carries this environment's link preview
+└── check-og.mjs                   # CI gate: every built page carries this environment's link preview
+packages/frontend/
+└── vite-plugin-tenant-pages.ts    # Build step: dist/<id>/index.html and an SWA rewrite per single-board tenant
 ```
 
 ---
@@ -113,36 +123,56 @@ packages/frontend/scripts/
 
 The frontend uses a three-route flow: landing page → auth callback → dashboard. Every flow now starts the same way at the callback — a passive `check-sso` — and differs only in the `keycloak.login()` call it makes when that comes back unauthenticated.
 
-**1. Landing Page (`/` — `LoginChoice.tsx`)**
+**1. Landing Page (`/` and `/:tenantId` — `LoginChoice.tsx`)**
 
-The landing page offers three ways in, plus a card per board:
+Both routes render `LoginChoice`, which waits for `tenants.json` and asks `resolveLandingTenant(pathname, search)` in `services/tenant.ts` what the URL shows:
+
+| URL | Shows |
+|---|---|
+| `/` | The default tenant's (`"default": "flevoland"`) board grid |
+| `/<id>` for an enabled tenant with exactly one board | That tenant's single-board page (`SingleBoardLanding`), in its theme |
+| `/<id>` for anything else — unknown, disabled, several boards, or a reserved id (`auth`, `dashboard`, `assets`, `tenants`, `api`, `t`, `pa`) | A redirect to `/`; a mixed-case id redirects to its lower-case path |
+| `/?tenant=<id>` (the URL before tenants had paths) | A redirect to `/<id>` |
+
+The single-board tenants today are Gemeente Amsterdam, Gemeente Heusden, Dienst Toeslagen and Univé Verzekeringen, each with `boards: ["caseworker"]`. Both layouts start their logins through the same hook, `useLandingLogin()` in `pages/login-choice/landing-login.ts`.
+
+**The board grid (`/`)** offers these ways in:
 
 | Control | Handler | Effect |
 |---|---|---|
 | Hero primary button, **Inloggen met uw Flevoland-account** | `startIdpLogin(FLEVOLAND_IDP)` | Hints Provincie Flevoland's Entra ID, brokered by Keycloak |
-| **Inwoner? Log in met DigiD** (`citizen-link`) | `startIdpLogin('digid')` | Hints DigiD |
-| Top-bar **Inloggen** (`login-link`) | `startMedewerkerLogin()` | No hint — Keycloak's own form, with the medewerker sentinel |
-| A board card | `startMedewerkerLogin(route, testUser)` | As above, plus a stored redirect to that board |
+| **Inwoner? Log in met DigiD** (`citizen-link`) | `startIdpLogin('digid', 'test-citizen-flevoland')` | Hints DigiD, with a test-user login hint |
+| Top-bar **Inloggen** (`login-link`) | `startMedewerkerLogin(undefined, 'test-caseworker-flevoland')` | Keycloak's own form with the test user pre-filled; no board target |
+| A board card's **Openen** | `startMedewerkerLogin(route, testUser)` | As above with the board's test user, plus a stored redirect to that board |
+| A board card's **Flevoland-account** (Caseworker, PA-Cockpit, Infra-board — every board with an `entraRole` in `boards.config.ts`; not Woo) | `startEntraBoardLogin(route)` | Entra ID, plus a stored redirect to that board |
 
-`FLEVOLAND_IDP` is `'entra-flevoland'`, exported from `services/identity-providers.ts` so the landing page can name the provider without importing `keycloak-js`. The alias must match the provider `scripts/keycloak-add-entra-idp.sh` creates and the redirect URI registered in Flevoland's Entra app registration — renaming it means changing all three. **Bekijk de borden** beside the hero button is a secondary anchor to `#boards`; it starts no login.
+All four cards show before sign-in; the grid does not filter by role. `FLEVOLAND_IDP` is `'entra-flevoland'`, exported from `services/identity-providers.ts` so the landing page can name the provider without importing `keycloak-js`. The alias must match the provider `scripts/keycloak-add-entra-idp.sh` creates and the redirect URI registered in Flevoland's Entra app registration — renaming it means changing all three. **Bekijk de borden** beside the hero button is a secondary anchor to `#boards`; it starts no login.
+
+**The single-board page (`/<id>`)** is tenant-first: the tenant's logo (or its name, when `logo` is absent), its colours, copy chosen by `organisationType` from `pages/login-choice/single-board.copy.ts` (a province falls back to the municipality copy), an illustrative Caseworker preview, and the ronl. mark only in the footer. Its controls are **Inloggen als medewerker** (`startMedewerkerLogin(board.route, 'test-caseworker-<id>')`), the top-bar **Inloggen** (the same hint, no board target) and **Inwoner? Log in met DigiD** (`startIdpLogin('digid', 'test-citizen-<id>')`). It has no Entra button: Entra ID exists only for Flevoland.
 
 ```typescript
-function startIdpLogin(idp: "digid" | "eherkenning" | "eidas" | typeof FLEVOLAND_IDP) {
+function startIdpLogin(idp: LandingIdp, usernameHint?: string) {
   try {
     // A board click stores a redirect and a test-user hint before the user
     // may come back and choose an identity provider instead. Neither belongs
     // to this login: the landing page follows the role Entra/DigiD grants.
-    sessionStorage.removeItem("post_login_redirect");
-    sessionStorage.removeItem("username_hint");
-    sessionStorage.setItem("selected_idp", idp);
+    // A hint passed here is this login's own, e.g. a tenant's test citizen.
+    chooseBoard(undefined);
+    if (usernameHint) sessionStorage.setItem('username_hint', usernameHint);
+    else sessionStorage.removeItem('username_hint');
+    sessionStorage.setItem('selected_idp', idp);
   } catch {
     /* non-fatal */
   }
-  navigate("/auth");
+  navigate('/auth');
 }
 ```
 
-The selected value is stored in `sessionStorage` under the key `selected_idp` and read by `AuthCallback.tsx`. `'eherkenning'` and `'eidas'` remain in the parameter's type union but no control emits them today: the realm export defines `digid` and `eidas` as disabled SAML providers and no eHerkenning provider at all.
+The selected value is stored in `sessionStorage` under the key `selected_idp` and read by `AuthCallback.tsx`. `'eherkenning'` and `'eidas'` remain in the `LandingIdp` union but no control emits them today: the realm export defines `digid` and `eidas` as disabled SAML providers and no eHerkenning provider at all.
+
+**A board chosen on a landing page** is remembered twice: `post_login_redirect` says where to go, and `login_board_request` (`services/board-request.ts`) records that the person picked that board on this landing page. When the login grants the board's role, `navigateAfterLogin()` opens the board. When it does not, a redirect stored by a dashboard just falls back to the role's own dashboard, but a board picked on a landing page sends the person back to that page with an `AccessDeniedState` in router state, and `AccessDeniedDialog` explains the refusal: **Geen toegang tot &lt;bord&gt;**, the signed-in name, the missing role, for boards with an Entra role the app role to ask for (`IOU_USERS`, `IOU_PA`, `IOU_INFRA`), and the buttons **Naar mijn dashboard** (only when the account has a staff dashboard) and **Uitloggen**. Closing it drops the router state, so a refresh or Back does not bring it back.
+
+**Logging out** of the Caseworker and citizen dashboards, or from the session-expiry warning, returns to the person's own landing page: they pass `landingUrl(user.municipality)` from `services/landing.ts` as Keycloak's `redirectUri`, so an Amsterdam caseworker lands on `/amsterdam`. A tenant without a page of its own, such as Flevoland, is sent on to `/`. The PA-Cockpit, Infra-board and Woo boards log out to `/`; **Uitloggen** in the no-access dialog returns to the landing page it was shown on.
 
 **2. Authentication Callback (`/auth` — `AuthCallback.tsx`)**
 
@@ -153,14 +183,18 @@ The callback reads `selected_idp` and branches on whether the user is a casework
 ```typescript
 const authenticated = await initializeKeycloak();
 if (authenticated) {
-  sessionStorage.removeItem("selected_idp");
+  sessionStorage.removeItem('selected_idp');
   navigateAfterLogin(navigate);
 } else {
-  await keycloak.login(selectedIdp ? { idpHint: selectedIdp } : undefined);
+  const loginHint = sessionStorage.getItem('username_hint') ?? undefined;
+  sessionStorage.removeItem('username_hint');
+  await keycloak.login(
+    selectedIdp ? { idpHint: selectedIdp, ...(loginHint && { loginHint }) } : undefined
+  );
 }
 ```
 
-The `idpHint` tells Keycloak to skip its native login form and redirect straight to the hinted provider. For `entra-flevoland` that is Provincie Flevoland's Entra ID; on a Flevoland-managed laptop Entra usually signs the employee in without a prompt. Where the hinted provider is not configured, Keycloak falls back to its native form without a context banner.
+The `idpHint` tells Keycloak to skip its native login form and redirect straight to the hinted provider. For `entra-flevoland` that is Provincie Flevoland's Entra ID; on a Flevoland-managed laptop Entra usually signs the employee in without a prompt. Where the hinted provider is not configured, Keycloak falls back to its native form without a context banner — with the DigiD links' `test-citizen-<id>` hint pre-filled, which is how a tenant page signs in its own test citizen.
 
 !!! warning "`keycloak.init({ onLoad: 'login-required', idpHint })` is not how this works any more"
     An earlier version of the citizen flow called `.init()` directly with
@@ -174,43 +208,29 @@ The `idpHint` tells Keycloak to skip its native login form and redirect straight
 **Caseworker path (medewerker):**
 
 ```typescript
-// Step 1: silent SSO check — no redirect triggered
-const authenticated = await keycloak.init({
-  onLoad: "check-sso",
-  checkLoginIframe: false,
-});
-
+const authenticated = await initializeKeycloak();
 if (authenticated) {
-  // Existing SSO session found — go straight to dashboard
-  navigate("/dashboard", { replace: true });
+  sessionStorage.removeItem('selected_idp');
+  sessionStorage.removeItem('username_hint');
+  navigateAfterLogin(navigate);
 } else {
-  // No session — redirect to Keycloak with sentinel
-  await keycloak.login({ loginHint: "__medewerker__" });
+  const usernameHint = sessionStorage.getItem('username_hint') ?? undefined;
+  sessionStorage.removeItem('username_hint');
+  await keycloak.login({ loginHint: usernameHint ?? '__medewerker__' });
 }
 ```
 
-`onLoad: 'check-sso'` returns `true` if a Keycloak SSO session cookie already exists in the browser, allowing the caseworker to skip the login screen entirely on subsequent visits within the session window. If no session exists, `keycloak.login({ loginHint: '__medewerker__' })` redirects to Keycloak and passes `__medewerker__` as the `login_hint` parameter. The `login.ftl` template detects this sentinel and renders the caseworker context banner (see [Keycloak Deployment — Caseworker banner](./deployment/keycloak.md#caseworker-context-banner)).
+`check-sso` returns `true` if a Keycloak SSO session cookie already exists in the browser, allowing the caseworker to skip the login screen entirely on subsequent visits within the session window. If no session exists, `keycloak.login()` redirects to Keycloak with a `login_hint`: the stored test-user hint when the landing page set one, which Keycloak pre-fills in the username field, otherwise the `__medewerker__` sentinel. The dashboards' own login buttons store no hint, so they send the sentinel; the `login.ftl` template detects it and renders the caseworker context banner (see [Keycloak Deployment — Caseworker banner](./deployment/keycloak.md#caseworker-context-banner)).
 
 **3. Caseworker dashboard (`/dashboard/caseworker` — V2 shell)**
 
-The caseworker portal. From v3.0.0 this route renders the V2 shell (`pages/CaseworkerDashboardV2.tsx`, with the "V2" suffix dropped after the Phase 3 file rename). The V1 page shell is retired; `/dashboard/caseworker/v2` redirects to the canonical route for one release. This route is **not wrapped in `ProtectedRoute`** — authentication is handled inside the component so public content (Nieuws, Berichten, Regelcatalogus, Procesbibliotheek) can render without a login. The component observes `keycloak.authenticated` on mount. The shell owns auth state, tenant theme, navigation state, and layout only; `SectionRouter` dispatches every section. See [Caseworker Dashboard (V2)](../features/archive/caseworker-dashboard-v2.md).
-```typescript
-const [isAuthenticated] = useState(() => !!keycloak.authenticated);
-```
+The caseworker portal, rendered by the V2 shell (`pages/CaseworkerDashboardV2.tsx`) inside `ProtectedRoute requiredRole="caseworker"`: a visitor without a session goes to `/`, a signed-in user without the `caseworker` role to `/dashboard/citizen`. The shell owns auth state, tenant theme, navigation state, and layout only; `SectionRouter` dispatches every section. See [Caseworker Dashboard (V2)](../features/archive/caseworker-dashboard-v2.md).
 
-The shell renders three zones driven by `tenantConfig` loaded from `public/tenants.json`:
-
-- **Top nav** — six `TopNavPage` values: `home | personal-info | projects | audit-log | gereedschap | iou`. The `audit-log` and `gereedschap` tabs are platform-scoped (hardcoded, not in `tenants.json`). The `iou` tab is tenant-scoped and only present for tenants that define `leftPanelSections.iou`.
-- **Left panel** — `tenantConfig.leftPanelSections[activeTopNavPage]`, an array of `LeftPanelSection` objects each with `id`, `label`, and `isPublic`
-- **Main content** — `renderContent()` switches on `activeSection`
-
-For unauthenticated visitors, `getDefaultTenantConfig()` loads the default tenant (`utrecht`) so the left panel always renders. When a visitor clicks a section with `isPublic: false`, `renderLoginPrompt()` is rendered instead of the section content — no redirect.
-
-Section memory (`sectionMemory` state) stores the last visited section per top-nav page, so switching pages and returning always restores context.
+The shell groups the sections into four modes — `werk | zoeken | simulatie | beheer` (`pages/caseworker-v2/modes.config.ts`) — each with its own rail of sections, gated per item by authentication, realm roles and organisation type. The tenant's `leftPanelSections` in `tenants.json` add the tenant-scoped section ids. The tenant config is the signed-in user's (from the `municipality` claim); without one it falls back to the default tenant (`flevoland`). The ⌘K command palette reaches any section, and the assistant dock sits on the right.
 
 **4. Citizen dashboard (`/dashboard/citizen` — `Dashboard.tsx`)**
 
-The citizen portal, protected by `ProtectedRoute requiredRole="citizen"`. The JWT `roles` claim determines whether the user sees the zorgtoeslag calculator or is redirected to the caseworker dashboard.
+The citizen portal, protected by `ProtectedRoute requiredRole="citizen"`: a signed-in caseworker is sent to `/dashboard/caseworker`. It has three tabs — **Diensten**, **Mijn aanvragen** and **Tijdlijn**. **Diensten** shows a card for each service `GET /v1/process/available` returns, with its label, icon and form from `CITIZEN_SERVICE_UI` (`pages/citizen/citizenServiceUi.ts`); see [Adding a citizen service](#adding-a-citizen-service). **Mijn aanvragen** lists the citizen's applications, one per case. **Tijdlijn** shows the BRP timeline.
 
 ---
 
@@ -319,11 +339,13 @@ After any successful authentication, `sessionStorage.removeItem('selected_idp')`
 
 ## Multi-tenant theming
 
-On successful login, `services/tenant.ts` reads the `municipality` claim from the decoded JWT and applies the corresponding theme:
+On successful login, each dashboard reads the `municipality` claim from the decoded JWT and applies the corresponding theme:
 
 ```typescript
-await initializeTenantTheme(keycloak.tokenParsed.municipality);
+await initializeTenantTheme(currentUser.municipality);
 ```
+
+Before login, the landing page applies the theme of the tenant its URL resolves to — the default tenant on `/`, the single-board tenant on `/<id>` — by calling `applyTenantTheme(resolution.tenant.theme)` directly.
 
 `initializeTenantTheme` loads `public/tenants.json`, finds the matching entry, and calls `applyTenantTheme`, which sets CSS custom properties on `document.documentElement`:
 
@@ -331,6 +353,10 @@ await initializeTenantTheme(keycloak.tokenParsed.municipality);
 root.style.setProperty("--color-primary", theme.primary);
 root.style.setProperty("--color-primary-dark", theme.primaryDark);
 // ...
+// Removed when absent, so a tenant without one does not keep the previous
+// tenant's background.
+if (theme.background) root.style.setProperty("--color-background", theme.background);
+else root.style.removeProperty("--color-background");
 ```
 
 All Tailwind utility classes and component styles reference these custom properties, so the entire UI re-themes without a page reload.
@@ -719,6 +745,8 @@ import NewPage from './pages/NewPage';
 <Route path="/new-page" element={<NewPage />} />
 ```
 
+A static path outranks `<Route path="/:tenantId" …>`, which catches every other top-level path for the tenant landing pages (App.tsx keeps it after the fixed routes for readability). Add the new path's first segment to `RESERVED_TENANT_IDS` in `services/tenant.ts` so no tenant id can claim it.
+
 3. **Add navigation link:**
 
 ```typescript
@@ -727,37 +755,23 @@ import NewPage from './pages/NewPage';
 
 ---
 
-## Adding a feature flag check
+## Adding a citizen service
 
-Feature flags are configured per municipality in `public/tenants.json`:
+There are no per-tenant feature flags: `tenants.json` lists no services, and a guard test (`pages/citizen/citizenServices.test.ts`) fails if a tenant carries a `features` key. Which services a citizen sees on **Diensten** follows from the `CITIZEN_SERVICES` registry in `@ronl/shared` and from what is deployed in Operaton. Adding one takes three steps:
 
-```json
-{
-  "utrecht": {
-    "name": "Gemeente Utrecht",
-    "features": {
-      "zorgtoeslag": true,
-      "newFeature": false
-    }
-  }
-}
-```
+1. **Register it** in `packages/shared/src/citizen-services.ts` — its id, the process it starts, and its scope:
 
-Check the flag in your component:
+    ```typescript
+    { id: 'heusdenpas', processKey: 'HeusdenpasAanvraagProcess', scope: 'own-tenant' },
+    ```
 
-```typescript
-import { useTenant } from '../contexts/TenantContext';
+    `own-tenant` offers the service only to citizens whose own tenant has deployed the process; `cross-tenant` offers it to every citizen when exactly one tenant deploys it, and that tenant handles the case (Zorgtoeslag at Dienst Toeslagen).
 
-function MyComponent() {
-  const { tenant } = useTenant();
+2. **Give it a face** in `packages/frontend/src/pages/citizen/citizenServiceUi.ts` — label, description and icon — and render its form in `Dashboard.tsx` under `activeService === '<id>'`. Add the process key to `PROCESS_DEFINITION_LABELS` there so **Mijn aanvragen** names the application. A unit test checks that `CITIZEN_SERVICE_UI` and `CITIZEN_SERVICES` name the same ids, so neither can ship without the other.
 
-  if (!tenant?.features?.newFeature) {
-    return null; // Feature disabled for this municipality
-  }
+3. **Deploy the process under the tenant** (or, for a cross-tenant service, under the one tenant that handles it). `GET /v1/process/available` reads the latest deployment per tenant; an untenanted deployment never counts, so a service deployed without a tenant does not appear.
 
-  return <div>New Feature Content</div>;
-}
-```
+The dashboard skips an id the backend returns that the bundle has no card for, since backend and frontend release separately.
 
 ---
 
@@ -811,7 +825,9 @@ npm test -- --watch
 - [ ] The hero's primary button reads "Inloggen met uw Flevoland-account"
 - [ ] "Bekijk de borden" renders as the secondary action and only scrolls to `#boards`
 - [ ] The DigiD link and the top-bar "Inloggen" both render
-- [ ] The board cards render, one per entitled board
+- [ ] All four board cards render before sign-in; Caseworker, PA-Cockpit and Infra-board carry a **Flevoland-account** button beside **Openen**, Woo does not
+- [ ] `/amsterdam`, `/heusden`, `/toeslagen` and `/unive` show the single-board page in the tenant's colours; `/?tenant=amsterdam` redirects to `/amsterdam`; an unknown `/<id>` redirects to `/`
+- [ ] A board opened with an account that lacks its role returns to the landing page with the **Geen toegang tot …** dialog
 - [ ] Changelog panel opens and closes correctly
 - [ ] Mobile responsive (< 640px)
 
@@ -823,14 +839,14 @@ npm test -- --watch
 - [ ] `AuthCallback` redirects to Keycloak with the matching `idpHint`
 - [ ] Login succeeds and JWT contains `roles: ["citizen"]`
 - [ ] Dashboard loads with correct municipality theme
-- [ ] Zorgtoeslag calculator submits and displays results
+- [ ] **Diensten** shows the cards for the citizen's organisation (Zorgtoeslag for everyone; Heusdenpas for `test-citizen-heusden`)
 
 **Caseworker flow:**
 
-- [ ] Caseworker button stores `selected_idp = medewerker` in sessionStorage
+- [ ] A board card's **Openen** stores `selected_idp = medewerker`, `post_login_redirect` and the board's test user as `username_hint`
 - [ ] `AuthCallback` calls `check-sso`, not `login-required`
-- [ ] Keycloak login shows indigo "Inloggen als gemeentemedewerker" banner
-- [ ] Username field is empty (sentinel `__medewerker__` suppressed)
+- [ ] From a landing page, Keycloak's username field is pre-filled with the test user
+- [ ] From a dashboard's own login button (no hint), Keycloak shows the indigo "Inloggen als gemeentemedewerker" banner and an empty username field (sentinel `__medewerker__` suppressed)
 - [ ] Login succeeds and JWT contains `roles: ["caseworker"]`
 - [ ] SSO session reuse: second visit within session window goes straight to dashboard
 
@@ -838,7 +854,7 @@ npm test -- --watch
 
 - [ ] Token refresh works (keep page open > 15 min)
 - [ ] "← Terug naar inlogkeuze" returns to `/` in a single click
-- [ ] Logout redirects to landing page and clears SSO session
+- [ ] Logout clears the SSO session and returns to the user's own landing page (`/amsterdam` for an Amsterdam caseworker, `/` for Flevoland)
 
 ### Browser Compatibility
 
@@ -861,18 +877,22 @@ Edit `public/tenants.json`:
 
 ```json
 {
-  "newmunicipality": {
-    "name": "Gemeente NewCity",
-    "theme": {
-      "primary": "#1e3a8a",
-      "primaryDark": "#1e40af"
-    },
-    "features": {
-      "zorgtoeslag": true
+  "tenants": {
+    "newmunicipality": {
+      "id": "newmunicipality",
+      "name": "newmunicipality",
+      "displayName": "Gemeente NewCity",
+      "organisationType": "municipality",
+      "theme": {
+        "primary": "#1e3a8a",
+        "primaryDark": "#1e40af"
+      }
     }
   }
 }
 ```
+
+The full shape, including the optional `background`, `boards`, `logo` and `share`, is in [Municipality Themes](../reference/municipality-themes.md#tenantconfig-schema).
 
 ### Add a new IDP button
 
@@ -884,7 +904,7 @@ The alias has to exist as an identity provider in the `ronl` realm first — `Au
 </button>
 ```
 
-Widen `startIdpLogin`'s parameter type to accept the alias. If it is a provider the platform owns rather than a one-off, give it a named export in `services/identity-providers.ts` the way `FLEVOLAND_IDP` has one, so the alias is written down in exactly one place.
+Widen the `LandingIdp` type in `pages/login-choice/landing-login.ts` to accept the alias. If it is a provider the platform owns rather than a one-off, give it a named export in `services/identity-providers.ts` the way `FLEVOLAND_IDP` has one, so the alias is written down in exactly one place.
 
 ### Debug Keycloak issues
 

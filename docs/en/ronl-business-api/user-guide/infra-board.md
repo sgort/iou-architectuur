@@ -75,7 +75,9 @@ The flow, from a project leader's point of view:
    emailed to you and sign elsewhere, for example on your phone.
 4. **Sign.** The panel watches for completion on its own.
 5. **The task completes.** The signed document and its evidence summary are
-   archived in eDOCS, and the process moves on.
+   archived in eDOCS, and the process moves on. Their titles in eDOCS end in
+   "— namens" followed by your name and e-mail address, so the archive shows
+   whom they were signed for.
 
 You do not complete the task by hand — it completes when the signature lands.
 

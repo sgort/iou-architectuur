@@ -91,7 +91,7 @@ Three confidential clients authenticate with a service account and no user:
 
 ## Identity provider: `entra-flevoland`
 
-An OIDC provider for Provincie Flevoland's Entra ID, configured by `scripts/keycloak-add-entra-idp.sh` rather than by the realm export, because it carries a client secret. Its mappers set `municipality = flevoland`, `organisation_type = province` and `assurance_level = substantieel`, and map the Entra app roles `IOU_ADMIN`, `IOU_USERS`, `IOU_PA` and `IOU_INFRA` to `admin`, `caseworker`, `public-affairs` and `infra-projectteam`, on every login. See [Entra ID](../developer/deployment/entra-id.md).
+An OIDC provider for Provincie Flevoland's Entra ID, configured by `scripts/keycloak-add-entra-idp.sh` rather than by the realm export, because it carries a client secret. Its mappers set `municipality = flevoland`, `organisation_type = province` and `assurance_level = substantieel`, and map the Entra app roles `IOU_ADMIN`, `IOU_USERS`, `IOU_PA` and `IOU_INFRA` to `admin`, `caseworker`, `public-affairs` and `infra-projectteam`, on every login. The provider is hidden on the Keycloak login form (`hideOnLogin`); Flevoland employees reach it through the landing page. It stores the Entra tokens it receives (`storeToken`, with `offline_access` in its default scope), so the backend can act in eDOCS as the person; the same script adds the `broker` client's `read-token` role to `default-roles-ronl` and the `broker-roles` client mapper to `ronl-business-api`. None of this is in the realm export. See [Entra ID](../developer/deployment/entra-id.md).
 
 The export itself carries two SAML providers, `digid` (DigiD) and `eidas` (eIDAS), both disabled.
 
@@ -194,7 +194,7 @@ The candidate groups the RIP process models address their tasks to. A task list 
 
 ## Test users
 
-The export defines 24 test users, all with password `test123` and `assurance_level = hoog`. The `ronl-business-api` client allows direct access grants, so a test token can be requested with a username and password.
+The export defines 27 test users, all with password `test123` and `assurance_level = hoog`. The `ronl-business-api` client allows direct access grants, so a test token can be requested with a username and password.
 
 | Username | `municipality` | `organisation_type` | Realm roles |
 |---|---|---|---|
@@ -202,6 +202,8 @@ The export defines 24 test users, all with password `test123` and `assurance_lev
 | `test-caseworker-utrecht` | `utrecht` | `municipality` | `caseworker` |
 | `test-citizen-amsterdam` | `amsterdam` | `municipality` | `citizen` |
 | `test-caseworker-amsterdam` | `amsterdam` | `municipality` | `caseworker` |
+| `test-citizen-heusden` | `heusden` | `municipality` | `citizen` |
+| `test-caseworker-heusden` | `heusden` | `municipality` | `caseworker` |
 | `test-citizen-rotterdam` | `rotterdam` | `municipality` | `citizen` |
 | `test-caseworker-rotterdam` | `rotterdam` | `municipality` | `caseworker` |
 | `test-citizen-denhaag` | `denhaag` | `municipality` | `citizen` |
@@ -222,6 +224,7 @@ The export defines 24 test users, all with password `test123` and `assurance_lev
 | `test-citizen-toeslagen` | `toeslagen` | `national` | `citizen` |
 | `test-caseworker-toeslagen` | `toeslagen` | `national` | `caseworker` |
 | `test-citizen-unive` | `unive` | `commercial` | `citizen` |
+| `test-caseworker-unive` | `unive` | `commercial` | `caseworker` |
 
 `test-hr-denhaag` is the primary HR test account — it holds the `hr-medewerker` realm role and can start onboarding processes and view the Afgeronde onboardingen archive. `test-onboarded-denhaag` simulates an employee who has already been onboarded; logging in with this account triggers an auto-fetch of the completed onboarding record for `emp-test-01`.
 
@@ -247,9 +250,9 @@ This also removes what was added to the local realm by hand or by script; run `s
 
 | Change | Script |
 |---|---|
-| New realm roles | `keycloak-add-rip-roles.sh` — creates every role in the realm file whose name starts with `ROLE_PREFIX` (default `rip-`), and grants them all to `GRANT_USER` (default `test-infra-flevoland`; empty grants nothing) |
+| New realm roles | `keycloak-add-rip-roles.sh` — creates every role in the realm file whose name starts with `ROLE_PREFIX` (default `rip-`), and grants them all to `GRANT_USER` (default `test-infra-flevoland` for `rip-`, empty for any other prefix; empty grants nothing) |
 | The ValidSign token claims | `keycloak-add-token-claim-mappers.sh` |
-| The Entra ID identity provider | `keycloak-add-entra-idp.sh` |
+| The Entra ID identity provider, its token storage, the `read-token` default role and the `broker-roles` client mapper | `keycloak-add-entra-idp.sh` |
 
 For the besluit roles, for example:
 
