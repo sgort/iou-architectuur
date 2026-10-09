@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Getting Started
 
 !!! info "Documentatie in ontwikkeling"
@@ -19,7 +23,7 @@
 
 ---
 
-## The five-step workflow
+## The six tabs
 
 ---
 

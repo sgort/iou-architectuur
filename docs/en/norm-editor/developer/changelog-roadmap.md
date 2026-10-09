@@ -8,6 +8,46 @@ component: Norm Editor
 
 ## Changelog
 
+### v2026.09.15-2 — Interpreting and Viewing in Three Panes (September 2026)
+
+> How it works now: [Interpreting sources](../user-guide/interpreting-sources.md) and [Frame visualisation](../features/visualisation.md). The code: [Frontend](frontend.md).
+
+**Interpret sources is laid out as three panes under a status bar.** The source text, the Frames list and a separate frame editor sit side by side, and a one-line status bar above them says what the editor expects next. While a role or condition is being chosen the bar turns orange and offers **Cancel**. Open frames become tabs across the editor pane instead of a list down its side, and new frames come from a **+ New** menu.
+
+**The frame forms read as forms.** Each carries its type as a coloured badge. Roles are set with a **Select** button that reads **Change** once the role is filled, and an empty role says *Not set*. Role detection moved into the Roles header as a **Detect roles** button beside the model choice, and **Show in source** replaces *Scroll to source*, disabled when the frame has no source. Deleting asks *Delete this act?* with **Keep** and **Delete**.
+
+**View interpretation shows the dependencies between acts.** The tab became three panes: the frames, a network of acts and claim-duties linked where one act creates what the next needs, and a details panel for the selected frame. That panel lists its roles, conditions, what enables it and what it enables, and opens the frame in the editor. The network fits itself to the pane, can be zoomed, re-laid out and filtered by hiding nodes, and a legend explains its shapes. It replaces the overlay tree drawn over the selected node.
+
+**The DNS zone moved to the shared resource group**, so one zone serves every environment: production on the apex, any other environment on `acc.` ([Deployment](deployment.md)).
+
+---
+
+### v2026.09.15 — A Name and an Icon (September 2026)
+
+**The application calls itself the Norm Editor.** The product name is *Norm Editor - RONL*, replacing *Regel Gui*, and the GUI ships a new favicon set and a web app manifest in the IOU colours.
+
+---
+
+### v2026.09.13 — Re-tag (September 2026)
+
+Carries no change of its own: it marks the same work as v2026.09.12, tagged again the same day.
+
+---
+
+### v2026.09.12 — The IOU Style, and a Registry Shared Across Environments (September 2026)
+
+> The changes: [Frontend](frontend.md#styling) and [Deployment](deployment.md).
+
+**The Norm Editor adopts the IOU style.** A navy title bar carries the name, a *What's new* button, a link to the repository and the load/save menu; the six steps sit below it as tabs. The palette, buttons and panels follow the IOU tokens defined once in `quasar.variables.scss`, and Roboto Mono is self-hosted for hashes and versions, so the editor makes no request to Google Fonts.
+
+**The changelog names the commit it was built from.** *What's new* shows the latest commit and links every hash to the repository. `build_gui` regenerates the changelog before building the image; see [Testing](testing.md#what-ci-actually-gates) for why that step is not yet reliable.
+
+**Deployments are per environment, with a shared registry.** `deploy.sh` deploys at subscription scope into `{name}-{environment}-rg`, with `ENVIRONMENT` defaulting to `acceptance`, while the container registry and the identity that pulls from it live in `{name}-general-rg`.
+
+**Model files left the repository.** The bundled `bertje_2022_e4` files are gone; locally, Docker Compose mounts `nlp_api/API_NLP/models` at `/mnt/models` for `nlp-api` and the backend, and in Azure the same path is the model file share. The Container Apps were given more CPU and memory, `nlp-api` most of all.
+
+---
+
 ### v2026.09.1 — Choosing the NLP Model (September 2026)
 
 > How to use it: [Using NLP suggestions](../user-guide/using-nlp-suggestions.md). The endpoint: [API endpoints](../reference/api-endpoints.md#post-apipredict).
@@ -95,11 +135,10 @@ and a Docker Compose port conflict on the `web` host mapping was resolved.
 
 ### Planned
 
-The five-stage interpretation workflow described in the [Overview](../index.md) has two
-stages still scaffolded as placeholders in the router (`pages/ExecutablePage.vue` and
-`pages/ExecutePage.vue` both render a "Coming soon" state):
+The editor shows six steps as tabs. The last two are placeholders that render
+"Coming soon" (`pages/ExecutablePage.vue` and `pages/ExecutePage.vue`):
 
 | Feature | Stage |
 |---|---|
-| Validate — making an interpretation executable | `executable` route |
-| Perform — executing a task | `execute` route |
+| Make interpretations executable | `executable` route |
+| Execute task | `execute` route |

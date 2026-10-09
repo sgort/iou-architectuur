@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Frontend
 
 !!! info "Documentatie in ontwikkeling"
@@ -15,6 +19,10 @@
 
 ---
 
+## Network views
+
+---
+
 ## The domain model
 
 ---
@@ -28,3 +36,7 @@
 ---
 
 ## Calling the services
+
+---
+
+## Styling

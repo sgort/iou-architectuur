@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Source Annotation
 
 !!! info "Documentatie in ontwikkeling"
@@ -33,4 +37,4 @@
 
 ---
 
-## Scroll-to-source
+## Show in source

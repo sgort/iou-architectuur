@@ -1,11 +1,27 @@
 # Norm Editor — screenshots to capture
 
-*A running record across syncs, newest first. Last reviewed for 2026.09.1 on
-7 September 2026 — **nothing outstanding, and nothing requested**.*
+*A running record across syncs, newest first. Last reviewed for 2026.09.15-2 on
+9 October 2026 — **nothing outstanding, and nothing requested**.*
 
 Real screenshot files live in **`docs/assets/screenshots/`** (language-neutral,
 served at the site root). Docs reference them as
 `../../assets/screenshots/<file>` inside a `<figure markdown>` block.
+
+---
+
+## Sync 2026.09.1 → 2026.09.15-2 — no screenshots, by decision
+
+Reviewed on 9 October 2026 for 2026.09.12, .13, .15 and .15-2.
+
+This gap is the first that would have justified screenshots: 2026.09.12 restyled the whole
+editor, 2026.09.15-2 laid *Interpret sources* out as three panes under a status bar, and
+*View interpretation* became a dependency network with a details panel. Four views were
+proposed — Interpret sources with an act open, the annotation pop-up, View interpretation
+with an act selected, and the *What's new* dialog — and **the user decided against
+screenshots for this sync**. The pages describe those views in prose.
+
+The proposal stands for a later run: if screenshots are wanted, those four are where to
+start, and each page that would embed one is named above.
 
 ---
 

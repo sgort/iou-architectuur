@@ -94,15 +94,22 @@ redeploying.
 ## Configuration surface
 
 Service endpoints (Triply, backend, and the three Python services) are provided through
-environment variables and a generated `config.json`. The canonical values for local Docker
-Compose are in `docker-compose.yml`; see the
+environment variables; the frontend itself only calls relative `/api/*` paths. The canonical
+values for local Docker Compose are in `docker-compose.yml`, those for Azure in
+`infra/resources.bicep`; see the
 [Environment Variables reference](../reference/environment-variables.md) for the full list.
+
+The NLP models are not in the repository or in any image. `nlp-api` loads them from
+`MODEL_PATH` (`/mnt/models`), which is a mounted directory in both setups:
+`nlp_api/API_NLP/models` under Docker Compose, an Azure Files share in Azure (see
+[Deployment](deployment.md#the-nlp-model-share)).
 
 ---
 
 ## Repositories
 
-The component is assembled from several repositories on the
-[open-regels.nl GitLab instance](https://git.open-regels.nl), corresponding to the `gui/`,
-`backend/`, `nlp_api/`, `unwrap_api/`, and `wrap_up_api/` directories, plus the `nginx/` and
-`infra/` deployment assets.
+The component lives in a single repository,
+[`regels/editor`](https://git.open-regels.nl/regels/editor) on the open-regels.nl GitLab
+instance, with one directory per service — `gui/`, `backend/`, `nlp_api/`, `unwrap_api/`,
+and `wrap_up_api/` — plus the `nginx/`, `infra/`, `docker/certbot/` and `scripts/`
+deployment assets. Each service has its own `VERSION` file; `versions.json` lists them.

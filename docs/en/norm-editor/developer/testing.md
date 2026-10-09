@@ -14,24 +14,20 @@ it. Before that the repository had no automated tests at all.
 
 !!! info "Figures on this page are measured, not estimated"
     Every count below was produced by running each suite the way `.gitlab-ci.yml`
-    runs it, against **2026.09.1** on **7 September 2026**, on `main` at `46e44c8`.
-    One exception is marked in the table and explained under
-    [What could not be measured here](#what-could-not-be-measured-here).
+    runs it, against **2026.09.15-2** on **9 October 2026**, on `main` at `c47096b`:
+    the two Vitest suites from their installed dependencies, each Python service in a
+    fresh virtual environment of its own on Python 3.14.3 (Windows). Two tests fail
+    there; see [Two failures in `wrap_up_api`](#two-failures-in-wrap_up_api).
 
-**At a glance:** 14 test files · **110 measured tests, all passing** · plus 9 more
-in a suite this machine cannot run.
+**At a glance:** 16 test files · **127 tests: 125 passing, 2 failing**.
 
-| Service | Language | Runner | Files | Tests | |
+| Service | Language | Runner | Files | Tests | Result |
 |---|---|---|--:|--:|---|
-| `gui` | JavaScript (Quasar/Vue) | Vitest | 6 | **38** | measured |
-| `backend` | JavaScript (Fastify) | Vitest | 2 | **11** | measured |
-| `wrap_up_api` | Python (Flask) | pytest | 3 | **34** | measured |
-| `unwrap_api` | Python (Flask) | pytest | 2 | **27** | measured |
-| `nlp_api` | Python (Flask) | pytest | 1 | 9 † | **not run here** |
-
-† Counted from `def test_` declarations rather than from the runner. The file
-contains no parameterised cases, so the static count and the runner's should agree
-— but that is an inference, not a measurement.
+| `gui` | JavaScript (Quasar/Vue) | Vitest | 8 | **46** | all pass |
+| `backend` | JavaScript (Fastify) | Vitest | 2 | **11** | all pass |
+| `wrap_up_api` | Python (Flask) | pytest | 3 | **34** | **32 pass, 2 fail** |
+| `unwrap_api` | Python (Flask) | pytest | 2 | **27** | all pass |
+| `nlp_api` | Python (Flask) | pytest | 1 | **9** | all pass |
 
 ---
 
@@ -56,25 +52,26 @@ Both `npm test` scripts are `vitest run` — the non-watching form, so they exit
 
 ---
 
-## What could not be measured here
+## Two failures in `wrap_up_api`
 
-**`nlp_api`'s suite did not run on this machine, and the reason is the runtime, not
-the code.** Its `requirements.txt` pins `networkx==3.6.1`, which declares
-`requires_python !=3.14.1,>=3.11`. This machine has Python **3.10.12**, so pip
-resolves no candidate and the install fails before pytest is reached:
+**`test_wrap_up.py::WrapTest::test_15` and `test_17` fail on a fresh install, and the
+cause is not established.** Both compare the service's output with a gold-standard
+Turtle fixture using `rdflib.compare.isomorphic`, and the printed difference is
+rdflib's own bookkeeping rather than interpretation content: the generated graph
+carries `[a rdfg:Graph; rdflib:storage [a rdflib:Store; rdfs:label 'Memory']]`
+triples the fixture does not.
 
-```
-ERROR: Could not find a version that satisfies the requirement networkx==3.6.1
-ERROR: No matching distribution found for networkx==3.6.1
-```
+`rdflib` is pinned at 7.6.0 in both requirements files, so a library version
+difference does not explain it, and `wrap_up_api` did not change between the
+7 September measurement, which passed, and this one. Whether CI's
+`test_wrap_up_api` job passes is not visible from outside the GitLab project. Until
+that is known, read the two failures as unexplained, not as a conversion defect.
 
-CI runs these jobs on `python:3.14.6`, where the pin resolves. **This is an
-environment limitation on the measuring machine, not a defect in the repository**
-— stated here so the 9 in the table is not mistaken for a measured figure, and so
-nobody re-investigates it as a bug.
-
-The other two Python services install and run cleanly on 3.10, because neither
-depends on the transformer stack that pulls `networkx` in.
+**`nlp_api` runs on Python 3.11 or later.** Its `requirements.txt` pins
+`networkx==3.6.1`, which requires `>=3.11`. On older Pythons the install stops
+before pytest is reached. The suite itself needs neither the model nor a GPU: it
+imports `labeling.py` only, though installing `requirements.txt` still pulls the
+transformer stack.
 
 ---
 
@@ -94,6 +91,19 @@ to `main`, `develop` and tags; the test jobs are not, so they run on every branc
 Images are tagged twice, with the commit SHA and with `latest`, and pushed to the
 registry named by `ACR_REGISTRY_USERNAME`.
 
+`build_gui` first regenerates the changelog the app displays:
+`./scripts/generate-changelog.mjs && mv ./changelog.json gui/public`, then builds the
+image.
+
+!!! warning "That step needs Node, and the job's image has none"
+    `build_gui` runs in `docker:latest`, an Alpine image with the Docker CLI and no
+    Node, while the script starts with `#!/usr/bin/env node`. Unless the runner
+    supplies Node some other way, the step fails and no GUI image is built. The
+    pipeline runs are not visible from outside the GitLab project, so this is read
+    from the source, not observed. Even where the step runs, the generator groups
+    commits by git tag, and the only tags on the remote are `2026.07.0` and
+    `2026.07.1`.
+
 !!! note "This is the only IOU component on GitLab CI"
     The CPSV Editor, RONL Business API and Linked Data Explorer all run GitHub
     Actions, and the supply-chain policy documented in
@@ -108,7 +118,7 @@ registry named by `ACR_REGISTRY_USERNAME`.
 
 ## Test inventory
 
-### `gui` — 6 files, 38 tests
+### `gui` — 8 files, 46 tests
 
 Domain logic only. The tests exercise the editor's in-memory model and its helper
 functions, not Vue components.
@@ -117,10 +127,12 @@ functions, not Vue components.
 |---|---|
 | `test/unit/model/sentence.test.js` | Sentence structure |
 | `test/unit/model/snippet.test.js` | Source snippets |
-| `test/unit/model/booleanConstruct.test.js` | Boolean fact construction |
+| `test/unit/model/booleanConstruct.test.js` | Boolean fact construction, including `isEmpty` until a frame is added at some level |
+| `test/unit/model/vizNetwork.test.js` | The View interpretation network: a node per act and claim-duty but none for facts, and a link from an act to the acts that need what it creates |
 | `test/unit/helpers/dateTimeFunctions.test.js` | Date and time handling |
 | `test/unit/helpers/sourceFormatting.test.js` | Source text formatting |
 | `test/unit/helpers/utilities.test.js` | Shared utilities |
+| `test/unit/helpers/frameRelations.test.js` | Relations between frames: the frames inside a subdivision, every role of an act or claim-duty whether set or not, what a frame uses through its roles and conditions, and which acts use a fact |
 
 ### `backend` — 2 files, 11 tests
 
@@ -131,7 +143,9 @@ rather than over a socket — faster, and with no port to collide on.
 ### `wrap_up_api` — 3 files, 34 tests
 
 `test_wrap_up.py`, `test_routes.py` and `test_helpers.py`. The largest suite in the
-repository, covering the service that assembles a finished interpretation.
+repository, covering the service that assembles a finished interpretation. Two of its
+gold-standard comparisons fail on a fresh install; see
+[Two failures in `wrap_up_api`](#two-failures-in-wrap_up_api).
 
 ### `unwrap_api` — 2 files, 27 tests
 
@@ -139,7 +153,7 @@ repository, covering the service that assembles a finished interpretation.
 
 ### `nlp_api` — 1 file, 9 tests
 
-`test_labeling.py`, and it is worth reading even though it does not run here: every
+`test_labeling.py`, and it is worth reading: every
 test targets the **token-merging logic** rather than the model. It covers dropping
 `[CLS]`/`[SEP]` specials, renaming raw labels to entity names, merging `##`
 continuation tokens into the preceding word, a continuation inheriting the previous

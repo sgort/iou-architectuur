@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # Local Development
 
 This page covers running the Norm Editor on your machine, both as a full stack and as a
@@ -8,7 +12,8 @@ frontend-only setup.
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) and Docker Compose (for the full stack), or
-- [Node.js](https://nodejs.org/) v20+ (for the frontend on its own).
+- [Node.js](https://nodejs.org/) 20, 22, 24, 26 or 28 (the `engines` range in `gui/package.json`) for
+  the frontend on its own; the frontend image and the pipeline build with Node 24.
 - A **Triply API key** if you intend to read from or write to TriplyDB.
 
 ---
@@ -21,13 +26,16 @@ frontend-only setup.
    TRIPLY_KEY_R=your-triply-api-key
    ```
 
-2. Build and start every service:
+2. Put the NLP model directories in `nlp_api/API_NLP/models/` — see
+   [NLP models](#nlp-models).
+
+3. Build and start every service:
 
    ```bash
    docker compose up --build
    ```
 
-3. Open **http://localhost**.
+4. Open **http://localhost**.
 
 All requests are proxied through nginx on port 80. For debugging, each service is also exposed
 directly:
@@ -39,15 +47,32 @@ directly:
 | unwrap-api | http://localhost:5001 |
 | wrap-up-api | http://localhost:5002 |
 
-The Compose file injects a `config.json` and shared environment variables (Triply endpoints
-and the internal service URLs) into the relevant containers — see
+The Compose file sets the shared environment variables (Triply endpoints, the internal
+service URLs and `MODEL_PATH`) on every service — see
 [Environment Variables](../reference/environment-variables.md).
+
+---
+
+## NLP models
+
+The model files are not in the repository and not in the `nlp-api` image. Compose sets
+`MODEL_PATH=/mnt/models` and mounts `./nlp_api/API_NLP/models` at `/mnt/models` into both
+`nlp-api` and `backend`. `nlp-api` loads each model from a directory of that name:
+
+```
+nlp_api/API_NLP/models/
+├── bertje_2022_e4/              # the default model
+└── legal-bert-dutch-english/
+```
+
+Without a model directory the stack still starts, but `/api/predict` for that model answers
+`500` with `Model does not exist on filesystem.`
 
 ---
 
 ## Frontend only (hot reload)
 
-When you are working on the UI against an already-running backend:
+When you are working on the UI with the Compose stack running:
 
 ```bash
 cd gui
@@ -55,12 +80,10 @@ npm install
 npm run dev
 ```
 
-Vite serves the app with hot reload (default port `5137`). Useful flags:
-
-```bash
-npm run dev -- --port=3333   # custom port
-npm run dev -- --open        # open the browser automatically
-```
+`npm run dev` runs `quasar dev`, which serves the app with hot reload on Quasar's default
+port; pass `npm run dev -- --port 3333` for another one. `quasar.config.js` proxies `/api` to
+`http://localhost:80`, the nginx of the running Compose stack, so the dev server talks to the
+real services.
 
 Build a production bundle with:
 
@@ -75,13 +98,18 @@ Other scripts: `npm run lint` (ESLint) and `npm run format` (Prettier).
 
 ## Running a single Python service
 
-Each Python service can run on its own for focused work. The pattern is the same for all
-three:
+Each Python service runs on its own for focused work, with the same commands as its
+Dockerfile — each pair from the repository root, in its own terminal:
 
 ```bash
-cd unwrap_api          # or nlp_api/API_NLP, or wrap_up_api
-pip install -r requirements.txt
-python app.py
+cd unwrap_api && pip install -r requirements.txt
+flask run --port=5001
+
+cd wrap_up_api && pip install -r requirements.txt
+flask --app=main run --port=5002
+
+cd nlp_api/API_NLP && pip install -r requirements.txt
+python app.py                   # port 8081; set MODEL_PATH to the models directory
 ```
 
 Or build and run its Docker image from the service directory. The NLP service additionally

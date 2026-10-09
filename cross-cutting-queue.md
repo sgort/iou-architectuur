@@ -128,6 +128,26 @@ Read at `origin/main` = `ebec288` (Promote to Production #7); `origin/acc` `0ea4
 
 9. **The 85% margin carry-over (4 October item 2)** — still unmeasured by this sync; the next coverage measurement should restate it.
 
+### 9 October 2026 — Norm Editor 2026.09.1 → 2026.09.15-2
+
+Read at `origin/main` `c47096b`. The pages themselves were not touched and no stamp was refreshed.
+
+1. **CI now also regenerates the changelog, in `build_gui`** (945a70f): `./scripts/generate-changelog.mjs && mv ./changelog.json gui/public`
+   runs before the image build, in `docker:latest`, which has no Node. The step very likely fails on every `main` push since
+   10 September (not observed: the pipelines are not visible from outside the project). Bears on: `code-standards.md`
+   ("The Norm Editor is shaped differently": the hooks paragraph says the changelog is regenerated on commit; CI now does it too,
+   and the "pipeline gates on tests alone" line).
+2. **The release tags after `2026.07.1` exist only in a local clone.** The changelog groups by tag, so CI's build would label
+   everything after `2026.07.1` as Unreleased, and the hashes the *What's new* dialog links are on no branch on the remote.
+   Bears on: `code-standards.md` (the git-log-derived changelog), any page describing how a Norm Editor release lands.
+3. **Deployments are per environment with a shared resource group** — `{name}-{environment}-rg` and `{name}-general-rg` for the
+   registry, pull identity and DNS zone; `ENVIRONMENT` defaults to `acceptance`, production takes the apex and other environments
+   `acc.` (db0a26a, 28b5183). Bears on: `code-standards.md` (the "Deploy artifact" row is still right), `contributing/index.md` if it
+   describes where the Norm Editor runs.
+4. **No lint, format, coverage or supply-chain change** in this range. The `.gitlab-ci.yml` diff is the one line in item 1.
+
+Findings for these went into [regels/editor#1](https://git.open-regels.nl/regels/editor/-/work_items/1).
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

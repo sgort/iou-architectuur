@@ -17,7 +17,7 @@ component: Norm Editor
 
 ## Running the tests
 
-## What could not be measured here
+## Two failures in `wrap_up_api`
 
 ## What CI actually gates
 

@@ -18,27 +18,37 @@ source without it.
 
 !!! warning "Dutch text only"
     The underlying model is trained on **Dutch** normative text. Suggestions on text in other
-    languages are unreliable. Run it on **selected sentences or fragments**, not on an entire
-    document — very long inputs can exceed the model's token limit.
+    languages are unreliable. The model runs on the **sentences the act is anchored to**, one
+    at a time — very long sentences can exceed the model's token limit.
 
 ---
 
 ## How to use it
 
-1. Work on a selected Dutch sentence in the source panel.
-2. Optionally pick a different model from the **NLP model** dropdown beside the suggestion
-   controls. Leaving it alone uses the default.
-3. Request suggestions for that sentence.
-4. The model returns each word labelled as **Actor**, **Action**, **Object**, **Recipient**,
-   or *none*.
-5. The editor surfaces these suggestions so you can turn them into facts and place them into
-   the matching roles of an act.
-6. **Review every suggestion.** Accept the ones that are right, adjust the boundaries where the
-   model over- or under-selected, and ignore anything incorrect.
+1. Open an act that is linked to source text — for example one you created by highlighting a
+   Dutch sentence. The suggestion controls appear in the act's **Roles** heading only when the
+   act is linked to source text.
+2. Optionally pick a different model in the dropdown next to **Detect roles**: *BERTje (2022)*
+   (the default) or *legal-bert-dutch-english*.
+3. Click **Detect roles**. The editor sends each sentence the act is anchored to to the model,
+   which labels every word as **Actor**, **Action**, **Object**, **Recipient**, or *none*.
+4. A **FlintFiller Recommendations** dialog shows each sentence with the suggested words
+   highlighted per role. Click a highlighted fragment to **Accept**, **Skip**, or **Discard**
+   it. **Review every suggestion** — accept the ones that are right and discard anything
+   incorrect.
+5. Click **OK** to add the accepted suggestions to the interpretation as facts, anchored to
+   their words in the text and given the matching subtype (*Agent* for an actor or recipient,
+   *Action*, or *Object*). **Cancel** closes the dialog without changes.
+6. Place the new facts into the act's roles with **Select**, as you would any other fact.
 
-When the editor creates an **agent** fact from a suggestion, it records the model's
-recommended role as a **comment** on that fact, so later reviewers can see where the
-classification came from.
+If the request fails — for example because the chosen model is not available on the server —
+the editor shows the error *Model not present on filesystem.* and stops sending sentences.
+
+!!! warning "Check the facts that OK adds"
+    For each sentence, the dialog adds as many facts as you accepted, but it takes them from
+    the start of that sentence's list of suggestions rather than from the ones you accepted.
+    Unless you accepted the first suggestions in a sentence, compare the new facts in the
+    Frames list with what you accepted, and delete any that are wrong.
 
 ---
 

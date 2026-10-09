@@ -1,3 +1,7 @@
+---
+component: Norm Editor
+---
+
 # TriplyDB Integration & Formats
 
 An interpretation only becomes useful to the rest of the ecosystem once it is stored as
@@ -66,7 +70,8 @@ avoiding duplicate writes when re-saving an interpretation.
 
 ## Export and import formats
 
-The editor supports three formats, available from the load/save banner:
+The editor supports three formats; JSON and TriG are available from the load and save
+buttons in the header:
 
 | Format | Extension | Use |
 |---|---|---|
