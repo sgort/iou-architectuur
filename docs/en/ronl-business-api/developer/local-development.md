@@ -14,8 +14,8 @@ The release it describes is the one in the header above.
 
 | Tool | Version | Why |
 |---|---|---|
-| Node.js | **22.23.2** (`.nvmrc`); `engines` asks for `>=22` | Backend and front-end runtimes. The Azure App Services run `NODE|22-lts` |
-| npm | `engines` asks for `>=10`; **11.10 or newer** recommended | Node 22.23.2 bundles npm 10.9.8, which silently ignores the 14-day `min-release-age` cooldown in the root `.npmrc`. `deps:check` warns and suggests `npm install -g npm@11` |
+| Node.js | **22.23.3** (`.nvmrc`); `engines` asks for `>=22` | Backend and front-end runtimes. The Azure App Services run `NODE|22-lts` |
+| npm | `engines` asks for `>=10`; **11.10 or newer** recommended | Node 22.23.3 bundles npm 10.9.9, which silently ignores the 14-day `min-release-age` cooldown in the root `.npmrc`. `deps:check` warns and suggests `npm install -g npm@11` |
 | Docker with Compose v2 | `docker compose …` | The five local services |
 | Git | — | Includes Git for Windows' **bash**, see below |
 | **bash** | Any recent bash | The install, the dev start and the checks are bash scripts |
@@ -77,7 +77,7 @@ Two further root scripts are plain Node and need no shell:
 
 | Script | Runs | What for |
 |---|---|---|
-| `check-swimlane-fixtures` | `node scripts/check-swimlane-fixtures.mjs` | Verifies the twelve RIP phase BPMNs under `packages/backend/src/rip-swimlane/__fixtures__/` against the sha256 fingerprints in `rip-bpmn-fingerprints.json`, which is committed identically here and in `linked-data-explorer`. With that repository checked out alongside it also compares byte for byte, and tells the two directions of drift apart: a fixture that disagrees with its fingerprint is stale here, and the advice is `--sync`; a fixture that agrees with its fingerprint but differs from the checkout means that checkout is out of step, and the advice is to update it there. `--sync` copies the models and the fingerprint file down, and refuses when the checkout disagrees with its own fingerprints; `--force` overrides that for deliberate, uncommitted upstream edits. `LDE_PATH` says where the checkout is (default: a sibling). Only the `RipRNNProcess.bpmn` files are checked — the seven Awb fixtures in `__fixtures__/awb/` sit outside the fingerprint contract. Runs in `pre-push` |
+| `check-swimlane-fixtures` | `node scripts/check-swimlane-fixtures.mjs` | Verifies fourteen BPMN fixtures under `packages/backend/src/rip-swimlane/__fixtures__/` — the twelve RIP phase models, and under `declared/` the two processes that declare their own phases (`GedelegeerdBesluitProcess`, `ManagementCapacityClaimProcess`) — against the sha256 fingerprints in `rip-bpmn-fingerprints.json`, which is committed identically here and in `linked-data-explorer`. With that repository checked out alongside it also compares byte for byte, and tells the two directions of drift apart: a fixture that disagrees with its fingerprint is stale here, and the advice is `--sync`; a fixture that agrees with its fingerprint but differs from the checkout means that checkout is out of step, and the advice is to update it there. `--sync` copies the models and the fingerprint file down, and refuses when the checkout disagrees with its own fingerprints; `--force` overrides that for deliberate, uncommitted upstream edits. `LDE_PATH` says where the checkout is (default: a sibling); each fingerprint entry's `source` names where its model lives upstream. The seven Awb fixtures in `__fixtures__/awb/` sit outside the fingerprint contract. Runs in `pre-push` and in the required [`audit` job](cicd.md#audit-the-required-check), where only the fingerprint half can run |
 | `e2e:deploy-fixtures` | `node scripts/deploy-e2e-fixtures.mjs` | Deploys the end-to-end process and decision bundle into the local engine, in one command. The script here is a shim: the deployer lives in `linked-data-explorer` beside the fixtures and the manifest, and this resolves the checkout (`LDE_PATH`, defaulting to a sibling), runs it and passes arguments and the exit code through. See [E2E testing](testing/e2e.md) |
 
 ---
@@ -274,6 +274,7 @@ first. Then:
 | **Processes**, in `e2e-fixtures/<tenant>/` | Import each process and set the **Organization** field to the tenant folder name (`flevoland` or `toeslagen`). That value becomes the Operaton `tenant-id` |
 | **Decisions**, listed under `sharedDecisions.files` in `e2e-fixtures/manifest.json` | Import each one with the **Organization field empty**. The processes resolve their decisions untenanted (`decisionRefTenantId="${null}"`), so a decision deployed under a tenant is not found |
 | **`zorgtoeslag_resultaat`** | Not in the fixture bundle. `manifest.json` lists it under `sharedDecisions.external`: it ships with the zorgtoeslag rules set |
+| **Heusdenpas** | Not in the fixture bundle either. From `linked-data-explorer/examples/organizations/heusden/swimlanes-for-rba/`, import `HeusdenpasAanvraagProcess.bpmn` and `HeusdenpasBeoordelingSubProcess.bpmn` (with the forms and document template beside them) with the **Organization** field set to `heusden`. Import the three decision files one folder up — `RONL_Heusden_Heusdenpas.dmn`, `RONL_SVB_Leeftijden.dmn`, `RONL_SZW_Bijstand.dmn` — with the Organization field empty, like the shared decisions |
 
 The frontend E2E suite refuses to run until this is done: its
 `global-setup.ts` calls `verifyRequiredProcesses()` and
@@ -337,7 +338,7 @@ To run a single server, use its root script: `npm run dev:backend`,
 
 ## Test users
 
-`config/keycloak/ronl-realm.json` defines **22 users**, all with password
+`config/keycloak/ronl-realm.json` defines **27 users**, all with password
 **`test123`** and assurance level `hoog`. The `municipality` attribute is the
 user's tenant.
 
@@ -347,6 +348,8 @@ user's tenant.
 | utrecht | `test-caseworker-utrecht` | caseworker |
 | amsterdam | `test-citizen-amsterdam` | citizen |
 | amsterdam | `test-caseworker-amsterdam` | caseworker |
+| heusden | `test-citizen-heusden` | citizen |
+| heusden | `test-caseworker-heusden` | caseworker |
 | rotterdam | `test-citizen-rotterdam` | citizen |
 | rotterdam | `test-caseworker-rotterdam` | caseworker |
 | denhaag | `test-citizen-denhaag` | citizen |
@@ -354,7 +357,9 @@ user's tenant.
 | denhaag | `test-hr-denhaag` | caseworker, hr-medewerker |
 | denhaag | `test-onboarded-denhaag` | caseworker |
 | flevoland | `test-citizen-flevoland` | citizen |
-| flevoland | `test-caseworker-flevoland` | caseworker |
+| flevoland | `test-caseworker-flevoland` | caseworker, besluit-indiener |
+| flevoland | `test-indiener-flevoland` | caseworker, besluit-indiener |
+| flevoland | `test-besluit-flevoland` | caseworker, besluit-jurist, besluit-bestuursautoriteit, besluit-ondertekenaar, besluit-registratie |
 | flevoland | `test-hr-flevoland` | caseworker, hr-medewerker, board-secretary, board-director, hrm-unit, procurement-unit, planning-control-officer, financial-controller, hr-business-partner, personnel-controller |
 | flevoland | `test-mngr-flevoland` | caseworker, manager |
 | flevoland | `test-infra-flevoland` | caseworker, infra-projectteam, infra-medewerker, and the RIP project roles (`rip-*`) |
@@ -365,6 +370,11 @@ user's tenant.
 | toeslagen | `test-citizen-toeslagen` | citizen |
 | toeslagen | `test-caseworker-toeslagen` | caseworker |
 | unive | `test-citizen-unive` | citizen |
+| unive | `test-caseworker-unive` | caseworker |
+
+The landing pages pre-fill these names: the board cards and the top-bar
+**Inloggen** on `/` use the board's Flevoland test user, and a tenant page such
+as `/heusden` uses `test-caseworker-heusden` and `test-citizen-heusden`.
 
 The Keycloak admin console is at `http://localhost:8080` with `admin`/`admin`.
 

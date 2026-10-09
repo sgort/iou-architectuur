@@ -89,6 +89,45 @@ Read at `origin/main` = `dd4728d` (Promote to Production #4); `origin/acc` `85f4
    lasts "up to max-age (1 h)" and plans a publication timestamp. On v1 a same-date correction keeps its ETag, so a
    revalidating client can get 304 indefinitely; `/v2/norms` signs a digest of the rules instead (517cd71).
 
+### 9 October 2026 — RONL Business API v2026.10.0 → v2026.10.1 (production, `ebec288`)
+
+Read at `origin/main` = `ebec288` (Promote to Production #7); `origin/acc` `0ea4985` holds the same tree.
+
+1. **Neither SBOM check can fail in CI — in RBA and the LDE.**
+   Evidence: `sbom.yml` runs "Generate the SBOM" (`write-sbom.mjs`, which rewrites the committed file in the workspace)
+   before `--verify-release` and the release-PR `--check`; run 37909059258 generated 409 components with npm 11.19.0 and then
+   reported "matches the lockfile", while the committed 2026.10.1 SBOM was generated with npm 10.9.9 and lists 423.
+   Filed as ronl-business-api#354 and linked-data-explorer#274. The 6 October LDE item 4 ("the SBOM is checked strictly,
+   in all three") therefore overstates it. Bears on: `dependency-scanning.md` (the SBOM paragraph), `ictu-dependency-guideline.md`
+   (R10 evidence), and any page that names the release-PR check as a safeguard.
+
+2. **RBA frontends build and deploy on lockfile-only changes on `acc` — but a promotion still skips them.**
+   Evidence: 6f79e93 (#247) adds `package-lock.json` and `package.json` to the three `*-acc` filters;
+   `scripts/promotion-targets.sh:44-47` is unchanged (ronl-business-api#354 item 2). Bears on: `code-standards.md`,
+   `ictu-dependency-guideline.md` and `branch-protection.md` (the long-standing "lockfile-only pull request skips the site
+   checks" warning — now true for promotions only).
+
+3. **`check-swimlane-fixtures` covers 14 fixtures** (12 RIP + 2 declared-phase, d2d10b4) and runs in `audit` (`zizmor.yml:177`).
+   Adds the count to the 6 October LDE item 1. Bears on: `code-standards.md` (the fingerprint-contract scope, "twelve").
+
+4. **RBA `.nvmrc` is 22.23.3** (2ff98e3). Bears on: `supply-chain.md` (the `.nvmrc` table and the npm it bundles — the committed
+   SBOM records npm 10.9.9), `ictu-dependency-guideline.md`, `controls.md`.
+
+5. **Two production advisories cleared.** `dompurify` 3.4.16 (4953ba6) closes the two `dompurify` lows; `@modelcontextprotocol/sdk`
+   1.31.0 (bbfac17, PR #331) for GHSA-6qxp-vccf-f47h — RBA's audit issue #323 (opened 6 Oct, closed 9 Oct); verify whether the
+   cooldown exception was used. Bears on: `dependency-scanning.md` (catch list, alert table), `ictu-dependency-guideline.md` (R6, R10).
+
+6. **RBA `SECURITY-PIPELINE.md` counts 41 `uses:` references across 13 workflows** (was 39), and its `main` row now lists `scan`.
+   RBA has 26 jobs, 22 choosing a runner, and `audit` has ten steps. Bears on: `supply-chain.md`, `code-standards.md`.
+
+7. **The PA demo job's Playwright browser install has `timeout-minutes: 10`** (c9c7edd, #337) — the first step-level timeout in RBA.
+   Bears on: `code-standards.md` (the PA demo row).
+
+8. **Accepted risk: Keycloak stores brokered Entra tokens a person can read** (#325). Not in `SECURITY-PIPELINE.md`
+   (ronl-business-api#354 item 6). Bears on: `controls.md` if it keeps an accepted-risk list.
+
+9. **The 85% margin carry-over (4 October item 2)** — still unmeasured by this sync; the next coverage measurement should restate it.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

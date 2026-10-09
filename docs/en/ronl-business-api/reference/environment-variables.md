@@ -103,15 +103,27 @@ component: RONL Business API
 | `M2M_ALLOWED_CLIENTS` | No | `operaton-mcp-client` | Comma-separated Keycloak client ids allowed to call `/v1/m2m`, matched against the token's `azp`. A token from any other client — every person's token included — is refused with `403 M2M_CLIENT_NOT_ALLOWED`. Adding a consumer means adding its client id here; nothing changes in Keycloak |
 
 ### eDOCS
- 
+
+With `EDOCS_STUB_MODE=false` the backend refuses to start unless `EDOCS_USER_ID`, `EDOCS_PASSWORD`, `ENTRA_TENANT_ID`, `ENTRA_CLIENT_ID` and `ENTRA_CLIENT_SECRET` are set. A person works in eDOCS as themselves, with the Entra ID token Keycloak stored at their login; the service account serves machine clients and background archiving — see [eDOCS — Live Testing](../developer/testing/edocs-live-testing.md#people-and-the-service-account).
+
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `EDOCS_BASE_URL` | Yes (live mode) | — | eDOCS REST API base URL, e.g. `https://docuvitt-host/edocsapi/v1.0` |
-| `EDOCS_LIBRARY` | Yes (live mode) | `DOCUVITT` | eDOCS library name |
-| `EDOCS_USER_ID` | Yes (live mode) | — | eDOCS service account user ID |
-| `EDOCS_PASSWORD` | Yes (live mode) | — | eDOCS service account password |
 | `EDOCS_STUB_MODE` | No | `true` | When `true`, all eDOCS service methods return realistic fake responses. Set to `false` to enable live calls. Never commit real credentials to the repository — use Azure App Service Application settings. |
- 
+| `EDOCS_BASE_URL` | Yes (live mode) | — | eDOCS REST API **root**, e.g. `https://<host>:<port>/edocsapi/v1.0`. The client appends `connect`, `workspaces`, `documents` and `libraries`, so a trailing `/connect` makes every call fail. Not checked at startup |
+| `EDOCS_LIBRARY` | No | `DOCUVITT` | eDOCS library name |
+| `EDOCS_USER_ID` | Yes (live mode) | — | The service account's user ID (`testuser001`), used by machine clients and background archiving. The backend refuses to start without it in live mode |
+| `EDOCS_PASSWORD` | Yes (live mode) | — | The service account's password. The backend refuses to start without it in live mode; every failed login counts towards an eDOCS lockout |
+| `EDOCS_DEPARTMENT` | No | `IVR` | The `UV_AFD_NAAM` profile field set on every uploaded document, which the DM server requires and validates against its own department list. A property of the eDOCS environment, not of a process; an invalid value makes every upload fail with `502` |
+| `ENTRA_TENANT_ID` | Yes (live mode) | — | Provincie Flevoland's Entra tenant, for refreshing a person's brokered Entra ID token |
+| `ENTRA_CLIENT_ID` | Yes (live mode) | — | The app registration Keycloak brokers (IOU-demonstrator) |
+| `ENTRA_CLIENT_SECRET` | Yes (live mode) | — | Its client secret — the same value Keycloak's `entra-flevoland` provider holds |
+| `ENTRA_IDP_ALIAS` | No | `entra-flevoland` | The Keycloak identity provider whose stored tokens the backend reads |
+| `EDOCS_ALLOW_SERVICE_FALLBACK` | No | `false` | `true` lets a person without a stored Entra token (a Keycloak test account) fall back to the service account, visibly (`actingAs: "service"`, with an audit entry). Refused at startup when `DEPLOYMENT_ENV=production` |
+| `EDOCS_ALLOWED_CLIENTS` | No | `edocs-mcp-client,copilot-studio-edocs,operaton-mcp-client` | Comma-separated Keycloak client ids (token `azp`) allowed on `/v1/edocs`; they act as the service account. Any other machine client is refused with `403 EDOCS_CLIENT_NOT_ALLOWED` |
+| `EDOCS_MCP_ENABLED` | No | `false` | Enables the AI assistant's eDOCS tools (`.env.example` sets `true`) |
+| `EDOCS_MCP_CLIENT_ID` | No | `edocs-mcp-client` | The Keycloak client the eDOCS MCP subprocess authenticates as when a call carries no person |
+| `EDOCS_MCP_CLIENT_SECRET` | Conditional | — | Its client secret; needed when `EDOCS_MCP_ENABLED=true` |
+
 ### GitLab integration
 
 | Variable | Default | Description |

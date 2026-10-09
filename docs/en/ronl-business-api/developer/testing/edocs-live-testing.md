@@ -10,13 +10,12 @@ the OAuth/Copilot Studio integration itself, see
 [Copilot Studio — eDOCS](../copilot-studio-edocs.md). For the general endpoint
 shapes, see [API Specification](../../reference/api-specification.md), under **Documents**.
 
-!!! warning "Test account has restricted rights"
-    All results below were captured against `infocenter-test.flevoland.nl`
-    (library `sqldocuvitt`) using a service account (`IOUTEST`) with limited
-    permissions — it cannot delete documents, for example. A replacement test
-    account with full rights is planned. Several "broken" rows below may turn
-    out to be account-permission issues rather than integration bugs once
-    retested with that account — each row links to the detail that explains
+!!! warning "The service account has restricted rights"
+    The results below were captured against `infocenter-test.flevoland.nl`
+    (library `sqldocuvitt`) as the eDOCS service account. The service account
+    is `testuser001` ("TestUser001 (voor iou)"); it cannot delete documents,
+    for example. Several "broken" rows below may be account-permission issues
+    rather than integration bugs — each row links to the detail that explains
     which is which.
 
 ---
@@ -43,15 +42,23 @@ shapes, see [API Specification](../../reference/api-specification.md), under **D
 
 ## Configuration
 
-Five environment variables, read by `config.ts`:
+The variables `config.ts` reads for eDOCS (the full list, with `EDOCS_DEPARTMENT` and the AI assistant's eDOCS settings, is in [Environment Variables](../../reference/environment-variables.md#edocs)):
 
 | Variable | Meaning | Default |
 | --- | --- | --- |
 | `EDOCS_STUB_MODE` | `false` to go live | `true` |
 | `EDOCS_BASE_URL` | DM REST API **root** — not the login endpoint | _(empty)_ |
-| `EDOCS_USER_ID` | service account user id | _(empty)_ |
+| `EDOCS_USER_ID` | service account user id (`testuser001`) | _(empty)_ |
 | `EDOCS_PASSWORD` | service account password | _(empty)_ |
 | `EDOCS_LIBRARY` | eDOCS library / docbase | `DOCUVITT` |
+| `ENTRA_TENANT_ID` | Flevoland's Entra tenant, for refreshing a person's ID token | _(empty)_ |
+| `ENTRA_CLIENT_ID` | the IOU-demonstrator app registration (the one Keycloak brokers) | _(empty)_ |
+| `ENTRA_CLIENT_SECRET` | its client secret — the same value Keycloak's `entra-flevoland` holds | _(empty)_ |
+| `EDOCS_ALLOW_SERVICE_FALLBACK` | a person without an Entra token may act as the service account, visibly | `false`; refused on `DEPLOYMENT_ENV=production` |
+| `EDOCS_ALLOWED_CLIENTS` | machine clients (token `azp`) allowed on `/v1/edocs` | `edocs-mcp-client,copilot-studio-edocs,operaton-mcp-client` |
+
+With `EDOCS_STUB_MODE=false` the backend **refuses to start** unless
+`EDOCS_USER_ID`, `EDOCS_PASSWORD` and the three `ENTRA_*` settings are set.
 
 !!! note "EDOCS_BASE_URL must be the API root"
     The client appends `connect`, `workspaces`, `documents`, and `libraries` to
@@ -63,6 +70,63 @@ In stub mode (the default) every method on `EdocsService` returns realistic
 fake data; the switch to live is a config change only, transparent to routes,
 the BPMN worker, and the frontend — see
 [`edocs.service.ts`](https://github.com/sgort/ronl-business-api/blob/acc/packages/backend/src/services/edocs.service.ts).
+In stub mode a person's call is served by the stub service client as well
+(`actingAs: "service"`); nobody talks to eDOCS.
+
+---
+
+## People and the service account
+
+Two identities reach eDOCS:
+
+- **A person** — a caseworker or admin signed in with the
+  **Inloggen met uw Flevoland-account** button — opens an eDOCS session **as
+  themselves**. The backend reads the Entra ID token Keycloak stored at their
+  login from Keycloak's broker endpoint, with the person's own Keycloak token,
+  and sends it in the `X-DM-AUTH` header on `/connect`. No password is
+  involved; eDOCS enforces and records that person's rights. When the stored
+  ID token has expired, the backend refreshes it at Entra itself with the
+  `ENTRA_*` settings.
+- **The service account** (`EDOCS_USER_ID`, `testuser001`) serves machine
+  clients on `EDOCS_ALLOWED_CLIENTS` and background archiving (the Operaton
+  worker and ValidSign). It records the employee who caused a write at the end
+  of the document title, as "— namens <naam> (<e-mail>)".
+
+The backend keeps one eDOCS session per identity. For a person, a `401` from
+eDOCS fetches a fresh ID token and retries once; a `403` is eDOCS refusing
+that person, not an expired session, and is not retried.
+
+Every `/v1/edocs` data response says which one acted, in a top-level
+`actingAs` member: `"user"` or `"service"`. `GET /v1/edocs/status` adds, for a
+person, `data.user`: whether an eDOCS session can be opened as them
+(`available`, `authenticated`, their eDOCS `edocsUserId`, or a `problem` code
+such as `EDOCS_USER_TOKEN_UNAVAILABLE`, `STUB_MODE` or
+`EDOCS_USER_LOOKUP_FAILED`). Refusals are problem details, with the code in
+the `code` member:
+
+| Code | Status | Meaning |
+| --- | --- | --- |
+| `EDOCS_USER_TOKEN_UNAVAILABLE` | 403 | The person has no stored Entra token — a Keycloak account, or signed in before Keycloak stored tokens. Sign in with the Flevoland button |
+| `EDOCS_REAUTH_REQUIRED` | 401 | Entra no longer refreshes the person's session — sign in again |
+| `EDOCS_ACCESS_DENIED` | 403 | eDOCS refused the person: no rights on the item, or not a user of the library / account disabled (`0X8004020C`) |
+| `EDOCS_CLIENT_NOT_ALLOWED` | 403 | A machine client not on `EDOCS_ALLOWED_CLIENTS` |
+| `FORBIDDEN` | 403 | A person without the `caseworker` or `admin` role |
+
+A person is never silently turned into the service account. Only with
+`EDOCS_ALLOW_SERVICE_FALLBACK=true` — refused on production — does a person
+without a stored Entra token act as the service account, visibly
+(`actingAs: "service"`) and with an audit entry. When Keycloak or Entra cannot
+be asked at all (an outage, not a fact about the person), the request fails
+rather than falling back.
+
+**Keycloak prerequisite**, per environment: run
+`scripts/keycloak-add-entra-idp.sh` (see [Entra ID](../deployment/entra-id.md)).
+It makes `entra-flevoland` store the tokens (`offline_access`), adds the
+`broker` client's `read-token` role to `default-roles-ronl`, and puts the
+broker roles in `ronl-business-api`'s access token (`broker-roles` mapper).
+Afterwards **each person signs in once more** for Keycloak to hold their
+tokens. Until then they get `EDOCS_USER_TOKEN_UNAVAILABLE` — not the service
+account — unless the fallback is on.
 
 ---
 
@@ -72,6 +136,16 @@ the BPMN worker, and the frontend — see
 # Local backend → live eDOCS (default target — CLIENT_SECRET auto-loads from
 # packages/backend/.env.<NODE_ENV>):
 bash scripts/test-edocs-live.sh
+#   1b checks a Keycloak person without an Entra token is refused;
+#   1c (PERSON_TOKEN=<a Flevoland-signed-in person's Keycloak token>) checks
+#   eDOCS knows that person and answers actingAs "user"
+
+# The same, with the person's token taken from the clipboard (copy any /v1
+# request as cURL in DevTools first). Never prints the token; stops on an
+# expired one or one from another environment:
+bash scripts/test-edocs-person.sh live          # test-edocs-live.sh, 1c included
+bash scripts/test-edocs-person.sh smoke acc     # test-smoke-live.sh, Tier 2c included
+bash scripts/test-edocs-person.sh diag acc      # only: broker endpoint + /v1/edocs as the person
 
 # Against ACC — always needs an explicit ACC CLIENT_SECRET:
 TARGET=acc CLIENT_SECRET=<acc-m2m-secret> bash scripts/test-edocs-live.sh
@@ -80,18 +154,36 @@ TARGET=acc CLIENT_SECRET=<acc-m2m-secret> bash scripts/test-edocs-live.sh
 cd packages/backend && npm run edocs:health
 ```
 
-The script runs, in order: status gate → list workspaces → ensure workspace →
-upload a document standalone → list workspace content → document profile →
-document versions → download + verify round-trip (sha256) → pause for a
-`y/N` confirmation before deleting anything it created. Non-interactive runs
-skip cleanup by default (`AUTO_CONFIRM_CLEANUP=1` to delete without
-prompting).
+`test-edocs-live.sh` runs, in order: a liveness gate and an in-process
+pre-flight (is eDOCS reachable, can the service account log in) → token →
+status gate (must be live, not stub) → **1b**, a Keycloak person without an
+Entra token (`test-caseworker-flevoland` by default), who must be refused with
+`EDOCS_USER_TOKEN_UNAVAILABLE` (or, with `EXPECT_FALLBACK=true`, act as the
+service) → **1c**, when `PERSON_TOKEN` is set, a person signed in with the
+Flevoland button: eDOCS must know them, answer `actingAs: "user"`, and record
+them as `AUTHOR_ID` of a document they upload → list workspaces (read-only) →
+upload a document standalone → document profile → document versions →
+download + verify the round-trip (sha256). Locally, with
+`PYTHON_MCP_POC_ENABLED=true`, a second route repeats the reads and an upload
+through the Python MCP proof of concept.
 
-Because the workspace-**create** path is broken (see below), point
-`PROJECT_NUMBER` at a workspace that already exists (created by hand in
-InfoCenter) to skip past it — the search branch works, and everything after
-it (including upload, which no longer depends on a workspace at all) runs
-regardless.
+The script creates and deletes no workspaces, and does not clean up the
+service account's documents: that account cannot delete them (see
+[Delete blocked](#delete-blocked-by-account-permissions)), so every run
+leaves its uploaded documents behind, named with a timestamped
+`PROJECT_NUMBER`. Section 1c tries to delete the person's own test document
+and, when eDOCS refuses, says to remove it in InfoCenter.
+
+`test-edocs-person.sh` reads the token from the clipboard: sign in with
+**Inloggen met uw Flevoland-account**, then in DevTools copy any request to
+the API's `/v1` as cURL, and run the script within the token's 15-minute
+lifetime. On ACC, which cannot reach the on-premises eDOCS and runs in stub
+mode, `diag` is the useful mode: it shows whether Keycloak's broker endpoint
+holds the person's Entra token.
+
+The workspace-**create** path is broken (see below); a workspace needed by
+hand-run calls is created once in InfoCenter, and upload does not depend on a
+workspace at all.
 
 ---
 
@@ -227,11 +319,10 @@ the first fully round-tripped live confirmation of upload → download.
 
 `DELETE /v1/edocs/documents/:id` failed with `400`, not a server error:
 *"U bent niet gemachtigd de gevraagde bewerking uit te voeren"* ("not
-authorized to perform the requested operation"). The `IOUTEST` service
-account likely lacks delete rights (consistent with the "Restricted"
-permission shown in InfoCenter's Create Profile dialog) — this is the
-leading candidate to re-test once the full-rights replacement account is
-available.
+authorized to perform the requested operation"). The service account has no
+delete-document right in the live DM server (consistent with the
+"Restricted" permission shown in InfoCenter's Create Profile dialog); through
+the backend the refusal surfaces as `502 EDOCS_ERROR`.
 
 `DELETE /v1/edocs/workspaces/:id`, by contrast, succeeded (`200`) with the
 same account — so the restriction is specific to document delete, not a
@@ -270,6 +361,8 @@ that matters.
 | `stubMode: true` | `EDOCS_STUB_MODE` still `true`, or backend not restarted |
 | `reachable: false` | Wrong `EDOCS_BASE_URL`, network/TLS, or server down |
 | `reachable: true`, `authenticated: false` | Login rejected — bad credentials, or **account locked out** |
+| `data.user.available: false`, `problem: EDOCS_USER_TOKEN_UNAVAILABLE` | The person signed in with a Keycloak account, or before Keycloak stored tokens — sign in with the Flevoland button |
+| `data.user.problem: EDOCS_USER_LOOKUP_FAILED` | Keycloak's broker endpoint or Entra could not be asked; `data.user.error` has the reason |
 
 !!! danger "Lockout risk"
     Repeated failed logins can lock the service account. `healthCheck()`
@@ -278,6 +371,12 @@ that matters.
     password in config will still lock it via real login attempts. Verify the
     password before retrying, and have an eDOCS admin unlock the account after
     a lockout.
+
+    The service account is the only password login: a person connects with
+    their Entra ID token and cannot be locked out this way. A failed
+    `data.user` probe for a person is likewise remembered for 30 s, per
+    person, so a polling dashboard does not reconnect on every load while that
+    person cannot connect.
 
 ---
 

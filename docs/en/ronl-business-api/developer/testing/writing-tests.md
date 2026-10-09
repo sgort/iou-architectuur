@@ -70,9 +70,9 @@ suite was green and wrong.
   configured **per file** in all five runner configs, so a thin new file does
   not merely look thin: it exits `npm test` non-zero and names itself. It is a
   branch floor only — the functions column carries no threshold, and adding one
-  at 80 would fail 24 existing files as measured on 3 October 2026
-  (23 on 30 September, and 26 on each of the four passes before that, which
-  is the figure the configs' own comments now carry).
+  at 80 would fail 23 existing files as measured on 9 October 2026
+  (24 on 3 October, 23 on 30 September, and 26 on each of the four passes
+  before that, which is the figure the configs' own comments now carry).
 
   **Keep a new file above 85 rather than aiming at 80.** On 30 September every
   file cleared 85%, five points above the floor: the three that sat at exactly
@@ -81,12 +81,16 @@ suite was green and wrong.
   say 80 — and v2026.10.0 is the first release to land files below it:
   `frontend/src/components/CaseworkerDashboard/BesluitOverzichtSection.tsx` at
   **80.43%**, one uncovered branch from failing the gate, and
-  `frontend/src/components/process/phaseSet.ts` at 83.33%.
+  `frontend/src/components/process/phaseSet.ts` at 83.33%. Measured again on
+  9 October, those two are still the only files below 85 in the repository;
+  v2026.10.1 added none.
 - **Update the counts on these pages** when work lands, from a real run
   (`--json --outputFile=…` for Jest, `--reporter=json --outputFile.json=…` for
   Vitest) rather than an estimate or a grep for `it(` / `test(` — both miscount
   multi-line and parameterised cases. Where a figure has to come from the
-  source instead, parse the test files and expand every `.each` table, and
+  source instead, parse the test files and expand every `.each` table and
+  every loop that declares tests, resolve by hand any table that is not a
+  literal in the file — a `tenants.json` read, a router's route layers — and
   publish it only if the per-file counts sum to the runner's own total. Give those output paths **absolutely**:
   `npm test --workspace=…` runs with the cwd set to the package, so a relative
   one lands in `packages/`. Take the file count from `testResults.length`, not

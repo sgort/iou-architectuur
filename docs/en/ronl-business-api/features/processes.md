@@ -71,7 +71,7 @@ Before starting, the backend asks Operaton which tenants deploy the latest versi
 1. The caller's own tenant, if it deploys the key.
 2. Otherwise the single tenant that deploys it.
 3. If several other tenants deploy it and none of them is the caller's, there is no basis for choosing: the start is refused with `409 AMBIGUOUS_DEPLOYMENT` and nothing is started. The start-form lookup answers the same way.
-4. If no tenant-scoped deployment exists (or the lookup itself fails), the process starts untenanted — the behaviour of a process deliberately deployed shared, without a tenant-id.
+4. If no tenant-scoped deployment exists (or the lookup itself fails), there is no deploying tenant. A member of staff starts the process untenanted — the behaviour of a process deliberately deployed shared, without a tenant-id, as HR onboarding still is. A citizen's start is refused: a citizen's case must belong to a tenant (see below).
 
 The choice never depends on the order in which Operaton lists its definitions.
 
@@ -79,13 +79,37 @@ The choice never depends on the order in which Operaton lists its definitions.
 
 The resolved deployment then decides whether the caller may start it and which organisation owns the resulting case:
 
-- An untenanted deployment, or one under the caller's own tenant: the case belongs to the caller's tenant.
-- A deployment under another tenant, started by a citizen: the case goes to the deploying tenant, and `originTenantId` records the tenant the citizen came in through. A citizen of one municipality applying for a benefit handled by a national organisation is this case.
-- A deployment under another tenant, started by staff: refused with `403 TENANT_MISMATCH`; no instance is created.
+- A deployment under the caller's own tenant: the case belongs to the caller's tenant.
+- No deploying tenant, started by staff: the case belongs to the caller's tenant.
+- No deploying tenant, started by a citizen: refused with `403 TENANT_MISMATCH`; no instance is created.
+- A deployment under another tenant, started by a citizen for a cross-tenant [citizen service](#citizen-services): the case goes to the deploying tenant, and `originTenantId` records the tenant the citizen came in through. A citizen of a municipality applying for Zorgtoeslag, handled by Dienst Toeslagen, is this case.
+- A deployment under another tenant, in any other case — started by staff, or by a citizen for a process that is not a cross-tenant citizen service, such as another organisation's own-tenant service: refused with `403 TENANT_MISMATCH`; no instance is created.
 
 The owning tenant is written into the instance's `municipality` process variable, so it always agrees with the tenant Operaton runs the instance under. That variable is the only tenant label any access check reads, and the checks fail closed: an instance without it is refused to everyone. The six reads — status, variables, historic variables, activity history, lineage and decision document — are open to the owning tenant and to the case's own applicant; cancelling the instance is open to the owning tenant only. See [Authentication & IAM — Tenancy](authentication-iam.md#tenancy) for the full rule set.
 
 This tenant scoping is covered by an automated end-to-end test — see [Testing](../developer/testing/dashboards/caseworker.md#e2e).
+
+---
+
+## Citizen services
+
+The services a citizen can apply for in the [citizen portal](../user-guide/citizen-portal.md) are listed once, in `CITIZEN_SERVICES` in the shared package (`@ronl/shared`): each entry names the service, the process it starts, and its scope.
+
+| Service | Process key | Scope |
+|---|---|---|
+| `zorgtoeslag` | `AwbZorgtoeslagProcess` | cross-tenant |
+| `vergunningen` | `AwbShellProcess` | own-tenant |
+| `subsidies` | `ThuisbatterijSubsidieAanvraagProcess` | own-tenant |
+| `heusdenpas` | `HeusdenpasAanvraagProcess` | own-tenant |
+
+- **own-tenant**: offered only to citizens of a tenant that deploys the process itself, so the case lands at their own organisation.
+- **cross-tenant**: offered to every citizen when exactly one tenant deploys the process; that tenant handles the case for whichever organisation the citizen came in through. Deployed under several tenants, a start would be ambiguous (`409 AMBIGUOUS_DEPLOYMENT`), so the service is not offered at all.
+
+The registry holds data only. The backend derives from it which services a citizen is offered and checks every start against it — the cross-tenant scope is what lets a citizen's start reach another tenant's deployment (see [Who owns the case](#who-owns-the-case)). The labels, icons and forms of the cards are the frontend's.
+
+`GET /v1/process/available` answers which services the signed-in citizen may start, as `data.services`, a list of service ids in registry order. It asks Operaton for the latest deployment of each registry process under every tenant and applies the two scopes; a deployment without a tenant never counts, since a citizen's case must belong to a tenant. The route is for citizens only: anyone else is refused with `403 FORBIDDEN`. When Operaton cannot be asked, it answers `503 SERVICES_UNAVAILABLE`, and the portal shows an error with a retry rather than every card.
+
+Adding a service means a registry entry, a card for it in the frontend, and deploying its process under the tenant — or, for a cross-tenant service, the one tenant — that handles it.
 
 ---
 

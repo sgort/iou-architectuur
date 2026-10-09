@@ -5,7 +5,7 @@ component: RONL Business API
 # Infra-board — tests
 
 **Frontend: 19 files · 259 tests**, including the shared signing panel.
-**E2E: 2 specs · 8 tests** — 7 passed and 1 skipped on 3 October 2026.
+**E2E: 2 specs · 8 tests** — 7 passed and 1 skipped on 9 October 2026, as on 3 October.
 
 The infra-board is well covered at the unit level — `src/pages/infra-board` is
 at **100%** statements, functions and lines and 98.47% branches, the
@@ -17,11 +17,15 @@ work that happens inside it.
 
 ## Frontend
 
-Re-derived on **3 October 2026** at `0625d48` (v2026.10.0). The frontend
-package was measured the same day — 124 files, 1378 tests, all passing — but
+Re-derived on **9 October 2026** at `ebec288` (v2026.10.1). The frontend
+package was measured the same day — 130 files, 1540 tests, all passing — but
 Vitest's console reports only that total, so the counts below are taken from
 the source, each test file parsed with its `.each` tables expanded; summed
-over the whole package the method gives exactly the runner's 1378.
+over the whole package the method gives exactly the runner's 1540. Every
+count on this page is the same as on 3 October: v2026.10.1 changed no test
+file this board owns. Its one change to the board's source is a comment in
+`SigningPanel.tsx`: a declined signature takes the process's decline route —
+a rework loop in R2.1, an escalation in Besluitvorming.
 
 | Area | Files | Tests |
 |---|---:|---:|
@@ -46,9 +50,10 @@ over the whole package the method gives exactly the runner's 1378.
     | `signing/useTaskSignature.test.ts` | 5 | **New.** Loading until the signing spec arrives; no fetch without a task; no spec when the fetch fails or answers `success: false`, so the caller falls back to the form; and never the previous task's spec after switching tasks |
     | `signing/resolveSigningUrl.test.ts` | 4 | Resolving the signing ceremony's URL — moved unchanged |
 
-    Coverage on 3 October: `components/signing` **93.1 / 88.75 / 95.65 /
-    96.11**, with `SigningPanel.tsx` at 85.93% branches and the other two
-    files at 100 on all four.
+    Coverage on 9 October, unchanged from 3 October: `components/signing`
+    **93.1 / 88.75 / 95.65 / 96.11**, with `SigningPanel.tsx` at 85.93%
+    branches — the nearest to the 85 margin of the files v2026.10.1 touched —
+    and the other two files at 100 on all four.
 
 !!! note "The phase swimlane's tests moved to `components/process/`"
     `PhaseSwimlane.test.tsx` lived in `components/InfraBoardDashboard/` until
@@ -79,8 +84,9 @@ over the whole package the method gives exactly the runner's 1378.
 | `components/InfraBoardDashboard/InfraDock.test.tsx` | 4 | The dock |
 | `components/InfraBoardDashboard/InfraNoAccessPanel.test.tsx` | 1 | The no-access panel |
 
-Coverage on 3 October: `pages/infra-board` **100 / 98.47 / 100 / 100**, and
-`components/InfraBoardDashboard` 95.34 / 89.91 / 92.59 / 95.85 — against
+Coverage on 9 October, unchanged from 3 October: `pages/infra-board`
+**100 / 98.47 / 100 / 100**, and `components/InfraBoardDashboard`
+95.34 / 89.91 / 92.59 / 95.85 — against
 95.06 / 89.37 / 93.71 / 96.14 on 30 September, over ten source files now that
 `SigningPanel.tsx` and `resolveSigningUrl.ts` have moved out as
 `PhaseSwimlane.tsx` did before them. `ProjectDetail.tsx`, which now hosts the
@@ -94,19 +100,20 @@ modules are exhaustively covered, while the components carry the
 
 ## E2E
 
-**Two specs, eight tests.** Measured **3 October 2026** as part of the full
-frontend run against the developer's already-running local stack: 27 passed,
-1 skipped, 2.8m. Before that, 30 August 2026 against `acc` at `15dfbf9`: all
-27 passing, 1.9m.
+**Two specs, eight tests.** Measured **9 October 2026** as part of the full
+frontend run against the developer's already-running local stack: 42 passed,
+5 skipped, 2.6m. Before that, 3 October 2026: 27 passed, 1 skipped, 2.8m; and
+30 August 2026 against `acc` at `15dfbf9`: all 27 passing, 1.9m.
 
-| Spec | Tests | 3 October | Covers |
+| Spec | Tests | 9 October | Covers |
 |---|---:|---|---|
 | `infra-board-journey.spec.ts` | 7 | 7 passed | The shell |
 | `rip-r21-journey.spec.ts` | 1 | **skipped, by its own guard** | The work |
 
-These eight are the largest per-board share of the frontend suite — see
-[Coverage per board](../e2e.md#coverage-per-board) for how they sit against the
-other twenty.
+These eight are still the largest share of any board in the frontend suite —
+see [Coverage per board](../e2e.md#coverage-per-board) for how they sit
+against the other thirty-nine, eighteen of them the citizen portal and
+landing-page specs v2026.10.1 added, which belong to no board.
 
 **`infra-board-journey.spec.ts`** drives the board itself: opening on Mijn dag
 with all three werkmodi available, each werkmodus reaching its own surface and
@@ -126,7 +133,7 @@ twelve tasks — the last of which now renders the
 It carries two `test.skip(true, reason)` calls **inside** the test body, which
 skip the run when its preconditions are not met and log the reason first. It
 did not skip on 30 August, which predates both. **On 3 October it did**, and
-said why before creating anything:
+again on 9 October, and said why before creating anything:
 
 ```text
 [rip-r21-journey] SKIPPED — local dev stack signs with the real ValidSign

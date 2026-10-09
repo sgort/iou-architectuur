@@ -15,16 +15,21 @@ and the only board with its own end-to-end suite.
     without anything being deleted.
 
 **Package: 43 files · 515 tests.** **Backend: 16 files · 583 tests** in
-`src/pa-monitoring` — the second-largest area in the backend, after
-`src/routes`. **E2E: 2 specs · 7 tests**, still in the frontend package.
+`src/pa-monitoring` — since v2026.10.1 the third-largest area in the backend,
+after `src/routes` and `src/services`. **E2E: 2 specs · 7 tests**, still in
+the frontend package.
 
 Measured with `npm run test:serial --workspace=packages/pa-cockpit` on
-**3 October 2026** for v2026.10.0 (`main` at `0625d48`), in the working
-checkout on `acc` at `0e3eed8`, a tree identical to `0625d48`, on Node 22.23.2:
-**515 of 515 passing**, `Duration 133.53s` without file parallelism (35.32s in
-the parallel run of 30 September). v2026.10.0 did not touch this package, and
-every count and percentage reproduced. Coverage **92.61 % statements ·
-93.89 % branches · 89.56 % functions · 93.13 % lines** — branches up 18.34
+**9 October 2026** for v2026.10.1 (`main` at `ebec288`), in the working
+checkout on `acc` at `0ea4985`, a tree identical to `ebec288`, on Node 22.23.3:
+**515 of 515 passing**, `Duration 136.61s` without file parallelism (133.53s
+serially on 3 October, 35.32s in the parallel run of 30 September).
+Neither v2026.10.0 nor v2026.10.1 touched this package, and every count
+reproduced; of the percentages, functions read 89.57 against 89.56 on
+3 October, one hundredth of run-to-run noise on identical code that
+[Coverage](../coverage.md#pa-cockpit-by-area) traces to the one-file
+`src/pages` row. Coverage **92.61 % statements · 93.89 % branches ·
+89.57 % functions · 93.13 % lines** — branches up 18.34
 points from v2026.08.36 under the per-file 80% floor adopted in v2026.09.2,
 which v2026.09.6 wrote into this package's `vitest.config.ts` as
 `thresholds: { branches: 80, perFile: true }`. The run passed it without naming
@@ -33,8 +38,8 @@ a file, and no file is below 85% either: the lowest is
 
 !!! note "Six releases of identical counts, then +39 tests"
     43 files and 476 tests at v2026.09.7, v2026.09.9, v2026.09.11, v2026.09.12
-    and v2026.09.13 — and **43 files and 515 tests** at v2026.09.15 and
-    v2026.10.0. Every one
+    and v2026.09.13 — and **43 files and 515 tests** at v2026.09.15,
+    v2026.10.0 and v2026.10.1. Every one
     of the 39 is from the two branch-margin commits: `391b1a8` (#256) added four
     to `DossierRow.test.tsx`, taking a file that sat at exactly 80.00% branches
     to 100 and exposing a latent crash when a dossier had no `kompas`, fixed in
@@ -50,7 +55,7 @@ a file, and no file is below 85% either: the lowest is
     two to five points on 30 September are worth reporting and a move in the
     second decimal is not.
 
-    This package holds **7 of the 24 files** an 80% *functions* floor would
+    This package holds **7 of the 23 files** an 80% *functions* floor would
     fail — the second-largest share after the frontend — while **none** of its
     38 source files is below the 80% *branch* floor that is actually
     configured.
@@ -66,18 +71,18 @@ a file, and no file is below 85% either: the lowest is
     consume it too and watch `packages/pa-cockpit/**` in their path filters,
     but run only pa-demo's own suite.
 
-!!! note "Every figure on this page is from 3 October 2026"
+!!! note "Every figure on this page is from 9 October 2026"
     The package counts and coverage, the `src/pa-monitoring` backend figure and
-    the two E2E specs were all measured on **3 October 2026** — the E2E specs
-    for the first time since 29–30 August, against the developer's
-    already-running local stack. See [E2E & live smoke](../e2e.md).
+    the two E2E specs were all measured on **9 October 2026**, the E2E specs
+    against the developer's already-running local stack, as on 3 October. See
+    [E2E & live smoke](../e2e.md).
 
 ---
 
 ## The package suite
 
-Re-derived on **3 October 2026** at `0625d48`, where every count is the same
-as at `ae06c9e` on 30 September. Vitest's console reports only the package
+Re-derived on **9 October 2026** at `ebec288`, where every count is the same
+as at `0625d48` on 3 October and at `ae06c9e` on 30 September. Vitest's console reports only the package
 total, so the per-file counts are taken from the source, each test file parsed
 with its `.each` tables expanded; they sum to exactly the runner's **515**, and
 the same method gives exactly 476 at `963fe24`. The
@@ -141,9 +146,10 @@ seam cannot silently close again.
 ## Backend
 
 `src/pa-monitoring` — **583 tests across 16 files**, from the backend run's own
-JSON output on 30 September 2026, and unchanged at v2026.10.0 — none of these
-files gained or lost a test, though `pa.routes.test.ts` and
-`pa-dossiers.routes.test.ts` were edited for problem details:
+JSON output on 30 September 2026, unchanged at v2026.10.0 and, parsed from
+the source at `ebec288`, at v2026.10.1 — none of these files gained or lost a
+test since, though `pa.routes.test.ts` and `pa-dossiers.routes.test.ts` were
+edited for problem details in v2026.10.0:
 
 | File | Tests |
 |---|---:|
@@ -160,9 +166,9 @@ files gained or lost a test, though `pa.routes.test.ts` and
 
 Plus 174 tests in the six source clients under `pa-monitoring/sources`: EU
 (73), media (27), EP texts submitted (24), TK (21), OB (19) and agenda (10).
-Coverage on 3 October (statements / branches): `pa-monitoring`
+Coverage on 9 October (statements / branches): `pa-monitoring`
 98.95 / 89.35, `pa-monitoring/sources` 98.13 / 93.05 — both as on
-30 September; `pa-monitoring`'s lines moved 99.16 → 98.99 when `pa.routes.ts`
+30 September and 3 October; `pa-monitoring`'s lines moved 99.16 → 98.99 when `pa.routes.ts`
 and `pa-dossiers.routes.ts` began answering problems.
 
 ---
@@ -172,17 +178,18 @@ and `pa-dossiers.routes.ts` began answering problems.
 Two Playwright specs, run with the same `playwright.config.ts` as the rest of
 the frontend suite.
 
-**Re-measured 3 October 2026: 7 tests, all passing**, as part of the full
-frontend run against the developer's already-running local stack (27 passed,
-1 skipped, 2.8m) — the five mock-mode tests in 2.4–4.5s each and the two
-live-authoring tests in 6.9s and 4.7s. Before that, 30 August 2026 against
+**Re-measured 9 October 2026: 7 tests, all passing**, as part of the full
+frontend run against the developer's already-running local stack (42 passed,
+5 skipped, 2.6m) — the five mock-mode tests in 2.2–3.3s each and the two
+live-authoring tests in 4.7s and 3.3s. On 3 October: 7 passing, mock mode in
+2.4–4.5s and live authoring in 6.9s and 4.7s. Before that, 30 August 2026 against
 `acc` at `15dfbf9`: 7 passing, in a run of 27 in 1.9m. The count is unchanged
 since 22 August, when the two together ran in 18.9s and the live spec was
 additionally run six consecutive times while chasing a flake, passing 2/2 each
 time in 7.3–11.7s.
 
 See [Coverage per board](../e2e.md#coverage-per-board) for how these seven sit
-against the other twenty-one.
+against the other forty.
 
 | Spec | Tests | Covers |
 |---|---:|---|

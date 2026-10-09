@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # MCP AI Assistant
 
 The AI Assistant is a streaming chat interface in the caseworker dashboard. From v3.0.0 it is hosted in the assistant dock — a toggleable right-side panel in the V2 shell (`components/CaseworkerDashboardV2/AssistantDock.tsx`), which re-uses the `McpChatSection` component verbatim and persists the conversation to `sessionStorage`. It is not a rail item and has no left-panel entry. It connects a configurable LLM to a registry of data sources via the [Model Context Protocol](https://modelcontextprotocol.io/) (MCP), allowing caseworkers to query process definitions, running instances, tasks, decisions, deployments, legislation, knowledge graph data, and deployed process bundles in natural language.
@@ -55,12 +59,28 @@ No tool was added on the basis of the OpenAPI spec alone — there is deliberate
 
 Unlike every other MCP source, the eDOCS subprocess does **not** talk to its upstream system (the OpenText eDOCS DM server) directly. Instead it calls this backend's own `/v1/edocs/*` HTTP surface — the same routes `EdocsService`/`edocs.routes.ts` already expose, live-tested end-to-end by `scripts/test-edocs-live.sh`. This keeps `EdocsService` the single place that knows eDOCS' auth/session/quirks (multipart upload shape, `HTTP 206` + `error_list` validation, flat-list response parsing, the `version="0"` download sentinel); the MCP layer never re-implements any of it.
 
-To call its own backend, the subprocess authenticates via a `client_credentials` flow against Keycloak using a **dedicated** `edocs-mcp-client` — not `copilot-studio-edocs`, which is kept separate since it has its own unrelated, unresolved custom-connector OAuth constraints. The subprocess caches its token, refreshes it 30 seconds before expiry, and retries once on a `401`.
+A tool call reaches `/v1/edocs` **as the caseworker** who asked the question, so eDOCS enforces and records that person's own rights (see [eDOCS — Live Testing](testing/edocs-live-testing.md#people-and-the-service-account)). `mcp.routes.ts` passes the caller's Keycloak token (`req.auth.token`) to `runChatStream()` as an `McpCallContext`; `McpRegistry.callTool()` hands that context only to a provider whose `McpProviderMeta.actsAsPerson` is `true` — today only `EdocsMcpProvider` — and every other provider gets the two-argument call, so it can never forward the caller's token. `EdocsMcpProvider` puts the token in the MCP request's `_meta.userToken`, never in the tool arguments, so the language model never sees it. The subprocess uses it as the bearer for that one call.
+
+A call as the person is never retried as anyone else. A refusal from `/v1/edocs` comes back as a tool result with `isError: true` and a short Dutch explanation the assistant can pass on:
+
+| Refusal code | Tool result text |
+|---|---|
+| `EDOCS_USER_TOKEN_UNAVAILABLE` | Geen eDOCS-toegang via uw account: eDOCS is alleen beschikbaar na inloggen met uw Flevoland-account. |
+| `EDOCS_REAUTH_REQUIRED`, or any other `401` | Uw Flevoland-sessie is verlopen. Log opnieuw in om eDOCS te gebruiken. |
+| `EDOCS_ACCESS_DENIED` | eDOCS weigert de toegang voor uw account. |
+| `EDOCS_CLIENT_NOT_ALLOWED` | eDOCS is niet beschikbaar via deze toepassing. |
+
+The "any other `401`" case covers the caseworker's own token, which is captured when the chat turn starts and can expire before it ends.
+
+Without a caller — a tool call that carries no `_meta.userToken` — the subprocess authenticates with its own `client_credentials` flow against Keycloak, using a **dedicated** `edocs-mcp-client` (not `copilot-studio-edocs`), and `/v1/edocs` treats the call as a machine client acting as the service account. `EdocsMcpProvider` logs such a call as running as the service account. The subprocess caches that client token, refreshes it 30 seconds before expiry, and on a `401` or `403` fetches a new one and retries once.
 
 ```typescript
 // mcp-servers/edocs/index.ts, on every tool call
-const token = await getToken();  // client_credentials against KEYCLOAK_URL/KEYCLOAK_REALM
-await backend.get(path, { headers: { Authorization: `Bearer ${token}` } });
+const userToken = request.params._meta?.userToken;
+const get = (path) =>
+  userToken
+    ? callBackendAs(path, userToken) // as the caseworker; a refusal becomes a Dutch tool error
+    : callBackend(path);             // client_credentials (edocs-mcp-client), the service account
 // backend baseURL defaults to http://localhost:<PORT>/v1/edocs — same App
 // Service instance, loopback, no TLS hop — override with EDOCS_MCP_BACKEND_URL
 ```
@@ -182,7 +202,7 @@ Pre-flight errors (MCP disabled, MCP not connected, missing message body) are re
 
 ### `mcpChat.service.ts`
 
-`runChatStream(history, userMessage, emit, selectedProviderIds, modelId, signal?)` is the agentic loop entry point. It resolves the correct `LlmProvider` from `LlmRegistry` by `modelId` and the scoped tool definitions and system prompt from `McpRegistry` by `selectedProviderIds`. The service has no direct dependency on any LLM SDK.
+`runChatStream(history, userMessage, emit, selectedProviderIds, modelId, signal?, context?)` is the agentic loop entry point. The optional `context` (`McpCallContext`) says who the tool calls are made for; it is passed to `McpRegistry.callTool()` with each tool call and never to the model. It resolves the correct `LlmProvider` from `LlmRegistry` by `modelId` and the scoped tool definitions and system prompt from `McpRegistry` by `selectedProviderIds`. The service has no direct dependency on any LLM SDK.
 
 Text deltas arrive via the `onDelta` callback supplied to `LlmProvider.streamTurn()` and are emitted immediately, so the user sees tokens in real time. See [LLM Provider Architecture — Response delivery](llm-provider-architecture.md#response-delivery-streaming-vs-buffered) for the streaming vs. buffered trade-off.
 
@@ -202,7 +222,7 @@ export type ChatEventCallback = (event: ChatStreamEvent) => void;
 
 ### `mcp.routes.ts`
 
-`POST /v1/mcp/chat` flushes SSE headers immediately after the pre-flight guards pass, then drives `runChatStream` and writes events to the response.
+`POST /v1/mcp/chat` flushes SSE headers immediately after the pre-flight guards pass, then drives `runChatStream` — passing the caller's token as `{ userToken: req.auth?.token }`, so a provider that acts as the person reaches its backend route as them — and writes events to the response.
 ```typescript
 res.setHeader('Content-Type', 'text/event-stream');
 res.setHeader('Cache-Control', 'no-cache');

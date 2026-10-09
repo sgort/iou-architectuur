@@ -59,8 +59,8 @@ On the VM (Ubuntu 24.04 LTS):
 The RONL theme provides a consistent visual experience from the MijnOmgeving landing page through the authentication flow.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Theme Comparison - Landing vs Keycloak](../../../../assets/screenshots/ronl-theme-consistency.png)
-  <figcaption>Visual consistency from landing page to Keycloak login</figcaption>
+  ![Screenshot: the RONL-themed Keycloak login form, headed MijnOmgeving · Demo portaal van Open Regels, with username and password fields, Inloggen and Terug naar inlogkeuze, and no Flevoland (Entra ID) button](../../../../assets/screenshots/ronl-theme-consistency.png)
+  <figcaption>The Keycloak login form in the RONL theme. It offers no Flevoland (Entra ID) button: Flevoland employees reach Entra ID through the landing page.</figcaption>
 </figure>
 
 ### Theme Features
@@ -73,8 +73,6 @@ The RONL theme provides a consistent visual experience from the MijnOmgeving lan
 - ✅ Responsive mobile-first design
 - ✅ Dutch language throughout
 - ✅ Identity provider button styling (DigiD/eHerkenning/eIDAS)
-
-**Technical:**
 
 **Technical:**
 
@@ -414,12 +412,13 @@ Changes reach those realms through the admin REST API instead, with the idempote
 |---|---|
 | New realm roles, such as `rip-*` or `besluit-*` | `keycloak-add-rip-roles.sh`, with `ROLE_PREFIX` for roles other than `rip-` |
 | The `email`, `given_name` and `family_name` token claims for ValidSign | `keycloak-add-token-claim-mappers.sh` |
-| The Entra ID identity provider for Flevoland | `keycloak-add-entra-idp.sh` |
+| The Entra ID identity provider for Flevoland, with the token storage eDOCS needs: stored tokens, the `broker` `read-token` role in `default-roles-ronl`, and the `broker-roles` client mapper on `ronl-business-api` | `keycloak-add-entra-idp.sh` |
 
 ```bash
 # From a checkout of ronl-business-api, in Git Bash. Creates the five besluit-* roles;
-# GRANT_USER empty grants them to nobody (its default is test-infra-flevoland).
-KEYCLOAK_URL=https://acc.keycloak.open-regels.nl ROLE_PREFIX=besluit- GRANT_USER=   bash scripts/keycloak-add-rip-roles.sh
+# GRANT_USER empty grants them to nobody (its default, test-infra-flevoland, applies only to rip-).
+KEYCLOAK_URL=https://acc.keycloak.open-regels.nl ROLE_PREFIX=besluit- GRANT_USER= \
+  bash scripts/keycloak-add-rip-roles.sh
 ```
 
 Each script prompts for the Keycloak admin password when `ADMIN_PASSWORD` is unset; `keycloak-add-rip-roles.sh` and `keycloak-add-entra-idp.sh` also accept `--dry-run`. Test users and per-user roles are added in the admin console. See [Entra ID — Rolling out to an environment](entra-id.md#rolling-out-to-an-environment) for the order in which to run them.

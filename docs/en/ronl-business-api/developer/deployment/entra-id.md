@@ -10,9 +10,11 @@ Employees of Provincie Flevoland sign in to RBA with their Flevoland M365 accoun
 
 ## What the employee sees
 
-The landing page's primary button, **Inloggen met uw Flevoland-account**, sends the browser through Keycloak straight to Microsoft. On a Flevoland-managed Windows laptop, Entra signs the employee in with the account the device is joined to, usually without a prompt. This works natively in Edge; Chrome needs the Windows Accounts extension, Firefox the "Allow Windows single sign-on" setting. The Keycloak login page also shows a **Flevoland (Entra ID)** button, as a fallback.
+The landing page's primary button, **Inloggen met uw Flevoland-account**, sends the browser through Keycloak straight to Microsoft. On a Flevoland-managed Windows laptop, Entra signs the employee in with the account the device is joined to, usually without a prompt. This works natively in Edge; Chrome needs the Windows Accounts extension, Firefox the "Allow Windows single sign-on" setting. The Keycloak login form does not offer Entra ID: the provider is hidden there (`hideOnLogin`), because the form serves every tenant and Entra login exists only for Flevoland. Entra is reached through the landing page.
 
 After sign-in the employee lands on the dashboard for their role.
+
+The Caseworker, PA-Cockpit and Infra-board cards on the landing page each carry a **Flevoland-account** button beside **Openen**, which signs in through Entra ID and keeps that board as the target; the Woo card has none, because no Entra app role exists for it. When the signed-in role does not open the chosen board, the employee returns to the landing page with a dialog, **Geen toegang tot <bord>**, that names their account, the missing role and the Entra app role to ask their functional administrator for (`IOU_USERS`, `IOU_PA` or `IOU_INFRA`), with **Naar mijn dashboard** and **Uitloggen**.
 
 ---
 
@@ -66,6 +68,23 @@ Roles assigned by hand in Keycloak — `pa-author`, `pa-editor`, `pa-admin`, the
 
 The four mapped roles are the exception. A hand-assigned `admin`, `caseworker`, `public-affairs` or `infra-projectteam` is removed at the next login whenever the Entra token lacks the matching app role. Grant those through the Entra groups only.
 
+### Stored tokens for eDOCS
+
+A caseworker or admin works in eDOCS as themselves, with their own Entra ID token (see [eDOCS — Live Testing](../testing/edocs-live-testing.md#people-and-the-service-account)). The backend reads that token from Keycloak's broker endpoint, so the provider and the realm are set up for it:
+
+| Setting | Effect |
+|---|---|
+| `storeToken: true` on `entra-flevoland` | Keycloak keeps the Entra token response it received at login |
+| `offline_access` in the provider's default scope | Entra issues a refresh token, so the backend can renew an expired ID token itself |
+| `addReadTokenRoleOnCreate: true` | A user Keycloak creates through the provider gets the `broker` client's `read-token` role |
+| `read-token` in `default-roles-ronl` | Every user, existing and future, holds that role; the broker endpoint only ever returns the caller's own stored token |
+| Client mapper `broker-roles` on `ronl-business-api` | Puts the broker client's roles in the access token (`resource_access.broker.roles`), which the broker endpoint requires |
+
+The script sets all five. Keycloak stores a person's tokens only at a login after the change, so **each person signs in once more** with the Flevoland account; until then eDOCS answers them with `EDOCS_USER_TOKEN_UNAVAILABLE`.
+
+!!! warning "Accepted risk"
+    Because `ronl-business-api`'s access tokens carry the `read-token` role, so does the token the browser holds. A stolen Keycloak access token can read its owner's stored Entra token from the broker endpoint and reach eDOCS as that person outside RBA's audit, for the ID token's remaining life (about an hour). The refresh token is of no use without the client secret. The risk is accepted pending a decision ([issue 325](https://github.com/sgort/ronl-business-api/issues/325)).
+
 ---
 
 ## Infra-board users
@@ -109,7 +128,7 @@ Locally, run it again after every fresh `--import-realm`.
 
 ## Rolling out to an environment
 
-Every Keycloak has its own realm. Each environment therefore needs the provider, and each employee there needs the roles that do not come from Entra, set up separately. The landing-page button reaches ACC when a pull request merges into `acc`, and PROD with the `acc` → `main` promotion. The fallback button on the Keycloak login page works as soon as the provider exists.
+Every Keycloak has its own realm. Each environment therefore needs the provider, and each employee there needs the roles that do not come from Entra, set up separately. The landing-page button reaches ACC when a pull request merges into `acc`, and PROD with the `acc` → `main` promotion.
 
 | | ACC | PROD |
 |---|---|---|
@@ -139,7 +158,7 @@ printf '%s' "$ENTRA_CLIENT_SECRET" | curl -s -X POST \
    bash scripts/keycloak-add-entra-idp.sh
 ```
 
-Expected: `SECRET OK`, `all mapped roles present in realm ronl`, `created provider entra-flevoland`, seven `created mapper` lines and `verified: provider entra-flevoland with 7 mappers in realm ronl`, followed by the redirect URI to register in Entra. On a re-run the lines read `updated` instead of `created`, and a mapper no longer in the file shows as `removed mapper`. If the script reports that the realm lacks a mapped role, create that role in the realm first; do not remove the mapper.
+Expected: `SECRET OK`, `all mapped roles present in realm ronl`, `created provider entra-flevoland`, seven `created mapper` lines and `verified: provider entra-flevoland with 7 mappers in realm ronl`, followed by the redirect URI to register in Entra, `added broker read-token to default-roles-ronl`, `created client mapper broker-roles on ronl-business-api`, and a reminder that users who signed in before the run must sign in once more for Keycloak to store their tokens. On a re-run the lines read `updated` instead of `created` (`present` for the default role), and a mapper no longer in the file shows as `removed mapper`. If the script reports that the realm lacks a mapped role, create that role in the realm first; do not remove the mapper.
 
 **2. First login.** Each employee signs in once through **Inloggen met uw Flevoland-account**. This creates their Keycloak user, with the tenant attributes and the roles of their Entra groups. Until step 3 an Infra-board user sees the board without tasks.
 
@@ -155,10 +174,11 @@ The script also creates any `rip-*` role the realm lacks. It grants **every** `r
 For colleagues who take part in Besluitvorming onder gedelegeerde bevoegdheid, create the five `besluit-*` roles once per environment with the same script:
 
 ```bash
-KEYCLOAK_URL=$KEYCLOAK_URL ROLE_PREFIX=besluit- GRANT_USER= \n  bash scripts/keycloak-add-rip-roles.sh
+KEYCLOAK_URL=$KEYCLOAK_URL ROLE_PREFIX=besluit- GRANT_USER= \
+  bash scripts/keycloak-add-rip-roles.sh
 ```
 
-With `GRANT_USER` empty the script only creates the roles. `GRANT_USER=<username>` would grant all five to that one user, which suits a demonstration account that plays every lane but not a colleague who holds one; without `GRANT_USER` at all, all five go to `test-infra-flevoland`. Assign each colleague the role of their lane in the admin console instead — see [Caseworker — Besluitvorming](../../user-guide/caseworker.md#besluitvorming) for which lane does what.
+With `GRANT_USER` empty the script only creates the roles — which is also its default for any prefix other than `rip-`, so `GRANT_USER=` can be left out here. `GRANT_USER=<username>` would grant all five to that one user, which suits a demonstration account that plays every lane but not a colleague who holds one. Assign each colleague the role of their lane in the admin console instead — see [Caseworker — Besluitvorming](../../user-guide/caseworker.md#besluitvorming) for which lane does what.
 
 Then, in the admin console (Users → the employee → Role mapping), assign `infra-medewerker` to Infra-board users, and where needed `woo-coordinatie` (Woo board), `pa-author`, `pa-editor` or `pa-admin` (Dossierbeheer) and a `besluit-*` role (Besluitvorming). Never assign `admin`, `caseworker`, `public-affairs` or `infra-projectteam` here; see [The Keycloak side](#the-keycloak-side).
 

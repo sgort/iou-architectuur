@@ -4,7 +4,7 @@ component: RONL Business API
 
 # Backend Development
 
-The backend is `packages/backend` (`@ronl/backend`) — a Node.js 22 Express application written in TypeScript. The repository pins the runtime in `.nvmrc` at `22.23.2`, and the root `engines.node` is `>=22`; both App Service plans run `NODE|22-lts`.
+The backend is `packages/backend` (`@ronl/backend`) — a Node.js 22 Express application written in TypeScript. The repository pins the runtime in `.nvmrc` at `22.23.3`, and the root `engines.node` is `>=22`; both App Service plans run `NODE|22-lts`.
 
 ---
 
@@ -148,40 +148,48 @@ import myfeatureRoutes from './myfeature.routes';
 ---
 
 ## eDOCS service and external task worker
- 
-`edocs.service.ts` wraps the OpenText eDOCS REST API. It authenticates once via `POST /connect`, caches the `X-DM-DST` session token extracted from the `Set-Cookie` response header, and re-authenticates automatically on `401`/`403`. Key methods:
- 
+
+`edocs.service.ts` wraps the OpenText eDOCS REST API. It keeps **one eDOCS session per principal** — the service account (`'service'`) or a person (`'user:<sub>'`) — in a shared session store. People's sessions are bounded (500, least recently used evicted first); the service session never counts against the bound, so a busy day cannot push the archiving session out. Concurrent first requests for one principal share a single connect.
+
+- **The service account** connects with `POST /connect` and `EDOCS_USER_ID`/`EDOCS_PASSWORD`. The exported singleton `edocsService` is this principal; background archiving and machine clients use it.
+- **A person** connects with `POST /connect` carrying their Entra ID token in the `X-DM-AUTH` header, no password. A route derives that client with `edocsService.forUser(...)`, which shares the singleton's store.
+
+Either connect yields the `X-DM-DST` session token (and `X-DM-CSRF-TOKEN`) from the `Set-Cookie` response header. On a failed call the two principals differ: the service account reconnects on `401` or `403` and retries once. For a person a `403` is eDOCS refusing *them* — no rights on that workspace or document — and is thrown as `EdocsAccessDeniedError` at once; only a `401` fetches a fresh ID token, reconnects and retries once, and whatever still refuses after that is a refusal too. Key methods:
+
 ```typescript
 ensureWorkspace(projectNumber: string, projectName: string): Promise<EdocsWorkspaceResult>
 uploadDocument(workspaceId: string, filename: string, contentBase64: string, metadata: EdocsDocumentMetadata): Promise<EdocsDocumentResult>
 getWorkspaceDocuments(workspaceId: string): Promise<...>
-healthCheck(): Promise<{ status: 'up' | 'down' | 'stub' }>
+healthCheck(): Promise<{ status: 'up' | 'down' | 'stub'; reachable: boolean; authenticated: boolean; latency?: number; error?: string }>
 ```
- 
+
 When `EDOCS_STUB_MODE=true` (the default), all methods return realistic fake data and log what they would have done. The stub is transparent — callers cannot distinguish it from a live server.
- 
-`externalTaskWorker.service.ts` polls Operaton's external task API (`POST /external-task/fetchAndLock`) using long-polling (`asyncResponseTimeout: 20 000 ms`). It handles two topics:
- 
+
+`externalTaskWorker.service.ts` polls Operaton's external task API (`POST /external-task/fetchAndLock`) using long-polling (`asyncResponseTimeout: 20 000 ms`). It handles three topics:
+
 | Topic | Reads | Writes |
 |---|---|---|
 | `rip-edocs-workspace` | `projectNumber`, `projectName` | `edocsWorkspaceId`, `edocsWorkspaceName`, `edocsWorkspaceCreated` |
-| `rip-edocs-document` | `edocsWorkspaceId`, `documentTemplateId`, `edocsDocumentVariableName`, + template variables | `<edocsDocumentVariableName>` (e.g. `edocsIntakeReportId`) |
- 
+| `rip-relatics-workspace` (simulated — no Relatics integration yet) | `projectNumber`, `projectName` | `relaticsWorkspaceId`, `relaticsWorkspaceName`, `relaticsWorkspaceCreated`, `relaticsWorkspaceSimulated` |
+| `rip-edocs-document` | `edocsWorkspaceId`, `edocsAuthor`, `edocsAuthorName`, `documentTemplateId`, `edocsDocumentVariableName`, + template variables | `<edocsDocumentVariableName>` (e.g. `edocsIntakeReportId`) and `<edocsDocumentVariableName>_docId` |
+
+The worker uploads as the service account. When the process carries `edocsAuthor` — the employee who last started or completed a step, stamped by the backend from their token — the document's title ends in ` — namens <naam> (<e-mail>)` (`attributedDocName()`), kept within eDOCS' 254-character title limit.
+
 The worker is started inside the `app.listen()` callback and stopped in both `SIGTERM` and `SIGINT` handlers. It will not begin polling until the HTTP server is fully bound.
- 
+
 For configuration and live-mode switchover, see [Copilot Studio — eDOCS OAuth Integration](copilot-studio-edocs.md).
 
 ---
- 
+
 ## M2M route group
  
-`m2m.routes.ts` exposes 18 Operaton operations, on 19 routes, to machine-to-machine clients without tenant scoping — process history answers both `POST /v1/m2m/process/history` and a deprecated `GET` that sends a `Deprecation` header. It applies `jwtMiddleware` and then `requireM2mClient` — `tenantMiddleware` is intentionally absent.
+`m2m.routes.ts` exposes 18 Operaton operations, on 18 routes, to machine-to-machine clients without tenant scoping. Process history is `POST /v1/m2m/process/history` only; `GET /v1/m2m/process/history` answers `404`. It applies `jwtMiddleware` and then `requireM2mClient` — `tenantMiddleware` is intentionally absent.
 
 `requireM2mClient` admits only a token whose `azp` is on `M2M_ALLOWED_CLIENTS` (comma-separated; default `operaton-mcp-client`). Every person in the realm holds a token for the `ronl-business-api` audience, so a valid token is not enough: anything else, a person's token included, gets `403 M2M_CLIENT_NOT_ALLOWED` before any engine call.
 
 A `M2M_ALLOWED_OPERATIONS` constant at the top of the file controls which operations are active. Commenting out an entry returns `403 OPERATION_NOT_PERMITTED` for that operation with no other code changes required.
 
-A start refuses a body that sets `municipality` or `originTenantId`, and a task completion one that sets `municipality`, `originTenantId` or `applicantId`: both answer `400 RESERVED_VARIABLE`, with the refused names in a `reserved` extension member, before any engine call.
+A start refuses a body that sets `municipality`, `originTenantId`, `edocsAuthor` or `edocsAuthorName`, and a task completion one that sets any of those or `applicantId`: both answer `400 RESERVED_VARIABLE`, with the refused names in a `reserved` extension member, before any engine call.
 
 The route group uses the main engine. `config.operaton.m2mBaseUrl` is `OPERATON_M2M_BASE_URL`, empty when the variable is unset — which it is on every tier — so the `: operatonService` branch below is the one taken. Setting the variable points M2M at a different engine on purpose:
  

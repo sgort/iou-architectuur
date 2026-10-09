@@ -28,7 +28,7 @@ component: RONL Business API
 
 The **RONL Business API** implements the **Business API Layer** pattern: a security and business-logic layer that sits between an IAM system and the Operaton BPMN engine, exposing scoped capabilities — processes, tasks, forms, decisions — rather than raw engine access.
 
-It is deployed for the **Province of Flevoland**, in production, with an acceptance environment where each release is tried first. Three surfaces put its capabilities to work: a signed-in **werkomgeving** where provincial staff work through role-scoped boards, a public **knowledge base** reachable with no login, and a public **cockpit demo** running on demonstration data with no backend behind it. See [Getting Started](user-guide/getting-started.md) for how these surfaces are organised, and [Features](features/overview.md) for the capabilities themselves.
+It is deployed for the **Province of Flevoland**, in production, with an acceptance environment where each release is tried first. Three surfaces put its capabilities to work: a signed-in **werkomgeving** where provincial staff work through role-scoped boards, a public **knowledge base** reachable with no login, and a public **cockpit demo** running on demonstration data with no backend behind it. Residents sign in to **MijnOmgeving**, the citizen portal, to apply for the services their own organisation offers, and the organisations on the platform that use one board — Gemeente Amsterdam, Gemeente Heusden, Dienst Toeslagen and Univé Verzekeringen — each have a landing page of their own. See [Getting Started](user-guide/getting-started.md) for how these surfaces are organised, and [Features](features/overview.md) for the capabilities themselves.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: RONL Business API Main UI](../../assets/screenshots/ronl-business-api-main-ui.png)
@@ -91,6 +91,6 @@ The Province of Flevoland deployment runs in production. Each release is tried o
 ## Documentation sections
 
 - [**Features**](features/overview.md) — What RONL Business API does and why
-- [**User Guides**](user-guide/getting-started.md) — The werkomgeving's four boards and the public knowledge base
+- [**User Guides**](user-guide/getting-started.md) — The werkomgeving's four boards, the citizen portal and the public knowledge base
 - [**Developer Docs**](developer/local-development.md) — Local setup, backend, frontend, deployment
 - [**References**](reference/api-specification.md) — API specification, environment variables, JWT claims, standards

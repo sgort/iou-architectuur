@@ -435,6 +435,7 @@ A token without a `bsn` claim is mapped to a test BSN by its Keycloak username, 
 | `test-citizen-utrecht` | 999992235 | utrecht | Wessel Kooyman (45 jaar, getrouwd, 3 kinderen) |
 | `test-caseworker-utrecht` | 999992235 | utrecht | Same persona |
 | `test-citizen-amsterdam` | 999992235 | amsterdam | Same persona, Amsterdam tenant |
+| `test-citizen-heusden` | 999992235 | heusden | Same persona, Heusden tenant |
 | `test-citizen-rotterdam` | 999992235 | rotterdam | Same persona, Rotterdam tenant |
 | `test-citizen-denhaag` | 999992235 | denhaag | Same persona, Den Haag tenant |
 | `test-citizen-flevoland` | 999992235 | flevoland | Same persona, Flevoland tenant |

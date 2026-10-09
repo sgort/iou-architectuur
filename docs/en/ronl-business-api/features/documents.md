@@ -18,6 +18,17 @@ A process can carry, among its own variables, a reference to a workspace in an e
 
 One integration pattern manages documents the way a records-management system does: a workspace is created (or reused if one already exists) to hold a case's documents, a document is uploaded into it with descriptive metadata such as its name and the responsible department, and from there a document can be listed, profiled, retrieved by version, or deleted. Every version of a document is addressable on its own, so a later upload does not replace what came before it — it adds a new version alongside it.
 
+### As whom the document system sees a call
+
+The document-management integration distinguishes two identities:
+
+- **A person** — a caseworker or admin who signed in with their organisation account — works in the document system **as themselves**: the platform opens a session with that person's own identity, so the document system enforces and records that person's rights. No shared password is involved.
+- **The service account** serves registered machine clients and background archiving, such as a process step that files a document or the archiving of a signed document.
+
+Every data response says which one acted (`actingAs: "user"` or `"service"`). A person is never silently turned into the service account: when the platform cannot act as them, the request is refused with a reason they can act on, such as signing in again.
+
+Background archiving runs as the service account, which can only record itself as the author. The employee who caused the write is therefore recorded at the end of the document's title, as **"<title> — namens <naam> (<e-mail>)"**.
+
 ---
 
 ## Delivering a document to a recipient
