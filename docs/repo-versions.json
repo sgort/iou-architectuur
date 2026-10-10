@@ -3,7 +3,7 @@
   "last_patch": {
     "date": "2026-10-10",
     "kind": "Component sync",
-    "summary": "CPRMV v0.4.2 in production: rule methods as modules in the vocabulary and the API, Echelons and acknowledged services and organisations, and SHACL shapes without recursion. It found that the released image left the method modules out, which broke /rules and /ref until the hosts were redeployed with the fix in standards/cprmv!20, and that /mcp is unreachable.",
+    "summary": "CPRMV v0.4.2 in production: rule methods as modules in the vocabulary and the API, Echelons and acknowledged services and organisations, and SHACL shapes without recursion. It found that the released image left the method modules out, which broke /rules and /ref until the hosts were redeployed with the fix in standards/cprmv!20, and that /mcp is unreachable. CPSV Editor v2026.10.1 in production: a lockfile review on every dependency pull request, registry signatures and provenance verified in the audit gate, a quarterly dependency review, and release SBOM checks that can fail.",
     "previous": {
       "date": "2026-10-09",
       "kind": "Component sync",
@@ -49,16 +49,16 @@
     {
       "name": "CPSV Editor",
       "icon": "✏️",
-      "version": "v2026.10.0",
+      "version": "v2026.10.1",
       "environment": "prod",
-      "commit": "719683b...",
-      "commit_date": "2026-10-01",
+      "commit": "98458fa...",
+      "commit_date": "2026-10-10",
       "build": {
-        "sha": "719683b",
-        "run": 104,
-        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/36860635642"
+        "sha": "98458fa",
+        "run": 106,
+        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/38072083995"
       },
-      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/719683b4edc2081e3f94ea3056db894666ad732d",
+      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/98458fa9547d8a2239cc26f79e9be84c5a70c050",
       "ci_repo": "https://github.com/sgort/ttl-editor"
     },
     {

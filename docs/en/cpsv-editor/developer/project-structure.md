@@ -25,6 +25,7 @@ ttl-editor/
 ├── postcss.config.js
 ├── package.json
 ├── package-lock.json
+├── lockfile-review.json            # Licence allow-list for the lockfile review
 ├── renovate.json                   # Dependency update policy
 ├── SECURITY-PIPELINE.md            # Pins, required checks, accepted risks
 ├── .nvmrc                          # Exact Node version (24.21.0); CI reads it
@@ -103,7 +104,7 @@ ttl-editor/
 │       ├── vocabularies.config.js  # RDF vocabulary mappings for parser
 │       └── iknow-mappings/         # iKnow default field mapping templates
 │
-├── e2e/                            # Playwright journeys and their global setup
+├── e2e/                            # Playwright journeys and the stack preflight fixture
 ├── e2e-fixtures/                   # Journey fixtures, with a provenance manifest
 ├── examples/                       # Reference TTL/DMN exports; round-trip test fixtures
 │   └── organizations/              # Per-organisation examples and test cases
@@ -113,6 +114,9 @@ ttl-editor/
 │   ├── write-deps-marker.mjs       # postinstall — snapshots the lockfile deps:check compares with
 │   ├── check-supply-chain.mjs      # npm run check-supply-chain — pin truth and register agreement
 │   ├── audit-tree.mjs              # Daily dependency audit, grouped by advisory
+│   ├── audit-signatures.sh         # npm run audit:signatures — registry signatures and provenance
+│   ├── lockfile-diff.mjs           # Lockfile review of a pull request's package-lock.json change
+│   ├── dependency-review.mjs       # Quarterly dependency review evidence
 │   ├── write-sbom.mjs              # npm run sbom — CycloneDX SBOM into docs/sbom/
 │   ├── check-mirror.sh             # npm run check-mirror — GitLab mirror vs GitHub (never pushes)
 │   └── check-previews.sh           # npm run check-previews — orphaned preview environments (never deletes)
@@ -129,6 +133,7 @@ ttl-editor/
         ├── azure-static-web-apps-white-sky-02b674303.yml     # Deploy PROD
         ├── close-preview-environments.yml
         ├── dependency-audit.yml
+        ├── dependency-review.yml
         ├── sbom.yml
         ├── semgrep.yml
         └── zizmor.yml                                        # Supply-chain audit

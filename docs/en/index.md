@@ -159,13 +159,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.10.0** · *October 2026*
+-   **✏️ CPSV Editor — v2026.10.1** · *October 2026*
 
     ---
 
-    **A published export survives its own round trip**
+    **Every dependency pull request reviewed, and signatures verified**
 
-    Importing a published export no longer turns its [cell-level grounding](cpsv-editor/developer/cell-level-grounding.md) into Policy rules: a cell resource, a minted concept or a citation stub is typed `cprmv:Rule` too, and only subjects under the CPRMV rule base are now read as rules — the rest stay in the preserved DMN block, and a ConceptScheme no longer doubles on every republish. A fourth end-to-end journey drives the Amsterdam export through import, export and import again and requires the two exports to match. Clear Imported DMN Data now also clears the concepts it generated. Amsterdam's grounded cells name their concept (`skos:prefLabel`, `dct:type`), taken from the annotation export, and a survey of the rest of the model ends in a work list rather than guessed citations. A Dutch application profile for DMN, DMN-AP NL, is proposed to Forum Standaardisatie. Node moves to 24.21.0, and the [suite](cpsv-editor/developer/testing.md) stands at 776 tests and four end-to-end journeys, all passing.
+    A pull request that changes the lockfile gets a review comment — added, removed and downgraded packages, licences, install scripts, and a checklist for a new direct dependency — and `lockfile-review` is required on `acc`. The `audit` gate verifies registry signatures and provenance, each quarter opens its own dependency review, and the release SBOM lists every production package and is checked before it is regenerated, so the check can finally fail. The editor itself is unchanged: the [suite](cpsv-editor/developer/testing.md) stands at 776 tests on Vitest 5 and four end-to-end journeys, all passing — and the Amsterdam re-import journey no longer needs a stack.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 

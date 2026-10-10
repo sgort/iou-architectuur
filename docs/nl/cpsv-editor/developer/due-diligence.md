@@ -107,13 +107,13 @@ De `useDsoImport`-hook (`src/hooks/useDsoImport.js`, v1.9.6) verwerkt een deep-l
 | Frontend | React 19, Vite, Tailwind CSS, Lucide-iconen |
 | Statusbeheer | React hooks (`useEditorState`, `useArrayHandlers`), geen externe state-library |
 | Build & lint | Vite, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
-| Testen | Vitest, `@testing-library/react`, Playwright — 776 tests in 62 bestanden bij v2026.10.0, plus 4 end-to-end-journeys ([Testing](testing.md)) |
+| Testen | Vitest 5, `@testing-library/react`, Playwright — 776 tests in 62 bestanden, alle geslaagd (gemeten op 10 oktober 2026), met 90,28% statements, 88,42% branches, 78,92% functions en 90,96% lines; plus 4 end-to-end-journeys ([Testing](testing.md)) |
 | TTL-parsing | Eigen handgeschreven parser (geen RDF-library-afhankelijkheid) |
 | DMN-parsing | Browser DOMParser (XML) |
 | Externe API's | TriplyDB REST + SPARQL, Operaton REST (Camunda-compatibel), RONL SPARQL-vocabulaire |
 | Backend-afhankelijkheid | Gedeelde Express-server (Linked Data Explorer-repo) voor CORS-geproxyde SPARQL-queries, TriplyDB-service-updates en DMN-syntactische validatie (libxmljs2) |
 | Hosting | Azure Static Web Apps (acc-branch → acceptatie, main → productie) |
-| CI/CD | GitHub Actions: lint, tests en de productiebuild op de runner (Node 24.21.0 uit `.nvmrc`), geüpload naar Azure Static Web Apps met `skip_app_build`; een dagelijkse dependency-audit en een SBOM per release ([Deployment](deployment.md)) |
+| CI/CD | GitHub Actions: lint, tests en de productiebuild op de runner (Node 24.21.0 uit `.nvmrc`), geüpload naar Azure Static Web Apps met `skip_app_build`; bij elke pull request een verplichte lockfile-review en controle van registry-handtekeningen en provenance-attestaties; een dagelijkse dependency-audit, een driemaandelijkse dependency-review en een SBOM per release van elk productiepakket ([Deployment](deployment.md)) |
 
 ---
 

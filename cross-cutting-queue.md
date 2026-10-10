@@ -164,6 +164,26 @@ Read at `origin/main` `ace9dfa`. The pages themselves were not touched and no st
 3. **No supply-chain change**: the Python requirements are unpinned in `pyproject.toml` and locked in `requirements.txt` (pip-compile),
    with no scanning job. Nothing to change on `supply-chain.md`, which already leaves CPRMV out.
 
+### 10 October 2026 — CPSV Editor v2026.10.0 → v2026.10.1
+
+Read at `origin/main` `98458fa` (same tree as `acc` `2cf6a90`). The pages themselves were not touched and no stamp was refreshed.
+
+1. **TTL now has a lockfile review, required on `acc`.** `zizmor.yml` gains a `lockfile-review` job (8bf8d50, 68bac82); the live
+   `acc supply-chain gate` ruleset requires `audit`, `scan`, `Build and deploy ACC` and `lockfile-review`; `main promotion gate`
+   requires `audit` and `scan`. All three applications now carry the review. Bears on: `supply-chain.md`, `code-standards.md`
+   (required checks per repository), `ictu-dependency-guideline.md` (R1/R11).
+2. **Registry signatures and provenance are verified in TTL's `audit` job** — step *Verify registry signatures*,
+   `npm run audit:signatures` → `scripts/audit-signatures.sh` (3fcdbbd, `zizmor.yml:193-209`). Bears on: `supply-chain.md`,
+   `ictu-dependency-guideline.md` (R5, provenance half).
+3. **A quarterly dependency review** — `dependency-review.yml`, cron `23 6 2 1,4,7,10 *`, opens an issue per quarter with the
+   evidence for every direct dependency; first review 2026-Q4 (#210). The criteria live in linked-data-explorer's
+   `docs/dependency-criteria.md` (e4af5e6). Bears on: `dependency-scanning.md` or `supply-chain.md`, `ictu-dependency-guideline.md` (R1, R11).
+4. **The SBOM checks now run before generation in TTL** (7a35934, fixing linked-data-explorer#274's defect here), the release
+   PR checks strictly (8417da0), and the SBOM lists the full production tree (c8f8804 — "the same fix landed in
+   linked-data-explorer and ronl-business-api"). This **corrects** the 6 October LDE item and the 9 October RBA item 1 for TTL;
+   verify the LDE and RBA state in their own syncs before the weekly pass. Bears on: `supply-chain.md`, `ictu-dependency-guideline.md` (R10).
+5. **TTL's workflow count is now eight** (`dependency-review.yml` added). Bears on: `code-standards.md` and any page that counts workflows.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |
