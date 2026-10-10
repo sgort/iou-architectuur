@@ -8,6 +8,26 @@ component: CPSV Editor
 
 ## Changelog
 
+### v2026.10.1 — Every Dependency Pull Request Reviewed, and Signatures Verified (October 2026)
+
+> How the pipeline checks dependencies now: [Deployment](deployment.md). The mechanism across repositories: [Supply-Chain Pinning](../../contributing/supply-chain.md) and [ICTU Dependency Guideline](../../contributing/ictu-dependency-guideline.md). Measured suites: [Testing](testing.md). The editor itself is unchanged.
+
+**A pull request that changes the lockfile gets a review.** The comment lists the packages added, removed, updated and downgraded, licence changes, new packages whose licence is not on the allow-list, and new install scripts; a new direct dependency comes with a checklist of the dependency criteria — maintained, maintainers, licence, release policy, footprint and need. The `lockfile-review` check is required on `acc`, and fails only for a package from outside the npm registry or one without an integrity hash; the rest is for the reviewer.
+
+**Registry signatures and provenance are verified on every pull request.** The required `audit` job has a step, *Verify registry signatures*, that runs `npm audit signatures` over the installed tree through `npm run audit:signatures`. It fails on an invalid or missing signature, and on an attestation the registry advertises but cannot serve; a package with no attestation passes. `whatwg-url` moved to 17.1.2 to leave the one version with such a gap.
+
+**Each quarter opens its own dependency review.** `dependency-review.yml` runs on the second day of each quarter and opens an issue with the registry and GitHub evidence for every direct dependency. The first, for 2026-Q4, flagged 7 of 30 and recorded an outcome for each.
+
+**The release SBOM can be wrong now, and says so.** The checks used to run after the generation step had rewritten the file, comparing a fresh SBOM with itself, so neither could fail; they now read the committed file first. The release pull request checks its SBOM strictly, while a promotion only asserts that it exists. The SBOM also lists every production package: `npm sbom --omit=dev` had left out react, react-dom and scheduler, and a production package npm does not list now stops the generation.
+
+**The testing-library packages are dev dependencies.** They had been production dependencies since the first commit, and through `jest-dom`'s optional `vitest` peer they made `npm audit --omit=dev` count the build tooling as production — which failed the daily audit on a build-time advisory.
+
+**The Amsterdam re-import journey runs without a stack.** The preflight that probes the backend and Operaton is now a fixture of the three journeys that call them, so the one that only imports and exports files no longer needs either. The suite as a whole is still not wired into CI.
+
+**Also in this release.** Vitest 5. The Thuisbatterij examples map each DMN output into a plain variable instead of a serialised result map, which concurrent reads collided on. The README says to run `npm ci` in a new worktree before committing, because Husky's hooks are installed, not checked in; `SECURITY-PIPELINE.md` describes the `main` promotion gate and names Node 24.21.0.
+
+---
+
 ### v2026.10.0 — A Published Export Survives Its Own Round Trip (October 2026)
 
 > The grounding it preserves: [Cell-Level Grounding](cell-level-grounding.md). The import rules: [DMN Implementation](dmn-implementation.md). Measured suites: [Testing](testing.md). The proposal for the standard: [DMN to Linked Data Workflow](../user-guide/dmn-workflow.md).
@@ -608,6 +628,9 @@ Initial release. React + Tailwind CSS web application. Five-tab interface: Servi
 | ACC build check required on `acc` | v2026.09.7 |
 | Published exports survive import → export → import, read by subject against the CPRMV rule base | v2026.10.0 |
 | [Cell grounding names its concept](cell-level-grounding.md) (`skos:prefLabel`, `dct:type`) | v2026.10.0 |
+| [Lockfile review on every dependency pull request](deployment.md), required on `acc` | v2026.10.1 |
+| Registry signatures and provenance verified in the `audit` gate | v2026.10.1 |
+| Dependency criteria and a quarterly dependency review | v2026.10.1 |
 
 ---
 

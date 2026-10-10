@@ -105,13 +105,13 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 | Frontend | React 19, Vite, Tailwind CSS, Lucide icons |
 | State management | React hooks (`useEditorState`, `useArrayHandlers`), no external state library |
 | Build & lint | Vite, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
-| Testing | Vitest, `@testing-library/react`, Playwright — 776 tests across 62 files at v2026.10.0, plus 4 end-to-end journeys ([Testing](testing.md)) |
+| Testing | Vitest 5, `@testing-library/react`, Playwright — 776 tests across 62 files, all passing (measured 10 October 2026), at 90.28% statements, 88.42% branches, 78.92% functions and 90.96% lines; plus 4 end-to-end journeys ([Testing](testing.md)) |
 | TTL parsing | Custom hand-written parser (no RDF library dependency) |
 | DMN parsing | Browser DOMParser (XML) |
 | External APIs | TriplyDB REST + SPARQL, Operaton REST (Camunda-compatible), RONL SPARQL vocabulary |
 | Backend dependency | Shared Express server (Linked Data Explorer repo) for CORS-proxied SPARQL queries, TriplyDB service updates, and DMN syntactic validation (libxmljs2) |
 | Hosting | Azure Static Web Apps (acc branch → acceptance, main → production) |
-| CI/CD | GitHub Actions: lint, tests and the production build on the runner (Node 24.21.0 from `.nvmrc`), uploaded to Azure Static Web Apps with `skip_app_build`; a daily dependency audit and an SBOM per release ([Deployment](deployment.md)) |
+| CI/CD | GitHub Actions: lint, tests and the production build on the runner (Node 24.21.0 from `.nvmrc`), uploaded to Azure Static Web Apps with `skip_app_build`; on every pull request a required lockfile review and verification of registry signatures and provenance attestations; a daily dependency audit, a quarterly dependency review, and an SBOM per release of every production package ([Deployment](deployment.md)) |
 
 ---
 

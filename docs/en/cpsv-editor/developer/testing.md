@@ -14,28 +14,26 @@ The testing roadmap that ran from P0 to P7 is **complete**: every phase has
 landed, and the per-file 80% branch floor is enforced natively by the runner.
 
 !!! info "Figures on this page are measured, not estimated"
-    Every figure below was re-measured against **v2026.10.0** on
-    **2 October 2026** at `acac6b3` on `acc` — the same tree as `719683b` on
+    Every figure below was re-measured against **v2026.10.1** on
+    **10 October 2026** at `2cf6a90` on `acc` — the same tree as `98458fa` on
     `main` — in the working checkout after a clean `npm run deps:check`, so the
-    installed dependencies matched the lockfile, under Node 24.21.0 and
-    npm 11.19.0 — the version `.nvmrc` names, and what CI runs. The full run
-    with coverage reported **62 files and 776 tests, all passing, in 58 s**
-    (Vitest's own duration). That is 13 tests more than v2026.09.7's 763, in
-    four existing files and no new one: `ttlGenerator.cellGrounding` 12 → 18,
-    `parseTTL.roundtrip` 9 → 14, `dmnHelpers` 54 → 55 and
-    `DMNTab.lifecycle` 15 → 16. Every phase script, lint and the format check
+    installed dependencies matched the lockfile, under Node 24.21.0 — the version
+    `.nvmrc` names, and what CI runs — and **Vitest 5**. The full run with
+    coverage reported **62 files and 776 tests, all passing, in 71 s** (Vitest's
+    own duration). The counts are v2026.10.0's: this release added no test, and
+    moved Vitest from 4.1 to 5. Every phase script, lint and the format check
     passed on the same checkout.
     The **end-to-end journeys were run too**, locally against a live stack —
     the Linked Data Explorer backend on `:3001`, Operaton on `:8081`, and this
     editor's dev server started by Playwright's own `webServer` on `:3000` —
-    and **4 passed in 27.6 s**, with Playwright 1.63.0.
+    and **4 passed in 42.4 s**, with Playwright 1.63.0.
     Rerun the commands in [Running the tests](#running-the-tests) to reproduce
     them.
 
-**At a glance:** 62 files · **776 tests** · all passing · 58 s for a full run
+**At a glance:** 62 files · **776 tests** · all passing · 71 s for a full run
 with coverage on this measurement, plus **4 end-to-end journeys** run separately.
 
-Coverage: **90.31% statements · 88.39% branches · 78.92% functions · 90.99%
+Coverage: **90.28% statements · 88.42% branches · 78.92% functions · 90.96%
 lines**, with every file at or above the 80% branch floor.
 
 !!! danger "Measure after `npm ci`, never after `npm install`"
@@ -50,7 +48,7 @@ lines**, with every file at or above the 80% branch floor.
 
 ## Running the tests
 
-All tests run on **Vitest**. `react-scripts` and Create React App are gone as
+All tests run on **Vitest** 5. `react-scripts` and Create React App are gone as
 of v2026.09.1 — see [The Vite migration](#the-vite-migration). Run everything
 from the repository root after `npm ci`.
 
@@ -75,12 +73,12 @@ not sum to 776.
 
 `test:e2e` drives the real application against a real backend and a real engine,
 with nothing mocked between the browser and Operaton. It is **not wired into
-CI**: three of the four journeys need the Linked Data Explorer backend and an
-Operaton engine, neither of which exists on a runner. The fourth,
-`amsterdam-reimport-journey`, only imports and downloads files and calls
-neither — but the global setup below probes both services for every run, so
-today even that spec runs only with both up, or with `E2E_BACKEND_URL` and
-`E2E_OPERATON_URL` pointed at live ones.
+CI** — `playwright.config.js` says so in as many words: three of the four journeys
+need the Linked Data Explorer backend and an Operaton engine, neither of which
+exists on a runner. The fourth, `amsterdam-reimport-journey`, only imports and
+downloads files and calls neither, so it runs **without a stack**: the preflight
+below is a fixture that only the three stack journeys use. That makes it the one
+journey that could be wired into CI first; no workflow runs it yet.
 
 | Command | What it does |
 |---|---|
@@ -88,7 +86,8 @@ today even that spec runs only with both up, or with `E2E_BACKEND_URL` and
 | `npm run test:e2e:headed` | A real browser window, actions slowed to 400 ms |
 | `npm run test:e2e:ui` | Playwright UI mode |
 
-A **global setup checks both services first and names what is missing**, because
+A **preflight fixture checks both services first and names what is missing** —
+once per run, for the three journeys that use them — because
 the failure otherwise arrives disguised: a connection refused surfaced as an
 amber validation banner, or as a deploy that quietly never enabled the Evaluate
 button, with the runner then reporting a timeout on a button several steps from
@@ -160,17 +159,19 @@ ignores the 14-day cooldown in `.npmrc` without a word.
 
 ### CI
 
-Seven workflows run in this repository. Every job runs on `ubuntu-24.04`.
+Eight workflows run in this repository. Every job runs on `ubuntu-24.04`.
 
 | Workflow | Job | Runs |
 |---|---|---|
 | **Deploy ACC (orange-beach)** | `changes`, then `Build and deploy ACC` | `changes` decides whether a pull request touches anything outside `docs/**`, `.claude/**` and `**/*.md`; then Node from `.nvmrc` → `npm ci` → `npm run lint` → `npm run test:ci` → `npm run build` → upload `dist/` to acceptance |
 | **Deploy PROD (white-sky)** | `Build and deploy PROD` | The same sequence without `changes`, deploying production |
-| **Supply-chain audit** (`zizmor.yml`) | `audit` | On Node 24.21.0: zizmor 1.29.0, `renovate-config-validator --strict`, *Lockfile matches package.json* (`npm ci --dry-run --ignore-scripts`), `npm run check-format`, and `npm run check-supply-chain` |
+| **Supply-chain audit** (`zizmor.yml`) | `audit` | On Node 24.21.0: zizmor 1.29.0, `renovate-config-validator --strict`, *Lockfile matches package.json* (`npm ci --dry-run --ignore-scripts`), `npm run check-format`, `npm run check-supply-chain`, and *Verify registry signatures* (`npm run audit:signatures`) |
+| **Supply-chain audit** (`zizmor.yml`) | `lockfile-review`, `lockfile-review-comment` | On every pull request, succeeding at once when `package-lock.json` is unchanged: a read-only job tests and runs the lockfile diff, and a separate job holding the write token posts the review comment — no tests |
 | **Semgrep** (`semgrep.yml`) | `scan` | Semgrep Code and Supply Chain — see [Dependency Scanning](../../contributing/dependency-scanning.md) |
 | **Close preview environments** | `Close ACC staging environment`, `Close PROD staging environment` | Deletes a pull request's Static Web Apps preview when it closes — no tests, but see below |
 | **Dependency audit** (`dependency-audit.yml`) | `dependency-audit` | Daily at 05:17 UTC: `npm audit --package-lock-only` on both `acc` and `main`, failing on a high or critical production advisory — no tests |
-| **Release SBOM** (`sbom.yml`) | `release-sbom` | On a push to `main`: writes the CycloneDX SBOM and checks the released version has one committed — no tests |
+| **Release SBOM** (`sbom.yml`) | `release-sbom` | Checks the committed CycloneDX SBOM before regenerating it — strictly on the release pull request, existence only on a push to `main` — no tests |
+| **Dependency review** (`dependency-review.yml`) | `dependency-review` | Quarterly, on the second day of January, April, July and October: opens the quarter's review issue for every direct dependency — no tests |
 
 **Preview environments close from a workflow with no path filter** (v2026.09.6). The
 close jobs used to live in the deploy workflows, whose `paths-ignore` applies to the
@@ -203,8 +204,8 @@ reported it as clean with zero checks, then blocked it permanently once the base
 was retargeted to `acc`.
 
 The `acc supply-chain gate` ruleset makes this *enforcement* rather than
-reporting: `acc` requires a pull request, and `audit`, `scan` and `Build and
-deploy ACC` are required status checks. A workflow that runs but cannot block is
+reporting: `acc` requires a pull request, and `audit`, `scan`, `Build and
+deploy ACC` and `lockfile-review` are required status checks. A workflow that runs but cannot block is
 advice — and requiring the checks without also requiring a pull request would
 still let a direct push past them. There are no bypass actors, so this applies to
 releases and to the repository owner alike. Since 30 September 2026 the
@@ -341,17 +342,18 @@ the branch that requires an uploaded file, so the error it raises can never fire
 
 ### End-to-end journeys (P7)
 
-Four Playwright specs, run against a live stack rather than mocks. Measured on
-2 October 2026 against v2026.10.0 on a local stack — the Linked Data Explorer
-backend on `:3001`, Operaton on `:8081`, and the dev server Playwright's
-`webServer` started on `:3000` — with the preflight confirming both services
-before anything was driven:
+Four Playwright specs, three of them run against a live stack rather than mocks.
+Measured on 10 October 2026 against v2026.10.1 on a local stack — the Linked Data
+Explorer backend on `:3001`, Operaton on `:8081`, and the dev server Playwright's
+`webServer` started on `:3000`. The re-import journey ran first and without the
+preflight; the preflight then confirmed both services once, for the other three:
 
 ```bash
 npx playwright test --reporter=list
+#   ✓ amsterdam-reimport 12.0 s
 #   preflight ok — backend http://localhost:3001 (HTTP 200), Operaton http://localhost:8081 (HTTP 200)
-#   4 passed (27.6s) — amsterdam-reimport 9.0 s, authoring 4.6 s,
-#                      normbedragen 2.8 s, round-trip 2.1 s
+#   ✓ authoring 8.9 s · ✓ normbedragen 4.9 s · ✓ round-trip 2.7 s
+#   4 passed (42.4s)
 ```
 
 `--reporter=list` rather than `npm run test:e2e`, which opens the HTML report when it
@@ -398,22 +400,24 @@ so the journey is not blocked, and the threshold is documented rather than dodge
 
 ## Coverage
 
-Measured with `npm run test:ci` (Vitest's `--coverage`) against v2026.10.0 on
-2 October 2026, in a checkout whose install `npm run deps:check` confirmed
+Measured with `npm run test:ci` (Vitest's `--coverage`) against v2026.10.1 on
+10 October 2026, in a checkout whose install `npm run deps:check` confirmed
 against the lockfile.
 
-**Overall: 90.31% statements · 88.39% branches · 78.92% functions · 90.99%
+**Overall: 90.28% statements · 88.42% branches · 78.92% functions · 90.96%
 lines** — against 54.75% / 40.88% / 38.68% / 55.57% at v2026.09.0. The jump is
 P5, P6 and the branch-floor work landing together; v2026.09.3's two parser guards
 moved `src/utils` a little further. At v2026.10.0 `src/utils` rose again and
-`src/config` fell, to 81.13% branches.
+`src/config` fell, to 81.13% branches. v2026.10.1 changed no source file; the
+small moves since v2026.10.0, `src/components` branches among them, come from
+Vitest 5's coverage provider counting the same code slightly differently.
 
 | Area | Statements | Branches | Functions | Lines |
 |---|---:|---:|---:|---:|
 | `src/hooks` | 100% | 93.44% | 100% | 100% |
 | `src/utils` | 95.26% | 88.52% | 98.49% | 96.11% |
 | `src/config` | 90.56% | 81.13% | 75.00% | 90.19% |
-| `src/components` | 84.41% | 87.94% | 85.71% | 87.50% |
+| `src/components` | 84.41% | 88.65% | 85.71% | 87.50% |
 | `src/components/tabs` | 84.48% | **92.18%** | 65.93% | 84.69% |
 | `src` (App, index, parser) | 84.64% | 82.41% | 59.32% | 85.71% |
 
