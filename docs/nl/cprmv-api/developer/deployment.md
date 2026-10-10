@@ -1,3 +1,7 @@
+---
+component: CPRMV
+---
+
 # Deployment
 
 !!! info "Documentatie in ontwikkeling"
@@ -15,6 +19,10 @@
 
 ---
 
+## Hosts
+
+---
+
 ## Running with Docker Compose
 
 ---
@@ -28,4 +36,3 @@
 ---
 
 ## Health check
-

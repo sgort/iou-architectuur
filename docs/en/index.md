@@ -179,13 +179,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
--   **📜 CPRMV API — v0.4.1** · *June 2026*
+-   **📜 CPRMV API — v0.4.2** · *October 2026*
 
     ---
 
-    **CPRMV 0.4.1 conformance & reference resolution**
+    **Rule methods as modules, and Echelons in the vocabulary**
 
-    RuleSets are now FRBR Works (`frbroo:F1_Work`); `/ref` auto-detects Juriconnect, ELI (to EU CELLAR), and CPRMV-API references; new `/cellar-by-celex` and `/cellar-by-eli` redirects; `unformat` works across all output formats; and the API now exposes a basic [MCP server](cprmv-api/reference/api-endpoints.md) at `/mcp`.
+    Every publication and reference method is now a module of its own, in the vocabulary and in the API, which [loads them at startup](cprmv-api/developer/architecture.md). CPRMV 0.4.2 adds Echelons, registers and catalogs of acknowledged services and organisations, and methods from Catala and OpenFisca to RegelRecht, and the API's output validates against SHACL shapes without recursion. The released image left the method modules out, so `/rules` and `/ref` failed until the hosts were redeployed on 10 October with the fix in [!20](https://git.open-regels.nl/standards/cprmv/-/merge_requests/20); `/mcp` is still unreachable ([#31](https://git.open-regels.nl/standards/cprmv/-/work_items/31)). Three of the thirteen [tests](cprmv-api/developer/testing.md) remain active, and they pass.
 
     [:octicons-arrow-right-24: Full changelog](cprmv-api/developer/changelog-roadmap.md)
 

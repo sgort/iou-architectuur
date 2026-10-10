@@ -1,3 +1,7 @@
+---
+component: CPRMV
+---
+
 # CPRMV Vocabulaire
 
 !!! info "Documentatie in ontwikkeling"
@@ -16,6 +20,10 @@
 ---
 
 ## Properties
+
+---
+
+## SHACL constraints
 
 ---
 

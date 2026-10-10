@@ -1,3 +1,7 @@
+---
+component: CPRMV
+---
+
 # Rule Path Syntax
 
 !!! info "Documentatie in ontwikkeling"
@@ -32,4 +36,8 @@
 ---
 
 ## Minimum and maximum length
+
+---
+
+## Responses for unmatched input
 

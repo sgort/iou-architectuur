@@ -1,3 +1,7 @@
+---
+component: CPRMV
+---
+
 # Architectuur
 
 !!! info "Documentatie in ontwikkeling"
@@ -19,11 +23,23 @@
 
 ---
 
-## Method detection
+## Method plugins
+
+---
+
+## Publication detection
+
+---
+
+## Reference resolution
 
 ---
 
 ## Rule graph traversal
+
+---
+
+## MCP
 
 ---
 
@@ -32,4 +48,3 @@
 ---
 
 ## Locale
-

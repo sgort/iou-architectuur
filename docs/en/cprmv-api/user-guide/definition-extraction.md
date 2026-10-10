@@ -1,3 +1,7 @@
+---
+component: CPRMV
+---
+
 # Definition Extraction
 
 The `unformat` parameter extracts structured values from a rule's `cprmv:definition` text using the Python [`parse`](https://pypi.org/project/parse/) library's pattern syntax.
@@ -8,9 +12,9 @@ The `unformat` parameter extracts structured values from a rule's `cprmv:definit
 
 Rule definitions in Dutch law frequently embed domain-specific values in natural language:
 
-> *Huur: € 1.200,—*
+> *een alleenstaande van 18, 19 of 20 jaar: € 337,98;*
 
-The `unformat` parameter allows you to pull these values out as named fields in the JSON response, ready for direct use in downstream processing or decision model inputs — without needing a separate text-parsing step.
+The `unformat` parameter allows you to pull these values out as named fields in the response, ready for direct use in downstream processing or decision model inputs — without needing a separate text-parsing step.
 
 ---
 
@@ -20,32 +24,33 @@ Use `{fieldname:param_value}` placeholders in the pattern string. The `:param_va
 
 **Pattern:** `{situatie:param_value}: € {norm:param_value}`
 
-This matches a definition like `Huur: € 1.200,—` and extracts:
+Applied to `BWBR0015703_2025-07-01_0, Artikel 20, lid 1, onderdeel a.`, whose definition is `een alleenstaande van 18, 19 of 20 jaar: € 337,98;`, the selected rule in the cprmv-json response becomes:
 
 ```json
 {
-    "situatie": "Huur",
-    "norm": "1.200,—",
-    "rulesetid": "BWBR0015703_2025-07-01_0",
-    "rule_id_path": "BWBR0015703_2025-07-01_0, Artikel 20, lid 1, onderdeel a.",
-    "https://standaarden.open-regels.nl/standards/cprmv/0.4.1#id": "onderdeel a.",
-    "https://standaarden.open-regels.nl/standards/cprmv/0.4.1#definition": "Huur: € 1.200,—"
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": "https://standaarden.open-regels.nl/standards/cprmv/0.4.2#Rule",
+    "https://standaarden.open-regels.nl/standards/cprmv/0.4.2#id": "onderdeel a.",
+    "https://standaarden.open-regels.nl/standards/cprmv/0.4.2#definition": "een alleenstaande van 18, 19 of 20 jaar: € 337,98;",
+    "http://cprmv.open-regels.nl/situatie": "een alleenstaande van 18, 19 of 20 jaar",
+    "http://cprmv.open-regels.nl/norm": "337,98;",
+    "http://cprmv.open-regels.nl/rulesetid": "BWBR0015703_2025-07-01_0",
+    "http://cprmv.open-regels.nl/rule_id_path": "BWBR0015703_2025-07-01_0, Artikel 20, lid 1, onderdeel a."
 }
 ```
 
-The extracted named fields are merged at the top level of the cprmv-json response alongside the full rule predicates and the `rulesetid` and `rule_id_path` context fields.
+The named fields, plus the `rulesetid` and `rule_id_path` context fields, are added to the selected rule as triples. Their predicate URIs are formed from the namespace of the rule set's URI (here `http://cprmv.open-regels.nl/`) and the field name. In the full response this rule object sits under the rule set's `cprmv:hasPart`.
 
 ---
 
 ## Behaviour when the pattern does not match
 
-If the `parse` search does not find the pattern in the definition text, `unformat` has no effect and the standard cprmv-json response is returned without the extracted fields.
+If the `parse` search does not find the pattern in the definition text, or the selected rule has no `cprmv:definition`, `unformat` has no effect and the standard response is returned without the extracted fields.
 
 ---
 
 ## Non-breaking spaces
 
-The API normalises `cprmv:definition` text before matching: sequences of non-breaking spaces (`\u00A0`) are converted to regular spaces. This ensures patterns work consistently regardless of how the source XML encoded whitespace.
+The API normalises `cprmv:definition` text before matching: every run of whitespace, including non-breaking spaces (`\u00A0`), is collapsed to a single regular space. This ensures patterns work consistently regardless of how the source XML encoded whitespace.
 
 ---
 
@@ -72,9 +77,9 @@ FastAPI's Swagger UI handles encoding automatically.
 
 ---
 
-## Works with any output format (v0.4.1)
+## Works with any output format
 
-Up to v0.4.0, `unformat` only had an effect when `format=cprmv-json`. As of **v0.4.1** it works with any format: the values extracted from the definition are added as additional triples on the selected rule, so they appear in the RDF serialisations too (e.g. `turtle`, `n3`, `json-ld`). Combine `unformat` with `format=turtle` to get the extracted `situatie`/`norm` values as triples in the Turtle output.
+`unformat` works with any format: the values extracted from the definition are added as additional triples on the selected rule, so they appear in the RDF serialisations too (e.g. `turtle`, `n3`, `json-ld`). Combine `unformat` with `format=turtle` to get the extracted `situatie`/`norm` values as triples in the Turtle output.
 
 !!! note
-    The interactive Swagger description of the `unformat` parameter still states that it implies `cprmv-json`; that text is stale — the cross-format behaviour above is what the API actually does in v0.4.1.
+    The interactive Swagger description of the `unformat` parameter still states that it implies `cprmv-json`; that text is stale — the cross-format behaviour above is what the API does.

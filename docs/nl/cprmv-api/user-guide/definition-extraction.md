@@ -1,3 +1,7 @@
+---
+component: CPRMV
+---
+
 # Definitie Extractie
 
 !!! info "Documentatie in ontwikkeling"
@@ -31,5 +35,5 @@
 
 ---
 
-## Works with any output format (v0.4.1)
+## Works with any output format
 

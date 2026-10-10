@@ -1,3 +1,7 @@
+---
+component: CPRMV
+---
+
 # Datamodel
 
 !!! info "Documentatie in ontwikkeling"
@@ -23,6 +27,14 @@
 
 ---
 
+## Echelons
+
+---
+
+## Registers and catalogs
+
+---
+
 ## RDF list structure for hasPart
 
 ---
@@ -32,4 +44,3 @@
 ---
 
 ## SHACL shapes
-
