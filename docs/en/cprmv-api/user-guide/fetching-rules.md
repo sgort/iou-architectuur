@@ -1,3 +1,7 @@
+---
+component: CPRMV
+---
+
 # Fetching Rules
 
 All rule retrieval goes through the `/rules/{rule_id_path}` endpoint. This page covers the full range of retrieval patterns.
@@ -6,7 +10,7 @@ All rule retrieval goes through the `/rules/{rule_id_path}` endpoint. This page 
 
 ## Fetching a complete rule set
 
-Omit the rule path after the rule set identifier to retrieve the full set as a single response. The rule set node itself is returned with all its top-level rules.
+Omit the rule path after the rule set identifier to retrieve the full set as a single response. The rule set node itself is returned with all its rules.
 
 ```
 GET /rules/BWBR0015703_2025-07-01_0
@@ -27,7 +31,7 @@ GET /rules/BWBR0015703_2025-07-01_0%2C%20Artikel%2020
 
 URL-encoding reference: `,` → `%2C`, space → `%20`.
 
-The response includes the article and all its contained sub-rules recursively.
+The response is the rule set with the article as its only part, including all the article's sub-rules recursively.
 
 ---
 
@@ -108,6 +112,6 @@ GET /rules/BWBR0015703_2025-07-01_0%2C%20Artikel%2020%2C%20lid%201%2C%20onderdee
 
 Decoded `unformat` pattern: `{situatie:param_value}: € {norm:param_value}`
 
-The response merges the extracted `situatie` and `norm` fields into the cprmv-json output alongside the full rule data.
+The response adds the extracted `situatie` and `norm` fields to the selected rule, alongside its full rule data. This works in every output format.
 
 See [Definition Extraction](definition-extraction.md) for more examples.

@@ -1,3 +1,7 @@
+---
+component: CPRMV
+---
+
 # Changelog & Roadmap
 
 ---
@@ -7,6 +11,33 @@
 This changelog is maintained starting from CPRMV / CPRMV API v0.4.0.
 Usage of earlier versions is deprecated and at own risk.
 Note that CPRMV / CPRMV API still is highly subject to change.
+
+### v0.4.2 (October 2026)
+
+> How the API now finds its sources: [Architecture](architecture.md). The vocabulary: [CPRMV Vocabulary](../reference/cprmv-vocabulary.md). The tests: [Testing](testing.md).
+
+**v0.4.2 - CPRMV**
+
+- Updates URIs and documentation to mention `0.4.2` instead of `0.4.1` (vocabulary namespace `https://standaarden.open-regels.nl/standards/cprmv/0.4.2#`).
+- **Echelons.** A `cprmv:Echelon` and six subclasses — Agreement, Semantic, Ontologic, Logic, Operable and Support — to which rule methods can be related, with `cprmv:refinesTowards` and `cprmv:refinesFrom` between them.
+- **Acknowledgement of services and organisations.** `OrganisationRegister`, `ServiceRegister`, `OrganisationCatalog`, `ServiceCatalog`, `AcknowledgedOrganisation` and `AcknowledgedService`, related by `cprmv:acknowledges`, so that a catalog published in a register can act as an official publication method.
+- `cprmv:SerialisationMethod` is added, and `ReferenceMethod` (previously misspelled `ReferencenMethod`) becomes a subclass of `PublicationMethod`.
+- **The method knowledge is split into modules**, one folder per method under `rdf/0.4.2/methods/`. New acknowledged methods include Catala, OpenFisca, ALEF with RegelSpraak, MC/DC as a test method, Legifrance and DSO as publication methods, STTR, the Normenbrief and RegelRecht; NRML is removed.
+- **SHACL without recursion.** The recursive `hasPart` list shape is replaced by a sequence-path shape, and the API's output for BWB, CVDR, DMN and Formex 4 validates against the shapes — DMN and Formex 4 with placeholder `validFrom` and `isOutputOf` values for now. `id` and `comment` accept language-tagged strings.
+- The ReSpec documentation gains generated chapters on the methods and the API, and `npm run build` creates the folders it writes to. The deprecated `example/` and `tools/` folders are removed.
+
+**v0.4.2 - CPRMV API**
+
+- **Rule methods are plugins.** Each publication and reference method is a Python module in `serve_api/methods/`, loaded at startup by `load_methods()` and configured from its RDF description; the detection and transformation functions that lived in `serve.py` are gone.
+- **MCP through FastMCP** at `/mcp`, replacing `fastapi-mcp`. In the current deployment `/mcp` answers 404 — the MCP app is built before the routes it should expose, and the container serves the plain app ([standards/cprmv#31](https://git.open-regels.nl/standards/cprmv/-/work_items/31)).
+- Python 3.14; the package versions are unpinned in `pyproject.toml` and locked in `requirements.txt`, with a script to refresh them.
+- Updates URIs and documentation to mention `0.4.2` instead of `0.4.1` (serve-API and methods namespaces `https://cprmv.open-regels.nl/0.4.2/…`).
+- Ten of the thirteen API tests are disabled while they are rewritten for the plugin structure; see [Testing](testing.md).
+
+!!! warning "The released image could not load its methods"
+    The `serve_api/Dockerfile` on `main` does not copy `serve_api/methods/`, so an image built from it loads no rule method: every `/rules` ID answered *No supported publication repository…* and `/ref` returned 500 on all three hosts after the 0.4.2 deployment. The hosts were redeployed on 10 October 2026 with an image built from the fix in [standards/cprmv!20](https://git.open-regels.nl/standards/cprmv/-/merge_requests/20), which is not yet merged.
+
+---
 
 ### v0.4.1 (June 2026)
 
@@ -63,6 +94,7 @@ Note that CPRMV / CPRMV API still is highly subject to change.
 
 | Feature | Version |
 | ------- | ------- |
+| CPRMV / CPRMV API | v0.4.2  |
 | CPRMV / CPRMV API | v0.4.1  |
 | CPRMV / CPRMV API | v0.4.0  |
 | CPRMV   | v0.3.1  |
@@ -71,33 +103,14 @@ Note that CPRMV / CPRMV API still is highly subject to change.
 
 ### Planned
 
-### v0.4.x — Features & documentation
+The repository's roadmap notes that it can change at any moment.
 
-**v0.4.x — CPRMV / ReSpec documentation (carried over)**
+**v0.4.3 — expected by 15 November 2026**
 
-- Examples and link to RDF definitions in the ReSpec documentation.
-- Adds a `:publication-location` (or similar) property referring to where a RuleSet is officially published (distinct from `:isBasedOn`). On a RuleSet this would be `repository.overheid.nl` for BWB/CVDR, an ELI reference for Formex 4, and the Operaton server URI for DMN.
+- *CPRMV:* a RuleSet as an FRBR Expression as well as a Work; officially published Dutch parliamentary documents and the rulesets based on them; fully traceable examples from parliament to executed rules (Article 7a of the Dutch old-age pension law, the Flevoland home-battery subsidy, the Normenbrief, a service based on an STTR published in the DSO); examples and links to the RDF definitions in the ReSpec; PNA Group's iKnow as an analysis method; DMN knowledge sources read as `cprmv:isBasedOn`; Operaton rulesets referenced by name.
+- *CPRMV API:* every RuleSet referenced to a service with its competent authority; `/rules` finding multiple published rulesets and returning references to them; organisation and service catalogs in references; basic support for DSO (STTR), MC/DC test sets, RegelSpraak, Legifrance, Catala and OpenFisca sources; `cprmv:isBasedOn` relations found automatically with ref2link and usable in references.
 
-**v0.4.x — CPRMV API (carried over)**
+**v0.4.4 — expected by 21 December 2026**
 
-- Link to the `/respec` section from within the `/docs` section.
-- The `/rules` endpoint allows retrieving the raw unprocessed source (the whole ruleset, not transformed into a CPRMV ruleset when the source isn't one).
-- Improved and more complete support for BWB, CVDR, Formex 4 and DMN 1.3 by using the existing XML Schemas independently from XSL stylesheets (a generic single stylesheet for all schema-constrained XML standards).
-
-**v0.4.2 - CPRMV**
-
-- Improved and more complete cprmv methods knowledge / value lists
-- Better defined relation with with official organisation registers (EU)
-- Start of a CPRMV-NL variant, based on MIM and CPSV-NL and the ROO
-- Adds acknowledgement of RegelSpraak as a FormalisationMethod and ALEF as tooling related to it
-- Adds acknowledgement of OpenFisca as a FormalisationMethod and tooling related to it
-
-**v0.4.2 - CPRMV API**
-
-- Support for using the /rules endpoint to find multiple published ruleset’s, which is a modus separate from referencing a single published ruleset. In the case of multiple ruleset’s the CPRMV API returns a list with references RuleSets which can be used with the CPRMV API to retrieve them.
-- Support for utilizing organisation and product and services catalog information within references in the /rules endpoint.
-- Support for utilizing :isBasedOn relations within references in the /rules endpoint. It should be possible to refer to.
-- Support for using ELI and where possible juriconnect references for other publication methods than typically supported by these reference types.
-- Adds a /browser section offering a minimal viable web based GUI to browse organisations, services and rulesets. Offers a searchable tree control at the left and a resource viewer at the right from which should offer users to start processes related to the resources (as defined by services)
-- Adds user friendly access to method knowledge in the /browser section relating to defined services for governance on value lists
-- Adds basic support for RegelSpraak sources (depending on where these will get published)
+- *CPRMV:* descriptions and names of concepts revised after feedback from expert communities (SEMIC, NORA and others).
+- *CPRMV API:* a cache for RuleSets, with recaching on request or when a new version appears and settings for memory and disk use; the API as a publishing node for one organisation's RuleSets, registered as that organisation's publication repository, with RuleSets signed by a key of the competent authority; security improvements.

@@ -148,6 +148,22 @@ Read at `origin/main` `c47096b`. The pages themselves were not touched and no st
 
 Findings for these went into [regels/editor#1](https://git.open-regels.nl/regels/editor/-/work_items/1).
 
+### 10 October 2026 — CPRMV v0.4.1 → v0.4.2
+
+Read at `origin/main` `ace9dfa`. The pages themselves were not touched and no stamp was refreshed.
+
+1. **CPRMV's CI tests the code but not the image, and most tests are disabled.** `test-cprmv-api` (python:3.14-bookworm) runs on merge
+   requests and `main` when `serve_api/**` changes: `py_compile`, an import check, warn-only data checks and `pytest`, which collects
+   3 of 13 tests since 0661a0d. `develop` builds and pushes an image with no test job, and nothing runs the built image — which is
+   how a `:latest` without `serve_api/methods/` reached all three hosts (fixed by standards/cprmv!20, findings in #31). Bears on:
+   `controls.md` ("The fourth and fifth components" — the CPRMV API is "outside this set"; consider one sentence on what its
+   pipeline does gate), `code-standards.md` if it ever describes the GitLab components' CI.
+2. **Deployment is a manual image pull on three hosts** — `cprmv.open-regels.nl`, `cprmv.open-rules.eu` and `acc.cprmv.open-regels.nl`;
+   `deploy-cprmv-api` only prints pull hints. Bears on: `contributing/index.md` (the CPRMV row) and `development-workflow/overview.md`
+   if either says how a CPRMV release lands.
+3. **No supply-chain change**: the Python requirements are unpinned in `pyproject.toml` and locked in `requirements.txt` (pip-compile),
+   with no scanning job. Nothing to change on `supply-chain.md`, which already leaves CPRMV out.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

@@ -1,30 +1,22 @@
 {
-  "docs_built": "2026-10-09",
+  "docs_built": "2026-10-10",
   "last_patch": {
-    "date": "2026-10-09",
+    "date": "2026-10-10",
     "kind": "Component sync",
-    "summary": "RONL Business API v2026.10.1 in production: citizen services follow the deployments, Gemeente Heusden and the Heusdenpas, a landing page per organisation, and people acting in eDOCS as themselves; it found that the release SBOM checks cannot fail in CI. Norm Editor 2026.09.15-2: the IOU style, three panes to interpret in, the dependencies between acts, and deployments per environment; it found that the release tags were never pushed and the GUI image build likely fails.",
+    "summary": "CPRMV v0.4.2 in production: rule methods as modules in the vocabulary and the API, Echelons and acknowledged services and organisations, and SHACL shapes without recursion. It found that the released image left the method modules out, which broke /rules and /ref until the hosts were redeployed with the fix in standards/cprmv!20, and that /mcp is unreachable.",
     "previous": {
-      "date": "2026-10-06",
+      "date": "2026-10-09",
       "kind": "Component sync",
-      "summary": "Linked Data Explorer v2026.10.1 in production: /v2/norms answers which norms are in force on a date, /v1/norms is deprecated, the Modeler binds forms to their deployment, and CI runs the fixture tests and a lockfile review. Every finding the earlier patches filed — ronl-business-api#312, linked-data-explorer#254 and #255, ttl-editor#194 — has been fixed in its repository; this sync filed one new display finding."
+      "summary": "RONL Business API v2026.10.1 in production: citizen services follow the deployments, Gemeente Heusden and the Heusdenpas, a landing page per organisation, and people acting in eDOCS as themselves; it found that the release SBOM checks cannot fail in CI. Norm Editor 2026.09.15-2: the IOU style, three panes to interpret in, the dependencies between acts, and deployments per environment; it found that the release tags were never pushed and the GUI image build likely fails."
     },
     "open_findings": [
       {
-        "label": "ronl-business-api#354",
-        "url": "https://github.com/sgort/ronl-business-api/issues/354"
+        "label": "standards/cprmv#31",
+        "url": "https://git.open-regels.nl/standards/cprmv/-/work_items/31"
       },
       {
-        "label": "regels/editor#1",
-        "url": "https://git.open-regels.nl/regels/editor/-/work_items/1"
-      },
-      {
-        "label": "linked-data-explorer#274",
-        "url": "https://github.com/sgort/linked-data-explorer/issues/274"
-      },
-      {
-        "label": "linked-data-explorer#270",
-        "url": "https://github.com/sgort/linked-data-explorer/issues/270"
+        "label": "standards/cprmv!20",
+        "url": "https://git.open-regels.nl/standards/cprmv/-/merge_requests/20"
       }
     ]
   },
@@ -87,11 +79,11 @@
     {
       "name": "CPRMV",
       "icon": "📜",
-      "version": "v0.4.1",
+      "version": "v0.4.2",
       "environment": "prod",
-      "commit": "d614539...",
-      "commit_date": "2026-06-13",
-      "repo_url": "https://git.open-regels.nl/standards/cprmv/-/commit/d61453970000e505b778ed95a36fbdf9ff85f555",
+      "commit": "ace9dfa...",
+      "commit_date": "2026-10-02",
+      "repo_url": "https://git.open-regels.nl/standards/cprmv/-/commit/ace9dfa9157c7be5fbd00d39994cd6d3837fb72a",
       "ci_repo": "https://git.open-regels.nl/standards/cprmv"
     }
   ]

@@ -1,3 +1,7 @@
+---
+component: CPRMV
+---
+
 # Publicatierepositories
 
 !!! info "Documentatie in ontwikkeling"
@@ -8,6 +12,10 @@
 
 **Status:** Concept
 **Engelstalige bron:** `cprmv-api/features/publication-repositories.md`
+
+---
+
+## How methods are loaded
 
 ---
 
