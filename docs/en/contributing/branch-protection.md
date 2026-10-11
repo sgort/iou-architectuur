@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-04
+  date: 2026-10-11
   against:
-    CPSV Editor: "4cba989"
-    Linked Data Explorer: "9e0d18e"
-    RONL Business API: "5c6e716"
+    CPSV Editor: "2cf6a90"
+    Linked Data Explorer: "a87f64b"
+    RONL Business API: "c51ec0a"
 ---
 
 # Branch Protection
@@ -19,14 +19,18 @@ how a merge is allowed to land. The checks themselves are documented on their ow
 the [Coverage Floor](coverage-floor.md) — and the
 [controls index](controls.md) is the one-page summary of where each holds.
 
-All three repositories' rulesets were read from the API again on 4 October 2026. On
+All three repositories' rulesets were read from the API again on 11 October 2026. On
 19 September **all three `acc` rulesets** gained the build and deploy checks: each now
 requires the build and deploy
 checks alongside `audit` and `scan`, so a red test suite blocks a merge to `acc` rather
 than only stopping the deploy. What made that possible
 was not a ruleset edit alone — see
 [How a path-filtered workflow became requireable](#how-a-path-filtered-workflow-became-requireable).
-Four things moved since the read of 27 September:
+One thing moved since the read of 4 October: on 6 October 2026 all three `acc supply-chain
+gate` rulesets added **`lockfile-review`** to their required checks — the job that reads a
+pull request's lockfile diff (see
+[What the rulesets still do not require](#what-the-rulesets-still-do-not-require)).
+Between 27 September and 4 October, four things had moved:
 
 - the RONL Business API's `main promotion gate` requires `scan` as well as `audit`, since
   29 September 2026;
@@ -44,7 +48,8 @@ named `acc supply-chain gate`, active on `refs/heads/acc` with **no bypass actor
 All three share the two rules that matter:
 
 - `required_status_checks` → the `audit` context must pass, and since 19 September 2026
-  `scan` and each repository's build/deploy checks alongside it
+  `scan` and each repository's build/deploy checks alongside it, and since 6 October 2026
+  `lockfile-review`
 - `pull_request` → a pull request is required (0 approvals; these repositories have a
   single maintainer, and GitHub does not permit self-approval)
 
@@ -54,13 +59,13 @@ is rejected outright** in all three repositories, including for releases and inc
 for the repository owner. Linked Data Explorer adopted the same ruleset in v2026.08.7;
 all three are named `acc supply-chain gate` and carry zero bypass actors.
 
-They are not identical in shape. Read per ruleset from the API on 4 October 2026:
+They are not identical in shape. Read per ruleset from the API on 11 October 2026:
 
 | | `acc` | `main` |
 |---|---|---|
-| CPSV Editor | pull request, `audit`, `scan`, `Build and deploy ACC`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward — `main promotion gate`, since 30 September 2026 |
-| Linked Data Explorer | pull request, `audit`, `scan`, `deploy`, `Build and Deploy Frontend`, `Build and Deploy ROPA Site`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward |
-| RONL Business API | pull request, `audit`, `scan`, `build`, `Build and Deploy ACC Frontend`, `Build and Deploy ACC PA Demo`, `Build and Deploy ACC Public Site`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward |
+| CPSV Editor | pull request, `audit`, `scan`, `Build and deploy ACC`, `lockfile-review`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward — `main promotion gate`, since 30 September 2026 |
+| Linked Data Explorer | pull request, `audit`, `scan`, `deploy`, `Build and Deploy Frontend`, `Build and Deploy ROPA Site`, `lockfile-review`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward |
+| RONL Business API | pull request, `audit`, `scan`, `build`, `Build and Deploy ACC Frontend`, `Build and Deploy ACC PA Demo`, `Build and Deploy ACC Public Site`, `lockfile-review`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward |
 
 **All three now gate `main`.** The Linked Data Explorer's `main promotion gate`
 came first, on 9 September 2026; the RONL Business API created its own on 12 September,
@@ -77,8 +82,8 @@ non-fast-forward rule are what close a direct push.
 `require_extra_approval_for_unattributed_changes` is `true` on `acc` and `false` on
 `main`, because a promotion carries commits under several author identities against a
 ruleset requiring zero approvals, and the flag would demand an approval nobody can give.
-That difference stands. What joined it is the build checks, which were added to `acc`
-only — so `acc` now requires strictly more than `main` does in all three. Read the
+That difference stands. What joined it is the build checks and, on 6 October 2026,
+`lockfile-review`, both added to `acc` only — so `acc` now requires strictly more than `main` does in all three. Read the
 table rather than assuming symmetry.
 
 Until 30 September 2026 the CPSV Editor's `main` required a pull request but no status
@@ -122,9 +127,10 @@ What closed it is the build and deploy checks in the table above. Each of those 
 `npm ci`, the linter, the type check where one exists and the unit suites **before** it
 builds, so requiring the job requires everything in front of it. On `acc`, a pull request
 that breaks a test now has a red required check and no merge button. In the RONL
-Business API that holds for source changes; a lockfile-only pull request still skips the
-three site suites, whose `changes` patterns do not name the root lockfile, and runs only
-the backend's.
+Business API that holds for a lockfile-only pull request too since v2026.10.1, when the
+three site workflows' `changes` patterns gained the root lockfile; a lockfile-only
+*promotion* still redeploys only the backend, because `scripts/promotion-targets.sh` names
+the lockfile for the backend alone.
 
 **No ruleset requires a branch to be up to date before merging**
 (`strict_required_status_checks_policy: false` in all six). Every required check is
@@ -150,10 +156,16 @@ reason.
 ICTU's guideline asks for more than the check list — that **the entire pipeline** succeeds
 before an update merges, and that the transitive changes in a lockfile diff are reviewed on
 a risk basis: new runtime packages, new origins, downgrades and licence changes. The first
-half is now met on `acc`; **none of the three has tooling for that lockfile review yet.**
-The scores are on [ICTU Dependency Guideline](ictu-dependency-guideline.md), recommendation
-R9, and the work is tracked in
-[linked-data-explorer#248](https://github.com/sgort/linked-data-explorer/issues/248).
+half is met on `acc`, and since 6 October 2026 so is the tooling for the second: a
+`lockfile-review` job in each repository's `zizmor.yml`, required on `acc` in all three,
+compares the pull request's lockfile with its base. It fails on a package resolved from
+outside the npm registry or without an integrity hash, and posts new packages, licence
+changes, new install scripts and downgrades to the pull request as prompts for the
+reviewer — the risk-based judgement stays a person's. The work was tracked in
+[linked-data-explorer#248](https://github.com/sgort/linked-data-explorer/issues/248),
+closed on 6 October 2026. The scores are on
+[ICTU Dependency Guideline](ictu-dependency-guideline.md), recommendation R9; the
+assessment of 11 October 2026 puts the RONL Business API's R9 at 4.
 
 ## How a path-filtered workflow became requireable
 
@@ -200,8 +212,9 @@ bypass actors**:
 
 - `required_status_checks` → context **`audit`**; **`scan`** as well, in the CPSV Editor
   and the Linked Data Explorer since v2026.09.3 and in the RONL Business API since
-  19 September 2026; and, since the same date, each repository's **build and deploy
-  checks** — the full list is in the table above
+  19 September 2026; since the same date, each repository's **build and deploy
+  checks**; and since 6 October 2026 **`lockfile-review`** — the full list is in the table
+  above
 - `pull_request` → `required_approving_review_count: 0`
 
 All three have a twin, `main promotion gate`, on `main` — see [Adoption status](supply-chain.md#adoption-status).

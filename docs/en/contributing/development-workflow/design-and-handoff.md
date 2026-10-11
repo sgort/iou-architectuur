@@ -1,9 +1,9 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-04
+  date: 2026-10-11
   against:
-    RONL Business API: "5c6e716"
+    RONL Business API: "c51ec0a"
 ---
 
 # Design & Handoff

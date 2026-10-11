@@ -2,8 +2,8 @@
   "docs_built": "2026-10-11",
   "last_patch": {
     "date": "2026-10-11",
-    "kind": "Component sync",
-    "summary": "RONL Business API v2026.10.2 in production: a checklist for every new dependency and a quarterly review of all of them, registry signatures and provenance verified in the audit gate, release SBOMs that list every production package with checks that can fail, and the decision document of the path a case took; it found that the decision document’s fallback does not split a list of document references.",
+    "kind": "Component sync and weekly pass",
+    "summary": "RONL Business API v2026.10.2 in production: a checklist for every new dependency and a quarterly review of all of them, registry signatures and provenance verified in the audit gate, release SBOMs that list every production package with checks that can fail, and the decision document of the path a case took; it found that the decision document’s fallback does not split a list of document references. Weekly pass at TTL 2cf6a90, LDE a87f64b and RBA c51ec0a: the contributing pages re-checked and re-stamped for the required lockfile review, signature verification, the dependency criteria and the first quarterly reviews, and SBOM checks that can fail; ICTU scores 42, 41 and 40, up from 35, 34 and 33.",
     "previous": {
       "date": "2026-10-10",
       "kind": "Component sync",
@@ -35,7 +35,7 @@
     {
       "name": "Norm Editor",
       "icon": "🖍️",
-      "version": "2026.09.15-2",
+      "version": "v2026.09.15-2",
       "environment": "prod",
       "commit": "c47096b...",
       "commit_date": "2026-09-15",

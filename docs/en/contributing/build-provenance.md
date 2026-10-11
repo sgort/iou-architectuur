@@ -1,19 +1,20 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-04
+  date: 2026-10-11
   against:
-    CPSV Editor: "4cba989"
-    Linked Data Explorer: "9e0d18e"
-    RONL Business API: "5c6e716"
+    CPSV Editor: "2cf6a90"
+    Linked Data Explorer: "a87f64b"
+    RONL Business API: "c51ec0a"
 ---
 
 # Build Provenance
 
 !!! info "Verification status"
-    All four implementations were re-checked on **4 October 2026**, against
-    `4cba989`, `9e0d18e` and `5c6e716`, by reading every workflow that carries the
-    `env:` block — eight files, unchanged in number.
+    All four implementations were re-checked on **11 October 2026**, against
+    `2cf6a90`, `a87f64b` and `c51ec0a`, by reading every workflow that carries the
+    `env:` block — eight files, unchanged in number — and both production backends'
+    `/v1/health`.
 
     **The two columns that used to be the odd ones out no longer are.** Until
     19 September 2026 the CPSV Editor and the Linked Data Explorer handed their build
@@ -74,13 +75,15 @@ commit share it. The run number is what makes the pair unique per artifact.
 number, and every deploy in one promotion shares it: on 27 September 2026 the Linked
 Data Explorer's production frontend bundle and its backend's `/v1/health` both read
 `build 4148c9a · #2`, and the RONL Business API's public-site bundle and backend both
-read `2443adc` and `3` — Promote to Production runs #2 and #3. On 4 October 2026 the two
-backends read `build 71a8236 · #3` and `0625d48` with run `6`, the latest promotion in
-each. The pair is still unique
+read `2443adc` and `3` — Promote to Production runs #2 and #3. On 11 October 2026 the RONL
+Business API's backend read `7117914` with run `8`, its latest promotion, and the Linked Data
+Explorer's read `build 03f48bd · #5` — not its latest promotion, #6 at `82f461f`, which
+carried only the SBOM fix, decided that nothing needed deploying, and skipped all three
+deploys. The pair is still unique
 per promotion, which is what it is for; it now names *which promotion* rather than
 *which execution of that deploy workflow*. Acceptance is unchanged — its workflows are
 not called — and so is the CPSV Editor, whose production workflow still triggers itself
-(its latest run, `Deploy PROD` #104, built `719683b` on 1 October 2026).
+(its latest run, `Deploy PROD` #106, built `98458fa` on 10 October 2026).
 
 ---
 

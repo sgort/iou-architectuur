@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-04
+  date: 2026-10-11
   against:
-    CPSV Editor: "4cba989"
-    Linked Data Explorer: "9e0d18e"
-    RONL Business API: "5c6e716"
+    CPSV Editor: "2cf6a90"
+    Linked Data Explorer: "a87f64b"
+    RONL Business API: "c51ec0a"
 ---
 
 # Contributing to IOU Architecture
@@ -70,7 +70,9 @@ GitHub, beside the pull request that will close it. The split that preceded this
 requests on one host, issues on the other — cost a decision its context every time.
 
 Since 12 September 2026 each of the three checks its mirror at every release, with
-`scripts/check-mirror.sh` called from `/bump-release`. It reports and never pushes — see
+`scripts/check-mirror.sh` called from `/bump-release`, and since 10 October 2026 the
+mirror is pushed at a release rather than after every merge, so between releases it lags.
+The check reports and never pushes — see
 [Supply-Chain Pinning — the GitLab mirror](the-gitlab-mirror.md).
 The Norm Editor and the CPRMV API are developed on GitLab, where their pipelines run.
 
@@ -183,8 +185,8 @@ release cycle.
 !!! warning "`acc` is protected in all three applications"
     In the CPSV Editor, the Linked Data Explorer and the RONL Business API, `acc` requires
     a pull request with no bypass actors — a direct `git push origin acc` is rejected —
-    plus a passing `audit`, a passing `scan`, and, since 19 September 2026, that
-    repository's build and deploy checks. In practice that means **a merge request whose
+    plus a passing `audit`, a passing `scan`, since 19 September 2026 that
+    repository's build and deploy checks, and since 6 October 2026 `lockfile-review`. In practice that means **a merge request whose
     tests fail cannot be merged into `acc`**.
 
     All three also gate `main` (the CPSV Editor since 30 September 2026), each with a

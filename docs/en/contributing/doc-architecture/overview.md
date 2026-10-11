@@ -124,6 +124,8 @@ graph LR
     DOC_RONL -.translate.-> NL_RONL[docs/nl/ronl-business-api/]
     DOC_CPSV -.translate.-> NL_CPSV[docs/nl/cpsv-editor/]
     DOC_LDE -.translate.-> NL_LDE[docs/nl/linked-data-explorer/]
+    DOC_NORM -.translate.-> NL_NORM[docs/nl/norm-editor/]
+    DOC_CPRMV -.translate.-> NL_CPRMV[docs/nl/cprmv-api/]
 
     style SRC_RONL fill:#ffe1e1
     style SRC_CPSV fill:#ffe1e1
@@ -132,4 +134,6 @@ graph LR
     style NL_RONL fill:#e17000
     style NL_CPSV fill:#e17000
     style NL_LDE fill:#e17000
+    style NL_NORM fill:#e17000
+    style NL_CPRMV fill:#e17000
 ```
