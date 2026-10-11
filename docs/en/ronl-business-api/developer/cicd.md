@@ -4,22 +4,23 @@ component: RONL Business API
 
 # CI/CD
 
-RONL Business API runs **thirteen GitHub Actions workflows**: an
+RONL Business API runs **fourteen GitHub Actions workflows**: an
 acceptance/production pair for each of four packages; two scanning workflows —
-the supply-chain `audit` gate and a Semgrep `scan`; two that watch dependencies
-rather than a commit — the daily `dependency-audit` and the release SBOM; and the
+the supply-chain `audit` gate and a Semgrep `scan`; three that watch dependencies
+rather than a commit — the daily `dependency-audit`, the quarterly
+`dependency-review` and the release SBOM; and the
 **promotion workflow** that orchestrates the four production deploys. They hold
-**twenty-six jobs**. Twenty-two of them choose a runner, and every one of those
+**twenty-seven jobs**. Twenty-three of them choose a runner, and every one of those
 names `ubuntu-24.04`, never `ubuntu-latest`; the other four are the promotion's
-calls into the production workflows, whose own jobs are among the twenty-two. That
+calls into the production workflows, whose own jobs are among the twenty-three. That
 label is one GitHub moves to a new Ubuntu release on its own schedule, so
 pinning it means a change of OS release arrives as a diff here rather than
 silently. The label pins the *release*, not the image — GitHub
 rebuilds the image about weekly, and a hosted runner cannot pin it by digest.
 
-!!! info "`acc` and `main` carry the same thirteen files, and deliberately different shapes"
-    Re-verified on 9 October 2026 (v2026.10.1): `origin/acc` at `0ea4985`
-    and `origin/main` at `ebec288` carry an identical tree, `.github/workflows/`
+!!! info "`acc` and `main` carry the same fourteen files, and deliberately different shapes"
+    Re-verified on 11 October 2026 (v2026.10.2): `origin/acc` at `c51ec0a`
+    and `origin/main` at `7117914` carry an identical tree, `.github/workflows/`
     included.
     `main` was once four workflows behind and carried none of the pinning or
     gating described below — closing that gap was a CI-alignment programme that
@@ -41,6 +42,7 @@ rebuilds the image about weekly, and a hosted runner cannot pin it by digest.
 | `zizmor.yml` | PR, push to `acc`/`main` | — | No — the `audit` gate, and `lockfile-review` on pull requests |
 | `semgrep.yml` | PR, push to `acc`/`main` | — | No — the `scan` job |
 | `dependency-audit.yml` | schedule (05:17 UTC daily), `workflow_dispatch`, PR touching its own files | — | No — the `dependency-audit` job |
+| `dependency-review.yml` | schedule (06:23 UTC on day 2 of each quarter), `workflow_dispatch`, PR touching the workflow, `dependency-review.mjs` or `lockfile-diff.mjs` | — | No — the `dependency-review` job |
 | `sbom.yml` | push to `main`, `workflow_dispatch`, PR touching the SBOM tooling | — | No — the `release-sbom` job |
 | `promote-to-production.yml` | push to `main` (**no paths filter**), `workflow_dispatch` | — | No — it *calls* the four below |
 | `azure-backend-acc.yml` | push + PR to `acc` | `acc.api.open-regels.nl` | **Yes** — except on a pull request |
@@ -56,8 +58,8 @@ All eight Azure workflows support `workflow_dispatch`, and for the four
 production ones that is now the **only** manual route into Azure — and the
 escape hatch if the promotion workflow itself is broken. Neither scanning
 workflow supports it: both are meant to run from the events themselves and
-nothing else. `dependency-audit.yml` and `sbom.yml` do, so an audit or an SBOM
-can be produced on demand.
+nothing else. `dependency-audit.yml`, `dependency-review.yml` and `sbom.yml`
+do, so an audit, a dependency review or an SBOM can be produced on demand.
 
 !!! note "The four production workflows no longer trigger on a push"
     They carry `workflow_call:` and `workflow_dispatch:` and nothing more. A
@@ -157,13 +159,13 @@ unsatisfiable `needs` graph — it simply deploys nothing.
 
 ## Scanning, audit and SBOM workflows
 
-None of the four deploys anything. The two scanners carry no `paths:` filter:
-both must reach every pull request regardless of what it touched. The other two
+None of the five deploys anything. The two scanners carry no `paths:` filter:
+both must reach every pull request regardless of what it touched. The other three
 run on a pull request only when it touches their own tooling.
 
 ### `audit` — the required check
 
-`zizmor.yml` has three jobs: `audit`, and the two [`lockfile-review`](#lockfile-review-what-a-lockfile-change-contains) jobs. `audit` runs **ten steps, all of them blocking**:
+`zizmor.yml` has three jobs: `audit`, and the two [`lockfile-review`](#lockfile-review-what-a-lockfile-change-contains) jobs. `audit` runs **eleven steps, all of them blocking**:
 
 | # | Step | What it does |
 |---|---|---|
@@ -172,13 +174,14 @@ run on a pull request only when it touches their own tooling.
 | 3 | Run zizmor | Workflow static analysis, with zizmor itself pinned to `1.29.0` — maintained by Renovate, which maps the action to the image `ghcr.io/zizmorcore/zizmor`, not bumped by hand |
 | 4 | Validate `renovate.json` | `renovate-config-validator --strict` |
 | 5 | Lockfile matches `package.json` | `npm ci --dry-run --ignore-scripts` — resolves and validates without writing `node_modules` |
-| 6 | `npm ci` | So the four steps below run *this* repository's tooling rather than a version named in the workflow |
+| 6 | `npm ci` | So the five steps below run *this* repository's tooling, and check its installed tree, rather than a version named in the workflow |
 | 7 | `npm run check-format` | Prettier, via the root script the pre-push hook also runs |
-| 8 | `npm run check-swimlane-fixtures` | The swimlane parser fixtures against the fingerprints `linked-data-explorer` commits identically — see [Local development](local-development.md) |
-| 9 | `npm run check-shared` | [`@ronl/shared` holds declarations, not logic](shared-package.md#kept-declarations-only) |
-| 10 | `npm run check-supply-chain` | Every digest resolved against the GitHub API, and the register in `SECURITY-PIPELINE.md` compared against the workflows |
+| 8 | `npm run audit:signatures` | The registry signature of every installed package, and the provenance attestation of those that have one — see below |
+| 9 | `npm run check-swimlane-fixtures` | The swimlane parser fixtures against the fingerprints `linked-data-explorer` commits identically — see [Local development](local-development.md) |
+| 10 | `npm run check-shared` | [`@ronl/shared` holds declarations, not logic](shared-package.md#kept-declarations-only) |
+| 11 | `npm run check-supply-chain` | Every digest resolved against the GitHub API, and the register in `SECURITY-PIPELINE.md` compared against the workflows |
 
-Steps 4 through 10 carry `if: always()`. That makes them run *after* an earlier
+Steps 4 through 11 carry `if: always()`. That makes them run *after* an earlier
 failure, so one run reports on every half of the policy instead of stopping at
 the first — it does **not** make them non-blocking. The job still fails.
 
@@ -189,11 +192,31 @@ finding appears only in the log while every check reads *success*.
 `check-supply-chain` ran that way from its adoption until v2026.09.7 promoted it
 to blocking.
 
-Steps 7, 8 and 9 are in this job rather than in a deploy workflow or a workspace
+Steps 7, 9 and 10 are in this job rather than in a deploy workflow or a workspace
 suite for one reason: `audit` has no paths filter and is the required check, so
 every pull request reaches it — a documentation-only one too, and one made with
 `--no-verify` or in the GitHub UI, which skips the pre-push hook that also runs
 the fixture check.
+
+Step 8, *Verify registry signatures*, is the provenance half of ICTU
+recommendation 5, *verify where packages come from*
+(sgort/linked-data-explorer#249). `scripts/audit-signatures.sh` runs `npm audit
+signatures` over the tree step 6 installed — it adds no install of its own —
+and fails in two cases:
+
+- **An invalid or missing registry signature.** npmjs.org signs every package it
+  serves, so either means a package may not be what the registry published.
+- **A registry gap**: the registry metadata advertises a provenance attestation
+  and the attestation URL answers 404. npm then aborts the whole check, so
+  nothing after that package is verified either; the step names the package and
+  the fix, which is moving it to a version whose attestation the registry serves.
+
+A package **without** an attestation passes: most of the tree has none, and npm
+verifies only the attestations that exist. The step sits in this required job
+rather than in the daily dependency audit because a signature can change only
+when `package-lock.json` does, and every such change comes through a pull
+request, where `audit` is required. The same script is in `linked-data-explorer`
+and `ttl-editor`, kept identical.
 
 Step 5 exists because a lockfile out of step with `package.json` was already
 detectable, but only as an `EUSAGE` error inside the formatter's `npm ci`, where
@@ -234,6 +257,19 @@ in the comment, never a failure: a licence change, a new package whose licence
 is not on the allow-list in `lockfile-review.json` at the repository root, a new
 install script, and a downgrade. A lockfile or configuration the script cannot
 use exits 2, which never reads as clean.
+
+A **new direct dependency** gets a section of its own in the comment: the
+package, the manifest and field that declare it, and a checklist of the
+[dependency criteria](https://github.com/sgort/linked-data-explorer/blob/acc/docs/dependency-criteria.md) — maintained,
+maintainers, licence, release policy and footprint, needed — to tick before
+merging (ICTU recommendation 1). Anything that does not hold needs a sentence in
+the pull request saying why the package is still the right choice. "New" means
+direct in the head lockfile and absent from every manifest in the base: a
+package already direct elsewhere in the repository was vetted when it arrived,
+and moving one between fields — `dependencies` to `devDependencies` — is not
+adding it. The lockfile carries its own copy of every workspace manifest, so
+the job reads them without reading a single `package.json`. Like the other
+prompts, the checklist never fails the check.
 
 `lockfile-review` is a **required status check on `acc`**. It can be: this
 workflow has no paths filter, so the check reports on every pull request, and an
@@ -308,12 +344,59 @@ the issue step is skipped there.
     ambiguous — one passing and one failing check under one name, which no
     ruleset can satisfy — and its first run blocked #206 outright.
 
+### `dependency-review` — quarterly, on every direct dependency
+
+Nothing else here notices an abandoned package: it raises no advisory, so the
+daily audit stays silent, and it opens no Renovate pull request. So
+`dependency-review.yml` runs on a clock — at 06:23 UTC on the second day of each
+quarter (`23 6 2 1,4,7,10 *`), off the hour like the daily audit — and on
+`workflow_dispatch`. It also runs on a pull request that touches the workflow,
+`scripts/dependency-review.mjs` or `scripts/lockfile-diff.mjs`, whose lockfile
+reading it shares, so a change to the review is exercised before it merges. Its
+one job, `dependency-review`, runs on Node `'24.21.0'`:
+
+1. **Test the review script** — `node scripts/dependency-review.test.mjs`.
+2. **Gather the evidence.** `scripts/dependency-review.mjs` takes every direct
+   dependency from `package-lock.json` and asks the npm registry and the GitHub
+   API about each — its last release, a deprecation, the number of
+   maintainers and whether an organisation owns the repository, an archived
+   repository, the licence against `lockfile-review.json`, an install script.
+   A deprecated package or an archived repository fails; no release in twelve
+   months, a single maintainer or a licence off the allow-list is flagged for a
+   judgement. It installs nothing, and writes the report to the job summary. It exits 0 whatever it found — a
+   finding is for a person, not a red run — and 2 when the lockfile or
+   configuration cannot be used.
+3. **Open the quarter's review issue**, titled after the quarter — *Quarterly
+   dependency review — 2026-Q4* — and labelled `dependencies`; this step is
+   what the job's `issues: write` is for. A re-run in the same quarter leaves an existing issue's body
+   alone, because the outcomes are recorded there, and adds the fresh evidence
+   as a comment. The step is skipped on a pull request.
+
+The script flags what fails a criterion or needs a judgement; a person ticks
+*keep*, *replace* or *accept* for each package and gives the reason, and a
+replacement gets an issue of its own. The criteria are the ones in
+`linked-data-explorer`'s
+[`docs/dependency-criteria.md`](https://github.com/sgort/linked-data-explorer/blob/acc/docs/dependency-criteria.md) —
+maintained, maintainers, licence (the allow-list in `lockfile-review.json`),
+release policy, footprint, and needed — shared by `linked-data-explorer`,
+`ttl-editor` and this repository: ICTU recommendation 1 applies them before a
+package is added (see [`lockfile-review`](#lockfile-review-what-a-lockfile-change-contains)),
+recommendation 11 again every quarter (sgort/linked-data-explorer#250).
+
+The first review, for 2026-Q4, is issue 362: of 85 direct dependencies, 3 failed
+a criterion and 19 needed a judgement, with follow-up issues 363 to 367.
+
 ### `release-sbom` — an SBOM for every release
 
 A promotion to `main` is the release here: there are no tags and no GitHub
 Releases. Each release keeps a CycloneDX SBOM of its **production** dependencies,
 committed as `docs/sbom/<name>-<version>.cdx.json` and written by `npm run sbom`
-(`scripts/write-sbom.mjs`) with `npm sbom --package-lock-only --omit=dev`. It
+(`scripts/write-sbom.mjs`). The script has npm list the whole tree — `npm sbom
+--package-lock-only --sbom-format cyclonedx` — and keeps the packages the
+lockfile does not mark `dev`, plus the workspace packages themselves, which the
+lockfile records as links. `devOptional` counts as production: an SBOM may
+overstate what ships, never understate it. A production package npm did not
+list stops the generation with an error rather than going missing. The SBOM
 describes the lockfile rather than whatever is in `node_modules`. `npm run sbom`
 is a bump-release step, after the version bump, since the filename carries the
 version. This copy answers a question about a version that shipped a year ago.
@@ -321,8 +404,9 @@ version. This copy answers a question about a version that shipped a year ago.
 The script has four modes: writing; `--check`, strict — the file must exist and
 match the lockfile, exit 1 otherwise; `--verify-release` — a missing file fails,
 drift only warns; and `--print-path`. Both comparisons ignore `serialNumber` and
-`metadata.timestamp`, which change on every run. `npm run sbom:check` runs the
-strict check locally.
+`metadata.timestamp`, which change on every run, and compare everything else —
+the npm version recorded in `metadata.tools` included. `npm run sbom:check` runs
+the strict check locally.
 
 `sbom.yml` runs one job, `release-sbom`, on Node `'24.21.0'` — the same literal
 as the daily audit, for the same reason:
@@ -331,28 +415,34 @@ as the daily audit, for the same reason:
 |---|---|---|
 | 1 | Checkout | Always |
 | 2 | Set up Node `24.21.0` | Always |
-| 3 | **Generate the SBOM** — `node scripts/write-sbom.mjs` | Always |
+| 3 | Test the SBOM generator — `node scripts/write-sbom.test.mjs` | Always |
 | 4 | `--verify-release` | A push to `main` |
-| 5 | `--check`, when the pull request changes the version's SBOM file (a release bump); skipped otherwise | A pull request touching the SBOM tooling |
-| 6 | Upload `docs/sbom/*.cdx.json` as a workflow artifact, kept ninety days | After the steps above |
+| 5 | `--check`, when the pull request changes the version's SBOM file (a release bump); skipped otherwise | A pull request touching the SBOM tooling — the workflow, `write-sbom.mjs`, its test, or `docs/sbom/**` |
+| 6 | **Generate the SBOM** — `node scripts/write-sbom.mjs` | Always, after the checks |
+| 7 | Upload `docs/sbom/*.cdx.json` as a workflow artifact, kept ninety days | After the steps above |
 
-!!! warning "Neither check can fail in CI"
-    Step 3 runs **before** steps 4 and 5, and it rewrites
-    `docs/sbom/<name>-<version>.cdx.json` in the runner's workspace from the
-    lockfile. Both checks then compare that freshly written file with a document
-    generated from the same lockfile — the file with itself — so they always
-    report *matches the lockfile*. The committed SBOM is never compared with
-    anything in CI, and the artifact step 6 uploads is the regenerated file, not
-    the committed one.
+Both checks run **before** the generation, so they compare the **committed**
+file with the lockfile; the generation then rewrites it in the runner's
+workspace, and the artifact step 7 uploads describes this commit's lockfile —
+on a promotion, what is deployed.
 
-    The difference is real. The committed `ronl-business-api-2026.10.1.cdx.json`
-    was generated with npm 10.9.9 (the npm bundled with Node 22.23.3, recorded in
-    its `metadata.tools`) and lists 423 components. npm 11 generates 409
-    components from the same lockfile: the release pull request's run used npm
-    11.19.0, generated 409 and reported a match. Run locally with npm 11, `npm
-    run sbom:check` fails against the committed file. Which npm writes the SBOM
-    changes its content, so an SBOM is comparable only with one generated by the
-    same npm.
+!!! note "Until v2026.10.2 neither check could fail in CI"
+    The generation step used to run first. It rewrote
+    `docs/sbom/<name>-<version>.cdx.json` from the lockfile, and both checks then
+    compared that fresh file with a document generated from the same lockfile —
+    the file with itself — so they always reported *matches the lockfile* (issue
+    354, sgort/linked-data-explorer#274). That is how the v2026.10.1 release pull
+    request passed for an SBOM npm 10.9.9 had written while CI ran npm 11.19.0.
+    The same SBOM also missed production packages — `react`, `react-dom` and
+    `scheduler` among them — because `npm sbom --omit=dev` drops them; the
+    lockfile filter above replaced it (#368).
+
+!!! warning "An SBOM is comparable only with one generated by the same npm"
+    The committed `ronl-business-api-2026.10.2.cdx.json` lists 487 components and
+    records npm 11.19.0 in its `metadata.tools` — the npm that `sbom.yml`'s Node
+    24.21.0 ships. Because `--check` compares that field too, a local `npm run
+    sbom:check` under npm 11.21.0 exits 1 against it (11 October 2026), although
+    all 487 components match exactly. Run the strict check with the npm CI uses.
 
 ---
 
@@ -365,9 +455,9 @@ deployed artifact on a major the host does not run.
 - The **eight deploy workflows** read `node-version-file: .nvmrc`.
 - `.nvmrc` carries an exact `22.23.3`, which bundles npm 10.9.9.
 - The root `engines.node` is `>=22`, and `engines.npm` is `>=10.0.0`.
-- `dependency-audit.yml` and `sbom.yml` name an exact `'24.21.0'`: they read
-  lockfiles — both branches', in the audit's case — and should not change Node
-  with the tree they read.
+- `dependency-audit.yml`, `dependency-review.yml` and `sbom.yml` name an exact
+  `'24.21.0'`: they read lockfiles — both branches', in the audit's case — and
+  should not change Node with the tree they read.
 - `zizmor.yml` names the same exact `'24.21.0'`, deliberately on a different
   major from `.nvmrc`:
   its `renovate-config-validator` step needs Node 24, because `renovate`

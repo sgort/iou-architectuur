@@ -4,55 +4,76 @@ component: RONL Business API
 
 # Backend suite
 
-`packages/backend`, Jest with the `ts-jest` preset. **105 files · 2633 tests ·
-all passing · nothing skipped · `Time: 228.051 s`** under `--runInBand`,
+`packages/backend`, Jest with the `ts-jest` preset. **105 files · 2638 tests ·
+all passing · nothing skipped · `Time: 110.806 s`** under `--runInBand`,
 followed by *"✓ all 136 documented operations were checked against a real
 response"*. Coverage is on by default; see
 [Coverage](coverage.md#backend-by-area) for the per-area figures.
 
-Measured on **9 October 2026** for v2026.10.1 — the release in production,
-`main` at `ebec288` — with `npm run test:serial --workspace=packages/backend`,
-in the working checkout on `acc` at `0ea4985` (a tree identical to `ebec288`)
-after `npm run deps:check` reported the install in sync with the lockfile, on
-Node 22.23.3, the version `.nvmrc` names. The package total is the runner's
-own. The per-file and per-area counts are not printed by Jest's default
-reporter, so every file's count is parsed from its source at `ebec288` with
-the TypeScript compiler, `.each` tables and literal `for … of` loops
-expanded — never a grep for `it(`, which miscounts parameterised and
+Measured on **11 October 2026** for v2026.10.2 — the release in production,
+`main` at `7117914` — with `npx jest --coverage --runInBand` followed by
+`node scripts/check-conformance-coverage.cjs`, which is exactly what
+`npm run test:serial --workspace=packages/backend` runs, in the working
+checkout on `acc` at `c51ec0a` (a tree identical to `7117914`) after
+`npm run deps:check` reported *"Dependencies are ready."*, on Node 22.23.3,
+the version `.nvmrc` names. The package total is the runner's own. The
+per-file and per-area counts are not printed by Jest's default reporter, so
+on 11 October they were read from Jest's JSON report of the same run
+(`--json`), which lists every test of every file; the 105 files sum to the
+runner's 2638. Through 9 October every file's count was parsed from its
+source with the TypeScript compiler, `.each` tables and literal `for … of`
+loops expanded — never a grep for `it(`, which miscounts parameterised and
 multi-line cases. Two tables are not literals and were resolved by hand:
 `SHELLS.slice(1)` in `bpmn-swimlane.test.ts` (2 cases) and the router's
-16 route layers in `public.routes.security.test.ts`. The sum is the runner's
-2633 exactly, and the same parse at `0625d48` gives 2457 and every per-area
-figure the 3 October pass published.
+16 route layers in `public.routes.security.test.ts`. That parse gave the
+runner's 2633 exactly at `ebec288`, and 2457 and every per-area figure the
+3 October pass published at `0625d48`.
 
 !!! success "`npm test` is two steps: Jest, then the conformance-coverage check"
     Since v2026.09.14 the backend's `test` and `test:serial` scripts end with
     `&& node scripts/check-conformance-coverage.cjs`. Jest runs the suite as
     before; the script then fails the run unless **every operation in the
     OpenAPI document was compared against a real response** at least once. On
-    9 October it printed *"✓ all 136 documented operations were checked
-    against a real response"* — the same number as on 3 October, by one in
-    and one out: v2026.10.1 documented `GET /v1/process/available`, the
+    11 October it printed *"✓ all 136 documented operations were checked
+    against a real response"* — the same number as on 3 and 9 October.
+    v2026.10.2 documented no operation and removed none; it rewrote the
+    description of `/v1/process/{instanceId}/decision-document` and its
+    `/v1/m2m` twin to say which document they return. On 9 October the
+    number held by one in and one out: v2026.10.1 documented
+    `GET /v1/process/available`, the
     services a citizen may start, and **removed** the `GET` spelling of
     `/v1/m2m/process/history`, deprecated for one release, which now answers
     404. On 3 October it was 133 from 30 September plus the two Besluitvorming
     lists and `POST /v1/m2m/process/history`.
 
-    **That figure, and 2633 / 105, are this package's alone.** The repository
-    runs **331 test files and 5069 tests** across five workspaces — see
+    **That figure, and 2638 / 105, are this package's alone.** The repository
+    runs **331 test files and 5074 tests** across five workspaces — see
     [Overview](overview.md). Quoting the backend's count as a repository total
     understates the suite by over two thousand tests.
 
-!!! note "2011 → 2008 → 2028 → 2072 → 2198 → 2202 → 2370 → 2457 → 2633, and nothing was lost on the way"
+!!! note "2011 → 2008 → 2028 → 2072 → 2198 → 2202 → 2370 → 2457 → 2633 → 2638, and nothing was lost on the way"
     The suite reported **2011** for several releases, of which 2008 ran and
     **three were permanently skipped**. Those three guarded the
     `PHASE_NOT_MODELLED` branch of the RIP phase model. v2026.09.7 made an
     unmodelled phase unrepresentable (issue #85), the branch went, and the
     three skipped cases went with it — a deletion of dead tests rather than a
-    regression. The **2633** measured here is growth on that 2008 base. No
+    regression. The **2638** measured here is growth on that 2008 base. No
     workspace in this repository skips anything.
 
-    **v2026.10.1 added +176 tests and five files** against the 3 October
+    **v2026.10.2 added +5 tests and no file** against the 9 October
+    measurement of v2026.10.1 (105 files, 2633), all five in one file:
+
+    | File | Tests | What changed |
+    |---|---:|---|
+    | `services/operaton.service.test.ts` | 192 → **197** | `getDecisionDocument` returns the decision document of the path the case took (sgort/linked-data-explorer#246), read from the instance's completed user tasks, most recent first: the signing task's document on the ordinary path; the authority's document after escalation, even though the signing task ran first; canceled task instances skipped; the first entry of a `documentRef` list; and the first `documentRef` in the BPMN when no completed task carries one |
+
+    Every other file kept its count. `rip-swimlane/bpmn-swimlane.test.ts` was
+    edited without a test added or removed — one task dropped from the HR
+    capacity claim's expected phase mapping, with that fixture — and seven
+    parser fixtures under `__fixtures__/awb/` and `__fixtures__/declared/`
+    were refreshed from linked-data-explorer.
+
+    **History: v2026.10.1 added +176 tests and five files** against the 3 October
     measurement of v2026.10.0 (100 files, 2457) — 68 in the new files and
     108 in existing ones, most of it eDOCS acting as the person who asked,
     the eDOCS author stamp, and the citizen services:
@@ -156,7 +177,7 @@ per-file 80% branch floor in `jest.config.js` rides along with it rather than
 needing a coverage job of its own — and so do the OpenAPI coverage gate, an
 ordinary test file, and the conformance-coverage check that `npm test` runs
 after Jest. Since v2026.09.7 `azure-backend-acc.yml` also
-triggers on `pull_request`, so these 2633 tests run *before* a merge rather than
+triggers on `pull_request`, so these 2638 tests run *before* a merge rather than
 only after one — and since **19 September 2026 that run is a required check**,
 so a red backend suite now blocks the merge to `acc` outright. See
 [Overview → What actually gates a merge](overview.md#what-actually-gates-a-merge).
@@ -164,7 +185,7 @@ so a red backend suite now blocks the merge to `acc` outright. See
 | Area | Files | Tests |
 |---|---:|---:|
 | `src/routes` | 21 | 702 |
-| `src/services` | 28 | 647 |
+| `src/services` | 28 | 652 |
 | `src/pa-monitoring` | 16 | 583 |
 | `src/rip-swimlane` | 2 | 206 |
 | `src/utils` | 15 | 150 |
@@ -175,13 +196,17 @@ so a red backend suite now blocks the merge to `acc` outright. See
 | `src/middleware` | 4 | 39 |
 
 !!! success "Both columns are current, and they sum"
-    Re-derived on 9 October 2026: the Files column accounts for all **105**
-    files and the Tests column sums to **2633**, the measured total, every
-    file parsed from its source at `ebec288` (see the note at the top of this
-    page). Earlier versions of this page carried a Files column from
-    one date and a Tests column from another that fell 274 short, with a
-    warning attached; that gap is closed and has stayed closed across seven
-    re-derivations.
+    Re-derived on 11 October 2026: the Files column accounts for all **105**
+    files and the Tests column sums to **2638**, the measured total, every
+    file's count read from Jest's JSON report of the measured run (see the
+    note at the top of this page). Earlier versions of this page carried a
+    Files column from one date and a Tests column from another that fell
+    274 short, with a warning attached; that gap is closed and has stayed
+    closed across eight re-derivations.
+
+    **One area moved in v2026.10.2, and no file was added**: `src/services`
+    647 → **652**, on `operaton.service.test.ts`. The other nine are
+    unchanged to the test.
 
     **Eight of the ten areas moved in v2026.10.1, and five files were
     added**: `src/routes` 20 → **21** files and 649 → **702** tests
@@ -237,16 +262,18 @@ so a red backend suite now blocks the merge to `acc` outright. See
     after their template and case; v2026.10.1 records the signer as the
     archived documents' author. The same two files grew both times:
 
-    | File | Tests | File time, 3 Oct (`--runInBand`) | File time, 9 Oct (`--runInBand`) |
-    |---|---:|---:|---:|
-    | `routes/validsign.routes.test.ts` | 116 → 120 → **123** | 5.5s | 5.7s |
-    | `services/validsign.service.test.ts` | 32 | under 5s | under 5s |
-    | `services/validsignCompletion.service.test.ts` | 9 → 13 → **15** | under 5s | under 5s |
-    | `services/validsignPoller.service.test.ts` | 7 | under 5s | under 5s |
-    | `utils/config.validsign.test.ts` | 4 | under 5s | under 5s |
+    | File | Tests | File time, 3 Oct (`--runInBand`) | File time, 9 Oct (`--runInBand`) | File time, 11 Oct (`--runInBand`) |
+    |---|---:|---:|---:|---:|
+    | `routes/validsign.routes.test.ts` | 116 → 120 → **123** | 5.5s | 5.7s | under 5s (2.1s) |
+    | `services/validsign.service.test.ts` | 32 | under 5s | under 5s | under 5s |
+    | `services/validsignCompletion.service.test.ts` | 9 → 13 → **15** | under 5s | under 5s | under 5s |
+    | `services/validsignPoller.service.test.ts` | 7 | under 5s | under 5s | under 5s |
+    | `utils/config.validsign.test.ts` | 4 | under 5s | under 5s | under 5s |
 
-    Jest prints a file's time only past its five-second slow-test threshold.
-    Both time columns are in-band runs, one file at a time; on 30 September,
+    v2026.10.2 changed none of the five; they still hold 181 tests. Jest's
+    console prints a file's time only past its five-second slow-test
+    threshold; the 2.1s is from the JSON report of the 11 October run.
+    All three time columns are in-band runs, one file at a time; on 30 September,
     in a parallel run, the route file took 29.3s. Read the next warning before
     drawing anything from any of them.
 
@@ -260,7 +287,7 @@ so a red backend suite now blocks the merge to `acc` outright. See
     opening as declined, and to **123** in v2026.10.1: the signer recorded as
     `edocsAuthor`, and the task variables read without deserialising them.
 
-    On 9 October the route module reports **97.27% statements · 98.38%
+    On 11 October, as on 9 October, the route module reports **97.27% statements · 98.38%
     branches · 100% functions · 97.05% lines**; `validsign.service.ts` and
     `validsignPoller.service.ts` are at 100 on all four, and
     `validsignCompletion.service.ts` at **94 / 92.59 / 100 / 95.74**, its
@@ -290,7 +317,11 @@ so a red backend suite now blocks the merge to `acc` outright. See
     `sources/ep-texts-submitted.client.test.ts` (8.0s),
     `edocs.routes.test.ts` (6.7s), `public.routes.test.ts` (6.4s) and
     `validsign.routes.test.ts` (5.7s) — four of them in `pa-monitoring`, which
-    v2026.10.1 did not touch.
+    v2026.10.1 did not touch. On 11 October, in band once more, only two
+    did: `routes/registry.test.ts` (58.0s, this time the first file of the
+    run) and `pa.routes.test.ts` (6.3s); `coverage.test.ts` and
+    `pa-dossiers.routes.test.ts` dropped below the threshold, and the whole
+    run's `Time:` halved, 228.051 s → 110.806 s, on five more tests.
 
     None of these figures is wrong and nothing regressed or improved. In a
     parallel run Jest reports each file's **elapsed** time while several workers
@@ -333,7 +364,7 @@ another 25 cases to `config.test.ts`, 131 at v2026.09.12, one more case in
 `errors.test.ts`, and **14 files and 144 tests** at v2026.10.0, which added
 `problem.test.ts` (13), and **15 files and 150 tests** at v2026.10.1, which
 added `config.edocs.test.ts` (6). Of the thirteen source files the area
-reports on 9 October, **twelve are at 100 on all four measures**, `problem.ts`
+reports on 11 October, **twelve are at 100 on all four measures**, `problem.ts`
 among them; the thirteenth is `config.ts` at 96.29% statements and 98.52%
 branches —
 see [Coverage](coverage.md#backend-by-area).

@@ -4,26 +4,52 @@ component: RONL Business API
 
 # Coverage
 
-Measured on **9 October 2026** against **v2026.10.1**, the release in
-production (`main` at `ebec288`), in the working checkout on `acc` at
-`0ea4985` — a tree identical to `ebec288` — after `npm run deps:check`
-reported the install in sync with the lockfile, on **Node 22.23.3**, the
-version `.nvmrc` names. Each package was measured by its own
-`npm run test:serial`, run one workspace at a time; all five of those scripts
-collect coverage, as their `npm test` counterparts do. Every figure on this
-page is read from those runs' coverage tables and from the
-`coverage/coverage-final.json` each of them wrote.
+Measured on **11 October 2026** against **v2026.10.2**, the release in
+production (`main` at `7117914`), in the working checkout on `acc` at
+`c51ec0a` — a tree identical to `7117914` — after `npm run deps:check`
+reported *"Dependencies are ready."*, on **Node 22.23.3**, the version
+`.nvmrc` names. Each package was measured serially, one workspace at a
+time: the backend by `npx jest --coverage --runInBand`, the Jest command its
+`test:serial` runs, and the four Vitest packages by their own
+`npm run test:serial`. All five collect coverage, as their `npm test`
+counterparts do. Every figure on this page is read from the
+`coverage/coverage-final.json` each of those runs wrote, and checked against
+the run's own totals.
+
+!!! warning "Read the backend from `coverage-final.json`, not from a stale summary"
+    None of the five runner configs asks for istanbul's `json-summary`
+    reporter, so no ordinary run writes `coverage/coverage-summary.json`.
+    A copy left in `packages/backend/coverage/` by an earlier run that did
+    ask for it — the one in this checkout dates from 30 September — is not
+    overwritten, and reads 98.90 / 95.14 / 97.98 / 99.20: the 30 September
+    figures, not today's. The 11 October backend figures below come from
+    the `coverage-final.json` and `lcov.info` that run wrote. To get a
+    summary file, ask for it, as
+    [Running the tests](overview.md#running-the-tests) does with
+    `--coverageReporters=json-summary`.
 
 | Package | Statements | Branches | Functions | Lines | Δ branches since v2026.08.36 |
 |---|---:|---:|---:|---:|---|
-| Backend | 98.77% | 94.97% | 97.95% | 99.10% | **+4.96** |
-| Frontend | 95.42% | 93.21% | 91.54% | 95.93% | **+12.88** |
+| Backend | 98.78% | 94.95% | 97.95% | 99.10% | **+4.94** |
+| Frontend | 95.35% | 93.18% | 91.48% | 95.85% | **+12.85** |
 | pa-cockpit | 92.61% | 93.89% | 89.57% | 93.13% | **+18.34** |
 | pa-demo | 93.47% | 95.65% | 85.00% | 92.85% | **+8.70** |
 | Public site | 96.68% | 97.41% | 95.09% | 97.23% | **+27.02** |
 
-Against the 3 October reading of v2026.10.0, the two packages v2026.10.1
-changed moved in opposite directions. The **frontend rose on all four** —
+Against the 9 October reading of v2026.10.1, **pa-cockpit, pa-demo and the
+public site reproduced all four figures to the decimal**, on packages
+v2026.10.2 did not touch. The **backend moved on two measures, by a
+hundredth or two** — statements 98.77 → 98.78, branches 94.97 → 94.95,
+functions and lines unchanged — all of it in `services/operaton.service.ts`,
+which now picks the decision document of the path a case took and reads
+**98.41 / 92.78 / 96.93 / 98.80**. The **frontend fell by three to eight
+hundredths on all four** — 95.42 → 95.35, 93.21 → 93.18, 91.54 → 91.48,
+95.93 → 95.85 — on code whose only change was the changelog data, and in
+one area row only, `CaseworkerDashboardV2`: run-to-run noise, set out in the
+*last two decimals* warning below.
+
+History, 9 October: against the 3 October reading of v2026.10.0, the two
+packages v2026.10.1 changed moved in opposite directions. The **frontend rose on all four** —
 95.23 → 95.42, 93.02 → 93.21, 91.21 → 91.54, 95.76 → 95.93 — on new code
 that arrived well covered and on the DVTP sections leaving. The **backend
 fell by a tenth or two on three** — statements 98.91 → 98.77, branches
@@ -38,24 +64,32 @@ packages/pa-cockpit packages/public-site packages/pa-demo` is empty. That
 hundredth is the noise the *last two decimals* warning below describes.
 
 !!! info "The repository-wide figure, and why it is not an average of that column"
-    Across all five workspaces together: **96.57% statements · 94.15% branches ·
-    93.05% functions · 97.04% lines**.
+    Across all five workspaces together: **96.54% statements · 94.13% branches ·
+    93.03% functions · 97.01% lines**.
 
     Those come from **summing the covered and total counts** across the five
-    workspaces' coverage reports and dividing once — 14738/15261 statements,
-    9508/10099 branches, 3416/3671 functions, 13325/13731 lines — not from
+    workspaces' coverage reports and dividing once — 14744/15271 statements,
+    9514/10107 branches, 3417/3673 functions, 13329/13739 lines — not from
     averaging the five percentages in the table. Averaging the column would
-    weight pa-demo's 92 statements exactly as heavily as the backend's 6879 and
-    give a repository-wide branch figure of 95.03% instead of 94.15%: nearly a
+    weight pa-demo's 92 statements exactly as heavily as the backend's 6889 and
+    give a repository-wide branch figure of 95.02% instead of 94.13%: nearly a
     point of pure arithmetic error, in the flattering direction. The
     denominators differ by two orders of magnitude here, so the distinction is
-    not academic. On 9 October the counts were summed from each workspace's
+    not academic. On 11 October the counts were summed from each workspace's
     `coverage/coverage-final.json`, which every one of the five runs writes —
     each file's timestamp matching that day's run; each workspace's own total
-    reproduces the table row above exactly, and the four Vitest totals match
-    the covered/total counts in the run's own *Coverage summary* block.
+    reproduces the table row above exactly, the four Vitest totals match the
+    covered/total counts in the run's own *Coverage summary* block, and the
+    backend's match the `lcov.info` its run wrote.
 
-    Against the 3 October measurement of v2026.10.0 the repository-wide
+    Against the 9 October measurement of v2026.10.1 every repository-wide
+    figure fell by two or three hundredths — 96.57 → 96.54, 94.15 → 94.13,
+    93.05 → 93.03, 97.04 → 97.01 — on a body of code that grew by 10
+    statements and 8 branches. Most of the fall is the frontend's noise,
+    which took one to four off each of its covered counts; the backend's new
+    code is 10 statements, all covered, and 8 branches, 7 of them covered.
+
+    History: against the 3 October measurement of v2026.10.0 the repository-wide
     figures held or rose in the second decimal — statements 96.51 → 96.57,
     branches 94.13 → 94.15, functions 92.83 → 93.05, lines 96.97 → 97.04 — on
     a body of code that grew by 544 statements and 331 branches. That is the
@@ -65,9 +99,11 @@ hundredth is the noise the *last two decimals* warning below describes.
 !!! note "Which frontend run the aggregate uses — like for like since 3 October"
     Every pass from 24 to 30 September took the frontend's figures from its
     **default parallel** run, the one CI makes. **The 3 and 9 October passes
-    ran every workspace with `test:serial`**, the frontend included, so the
-    frontend row now comes from a serial run, and the 3 → 9 October
-    comparison is like for like. Serial and parallel runs of the same code do
+    ran every workspace with `test:serial`**, the frontend included, and so
+    did the 11 October pass, so the frontend row comes from a serial run and
+    the 3 → 9 → 11 October comparison is like for like. (11 October also
+    made a default parallel run of the four Vitest workspaces, to collect
+    per-file test counts; none of this page's figures is taken from it.) Serial and parallel runs of the same code do
     not report identical v8 coverage.
 
     The size of that effect is on record. On 28 September, when the parallel
@@ -93,8 +129,8 @@ hundredth is the noise the *last two decimals* warning below describes.
     what a campaign targeting *all* of them should look like. The table above
     is several releases further on. It moved only in decimals until
     v2026.09.14, then by whole points again on the margin work, and in
-    v2026.10.0 and v2026.10.1 by decimals once more; what changed is set out
-    below.
+    v2026.10.0, v2026.10.1 and v2026.10.2 by decimals once more; what changed
+    is set out below.
 
 !!! success "The floor is a gate, and it is per file"
     It used to be a convention held by review, with no threshold configured
@@ -119,10 +155,11 @@ hundredth is the noise the *last two decimals* warning below describes.
     A file below the line exits the run non-zero and names that file, locally
     and in CI alike — `npm test` already collects coverage in every workspace,
     so nothing needed a separate coverage job. **The five thresholds are
-    unchanged at `ebec288`** — the frontend's `vite.config.ts` changed in
-    v2026.10.1, but only to add the tenant-pages build plugin — **and no file
-    was named in any of the five runs of this pass**; reading every file
-    entry in the five workspaces' coverage reports confirms it independently:
+    unchanged at `c51ec0a`** — the frontend's `vite.config.ts` changed in
+    v2026.10.1, but only to add the tenant-pages build plugin, and no runner
+    config changed in v2026.10.2 — **and no file was named in any of the five
+    runs of this pass**; reading every file entry in the five workspaces'
+    coverage reports on 11 October confirms it independently:
     **zero of 337 files below 80% branches** — 105 in backend, 134 in
     frontend, 38 in pa-cockpit, 16 in pa-demo and 44 in public-site. (Since
     3 October the backend gained four source files: `auth/citizen-services.ts`
@@ -144,9 +181,10 @@ hundredth is the noise the *last two decimals* warning below describes.
     !!! warning "Zero below the line — but since v2026.10.0, two frontend files within five points of it"
         On 30 September every file in the repository cleared 85% branches.
         On 3 October two did not, both new or rewritten in v2026.10.0 and
-        both in the frontend — and **restated from the 9 October coverage
+        both in the frontend — and **restated from the 11 October coverage
         reports, the same two are still the only files below 85 in any
-        workspace**, at the same figures. v2026.10.1 touched neither:
+        workspace**, at the same figures. Neither v2026.10.1 nor v2026.10.2
+        touched either:
 
         | File | Branches | |
         |---|---:|---|
@@ -154,14 +192,15 @@ hundredth is the noise the *last two decimals* warning below describes.
         | `components/process/phaseSet.ts` | 83.33 (10/12) | New in place of `awbStepper.ts`: the phase set a process declares, or the Awb set |
 
         **85 is a margin, not a floor**, and v2026.10.0 was the first release
-        since the margin was reached to arrive below it; v2026.10.1 added
-        nothing below it. The two are the obvious next targets;
+        since the margin was reached to arrive below it; v2026.10.1 and
+        v2026.10.2 added nothing below it. The two are the obvious next targets;
         `BesluitOverzichtSection.tsx` is the urgent one, because the next
         uncovered edge added to it fails a required check. Of the files
         v2026.10.1 changed or added, the nearest to the margin are
         `components/signing/SigningPanel.tsx` at 85.93%, and in the backend
         `routes/edocs.access.ts` at 89.28% and `routes/brp.routes.ts` at
-        89.47%.
+        89.47%. v2026.10.2's one changed source file under coverage,
+        `services/operaton.service.ts`, reads 92.78% (270/291).
 
         History. On 28 September the margin was thinner than the headline sounded:
         **three files sat at exactly 80.00% branches** —
@@ -186,16 +225,16 @@ hundredth is the noise the *last two decimals* warning below describes.
           v2026.10.0 taught it to read a problem's `detail`). The arms left
           there cannot occur in Node and are tracked in #294.
 
-        Measured on 9 October, the lowest file in each workspace — the same
-        five as on 3 October:
+        Measured on 11 October, the lowest file in each workspace — the same
+        five as on 3 and 9 October, at the same figures:
 
         | Workspace | Lowest file by branches | Branches |
         |---|---|---:|
-        | backend | `src/pa-monitoring/pa-cache.ts` and `src/services/llm/OpenAILlmProvider.ts` | 86.36 |
-        | frontend | `src/components/CaseworkerDashboard/BesluitOverzichtSection.tsx` | **80.43** |
+        | backend | `src/pa-monitoring/pa-cache.ts` and `src/services/llm/OpenAILlmProvider.ts` | 86.36 (19/22 each) |
+        | frontend | `src/components/CaseworkerDashboard/BesluitOverzichtSection.tsx` | **80.43** (37/46) |
         | pa-cockpit | `src/services/dossierbeheer.api.ts` | 85.10 (40/47) |
-        | pa-demo | `src/demo/changelog/DemoChangelogPanel.tsx` | 87.50 |
-        | public-site | `src/lib/useQueryState.ts` and `src/pages/herkomst/HerkomstTrace.tsx` | 87.50 |
+        | pa-demo | `src/demo/changelog/DemoChangelogPanel.tsx` | 87.50 (7/8) |
+        | public-site | `src/lib/useQueryState.ts` and `src/pages/herkomst/HerkomstTrace.tsx` | 87.50 (14/16 each) |
 
         Four of the five are as on 30 September. `IouFeedbackSection.tsx`,
         which then sat exactly on the 85 line at 51 of 60 branches, has read
@@ -205,7 +244,7 @@ hundredth is the noise the *last two decimals* warning below describes.
     Per file is the whole point: against a package average, one file falling to
     40% barely moves 95%, and the regression the floor exists to catch would
     pass. **Branches only is equally deliberate.** Measured the same way on
-    9 October, a functions floor at 80 would fail **23 files** — frontend 8,
+    11 October, a functions floor at 80 would fail **23 files** — frontend 8,
     pa-cockpit 7, pa-demo 5, public-site 3, backend 0 — so the symmetry is a
     trap for whoever adds `functions: 80` on the assumption that it is free.
 
@@ -218,22 +257,23 @@ hundredth is the noise the *last two decimals* warning below describes.
 
     See [Coverage Floor](../../../contributing/coverage-floor.md).
 
-!!! note "The configs' own comments say 26 — corrected on 28 September, and three high on 9 October"
+!!! note "The configs' own comments say 26 — corrected on 28 September, and three high on 11 October"
     Through v2026.09.13 all five runner configs claimed a functions floor would
     fail 31 files, a figure the reports had contradicted on 20, 24, 26 and
     28 September, which each measured 26. `391b1a8` (v2026.09.14) corrected the
     comments to **26** and dated the measurement 28 September; they are
-    unchanged at `ebec288`. Measured since, the figure was **23** on
-    30 September, **24** on 3 October and is **23** on 9 October:
+    unchanged at `c51ec0a`. Measured since, the figure was **23** on
+    30 September, **24** on 3 October, **23** on 9 October and is **23** on
+    11 October:
 
-    | Workspace | Comment until v2026.09.13 | Comment since `391b1a8` | Measured, 30 Sep | Measured, 3 Oct | Measured, 9 Oct |
-    |---|---:|---:|---:|---:|---:|
-    | `frontend` | 11 | 10 | 8 | 9 | **8** |
-    | `pa-cockpit` | 10 | 8 | 7 | 7 | **7** |
-    | `pa-demo` | 7 | 5 | 5 | 5 | **5** |
-    | `public-site` | 3 | 3 | 3 | 3 | **3** |
-    | `backend` | 0 | 0 | 0 | 0 | **0** |
-    | **Total** | **31** | **26** | **23** | **24** | **23** |
+    | Workspace | Comment until v2026.09.13 | Comment since `391b1a8` | Measured, 30 Sep | Measured, 3 Oct | Measured, 9 Oct | Measured, 11 Oct |
+    |---|---:|---:|---:|---:|---:|---:|
+    | `frontend` | 11 | 10 | 8 | 9 | 8 | **8** |
+    | `pa-cockpit` | 10 | 8 | 7 | 7 | 7 | **7** |
+    | `pa-demo` | 7 | 5 | 5 | 5 | 5 | **5** |
+    | `public-site` | 3 | 3 | 3 | 3 | 3 | **3** |
+    | `backend` | 0 | 0 | 0 | 0 | 0 | **0** |
+    | **Total** | **31** | **26** | **23** | **24** | **23** | **23** |
 
     The comments are not wrong so much as dated: each says when it was
     measured, which is the fix that matters, since a count like this moves
@@ -247,7 +287,7 @@ hundredth is the noise the *last two decimals* warning below describes.
     `Dashboard`, `InfraBoardDashboard`, `WooDashboard`), three
     `CaseworkerDashboard` sections — `BesluitStartSection`,
     `IouFeedbackSection` and `IouGebruiksscenarioSection` — and
-    `RegelSimulatie` at 56%; in pa-cockpit,
+    `RegelSimulatie` at 54%; in pa-cockpit,
     `PADashboardV2`, `Dossierbeheer`, `MdEditor`, `Vandaag`, `pa.data`,
     `CuratieSpecSection` and `ZoekcriteriaSection`; in pa-demo, `App.tsx` and
     four shims, two of which — the dock stand-in and the session-expiry
@@ -266,6 +306,29 @@ figures previously spanned a byte-identical copy of the cockpit with
 `src/vendor/**` excluded by hand; the fork was deleted in v2026.08.28 and the
 package is now a thin host adapter over `@ronl/pa-cockpit`. There is nothing
 left to exclude — see [pa-demo by area](#pa-demo-by-area) below.
+
+**What moved in v2026.10.2** — measured 11 October, against the 9 October
+reading of v2026.10.1. `git diff --name-status ebec288 c51ec0a --
+'packages/*/src/**'` is the whole window: `services/operaton.service.ts` and
+its test, `bpmn-swimlane.test.ts` and seven of its fixtures in the backend,
+and `pages/changelog-data.ts` in the frontend.
+
+- **Backend: no new file, +5 tests, 2633 → 2638.** Package figures:
+  statements 98.77 → **98.78**, branches 94.97 → **94.95**, functions
+  **97.95** and lines **99.10** unchanged. All of it is
+  `operaton.service.ts`, whose `getDecisionDocument` now reads the
+  instance's completed user tasks to pick the document of the path taken;
+  the file reads **98.41 / 92.78 / 96.93 / 98.80**, and the `services` row is
+  the only area row that moved. See [Backend by area](#backend-by-area).
+- **Frontend: no test change, 1540.** Package figures 95.42 → **95.35**,
+  93.21 → **93.18**, 91.54 → **91.48**, 95.93 → **95.85**, both runs serial,
+  on source whose only change is the changelog data. Every area row
+  reproduced to the decimal but `CaseworkerDashboardV2`, in which no file has
+  changed since 14 September — see [Frontend by area](#frontend-by-area) and
+  the *last two decimals* warning below.
+- **pa-cockpit, pa-demo and the public site: no source and no test change,
+  and every package figure and every area row reproduced to the decimal**
+  against 9 October — pa-demo for the tenth release running.
 
 **What moved in v2026.10.1** — measured 9 October, against the 3 October
 reading of v2026.10.0. `git diff --name-status 0625d48 ebec288 --
@@ -381,16 +444,28 @@ frontend three in `infra-board.data.test.ts`.
 
     The backend has a different sensitivity: its figures depend on the
     invocation. Through 30 September they came from
-    `npm test --workspace=@ronl/backend`; the 3 and 9 October figures come
-    from `npm run test:serial`, the same Jest command with `--runInBand`, so a
-    second-decimal difference against earlier passes may be the invocation
-    rather than the code.
+    `npm test --workspace=@ronl/backend`; the 3, 9 and 11 October figures
+    come from the same Jest command with `--runInBand`, so a second-decimal
+    difference against earlier passes may be the invocation rather than the
+    code.
 
     **9 October caught it again on unchanged packages.** pa-cockpit's
     one-file `src/pages` row read 86.87% statements and 79.03% functions on
     3 October and 86.95% and 79.36% on 9 October, on byte-identical source — enough to move the
     package's functions figure by one hundredth, 89.56 → 89.57. The public
     site's branches did the same, 97.40 → 97.41.
+
+    **11 October caught it in the frontend, and larger.** Between 9 and
+    11 October no file under `components/CaseworkerDashboardV2/` changed —
+    none has since 14 September — yet its row went from 91.98 / 93.22 /
+    82.92 / 92.35 to **91.22 / 92.97 / 82.31 / 91.46**, serial run against
+    serial run. `RegelSimulatie.tsx` is in it: **54% functions (27 of 50)**,
+    where 9 October recorded 56% (28 of 50) and 3 October 60%. That one row
+    moved the package by three to eight hundredths on every measure. A move
+    that size, on code nobody touched, is noise to note rather than a
+    regression to chase; a fall of a whole point would not be. pa-cockpit's
+    and the public site's rows, by contrast, reproduced their 9 October
+    readings exactly.
 
 All five configure `collectCoverageFrom` / `coverage.include` to span the whole
 `src` tree rather than only the files a test happens to import, so an untested
@@ -408,15 +483,15 @@ used to be measured there. pa-demo is the outlier in the other direction (see
 
 | Package | Statements → branches | Gap | Was, v2026.08.36 |
 |---|---|---:|---:|
-| Backend | 98.77 → 94.97 | 3.8 | 7.5 |
-| Frontend | 95.42 → 93.21 | 2.2 | 8.0 |
+| Backend | 98.78 → 94.95 | 3.8 | 7.5 |
+| Frontend | 95.35 → 93.18 | 2.2 | 8.0 |
 | pa-cockpit | 92.61 → 93.89 | **−1.3** | 10.6 |
 | pa-demo | 93.47 → 95.65 | **−2.2** | 4.4 |
 | Public site | 96.68 → 97.41 | **−0.7** | 16.4 |
 
 Every gap narrowed, and three have gone **negative** — branches now sit above
 statements, pa-cockpit joining pa-demo and the public site on 30 September,
-and all three still there on 9 October. The backend's gap widened by a tenth
+and all three still there on 11 October. The backend's gap widened by a tenth
 in v2026.10.1, on the new eDOCS branches.
 That is what a campaign aimed at branch edges produces once it reaches the
 guards inside files whose plain statements nobody had a reason to execute. The
@@ -437,11 +512,11 @@ Sub-directories report separately rather than rolling up into their parent, and
 istanbul truncates to two decimals rather than rounding. Match these against
 `npm test --workspace=@ronl/backend -- --coverageReporters=text`.
 
-**Re-derived on 9 October 2026** from the run's own coverage report, grouped
-per directory the way istanbul's text reporter groups them and truncated to two
-decimals the same way — and checked against that text table, which the run
-printed and which every row below matches. The rows reconcile to the package
-total in the table at the top of this page, which is the check that they are
+**Re-derived on 11 October 2026** from the run's own
+`coverage/coverage-final.json`, grouped per directory the way istanbul's text
+reporter groups them and truncated to two decimals the same way. The rows
+reconcile to the package total in the table at the top of this page, and that
+total to the `lcov.info` the same run wrote, which is the check that they are
 current.
 
 | Area | Files | Statements | Branches | Functions | Lines |
@@ -457,14 +532,21 @@ current.
 | `services/llm` | 4 | 99.02 | 92.3 | 100 | 98.95 |
 | `utils` | 13 | 98.96 | 98.95 | 100 | 98.84 |
 | `pa-monitoring` | 10 | 98.95 | 89.35 | 95.93 | 98.99 |
-| `services` | 16 | 98.7 | 95.05 | 98.68 | 99.09 |
+| `services` | 16 | 98.71 | 94.98 | 98.69 | 99.09 |
 | `auth` | 4 | 98.21 | 96.07 | 97.72 | 98.56 |
 | `pa-monitoring/sources` | 6 | 98.13 | 93.05 | 94.52 | 99.13 |
 | `mcp-servers/lde` | 1 | 98.03 | 100 | 100 | 97.95 |
 | `media-aggregator` | 10 | 97.58 | 93.37 | 100 | 98.61 |
 | `services/mcp` | 6 | 96.35 | 100 | 93.9 | 97.86 |
 
-**Five rows moved in v2026.10.1, and twelve are unchanged to the decimal** —
+**One row moved in v2026.10.2, and sixteen are unchanged to the decimal.**
+`services` went 98.7 → **98.71** statements, 95.05 → **94.98** branches and
+98.68 → **98.69** functions, lines unchanged, on `operaton.service.ts` at
+**98.41 / 92.78 / 96.93 / 98.80** (558/567, 270/291, 95/98, 495/501): the
+decision-document path brought 10 statements and 8 branches, and the
+five new tests reach all the statements and 7 of the branches.
+
+**History: five rows moved in v2026.10.1, and twelve were unchanged to the decimal** —
 `mcp-servers/edocs` among them, still at 100 on all four although its server
 now refuses a person's call in Dutch when their eDOCS session cannot be
 used. **`auth`** moved most: two new files, `citizen-services.ts` at 100 and
@@ -526,7 +608,7 @@ denominator; **`routes/`** gained `openapi.routes.ts` and `registry.ts`, both at
     `validateConfig` on import, and `logger.ts` was mocked in every test that
     touched it.
 
-    Both are closed. Of the thirteen source files in `utils/` on 9 October,
+    Both are closed. Of the thirteen source files in `utils/` on 11 October,
     **twelve report 100 / 100 / 100 / 100** — `altcha`, `build-info`,
     `client-ip`, `cors-origin`, `dutch-datetime`, `env`, `errors`, `logger`,
     `operaton-variables`, `problem` (new in v2026.10.0), `slug`,
@@ -543,7 +625,8 @@ denominator; **`routes/`** gained `openapi.routes.ts` and `registry.ts`, both at
 at 100 on all four, lifting the row to 90.74% statements and 88.63% branches;
 and `73a6764` took `jwt.middleware.ts` itself to 100, so the row read
 **100 on all four** from 30 September to 3 October, until v2026.10.1's
-`entra-token.service.ts` arrived. The lowest rows on 9 October are
+`entra-token.service.ts` arrived. The lowest rows on 11 October, as on
+9 October, are
 `services/mcp` on statements, functions and lines (96.35%, 93.9% and
 97.86%) — `middleware`, lowest on functions through 30 September, rose past
 it with `error.middleware.ts` — and `pa-monitoring` on branches at
@@ -555,15 +638,22 @@ both at **86.36%** branches.
 
 ## Frontend by area
 
-**Re-derived on 9 October 2026**, from the serial run — the one this pass
-made, for the reason given in *Which frontend run the aggregate uses* at the
-top of this page. The rows reconcile to the 95.42 / 93.21 / 91.54 / 95.93
-package total above. Vitest's text table omits fully covered files, so the
-rows are grouped from the run's `coverage-final.json`; every row the text
-table does print matches.
+**Re-derived on 11 October 2026**, from the serial run, for the reason
+given in *Which frontend run the aggregate uses* at the top of this page.
+The rows reconcile to the 95.35 / 93.18 / 91.48 / 95.85 package total above.
+Vitest's text table omits fully covered files, so the rows are grouped from
+the run's `coverage-final.json`.
 
-**In v2026.10.1 six rows moved, one is new and fifteen reproduced to the
-decimal.** `src/pages/citizen` is new, at 100 — `citizenServiceUi.ts` and
+**In v2026.10.2 one row moved, on unchanged code, and twenty-one reproduced
+to the decimal.** `CaseworkerDashboardV2` went 91.98 → **91.22** statements,
+93.22 → **92.97** branches, 82.92 → **82.31** functions and 92.35 →
+**91.46** lines, although no file in it has changed since 14 September;
+`RegelSimulatie.tsx` reads 54% functions (27 of 50), against 56% on
+9 October. That is run-to-run noise — see the *last two decimals* warning.
+`src/pages`, where the changelog data did change, reproduced to the decimal.
+
+**History: in v2026.10.1 six rows moved, one was new and fifteen reproduced
+to the decimal.** `src/pages/citizen` is new, at 100 — `citizenServiceUi.ts` and
 `heusdenpasTestCases.ts`, both data. `src/components/LoginChoice` went from
 two files at 100 to four (**98.38 / 97.82 / 96 / 98.21**), with
 `AccessDeniedDialog.tsx` and `SingleBoardLanding.tsx`;
@@ -615,7 +705,7 @@ response interceptor in `api.ts`. `InfraBoardDashboard` rose on branches,
 | `src/components/InfraBoardDashboard` | 10 | 95.34 | 89.91 | 92.59 | 95.85 |
 | `src/components/CaseworkerDashboard` | 26 | 94.2 | 94.51 | 90.43 | 95.12 |
 | `src/components/signing` | 3 | 93.1 | 88.75 | 95.65 | 96.11 |
-| `src/components/CaseworkerDashboardV2` | 10 | 91.98 | 93.22 | 82.92 | 92.35 |
+| `src/components/CaseworkerDashboardV2` | 10 | 91.22 | 92.97 | 82.31 | 91.46 |
 | `src/pages` | 11 | 89.03 | 95.73 | 81.2 | 88.97 |
 
 !!! note "This table no longer carries the cockpit's rows"
@@ -646,14 +736,15 @@ pages: [Caseworker](dashboards/caseworker.md),
 
 ## pa-cockpit by area
 
-**Re-derived on 9 October 2026**, on a package neither v2026.10.0 nor
-v2026.10.1 touched. These rows reconcile to the 92.61 / 93.89 / 89.57 /
-93.13 package total above. Six of the seven are identical to 30 September
-and 3 October; the seventh, the one-file `src/pages` row, moved on
-identical code — 86.87 → **86.95** statements, 79.03 → **79.36** functions,
+**Re-derived on 11 October 2026**, on a package none of v2026.10.0,
+v2026.10.1 and v2026.10.2 touched. These rows reconcile to the 92.61 /
+93.89 / 89.57 / 93.13 package total above, and all seven are identical to
+9 October. Six of them are also identical to 30 September and 3 October;
+the seventh, the one-file `src/pages` row, moved on identical code between
+3 and 9 October — 86.87 → **86.95** statements, 79.03 → **79.36** functions,
 86.76 → **86.86** lines — the run-to-run noise the *last two decimals*
-warning describes, and enough to move the package's functions figure by one
-hundredth. The account below is of the
+warning describes, enough to move the package's functions figure by one
+hundredth, and has held there since. The account below is of the
 28 → 30 September window. The package's only changes in it were tests —
 `391b1a8`'s four in `DossierRow.test.tsx` and `73a6764`'s 35 across six files — plus the small `DossierRow.tsx` fix the
 first of them exposed, so nearly everything that moved below moved on new
@@ -689,11 +780,12 @@ that an 80% functions floor would fail.
 
 ## Public site by area
 
-**Re-derived on 9 October 2026**, on a package v2026.10.1 did not touch.
-These rows reconcile to the 96.68 / 97.41 / 95.09 / 97.23 package total
-above. Five of the six are identical to 3 October; the sixth, `src/pages`,
-read 97.29% branches then and **97.31%** now, on identical code — the same
-run-to-run noise as pa-cockpit's. On 3 October `src/lib` was the row that
+**Re-derived on 11 October 2026**, on a package neither v2026.10.1 nor
+v2026.10.2 touched. These rows reconcile to the 96.68 / 97.41 / 95.09 /
+97.23 package total above, and all six are identical to 9 October. Five of
+them are also identical to 3 October; the sixth, `src/pages`, read 97.29%
+branches then and **97.31%** on 9 and 11 October, on identical code — the
+same run-to-run noise as pa-cockpit's. On 3 October `src/lib` was the row that
 moved, on v2026.10.0's problem details: `lib/problem.ts` is new, at 100 on
 all four, and `lib/api.ts` now reads a problem's `detail` through it.
 
@@ -741,9 +833,9 @@ deliberately not covered.
 
 ## pa-demo by area
 
-**Re-derived on 9 October 2026**, and every row below reconciles to the
+**Re-derived on 11 October 2026**, and every row below reconciles to the
 **All files** row rather than predating it. All five rows reproduced to the
-decimal against 24, 26, 28 and 30 September and 3 October, on a package whose
+decimal against 24, 26, 28 and 30 September and 3 and 9 October, on a package whose
 `src/` tree has not changed since v2026.09.5.
 
 | Area | Files | Statements | Branches | Functions | Lines |

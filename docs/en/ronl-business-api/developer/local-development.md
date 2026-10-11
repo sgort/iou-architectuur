@@ -50,6 +50,7 @@ they run are `#!/usr/bin/env bash` scripts using bash arrays:
 |---|---|
 | `postinstall` | `bash scripts/write-deps-marker.sh`, so **`npm ci` and `npm install` themselves need bash**; on `npm install --package-lock-only`, which installs nothing, it writes no marker |
 | `deps:check` | `bash scripts/check-deps.sh` |
+| `audit:signatures` | `bash scripts/audit-signatures.sh` — `npm audit signatures` over the installed tree, so it needs `npm ci` first; the required [`audit` job](cicd.md#audit-the-required-check) runs it on every pull request |
 | `docker:check` | `bash scripts/check-docker.sh` |
 | `dev` | `deps:check`, then `docker:check`, then the dev servers |
 | `check-mirror`, `check-previews` | `bash scripts/check-mirror.sh`, `bash scripts/check-previews.sh` |

@@ -8,6 +8,26 @@ component: RONL Business API
 
 ## Changelog
 
+## v2026.10.2 — Every Dependency Weighed, Signatures Verified, and the Decision Document of the Path Taken (October 2026)
+
+> The workflows: [CI/CD](cicd.md). The document a case produces: [Frontend development](frontend-development.md). Multi-output decisions: [BPMN Design Criteria](../reference/bpmn-design-criteria.md). Measured suites: [Testing](testing/overview.md).
+
+**Every new dependency is weighed against written criteria, and every quarter all of them are.** The criteria are shared with the Linked Data Explorer and the CPSV Editor and live in the Linked Data Explorer's `docs/dependency-criteria.md`: maintained, maintainers, licence, release policy, footprint and need (ICTU recommendations 1 and 11, [sgort/linked-data-explorer#250](https://github.com/sgort/linked-data-explorer/issues/250)). When a pull request adds a direct dependency, the lockfile-review comment lists it with a checklist of those criteria. A fourteenth workflow, `dependency-review.yml`, runs on the second day of each quarter and opens that quarter's review issue from registry and GitHub evidence for every direct dependency; the first, for 2026-Q4, is [#362](https://github.com/sgort/ronl-business-api/issues/362).
+
+**Registry signatures and provenance are verified on every pull request.** The required `audit` job runs `npm run audit:signatures` over the installed tree. It fails on an invalid or missing registry signature, and on an attestation the registry advertises but does not serve; a package without an attestation passes (ICTU recommendation 5, the provenance half, [sgort/linked-data-explorer#249](https://github.com/sgort/linked-data-explorer/issues/249)).
+
+**The release SBOM lists every production package, and its checks can fail.** `npm sbom --omit=dev` had dropped production packages — React among them — so `write-sbom.mjs` now has npm list the whole tree and keeps what the lockfile does not mark dev, plus the workspace packages; a production package npm does not list stops the generation ([#368](https://github.com/sgort/ronl-business-api/pull/368)). The SBOM workflow tests that script and runs both checks before it generates the file, so they compare the committed document rather than a fresh one with itself ([#354](https://github.com/sgort/ronl-business-api/issues/354)). The v2026.10.2 SBOM lists 487 components and was made with the npm CI uses.
+
+**The decision document follows the path the case took.** `GET /v1/process/:id/decision-document` and its machine twin used to return the template of the first `ronl:documentRef` in the BPMN. Since the besluitvorming example produces a different document after escalation ([sgort/linked-data-explorer#246](https://github.com/sgort/linked-data-explorer/issues/246)), the endpoint takes the document of the most recently completed user task that carries `ronl:documentRef` or `ronl:signatureRef`, and falls back to the first `ronl:documentRef` only when none does — so a single-document process gets the same template as before.
+
+**Examples store DMN results as plain variables.** The HR onboarding and RIP phase 1 examples map each decision output into its own variable instead of `mapDecisionResult="singleResult"`, whose serialised map concurrent REST reads could collide on with ENGINE-03005, and lose the script tasks that only copied the outputs ([sgort/linked-data-explorer#273](https://github.com/sgort/linked-data-explorer/issues/273)). The swimlane parser fixtures — the Thuisbatterij one with its completeness check and Awb 4:5 path — and `rip-bpmn-fingerprints.json` are refreshed from the Linked Data Explorer.
+
+**Also in this release.** lint-staged 17.6, and an unused helper removed from `dependency-review.mjs`.
+
+**Found while documenting it.** The decision document's fallback takes the first `ronl:documentRef` as written and does not split a comma-separated list, where the path-taken rule does ([#371](https://github.com/sgort/ronl-business-api/issues/371)).
+
+---
+
 ## v2026.10.1 — Citizen Services Follow the Deployments, Every Organisation Its Own Page, and eDOCS as the Person (October 2026)
 
 > For citizens: [Citizen portal](../user-guide/citizen-portal.md). The landing pages: [Getting started](../user-guide/getting-started.md). How a service is offered and started: [Processes](../features/processes.md). eDOCS as the person: [eDOCS live testing](testing/edocs-live-testing.md) and [Entra ID](deployment/entra-id.md). The assistant: [MCP AI Assistant](mcp-ai-assistant.md). Measured suites: [Testing](testing/overview.md).
