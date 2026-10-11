@@ -9,8 +9,8 @@ component: Linked Data Explorer
 It lives in `packages/frontend/public/examples/flevoland/besluitvorming-gedelegeerd/` and is seeded in the Modeler as **Besluitvorming onder gedelegeerde bevoegdheid (Voorbeeld, NL)**. Everything in it is Dutch: element names, lanes, phases, forms and the document. Like the Kapvergunning, Thuisbatterij, Zorgtoeslag and HR capacity examples, it is drawn in swimlanes and declares phases the RONL Business API shows the caseworker.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: GedelegeerdBesluitProcess open in the BPMN Modeler — six lanes from Aanvrager / Indiener to Registratie & Beheer, the blue DMN badge GedelegeerdBesluitRoute on Beslisregels toepassen in the Systeem lane, and green form badges and a purple document badge on the user tasks](../../assets/screenshots/linked-data-explorer-bpmn-besluitvorming-swimlanes.png)
-  <figcaption>GedelegeerdBesluitProcess in the Modeler: six lanes, the routing DMN on "Beslisregels toepassen", and the form and document badges on the user tasks</figcaption>
+  ![Screenshot: GedelegeerdBesluitProcess open in the BPMN Modeler — six lanes from Aanvrager / Indiener to Registratie & Beheer, phase badges at the top left of the nodes, solid where a phase starts and outlined where it is inherited, green form badges on the user tasks, the purple document badge on Neem besluit (truncated on the canvas to besluit-gb-besluit-...), and the process's own phases listed in the properties panel](../../assets/screenshots/linked-data-explorer-bpmn-besluitvorming-swimlanes.png)
+  <figcaption>GedelegeerdBesluitProcess in the Modeler: the lanes, the phase badges, the process's six phases in the panel, and Neem besluit's document badge (besluit-gb-besluit-bestuur, cut short on the canvas)</figcaption>
 </figure>
 
 ---
@@ -74,13 +74,13 @@ ronl:phases="voorbereiding:Voorbereiding;toetsing:Advies en toetsing;memorandum:
 | 5 | `escalatie` | Escaleren naar bevoegde bestuursautoriteit |
 | 6 | `registratie` | Ontvang en registreer |
 
-Every unmarked node inherits its phase from the flow before it. Memorandum and Escalatie are optional branches, so a besluit on the direct path skips them on the stepper. The attributes are written by hand: the Modeler keeps them but has no control for them yet ([LDE issue #242](https://github.com/sgort/linked-data-explorer/issues/242)). See [A process's own phases](../../ronl-business-api/reference/bpmn-design-criteria.md#a-processs-own-phases-ronlphases-ronlphaselabel-ronlphase) for how they are read.
+Every unmarked node inherits its phase from the flow before it. Memorandum and Escalatie are optional branches, so a besluit on the direct path skips them on the stepper. The Modeler shows the phases as badges on the canvas and edits them in the properties panel — see [Phases](bpmn-modeler.md#phases). See [A process's own phases](../../ronl-business-api/reference/bpmn-design-criteria.md#a-processs-own-phases-ronlphases-ronlphaselabel-ronlphase) for how they are read.
 
 ---
 
 ## Bundle contents
 
-Fifteen files: one BPMN, one DMN, twelve forms and one document template.
+Sixteen files: one BPMN, one DMN, twelve forms and two document templates.
 
 ### Forms
 
@@ -97,7 +97,7 @@ One form per user task, each named after its own id and seeded in the Form Edito
 | `besluit-gb-indienen` | 6. Dien het besluit in voor ondertekening | `documentenCompleet`, `ondertekenaar` |
 | `besluit-gb-ondertekenen` | Onderteken het besluit | `approvalStatus` — `approved` or `rejected` — and `ondertekenToelichting` |
 | `besluit-gb-escalatie` | Escaleren naar bevoegde bestuursautoriteit | `escalatieReden` |
-| `besluit-gb-besluit-nemen` | Neem besluit | `besluitUitkomst` — `genomen` or `afgewezen` — and `besluitToelichting` |
+| `besluit-gb-besluit-nemen` | Neem besluit | `besluitUitkomst` — `genomen` or `afgewezen` — `besluitToelichting`, and `besluitnemer`, the name of the bevoegde bestuursautoriteit's decision-maker (required) |
 | `besluit-gb-registreren` | Ontvang en registreer | `zaaknummer`, `kenmerk`, `documentenGekoppeld` |
 | `besluit-gb-archiveren` | Archiveer | `bewaartermijn` — 5, 10 or 20 years, or permanent — and `toegankelijkOpgeslagen` |
 
@@ -105,27 +105,29 @@ The five DMN inputs all come from these forms, and each has a default, so the DM
 
 `besluit-gb-ondertekenen` is the **fallback** for the signing task. The RONL Business API shows its ValidSign signing panel in place of the form, and falls back to the form only when it cannot fetch the signing specification. Both write `approvalStatus`, so *Ondertekend?* works either way — see [Configuring a process for signing](../../ronl-business-api/developer/validsign-signing.md#configuring-a-process-for-signing).
 
-### Document template
+### Document templates
 
 `besluit-gb-besluit.document`, *Besluit onder gedelegeerde bevoegdheid*, is the besluit itself. It has a Provincie Flevoland letterhead and contact block, a reference block with the subject and type, a body with the scope of the delegation, the besluit, the motivering and the financial consequences, a closing with the objection clause, and a `signOff` zone for the gemachtigde ondertekenaar. It binds six process variables: `onderwerp`, `besluitType`, `voorgesteldBesluit`, `motivering`, `financieleGevolgen` and `ondertekenaar`.
 
-Two tasks refer to it:
+`besluit-gb-besluit-bestuur.document`, *Besluit van de bevoegde bestuursautoriteit*, is the besluit on the escalation path. It has the same letterhead, reference block and objection clause, but says that the bevoegde bestuursautoriteit decided, and why: the besluit could not be settled under the delegated authority, because it fell outside the mandate or the gemachtigde ondertekenaar did not sign it. Below the proposed besluit it gives the outcome and the authority's explanation, and its sign-off, *De bevoegde bestuursautoriteit,*, closes with the `besluitnemer`. It binds eight process variables: `onderwerp`, `besluitType`, `voorgesteldBesluit`, `motivering`, `financieleGevolgen`, `besluitUitkomst`, `besluitToelichting` and `besluitnemer` — the last three set on *Neem besluit* itself. It does not bind `ondertekenaar`.
+
+Each task refers to its own document:
 
 | Task | Attribute | Effect |
 |---|---|---|
 | Onderteken het besluit | `ronl:signatureRef="besluit-gb-besluit"` | The RONL Business API has the gemachtigde ondertekenaar sign the document through ValidSign |
-| Neem besluit | `ronl:documentRef="besluit-gb-besluit"` | The bevoegde bestuursautoriteit sees the document with the task |
+| Neem besluit | `ronl:documentRef="besluit-gb-besluit-bestuur"` | The bevoegde bestuursautoriteit sees its own besluit with the task |
 
-The Modeler's deploy modal follows both attributes, so the document travels with the process. The Document Composer seeds the template from an inline copy, `BESLUIT_GB_BESLUIT` in `defaultTemplates.ts`, because the Vite dev server rejects imports from `public/`; `defaultTemplates.test.ts` keeps the inline copy identical to the file.
+The ordinary path keeps `besluit-gb-besluit` and its ValidSign signing. The Modeler's deploy modal follows both attributes, so both documents travel with the process. The Document Composer seeds the templates from inline copies, `BESLUIT_GB_BESLUIT` and `BESLUIT_GB_BESLUIT_BESTUUR` in `defaultTemplates.ts`, because the Vite dev server rejects imports from `public/`; `defaultTemplates.test.ts` keeps each inline copy identical to its file.
 
 ---
 
 ## Deploying the bundle
 
 1. **Deploy the DMN once, without an organization.** `GedelegeerdBesluitRoute` is not part of the Modeler's deploy bundle. It is shared and untenanted, which is what `decisionRefTenantId="${null}"` expects.
-2. **Deploy the process from the Modeler.** Open *Besluitvorming onder gedelegeerde bevoegdheid (Voorbeeld, NL)* and click **Deploy**. The modal lists `GedelegeerdBesluitProcess.bpmn`, the twelve forms and `besluit-gb-besluit.document`, and deploys them under the organization `flevoland`. See [One-click deploy](bpmn-modeler.md#one-click-deploy).
+2. **Deploy the process from the Modeler.** Open *Besluitvorming onder gedelegeerde bevoegdheid (Voorbeeld, NL)* and click **Deploy**. The modal lists `GedelegeerdBesluitProcess.bpmn`, the twelve forms, `besluit-gb-besluit.document` and `besluit-gb-besluit-bestuur.document`, and deploys them under the organization `flevoland`. See [One-click deploy](bpmn-modeler.md#one-click-deploy).
 
-The bundle has no `e2e-fixtures/` copy and no E2E journey; it is checked by its bundle test.
+The bundle has no `e2e-fixtures/` copy and no E2E journey; it is checked by its bundle test. Its authored copy is `examples/organizations/flevoland/besluitvorming-gedelegeerd/`, and `public-example-fixture-parity.test.ts` keeps every file the Modeler serves from `public/examples/flevoland/` identical to it.
 
 Its BPMN is nonetheless copied downstream: the RONL Business API keeps `GedelegeerdBesluitProcess.bpmn` as a parser fixture for a process that declares its own phases. `npm run check-rip-bpmn` therefore fingerprints it in `rip-bpmn-fingerprints.json`, in the pre-push hook and the required CI `audit` job, so an edit to the BPMN fails that check until `node scripts/check-rip-bpmn-copies.mjs --write` records the new fingerprint, and the RONL Business API's fixture is refreshed with the command it prints. See [RIP R2.2 Bundle → The mirrored copy](rip-r22-bundle.md#the-mirrored-copy).
 
@@ -138,7 +140,8 @@ The files reference each other by id and by variable name, and nothing else chec
 - the DMN's id, hit policy, five inputs in order and six rules;
 - the twelve forms, each named after its own id, with the DMN inputs writable and defaulted, the radio values the gateways test, and every value the document binds collected as a required field before signing;
 - the process's id, name, organization and language, the six lanes in order, a deployed form and the lane's candidate group on every user task, the untenanted DMN call, `signatureRef` and `documentRef`, the six phases and their markers, the gateway conditions, and the declined signature leading to escalation;
-- the document's id, process key and bindings.
+- the document's id, process key and bindings;
+- the escalation document: its id and process key, a `besluitnemer` binding and no `ondertekenaar`, only bindings a form writes, and `besluitUitkomst`, `besluitToelichting` and a required `besluitnemer` writable on *Neem besluit*.
 
 ---
 
@@ -148,22 +151,9 @@ The process starts on the caseworker dashboard rather than from a resident's req
 
 ---
 
-## Known issue
-
-!!! warning "The besluit document reads wrong on the escalation path"
-    The document is written for the ordinary path, where the gemachtigde
-    ondertekenaar signs it. On escalation, *Neem besluit* shows the same
-    document: `{{ondertekenaar}}` is empty when the besluit never reached
-    *6. Dien het besluit in voor ondertekening*, or names the person who
-    declined to sign; and the sign-off still reads *"Namens deze, de
-    gemachtigde ondertekenaar,"* although the bevoegde bestuursautoriteit
-    decides. Tracked as [LDE issue #246](https://github.com/sgort/linked-data-explorer/issues/246).
-
----
-
 ## Related
 
-- [BPMN Modeler](bpmn-modeler.md) — the Deploy modal and the `ronl:*` attributes
+- [BPMN Modeler](bpmn-modeler.md) — the Deploy modal, the phase editors and the `ronl:*` attributes
 - [Form Editor](form-editor.md) — the seeded forms
 - [Document Composer](document-composer.md) — how `.document` templates and their zones work
 - [RONL Business API — BPMN Design Criteria](../../ronl-business-api/reference/bpmn-design-criteria.md#lanes-and-phase-markers-the-caseworker-process-view) — lanes and phase markers in the caseworker process view

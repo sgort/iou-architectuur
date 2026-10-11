@@ -22,6 +22,11 @@ On your first visit, the Modeler seeds its example processes and opens the first
 2. A new process named "New Process" appears in the list and the canvas shows an empty diagram with a start event.
 3. Double-click the process name in the list to rename it.
 
+Each new process gets a process id of its own — the template's id plus a timestamp — because a process id is unique within an organisation.
+
+!!! note "Importing a process whose id is already used"
+    When you import a BPMN whose process id your organisation already uses, the Modeler asks what to do. **OK** replaces the existing process's content with the import, keeping that process's record, status and deploy stamp. **Cancel** asks for another process id for the import, with a fresh one filled in; leave it empty and nothing is imported. The same id in a different organisation is no conflict.
+
 ---
 
 ## Building a diagram
@@ -87,6 +92,28 @@ A **purple badge** below the task on the canvas names the template, or reads **2
 
 ---
 
+## Setting phases
+
+The RONL Business API shows a caseworker a phase stepper for the process. You set its phases in two places.
+
+**On the process.** Click an empty spot on the canvas — or the pool, in a diagram with pools — so the process itself is selected. Under **Phases (RBA stepper)**:
+
+1. Choose **Own phases** to give the process its own list, or **Awb phases** to use the eight phases of the Awb procedure.
+2. For own phases, type a name under **New phase name** and click **Add phase**. Repeat for every phase, in order. The Modeler fills in a code for each; change it if you want another.
+3. Put the phases in order with the arrows, and remove one with the bin.
+4. Optionally change **Label**, the word before a phase's number in the stepper. It is `Fase` unless you change it.
+
+**On the nodes.** Select the node where a phase begins. Under **Start van fase**, pick that phase. Leave the nodes that follow on **(erft over)**: they inherit it, and the line under the select says which phase that is.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: properties panel of a selected task under Start van fase, the select reading (erft over), and below it the line saying which phase the task inherits](../../assets/screenshots/linked-data-explorer-bpmn-phase-marker-picker.png)
+  <figcaption>Start van fase: pick the phase a node starts, or leave it on (erft over) to inherit</figcaption>
+</figure>
+
+The canvas shows the result as you go: a solid badge on a node that starts a phase, an outlined one on a node that inherits it. Undo takes back a whole phase edit in one step. The deploy modal checks the phases before you deploy; see [Phases](../features/bpmn-modeler.md#phases) for the details and [Phase findings](../features/bpmn-modeler.md#phase-findings) for what it reports.
+
+---
+
 ## Deploying to Operaton
 
 The Modeler can deploy your process — including subprocess BPMNs, linked forms and document templates — to Operaton in a single step.
@@ -109,7 +136,7 @@ The modal also has a required **Board ownership** section. It auto-detects the o
 </figure>
 
 1. Review the resource list. A form or document template the process references but this browser does not have is listed under **⛔ Referenced resources are missing from local storage**, and **Deploy** stays disabled until you import it in the Form Editor or the Document Composer.
-2. Read any amber warning. **Bundle mixes languages** means the artefacts carry more than one language tag — a process's `ronl:language`, or the language of a form or document template; untagged artefacts do not count. It does not stop the deploy, but a deployed bundle should be one language: retag or untag the odd one out first. A missing `ronl:ropaRef` gets a warning of the same kind.
+2. Read any red or amber finding. A process that declares its own phases and also has Awb phase markers gets a red one, and **Deploy** stays disabled until you remove one of the two schemes; the amber phase warnings do not block. **Bundle mixes languages** means the artefacts carry more than one language tag — a process's `ronl:language`, or the language of a form or document template; untagged artefacts do not count. It does not stop the deploy, but a deployed bundle should be one language: retag or untag the odd one out first. A missing `ronl:ropaRef` gets a warning of the same kind.
 3. Check the **Board ownership** section — accept the auto-detected board or override it. A board owner is required to deploy.
 4. Check the **Organization**. It comes from the sidebar's **Organization** field once the process is saved, and it is **required** — the deploy will not submit without one. It is sent to Operaton as the deployment's tenant-id, so a process deployed without it would be invisible to any tenant-scoped lookup made later.
 5. Check the line **Deploys to …**, which names the Operaton the process will reach. You do not choose it here: the backend always deploys to its own configured Operaton, with its own credentials.
@@ -185,6 +212,8 @@ The process library ships with three AWB shell processes and their subprocesses.
 
 **Asking for missing information.** When an application is incomplete, each shell opens the task *Aanvullende gegevens opvragen (Awb 4:5)* with its own form — `kapvergunning-aanvullende-gegevens`, `zorgtoeslag-aanvullende-gegevens` or `thuisbatterij-aanvullende-gegevens`. Its **supplementReceived** checkbox decides the next gateway, *Aanvulling ontvangen?*: the case continues, or the application is not processed. The form deploys with the shell like its other forms.
 
+The Thuisbatterij shell checks completeness with a decision of its own, `ThuisbatterijCompletenessCheck`, and its gateway *Aanvraag volledig?* has three exits: a complete application goes on to the assessment; an incomplete one goes to *Aanvullende gegevens opvragen (Awb 4:5)* the first time; and one still incomplete after that recovery is put out of consideration, *Aanvraag buiten behandeling stellen (Awb 4:5 lid 2)*. A supplement received within the recovery period sends the application back through the completeness check. The form shows the fields the check found missing (`missingFields`) and records the values the applicant supplied.
+
 ---
 
 ## Standalone examples
@@ -195,6 +224,6 @@ Three examples are standalone processes, with no shell:
 - **Besluitvorming onder gedelegeerde bevoegdheid (Voorbeeld, NL)** — a decision prepared, reviewed, signed through ValidSign or escalated, then registered and archived, in six lanes and six phases. See [Besluitvorming onder gedelegeerde bevoegdheid](../features/besluitvorming-gedelegeerd-bundle.md).
 - **DvTP — Flow A: Toestemming geven** — the DvTP consent process.
 
-The lanes and phases are what the RONL Business API shows a caseworker; see [Lanes and phase markers](../../ronl-business-api/reference/bpmn-design-criteria.md#lanes-and-phase-markers-the-caseworker-process-view).
+The lanes and phases are what the RONL Business API shows a caseworker; to set phases on a process of your own, see [Setting phases](#setting-phases) above and [Lanes and phase markers](../../ronl-business-api/reference/bpmn-design-criteria.md#lanes-and-phase-markers-the-caseworker-process-view).
 
 All seeded examples carry the `EXAMPLE` badge and cannot be deleted. They can be edited and saved, but a later example update replaces your edits, so to keep a change, export the process and import the copy as a new process.

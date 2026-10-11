@@ -472,7 +472,9 @@ POST   /v1/assets/documents
 DELETE /v1/assets/documents/:id
 ```
 
-Persisteert BPMN-processen, formulierschema's en documenttemplates naar PostgreSQL. Alle routes retourneren `503 DB_NOT_CONFIGURED` wanneer `DATABASE_URL` ontbreekt. De upserts, de deploymarkering en het verwijderen van een ROPA-record valideren hun invoer voordat die Postgres bereikt, en antwoorden `400 INVALID_INPUT` met een detail dat elk afgekeurd veld noemt; de controles volgen de eigen constraints van de database, en een lege titel, id of naam wordt geweigerd op de velden die een record identificeren. Zie [Asset-opslag](asset-storage.md) voor de service-architectuur en de [API Specification](../reference/api-specification.md) voor de vorm van requests en responses.
+Persisteert BPMN-processen, formulierschema's en documenttemplates naar PostgreSQL. Alle routes retourneren `503 DB_NOT_CONFIGURED` wanneer `DATABASE_URL` ontbreekt. De upserts, de deploymarkering en het verwijderen van een ROPA-record valideren hun invoer voordat die Postgres bereikt, en antwoorden `400 INVALID_INPUT` met een detail dat elk afgekeurd veld noemt; de controles volgen de eigen constraints van de database, en een lege titel, id of naam wordt geweigerd op de velden die een record identificeren.
+
+Een opgeslagen proces is uniek per organisatie en proces-id. `POST /v1/assets/bpmn` antwoordt `409 PROCESS_ID_TAKEN` wanneer een ander opgeslagen proces in dezelfde organisatie het `bpmnProcessId` al heeft, en schrijft niets; het probleem bevat `bpmnProcessId`, `organization` en `existing` (`id`, `name` en `status` van het proces dat het id heeft), zodat de Modeler kan aanbieden dat proces te vervangen of het nieuwe een ander id te geven. `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId` accepteert een optionele `?organization=` die het opzoeken tot één organisatie beperkt; een lege waarde betekent rijen zonder organisatie, en zonder de parameter tellen de rijen van elke organisatie mee. Zie [Asset-opslag](asset-storage.md) voor de service-architectuur en de [API Specification](../reference/api-specification.md) voor de vorm van requests en responses.
 
 ---
 
@@ -480,11 +482,11 @@ Persisteert BPMN-processen, formulierschema's en documenttemplates naar PostgreS
 
 De backend verbindt met een PostgreSQL-database via een `pg.Pool`. De pool wordt geïnitialiseerd in `src/db/pool.ts` wanneer `DATABASE_URL` aanwezig is in de omgeving. Wanneer de variabele afwezig is, is `pool` `null` en retourneren alle asset-endpoints `503`.
 
-Schemamigraties draaien automatisch bij opstart via `migrate()` in `src/db/migrate.ts`, aangeroepen vanuit `startServer()` vóór `app.listen()`. De migratie is idempotent (`CREATE TABLE IF NOT EXISTS`).
+Schemamigraties draaien automatisch bij opstart via `migrate()` in `src/db/migrate.ts`, aangeroepen vanuit `startServer()` vóór `app.listen()`. De migratie is idempotent: ze maakt tabellen en indexen alleen aan waar ze nog niet bestaan, en haar datastappen zijn veilig te herhalen. Voordat ze de unieke index op organisatie en proces-id aanmaakt, archiveert en verwijdert ze dubbele opgeslagen processen (zie [Asset-opslag](asset-storage.md#migraties)).
 ```
 src/db/
 ├── pool.ts       — pg.Pool-initialisatie, error listener, null-if-unconfigured guard
-└── migrate.ts    — idempotente DDL: process_definitions, form_schemas, document_templates
+└── migrate.ts    — idempotente DDL voor de zes tabellen, ontdubbeling, unieke index
 ```
 
 Zie [PostgreSQL-deployment](deployment-postgresql.md) voor Azure-provisioning.

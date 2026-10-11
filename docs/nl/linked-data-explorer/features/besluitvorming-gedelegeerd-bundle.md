@@ -35,8 +35,4 @@ component: Linked Data Explorer
 
 ---
 
-## Bekend probleem
-
----
-
 ## Gerelateerd

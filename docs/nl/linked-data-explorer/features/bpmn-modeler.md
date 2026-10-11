@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # BPMN Modeler
 
 !!! info "Documentatie in ontwikkeling"
@@ -32,6 +36,10 @@
 ---
 
 ## Documentsjabloonkoppeling
+
+---
+
+## Phases
 
 ---
 

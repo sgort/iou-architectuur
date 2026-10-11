@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # BPMN Modeler Implementatie
 
 !!! info "Documentatie in ontwikkeling"
@@ -44,3 +48,7 @@
 ---
 
 ## Deploy modal
+
+---
+
+## Phases

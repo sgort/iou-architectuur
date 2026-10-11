@@ -80,7 +80,7 @@ You can also add bindings manually without using Discover Variables — fill in 
 
 ## Working with the example documents
 
-The Composer seeds eight example templates, each marked with the EXAMPLE badge. **Kapvergunning Beschikking (Example)** (`example_treefelling_beschikking`) demonstrates a complete, production-style beschikking template linked to the `AwbShellProcess` process key. The others cover the Zorgtoeslag provisional and final decisions, the DvTP consent receipt, two Dutch HR capacity documents, the Subsidie Thuisbatterij decision and the delegated decision **Besluit onder gedelegeerde bevoegdheid**.
+The Composer seeds nine example templates, each marked with the EXAMPLE badge. **Kapvergunning Beschikking (Example)** (`example_treefelling_beschikking`) demonstrates a complete, production-style beschikking template linked to the `AwbShellProcess` process key. The others cover the Zorgtoeslag provisional and final decisions, the DvTP consent receipt, two Dutch HR capacity documents, the Subsidie Thuisbatterij decision, the delegated decision **Besluit onder gedelegeerde bevoegdheid**, and **Besluit van de bevoegde bestuursautoriteit**, the decision the competent authority takes after escalation.
 
 Examples cannot be deleted. Every example except **DvTP Toestemmingsbewijs (Example)** can be edited and saved in place; that one is read-only. To build your own variant of any example:
 

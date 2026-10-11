@@ -21,6 +21,8 @@ packages/frontend/src/components/BpmnModeler/
 ├── DocumentTemplateSelector.tsx  document template chips and "add" select for UserTask linking
 ├── RopaSelector.tsx           RoPA record selector, in the footer pinned below the process list
 ├── DsoActiviteitSelector.tsx  DSO activiteit URN selector, in the same footer
+├── ProcessPhasesEditor.tsx    the process's phase scheme and own phases, for RBA's stepper
+├── PhaseMarkerSelector.tsx    "Start van fase": the phase a node starts
 ├── ronlModdleDescriptor.json  registers the ronl: attributes bpmn-js reads as properties
 └── BpmnModeler.css            custom styles for canvas rendering fixes and badge overlays
 
@@ -29,10 +31,13 @@ packages/frontend/src/
 │   ├── bpmnService.ts         localStorage CRUD for BpmnProcess records
 │   └── formService.ts         localStorage CRUD for FormSchema records (shared with FormEditor)
 └── utils/
+    ├── bpmnLinks.ts           extractCallActivityTargets, shared with the RoPA editor
     ├── bpmnTemplates.ts       default BPMN XML templates (new process, example)
     ├── deployBundle.ts        findProcessId, resolveSubProcesses, collectBundleRefs: the deploy bundle
     ├── documentRefs.ts        parse and format the comma-separated ronl:documentRef list
-    └── exampleVersions.ts     EXAMPLE_VERSIONS, the seed version registry
+    ├── exampleVersions.ts     EXAMPLE_VERSIONS, the seed version registry
+    ├── processIdentity.ts     isValidProcessId, renameProcessId, freshProcessId
+    └── phases/                phase model, RBA's phase inheritance, deploy checks, edit commands
 ```
 
 ---
@@ -355,6 +360,8 @@ const { formRefs, documentRefs } = collectBundleRefs(xml, subProcessXmls);
 
 References that match nothing in local storage are passed to the modal as `unmatchedForms` and `unmatchedDocuments`. The modal lists them by name under **⛔ Referenced resources are missing from local storage** and **disables Deploy** while any remain, alongside the board-owner and organization guards: a bundle without them is one the engine cannot resolve at runtime.
 
+`handleOpenDeployModal` also runs `checkPhases(xml)` (`utils/phases/phaseChecks.ts`) on the open process and passes the result as `phaseFindings`. Each finding renders as its own banner, red for an error and amber for a warning, and an error **disables Deploy** too. There is one error, `MIXED_SCHEMES` — declared phases and Awb markers in one process — and five warnings: `NO_MARKERS`, `UNKNOWN_CODE`, `EMPTY_PHASE`, `SKIPPED_ENTRIES` and `IGNORED_NODE_KIND`. See [Phases](#phases).
+
 ### Stacking
 
 The modal's overlay sits at `z-[1100]`, not the `z-50` the app's other dialogs use. It is the only dialog that opens over a bpmn-js canvas, and bpmn-js brings its own stacking: `diagram-js.css` puts the context pad at 100, the popup menu at 200 and the hover tooltip at 1000, and `properties-panel.css` puts its tooltip and FEEL editor popup at 1001. At `z-50` a selected task's context pad sat on top of the modal and stayed clickable through the backdrop; 1100 clears them all. `BpmnCanvas.test.tsx` pins the class.
@@ -398,7 +405,7 @@ The organization goes in Operaton's native `tenant-id` field.
 
 Processes deploy **only to the configured Operaton**. `deployProcess()` always uses the shared client, built from `OPERATON_BASE_URL` and carrying `OPERATON_API_KEY`, so Operaton credentials stay on the backend. For older frontends, an `operatonUrl` equal to the configured one is still accepted; any other answers `400`, and `operatonUsername` and `operatonPassword` are ignored. All three fields are deprecated.
 
-After Operaton accepts the deployment, the route finds the stored process by the id in the BPMN — or creates a minimal row when none exists — and stamps it as deployed, recording the Operaton actually used. Saving a process takes `bpmnProcessId` from the saved XML, so renaming the process id no longer leaves a stale value that makes the next deploy create a second row.
+After Operaton accepts the deployment, the route finds the stored process by the id in the BPMN within the deploy's organisation — or creates a minimal row when none exists — and stamps it as deployed, recording the Operaton actually used. A minimal row's `lde_id` is `${organization}:${bpmnProcessId}` (the bare process id without an organisation), so one organisation's deploy can neither find nor overwrite another's row with the same process id. Saving a process takes `bpmnProcessId` from the saved XML, so renaming the process id no longer leaves a stale value that makes the next deploy create a second row.
 
 ---
 
@@ -459,11 +466,21 @@ const extractBpmnProcessId = (xml: string): string => {
 
 `ProcessList.tsx` uses `calledElement === shell.bpmnProcessId` to group subprocesses under their parent shell in the hierarchical view.
 
+### One process id per organisation
+
+The backend keeps one stored process per organisation and process id, and answers a save that would break that with `409 PROCESS_ID_TAKEN`, naming the row that holds the id (see [Asset Storage](asset-storage.md)). `BpmnService.saveProcessDetailed` returns `{ saved, conflict? }`, with `conflict` set only for that refusal; `saveProcess` still returns the plain boolean. The Modeler handles the conflict in three places:
+
+- **`handleCreateProcess`** gives every new process a fresh process id — `freshProcessId(templateId)`, the template's id plus a timestamp, written with `renameProcessId` — since every new process would otherwise share the template's id.
+- **An import** whose id is taken is dropped from the local cache with `BpmnService.forgetLocal` (the server never stored it), and `resolveImportConflict` asks: replace the holder's content with the import, keeping its LDE id, record, status and deploy stamp, or give the import another id, prompted with a fresh one and checked with `isValidProcessId`.
+- **A save** whose process id was renamed to a taken one shows an error naming the holder.
+
+`renameProcessId` rewrites only the `<process>` id, a participant's `processRef` and the diagram plane's `bpmnElement`.
+
 ### Bundle assembly after migration
 
 `BpmnCanvas.tsx` resolves subprocess XMLs for deployment by matching `calledElement` values from the active BPMN against stored `BpmnProcess` records. After the PostgreSQL migration the lookup continues to work identically — `hydrateFromServer()` ensures the local cache reflects the database state on mount, so the in-memory lookup in `BpmnService.getProcesses()` always has current data.
 
-The backend additionally exposes `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId` for direct server-side subprocess lookup by BPMN process id.
+The backend additionally exposes `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId` for direct server-side subprocess lookup by BPMN process id. An optional `?organization=` scopes the lookup to one organisation, an empty value meaning none; without it, every organisation's rows count.
 
 ---
 
@@ -473,7 +490,7 @@ The backend additionally exposes `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId`
 
 `ronlModdleDescriptor.json` registers `ronl:` extensions against bpmn-js, under the namespace `http://ronl.nl/schema/1.0`, so bpmn-js reads and writes them as typed properties of the element — which is what lets `businessObject.get('ronl:documentRef')` and `modeling.updateProperties` work on them.
 
-The descriptor declares five type entries:
+The descriptor declares seven type entries:
 
 | Type | Extends | Attribute |
 |---|---|---|
@@ -482,10 +499,12 @@ The descriptor declares five type entries:
 | `DsoActiviteitMixin` | `bpmn:Process` | `dsoActiviteitUrn` |
 | `LanguageMixin` | `bpmn:Process` | `language` |
 | `OrganizationMixin` | `bpmn:Process` | `organization` |
+| `PhasesMixin` | `bpmn:Process` | `phases` — the process's own phases, `code:Name` pairs separated by `;`; `phaseLabel` — the word before a phase's number, `Fase` when absent |
+| `PhaseMarkerMixin` | `bpmn:FlowNode` | `phase` — the declared phase a node starts; `awbPhase` — the Awb phase it starts |
 
 `ronl:signatureRef` is registered, but the Modeler offers no control for it: it is written by hand in the BPMN. `ronlModdleDescriptor.test.ts` reads `documentRef` and `signatureRef` on a user task as typed properties, because an unregistered attribute still round-trips, parked in `$attrs`, and a missing registration would otherwise fail silently.
 
-**Not every `ronl:` attribute is registered.** `ronl:awbPhase`, `ronl:phases`, `ronl:phaseLabel` and `ronl:phase` are absent from the descriptor. They are written by hand in the BPMN, and a round trip through the Modeler keeps them as unknown attributes: they survive a save, but the Modeler offers no control for them and nothing checks their values. Registering the phase attributes and giving them a properties-panel editor and pre-deploy checks is [LDE issue #242](https://github.com/sgort/linked-data-explorer/issues/242).
+The phase attributes are registered so the phase editors can write them with `modeling.updateModdleProperties`; the test also reads them as typed properties and round-trips them through a save.
 
 Each entry has the same shape, e.g. for `LanguageMixin`:
 ```json
@@ -530,6 +549,36 @@ In all cases it first checks for `xmlns:ronl=` in the XML and injects the namesp
 
 ---
 
+## Phases
+
+The phase editors set the attributes the RONL Business API reads to draw a caseworker's phase stepper. RBA is the reference for every rule: the code in `utils/phases/` copies its parsing and its inheritance so that the canvas cannot show something the stepper does not.
+
+```
+packages/frontend/src/utils/phases/
+├── phaseSet.ts        Phase, PhaseSet, the Awb table; parse and serialise ronl:phases, derive a code from a name
+├── phaseGraph.ts      graphFromXml: the first <process>, its direct children of RBA's counted kinds
+├── assignPhases.ts    findBackEdges, assignColumns, computePhaseView: RBA's inheritance, ported line for line
+├── phaseChecks.ts     checkPhases: the deploy modal's findings
+└── phaseCommands.ts   the ronl.phases.update command, process and node targeting, marker rewrites
+```
+
+- **`phaseSet.ts`** — `parseDeclaredPhases` follows RBA's `declaredPhaseSet`: entries split on `;`, each at its first `:`, both parts trimmed; an entry without a code or a name, or repeating a code, is skipped and reported. `AWB_PHASES` is copied from RBA's `awb-phases.ts`. `phaseCodeLabel` gives the label RBA shows: `Fase 4+5` or `Archiefwet` for Awb, `<label> <n>` for declared phases.
+- **`phaseGraph.ts`** — reads the XML the way RBA's `parseSwimlane` does: only the first `<process>`, only its direct children of the counted kinds, attributes by local name, blank as absent. Nodes are sorted kind by kind in RBA's order, because that order decides the seed when there is no start event. A marker on an element of another kind, such as a boundary event, is collected as ignored.
+- **`assignPhases.ts`** — `computePhaseView` decides the scheme (`declared` when `ronl:phases` yields a set, `awb` when an `ronl:awbPhase` marker exists, `none` otherwise), drops back edges, orders nodes by longest path, and gives an unmarked node the latest phase among its forward predecessors. The result, a `PhaseView`, holds every node's phase with an `inherited` flag, plus the unknown markers and skipped entries the checks report.
+- **`phaseCommands.ts`** — every phase edit is one `ronl.phases.update` command, whose handler applies its updates as nested `updateModdleProperties` calls in `preExecute`. diagram-js records nested commands under the outer one, so a code rename that rewrites eight markers is one undo step. `updateModdleProperties` rather than `updateProperties`, because the phase list lives on the process while the selected element in a collaboration is its participant. `resolveProcessTarget` picks the process to edit, and `isCountedNode` mirrors RBA's counted kinds for bpmn-js elements.
+
+### The panel
+
+`BpmnCanvas.tsx` renders the panel into the properties panel's scroll container, below the other selectors: `ProcessPhasesEditor` when the process is the target — nothing selected, or a participant — and `PhaseMarkerSelector` for a flow node. The panel keeps one React root across edits and only re-renders it with the new phase view, so typing in a field survives the recompute; it re-mounts only when the selection or the process changes. Both components take `readByRba`: a pool other than the first process RBA reads gets an explanation instead of controls.
+
+Awb phases have no process attribute — RBA recognises them by their markers — so a fresh **Awb phases** choice lives in the canvas's `schemeIntent` state until the first marker exists.
+
+### Badges
+
+`schedulePhaseRefresh` runs on import and on every `commandStack.changed`. After 150 ms it serialises the diagram with `saveXML`, computes the view with `phaseViewFromXml` and redraws the `phase-marker` overlays in `refreshPhaseOverlays`: `phase-badge--start` (solid) where a node carries its own marker, `phase-badge--inherited` (outlined) where it inherits, one colour per position in the set from `PHASE_COLOURS`. Phase names and codes are user text, so the overlay HTML is escaped. A failed save or parse keeps the last view.
+
+---
+
 ## Example process seeding
 
 On mount, `BpmnModeler.tsx` runs a versioned seed effect. For each example defined in `EXAMPLE_VERSIONS` (`utils/exampleVersions.ts`), if the stored version is lower than the current version the file is re-fetched from `public/examples/` and the record is overwritten in `localStorage`. The Migration & Asylum record is the exception: it is inline XML, written only when no record with its id exists, and has no version.
@@ -542,16 +591,16 @@ The current example processes and their roles:
 
 | Seed ID | `processRole` | `bpmnProcessId` | `calledElement` | Organization | Version |
 |---|---|---|---|---|---|
-| `example_awb_process` | `shell` | `AwbShellProcess` | — | `flevoland` | 8 |
+| `example_awb_process` | `shell` | `AwbShellProcess` | — | `flevoland` | 9 |
 | `example_tree_felling` | `subprocess` | `TreeFellingPermitSubProcess` | `AwbShellProcess` | `flevoland` | 11 |
-| `example_awb_zorgtoeslag` | `shell` | `AwbZorgtoeslagProcess` | — | `toeslagen` | 6 |
-| `example_zorgtoeslag_provisional` | `subprocess` | `ZorgtoeslagProvisionalSubProcess` | `AwbZorgtoeslagProcess` | `toeslagen` | 8 |
+| `example_awb_zorgtoeslag` | `shell` | `AwbZorgtoeslagProcess` | — | `toeslagen` | 7 |
+| `example_zorgtoeslag_provisional` | `subprocess` | `ZorgtoeslagProvisionalSubProcess` | `AwbZorgtoeslagProcess` | `toeslagen` | 9 |
 | `example_zorgtoeslag_final` | `subprocess` | `ZorgtoeslagFinalSubProcess` | `AwbZorgtoeslagProcess` | `toeslagen` | 7 |
-| `example_thuisbatterij_aanvraag` | `shell` | `ThuisbatterijSubsidieAanvraagProcess` | — | `flevoland` | 2 |
-| `example_thuisbatterij_decision` | `subprocess` | `ThuisbatterijSubsidieDecisionSubProcess` | `ThuisbatterijSubsidieAanvraagProcess` | `flevoland` | 2 |
-| `example_dvtp_toestemming` | `standalone` | `DvtpToestemmingGevenProcess` | — | `bzk` | 3 |
-| `example_hr_capacity_nl` | `standalone` | `ManagementCapacityClaimProcess` | — | `flevoland` | 4 |
-| `example_besluit_gb` | `standalone` | `GedelegeerdBesluitProcess` | — | `flevoland` | 2 |
+| `example_thuisbatterij_aanvraag` | `shell` | `ThuisbatterijSubsidieAanvraagProcess` | — | `flevoland` | 4 |
+| `example_thuisbatterij_decision` | `subprocess` | `ThuisbatterijSubsidieDecisionSubProcess` | `ThuisbatterijSubsidieAanvraagProcess` | `flevoland` | 3 |
+| `example_dvtp_toestemming` | `standalone` | `DvtpToestemmingGevenProcess` | — | `bzk` | 4 |
+| `example_hr_capacity_nl` | `standalone` | `ManagementCapacityClaimProcess` | — | `flevoland` | 5 |
+| `example_besluit_gb` | `standalone` | `GedelegeerdBesluitProcess` | — | `flevoland` | 3 |
 | `wip_asylum_migration` | `standalone` | `Process_Migratie_en_Asiel` | — | `ind` | — |
 
 Every subprocess record declares `shellId` alongside `calledElement`. `example_besluit_gb` lists `GedelegeerdBesluitRoute` as its linked DMN; see [Besluitvorming onder gedelegeerde bevoegdheid](../features/besluitvorming-gedelegeerd-bundle.md) for the bundle.
@@ -572,6 +621,12 @@ Every Awb process is drawn as a pool with lanes and carries Dutch element names.
 
 A subprocess has no applicant-facing step, so it has no Aanvrager lane.
 
+### DMN results as plain variables
+
+A business rule task with `mapDecisionResult="singleResult"` stored a multi-output result as one serialised Java map, and two concurrent REST reads of it could collide with `ENGINE-03005`. The examples' business rule tasks that did so now map each output straight into a plain variable with a `camunda:outputParameter` on the transient `decisionResult` — for instance `${decisionResult.getSingleResult().getEntry("isComplete")}` — and the script tasks that only copied map values are gone. Gateways and scripts read the plain variables. Instances already running keep their old definition until they finish.
+
+### Missing information
+
 In each of the three Awb shells — kapvergunning, zorgtoeslag and Thuisbatterij — the user task *Aanvullende gegevens opvragen (Awb 4:5)* (`Task_RequestMissingInfo`) opens a form-js form with `camunda:formRefBinding="deployment"`. The form carries the `supplementReceived` checkbox the next gateway, *Aanvulling ontvangen?*, branches on.
 
 | Shell | Form | Form Editor seed |
@@ -582,9 +637,11 @@ In each of the three Awb shells — kapvergunning, zorgtoeslag and Thuisbatterij
 
 The `e2e-fixtures/manifest.json` entry for each shell lists its missing-information form beside the start and notification forms.
 
+The Thuisbatterij shell checks completeness with its own `ThuisbatterijCompletenessCheck` decision, whose outputs `isComplete` and `missingFields` become plain variables. Its gateway *Aanvraag volledig?* has three exits: complete to the assessment; incomplete with no recovery asked yet to `Task_RequestMissingInfo`, whose end listener sets `herstelVerzocht`; and incomplete after recovery to *Aanvraag buiten behandeling stellen (Awb 4:5 lid 2)*. A supplement received sends the case back through the completeness check. The form shows `missingFields` and records the supplied values.
+
 ### Phase markers
 
-The examples carry the phase attributes the RONL Business API reads to draw the caseworker's phase stepper. They are hand-authored: the Modeler has no control for them yet ([LDE issue #242](https://github.com/sgort/linked-data-explorer/issues/242)).
+The examples carry the phase attributes the RONL Business API reads to draw the caseworker's phase stepper; the [phase editors](#phases) show and edit them.
 
 - **The Awb shells** mark the node that starts each Awb phase with `ronl:awbPhase` — `1`, `2`, `3`, `4+5`, `6`, `7`, `8` and `archivering` — and each Awb subprocess marks its start event with `4+5`. See [`ronl:awbPhase`](../../ronl-business-api/reference/bpmn-design-criteria.md#ronlawbphase).
 - **The Dutch HR capacity claim** (`HR-capacity/ManagementCapacityClaimProcess.bpmn`) declares its own eight phases with `ronl:phases` and `ronl:phaseLabel`, marks the node that starts each with `ronl:phase`, and is drawn in eight lanes. Its business rule task `Task_DetermineRouting` carries `decisionRefTenantId="${null}"`, so it resolves the shared `CapacityClaimRouting` DMN untenanted.
@@ -683,6 +740,10 @@ After changes to any BPMN Modeler component:
 - [ ] Single DMN selected — blue info card shows identifier
 - [ ] UserTask with a form — attach two document templates: two chips, the badge reads **2 documents**, removing a chip updates the badge
 - [ ] Deploy modal — lists every `.document` named by `ronl:documentRef` and `ronl:signatureRef`; a missing form or document disables Deploy
+- [ ] Process selected — **Own phases**: add, rename, recode, reorder and remove a phase; one undo takes back each edit
+- [ ] Node selected — **Start van fase** sets and clears a marker; the canvas badge turns solid or outlined within a moment
+- [ ] Deploy modal — own phases plus an `ronl:awbPhase` marker shows the red finding and disables Deploy
+- [ ] New process — gets a process id of its own; importing a BPMN whose id the organisation already uses asks to replace or rename
 - [ ] Scroll to zoom — wheel event zooms without requiring Ctrl
 - [ ] Fit to viewport — canvas centres diagram
 - [ ] No rendering artifacts during drag — no black circles or stray lines

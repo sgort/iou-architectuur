@@ -102,7 +102,7 @@ DocumentService.deleteTemplate(id: string): void
 
 ## Example document seeding
 
-The example templates are defined inline in `DocumentComposer/defaultTemplates.ts` and listed in `DEFAULT_TEMPLATES`, eight in all:
+The example templates are defined inline in `DocumentComposer/defaultTemplates.ts` and listed in `DEFAULT_TEMPLATES`, nine in all:
 
 | Template id | Name |
 |---|---|
@@ -114,12 +114,13 @@ The example templates are defined inline in `DocumentComposer/defaultTemplates.t
 | `capacity-claim-handover-nl` | HR — Overdracht capaciteitsclaim (Voorbeeld, NL) |
 | `thuisbatterij_subsidie_beschikking` | Subsidie Thuisbatterij Beschikking |
 | `besluit-gb-besluit` | Besluit onder gedelegeerde bevoegdheid |
+| `besluit-gb-besluit-bestuur` | Besluit van de bevoegde bestuursautoriteit |
 
-On mount, `DocumentComposer.tsx` seeds by version, like the example forms and processes: it saves every entry of `DEFAULT_TEMPLATES` whose version in `EXAMPLE_VERSIONS` (`utils/exampleVersions.ts`, keyed by template id) is higher than the version this browser has recorded, and then records the new version. A template with no recorded version counts as version 0, so it is written on the next load even when a copy is already stored. A refresh **overwrites** the stored template, local edits included. `exampleVersions.test.ts` fails when a default template has no entry. `example_treefelling_beschikking` is at version 2; the other seven are at 1.
+On mount, `DocumentComposer.tsx` seeds by version, like the example forms and processes: it saves every entry of `DEFAULT_TEMPLATES` whose version in `EXAMPLE_VERSIONS` (`utils/exampleVersions.ts`, keyed by template id) is higher than the version this browser has recorded, and then records the new version. A template with no recorded version counts as version 0, so it is written on the next load even when a copy is already stored. A refresh **overwrites** the stored template, local edits included. `exampleVersions.test.ts` fails when a default template has no entry. `example_treefelling_beschikking` is at version 2; the other eight are at 1.
 
 Every example carries `status: 'example'`, which blocks deletion. All of them are `readonly: false` except `example_dvtp_consent_receipt`, which is `readonly: true`: **Save** is disabled for it, and **Save As** creates an editable copy.
 
-Some templates mirror a `.document` file that is deployed with a bundle. `thuisbatterij_subsidie_beschikking` is kept in step with `public/examples/flevoland/thuisbatterij_subsidie_beschikking.document`, and `besluit-gb-besluit` with `public/examples/flevoland/besluitvorming-gedelegeerd/besluit-gb-besluit.document` — the copy the LDE deploys and the RONL Business API renders for signing. The copy is inline because the Vite dev server rejects imports from `public/`; `defaultTemplates.test.ts` pins the inline copy and the file as identical.
+Some templates mirror a `.document` file that is deployed with a bundle. `thuisbatterij_subsidie_beschikking` is kept in step with `public/examples/flevoland/thuisbatterij_subsidie_beschikking.document`, `besluit-gb-besluit` with `public/examples/flevoland/besluitvorming-gedelegeerd/besluit-gb-besluit.document` — the copy the LDE deploys and the RONL Business API renders for signing — and `besluit-gb-besluit-bestuur` with `besluit-gb-besluit-bestuur.document` in the same folder, the besluit the competent authority takes after escalation. The copy is inline because the Vite dev server rejects imports from `public/`; `defaultTemplates.test.ts` pins each inline copy and its file as identical.
 
 **Developer workflow:** edit the template in `defaultTemplates.ts`; where it mirrors a deployed `.document` file, change that file in the same commit. Bump the template's `EXAMPLE_VERSIONS` entry in the same change, or browsers that already hold it keep the old copy.
 

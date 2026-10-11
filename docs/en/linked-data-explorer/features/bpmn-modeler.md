@@ -19,7 +19,7 @@ The Modeler uses the same three-panel layout as the Chain Builder:
 
 - **Left panel** — Process list. Shows all saved processes with create, rename, and delete actions. An EXAMPLE badge marks protected processes that cannot be deleted.
 - **Centre panel** — Canvas. Interactive BPMN 2.0 canvas powered by bpmn-js, with drag-and-drop palette, zoom controls, and scroll-to-zoom.
-- **Right panel** — Properties. Shows element type, ID, name field, and — for `BusinessRuleTask` elements — the DMN/DRD decision reference section.
+- **Right panel** — Properties. Shows element type, ID, name field, and — for `BusinessRuleTask` elements — the DMN/DRD decision reference section. Below the other sections it shows the [phase](#phases) controls: the process's phases when the process or a pool is selected, the **Start van fase** picker when a node is.
 
 ---
 
@@ -63,6 +63,8 @@ Every `BpmnProcess` record carries three relationship fields:
 | `calledElement` | `string?` | For subprocesses: the `bpmnProcessId` of the parent shell |
 
 User-created and imported processes default to `standalone`. The BPMN `<process id="...">` value is extracted automatically from the XML on save.
+
+A process id is unique within an organisation: the backend refuses to store a second process with the same id in the same organisation. So **New process** gives every new process a fresh id — the template's id plus a timestamp — rather than the template's own. An imported BPMN whose process id the organisation already uses opens a dialog: **OK** replaces the existing process's content with the import, keeping that process's record, status and deploy stamp; **Cancel** asks for another process id for the import, suggesting a fresh one. Renaming a process id in the properties panel to one already in use is not saved, and the Modeler says which process holds it.
 
 ### Example processes
 
@@ -152,26 +154,65 @@ A **purple badge** (📄) appears beneath the element on the canvas, below the g
 | Blue | DMN / DRD decision | `camunda:decisionRef` |
 | Green | Camunda Form | `camunda:formRef` |
 | **Purple** | **Document templates** | **`ronl:documentRef`** |
+| One colour per phase, top left of the node | Phase | `ronl:phase` or `ronl:awbPhase` — see [Phases](#phases) |
 
 Document template linking is only available for `UserTask` elements (not `StartEvent`). The purple badge is drawn only on a user task that also has a form linked.
 
-!!! note "Hand-authored `ronl:*` attributes"
-    Several `ronl:*` attributes are set by hand in the BPMN: the Modeler keeps
-    them through a save but offers no control for them and shows no badge for
-    them.
-
-    - **`ronl:signatureRef`** on a user task names a document template. For
-      that task the RONL Business API offers a ValidSign signing ceremony for
-      the document in place of the task's plain form. The deploy modal bundles
-      that template like any other. See [ValidSign signing](../../ronl-business-api/developer/validsign-signing.md)
-      and [RIP R2.1 Bundle](rip-phase1-bundle.md#the-phase-exit-approval-is-signed).
-    - **`ronl:awbPhase`**, **`ronl:phases`**, **`ronl:phaseLabel`** and
-      **`ronl:phase`** declare a process's phases and mark the node that starts
-      each one. The RONL Business API reads them to draw the caseworker's phase
-      stepper — see [Lanes and phase markers](../../ronl-business-api/reference/bpmn-design-criteria.md#lanes-and-phase-markers-the-caseworker-process-view).
-      A Modeler control for them is [LDE issue #242](https://github.com/sgort/linked-data-explorer/issues/242).
+!!! note "Hand-authored `ronl:signatureRef`"
+    **`ronl:signatureRef`** on a user task is set by hand in the BPMN: the
+    Modeler keeps it through a save but offers no control for it and shows no
+    badge for it. It names a document template. For that task the RONL
+    Business API offers a ValidSign signing ceremony for the document in place
+    of the task's plain form. The deploy modal bundles that template like any
+    other. See [ValidSign signing](../../ronl-business-api/developer/validsign-signing.md)
+    and [RIP R2.1 Bundle](rip-phase1-bundle.md#the-phase-exit-approval-is-signed).
 
 See [Document Composer](document-composer.md) for how to create and manage document templates.
+
+---
+
+## Phases
+
+The RONL Business API draws a phase stepper above a caseworker's process view. It reads the phases from the BPMN — see [Lanes and phase markers](../../ronl-business-api/reference/bpmn-design-criteria.md#lanes-and-phase-markers-the-caseworker-process-view) — and the Modeler sets them: the process says which phases it has, and a node says which phase it starts. Every node after it inherits that phase until the next marker.
+
+### The process's phases
+
+With the process selected — nothing selected on the canvas, or its pool — the properties panel shows **Phases (RBA stepper)** with three choices:
+
+- **None** — no stepper.
+- **Own phases** — the process declares its own list, written to `ronl:phases` as `code:Name` pairs separated by `;`. Type a name under **New phase name** and click **Add phase**; the Modeler derives a code from the name, which you can change. Each phase can be renamed, given another code, moved up or down, or removed. Changing a code moves the markers that use it along with it; removing a phase removes its markers, after a confirmation. **Label** sets the word the stepper puts before a phase's number (`ronl:phaseLabel`), `Fase` when left as it is.
+- **Awb phases** — the eight phases of the Awb procedure, from **1 · Rechtsbetrekking** to **archivering · Archivering**. They are built in, so the process carries no list; nodes mark them with `ronl:awbPhase`.
+
+Switching away from a scheme asks first when it would remove something. From **Own phases** to **None** the list and label go and the node markers stay; to **Awb phases** the markers go too. Leaving **Awb phases** removes every Awb marker.
+
+The RONL Business API reads only the first process of a collaboration. Selecting another pool shows a line saying so instead of the controls; with nothing selected in a collaboration, the panel edits the first participant's process and says that it does.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: properties panel of a selected process under Phases (RBA stepper), with Own phases chosen, a numbered list of phases each with its name, its code, move-up and move-down arrows and a remove button, the New phase name field with Add phase, and the Label field](../../assets/screenshots/linked-data-explorer-bpmn-phases-process-editor.png)
+  <figcaption>The process's own phases: name and code per phase, reorder and remove, and the Label field</figcaption>
+</figure>
+
+### Where a phase starts
+
+With a node selected, the panel shows **Start van fase**: a select with **(erft over)** and every phase of the process. Choosing a phase marks the node as its start; **(erft over)** removes the marker, so the node inherits. Without a marker of its own, a line under the select says which phase the node inherits, or that it lies before the first phase marker.
+
+The picker follows the RONL Business API's own rules for which nodes count. A node inside an embedded subprocess, or of a kind the stepper does not count, gets a line explaining why instead of the select; so does a node in a pool other than the first. Until the process has phases, the picker asks for those first.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: properties panel of a selected task under Start van fase, the select reading (erft over), and below it the line saying which phase the task inherits](../../assets/screenshots/linked-data-explorer-bpmn-phase-marker-picker.png)
+  <figcaption>Start van fase on a node without a marker: the line below the select names the phase it inherits</figcaption>
+</figure>
+
+### Phase badges on the canvas
+
+Every node that falls in a phase carries a badge at its top left, one colour per phase. The badge is **solid** where the node starts the phase and **outlined** where it inherits it; the text is the same either way — the phase's number and code for own phases, `Fase 4+5` or `Archiefwet` for Awb phases.
+
+The Modeler recomputes the badges 150 ms after each change, from the diagram's XML — the input the RONL Business API reads — and with the same inheritance rules, so the canvas shows the stepper the caseworker will see. Each phase edit — a rename that moves eight markers included — is one undo step.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: BPMN canvas with phase badges at the top left of the nodes, solid on the nodes that start a phase and outlined on the nodes after them that inherit it, each phase in its own colour](../../assets/screenshots/linked-data-explorer-bpmn-phase-badges.png)
+  <figcaption>Phase badges: solid where a node starts a phase, outlined where it inherits one</figcaption>
+</figure>
 
 ---
 
@@ -204,6 +245,23 @@ If a `camunda:formRef`, `ronl:documentRef` or `ronl:signatureRef` names a form o
 
 !!! note "Board-owner injection preserves BPMN schema order"
     When a `<bpmn:process>` already carries a `<bpmn:documentation>` child, the `boardOwner` property is inserted **after** it — `injectBoardOwner` skips past any leading `<documentation>` element(s) before locating or creating `extensionElements`, so the resulting XML stays schema-valid (documentation must precede extensionElements). A failed deploy shows the error the backend reports rather than a generic message.
+
+### Phase findings
+
+The modal also checks the open process's [phases](#phases), the way the RONL Business API will read them:
+
+- **Error** (red, ✗) — the process declares its own phases (`ronl:phases`) and also carries Awb phase markers (`ronl:awbPhase`). The stepper reads only one scheme, so **Deploy stays disabled** until the other is removed.
+- **Warnings** (amber, ⚠️) — none of them blocks the deploy; each describes a stepper that will look wrong:
+    - phases are set on the process, but no node starts one, so there is no stepper;
+    - a marker names a phase the process does not have;
+    - a phase that no node falls into, so its step never lights up;
+    - an entry of `ronl:phases` the stepper skips — no code, no name, or a repeated code;
+    - a phase marker on an element the stepper does not count, such as a boundary event.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Deploy modal with a red finding that the process declares its own phases and also has Awb phase markers, an amber phase warning below it, and the Deploy button disabled](../../assets/screenshots/linked-data-explorer-bpmn-deploy-phase-findings.png)
+  <figcaption>Phase findings in the deploy modal: mixing the two schemes disables Deploy; a warning does not</figcaption>
+</figure>
 
 ---
 

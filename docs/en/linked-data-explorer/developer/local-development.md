@@ -339,12 +339,12 @@ npm run lint           # ESLint in every workspace
 npm run lint:fix
 npm run format         # Prettier, writing
 npm run check-format   # Prettier, checking only
-npm run test:scripts   # two of the repository scripts' own test harnesses
+npm run test:scripts   # two of the five test harnesses in scripts/
 ```
 
 [Testing](testing.md) has the suites, their current counts, the contract subset and the CI gate.
 
-`npm run test:scripts` runs on Windows as well as Linux: both harnesses print `PASS: 24 checks` (measured on Windows, 6 October 2026). The third harness, `node scripts/lockfile-diff.test.mjs`, has no npm script; CI runs it in the `lockfile-review` job.
+`npm run test:scripts` runs on Windows as well as Linux: both harnesses print `PASS: 24 checks` (measured on Windows, 10 October 2026). The other three harnesses have no npm script, and CI runs each in the workflow that uses the script it tests: `node scripts/lockfile-diff.test.mjs` in the `lockfile-review` job, `node scripts/write-sbom.test.mjs` in `sbom.yml`, and `node scripts/dependency-review.test.mjs` in `dependency-review.yml`.
 
 ### Git hooks
 
@@ -366,8 +366,9 @@ The root `package.json` also defines these scripts:
 | Script | What it does |
 |---|---|
 | `deps:check` | `bash scripts/check-deps.sh`: checks the installed dependencies against the lockfile and warns about npm older than 11.10 |
+| `audit:signatures` | `bash scripts/audit-signatures.sh`: runs `npm audit signatures` on the installed tree, verifying each package's registry signature and, where it has one, its provenance attestation. It reads `node_modules`, so it needs `npm ci` first. The required `audit` job runs it on every pull request. |
 | `check-supply-chain` | `node scripts/check-supply-chain.mjs` |
-| `sbom` | `node scripts/write-sbom.mjs`: writes a software bill of materials |
+| `sbom` | `node scripts/write-sbom.mjs`: writes the CycloneDX software bill of materials of the production dependencies, read from the lockfile, to `docs/sbom/<name>-<version>.cdx.json` |
 | `sbom:check` | `node scripts/write-sbom.mjs --check`: exits 1 when the committed SBOM for the current version is missing or no longer matches the lockfile. `sbom.yml` runs the same check on the release pull request. |
 | `test:scripts` | Tests `promotion-targets.mjs` and `dso-dossier.mjs`: `node scripts/promotion-targets.test.mjs && node scripts/dso-dossier.test.mjs` |
 | `check-mirror` | `bash scripts/check-mirror.sh`: compares `acc` and `main` on `origin` with the `gitlab` mirror. It prints the push command for any drift and never pushes. |

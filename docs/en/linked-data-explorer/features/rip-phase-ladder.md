@@ -175,11 +175,10 @@ coexist and no deployment history has to be destroyed.
 
 Every `camunda:formRef` in the processes the Modeler seeds from `public/examples/` binds
 this way, the Thuisbatterij bundle included. The only `"latest"` references left in the repository's BPMN files are in
-`examples/organizations/flevoland/thuisbatterij/` and `examples/organizations/ind/`,
-which are not seeded. The Thuisbatterij folder is a superseded reference copy: its
-`README.md` marks it as drifted and not deployed, and names the maintained definitions,
-`public/examples/flevoland/ThuisbatterijSubsidieAanvraagProcess.bpmn` and its
-`e2e-fixtures/` copy.
+`examples/organizations/ind/`, which is not seeded. `examples/organizations/flevoland/thuisbatterij/`
+is the authored copy of the Thuisbatterij bundle the Modeler seeds: the authored-copy parity test
+(`public-example-fixture-parity.test.ts`) requires every file under `public/examples/flevoland/`
+to have exactly one byte-identical copy under `examples/organizations/flevoland/`.
 
 The Modeler's **Link to Form** dropdown writes the same binding, so a form linked in the
 Modeler binds to its own deployment too — see [Form linking](bpmn-modeler.md#form-linking).

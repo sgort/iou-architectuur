@@ -55,13 +55,15 @@ az webapp config appsettings set \
 
 ### 4 — Deploy and verify
 
-Merge a pull request into `acc`. The merge starts the ACC backend workflow, which builds and deploys the backend. On first startup `migrate()` creates all five tables automatically — `process_definitions`, `form_schemas`, `document_templates`, `ropa_records` and `ropa_personal_data_fields`.
+Merge a pull request into `acc`. The merge starts the ACC backend workflow, which builds and deploys the backend. On first startup `migrate()` creates all six tables automatically — `process_definitions`, `form_schemas`, `document_templates`, `ropa_records`, `ropa_personal_data_fields` and `process_definitions_dedup_archive`.
 
 Check the App Service log stream for:
 ```
 [DB] Migrations applied
 Server started
 ```
+
+On a database that holds two stored processes with the same organisation and process id, a warning precedes them: `[DB] Archived duplicate stored processes before enforcing uniqueness`, listing each archived row and the row kept in its place. The archived rows stay in `process_definitions_dedup_archive`; see [Asset Storage](asset-storage.md#migrations).
 
 Then smoke-test the asset endpoints:
 ```bash
