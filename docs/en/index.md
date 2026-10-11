@@ -169,13 +169,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.10.1** · *October 2026*
+-   **🔍 Linked Data Explorer — v2026.10.2** · *October 2026*
 
     ---
 
-    **The norms in force on a date, at `/v2/norms`**
+    **Phases set in the Modeler, and a process id that belongs to one organisation**
 
-    [`/v2/norms`](linked-data-explorer/reference/api-stability.md#v2norms) answers which norms apply on a given date: per ruleset, the period in force on `valid_on` — today in Amsterdam by default — in CPRMV 0.4.1, with an ETag that also catches a correction made within a period, and its own OpenAPI document at `/v2/openapi.json`. `/v1/norms` is deprecated from 1 November 2026, with a sunset on 1 November 2028, and says so in `Deprecation`, `Sunset` and `Link` headers. The Modeler binds forms to their deployment, the Kapvergunning bundle is Dutch throughout, and the English HR-capacity variant is gone. CI now runs the fixture tests and the RIP fingerprint check, every dependency pull request gets a lockfile review, and a release pull request must carry an SBOM that matches its lockfile. The [suites](linked-data-explorer/developer/testing.md) stand at 3,234 tests, all passing.
+    The [Modeler](linked-data-explorer/features/bpmn-modeler.md) now sets a process's phases for RBA's caseworker stepper — own or Awb phases on the process, *Start van fase* on a node — draws badges computed with a port of RBA's own rule, and checks the phases before a deploy. A stored process is unique per organisation and process id, RoPA records nest under the shell that calls them, and the examples store multi-output DMN results as plain variables. CI verifies registry signatures, reviews every new direct dependency against shared criteria, and its SBOM checks can now fail. The [suites](linked-data-explorer/developer/testing.md) stand at 3,418 tests, all passing.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

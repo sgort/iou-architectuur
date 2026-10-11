@@ -184,6 +184,24 @@ Read at `origin/main` `98458fa` (same tree as `acc` `2cf6a90`). The pages themse
    verify the LDE and RBA state in their own syncs before the weekly pass. Bears on: `supply-chain.md`, `ictu-dependency-guideline.md` (R10).
 5. **TTL's workflow count is now eight** (`dependency-review.yml` added). Bears on: `code-standards.md` and any page that counts workflows.
 
+### 10 October 2026 — Linked Data Explorer v2026.10.1 → v2026.10.2
+
+Read at `origin/main` `82f461f` (same tree as `acc` `a87f64b`). The pages themselves were not touched and no stamp was refreshed.
+
+1. **LDE verifies registry signatures in its required `audit` job** (`npm run audit:signatures`, 42ca25f); the registry or
+   proxy half of ICTU R5 stays open (#249). With TTL's 3fcdbbd, two of the three applications now do — check RBA in its sync.
+   Bears on: `supply-chain.md`, `ictu-dependency-guideline.md` (R5).
+2. **Dependency criteria are written down and applied twice**: `docs/dependency-criteria.md` (six criteria) in this repository,
+   a checklist in the lockfile-review comment for a new direct dependency, and the quarterly `dependency-review.yml`
+   (ddb1687). Bears on: `ictu-dependency-guideline.md` (R1, R11), `dependency-scanning.md`.
+3. **LDE's SBOM checks run before generation, and the production set is read from the lockfile** (af06deb, a87f64b/#297); the
+   6 October LDE item 4 and the 9 October RBA item 1 are corrected for LDE — `sbom:check` passed locally on 10 October.
+   Bears on: `supply-chain.md`, `ictu-dependency-guideline.md` (R10).
+4. **LDE now has twelve workflows** (`dependency-review.yml` added) and five script harnesses. Bears on: `code-standards.md`.
+5. **Cross-component:** RBA's `ronl-business-api/reference/bpmn-design-criteria.md` still recommends `mapDecisionResult="singleResult"`
+   plus a script task, the pattern LDE removed from every example for ENGINE-03005 (2cbfa2b) — a component page, so it belongs
+   to the RBA sync, recorded here so it is not lost.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

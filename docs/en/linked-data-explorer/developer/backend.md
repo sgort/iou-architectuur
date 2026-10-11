@@ -481,7 +481,9 @@ POST   /v1/assets/documents
 DELETE /v1/assets/documents/:id
 ```
 
-Persists BPMN processes, form schemas, and document templates to PostgreSQL. All routes return `503 DB_NOT_CONFIGURED` when `DATABASE_URL` is absent. The upserts, the deploy mark and the ROPA delete validate their input before it reaches Postgres and answer `400 INVALID_INPUT` with a detail naming every field that failed; the checks follow the database's own constraints, and a blank title, id or name is refused on the fields that identify a record. See [Asset Storage](asset-storage.md) for the service architecture and the [API Specification](../reference/api-specification.md) for request and response shapes.
+Persists BPMN processes, form schemas, and document templates to PostgreSQL. All routes return `503 DB_NOT_CONFIGURED` when `DATABASE_URL` is absent. The upserts, the deploy mark and the ROPA delete validate their input before it reaches Postgres and answer `400 INVALID_INPUT` with a detail naming every field that failed; the checks follow the database's own constraints, and a blank title, id or name is refused on the fields that identify a record.
+
+A stored process is unique per organisation and process id. `POST /v1/assets/bpmn` answers `409 PROCESS_ID_TAKEN` when another stored process in the same organisation already has the `bpmnProcessId`, and writes nothing; the problem carries `bpmnProcessId`, `organization` and `existing` (`id`, `name` and `status` of the process that holds the id), so the Modeler can offer to replace that process or rename the new one. `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId` takes an optional `?organization=` that limits the lookup to one organisation, an empty value meaning rows without one; without it every organisation's rows count. See [Asset Storage](asset-storage.md) for the service architecture and the [API Specification](../reference/api-specification.md) for request and response shapes.
 
 ---
 
@@ -489,11 +491,11 @@ Persists BPMN processes, form schemas, and document templates to PostgreSQL. All
 
 The backend connects to a PostgreSQL database via a `pg.Pool`. The pool is initialised in `src/db/pool.ts` when `DATABASE_URL` is present in the environment. If the variable is absent, `pool` is `null` and all asset endpoints respond with `503`.
 
-Schema migrations run automatically on startup via `migrate()` in `src/db/migrate.ts`, called from `startServer()` before `app.listen()`. The migration is idempotent (`CREATE TABLE IF NOT EXISTS`).
+Schema migrations run automatically on startup via `migrate()` in `src/db/migrate.ts`, called from `startServer()` before `app.listen()`. The migration is idempotent: it creates tables and indexes only where they do not exist, and its data steps are safe to repeat. Before it creates the unique index on organisation and process id, it archives and removes duplicate stored processes (see [Asset Storage](asset-storage.md#migrations)).
 ```
 src/db/
 ├── pool.ts       — pg.Pool initialisation, error listener, null-if-unconfigured guard
-└── migrate.ts    — idempotent DDL: process_definitions, form_schemas, document_templates
+└── migrate.ts    — idempotent DDL for the six tables, duplicate resolution, unique index
 ```
 
 As of v1.9.9, `process_definitions` carries a `board_owner` column that records the owning board chosen (or auto-derived from candidate groups) at deploy time. It is set from the deployed BPMN's process-level `camunda:property boardOwner` and surfaced through `/bundles/public`, so downstream consumers (the ronl-business-api Procesbibliotheek and archive split) can group processes by board.

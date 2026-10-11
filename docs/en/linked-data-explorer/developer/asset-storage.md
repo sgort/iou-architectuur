@@ -31,6 +31,8 @@ On **delete**, each service:
 1. Removes the record from `localStorage` immediately.
 2. Fires a background `DELETE /v1/assets/{type}/:id`.
 
+One refusal is not swallowed. When the backend answers a BPMN save with `409 PROCESS_ID_TAKEN`, `BpmnService.saveProcessDetailed()` returns the conflict, and the BPMN Modeler shows it: a save that renames a process to a process id the organisation already uses is reported as not saved, and an import with such an id asks whether to replace the existing process or give the import another process id.
+
 Examples are seeded on the frontend from static files in `public/examples/` and from `defaultTemplates.ts`, and carry `status: 'example'`. Seeding saves them through the same service call as a user edit, so every example with `readonly: false` is written to the backend too. Only records with `readonly: true` are never written: the BPMN example `example_dvtp_toestemming` and the document template `example_dvtp_consent_receipt`. Hydration keeps those two from `localStorage` and takes everything else from the server.
 
 ---
@@ -90,9 +92,15 @@ CREATE INDEX idx_pd_language        ON process_definitions (language)
   WHERE language IS NOT NULL;
 CREATE INDEX idx_pd_organization    ON process_definitions (organization)
   WHERE organization IS NOT NULL;
+
+CREATE UNIQUE INDEX idx_pd_org_bpmn_process_id_unique
+  ON process_definitions (COALESCE(organization, ''), bpmn_process_id)
+  WHERE status <> 'e2e' AND bpmn_process_id <> 'unknown';
 ```
 
-`lde_id` is the internal LDE identifier (e.g. `process_1774384869117`). `bpmn_process_id` is the `<process id="...">` value from the BPMN XML — used for subprocess lookup during bundle assembly.
+`lde_id` is the internal LDE identifier (e.g. `process_1774384869117`). `bpmn_process_id` is the `<process id="...">` value from the BPMN XML — used for subprocess lookup during bundle assembly. A row that deploy creates for a process that was never saved has `lde_id` `<organization>:<process id>` (the bare process id without an organisation).
+
+A stored process is unique per organisation and process id: two organisations may share a process id, one organisation may not hold it twice. `idx_pd_org_bpmn_process_id_unique` enforces this, exempting rows with status `e2e` (the E2E fixture shells reuse a seeded example's key on purpose) and the placeholder id `unknown`. `upsertBpmn()` checks first and throws `ProcessIdTakenError`, which the route answers with `409 PROCESS_ID_TAKEN`; a save that loses a race against the index is reported the same way.
 
 `language` (ISO 639-1, nullable) and `organization` (open-ended key, nullable) were added in v1.6.0 to drive list-panel grouping and the deploy-time language consistency check; partial indexes skip the common `NULL` case. See [Multilingualism](../features/multilingualism.md). The `deployed_*` columns were added in v1.4.0 for the deployment metadata flowback used by `listPublicBundles()`.
 
@@ -147,6 +155,8 @@ CREATE INDEX idx_dt_organization ON document_templates (organization)
 ## Migrations
 
 Schema migrations run automatically on backend startup via `migrate()` in `src/db/migrate.ts`, called from `startServer()` in `src/index.ts`. The migration uses inline SQL with `CREATE TABLE IF NOT EXISTS` guards, making it idempotent and safe to run on every deploy.
+
+**Duplicate stored processes are resolved before the unique index is created**, so the index cannot fail on old data. Per organisation and process id, the most recently deployed row stays — the most recently updated one when none was deployed; rows that point at the others through `shell_id` are repointed to it; the others are copied, whole as JSON together with the id of the row kept, to `process_definitions_dedup_archive` and then deleted. Each archived row is logged as a warning (`[DB] Archived duplicate stored processes before enforcing uniqueness`). Once the index exists no duplicate can form again, so on every later start the step finds nothing.
 
 **`status` became `NOT NULL` in v2026.09.5.** `form_schemas.status` and `document_templates.status` defaulted to `'wip'` but were nullable, so a row written outside the upserts could reach the API as `status: null`, which the OpenAPI description forbids. The migration backfills any NULL and then sets the columns `NOT NULL`; both steps are safe to repeat on every start. Measured on 19 September 2026, no form on acceptance (253) or production (42) is without a status.
 

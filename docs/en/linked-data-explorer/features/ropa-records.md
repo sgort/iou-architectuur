@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # RoPA Records
 
 The RoPA Records feature lets Product Owners author and maintain a **Record of Processing Activities** (RoPA) for every deployed process bundle, fulfilling the mandatory GDPR Article 30 obligation for government processing activities. Records are stored in PostgreSQL, linked to their BPMN process via `ronl:ropaRef`, and published to a public-facing website isolated from the LDE stack.
@@ -13,18 +17,18 @@ The RoPA Records feature lets Product Owners author and maintain a **Record of P
 
 The RoPA Records view follows the same two-panel convention as the Form Editor:
 
-- **Left panel** — Record list. All RoPA records grouped as shell processes first, subprocesses second, each with a DRAFT / ACTIVE / ARCHIVED status badge and a delete control.
+- **Left panel** — Record list. All RoPA records, each subprocess record nested under the shell record that calls it, each with a DRAFT / ACTIVE / ARCHIVED status badge and a delete control.
 - **Right panel** — Record editor. Four tabs covering the full GDPR Art. 30 data model, BPMN linkage, and lifecycle management.
 
 ---
 
 ## Record list
 
-Each entry in the list shows the record title, the `bpmnProcessId` it covers, and its current status. Shell records are top-level entries; subprocess records are indented beneath their parent shell with a tree connector — mirroring the hierarchy in the BPMN Modeler process list.
+Each entry in the list shows the record title, the `bpmnProcessId` it covers, and its current status. Shell records are top-level entries. Each subprocess record is indented beneath the shell record whose stored process calls it, with a tree connector: the list reads the call activities in the shell's BPMN, the same link the BPMN Modeler follows. Subprocesses keep the order of the shell's call activities, and a subprocess called by two shells appears under both. A subprocess record that no shell record calls — its shell has no RoPA record, or no stored shell process calls it — is listed apart, under **Not linked to a shell**, rather than under a guessed shell.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: RoPA Records left panel showing two shell records (AWB Shell Tree Felling Permit and AWB Shell Zorgtoeslag) each with two subprocess records indented beneath them, all carrying ACTIVE badges](../../assets/screenshots/linked-data-explorer-ropa-list.png)
-  <figcaption>Record list — shell/subprocess hierarchy with status badges</figcaption>
+  ![Screenshot: RoPA Records left panel showing shell records, each with the subprocess records its process calls nested beneath it by a tree connector, every record carrying its status badge](../../assets/screenshots/linked-data-explorer-ropa-list.png)
+  <figcaption>Record list — subprocess records nested under the shell that calls them, with status badges</figcaption>
 </figure>
 
 Clicking a record opens it in the editor. The **+** button in the panel header creates a new blank record.
@@ -140,7 +144,7 @@ The warning is non-blocking — the **Deploy** button remains active. It is inte
 
 ## Public website
 
-Active RoPA records are served from a CORS-open public endpoint and rendered on a dedicated static site **[ropa.open-regels.nl](https://acc.ropa.open-regels.nl)** deployed separately from the LDE. The site displays collapsible cards — one per record — with all GDPR Art. 30 fields including the personal data fields table with colour-coded data categories and Art. 9/10 flags.
+Active RoPA records are served from a CORS-open public endpoint and rendered on a dedicated static site **[ropa.open-regels.nl](https://acc.ropa.open-regels.nl)** deployed separately from the LDE. The site displays collapsible cards — one per record — with all GDPR Art. 30 fields including the personal data fields table with colour-coded data categories and Art. 9/10 flags. The site lists shell records first and subprocess records after them, without the nesting of the record list ([#284](https://github.com/sgort/linked-data-explorer/issues/284)).
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: ropa.flevoland.nl public site showing four collapsible record cards — AWB Shell Zorgtoeslag (Processchil, Actief), AWB Shell Tree Felling Permit (Processchil, Actief), Zorgtoeslag provisional entitlement assessment (Deelproces, Actief), Tree Felling Permit material law assessment (Deelproces, Actief)](../../assets/screenshots/ropa-site-overview.png)

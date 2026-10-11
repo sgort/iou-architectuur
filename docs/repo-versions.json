@@ -3,7 +3,7 @@
   "last_patch": {
     "date": "2026-10-10",
     "kind": "Component sync",
-    "summary": "CPRMV v0.4.2 in production: rule methods as modules in the vocabulary and the API, Echelons and acknowledged services and organisations, and SHACL shapes without recursion. It found that the released image left the method modules out, which broke /rules and /ref until the hosts were redeployed with the fix in standards/cprmv!20, and that /mcp is unreachable. CPSV Editor v2026.10.1 in production: a lockfile review on every dependency pull request, registry signatures and provenance verified in the audit gate, a quarterly dependency review, and release SBOM checks that can fail.",
+    "summary": "CPRMV v0.4.2 in production: rule methods as modules in the vocabulary and the API, Echelons and acknowledged services and organisations, and SHACL shapes without recursion. It found that the released image left the method modules out, which broke /rules and /ref until the hosts were redeployed with the fix in standards/cprmv!20, and that /mcp is unreachable. CPSV Editor v2026.10.1 in production: a lockfile review on every dependency pull request, registry signatures and provenance verified in the audit gate, a quarterly dependency review, and release SBOM checks that can fail. Linked Data Explorer v2026.10.2 in production: phases set in the Modeler with RBA's own rule, a process id unique per organisation, RoPA records nested under their shell, and signature verification in CI.",
     "previous": {
       "date": "2026-10-09",
       "kind": "Component sync",
@@ -17,6 +17,10 @@
       {
         "label": "standards/cprmv!20",
         "url": "https://git.open-regels.nl/standards/cprmv/-/merge_requests/20"
+      },
+      {
+        "label": "linked-data-explorer#300",
+        "url": "https://github.com/sgort/linked-data-explorer/issues/300"
       }
     ]
   },
@@ -64,16 +68,16 @@
     {
       "name": "Linked Data Explorer",
       "icon": "🔍",
-      "version": "v2026.10.1",
+      "version": "v2026.10.2",
       "environment": "prod",
-      "commit": "dd4728d...",
-      "commit_date": "2026-10-06",
+      "commit": "82f461f...",
+      "commit_date": "2026-10-10",
       "build": {
-        "sha": "dd4728d",
-        "run": 4,
-        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/37472357224"
+        "sha": "82f461f",
+        "run": 6,
+        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/38072829951"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/dd4728dd3429f6804c94fbcf6c951bfeef40151d",
+      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/82f461f56ca0cb634ddfb1fb15dd230bf28eca5f",
       "ci_repo": "https://github.com/sgort/linked-data-explorer"
     },
     {

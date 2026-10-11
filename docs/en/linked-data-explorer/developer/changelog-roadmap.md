@@ -8,6 +8,28 @@ component: Linked Data Explorer
 
 ## Changelog
 
+### v2026.10.2 — Phases Set in the Modeler, and a Process Id That Belongs to One Organisation (October 2026)
+
+> How to set phases: [BPMN Modeler](../features/bpmn-modeler.md) and the [user guide](../user-guide/bpmn-modeler.md). How it is built: [BPMN Modeler (developer)](bpmn-modeler.md). Storage: [Asset Storage](asset-storage.md). The pipeline: [Deployment](deployment.md). Measured suites: [Testing](testing.md).
+
+**A process's phases are set in the Modeler, not by hand.** With the process or a pool selected, the properties panel offers *None*, *Own phases* or *Awb phases*; own phases can be added, renamed, reordered and removed, with a code generated from the name and an optional label, and renaming or removing a phase carries its markers along. On a node, *Start van fase* picks the phase it starts or leaves it to inherit, with a line saying which phase that is. Each edit is one undo step, however many markers it rewrites. This closes #242.
+
+**The canvas shows the phases RBA will show.** 150 ms after each change the Modeler recomputes every node's phase from the saved XML, with a port of the RONL Business API's own rule — the same node order, back-edge detection and column assignment — and draws a solid badge where a node starts a phase and an outlined one where it inherits. A randomised comparison against RBA's parser went from 393 differing processes in 10,000 to none.
+
+**A deploy checks the phases first.** Declared phases mixed with Awb markers is an error and disables Deploy, because RBA would read one scheme and silently ignore the other. Phases with no marked node, a marker naming a phase the process does not have, a declared phase no node falls into, entries of `ronl:phases` RBA skips, and a marker on an element RBA does not count are warnings.
+
+**A stored process is unique per organisation and process id.** Re-importing an example could store a second row with the same process id, and lookups ignored the organisation, so a deploy for one organisation could stamp another's row. On start the database archives the duplicates, keeping the deployed, most recently updated row, and enforces a unique index; saving a process id the organisation already uses answers `409 PROCESS_ID_TAKEN`, and the Modeler offers to replace the existing process or give the import another id.
+
+**RoPA records nest under the shell that calls them.** Read from each stored shell's call activities, a subprocess record appears under every shell that calls it, and records with no linked shell are listed apart. The public RoPA site stays flat for now (#284).
+
+**The examples.** The besluitvorming escalation path gets its own besluit, taken and signed by the competent authority. Thuisbatterij has its own completeness check and a reachable Awb 4:5 path. The 36 business rule tasks that stored a multi-output result with `mapDecisionResult="singleResult"` now map each output straight into a plain variable, instead of a serialised map that concurrent REST reads collided on (ENGINE-03005). `examples/organizations/flevoland` is the authored copy of every Flevoland bundle, and a test now says so. The Heusdenpas has a swimlane bundle for RBA, with the 2026 bijstandsnormen, and the E2E fixtures carry it.
+
+**CI.** The required `audit` job verifies registry signatures and provenance (#249's provenance half; the registry or proxy half stays open). A new direct dependency gets a checklist of the [dependency criteria](https://github.com/sgort/linked-data-explorer/blob/main/docs/dependency-criteria.md) in the lockfile-review comment, and `dependency-review.yml` opens a review issue each quarter. Both SBOM checks now run before the generation step that used to overwrite the file, so they can fail (#274), and the production set is read from the lockfile.
+
+**Also in this release.** The form card shows the element's actual binding (#270). bpmn-js 18.30.1, the properties panel 5.65.1, Prettier 3.9.9, `ts-jest` 29.4.14 and `typescript-eslint` 8.70.1.
+
+---
+
 ### v2026.10.1 — The Norms in Force on a Date, and a Lockfile Review on Every Dependency Change (October 2026)
 
 > The contract: [API Stability](../reference/api-stability.md#v2norms). How it is built: [Backend](backend.md). The Modeler fixes: [BPMN Modeler](bpmn-modeler.md). The pipeline: [Deployment](deployment.md). Measured suites: [Testing](testing.md).
