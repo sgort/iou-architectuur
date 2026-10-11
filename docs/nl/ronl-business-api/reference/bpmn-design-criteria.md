@@ -21,9 +21,9 @@ component: RONL Business API
 
 ### `singleEntry` — the default for single-output decisions
 
-### `singleResult` — structured multi-output decisions
+### Multi-output decisions: one output parameter per column
 
-### Known issue in `AwbShellProcess`
+### Why not `singleResult` with a result variable
 
 ---
 

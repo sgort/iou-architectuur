@@ -43,6 +43,8 @@ The backend resolves that attribute from a named BPMN user task to the document 
 
 That is the whole switch. A single attribute in a model the LDE deploys turns on a feature implemented entirely here.
 
+The same attribute names the case's decision document once the task completes: `GET /v1/process/:id/decision-document` returns the template of the most recently completed task carrying `ronl:documentRef` or `ronl:signatureRef` — see [`DecisionViewer`](frontend-development.md#decisionviewer).
+
 ---
 
 ## Configuring a process for signing

@@ -10,14 +10,14 @@ This page documents design constraints and conventions that apply when authoring
 
 ## BusinessRuleTask: `camunda:mapDecisionResult`
 
-A `BusinessRuleTask` that calls a DMN decision must declare how the engine maps the decision output into a process variable. This is controlled by the `camunda:mapDecisionResult` attribute.
+A `BusinessRuleTask` that calls a DMN decision must declare how the engine hands the decision output to the process. For a decision with one output column that is the `camunda:mapDecisionResult` attribute together with `camunda:resultVariable`; for a decision with several output columns it is one `camunda:outputParameter` per column, and no result variable at all.
 
 Operaton supports four mapping modes:
 
 | Value | Returns | Use when |
 |---|---|---|
 | `singleEntry` | The value of a single output column from a single matched rule | The decision has one output column and a hit policy that guarantees at most one result (`UNIQUE`, `FIRST`, `ANY`) |
-| `singleResult` | All output columns of a single matched rule as a `Map` object | The decision has multiple output columns and you need all of them as a structured object |
+| `singleResult` | All output columns of a single matched rule as a `Map` object | Not with a result variable — read a multi-output decision through [output parameters](#multi-output-decisions-one-output-parameter-per-column) instead |
 | `collectEntries` | A `List` of values from a single output column across all matched rules | The decision uses `COLLECT` and you need all values from one column |
 | `resultList` | A `List` of `Map` objects, one per matched rule | The decision uses `COLLECT` and you need all columns of all matched rules |
 
@@ -40,47 +40,32 @@ For decisions with one output column and a `UNIQUE` hit policy, always use `sing
 
 The process variable `permitDecision` will contain the string `"Permit"` or `"Reject"` directly, usable in gateway conditions and script tasks without any unwrapping.
 
-### `singleResult` — structured multi-output decisions
+### Multi-output decisions: one output parameter per column
 
-For decisions with multiple output columns (for example a completeness check returning `isComplete`, `missingFields`, and `legalArticle`), use `singleResult`. This stores a `Map` as the result variable.
-
-```xml
-<bpmn:businessRuleTask
-  id="Task_CompletenessCheck"
-  name="Phase 3: Admissibility check"
-  camunda:resultVariable="completenessResult"
-  camunda:decisionRef="AwbCompletenessCheck"
-  camunda:mapDecisionResult="singleResult">
-```
-
-The process variable `completenessResult` will be a `Map`. To use individual fields in downstream tasks, access them by key:
-
-```javascript
-// In a script task (Groovy / JavaScript):
-var isComplete = completenessResult.get("isComplete");
-var missingFields = completenessResult.get("missingFields");
-```
-
-!!! warning "Frontend display"
-    When `singleResult` is used, the process variable is stored as a `Map` object. Rendering it via `String(value)` in a JavaScript frontend produces `[object Object]`. The caseworker interface handles this by detecting object-type values and serialising them with `JSON.stringify`. However, to keep process data readable, prefer extracting the specific sub-values you need into separate scalar variables using a script task immediately after the business rule task.
-
-### Known issue in `AwbShellProcess`
-
-The `Task_Phase3_Completeness` task in `awb-process.bpmn` uses `singleResult` because `AwbCompletenessCheck.dmn` has three output columns. This causes `completenessResult` to be stored as a `Map` and to appear as `[object Object]` in raw variable displays.
-
-**Workaround (frontend):** The caseworker variables panel serialises object values with `JSON.stringify` before display.
-
-**Proper fix (BPMN):** Add a script task after `Task_Phase3_Completeness` that extracts `completenessResult.get("isComplete")` into a plain `Boolean` variable, then use that variable in the `Gateway_Complete` condition:
+For a decision with several output columns, leave out `camunda:resultVariable` and `camunda:mapDecisionResult`, and give the task one `camunda:outputParameter` per output column that the process needs. Each reads its column from the decision result. `HrOnboardingProcess` (`examples/organizations/flevoland/HrOnboardingProcess.bpmn`) does this for the three outputs of `EmployeeRoleAssignment`:
 
 ```xml
-<bpmn:scriptTask id="Task_ExtractCompleteness" name="Extract completeness flag" scriptFormat="javascript">
-  <bpmn:script>
-    var result = execution.getVariable("completenessResult");
-    execution.setVariable("isComplete", result.get("isComplete"));
-    execution.setVariable("missingFieldsDescription", result.get("missingFields"));
-  </bpmn:script>
-</bpmn:scriptTask>
+<bpmn:businessRuleTask id="Task_DetermineRoles" name="Determine roles" camunda:decisionRef="EmployeeRoleAssignment">
+  <bpmn:extensionElements>
+    <camunda:inputOutput>
+      <camunda:outputParameter name="assignedRoles">${decisionResult.getSingleResult().getEntry("assignedRoles")}</camunda:outputParameter>
+      <camunda:outputParameter name="candidateGroups">${decisionResult.getSingleResult().getEntry("candidateGroups")}</camunda:outputParameter>
+      <camunda:outputParameter name="accessLevel">${decisionResult.getSingleResult().getEntry("accessLevel")}</camunda:outputParameter>
+    </camunda:inputOutput>
+  </bpmn:extensionElements>
+  ...
+</bpmn:businessRuleTask>
 ```
+
+Each output is then a plain `String`, `Boolean` or `Integer` process variable, usable directly in gateway conditions, forms and script tasks. The variable may be named differently from its column: `AwbShellProcess` maps the `legalBasis` column of `ArchivesActRetention` to `archivingLegalBasis`. As with `singleEntry`, the decision needs a hit policy that yields a single result.
+
+`AwbShellProcess` maps only the column it branches on: `Task_Phase3_Completeness` calls `AwbCompletenessCheck` and maps `isComplete` through an output parameter, and `Gateway_Complete` tests `${isComplete == true}` and `${isComplete == false}`.
+
+### Why not `singleResult` with a result variable
+
+`camunda:mapDecisionResult="singleResult"` with a `camunda:resultVariable` stores the whole matched rule as one variable: a Java-serialised `java.util.HashMap`. A REST read that deserialises the process variables can write that object back, so concurrent reads of the same instance collide with `ENGINE-03005`, Operaton's optimistic-locking failure ([sgort/linked-data-explorer#273](https://github.com/sgort/linked-data-explorer/issues/273)). The example processes were rewritten to output parameters for that reason (`f3117dd`). The map is also no use where a simple value is expected: a gateway has to reach into it by key, and a frontend that renders it with `String(value)` shows `[object Object]`.
+
+A script task that only copies entries out of the map into separate variables is unnecessary: the output parameters produce those variables directly, without the map ever being stored.
 
 ---
 
@@ -93,9 +78,8 @@ Gateway `conditionExpression` values must match the actual type of the process v
 | `String` | `${permitDecision == "Permit"}` | `${permitDecision == true}` |
 | `Boolean` | `${isComplete == true}` or `${isComplete}` | `${isComplete == "true"}` |
 | `Integer` | `${treeDiameter > 30}` | `${treeDiameter > "30"}` |
-| `Map` (singleResult) | `${completenessResult.get("isComplete") == true}` | `${completenessResult == true}` |
 
-When `singleResult` is used, the gateway must call `.get("columnName")` on the map variable. Comparing the map object directly to a primitive always evaluates to `false` without throwing an error, making this class of bug difficult to detect at design time.
+An output of a multi-output decision, mapped through an output parameter, is one of these types and is tested the same way. Do not branch on a field of a `Map` variable (`${completenessResult.isComplete == true}`): it needs the map stored, which is the pattern to avoid — see [Why not `singleResult` with a result variable](#why-not-singleresult-with-a-result-variable).
 
 ---
 

@@ -202,6 +202,30 @@ Read at `origin/main` `82f461f` (same tree as `acc` `a87f64b`). The pages themse
    plus a script task, the pattern LDE removed from every example for ENGINE-03005 (2cbfa2b) — a component page, so it belongs
    to the RBA sync, recorded here so it is not lost.
 
+### 11 October 2026 — RONL Business API v2026.10.1 → v2026.10.2 (production, `7117914`)
+
+Read at `origin/main` `7117914` (Promote to Production #8); `origin/acc` `c51ec0a` holds the same tree. The pages themselves were
+not touched and no stamp was refreshed.
+
+1. **All three applications now verify registry signatures in their required `audit` job.** RBA `zizmor.yml` runs
+   `npm run audit:signatures` (74ebeeb, `scripts/audit-signatures.sh`); measured 11 October: 1575 signatures and 213 attestations
+   verified. Completes the 10 October LDE item 1. Bears on: `supply-chain.md`, `controls.md` (R5 "nowhere yet"),
+   `ictu-dependency-guideline.md` (R5).
+2. **RBA applies the shared dependency criteria too**: the lockfile-review checklist for a new direct dependency
+   (`scripts/lockfile-diff.mjs`) and the quarterly `dependency-review.yml` (83fc2a1); the first review, 2026-Q4, is
+   ronl-business-api#362 (closed). Bears on: `controls.md` (R1, R11 "nowhere yet"), `ictu-dependency-guideline.md` (R1, R11),
+   `dependency-scanning.md`.
+3. **RBA has fourteen workflows, 27 jobs (23 choosing a runner), `audit` has eleven steps, and `check-supply-chain` counts 43
+   pinned references across 6 actions** (was 13 / 26 / 22 / ten / 41). Supersedes the counts in the 9 October RBA item 6.
+   Bears on: `code-standards.md` (":174 thirteen workflows"), `supply-chain.md`.
+4. **RBA's SBOM checks run before generation and the production set comes from the lockfile** (5a0d969, 38a3bcb, #354/#368).
+   The 9 October RBA item 1 is now history for RBA too: the v2026.10.2 SBOM lists 487 components and records npm 11.19.0, and a
+   local `sbom:check` with another npm (11.21.0) exits 1 on `metadata.tools` alone. Bears on: `supply-chain.md`,
+   `dependency-scanning.md`, `ictu-dependency-guideline.md` (R10).
+5. **The 10 October LDE item 5 is done:** this sync rewrote `ronl-business-api/reference/bpmn-design-criteria.md` for plain
+   variables. Nothing for the weekly pass to do there; drain it.
+6. **The 85% margin carry-over (4 October item 2)**: measured in this sync. Two RBA files are below 85% branches: `BesluitOverzichtSection.tsx` 80.43% (37/46, as on 3 October) and the frontend's `components/process/phaseSet.ts` 83.33% (10/12); none is below the 80% floor. Bears on: `coverage-floor.md` (the margin sentence).
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

@@ -1,8 +1,15 @@
 # RONL Business API — screenshots to capture
 
-!!! note "Nothing outstanding — reviewed 9 October 2026 for v2026.10.1"
-    Rows 16–20 were captured the same day. Row 20 shows the Keycloak login form on its
-    own rather than beside the landing page; the figure's text says so. Rows 11–15 still hold.
+!!! note "Nothing outstanding — reviewed 11 October 2026 for v2026.10.2"
+    Nothing requested for v2026.10.2 (first section below). Rows 16–20 were captured on 9 October.
+    Row 20 shows the Keycloak login form on its own rather than beside the landing page; the figure's
+    text says so. Rows 11–15 still hold.
+
+## Sync v2026.10.1 → v2026.10.2 — no screenshots requested
+
+Reviewed on 11 October 2026 for **v2026.10.2**, in production. The release changes CI, the supply chain, the
+decision-document endpoint and the BPMN examples. The only change in a UI package is the in-app changelog
+(`packages/frontend/src/pages/changelog-data.ts`), which no figure shows, so no captured view went stale.
 
 ## Sync v2026.10.0 → v2026.10.1 — two REPLACE, three NEW (captured)
 

@@ -139,13 +139,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.10.1** · *October 2026*
+-   **⚙️ RONL Business API — v2026.10.2** · *October 2026*
 
     ---
 
-    **Citizen services follow the deployments, every organisation gets its own page, and eDOCS knows who is asking**
+    **Every dependency weighed, signatures verified, and the decision document of the path taken**
 
-    The [citizen portal](ronl-business-api/user-guide/citizen-portal.md) now offers only the services a citizen's organisation actually runs, derived from where each process is deployed — and enforced when one is started; DVTP is retired. Gemeente Heusden joins with the Heusdenpas, test cases included. Amsterdam, Heusden, Dienst Toeslagen and Univé each have a [landing page](ronl-business-api/user-guide/getting-started.md) at `mijn.open-regels.nl/<id>` with its own link preview, and a board your role does not open now explains why. People reach eDOCS as themselves through their Entra ID token, the assistant's eDOCS tools act as the caseworker, and archiving records the employee "namens". Dependency pull requests get a lockfile review, and the deprecated `GET /v1/m2m/process/history` is gone. The [suites](ronl-business-api/developer/testing/overview.md) stand at 5,069 unit tests and 59 end-to-end tests, all passing.
+    A pull request that adds a direct dependency now gets a checklist of the shared [dependency criteria](ronl-business-api/developer/cicd.md), and a new quarterly workflow opens a review of every direct dependency. The required `audit` job verifies registry signatures and provenance. The release SBOM lists every production package again, and its checks run before it is generated, so they can fail. The decision document now follows the path a case took, so an escalated besluit returns the competent authority's own document, and the examples store [multi-output DMN results](ronl-business-api/reference/bpmn-design-criteria.md) as plain variables. The [suites](ronl-business-api/developer/testing/overview.md) stand at 5,074 unit tests, all passing; the 59 end-to-end tests are unchanged since 9 October.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
