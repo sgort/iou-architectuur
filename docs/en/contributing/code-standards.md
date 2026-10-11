@@ -1,25 +1,26 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-04
+  date: 2026-10-11
   against:
-    CPSV Editor: "4cba989"
-    Linked Data Explorer: "9e0d18e"
-    RONL Business API: "5c6e716"
+    CPSV Editor: "2cf6a90"
+    Linked Data Explorer: "a87f64b"
+    RONL Business API: "c51ec0a"
 ---
 
 # Code Standards
 
 !!! info "Verification status"
-    All three repositories' claims were re-checked on **4 October 2026**, against
-    `4cba989`, `9e0d18e` and `5c6e716`: rulesets read from the API per ruleset, workflow
+    All three repositories' claims were re-checked on **11 October 2026**, against
+    `2cf6a90`, `a87f64b` and `c51ec0a`: rulesets read from the API per ruleset, workflow
     files enumerated and their steps, triggers and filters read from source, and both
     hook files read from each repository.
 
-    **What moved is the hooks and `main`.** Since 28 September 2026 the Linked Data
-    Explorer's and the RONL Business API's `pre-push` also run a BPMN fingerprint check,
-    so the three hooks no longer gate the same things. And since 30 September 2026 the
-    CPSV Editor holds `main` to a ruleset too, so all three now gate it.
+    **What moved is CI, not the hooks.** The BPMN fingerprint checks that ran only in
+    `pre-push` now also run in each repository's required `audit` job; since 6 October
+    2026 a `lockfile-review` check is required on `acc` in all three; every `audit` job
+    verifies registry signatures; and each repository gained a quarterly
+    `dependency-review` workflow.
 
 This page covers three application repositories — CPSV Editor (`ttl-editor`), Linked
 Data Explorer, and RONL Business API — that share a common tooling convention:
@@ -109,21 +110,25 @@ theirs.
 
 **The BPMN fingerprint contract.** The twelve RIP phase BPMNs are authored in the Linked
 Data Explorer and copied twice: into its own `e2e-fixtures/`, and into the RONL Business
-API's swimlane parser fixtures. `rip-bpmn-fingerprints.json`, committed byte-identical
-in both repositories, records a sha256 for each of the twelve. The Linked Data
+API's swimlane parser fixtures. Two declared-phase models authored there —
+`GedelegeerdBesluitProcess.bpmn` and `ManagementCapacityClaimProcess.bpmn` — are copied
+into those parser fixtures too, under `declared/`. `rip-bpmn-fingerprints.json`, committed
+byte-identical in both repositories, records a sha256 for each of the fourteen. The Linked Data
 Explorer's `scripts/check-rip-bpmn-copies.mjs` (`npm run check-rip-bpmn`) compares the
 `e2e-fixtures/` copies byte for byte against their source and checks the authoring
 files against the fingerprints. The RONL Business API's
 `scripts/check-swimlane-fixtures.mjs` (`npm run check-swimlane-fixtures`) checks its
-twelve fixtures against the fingerprints and, when a sibling Linked Data Explorer
+fourteen fixtures against the fingerprints and, when a sibling Linked Data Explorer
 checkout is present (`LDE_PATH` overrides where), byte-compares them against it too. Its
 `--sync` copies the Linked Data Explorer's files over the fixtures, and refuses when a
 fixture agrees with its fingerprint but differs from that checkout — the checkout is then
-the stale side — unless `--force` is given. Both checks run in `pre-push` only, in no workflow at either
-head, although the Linked Data Explorer script's header describes each side enforcing it
-"in ITS ci". The seven Awb fixtures under
-`packages/backend/src/rip-swimlane/__fixtures__/awb/` are outside the contract: the
-check matches only `RipRNNProcess.bpmn`.
+the stale side — unless `--force` is given. Both checks run in `pre-push` and, since
+v2026.10.1 in each repository, in its required `audit` job as well, so a push that skips
+the hook, or an edit made in the GitHub UI, still meets them. In CI the RONL Business API
+checks the fingerprint half only: the Linked Data Explorer is not checked out there. The
+seven Awb fixtures under `packages/backend/src/rip-swimlane/__fixtures__/awb/` are
+outside the contract: the check reads only `RipRNNProcess.bpmn` at the fixture root and
+the files under `declared/`.
 
 **None of the three repositories' git hooks run the test suite.** Neither `pre-commit`
 nor `pre-push` invokes `npm test` anywhere. A passing hook is not evidence your change
@@ -148,9 +153,9 @@ without blocking the promotion. See [What blocks a merge](#what-blocks-a-merge) 
     from that worktree skips `lint-staged`, `deps:check`, lint and `check-format`
     entirely** — and with them the Linked Data Explorer's `check-rip-bpmn` and the RONL
     Business API's shared build, `check-swimlane-fixtures` and `type-check`. The first
-    sign is CI failing on something a hook would have caught locally — or, worse, nothing
-    failing at all, because the formatting check lives in a workflow the branch did not
-    touch, and the two fingerprint checks run in no workflow, so CI never catches those.
+    sign is CI failing on something a hook would have caught locally. The `audit` job
+    checks formatting on every pull request in all three repositories, so a formatting
+    slip is caught there; a branch pushed without a pull request is checked by nothing.
 
     Recorded as [ttl-editor#159](https://github.com/sgort/ttl-editor/issues/159), and true
     in all three; the issue was closed on 3 October 2026 once the CPSV Editor's README
@@ -171,18 +176,19 @@ and a failing test blocks the deploy. That has only been true since 20 August 20
 before then CI and the hooks left the same gap, and RONL Business API's public-site
 package had the only real test gate anywhere.
 
-**RONL Business API** — **thirteen** workflows: an acc/prod pair for each of **four**
+**RONL Business API** — **fourteen** workflows: an acc/prod pair for each of **four**
 deployable packages, the supply-chain `audit`, since v2026.09.7 the Semgrep `scan`,
 since v2026.09.10 `promote-to-production.yml`, which is what a push to `main` starts and
-which calls the four production workflows in order, and since v2026.09.12 the daily
-`dependency-audit` and the release `sbom`:
+which calls the four production workflows in order, since v2026.09.12 the daily
+`dependency-audit` and the release `sbom`, and since v2026.10.2 the quarterly
+`dependency-review`:
 
 | Workflow pair | Lint | Type-check | Tests | Notes |
 |---|:---:|:---:|:---:|---|
 | `azure-backend-*` | ✅ | – | ✅ | Builds, uploads the artifact, and since v2026.09.10 deploys it over OIDC (`azure/login` then `az webapp deploy`), then waits until `/v1/health` reports the deployed commit. The four deploy steps are skipped on a pull request. Also lints the OpenAPI document. Since 29 September 2026 ([#269](https://github.com/sgort/ronl-business-api/issues/269)) the backend's `npm test` and `test:serial` end with `scripts/check-conformance-coverage.cjs`, which fails when the OpenAPI document holds an operation no test compared against a real response — so both backend workflows run it |
 | `azure-frontend-*` | ✅ | – | ✅ | Also runs `npm run test:perf`, the wall-clock budget, as a step of its own |
 | `azure-publicsite-*` | ✅ | ✅ | ✅ | Its build additionally gates on a prerender and a bundle-cleanliness check |
-| `azure-pa-demo-*` | ✅ | ✅ | ✅ | The acc workflow also installs Chromium and runs the Playwright E2E suite before the bundle gate; the production one does not |
+| `azure-pa-demo-*` | ✅ | ✅ | ✅ | The acc workflow also installs Chromium and runs the Playwright E2E suite before the bundle gate; the production one does not. Since v2026.10.1 the Chromium install has a ten-minute `timeout-minutes` of its own |
 
 The frontend's performance budget runs separately because it asserts wall-clock time,
 which means nothing while more than a hundred test files compete for cores — see
@@ -199,14 +205,19 @@ guards at the time, unlike the Linked Data Explorer's equivalent change below: t
 workflow then ended at an uploaded artifact and had no deploy step to gate. Both filters
 gained `package-lock.json` and `package.json`, because every workspace resolves through
 them and a lockfile-only change was built and tested by nothing. The other three
-acceptance workflows did not: the `changes` patterns of the frontend, PA demo and public
-site name neither file, so a lockfile-only pull request still skips all three required
-site checks, which report success, and only the backend's `build` runs a suite.
+acceptance workflows followed in v2026.10.1
+([#247](https://github.com/sgort/ronl-business-api/issues/247)): their push filters and
+`changes` patterns name both files, so a lockfile-only pull request now builds and tests
+all four packages — deploying no preview unless it is labelled `preview` — and its merge
+deploys them to acceptance. A promotion still does not: `scripts/promotion-targets.sh`
+names the root lockfile for the backend only, so a lockfile-only promotion redeploys the
+backend and none of the three sites.
 
-**Linked Data Explorer** — **eleven** workflows in the tree: six deployment workflows,
+**Linked Data Explorer** — **twelve** workflows in the tree: six deployment workflows,
 the supply-chain `audit` gate added in v2026.08.7, the Semgrep `scan` added in
-v2026.09.3, and since v2026.09.7–8 `promote-to-production.yml`, the daily
-`dependency-audit` and the release `sbom` (see
+v2026.09.3, since v2026.09.7–8 `promote-to-production.yml`, the daily
+`dependency-audit` and the release `sbom`, and since v2026.10.2 the quarterly
+`dependency-review` (see
 [Supply-Chain Pinning — the npm tree](dependency-scanning.md)).
 Both backend and both frontend workflows run lint and then the suite before building.
 **Since v2026.09.5 the backend workflows also lint the OpenAPI description** —
@@ -216,16 +227,17 @@ recorded exception stops the deploy. The routes are held to that description by 
 test step, which validates every response against it.
 The two `ropa-site` workflows run neither, and correctly so: that package is a static
 `index.html` plus a `staticwebapp.config.json`, with no build and no test script to run.
-**The backend's fixture tests gate nothing for a fixture-only change.** The acceptance
-backend workflow decides relevance with the pattern
-`^(\.nvmrc$|packages/backend/|\.github/workflows/azure-backend-acc\.yml$|package-lock\.json$|package\.json$)`,
-which leaves out `examples/`, `e2e-fixtures/` and `packages/frontend/public/examples/`.
-A pull request that changes only examples or fixtures therefore runs no backend suite,
-so `e2e-fixtures.test.ts`, `e2e-fixture-decisions.test.ts`,
+**Since v2026.10.1 a fixture-only change runs the backend's fixture tests.** Until then
+the acceptance backend workflow decided relevance with a pattern that left out
+`examples/`, `e2e-fixtures/` and `packages/frontend/public/examples/`, so a pull request
+that changed only examples or fixtures ran no backend suite, and
+`e2e-fixtures.test.ts`, `e2e-fixture-decisions.test.ts`,
 `example-fixture-parity.test.ts` and `public-example-fixture-parity.test.ts` — the tests
-that guard exactly those files — do not run on it. Pull request #235 shows it: the
+that guard exactly those files — did not run on it. Pull request #235 showed it: the
 backend deploy was skipped, and only the frontend suite ran, because the change also
-touched `packages/frontend/`.
+touched `packages/frontend/`. The push filter and the `changes` pattern now name all
+three directories ([#254](https://github.com/sgort/linked-data-explorer/issues/254),
+item 4); a merge of such a change also redeploys the unchanged backend to acceptance.
 
 **Both backends are now deployed by CI.** The Linked Data Explorer's end in
 `azure/webapps-deploy` with a publish profile; since v2026.09.10 the RONL Business API's
@@ -267,21 +279,24 @@ Production* and not the deploys; and if the promotion workflow breaks, nothing d
 and nothing on `main` says so, because its checks are not required. The CPSV Editor is
 unchanged: `Deploy PROD (white-sky)` still triggers itself on a push to `main`.
 
-**CPSV Editor** — seven workflows: two Azure Static Web Apps workflows, `acc` and `main`
+**CPSV Editor** — eight workflows: two Azure Static Web Apps workflows, `acc` and `main`
 alike, running `npm ci`, `npm run lint` and `npm run test:ci` ahead of the deploy action
 — and, since 19 September 2026, a `Build` step of their own that runs `npm run build` on
 the runner and asserts `dist/index.html` exists before the deploy action uploads it with
 `skip_app_build: true` — plus the supply-chain `audit`, since v2026.09.3 the Semgrep
 `scan` (see
 [Supply-Chain Pinning — the npm tree](dependency-scanning.md)), and since v2026.09.6
-`close-preview-environments.yml`, and since v2026.09.7 the daily `dependency-audit` and
-the release `sbom`. The preview workflow holds the two jobs that delete a pull
+`close-preview-environments.yml`, since v2026.09.7 the daily `dependency-audit` and
+the release `sbom`, and since v2026.10.1 the quarterly `dependency-review`. The preview workflow holds the two jobs that delete a pull
 request's Static Web Apps preview when it closes. They used to sit in the deploy
 workflows, whose `paths-ignore` applies to the close event too — so a documentation-only
 pull request never started the workflow holding its close job, and its preview kept
 running on a public URL. The new workflow has no path filter at all. Since v2026.09.2 that `audit` job also runs
 `npm run check-format` and `npm run check-supply-chain` — and it gained its first
 `npm ci` to do so, everything in it having previously run from `npx` or plain node.
+Since v2026.10.1 it also runs `npm run audit:signatures`, which verifies the registry
+signatures and provenance attestations of the installed tree; the Linked Data Explorer's
+and the RONL Business API's `audit` jobs run the same step since their v2026.10.2.
 Since 25 September 2026 a **Lockfile matches package.json** step runs before that
 install in all three repositories — `npm ci --dry-run --ignore-scripts` — so a lockfile
 out of step with its manifest fails under its own name rather than as an `EUSAGE` three
@@ -361,8 +376,8 @@ Running a check and being able to block on it are different things. Which checks
 branch **requires**, what the rulesets carry beyond them, and how merge method is
 enforced are on [Branch Protection](branch-protection.md). The short version, because it
 is the fact most often got wrong — and because it reversed on 19 September 2026: on
-`acc`, every repository now requires `audit`, `scan` and its build and deploy checks, so
-a red test blocks the merge. On `main` every repository requires `audit` and `scan` and
+`acc`, every repository now requires `audit`, `scan`, its build and deploy checks and,
+since 6 October 2026, `lockfile-review`, so a red test blocks the merge. On `main` every repository requires `audit` and `scan` and
 nothing else — no build and no test.
 
 ### Supply-chain hardening
@@ -379,6 +394,12 @@ by every deploy workflow, and a root **`.npmrc` setting `min-release-age=14`**, 
 package-manager half of the cooldown Renovate already applies to its own proposals. What
 *cannot* be pinned is written down in each repository's `SECURITY-PIPELINE.md` rather
 than glossed over.
+
+Since 6 October 2026 a **`lockfile-review`** job, required on `acc` in all three, compares
+the pull request's `package-lock.json` with its base. It fails on a package resolved from
+outside the npm registry or recorded without an integrity hash, and lists new packages,
+licence changes and licences outside the repository's `lockfile-review.json` allow-list,
+new install scripts and downgrades as prompts for the reviewer rather than failures.
 
 Two Renovate settings joined that list in September 2026, and they matter more than they
 look. **Lock-file maintenance** is what moves the transitive tree at all — Renovate
@@ -519,10 +540,21 @@ something the others do not attempt:
   `scripts/generate-changelog.mjs`, so the in-app changelog cannot drift from what was
   actually committed. It degrades gracefully when `node` is absent rather than
   blocking the commit.
+- **`pre-merge-commit`** runs `pre-commit`, so a merge commit ships a regenerated
+  changelog too.
 
-That last one is the reason its changelog is **git-log-derived** rather than
+Those last two are the reason its changelog is **git-log-derived** rather than
 hand-curated, and why its entries read as commit subjects. A sync reading it should
 expect terse text and check the source for anything substantive.
+
+CI now regenerates it as well: the `build_gui` job runs
+`./scripts/generate-changelog.mjs && mv ./changelog.json gui/public` before building the
+GUI image. The script groups commits by git tag, and the remote holds only the tags
+`2026.07.0` and `2026.07.1`, while the committed changelog names releases up to
+`2026.09.15-2` — so a changelog generated from the remote's history files everything
+after `2026.07.1` under *Unreleased*. The job runs in `docker:latest`, an image without
+Node, so the step may not complete at all; the pipelines are not visible from outside the
+project, so that has not been observed.
 
 ### What it does not have
 

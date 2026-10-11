@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-04
+  date: 2026-10-11
   against:
-    CPSV Editor: "4cba989"
-    Linked Data Explorer: "9e0d18e"
-    RONL Business API: "5c6e716"
+    CPSV Editor: "2cf6a90"
+    Linked Data Explorer: "a87f64b"
+    RONL Business API: "c51ec0a"
 ---
 
 # Development Workflow
@@ -52,7 +52,8 @@ locally created bump commit has never been through CI. Merging the pull request 
 push, and triggers the acceptance deploy.
 
 Since 19 September 2026 that pull request must also pass the build and deploy checks, not
-only `audit` and `scan` — so a release whose suite is red cannot be merged. Expect the
+only `audit` and `scan`, and since 6 October 2026 `lockfile-review`, which has a lockfile
+change to read in every release — so a release whose suite is red cannot be merged. Expect the
 release pull request to sit until CI is green rather than to be waved through.
 
 A release pull request is **merged, never squashed and never rebased** — the changelog

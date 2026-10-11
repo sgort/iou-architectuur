@@ -1,33 +1,35 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-04
+  date: 2026-10-11
   against:
-    CPSV Editor: "4cba989"
-    Linked Data Explorer: "9e0d18e"
-    RONL Business API: "5c6e716"
+    CPSV Editor: "2cf6a90"
+    Linked Data Explorer: "a87f64b"
+    RONL Business API: "c51ec0a"
 ---
 
 # The Coverage Floor
 
-!!! info "What was re-checked on 4 October 2026, and what was not"
-    The **CI, ruleset and environment claims** on this page were re-checked on
-    4 October 2026 against `4cba989`, `9e0d18e` and `5c6e716`: which workflows run
-    the suites, on which triggers, which checks each branch requires, and what each
-    deployment environment demands. The floor has been blocking on `acc` in all three
-    since 19 September 2026. Every `main` now requires `audit` and `scan`, and none
-    requires a build or a test.
+!!! info "What was re-checked on 11 October 2026, and what was not"
+    The **CI and ruleset claims** on this page were re-checked on 11 October 2026
+    against `2cf6a90`, `a87f64b` and `c51ec0a`: which workflows run the suites, on
+    which triggers, and which checks each branch requires. The floor has been blocking
+    on `acc` in all three since 19 September 2026. Every `main` now requires `audit`
+    and `scan`, and none requires a build or a test.
 
-    **The percentages and file counts below were not re-measured on that date.** They
-    were measured on 12 September 2026 against `f5bae6a`, `be6bc54` and `311d732`, the
-    RONL Business API's by running all five suites with coverage rather than reading a
-    record. They are a dated measurement, and this note is the honest version of that.
-    One later measurement changes the picture they give of the RONL Business API: on
-    3 October 2026, at v2026.10.0, no file there was below 80% branches, but the 85% margin
-    its coverage page recorded for every file on 30 September no longer holds —
-    `CaseworkerDashboard/BesluitOverzichtSection.tsx` reads **80.43%**, one uncovered
-    branch from failing. See its
-    [coverage page](../ronl-business-api/developer/testing/coverage.md).
+    **That re-check ran no suite.** The package-level figures below were measured on
+    12 September 2026 against `f5bae6a`, `be6bc54` and `311d732`, the RONL Business
+    API's by running all five suites with coverage rather than reading a record. The
+    per-file figures for the files nearest the floor come from the component syncs of
+    10–11 October 2026: the Linked Data Explorer at v2026.10.2 (measured 10 October),
+    the RONL Business API at v2026.10.2 (measured 11 October), and the CPSV Editor at
+    v2026.10.1 (measured 10 October, on its
+    [testing page](../cpsv-editor/developer/testing.md#coverage)). No file in any of
+    the three is below 80% branches. The 85% margin the RONL Business API recorded for
+    every file on 30 September no longer holds:
+    `CaseworkerDashboard/BesluitOverzichtSection.tsx` reads **80.43%** (37 of 46), one
+    uncovered branch from failing, and `components/process/phaseSet.ts` 83.33% (10 of
+    12). See its [coverage page](../ronl-business-api/developer/testing/coverage.md).
 
 *A per-file 80% branch-coverage floor, and what it took to enforce it in three
 repositories*
@@ -87,7 +89,7 @@ two disagree, the measured one wins.
 
 The asymmetry runs both ways. In the CPSV Editor, `ConceptsTab.jsx` reads 80.55%
 on branches but **71.62% on statements and 63.33% on functions**, and `App.jsx`
-reads 81.48% / 71.65% / **53.70%** — the uncovered code there is largely
+reads 83.33% / 72.44% / **55.55%** at v2026.10.1 — the uncovered code there is largely
 branch-free, whole handlers no test calls, so a branch floor steps straight over
 it. Worth knowing what the column you gate on does not see.
 
@@ -296,10 +298,14 @@ rather than from the printed table, which elides rows. A file with no branches
 cannot fail a branch threshold, so including it inflates the denominator without
 telling you anything.
 
-The Linked Data Explorer rows were re-measured at v2026.09.4. The frontend reads
+The Linked Data Explorer rows were re-measured at v2026.09.4. The frontend read
 **69 of 78**, one more file carrying a branch, with `GraphView.tsx` at 82.26% the
-only one under 85%. The backend reads **38 of 44**, and its lowest file has not
-moved. That backend row said **49** until 11 September 2026, copied from the comment
+only one under 85%. The backend read **38 of 44**, and its lowest file had not
+moved. At v2026.10.2 (10 October 2026) the frontend reads **85 of 96**, with two files
+under 85% — `GraphView.tsx`, still at 51 of 62, and `BpmnModeler/BpmnCanvas.tsx` at
+84.03% (200 of 238), which that release's phase panel took below — and the backend
+**55 of 61**, with `sparql.service.ts` still lowest at 82.85% and
+`dmn-validation.service.ts` at 84.97%. That backend row said **49** until 11 September 2026, copied from the comment
 `jest.config.js` carries — *"measured clean when this landed — 49 files"* — and 49
 is neither 38 nor the 44 files the report contains at all. It is the same class of
 figure as the frontend's 64: quoted from a record rather than recounted under the
@@ -329,12 +335,13 @@ unrelated change.
 package branches 90.59% → **92.88%**, files under 85% from fourteen to one, tests
 1042 → 1073. **No production code changed** — test files only, plus the config
 comment. The CPSV Editor has not yet, and arrived at the same position by a
-different route: its three lowest files — `useDsoImport.js` 80.39%,
-`ConceptsTab.jsx` 80.55%, `ChangelogTab.jsx` 80.70% — are each one uncovered
-branch from failing, and the ratchet's pins that used to absorb a slip are gone.
+different route: at v2026.10.1 its three lowest files — `ConceptsTab.jsx` 80.55%,
+`ChangelogTab.jsx` 80.70%, `vocabularies.config.js` 81.13% — each pass by one covered
+branch, and the ratchet's pins that used to absorb a slip are gone.
 The RONL Business API closed it on 28 September 2026, when `391b1a8` took its three files
 at exactly 80.00% to 100%, and its 30 September reading had every file above 85%; on 3 October
-v2026.10.0 brought a new one in at 80.43%, as the note at the top of this page records.
+v2026.10.0 brought `BesluitOverzichtSection.tsx` in at 80.43%, and at v2026.10.2 it still
+reads that, with `phaseSet.ts` at 83.33%, as the note at the top of this page records.
 
 **The first uncovered branch added to any of them turns CI red on an otherwise
 unrelated change.** That is the floor working as designed, but it is worth meeting
@@ -378,9 +385,8 @@ caught it.
     `acc` ruleset requires the build and deploy checks alongside `audit` and `scan`,
     and those jobs run the suites — coverage thresholds included — before they build.
     A pull request that drops a file below 80% turns a **required** check red, and the
-    merge button goes with it — for a source change. In the RONL Business API a
-    lockfile-only pull request still runs only the backend's suite: the three site
-    workflows' `changes` patterns do not name the root lockfile.
+    merge button goes with it. Since v2026.10.1 that includes a lockfile-only pull
+    request in the RONL Business API, whose three site workflows used to skip one.
 
     Until that date this said the opposite, correctly: the workflows that enforce the
     floor were named by no ruleset, so a sub-80% file stopped the deploy and left the

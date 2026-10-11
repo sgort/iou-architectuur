@@ -1,20 +1,21 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-04
+  date: 2026-10-11
   against:
-    Linked Data Explorer: "9e0d18e"
-    RONL Business API: "5c6e716"
+    Linked Data Explorer: "a87f64b"
+    RONL Business API: "c51ec0a"
 ---
 
 # OpenAPI Rendering
 
-How the API Specification pages — the
-[Linked Data Explorer's](../../linked-data-explorer/reference/api-specification.md)
+How the API Specification pages — the Linked Data Explorer's two
+([v1](../../linked-data-explorer/reference/api-specification.md) and, since
+6 October 2026, [v2](../../linked-data-explorer/reference/api-specification-v2.md))
 and, since 26 September 2026, the
 [RONL Business API's](../../ronl-business-api/reference/api-specification.md) — turn
 a component's OpenAPI document into a browsable reference, what they depend on at
-run time, and which of those dependencies are load-bearing. The two pages are built
+run time, and which of those dependencies are load-bearing. The three pages are built
 the same way; where they differ, this page says so.
 
 This page exists so the specification page itself can stay what a reader came
@@ -27,7 +28,7 @@ detail.
 
 Each page declares an empty banner element and three script tags: the provenance
 script described below, then Scalar (`@scalar/api-reference`, pinned at 1.68.0 on
-both pages) loaded from `cdn.jsdelivr.net`, and a configuration element that tells it
+all three pages) loaded from `cdn.jsdelivr.net`, and a configuration element that tells it
 which document to fetch:
 
 ```html
@@ -51,7 +52,7 @@ was describing the API route group by route group: the document went from 24 pat
 to 63 in three days, so a snapshot would have been stale within days, and every
 backend deploy would have owed the documentation site a fetch, a commit, a build and
 a promotion. #129 closed on 17 September, and every `/v1` route is now described —
-the backend's tests fail when one is not.
+as is every `/v2` route since 6 October — and the backend's tests fail when one is not.
 
 The cost is **reproducibility**. The page cannot be replayed as it looked last
 week, and it shows nothing at all if the backend is unreachable. When the
@@ -63,12 +64,14 @@ one-line change to `data-url` plus the file.
 
 ### Provenance comes from a second endpoint
 
-Both documents carry their own release version: `info.version` is injected from
+All three documents carry their own release version: `info.version` is injected from
 `package.json` at build time, never written in the source, so the document and the
 running service cannot disagree about it. What the document cannot say is **which
 build** is serving it, or in which environment — so the banner reads `/v1/health`,
 which reports the version, the environment and the build (commit and workflow run)
-of the very service that just served the document:
+of the very service that just served the document. The Linked Data Explorer's v2
+page reads `/v1/health` too, because the same running process serves both of its
+documents:
 
 ```
 Rendered from acceptance · version 2026.10.0 · build 9e0d18e · #342 · read … UTC
@@ -83,8 +86,8 @@ and run number itself.
 If that fetch fails the banner stays hidden and the reference still renders. It
 degrades to nothing, never to an error.
 
-Both banners are styled by `docs/stylesheets/spec-provenance.css`, listed in
-`extra_css`. The Linked Data Explorer's element is targeted by its id,
+All three banners are styled by `docs/stylesheets/spec-provenance.css`, listed in
+`extra_css`. The Linked Data Explorer's two pages share an element targeted by its id,
 `#lde-spec-provenance`; any later page uses the shared `.spec-provenance` class, as
 the RONL Business API's does.
 
@@ -97,7 +100,9 @@ the RONL Business API's does.
   places the sidebar inline.
 - **`servers` is overridden** rather than the servers array being reordered in
   the document. Which environment a reader is pointed at is a presentation
-  choice and belongs in the page, not in a copy of someone else's contract.
+  choice and belongs in the page, not in a copy of someone else's contract. The
+  Linked Data Explorer's v2 document lists Production first; its page points at the
+  acceptance `/v2` base.
 
 ---
 
@@ -107,7 +112,7 @@ Three separate mechanisms, commonly confused with one another.
 
 | Mechanism | Governs | Load-bearing for |
 |---|---|---|
-| Wildcard CORS on `/v1/openapi.json` | the document fetch | **the render** |
+| Wildcard CORS on `/v1/openapi.json` (and the Linked Data Explorer's `/v2/openapi.json`) | the document fetch | **the render** |
 | `CORS_ORIGIN` allowlist | every other route | **Test Request**, and the provenance banner |
 | `connect-src` in the site CSP | all outbound fetches | both — if the CSP is ever enforced |
 
@@ -116,8 +121,8 @@ allowlist.
 
 ### The CORS asymmetry
 
-`/v1/openapi.json` is a **public mount** served with
-`Access-Control-Allow-Origin: *`, entirely separate from the `CORS_ORIGIN`
+`/v1/openapi.json` — and the Linked Data Explorer's `/v2/openapi.json` — is a
+**public mount** served with `Access-Control-Allow-Origin: *`, entirely separate from the `CORS_ORIGIN`
 allowlist that governs every other route. So the render works from any origin
 and does not depend on either documentation tier being allowlisted — a third
 party could render the same document.
@@ -138,7 +143,7 @@ acceptance API. The production backend allows only its own two frontends — the
 Linked Data Explorer's and the CPSV Editor's — so no documentation page can reach it
 from a browser.
 
-That split is a decision, not an accident. The Linked Data Explorer's specification declares no
+That split is a decision, not an accident. Neither of the Linked Data Explorer's documents declares
 `securitySchemes` and no global `security`, so every operation is
 unauthenticated — including `POST /dmns/deploy`, `POST /dmns/process/deploy`
 and `DELETE /cache/clear`. Those are already reachable by anything that is not
@@ -146,7 +151,8 @@ a browser, since the origin check passes requests that send no `Origin` at all;
 CORS is a browser policy, not an authorization boundary. But a Send button on a
 public documentation page is a different proposition from an endpoint someone
 has to write a request to reach, so production stays locked to its own
-frontend.
+frontend. On `/v2`, `GET /v2/norms` echoes the acceptance documentation origin, so
+Test Request works there too.
 
 The RONL Business API's document is different on both counts. It declares three
 security schemes — `bearerAuth`, a Keycloak-issued JWT that applies to every
@@ -157,7 +163,7 @@ its acceptance `CORS_ORIGIN` includes `https://acc.iou-architectuur.open-regels.
 so Test Request works from both documentation tiers.
 
 Measured against the Linked Data Explorer's acceptance backend on 16 September 2026
-(and identically again on 27 September and 4 October), varying only the
+(and identically again on 27 September, 4 October and 11 October), varying only the
 `Origin` header on `GET /v1/health`:
 
 | `Origin` sent | Status | `Access-Control-Allow-Origin` |
@@ -167,7 +173,7 @@ Measured against the Linked Data Explorer's acceptance backend on 16 September 2
 | `https://acc.linkeddata.open-regels.nl` | 200 | echoed |
 | `http://localhost:8000` | 200 | absent |
 
-Measured against the RONL Business API's acceptance backend on 4 October 2026:
+Measured against the RONL Business API's acceptance backend on 11 October 2026 (identical to 4 October):
 
 | `Origin` sent | Status | `Access-Control-Allow-Origin` |
 |---|---|---|
@@ -197,7 +203,7 @@ made the Linked Data Explorer's table possible: a disallowed origin no longer an
     Azure Static Web Apps reads `staticwebapp.config.json` from the app artifact
     root, and `mkdocs build` never copies the file into `site/`.
 
-    Verified 16 September 2026, and again on 27 September: neither `iou-architectuur.open-regels.nl` nor
+    Verified 16 September 2026, and again on 27 September and 11 October: neither `iou-architectuur.open-regels.nl` nor
     `acc.iou-architectuur.open-regels.nl` returns a `Content-Security-Policy` or
     `X-Frame-Options` header, and both return `Referrer-Policy: same-origin`
     where the file declares `strict-origin-when-cross-origin`.

@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-04
+  date: 2026-10-11
   against:
-    CPSV Editor: "4cba989"
-    Linked Data Explorer: "9e0d18e"
-    RONL Business API: "5c6e716"
+    CPSV Editor: "2cf6a90"
+    Linked Data Explorer: "a87f64b"
+    RONL Business API: "c51ec0a"
 ---
 
 # The GitLab Mirror
@@ -17,7 +17,9 @@ Every CI gate in this documentation — [pinning](supply-chain.md),
 [rulesets](branch-protection.md) that require them — runs on GitHub Actions. The
 applications are also mirrored by hand to the open-regels.nl GitLab instance, and
 **the mirror is outside all of them**. It stays outside: each merge leaves it behind
-until someone pushes.
+until someone pushes — and since 10 October 2026 that push happens **only while a release
+is cut**: the release procedure runs `check-mirror` (below) and the mirror is reconciled
+there. Between releases GitLab is expected to lag.
 
 What changed on 12 September 2026 is that something now *notices*. A release-time check,
 `scripts/check-mirror.sh`, runs in all three repositories from `/bump-release`, in the
@@ -55,6 +57,13 @@ three mirrors were in sync after that week's promotions: the CPSV Editor at `4cb
 `5c6e716` / `0625d48` (`acc` / `main`). On 27 September 2026 they had been in sync at
 `a7fe76f` / `7d154ba`, `0143ea2` / `4148c9a` and `3c44b9e` / `2443adc`. A tick is still
 *synced at the last check*.
+
+On 11 October 2026, by `git ls-remote` against both remotes, with the check re-read and
+unchanged: the CPSV Editor in sync at `2cf6a90` / `98458fa` and the RONL Business API at
+`c51ec0a` / `7117914` (`acc` / `main`). The Linked Data Explorer's `main` is in sync at
+`82f461f`; its GitLab `acc` is at `b7ccd6f`, an ancestor two commits behind GitHub's
+`a87f64b` — the SBOM fix promoted to `main` without a release, so the mirror's `acc` waits
+for the next one.
 
 **Two of the three release procedures run a second check straight after this one** — the
 CPSV Editor's since v2026.09.6 and the RONL Business API's since v2026.09.11.

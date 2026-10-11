@@ -594,6 +594,9 @@ assessments:
           production tree — the release SBOM fell from 416 to 370 components.
           The `@tiptap/core` medium has waited a month on the Tiptap 3 major,
           which a stricter reading holds against it.
+          Corrected 11 October 2026: both counts came from a generator that
+          dropped production packages (`d2bb22c`); the comparison was like for
+          like, but the v2026.10.2 SBOM lists 445.
       - component: RBA
         recommendation: R10
         from: 3
@@ -604,6 +607,120 @@ assessments:
           build-time devDependency it is; #307 covered `main` until the
           promotion. Four alerts stay open, none dismissed, now tracked in
           #311 — the reason a stricter reading keeps 3.
+
+  - date: 2026-10-11
+    kind: measured
+    heads:
+      TTL: 2cf6a90
+      LDE: a87f64b
+      RBA: c51ec0a
+    note: >-
+      The week the human half of the guideline got a written trace:
+      dependency criteria, a new-dependency checklist on every lockfile
+      change, and a quarterly review that ran in all three and ended in nine
+      replacement issues. Registry signatures are now verified on every pull
+      request; the internal registry still waits on ICTU.
+    scores:
+      TTL: [3, 4, 3, 4, 2, 4, 5, 5, 4, 4, 4]
+      LDE: [3, 4, 3, 4, 2, 4, 5, 4, 4, 4, 4]
+      RBA: [3, 4, 3, 4, 2, 4, 4, 4, 4, 4, 4]
+    changes:
+      - component: TTL
+        recommendation: R1
+        from: 1
+        to: 3
+        why: >-
+          Criteria for adding a dependency are written down in
+          `dependency-criteria.md` (#250, `e4af5e6`), and the required
+          `lockfile-review` now lists every new direct dependency with a
+          checklist of them. Not 4: nothing fails on an unticked box, and no
+          pull request has yet added a direct dependency for it to list — a
+          stricter reading keeps 2.
+      - component: LDE
+        recommendation: R1
+        from: 1
+        to: 3
+        why: >-
+          The criteria live here, in `docs/dependency-criteria.md` (#250,
+          `ddb1687`), and `lockfile-review` lists every new direct dependency
+          with a checklist of them. Not 4: the checklist blocks nothing and has
+          not yet had a new dependency to list — a stricter reading keeps 2.
+      - component: RBA
+        recommendation: R1
+        from: 2
+        to: 3
+        why: >-
+          The informal design notes are joined by the shared criteria and the
+          `lockfile-review` checklist for every new direct dependency
+          (`83fc2a1`). Not 4, for the same reasons as the other two: the
+          checklist blocks nothing and has not yet been used.
+      - component: TTL
+        recommendation: R5
+        from: 0
+        to: 2
+        why: >-
+          The required `audit` job runs `npm audit signatures` on every pull
+          request (`3fcdbbd`, #249) and fails on a missing or invalid registry
+          signature or an attestation the registry serves as 404 —
+          `whatwg-url` had to move to 17.1.2 first. `lockfile-review` fails on
+          a non-npmjs origin or a missing `integrity`. The registry or proxy
+          half is untouched, which a stricter reading scores 1.
+      - component: LDE
+        recommendation: R5
+        from: 0
+        to: 2
+        why: >-
+          `npm audit signatures` in the required `audit` job (`42ca25f`, #249),
+          and `lockfile-review` failing on a foreign origin or a missing
+          `integrity`. #249 is still open on the registry or proxy, with no
+          question to ICTU or answer recorded — a stricter reading scores 1.
+      - component: RBA
+        recommendation: R5
+        from: 0
+        to: 2
+        why: >-
+          The same signature and provenance check in the required `audit` job
+          (`74ebeeb`), and the same `lockfile-review` origin check. No
+          internal registry or proxy, which a stricter reading scores 1.
+      - component: RBA
+        recommendation: R9
+        from: 3
+        to: 4
+        why: >-
+          The gap that held it at 3 is closed: `6f79e93` (#247) adds the root
+          `package-lock.json` and `package.json` to the three Static Web App
+          workflows, so a lockfile-only pull request now builds and tests all
+          of its required checks. `lockfile-review`, required on `acc` since
+          6 October, shows the transitive changes. No ruleset requires a
+          branch to be up to date, which a stricter reading holds at 3.
+      - component: TTL
+        recommendation: R11
+        from: 1
+        to: 4
+        why: >-
+          `dependency-review.yml` opened #210 on 10 October: 30 direct
+          dependencies, 7 flagged, each given a recorded outcome — 4 accepted,
+          all tied to the ESLint 10 hold already in `renovate.json`, and 3
+          kept. Not 5: the run was started by hand, and the first scheduled
+          one is 2 January 2027 — a stricter reading keeps 3.
+      - component: LDE
+        recommendation: R11
+        from: 1
+        to: 4
+        why: >-
+          The review opened #290: 75 direct dependencies, 24 flagged — 4 to
+          replace (#291–#294, `libxmljs2` among them), 5 accepted with a
+          condition for revisiting, 15 kept. Run by hand on 10 October; the
+          schedule has not fired yet, which a stricter reading holds at 3.
+      - component: RBA
+        recommendation: R11
+        from: 1
+        to: 4
+        why: >-
+          The review opened #362: 85 direct dependencies, 22 flagged — 4 to
+          replace (#363–#366: ESLint 10, `supertest` 7, the `@types/uuid`
+          stub, `node-cache`), 1 accepted pending #367, 17 kept. Run by hand;
+          a stricter reading keeps 3 until the schedule has run.
 
 # The test work of the same period, which the guideline above barely scores.
 # Counted from the tree at each weekly commit: files whose name ends in
@@ -643,3 +760,7 @@ tests:
     TTL: {files: 66, e2e: 4, ci: 2, workflows: 7, floor: true}
     LDE: {files: 148, e2e: 0, ci: 5, workflows: 11, floor: true}
     RBA: {files: 334, e2e: 13, ci: 8, workflows: 13, floor: true}
+  - date: 2026-10-11
+    TTL: {files: 69, e2e: 4, ci: 5, workflows: 8, floor: true}
+    LDE: {files: 163, e2e: 0, ci: 8, workflows: 12, floor: true}
+    RBA: {files: 352, e2e: 17, ci: 11, workflows: 14, floor: true}

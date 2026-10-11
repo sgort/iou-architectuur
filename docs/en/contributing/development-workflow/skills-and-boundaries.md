@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-04
+  date: 2026-10-11
   against:
-    CPSV Editor: "4cba989"
-    Linked Data Explorer: "9e0d18e"
-    RONL Business API: "5c6e716"
+    CPSV Editor: "2cf6a90"
+    Linked Data Explorer: "a87f64b"
+    RONL Business API: "c51ec0a"
 ---
 
 # Skills & Boundaries
@@ -69,11 +69,12 @@ precisely the test.
 
 The assistant operates inside a set of recorded boundaries: things it will not do
 unprompted, and approvals it will not infer from an earlier one. `~/.claude/CLAUDE.md`
-is the authority for the full set — **sixteen rules** as of 4 October 2026 — and is
+is the authority for the full set — **sixteen rules** as of 11 October 2026 — and is
 not reproduced here in full, because a copy would drift. The set has grown since the
 2026-08-19 consolidation, most recently on 30 September, when two were added:
 suppressing Semgrep false positives in code rather than in the Semgrep UI, and changing
-an Azure App Service setting. It will grow again; treat any count on this page as a
+an Azure App Service setting. On 10 October one was narrowed rather than added:
+housekeeping now syncs the GitLab mirror only at a release. It will grow again; treat any count on this page as a
 snapshot, and the file as the authority. The boundaries most visible to a day-to-day
 contributor:
 
@@ -103,15 +104,19 @@ contributor:
   fast-forward of the local branches, and the fast-forward-only push of those heads to
   the GitLab mirror. The rule names three repositories on purpose; this documentation
   repository is not one of them.
-- **Housekeeping after a merge includes the GitLab mirror.** Added on 11 September
-  2026, this is the one boundary that *grants* something rather than withholding it:
-  asking for housekeeping authorises the fast-forward push that reconciles the mirror,
-  because nothing else keeps it current. It is fenced — fast-forward only, never a
+- **Housekeeping syncs the GitLab mirror — but only at a release.** Added on
+  11 September 2026, this is the one boundary that *grants* something rather than
+  withholding it. When housekeeping is part of a release — after the release pull
+  request merges, and after the promotion to `main` — asking for it authorises the
+  fast-forward push that reconciles the mirror, because nothing else keeps it current.
+  Since 10 October 2026 every other housekeeping pass is GitHub-only: syncing on each
+  merged pull request cost a push, and its pre-push hook, for a mirror that only has to
+  be current at a release, so between releases GitLab is expected to lag. It is fenced — fast-forward only, never a
   force, and only in the repositories where the `gitlab` remote is a mirror with no
   pipeline of its own. A diverged mirror is reported, not forced into line.
 
     **Housekeeping has exactly two triggers**, and is never done in the middle of other
-    work: after pull requests are merged and promoted, and when setting up a fresh
+    work: after pull requests are merged (and promoted, where that applies), and when setting up a fresh
     checkout. On a fresh setup, a step with nothing to act on is reported as such rather
     than skipped silently.
 

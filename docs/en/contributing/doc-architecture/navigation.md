@@ -89,8 +89,8 @@ IOU Architecture Docs
     a box diagram uses one.
 
     The Dutch tree mirrors the English one, and falls back to the English page where no
-    Dutch counterpart exists. As of 27 September 2026 that is six pages: **OpenAPI
-    Rendering**, both components' **API Specification** pages (Linked Data Explorer and
-    RONL Business API), the CPSV Editor's **Data Model Diagrams**, the **IOU
+    Dutch counterpart exists. As of 11 October 2026 that is seven pages: **OpenAPI
+    Rendering**, the Linked Data Explorer's two **API Specification** pages (v1 and,
+    since 6 October 2026, v2) and the RONL Business API's, the CPSV Editor's **Data Model Diagrams**, the **IOU
     Architecture** slide deck, and the Norm Editor's **Changelog & Roadmap**.
 
