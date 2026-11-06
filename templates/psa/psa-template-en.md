@@ -21,7 +21,7 @@ The status at IOU shows how far IOU itself has got with a decision, on the date 
 
 ## 1. Executive summary
 
-Explained in the guide: https://iou-architectuur.open-regels.nl/psa/01-executive-summary/
+Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/01-executive-summary/>
 
 IOU's first decision, which applies to everyone: AB-01 — IOU adopts standards that are still evolving step by step, and feeds back what it learns. A function that needs a newer version stays deliberately off until that version is deployed; the rest keeps working.
 
@@ -35,7 +35,7 @@ IOU's first decision, which applies to everyone: AB-01 — IOU adopts standards 
 
 ## 2. Context and scope
 
-Explained in the guide: https://iou-architectuur.open-regels.nl/psa/02-context-and-scope/
+Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/02-context-and-scope/>
 
 ### IOU's decisions
 
@@ -115,7 +115,7 @@ whether it runs in IOU.
 
 ## 3. Architecture frameworks
 
-Explained in the guide: https://iou-architectuur.open-regels.nl/psa/03-architecture-frameworks/
+Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/03-architecture-frameworks/>
 
 ### IOU's decisions
 
@@ -207,7 +207,7 @@ Do we follow IOU's choice for AB-27? [yes / no — see deviation DEV-…]
 
 ## 4. Functional architecture
 
-Explained in the guide: https://iou-architectuur.open-regels.nl/psa/04-functional-architecture/
+Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/04-functional-architecture/>
 
 ### IOU's decisions
 
@@ -294,7 +294,7 @@ Do we follow IOU's choice for AB-12? [yes / no — see deviation DEV-…]
 
 ## 5. Application architecture
 
-Explained in the guide: https://iou-architectuur.open-regels.nl/psa/05-application-architecture/
+Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/05-application-architecture/>
 
 ### IOU's decisions
 
@@ -407,7 +407,7 @@ Do we follow IOU's choice for AB-32? [yes / no — see deviation DEV-…]
 
 ## 6. Data architecture
 
-Explained in the guide: https://iou-architectuur.open-regels.nl/psa/06-data-architecture/
+Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/06-data-architecture/>
 
 ### IOU's decisions
 
@@ -498,7 +498,7 @@ Do we follow IOU's choice for AB-27? [yes / no — see deviation DEV-…]
 
 ## 7. Integration architecture
 
-Explained in the guide: https://iou-architectuur.open-regels.nl/psa/07-integration-architecture/
+Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/07-integration-architecture/>
 
 ### IOU's decisions
 
@@ -601,7 +601,7 @@ route 3 does not exist; route 2 is not recommended.
 
 ## 8. Security and privacy
 
-Explained in the guide: https://iou-architectuur.open-regels.nl/psa/08-security-and-privacy/
+Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/08-security-and-privacy/>
 
 ### IOU's decisions
 
@@ -735,7 +735,7 @@ Do we follow IOU's choice for AB-32? [yes / no — see deviation DEV-…]
 
 ## 9. Technical infrastructure
 
-Explained in the guide: https://iou-architectuur.open-regels.nl/psa/09-technical-infrastructure/
+Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/09-technical-infrastructure/>
 
 ### IOU's decisions
 
@@ -839,7 +839,7 @@ Do we follow IOU's choice for AB-16? [yes / no — see deviation DEV-…]
 
 ## 10. Management and continuity
 
-Explained in the guide: https://iou-architectuur.open-regels.nl/psa/10-management-and-continuity/
+Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/10-management-and-continuity/>
 
 ### IOU's decisions
 
@@ -925,7 +925,7 @@ has no test coverage or check gates yet.
 
 ## 11. Architectural decisions and risks
 
-Explained in the guide: https://iou-architectuur.open-regels.nl/psa/11-decisions-and-risks/
+Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/11-decisions-and-risks/>
 
 ### IOU's decision register
 

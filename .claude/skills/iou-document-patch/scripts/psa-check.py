@@ -257,11 +257,33 @@ def check_template(lang_root, template_path):
     psa_template = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(psa_template)
     path = pathlib.Path(template_path)
-    fresh = psa_template.build(lang_root)
+    try:
+        fresh = psa_template.build(lang_root)
+    except (KeyError, StopIteration, ValueError, TypeError, IndexError) as exc:
+        return [f"{template_path}: cannot generate the template from {lang_root} ({type(exc).__name__}: {exc}) — fix the pages, then regenerate"]
     if not path.exists():
         return [f"{template_path}: missing — regenerate with psa-template.py"]
     if path.read_text(encoding="utf-8") != fresh:
         return [f"{template_path}: out of date with {lang_root} — regenerate with psa-template.py"]
+    return []
+
+
+DOWNLOADS = {"nl": "docs/assets/downloads/psa-sjabloon-nl.zip", "en": "docs/assets/downloads/psa-template-en.zip"}
+
+
+def check_download(template_path, zip_path):
+    """The site's download carries the committed template, not an older one."""
+    import zipfile
+
+    template, archive = pathlib.Path(template_path), pathlib.Path(zip_path)
+    if not archive.exists():
+        return [f"{zip_path}: missing — regenerate with psa-template.py"]
+    with zipfile.ZipFile(archive) as z:
+        if template.name not in z.namelist():
+            return [f"{zip_path}: has no {template.name} — regenerate with psa-template.py"]
+        inside = z.read(template.name).decode("utf-8").replace(chr(13) + chr(10), chr(10))
+    if not template.exists() or inside != template.read_text(encoding="utf-8"):
+        return [f"{zip_path}: does not carry the committed {template.name} — regenerate with psa-template.py"]
     return []
 
 
@@ -276,7 +298,7 @@ def main(argv):
         failed |= bool(problems)
         lang = language(root)
         if not argv and lang in TEMPLATES:
-            stale = check_template(root, TEMPLATES[lang])
+            stale = check_template(root, TEMPLATES[lang]) or check_download(TEMPLATES[lang], DOWNLOADS[lang])
             for problem in stale:
                 print(f"  ✗ {problem}")
             failed |= bool(stale)

@@ -179,6 +179,14 @@ def _trim(lines):
     return lines
 
 
+def _front_matter(text):
+    """The YAML front matter of a page, parsed (not split on every '---')."""
+    if not text.startswith("---"):
+        return {}
+    end = text.find(chr(10) + "---", 3)
+    return (yaml.safe_load(text[3:end]) or {}) if end != -1 else {}
+
+
 def _title(text):
     return next(l[2:].strip() for l in psa_check.strip_front_matter(text).splitlines() if l.startswith("# "))
 
@@ -191,7 +199,7 @@ def build(lang_root, site=SITE):
     pages = {p.stem: p.read_text(encoding="utf-8") for p in sorted(root.glob("*.md"))}
     register = {r["id"]: r for r in psa_check.register(lang_root)}
 
-    meta = yaml.safe_load(pages["index"].split("---")[1])["verified"]
+    meta = _front_matter(pages["index"])["verified"]
     commits = ", ".join(f"{k} {v}" for k, v in meta["against"].items())
 
     out = [f"# {L['title']}", "", "| | |", "|---|---|"]
@@ -201,7 +209,7 @@ def build(lang_root, site=SITE):
         out += [paragraph, ""]
 
     def guide_line(stem):
-        return [f"{L['guide']} {_page_url(lang, 'psa/' + stem + '.md', site)}", ""]
+        return [f"{L['guide']} <{_page_url(lang, 'psa/' + stem + '.md', site)}>", ""]
 
     # Chapter 1: prompts only, plus IOU's first decision.
     stem = "01-executive-summary"

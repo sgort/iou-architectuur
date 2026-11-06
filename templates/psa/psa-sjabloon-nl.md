@@ -21,7 +21,7 @@ De status bij IOU geeft aan hoe ver IOU zelf is met een besluit, op de datum hie
 
 ## 1. Managementsamenvatting
 
-Toelichting in de gids: https://iou-architectuur.open-regels.nl/nl/psa/01-executive-summary/
+Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/01-executive-summary/>
 
 IOU's eerste besluit, dat voor iedereen geldt: AB-01 — IOU neemt standaarden die nog in ontwikkeling zijn stap voor stap over, en geeft terug wat het daarbij leert. Een functie die een nieuwere versie nodig heeft, staat bewust uit tot die versie is uitgerold; de rest werkt door.
 
@@ -35,7 +35,7 @@ IOU's eerste besluit, dat voor iedereen geldt: AB-01 — IOU neemt standaarden d
 
 ## 2. Context en scope
 
-Toelichting in de gids: https://iou-architectuur.open-regels.nl/nl/psa/02-context-and-scope/
+Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/02-context-and-scope/>
 
 ### Besluiten van IOU
 
@@ -116,7 +116,7 @@ bestaande zaaksystemen: u kiest per proces of het in IOU wordt uitgevoerd.
 
 ## 3. Architectuurkaders
 
-Toelichting in de gids: https://iou-architectuur.open-regels.nl/nl/psa/03-architecture-frameworks/
+Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/03-architecture-frameworks/>
 
 ### Besluiten van IOU
 
@@ -208,7 +208,7 @@ Volgen wij IOU's keuze voor AB-27? [ja / nee — zie afwijking DEV-…]
 
 ## 4. Functionele architectuur
 
-Toelichting in de gids: https://iou-architectuur.open-regels.nl/nl/psa/04-functional-architecture/
+Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/04-functional-architecture/>
 
 ### Besluiten van IOU
 
@@ -295,7 +295,7 @@ Volgen wij IOU's keuze voor AB-12? [ja / nee — zie afwijking DEV-…]
 
 ## 5. Applicatiearchitectuur
 
-Toelichting in de gids: https://iou-architectuur.open-regels.nl/nl/psa/05-application-architecture/
+Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/05-application-architecture/>
 
 ### Besluiten van IOU
 
@@ -409,7 +409,7 @@ Volgen wij IOU's keuze voor AB-32? [ja / nee — zie afwijking DEV-…]
 
 ## 6. Gegevensarchitectuur
 
-Toelichting in de gids: https://iou-architectuur.open-regels.nl/nl/psa/06-data-architecture/
+Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/06-data-architecture/>
 
 ### Besluiten van IOU
 
@@ -502,7 +502,7 @@ Volgen wij IOU's keuze voor AB-27? [ja / nee — zie afwijking DEV-…]
 
 ## 7. Integratiearchitectuur
 
-Toelichting in de gids: https://iou-architectuur.open-regels.nl/nl/psa/07-integration-architecture/
+Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/07-integration-architecture/>
 
 ### Besluiten van IOU
 
@@ -605,7 +605,7 @@ er niet is; route 2 is af te raden.
 
 ## 8. Beveiliging en privacy
 
-Toelichting in de gids: https://iou-architectuur.open-regels.nl/nl/psa/08-security-and-privacy/
+Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/08-security-and-privacy/>
 
 ### Besluiten van IOU
 
@@ -737,7 +737,7 @@ Volgen wij IOU's keuze voor AB-32? [ja / nee — zie afwijking DEV-…]
 
 ## 9. Technische infrastructuur
 
-Toelichting in de gids: https://iou-architectuur.open-regels.nl/nl/psa/09-technical-infrastructure/
+Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/09-technical-infrastructure/>
 
 ### Besluiten van IOU
 
@@ -841,7 +841,7 @@ Volgen wij IOU's keuze voor AB-16? [ja / nee — zie afwijking DEV-…]
 
 ## 10. Beheer en continuïteit
 
-Toelichting in de gids: https://iou-architectuur.open-regels.nl/nl/psa/10-management-and-continuity/
+Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/10-management-and-continuity/>
 
 ### Besluiten van IOU
 
@@ -928,7 +928,7 @@ heeft nog geen testdekking of controlepoorten.
 
 ## 11. Architectuurbesluiten en risico's
 
-Toelichting in de gids: https://iou-architectuur.open-regels.nl/nl/psa/11-decisions-and-risks/
+Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/11-decisions-and-risks/>
 
 ### Besluitenregister van IOU
 

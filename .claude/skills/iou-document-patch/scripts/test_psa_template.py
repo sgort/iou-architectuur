@@ -165,6 +165,14 @@ class TemplateTest(unittest.TestCase):
         self.assertTrue(header.endswith("Geldt voor ons? | Onze maatregel |"))
         self.assertIn("| R-01 |", ch11)
 
+    def test_guide_line_is_a_link(self):
+        self.assertIn(f"<{SITE}/nl/psa/04-functional-architecture/>", self.chapter(self.nl, 4))
+
+    def test_front_matter_with_dashes_in_a_value(self):
+        index = pathlib.Path(self._tmp.name) / "nl" / "psa" / "index.md"
+        index.write_text(index.read_text(encoding="utf-8").replace('title: "Over deze PSA"', 'title: "PSA --- gids"'), encoding="utf-8")
+        self.assertIn("2026-11-06", psa_template.build(str(index.parent)))
+
     def test_english_labels(self):
         self.assertIn("Project Start Architecture — [organisation name]", self.en)
         self.assertIn("IOU's decisions", self.en)
@@ -202,6 +210,30 @@ class FreshnessTest(unittest.TestCase):
 
     def test_template_missing(self):
         problems = psa_check.check_template(self.root, str(self.template))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("regenerate", problems[0])
+
+    def test_template_reports_instead_of_crashing(self):
+        (pathlib.Path(self.root) / "06-data-architecture.md").unlink()
+        problems = psa_check.check_template(self.root, str(self.template))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("cannot generate", problems[0])
+
+    def test_download_matches_template(self):
+        import zipfile
+        self.template.write_text(psa_template.build(self.root), encoding="utf-8")
+        zipped = self.template.with_suffix(".zip")
+        with zipfile.ZipFile(zipped, "w") as archive:
+            archive.writestr(self.template.name, self.template.read_text(encoding="utf-8"))
+        self.assertEqual(psa_check.check_download(str(self.template), str(zipped)), [])
+
+    def test_download_stale(self):
+        import zipfile
+        self.template.write_text(psa_template.build(self.root), encoding="utf-8")
+        zipped = self.template.with_suffix(".zip")
+        with zipfile.ZipFile(zipped, "w") as archive:
+            archive.writestr(self.template.name, "older text")
+        problems = psa_check.check_download(str(self.template), str(zipped))
         self.assertEqual(len(problems), 1)
         self.assertIn("regenerate", problems[0])
 
