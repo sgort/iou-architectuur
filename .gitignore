@@ -98,3 +98,6 @@ flatten_directory.sh
 
 # PSA working material — source example, task brief and Flevoland v0.6 slides; input, not documentation
 specs/PSA/
+
+# PSA template: the .odt is generated and travels inside docs/assets/downloads/*.zip
+templates/psa/*.odt

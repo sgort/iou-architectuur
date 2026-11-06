@@ -89,6 +89,16 @@ IOU is als referentie nog niet af. Elk besluit dat deels of nog niet is
 gerealiseerd, staat daarom ook als risico in hoofdstuk 11, met wat u in de
 tussentijd zelf regelt en het issue waarin IOU het oplost.
 
+## Sjabloon downloaden
+
+Voor uw eigen PSA is er een sjabloon:
+[psa-sjabloon-nl.zip](../../assets/downloads/psa-sjabloon-nl.zip). Het bevat
+hetzelfde document twee keer: als `.odt`, dat u in Word of LibreOffice opent en
+bewerkt, en als `.md` (Markdown). De besluiten van IOU staan er per hoofdstuk al
+in, met laag en status. U vult alleen in wat uw organisatie zelf bepaalt; die
+plekken zijn gemarkeerd met […]. Het sjabloon wordt gemaakt uit deze pagina's en
+volgt ze bij elke wekelijkse controle.
+
 ## Hoe IOU zich ontwikkelt
 
 IOU is ook een manier van werken. Het verkent: met concrete oplossingen leren

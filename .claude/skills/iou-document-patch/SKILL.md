@@ -1168,7 +1168,13 @@ Steps:
    always has a risk in chapter 11 that names it (`psa-check.py` enforces this).
 3. Edit Dutch, then English; re-stamp each re-checked page with today's date and
    the five `main` heads.
-4. `venv/Scripts/python.exe .claude/skills/iou-document-patch/scripts/psa-check.py`
+4. **Regenerate the template** whenever a page changed:
+   `venv/Scripts/python.exe .claude/skills/iou-document-patch/scripts/psa-template.py`
+   (needs `pip install -r requirements-dev.txt` once, for pandoc). It rewrites
+   `templates/psa/psa-sjabloon-nl.md` and `psa-template-en.md` and the two zips in
+   `docs/assets/downloads/`; commit all four. Fix wording in the generator, never in
+   its output.
+5. `venv/Scripts/python.exe .claude/skills/iou-document-patch/scripts/psa-check.py`
    — exit 0, both languages within the word budget.
 
 Rules that keep applying, from `specs/PSA/2026-11-06-psa-design.md` (git-ignored;

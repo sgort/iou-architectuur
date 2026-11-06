@@ -88,6 +88,16 @@ IOU is not finished as a reference. Every decision that is partly or not yet
 realised therefore also appears as a risk in chapter 11, with what you arrange
 yourself in the meantime and the issue in which IOU resolves it.
 
+## Download the template
+
+For your own PSA there is a template:
+[psa-template-en.zip](../../assets/downloads/psa-template-en.zip). It holds the
+same document twice: as `.odt`, which you open and edit in Word or LibreOffice,
+and as `.md` (Markdown). IOU's decisions are already in it per chapter, with tier
+and status. You fill in only what your organisation decides itself; those places
+are marked […]. The template is generated from these pages and follows them at
+every weekly check.
+
 ## How IOU develops
 
 IOU is also a way of working. It explores: learning to deal with complex

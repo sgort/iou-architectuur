@@ -173,5 +173,46 @@ class TemplateTest(unittest.TestCase):
         self.assertIn("Applies to us? | Our measure |", self.en)
 
 
+_check_spec = importlib.util.spec_from_file_location("psa_check_for_template", HERE / "psa-check.py")
+psa_check = importlib.util.module_from_spec(_check_spec)
+_check_spec.loader.exec_module(psa_check)
+REPO = HERE.parents[3]
+
+
+class FreshnessTest(unittest.TestCase):
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        base = pathlib.Path(self._tmp.name)
+        (base / "nl" / "psa").mkdir(parents=True)
+        self.root = write_fixture(base / "nl" / "psa", "nl")
+        self.template = base / "psa-sjabloon-nl.md"
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_template_fresh(self):
+        self.template.write_text(psa_template.build(self.root), encoding="utf-8")
+        self.assertEqual(psa_check.check_template(self.root, str(self.template)), [])
+
+    def test_template_stale(self):
+        self.template.write_text(psa_template.build(self.root) + "old line" + NL_, encoding="utf-8")
+        problems = psa_check.check_template(self.root, str(self.template))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("regenerate", problems[0])
+
+    def test_template_missing(self):
+        problems = psa_check.check_template(self.root, str(self.template))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("regenerate", problems[0])
+
+
+class RealPagesTest(unittest.TestCase):
+    def test_real_pages_template(self):
+        out = psa_template.build(str(REPO / "docs" / "nl" / "psa"))
+        for n in range(1, 33):
+            self.assertIn(f"AB-{n:02d}", out)
+        self.assertIn("Volgen wij IOU's keuze voor AB-32?", out)
+
+
 if __name__ == "__main__":
     unittest.main()

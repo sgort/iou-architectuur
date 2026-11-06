@@ -22,7 +22,9 @@ specs/PSA/2026-11-06-psa-design.md:
 With both languages, also:
 
   (h) the Dutch and English registers carry the same IDs with the same tier
-      and status (mapped across the two vocabularies).
+      and status (mapped across the two vocabularies);
+  (i) the committed template (templates/psa/<name>.md) equals a fresh
+      generation by psa-template.py — after editing the pages, regenerate.
 
 Usage:
   python .claude/skills/iou-document-patch/scripts/psa-check.py
@@ -31,6 +33,7 @@ Usage:
 Exit status 1 if any folder has a problem.
 """
 
+import importlib.util
 import pathlib
 import re
 import sys
@@ -245,6 +248,23 @@ def check_pair(nl_root, en_root):
     return problems
 
 
+TEMPLATES = {"nl": "templates/psa/psa-sjabloon-nl.md", "en": "templates/psa/psa-template-en.md"}
+
+
+def check_template(lang_root, template_path):
+    """The committed template matches what psa-template.py makes of the pages now."""
+    spec = importlib.util.spec_from_file_location("psa_template", pathlib.Path(__file__).with_name("psa-template.py"))
+    psa_template = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(psa_template)
+    path = pathlib.Path(template_path)
+    fresh = psa_template.build(lang_root)
+    if not path.exists():
+        return [f"{template_path}: missing — regenerate with psa-template.py"]
+    if path.read_text(encoding="utf-8") != fresh:
+        return [f"{template_path}: out of date with {lang_root} — regenerate with psa-template.py"]
+    return []
+
+
 def main(argv):
     roots = argv or ["docs/nl/psa", "docs/en/psa"]
     failed = False
@@ -254,6 +274,12 @@ def main(argv):
         for problem in problems:
             print(f"  ✗ {problem}")
         failed |= bool(problems)
+        lang = language(root)
+        if not argv and lang in TEMPLATES:
+            stale = check_template(root, TEMPLATES[lang])
+            for problem in stale:
+                print(f"  ✗ {problem}")
+            failed |= bool(stale)
     by_language = {language(r): r for r in roots}
     if {"nl", "en"} <= set(by_language):
         problems = check_pair(by_language["nl"], by_language["en"])
