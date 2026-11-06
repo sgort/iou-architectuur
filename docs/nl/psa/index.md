@@ -46,7 +46,7 @@ Elk hoofdstuk heeft dezelfde vaste onderdelen:
 
 ### Architectuurbesluiten
 
-Elk besluit heeft een vast nummer, van AB-01 tot en met AB-30. In
+Elk besluit heeft een vast nummer, van AB-01 tot en met AB-31. In
 [hoofdstuk 11](11-decisions-and-risks.md) staan ze allemaal in het
 besluitenregister; de andere hoofdstukken verwijzen ernaar. Neem de nummers over
 in uw eigen PSA. Een nummer verandert nooit: vervalt een besluit, dan blijft het
@@ -89,6 +89,29 @@ IOU is als referentie nog niet af. Elk besluit dat deels of nog niet is
 gerealiseerd, staat daarom ook als risico in hoofdstuk 11, met wat u in de
 tussentijd zelf regelt en het issue waarin IOU het oplost.
 
+## Hoe IOU zich ontwikkelt
+
+IOU is ook een manier van werken. Het verkent: met concrete oplossingen leren
+omgaan met complexe vraagstukken, waar veel onzeker en onvoorspelbaar is, door
+patronen te herkennen en daarvan te leren.
+
+Dat geldt ook voor de standaarden waarop IOU rust. CPRMV ontwikkelt zich, en IOU
+neemt elke versie stap voor stap over. Wat IOU daarbij tegenkomt, gaat terug als
+voorstel om CPRMV te verfijnen of aan te passen. IOU laat dus zien hoe een
+standaard en zijn gebruik samen groeien. Een functie die op een nieuwe versie
+wacht, staat zolang bewust uit; de rest van IOU werkt door.
+
+Dit is het eerste en belangrijkste architectuurbesluit van IOU (AB-01).
+
+Voor uw PSA betekent dat:
+
+- statussen veranderen. Deze gids wordt elke week opnieuw gecontroleerd tegen de
+  vrijgegeven versies, en de datum bovenaan elke pagina zegt wanneer dat het
+  laatst gebeurde;
+- besluiten die **onder herziening** staan, kunnen wijzigen;
+- uw organisatie heeft een manier nodig om die veranderingen te volgen en door te
+  voeren in uw eigen PSA (zie [hoofdstuk 10](10-management-and-continuity.md)).
+
 ## Eerst voor medewerkers, later voor inwoners
 
 De meeste organisaties beginnen met IOU voor hun eigen medewerkers (fase 1) en
@@ -97,12 +120,12 @@ stap mag geen verbouwing vragen. Dat lukt alleen als een paar keuzes vanaf het
 begin vastliggen:
 
 - inloggen staat los van de bedrijfslogica, zodat er later een andere
-  inlogvoorziening bij kan (AB-16);
+  inlogvoorziening bij kan (AB-17);
 - de backend controleert per zaak wie iets mag zien of doen, niet het scherm
-  (AB-17);
-- er is één beveiligde API-laag tussen alle schermen en de procesengine (AB-12);
+  (AB-18);
+- er is één beveiligde API-laag tussen alle schermen en de procesengine (AB-13);
 - de ontwerptools blijven alleen voor medewerkers; inwoners komen alleen bij de
-  portalen en de publieke site (AB-20).
+  portalen en de publieke site (AB-21).
 
 ```mermaid
 flowchart TB
