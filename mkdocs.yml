@@ -470,6 +470,7 @@ extra_css:
 
 extra_javascript:
   - javascripts/doc-status.js
+  - javascripts/language-switch.js
 
 # Extra configuration
 extra:
