@@ -54,6 +54,9 @@ EN_REGISTER = [
 EN_RISKS = ["| R-01 | Engine reachable | AB-12 | Shield it in your own network | #415 |"]
 
 
+NEWLINE = chr(10)
+
+
 def separator(header):
     return "|" + "---|" * (header.count("|") - 1)
 
@@ -170,6 +173,91 @@ class PsaCheckTest(unittest.TestCase):
         problems = psa_check.check(root)
         self.assertEqual(len(problems), 1)
         self.assertIn("deels", problems[0])
+
+    def test_retired_status_needs_no_risk(self):
+        root = build(self.dir, register=[
+            "| AB-01 | Open formaten | Kern | gerealiseerd | x |",
+            "| AB-12 | Engine afgeschermd | Kern | vervallen | x |",
+        ], risks=["| R-01 | Iets anders | AB-01 | x | — |"])
+        self.assertEqual(psa_check.check(root), [])
+
+    def test_unknown_language_folder_raises(self):
+        fr = pathlib.Path(self._tmp.name) / "fr" / "psa"
+        fr.mkdir(parents=True)
+        with self.assertRaises(ValueError):
+            psa_check.check(build(fr))
+
+    def test_ab_in_fenced_block_checked(self):
+        index = NEWLINE.join(["# Intro", "", "```mermaid", "flowchart LR", '  A["AB-33"]', "```", ""])
+        root = build(self.dir, overrides={"index.md": index})
+        problems = psa_check.check(root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("AB-33", problems[0])
+
+    def test_duplicate_register_id(self):
+        root = build(self.dir, register=[
+            "| AB-01 | Open formaten | Kern | gerealiseerd | x |",
+            "| AB-01 | Nog eens | Kern | gerealiseerd | x |",
+            "| AB-12 | Engine afgeschermd | Kern | deels | x |",
+        ])
+        problems = psa_check.check(root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("duplicate", problems[0])
+        self.assertIn("AB-01", problems[0])
+
+    def test_malformed_risk_id(self):
+        root = build(self.dir, risks=["| R-1 | Engine bereikbaar | AB-12 | x | — |"])
+        problems = psa_check.check(root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("R-1", problems[0])
+
+    def test_missing_page_file(self):
+        root = build(self.dir)
+        (pathlib.Path(root) / "06-data-architecture.md").unlink()
+        problems = psa_check.check(root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("06-data-architecture.md", problems[0])
+
+    def test_count_words_excludes_fences(self):
+        plain = NEWLINE.join(["# Intro", "", "een twee drie", ""])
+        fenced = NEWLINE.join(["# Intro", "", "een twee drie", "", "```mermaid", "vier vijf", "```", ""])
+        without_fence = psa_check.count_words(build(self.dir, overrides={"index.md": plain}))
+        with_fence = psa_check.count_words(build(self.dir, overrides={"index.md": fenced}))
+        self.assertEqual(with_fence, without_fence)
+
+
+class PairTest(unittest.TestCase):
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        base = pathlib.Path(self._tmp.name)
+        (base / "nl" / "psa").mkdir(parents=True)
+        (base / "en" / "psa").mkdir(parents=True)
+        self.nl = build(base / "nl" / "psa")
+        self.en_dir = base / "en" / "psa"
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def _en(self, register):
+        return build(self.en_dir, lang=EN, register=register, risks=EN_RISKS, chapter_body="See AB-01.")
+
+    def test_pair_matches(self):
+        en = self._en(["| AB-01 | Open formats | Core | realised | x |",
+                       "| AB-12 | Engine shielded | Core | partly | x |"])
+        self.assertEqual(psa_check.check_pair(self.nl, en), [])
+
+    def test_pair_status_mismatch(self):
+        en = self._en(["| AB-01 | Open formats | Core | realised | x |",
+                       "| AB-12 | Engine shielded | Core | realised | x |"])
+        problems = psa_check.check_pair(self.nl, en)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("AB-12", problems[0])
+
+    def test_pair_missing_id(self):
+        en = self._en(["| AB-01 | Open formats | Core | realised | x |"])
+        problems = psa_check.check_pair(self.nl, en)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("AB-12", problems[0])
 
 
 if __name__ == "__main__":
