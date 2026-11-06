@@ -16,7 +16,10 @@ verified:
 This chapter is the backbone of the guide. The decision register holds every
 decision IOU has taken, with its tier and its status. The other chapters refer to
 it by number. Copy the register into your own PSA, add your deviations, and take
-over the risks that apply to you.
+over the risks that apply to you. The
+[template](../../assets/downloads/psa-template-en.zip) already contains this
+register, with an empty table for your deviations and two columns on the risks
+for your own assessment and measure.
 
 What the tiers and statuses mean is explained on
 [About this PSA](index.md#three-tiers).

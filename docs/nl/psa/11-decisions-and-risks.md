@@ -17,6 +17,9 @@ Dit hoofdstuk is de ruggengraat van de gids. Het besluitenregister bevat alle
 besluiten die IOU heeft genomen, met hun laag en hun status. De andere
 hoofdstukken verwijzen ernaar met het nummer. Neem het register over in uw eigen
 PSA, vul het aan met uw afwijkingen, en neem de risico's over die voor u gelden.
+Het [sjabloon](../../assets/downloads/psa-sjabloon-nl.zip) bevat dit register al,
+met een lege tabel voor uw afwijkingen en twee kolommen bij de risico's voor uw
+eigen afweging en maatregel.
 
 Wat de lagen en de statussen betekenen, staat op de pagina
 [Over deze PSA](index.md#drie-lagen).
