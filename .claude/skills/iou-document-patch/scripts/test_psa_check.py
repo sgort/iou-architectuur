@@ -152,11 +152,11 @@ class PsaCheckTest(unittest.TestCase):
         self.assertIn("open-regels.nl", problems[0])
 
     def test_word_budget(self):
-        words = " ".join(["woord"] * 9001)
+        words = " ".join(["woord"] * 12001)
         over = build(self.dir, overrides={"index.md": f"# Intro\n\n{words}\n"})
         problems = psa_check.check(over)
         self.assertEqual(len(problems), 1)
-        self.assertIn("9000", problems[0])
+        self.assertIn("12000", problems[0])
         inside = build(self.dir, overrides={"index.md": f"# Intro\n\n```mermaid\n{words}\n```\n"})
         self.assertEqual(psa_check.check(inside), [])
 

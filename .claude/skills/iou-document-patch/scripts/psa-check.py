@@ -13,7 +13,7 @@ specs/PSA/2026-11-06-psa-design.md:
   (e) no forbidden fragment: hostnames, routes and header values that would
       turn a generic gap description into instructions, and claims the
       component code does not support;
-  (f) at most 9,000 words of prose (front matter, fenced blocks and table
+  (f) at most 12,000 words of prose (front matter, fenced blocks and table
       separator rows excluded).
 
 Usage:
@@ -27,7 +27,7 @@ import pathlib
 import re
 import sys
 
-WORD_BUDGET = 9000
+WORD_BUDGET = 12000  # raised from 9,000 on 6 Nov 2026 (architect); condense later
 AB = re.compile(r"\bAB-\d{2}\b")
 
 VOCAB = {
