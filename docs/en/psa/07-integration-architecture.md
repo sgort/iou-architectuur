@@ -56,7 +56,7 @@ the reference deployment shows the following:
 | Kind of system | Example in the reference | Connection |
 |---|---|---|
 | Login service for staff | Entra ID | Brokered behind the OIDC issuer (AB-17) |
-| Login means for residents and businesses | DigiD, eIDAS, eHerkenning | Prepared, not yet active (R-03) |
+| Login means for residents and businesses | DigiD, eIDAS, eHerkenning | DigiD and eIDAS prepared but switched off; eHerkenning not yet present (R-03) |
 | Document management | eDOCS | The case keeps a reference (AB-24); the backend acts on behalf of the user |
 | Signing | ValidSign | From a task in the process |
 | Message box | Doccle | From a task in the process |

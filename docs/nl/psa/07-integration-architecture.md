@@ -56,7 +56,7 @@ keuze; de referentie-inrichting laat de volgende zien:
 | Soort voorziening | Voorbeeld in de referentie | Koppeling |
 |---|---|---|
 | Inlogvoorziening voor medewerkers | Entra ID | Gekoppeld achter de OIDC-uitgever (AB-17) |
-| Inlogmiddelen voor inwoners en ondernemers | DigiD, eIDAS, eHerkenning | Voorbereid, nog niet actief (R-03) |
+| Inlogmiddelen voor inwoners en ondernemers | DigiD, eIDAS, eHerkenning | DigiD en eIDAS voorbereid maar uitgeschakeld; eHerkenning is er nog niet (R-03) |
 | Documentmanagement | eDOCS | De zaak bewaart een verwijzing (AB-24); de backend handelt namens de gebruiker |
 | Ondertekening | ValidSign | Vanuit een taak in het proces |
 | Berichtenbox | Doccle | Vanuit een taak in het proces |

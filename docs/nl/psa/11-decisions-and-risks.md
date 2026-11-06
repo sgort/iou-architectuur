@@ -32,7 +32,7 @@ Wat de lagen en de statussen betekenen, staat op de pagina
 | AB-05 | API's volgen de API Design Rules en hebben een OpenAPI 3.1-beschrijving die automatisch wordt gecontroleerd. | Kern | deels | RONL Business API en Linked Data Explorer wel; CPRMV en de Norm Editor nog niet. |
 | AB-06 | Publieke dienstverlening wordt beschreven en gepubliceerd met de CPSV Editor. | Kern | gerealiseerd | |
 | AB-07 | Regels worden vastgelegd in CPRMV: een regelset hoort bij een publieke dienst, verwijst naar de wet waarop hij berust, en heeft een geldigheidsperiode. | Kern | deels | De CPSV Editor koppelt een regelset aan de wet met een andere relatie dan CPRMV voorschrijft. CPRMV is nog een eerste openbare werkversie. |
-| AB-08 | Processen worden ontworpen in de Linked Data Explorer en alleen via zijn backend uitgerold, als één bundel van proces, formulieren en documentsjablonen. | Kern | gerealiseerd | |
+| AB-08 | Processen worden ontworpen in de Linked Data Explorer en alleen via zijn backend uitgerold, als één bundel van proces, formulieren en documentsjablonen. | Kern | deels | Zo rolt de Linked Data Explorer uit. Maar zolang de engine direct bereikbaar is, kan een uitrol er ook omheen (zie AB-13). |
 | AB-09 | Beslismodellen worden gevonden met standaard SPARQL; regels worden afgenomen via de versie-2-API voor normen, met een vaste stabiliteitsbelofte. | Kern | gerealiseerd | De versie-1-API is uitgefaseerd en verdwijnt op 1 november 2028. |
 | AB-10 | Elke gepubliceerde dienst staat in één eigen graaf per organisatie en dienst, op een vast adres. | Kern | gerealiseerd | Opnieuw publiceren overschrijft de graaf; er blijft geen geschiedenis bewaard (risico R-06). |
 | AB-11 | Gedeelde producten worden vóór publicatie gevalideerd tegen de SHACL-shapes van CPSV-AP, CPRMV en RONL; een fout blokkeert publicatie. Tijdens het opstellen is de controle een advies. | Kern | nog niet | De controle bestaat, maar blokkeert nooit. |
@@ -74,13 +74,15 @@ gewoon uw keuze vast, in het hoofdstuk waar die hoort.
 ## Risico's
 
 Elk besluit dat IOU deels of nog niet heeft gerealiseerd, staat hieronder als
-risico. Daarnaast staan er risico's die geen besluit raken maar wel voor elke
+risico. Een beveiligingsgat dat nog openstaat, beschrijven we hier in algemene
+termen, zonder link naar het issue; de link volgt zodra het gat is gedicht.
+Daarnaast staan er risico's die geen besluit raken maar wel voor elke
 implementatie gelden. Neem over wat voor u geldt, en vul aan.
 
 | ID | Risico | Raakt | Wat u ondertussen doet | Issue |
 |---|---|---|---|---|
-| R-01 | De procesengine is direct bereikbaar, buiten de controles van de Business API om. | AB-13 | Plaats de engine in uw eigen netwerk zo dat alleen de backends hem bereiken. | [ronl-business-api#415](https://github.com/sgort/ronl-business-api/issues/415) |
-| R-02 | De ontwerptools accepteren schrijfacties zonder dat vaststaat wie ze doet. | AB-17, AB-20, AB-21 | Maak de ontwerptools alleen bereikbaar binnen uw netwerk, achter de inlogvoorziening van uw organisatie. | [linked-data-explorer#163](https://github.com/sgort/linked-data-explorer/issues/163), [ttl-editor#234](https://github.com/sgort/ttl-editor/issues/234), [editor#2](https://git.open-regels.nl/regels/editor/-/issues/2) |
+| R-01 | De procesengine is direct bereikbaar, buiten de controles van de Business API om. | AB-08, AB-13 | Plaats de engine in uw eigen netwerk zo dat alleen de backends hem bereiken. | Gemeld bij het onderdeel; link volgt na herstel |
+| R-02 | De ontwerptools accepteren schrijfacties zonder dat vaststaat wie ze doet. | AB-17, AB-20, AB-21 | Maak de ontwerptools alleen bereikbaar binnen uw netwerk, achter de inlogvoorziening van uw organisatie. | Gemeld bij het onderdeel; link volgt na herstel |
 | R-03 | Toegang voor inwoners en ondernemers werkt nog niet echt: DigiD en eIDAS staan uit, eHerkenning ontbreekt, de BRP is een testvoorziening. | AB-19, AB-26 | Beperk de ingebruikname tot fase 1. Plan de aansluiting op DigiD, eHerkenning en de BRP als eigen project vóór fase 2. | — |
 | R-04 | Wat de CPSV Editor schrijft, wijkt af van CPRMV 0.4.2, en CPRMV is zelf nog een werkversie. Dat hoort bij hoe IOU en CPRMV samen groeien, maar het betekent dat gedeelde regels tussen versies kunnen verschillen. | AB-03, AB-07 | Valideer gepubliceerde regels tegen de CPRMV-shapes, volg de ontwikkeling van CPRMV, en geef wat u tegenkomt terug aan IOU. | — |
 | R-05 | SHACL-validatie geeft alleen advies; een product met fouten kan worden gepubliceerd. | AB-11 | Spreek af dat niemand publiceert zolang de validatie fouten meldt. | — |
@@ -90,7 +92,7 @@ implementatie gelden. Neem over wat voor u geldt, en vul aan.
 | R-09 | Eén onderdeel leest rechtstreeks de database van een ander; wijzigingen aan die database kunnen het breken. | AB-25 | Neem beide onderdelen altijd samen op in uw acceptatietest. | — |
 | R-10 | Er wordt geen bewaartermijn toegepast op auditgegevens. | AB-23 | Stel uw bewaartermijn vast en richt het opschonen zelf in. | — |
 | R-11 | De juridische interpretatie wordt met de hand overgenomen in de dienstbeschrijving, en de Norm Editor is nog niet compleet. | AB-02, AB-12 | Leg vast wie de overname controleert, en hoe. | — |
-| R-12 | De procesengine heeft nog geen eigen productie-instantie: acceptatie en productie delen één engine. Voor de engine en de database van de Linked Data Explorer is geen back-up ingericht. | — | Richt in uw eigen omgeving een aparte engine per omgeving in, met een productiedatabase, back-up en een geteste herstelprocedure. | [ronl-business-api#349](https://github.com/sgort/ronl-business-api/issues/349) |
+| R-12 | De procesengine heeft nog geen eigen productie-instantie: acceptatie en productie delen één engine. Voor de engine en de database van de Linked Data Explorer is geen back-up ingericht. | — | Richt in uw eigen omgeving een aparte engine per omgeving in, met een productiedatabase, back-up en een geteste herstelprocedure. | Gemeld bij het onderdeel; link volgt na herstel |
 | R-13 | Overstappen naar een andere triplestore of hosting vraagt aanpassingen in de code; niet alle adressen zijn instelbaar. | AB-16 | Reken bij een andere triplestore of hosting op ontwikkelwerk, en neem dat op in de planning. | — |
 | R-14 | Op test en acceptatie breekt de keten: de bestaande voorzieningen waaraan IOU koppelt (bijvoorbeeld documentbeheer, ondertekening, identiteitsbeheer, financiën) hebben vaak alleen een productieomgeving. Acceptatie toetst dan een nabootsing, of raakt productiegegevens. | — | Laat beheerders en leveranciers een test- en acceptatieomgeving inrichten voor elke gekoppelde voorziening (route 3 in [hoofdstuk 7](07-integration-architecture.md)). Tot die er is: toets met nabootsingen, en leg vast dat de echte koppeling pas in productie voor het eerst wordt gebruikt. | — |
 | R-15 | Een beslismodel kan alle controles doorstaan en toch nooit de juiste uitkomst geven: DMN eist niet dat een model aantoont dat het werkt, en zegt niet hoe het naar de wet verwijst. | AB-03 | Test elk beslismodel met testgevallen vóór uitrol, ook op de uitkomsten die het moet kunnen geven. Volg de ontwikkeling van [DMN-AP NL](https://github.com/sgort/ttl-editor/blob/main/docs/dmn-ap-nl-voorstel.md). | — |

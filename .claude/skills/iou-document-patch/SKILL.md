@@ -1162,8 +1162,10 @@ Steps:
    chapter-11 register, or a **risk** changed. Read the source at the `main`
    head; never the component docs alone.
 2. Status is IOU-wide and **the weakest component decides** it: `gerealiseerd`
-   only when every component the decision binds meets it; the note names who does
-   and who does not.
+   only when every component the decision binds meets it; `nog niet` when none
+   does, or when the decision is a gap nobody has started on; `deels` otherwise.
+   The note names who does and who does not. A `deels` or `nog niet` decision
+   always has a risk in chapter 11 that names it (`psa-check.py` enforces this).
 3. Edit Dutch, then English; re-stamp each re-checked page with today's date and
    the five `main` heads.
 4. `venv/Scripts/python.exe .claude/skills/iou-document-patch/scripts/psa-check.py`
@@ -1173,8 +1175,13 @@ Rules that keep applying, from `specs/PSA/2026-11-06-psa-design.md` (git-ignored
 ask the user if it is missing):
 
 - **Gaps are described generically** — what the gap means, never how to use it:
-  no hostnames, routes, header values or configuration keys — and link the issue.
-  `psa-check.py` rejects the common leaks; it is a floor, not the rule.
+  no hostnames, routes, header values or configuration keys. **An open security
+  gap gets no issue link**: the public issues spell out host and routes, which
+  undoes the generic wording one click away. Its Issue cell reads "Gemeld bij het
+  onderdeel; link volgt na herstel" (EN: "Filed with the component; link follows
+  once fixed"); when the gap closes, add the link and propose the status change
+  in 6d (architect, 6 November 2026). `psa-check.py` rejects the common leaks; it
+  is a floor, not the rule.
 - **AB-IDs are never renumbered.** A decision that goes away is retired in place
   (its row says so), so that organisations' deviations keep pointing at the right
   decision.

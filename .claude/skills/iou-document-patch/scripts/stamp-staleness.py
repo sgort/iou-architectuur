@@ -75,7 +75,14 @@ COMPONENTS = {
     "Linked Data Explorer": ("linked-data-explorer", "acc", "origin"),
     "RONL Business API": ("ronl-business-api", "acc", "origin"),
     "Norm Editor": ("editor", "main", "origin"),  # origin is GitLab; no acc branch
-    "CPRMV": ("cprmv", "main", "origin"),  # origin is GitLab (standards/cprmv), its only remote
+    "CPRMV": ("cprmv", "main", None),  # remote resolved by URL: see REMOTE_URLS
+}
+
+# Components whose clone has named its GitLab remote differently over time
+# (`gitlab` in one clone, `origin` in another). A fixed name then reads a
+# months-old ref without complaint, so these resolve the remote by its URL.
+REMOTE_URLS = {
+    "CPRMV": "git.open-regels.nl/standards/cprmv",
 }
 
 # What a contributing page makes claims about: CI, hooks, the supply-chain
@@ -138,6 +145,16 @@ PROFILES = {
 
 def profile_settings(name):
     return PROFILES[name]
+
+
+def resolve_remote(repo, url_fragment):
+    """Name of the first remote of `repo` whose URL contains `url_fragment`, or None."""
+    proc = subprocess.run(["git", "-C", repo, "remote", "-v"], capture_output=True, text=True)
+    for line in proc.stdout.splitlines():
+        parts = line.split()
+        if len(parts) >= 2 and url_fragment in parts[1]:
+            return parts[0]
+    return None
 
 # Workflow names that deploy something. Supply-chain audits and backend builds
 # run on the same push but ship nothing a reader can see.
@@ -231,6 +248,12 @@ def check_stamp(component, value, siblings_root, records, offline, branch=None, 
     if not os.path.isdir(repo):
         finding["problems"].append(f"clone not found at {repo}")
         return finding
+    if remote is None:
+        remote = resolve_remote(repo, REMOTE_URLS[component])
+        if remote is None:
+            finding["problems"].append(f"no remote of {clone} points at {REMOTE_URLS[component]}")
+            return finding
+        finding["remote"] = remote
 
     code, full = git(repo, "rev-parse", "--verify", "--quiet", f"{value}^{{commit}}")
     if code != 0:
