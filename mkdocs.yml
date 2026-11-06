@@ -80,6 +80,19 @@ plugins:
         - locale: nl
           name: Nederlands
           build: true
+          nav_translations:
+            "About this PSA": "Over deze PSA"
+            "1. Executive summary": "1. Managementsamenvatting"
+            "2. Context and scope": "2. Context en scope"
+            "3. Architecture frameworks": "3. Architectuurkaders"
+            "4. Functional architecture": "4. Functionele architectuur"
+            "5. Application architecture": "5. Applicatiearchitectuur"
+            "6. Data architecture": "6. Gegevensarchitectuur"
+            "7. Integration architecture": "7. Integratiearchitectuur"
+            "8. Security and privacy": "8. Beveiliging en privacy"
+            "9. Technical infrastructure": "9. Technische infrastructuur"
+            "10. Management and continuity": "10. Beheer en continuïteit"
+            "11. Decisions and risks": "11. Architectuurbesluiten en risico's"
   
   - git-revision-date-localized:
       enable_creation_date: true
@@ -97,6 +110,19 @@ hooks:
 nav:
   - Home: index.md
   - IOU Architecture (slides): iou-architecture-deck.md
+  - 🧭 Project Start Architectuur:
+    - About this PSA: psa/index.md
+    - 1. Executive summary: psa/01-executive-summary.md
+    - 2. Context and scope: psa/02-context-and-scope.md
+    - 3. Architecture frameworks: psa/03-architecture-frameworks.md
+    - 4. Functional architecture: psa/04-functional-architecture.md
+    - 5. Application architecture: psa/05-application-architecture.md
+    - 6. Data architecture: psa/06-data-architecture.md
+    - 7. Integration architecture: psa/07-integration-architecture.md
+    - 8. Security and privacy: psa/08-security-and-privacy.md
+    - 9. Technical infrastructure: psa/09-technical-infrastructure.md
+    - 10. Management and continuity: psa/10-management-and-continuity.md
+    - 11. Decisions and risks: psa/11-decisions-and-risks.md
   
   - ⚙️ RONL Business API:
     - Overview: ronl-business-api/index.md

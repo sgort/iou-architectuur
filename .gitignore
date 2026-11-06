@@ -95,3 +95,6 @@ flatten_directory.sh
 
 # Semgrep plugin session cache — an auth record, never a repository file
 .semgrep/
+
+# PSA working material — source example, task brief and Flevoland v0.6 slides; input, not documentation
+specs/PSA/
