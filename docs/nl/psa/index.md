@@ -101,6 +101,16 @@ voorstel om CPRMV te verfijnen of aan te passen. IOU laat dus zien hoe een
 standaard en zijn gebruik samen groeien. Een functie die op een nieuwe versie
 wacht, staat zolang bewust uit; de rest van IOU werkt door.
 
+Een tweede voorbeeld is DMN. Bij het uitwerken van regelgeving tot uitvoerbare
+beslisdiensten bleek dat de standaard drie vragen open laat: wat een regel
+blijvend identificeert, hoe een beslismodel verwijst naar de wet die het
+uitvoert, en wat een model moet kunnen aantonen. Een model kan alle controles
+doorstaan en toch nooit de juiste uitkomst geven. IOU stelt daarom aan Forum
+Standaardisatie, dat ook eigenaar is van CPRMV, een Nederlands toepassingsprofiel
+voor DMN voor: [DMN-AP NL](https://github.com/sgort/ttl-editor/blob/main/docs/dmn-ap-nl-voorstel.md). Het profiel beperkt DMN zoals CPSV-AP dat
+doet voor CPSV, vraagt niets van de internationale standaard, en wordt eerst
+beproefd op nieuwe regelgeving voordat iemand wordt gevraagd het over te nemen.
+
 Dit is het eerste en belangrijkste architectuurbesluit van IOU (AB-01).
 
 Voor uw PSA betekent dat:

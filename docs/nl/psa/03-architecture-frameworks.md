@@ -66,7 +66,7 @@ uitlegt waarom niet.
 | CPSV-AP 3.2.0 | Dienstbeschrijvingen (AB-06) | Niet op de lijst; Europese standaard |
 | CPRMV 0.4.2 | Regels en hun methoden (AB-07) | Niet op de lijst; eerste openbare werkversie |
 | ELI | Verwijzingen naar wetgeving | Niet op de lijst; Europese standaard |
-| BPMN 2.0, DMN 1.3 | Proces- en beslismodellen | Niet op de lijst; internationale standaarden |
+| BPMN 2.0, DMN 1.3 | Proces- en beslismodellen | Niet op de lijst; internationale standaarden. Voor DMN stelt IOU een Nederlands toepassingsprofiel voor: [DMN-AP NL](https://github.com/sgort/ttl-editor/blob/main/docs/dmn-ap-nl-voorstel.md) |
 | SPARQL | Bevragen van de kennisgraaf | Niet op de lijst |
 
 IOU heeft niet per verplichte standaard vastgesteld of elk onderdeel er volledig
