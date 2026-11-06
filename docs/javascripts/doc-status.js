@@ -8,7 +8,8 @@
  *   3. Renders the "last documentation patch" box under the home page's
  *      subtitle (identified by #last-patch) from the `last_patch` record —
  *      when the site was last patched, what kind of run it was, the run
- *      before it, and where the findings left open are tracked.
+ *      before it, where the findings left open are tracked, and a fixed
+ *      paragraph on how the site is maintained (component sync, weekly pass).
  *
  * Update repo-versions.json manually whenever you sync content from a
  * component repository, then rebuild the MkDocs site.
@@ -157,6 +158,18 @@
           .join(" · ") +
         "</p>";
     }
+    // How the site is kept true, independent of any one run: fixed text, so
+    // it lives here rather than in the per-run record.
+    html +=
+      "<p><strong>How this documentation is maintained.</strong> " +
+      "A <em>component sync</em> brings a component's own pages in line with " +
+      "each release it ships. A <em>weekly pass</em>, every Sunday, re-checks " +
+      "the pages that describe all components at once against their source: " +
+      "the contributing pages at each component's acceptance branch, and the " +
+      'Project Start Architectuur (<a href="psa/">PSA</a>) at each ' +
+      "component's released version, including the status of every decision " +
+      "in its register. Each re-checked page states the date and the commits " +
+      "it was verified against.</p>";
     return html + "</div>";
   }
 

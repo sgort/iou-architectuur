@@ -1,0 +1,3 @@
+# Tools for maintaining the site, not needed to build it.
+# psa-template.py turns the PSA template into ODT with pandoc (bundled).
+pypandoc_binary==1.17

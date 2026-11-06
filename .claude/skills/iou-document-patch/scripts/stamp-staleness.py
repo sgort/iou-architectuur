@@ -75,7 +75,14 @@ COMPONENTS = {
     "Linked Data Explorer": ("linked-data-explorer", "acc", "origin"),
     "RONL Business API": ("ronl-business-api", "acc", "origin"),
     "Norm Editor": ("editor", "main", "origin"),  # origin is GitLab; no acc branch
-    "CPRMV": ("cprmv", "main", "gitlab"),  # GitLab CI; origin is a GitHub copy
+    "CPRMV": ("cprmv", "main", None),  # remote resolved by URL: see REMOTE_URLS
+}
+
+# Components whose clone has named its GitLab remote differently over time
+# (`gitlab` in one clone, `origin` in another). A fixed name then reads a
+# months-old ref without complaint, so these resolve the remote by its URL.
+REMOTE_URLS = {
+    "CPRMV": "git.open-regels.nl/standards/cprmv",
 }
 
 # What a contributing page makes claims about: CI, hooks, the supply-chain
@@ -101,6 +108,53 @@ CI_PATHS = [
     ":(glob)**/.lintstagedrc*",
     ":(glob)**/commitlint.config.*",
 ]
+
+# What a PSA page makes claims about: everything a contributing page does, plus
+# the architecture itself — deployment and proxy config, auth, routes, data
+# stores, vocabularies and shapes, API descriptions. A Caddyfile change can
+# make a PSA status false without touching a single CI file.
+ARCH_PATHS = CI_PATHS + [
+    "deployment",
+    "infra",
+    "config",
+    ":(glob)**/Dockerfile*",
+    ":(glob)**/docker-compose*.yml",
+    ":(glob)**/Caddyfile",
+    ":(glob)**/*.bicep",
+    ":(glob)**/staticwebapp.config.json",
+    ":(glob)**/src/auth/**",
+    ":(glob)**/src/middleware/**",
+    ":(glob)**/src/routes/**",
+    ":(glob)**/src/db/**",
+    ":(glob)**/migrations/**",
+    "rdf",
+    ":(glob)**/shapes/**",
+    "methods",
+    ":(glob)**/openapi*.json",
+]
+
+# contributing: the cross-cutting contributor pages, each component on its own
+#   branch of record (COMPONENTS), CI paths only.
+# psa: the Project Start Architectuur, Dutch-first, measured on main for every
+#   component — an organisation adopts what IOU has released, not acc.
+PROFILES = {
+    "contributing": {"roots": ["docs/en/contributing"], "branch": None, "paths": CI_PATHS},
+    "psa": {"roots": ["docs/nl/psa", "docs/en/psa"], "branch": "main", "paths": ARCH_PATHS},
+}
+
+
+def profile_settings(name):
+    return PROFILES[name]
+
+
+def resolve_remote(repo, url_fragment):
+    """Name of the first remote of `repo` whose URL contains `url_fragment`, or None."""
+    proc = subprocess.run(["git", "-C", repo, "remote", "-v"], capture_output=True, text=True)
+    for line in proc.stdout.splitlines():
+        parts = line.split()
+        if len(parts) >= 2 and url_fragment in parts[1]:
+            return parts[0]
+    return None
 
 # Workflow names that deploy something. Supply-chain audits and backend builds
 # run on the same push but ship nothing a reader can see.
@@ -172,7 +226,7 @@ def deploy_runs(slug, full_sha):
     ]
 
 
-def check_stamp(component, value, siblings_root, records, offline):
+def check_stamp(component, value, siblings_root, records, offline, branch=None, paths=CI_PATHS):
     finding = {"component": component, "sha": value, "problems": [], "warnings": []}
 
     if not isinstance(value, str):
@@ -187,12 +241,19 @@ def check_stamp(component, value, siblings_root, records, offline):
         finding["problems"].append("no clone mapping in stamp-staleness.py")
         return finding
 
-    clone, branch, remote = COMPONENTS[component]
+    clone, default_branch, remote = COMPONENTS[component]
+    branch = branch or default_branch
     repo = os.path.join(siblings_root, clone)
     finding.update(clone=clone, branch=branch, remote=remote)
     if not os.path.isdir(repo):
         finding["problems"].append(f"clone not found at {repo}")
         return finding
+    if remote is None:
+        remote = resolve_remote(repo, REMOTE_URLS[component])
+        if remote is None:
+            finding["problems"].append(f"no remote of {clone} points at {REMOTE_URLS[component]}")
+            return finding
+        finding["remote"] = remote
 
     code, full = git(repo, "rev-parse", "--verify", "--quiet", f"{value}^{{commit}}")
     if code != 0:
@@ -218,7 +279,7 @@ def check_stamp(component, value, siblings_root, records, offline):
             finding["deploys"] = runs
 
     ref = f"{remote}/{branch}"
-    code, out = git(repo, "log", "--oneline", "--no-decorate", f"{value}..{ref}", "--", *CI_PATHS)
+    code, out = git(repo, "log", "--oneline", "--no-decorate", f"{value}..{ref}", "--", *paths)
     if code != 0:
         finding["problems"].append(f"git log {value}..{ref} failed")
         return finding
@@ -269,7 +330,10 @@ def main():
     parser.add_argument("--fetch", action="store_true", help="fetch each clone first")
     parser.add_argument("--offline", action="store_true", help="skip the GitHub checks")
     parser.add_argument("--page", action="append", help="limit to these page paths")
-    parser.add_argument("--docs-root", default="docs/en/contributing")
+    parser.add_argument("--profile", choices=sorted(PROFILES), default="contributing",
+                        help="contributing pages (default) or the PSA pages, measured on main")
+    parser.add_argument("--docs-root", action="append",
+                        help="override the profile's page folders (repeatable)")
     parser.add_argument("--siblings", default="..", help="directory holding the clones")
     args = parser.parse_args()
 
@@ -282,8 +346,11 @@ def main():
             if os.path.isdir(repo):
                 git(repo, "fetch", "--quiet", "--all", "--prune")
 
+    profile = profile_settings(args.profile)
+    roots = args.docs_root or profile["roots"]
+    label = "CI-relevant" if args.profile == "contributing" else "relevant"
     pages, malformed = [], False
-    for path, meta in cross_cutting_pages(args.docs_root):
+    for path, meta in (p for root in roots for p in cross_cutting_pages(root)):
         if args.page and path not in args.page:
             continue
         verified = meta.get("verified")
@@ -294,7 +361,8 @@ def main():
                 stamped=True,
                 date=date.isoformat() if isinstance(date, datetime.date) else date,
                 components=[
-                    check_stamp(name, sha, args.siblings, records, args.offline)
+                    check_stamp(name, sha, args.siblings, records, args.offline,
+                                profile["branch"], profile["paths"])
                     for name, sha in verified["against"].items()
                 ],
             )
@@ -318,7 +386,7 @@ def main():
             mark = "✓" if n == 0 else "⚠"
             print(
                 f"  {mark} {c['component']:<22} {c['sha']}  →  {c['remote']}/{c['branch']} {c['head']}"
-                f"  —  {n} CI-relevant commit{'s' if n != 1 else ''} since"
+                f"  —  {n} {label} commit{'s' if n != 1 else ''} since"
             )
             if c.get("deploys"):
                 print(f"        deployed by: {', '.join(c['deploys'])}")

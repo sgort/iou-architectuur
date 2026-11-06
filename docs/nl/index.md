@@ -4,6 +4,11 @@
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
     Raadpleeg de <a href="/">Engelse versie</a> voor de huidige inhoud.
 
+!!! tip "Project Start Architectuur"
+    Schrijft u een PSA voor uw eigen IOU-implementatie? De [PSA-gids](psa/index.md)
+    beschrijft per hoofdstuk wat IOU heeft besloten, hoe bindend dat is, hoe ver IOU
+    zelf is en wat u zelf invult.
+
 ---
 
 **Status:** Concept

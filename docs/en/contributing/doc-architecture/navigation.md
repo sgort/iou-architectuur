@@ -16,6 +16,7 @@ IOU Architecture Docs
 ├── English (/)
 │   ├── Home
 │   ├── IOU Architecture (slides)
+│   ├── Project Start Architecture
 │   ├── RONL Business API
 │   │   ├── Overview
 │   │   ├── Features

@@ -1,6 +1,6 @@
 ---
 name: iou-document-patch
-description: Use when the user asks to sync, patch or update the IOU architecture documentation site (iou-architectuur) to a component's latest release — CPSV Editor / ttl-editor, Linked Data Explorer, RONL Business API, Norm Editor, CPRMV — or invokes /iou-document-patch; and use when the user asks for the weekly Sunday pass, the cross-cutting contributor pages under docs/en/contributing/, a new ICTU dependency-guideline assessment or score, or the test-posture figures behind its charts. The run has two modes that touch different files — a component sync edits that component's own pages and defers the cross-cutting half, while the weekly pass edits the contributing pages and docs/data/ictu-assessments.yml and reads no component changelog. Establish which mode before Stage 0.
+description: Use when the user asks to sync, patch or update the IOU architecture documentation site (iou-architectuur) to a component's latest release — CPSV Editor / ttl-editor, Linked Data Explorer, RONL Business API, Norm Editor, CPRMV — or invokes /iou-document-patch; and use when the user asks for the weekly Sunday pass, the cross-cutting contributor pages under docs/en/contributing/, the Project Start Architectuur pages under docs/{nl,en}/psa/, a new ICTU dependency-guideline assessment or score, or the test-posture figures behind its charts. The run has two modes that touch different files — a component sync edits that component's own pages and defers the cross-cutting half, while the weekly pass edits the contributing pages, the PSA pages and docs/data/ictu-assessments.yml and reads no component changelog. Establish which mode before Stage 0.
 ---
 
 # IOU Document Patch
@@ -25,9 +25,9 @@ before Stage 0, and say so in your first message.
 |---|---|---|
 | Triggered by | a component and/or a version — "sync RBA", "patch the docs to v2026.09.9", `/iou-document-patch <component>` | "the Sunday pass", "the weekly pass", "a new assessment", "score the guideline", "the cross-cutting pages", `/iou-document-patch weekly` |
 | Cadence | whenever a component ships | every Sunday, over all components at once |
-| Reads | that component's changelog at its branch of record | the three repositories' `acc` heads, and the queue (below) |
-| Edits | `docs/{en,nl}/<component>/**`, the What's New card, `repo-versions.json`, the screenshot manifest | `docs/{en,nl}/contributing/**`, `docs/data/ictu-assessments.yml` |
-| Must not edit | **anything under `docs/{en,nl}/contributing/`**, and no `verified:` stamp | any component page, `repo-versions.json`, the What's New card |
+| Reads | that component's changelog at its branch of record | the three repositories' `acc` heads, and the queue (below); for the PSA pages, all five components' `main` heads |
+| Edits | `docs/{en,nl}/<component>/**`, the What's New card, `repo-versions.json`, the screenshot manifest | `docs/{en,nl}/contributing/**`, `docs/{nl,en}/psa/**`, `docs/data/ictu-assessments.yml` |
+| Must not edit | **anything under `docs/{en,nl}/contributing/` or `docs/{nl,en}/psa/`**, and no `verified:` stamp | any component page, `repo-versions.json`, the What's New card |
 | Stages | 0, 1, 2, 2b, 2c, 2d, 3, 4, 5 — **2e is deferred, not skipped** | 6 (which has its own staging) |
 
 **Why they were split.** Until 20 September 2026 every component sync carried the
@@ -70,6 +70,7 @@ adapt the paths — the same staging applies.
 | Screenshots referenced by docs | `../../assets/screenshots/cpsv-editor-*.png` → real files in `docs/assets/screenshots/` (language-neutral, served at site root) |
 | Testing page | `docs/en/<component>/developer/testing.md` — the site is the **single source of truth** for test docs (see Stage 2d) |
 | Cross-cutting contributor docs | `docs/en/contributing/**` — **not component-scoped, and easy to miss.** These pages describe the tooling across *all* components at once: CI, git hooks, lint/format scripts, the repository table, the release process, the supply-chain gate, the assistant's plugin set and its working boundaries. A single component's release can falsify them, and they carry no `component:` front matter to flag them as in-scope. **Owned by the weekly pass (Stage 6); a component sync queues instead of editing them** |
+| Project Start Architectuur | `docs/{nl,en}/psa/**` — the PSA guide: what IOU decides per chapter, the decision register (AB-01…) with each decision's tier and status, and the risks. **Dutch is the original.** Status is measured on every component's `main`. **Owned by the weekly pass (Stage 6b-psa); a component sync queues instead of editing it** |
 | Cross-cutting queue | `cross-cutting-queue.md` at the repository root — what a component sync noticed and deferred. An operational artifact like the screenshot manifest, so never under `docs/`, where a file outside the nav warns on every build |
 | ICTU assessment series | `docs/data/ictu-assessments.yml` — one entry per Sunday: the three `acc` heads, eleven scores per component, and a reason per moved cell. Every table and chart on `contributing/ictu-dependency-guideline.md` is generated from it; write the week's scores here and nowhere else |
 | Assistant-tooling sources of truth | `~/.claude/CLAUDE.md` (working boundaries), `~/.claude/plugins/installed_plugins.json` (what is installed, and at which scope), `~/.claude/settings.json` → `enabledPlugins` (what is actually on), `~/.claude/plugins/known_marketplaces.json`. These are the **only** authority for `development-workflow/skills-and-boundaries.md` and `working-with-claude-code.md` — never restate those pages from memory. See Stage 2e |
@@ -679,7 +680,9 @@ Page structure that worked well:
 mode first*). Read the checks below anyway: they tell you what counts as a
 cross-cutting fact, which is what the queue entry has to capture. Then leave
 `docs/{en,nl}/contributing/**` untouched, leave every `verified:` stamp exactly as
-it is, and write what you found into `cross-cutting-queue.md`.
+it is, and write what you found into `cross-cutting-queue.md`. The same holds for
+`docs/{nl,en}/psa/**`: a release that changes a decision's status or closes a
+risk is queued, with the AB- or R-ID it touches.
 
 **In the weekly pass this stage is the work itself** — Stage 6 runs it in full,
 over all components at once.
@@ -1110,8 +1113,8 @@ changelog. It has two deliverables that belong together: the contributing pages
 re-checked against source, and one new point in the assessment series that the
 same re-check produced.
 
-**It edits `docs/{en,nl}/contributing/**` and `docs/data/ictu-assessments.yml`,
-and nothing else** — with two exceptions in `repo-versions.json`, `docs_built` and
+**It edits `docs/{en,nl}/contributing/**`, `docs/{nl,en}/psa/**` and
+`docs/data/ictu-assessments.yml`, and nothing else** — with two exceptions in `repo-versions.json`, `docs_built` and
 `last_patch` (Stage 3 step 11), which date the documentation rather than any
 component. A component's `version`,
 `commit` or `build` never moves in this pass; that is a component sync's job.
@@ -1136,6 +1139,60 @@ Run **Stage 2e in full** — the stamp report first, then the page-by-page
 staleness table, the required checks, the re-count of every counted claim, and the
 re-derivation of the assistant-tooling pages from `~/.claude/`. That stage is
 written for this pass; nothing here replaces it.
+
+### 6b-psa — Re-check the PSA pages
+
+The Project Start Architectuur (`docs/{nl,en}/psa/**`, since 6 November 2026) is
+owned by this pass too, but it is read differently from the contributing pages:
+
+- **Measured on `main`, for all five components** — an organisation adopts what
+  IOU has released, not what is on `acc`. Pin the five `main` heads alongside the
+  three `acc` heads of 6a: `origin/main` for the CPSV Editor, the Linked Data
+  Explorer, the RONL Business API and the Norm Editor (whose `origin` is GitLab),
+  and `origin/main` for CPRMV (its clone's only remote, also GitLab).
+- **Dutch first.** The Dutch pages are the original; edit `docs/nl/psa/`, then
+  carry the same change into `docs/en/psa/`.
+
+Steps:
+
+1. `venv/Scripts/python.exe .claude/skills/iou-document-patch/scripts/stamp-staleness.py --profile psa --fetch`
+   — every commit it lists since a page's stamp touched deployment or proxy
+   config, auth, routes, data stores, vocabularies, API descriptions or CI. For
+   each, decide whether a statement on that page, a decision's **status** in the
+   chapter-11 register, or a **risk** changed. Read the source at the `main`
+   head; never the component docs alone.
+2. Status is IOU-wide and **the weakest component decides** it: `gerealiseerd`
+   only when every component the decision binds meets it; `nog niet` when none
+   does, or when the decision is a gap nobody has started on; `deels` otherwise.
+   The note names who does and who does not. A `deels` or `nog niet` decision
+   always has a risk in chapter 11 that names it (`psa-check.py` enforces this).
+3. Edit Dutch, then English; re-stamp each re-checked page with today's date and
+   the five `main` heads.
+4. **Regenerate the template** whenever a page changed:
+   `venv/Scripts/python.exe .claude/skills/iou-document-patch/scripts/psa-template.py`
+   (needs `pip install -r requirements-dev.txt` once, for pandoc). It rewrites
+   `templates/psa/psa-sjabloon-nl.md` and `psa-template-en.md` and the two zips in
+   `docs/assets/downloads/`; commit all four. Fix wording in the generator, never in
+   its output.
+5. `venv/Scripts/python.exe .claude/skills/iou-document-patch/scripts/psa-check.py`
+   — exit 0, both languages within the word budget.
+
+Rules that keep applying, from `specs/PSA/2026-11-06-psa-design.md` (git-ignored;
+ask the user if it is missing):
+
+- **Gaps are described generically** — what the gap means, never how to use it:
+  no hostnames, routes, header values or configuration keys. **An open security
+  gap gets no issue link**: the public issues spell out host and routes, which
+  undoes the generic wording one click away. Its Issue cell reads "Gemeld bij het
+  onderdeel; link volgt na herstel" (EN: "Filed with the component; link follows
+  once fixed"); when the gap closes, add the link and propose the status change
+  in 6d (architect, 6 November 2026). `psa-check.py` rejects the common leaks; it
+  is a floor, not the rule.
+- **AB-IDs are never renumbered.** A decision that goes away is retired in place
+  (its row says so), so that organisations' deviations keep pointing at the right
+  decision.
+- **No compliance claims** (BIO2, AVG, signed builds, DigiD/eHerkenning as live)
+  and no figure the source does not support.
 
 ### 6c — Score the assessment
 
@@ -1185,6 +1242,13 @@ data file:
 - **every cell where a stricter reading would score lower**, with both readings
   and what each would make the total. These are the cells the published page has
   to be honest about, and the user decides them.
+
+And for the PSA pages, separately:
+
+- **every proposed status change** in the register (AB-ID, old → new, the commit
+  and file that decide it), and **every risk proposed for retirement** (R-ID and
+  why it is closed). **The user approves each one**; nothing in the register
+  changes without it. Other PSA corrections are listed as for any page.
 
 Then stop for approval, as in Stage 2.
 
