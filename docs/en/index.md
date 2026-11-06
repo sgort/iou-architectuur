@@ -195,7 +195,7 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 ### 🧭 Project Start Architecture
 
-Writing a Project Start Architectuur for your own IOU implementation? The
+Writing a Project Start Architecture for your own IOU implementation? The
 [PSA guide](psa/index.md) sets out, chapter by chapter, what IOU has decided, how
 binding each decision is, how far IOU itself meets it, and what you fill in.
 

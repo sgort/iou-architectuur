@@ -81,6 +81,7 @@ plugins:
           name: Nederlands
           build: true
           nav_translations:
+            "🧭 Project Start Architecture": "🧭 Project Start Architectuur"
             "About this PSA": "Over deze PSA"
             "1. Executive summary": "1. Managementsamenvatting"
             "2. Context and scope": "2. Context en scope"
@@ -110,7 +111,7 @@ hooks:
 nav:
   - Home: index.md
   - IOU Architecture (slides): iou-architecture-deck.md
-  - 🧭 Project Start Architectuur:
+  - 🧭 Project Start Architecture:
     - About this PSA: psa/index.md
     - 1. Executive summary: psa/01-executive-summary.md
     - 2. Context and scope: psa/02-context-and-scope.md
