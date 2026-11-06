@@ -61,11 +61,12 @@ Wat de lagen en de statussen betekenen, staat op de pagina
 
 Van een besluit in de laag **Kern** wijkt u niet af. Van een besluit in de laag
 **Vervangbaar** mag u afwijken; leg elke afwijking in uw eigen PSA vast in deze
-vorm:
+vorm. Het nummer begint met DEV (van *deviation*, Engels voor afwijking), in
+beide taalversies van deze gids, zodat een afwijking overal hetzelfde nummer houdt:
 
 | ID | Wijkt af van | Reden | Strijdig met principe | Kosten | Weg terug |
 |---|---|---|---|---|---|
-| AFW-01 | AB-14: Operaton | Bestaand contract en kennis bij het team voor Camunda 7 Enterprise. | AB-04: open source is de standaard. | Licentiekosten, afhankelijkheid van één leverancier, verbeteringen in Operaton komen niet vanzelf mee. | Beide volgen de Camunda 7 REST-API; overstappen vraagt opnieuw uitrollen, geen herbouw. |
+| DEV-01 | AB-14: Operaton | Bestaand contract en kennis bij het team voor Camunda 7 Enterprise. | AB-04: open source is de standaard. | Licentiekosten, afhankelijkheid van één leverancier, verbeteringen in Operaton komen niet vanzelf mee. | Beide volgen de Camunda 7 REST-API; overstappen vraagt opnieuw uitrollen, geen herbouw. |
 
 Een afwijking op een besluit in de laag **Eigen keuze** bestaat niet: daar legt u
 gewoon uw keuze vast, in het hoofdstuk waar die hoort.
