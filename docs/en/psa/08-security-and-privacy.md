@@ -27,7 +27,8 @@ them.
 - **One OIDC issuer for all backends** (AB-17). Staff log in through your
   organisation's login service, later residents through DigiD or eHerkenning, all
   brokered behind the same issuer. The backend checks the token on every request:
-  signature, issuer, audience and validity.
+  signature, issuer, audience and validity. IOU chooses
+  Keycloak as the issuer; that is replaceable (AB-32).
 - **Authorisation per case, in the backend** (AB-18). A staff member sees only
   cases of their own organisation, a resident only their own cases. The server sets
   the organisation label itself; when in doubt, it refuses. The screen is not a

@@ -39,7 +39,7 @@ got with it, and what you fill in.
 - **One OIDC issuer for all backends** (AB-17), behind which you connect your own
   login service and later DigiD and eHerkenning.
 - **The engine, triple store, login service and Norm Editor are replaceable**
-  (AB-12, AB-14, AB-16), provided you record the deviation.
+  (AB-12, AB-14, AB-16, AB-32), provided you record the deviation.
 - **Hosting, environments, retention periods and operations are your
   organisation's own choice.**
 

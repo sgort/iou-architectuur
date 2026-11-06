@@ -41,7 +41,7 @@ Wat de lagen en de statussen betekenen, staat op de pagina
 | AB-14 | Processen en beslissingen draaien op een engine met de Camunda 7 REST-API; IOU kiest Operaton. | Vervangbaar | gerealiseerd | Camunda 7 Enterprise past; Camunda 8 vraagt een herbouw. |
 | AB-15 | De organisatie reist mee met elke uitrol en elke zaak. Een beslismodel wordt één keer uitgerold en gedeeld; verschillen per organisatie staan in de beslistabel zelf. | Kern | gerealiseerd | |
 | AB-16 | Gepubliceerde producten staan in een SPARQL 1.1-triplestore; IOU kiest TriplyDB. | Vervangbaar | gerealiseerd | **Onder herziening**: IOU overweegt Apache Jena Fuseki. |
-| AB-17 | Backends accepteren tokens van één OIDC-uitgever, die de inlogvoorzieningen voor medewerkers en inwoners achter zich koppelt. IOU kiest Keycloak, dat vervangbaar is. | Kern | deels | De RONL Business API wel. De ontwerptools controleren nog geen tokens (zie AB-20). |
+| AB-17 | Backends accepteren tokens van één OIDC-uitgever, die de inlogvoorzieningen voor medewerkers en inwoners achter zich koppelt. Welk product de uitgever is, staat in AB-32. | Kern | deels | De RONL Business API wel. De ontwerptools controleren nog geen tokens (zie AB-20). |
 | AB-18 | De backend bepaalt per zaak wie iets mag, en weigert bij twijfel: alleen de eigen organisatie of de aanvrager zelf. | Kern | gerealiseerd | In de RONL Business API. |
 | AB-19 | Handelingen vragen een betrouwbaarheidsniveau: `basis` om een beslissing te laten berekenen, `midden` om een proces te starten. | Kern | deels | De controle werkt. DigiD en eIDAS zijn voorbereid maar uitgeschakeld; eHerkenning is er nog niet. |
 | AB-20 | Elke schrijfactie in elk onderdeel is geauthenticeerd, geautoriseerd en vastgelegd. Publiceren gebeurt namens een bevoegde organisatie. | Kern | deels | De RONL Business API wel. Linked Data Explorer, CPSV Editor en Norm Editor nog niet. |
@@ -56,6 +56,7 @@ Wat de lagen en de statussen betekenen, staat op de pagina
 | AB-29 | Elk onderdeel heeft zelfstandige releases met kalenderversies; wijzigingen bereiken acceptatie en productie alleen via een pull request. | Kern | deels | CPSV Editor, Linked Data Explorer en RONL Business API wel. CPRMV volgt de versie van zijn specificatie; de Norm Editor kent alleen een productiebranch. |
 | AB-30 | Productie wordt geleverd via een standaard leverstraat met een kwaliteitspoort. | Kern | nog niet | Alle onderdelen leveren nu via het spoor voor snelle prototypes. |
 | AB-31 | Een taalmodel-assistent is optioneel en de keuze van de organisatie. | Eigen keuze | nog niet | De RONL Business API start in productie niet zonder sleutel voor een gesloten taaldienst. |
+| AB-32 | IOU kiest Keycloak als OIDC-uitgever. | Vervangbaar | gerealiseerd | Een andere uitgever die OIDC-tokens uitgeeft en de inlogvoorzieningen koppelt, kan; bijvoorbeeld Entra ID. |
 
 ## Afwijkingen vastleggen
 

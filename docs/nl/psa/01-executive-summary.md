@@ -39,7 +39,7 @@ zelf mee is, en wat u invult.
 - **Eén OIDC-uitgever voor alle backends** (AB-17), waarachter u uw eigen
   inlogvoorziening en later DigiD en eHerkenning koppelt.
 - **Engine, triplestore, inlogvoorziening en de Norm Editor zijn vervangbaar**
-  (AB-12, AB-14, AB-16), mits u de afwijking vastlegt.
+  (AB-12, AB-14, AB-16, AB-32), mits u de afwijking vastlegt.
 - **Hosting, omgevingen, bewaartermijnen en beheer zijn uw eigen keuze.**
 
 **Waar IOU nu staat.** IOU is als referentie nog niet af. De grootste open punten:

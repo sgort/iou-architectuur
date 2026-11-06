@@ -46,7 +46,7 @@ Elk hoofdstuk heeft dezelfde vaste onderdelen:
 
 ### Architectuurbesluiten
 
-Elk besluit heeft een vast nummer, van AB-01 tot en met AB-31. In
+Elk besluit heeft een vast nummer, van AB-01 tot en met AB-32. In
 [hoofdstuk 11](11-decisions-and-risks.md) staan ze allemaal in het
 besluitenregister; de andere hoofdstukken verwijzen ernaar. Neem de nummers over
 in uw eigen PSA. Een nummer verandert nooit: vervalt een besluit, dan blijft het

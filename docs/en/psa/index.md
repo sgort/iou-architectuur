@@ -46,7 +46,7 @@ Every chapter has the same fixed parts:
 
 ### Architectural decisions
 
-Every decision has a fixed number, from AB-01 to AB-31 (*AB* for
+Every decision has a fixed number, from AB-01 to AB-32 (*AB* for
 *architectuurbesluit*). [Chapter 11](11-decisions-and-risks.md) lists them all in
 the decision register; the other chapters refer to them. Use the same numbers in
 your own PSA. A number never changes: if a decision lapses, its number stays,

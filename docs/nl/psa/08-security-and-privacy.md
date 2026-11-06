@@ -27,7 +27,8 @@ vervanging van.
 - **Eén OIDC-uitgever voor alle backends** (AB-17). Medewerkers loggen in via de
   inlogvoorziening van uw organisatie, later inwoners via DigiD of eHerkenning,
   allemaal gekoppeld achter dezelfde uitgever. De backend controleert bij elk
-  verzoek het token: handtekening, uitgever, bestemming en geldigheid.
+  verzoek het token: handtekening, uitgever, bestemming en geldigheid. IOU kiest
+  Keycloak als uitgever; dat is vervangbaar (AB-32).
 - **Autorisatie per zaak, in de backend** (AB-18). Een medewerker ziet alleen zaken
   van de eigen organisatie, een inwoner alleen de eigen zaken. Het
   organisatielabel zet de server zelf; bij twijfel weigert hij. Het scherm is geen

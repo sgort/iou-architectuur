@@ -33,7 +33,7 @@ Another engine with the same API is possible; an engine with a different API
 **Shared artefacts live in a SPARQL triple store** (AB-16). IOU chooses TriplyDB;
 that decision is under review.
 
-**One OIDC issuer for all backends** (AB-17). IOU chooses Keycloak, which brokers
+**One OIDC issuer for all backends** (AB-17). IOU chooses Keycloak (AB-32, replaceable), which brokers
 your organisation's login service and later DigiD and eHerkenning.
 
 **A separate public layer that only reads** (AB-22), and **every component

@@ -33,7 +33,7 @@ betekent herbouw.
 **Gedeelde producten staan in een SPARQL-triplestore** (AB-16). IOU kiest TriplyDB;
 dat besluit is onder herziening.
 
-**Eén OIDC-uitgever voor alle backends** (AB-17). IOU kiest Keycloak, dat de
+**Eén OIDC-uitgever voor alle backends** (AB-17). IOU kiest Keycloak (AB-32, vervangbaar), dat de
 inlogvoorziening van uw organisatie en later DigiD en eHerkenning achter zich
 koppelt.
 

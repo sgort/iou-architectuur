@@ -41,7 +41,7 @@ What the tiers and statuses mean is explained on
 | AB-14 | Processes and decisions run on an engine with the Camunda 7 REST API; IOU chooses Operaton. | Replaceable | realised | Camunda 7 Enterprise fits; Camunda 8 means a rebuild. |
 | AB-15 | The organisation travels with every deployment and every case. A decision model is deployed once and shared; differences per organisation are in the decision table itself. | Core | realised | |
 | AB-16 | Published artefacts live in a SPARQL 1.1 triple store; IOU chooses TriplyDB. | Replaceable | realised | **Under review**: IOU is considering Apache Jena Fuseki. |
-| AB-17 | Backends accept tokens from one OIDC issuer, which brokers the login services for staff and residents. IOU chooses Keycloak, which is replaceable. | Core | partly | The RONL Business API yes. The design tools do not check tokens yet (see AB-20). |
+| AB-17 | Backends accept tokens from one OIDC issuer, which brokers the login services for staff and residents. Which product the issuer is, is AB-32. | Core | partly | The RONL Business API yes. The design tools do not check tokens yet (see AB-20). |
 | AB-18 | The backend decides per case who may do what, and refuses when in doubt: only the owning organisation or the applicant themselves. | Core | realised | In the RONL Business API. |
 | AB-19 | Actions require a level of assurance: `basis` to have a decision evaluated, `midden` to start a process. | Core | partly | The check works. DigiD and eIDAS are prepared but switched off; eHerkenning does not exist yet. |
 | AB-20 | Every write in every component is authenticated, authorised and recorded. Publishing happens on behalf of a competent organisation. | Core | partly | The RONL Business API yes. Linked Data Explorer, CPSV Editor and Norm Editor not yet. |
@@ -56,6 +56,7 @@ What the tiers and statuses mean is explained on
 | AB-29 | Every component has independent releases with calendar versions; changes reach acceptance and production only through a pull request. | Core | partly | CPSV Editor, Linked Data Explorer and RONL Business API yes. CPRMV follows the version of its specification; the Norm Editor has only a production branch. |
 | AB-30 | Production is delivered through a standard delivery pipeline with a quality gate. | Core | not yet | All components currently deliver through the rapid-prototyping track. |
 | AB-31 | A language-model assistant is optional and the organisation's choice. | Organisation's own | not yet | The RONL Business API does not start in production without a key for a closed language-model service. |
+| AB-32 | IOU chooses Keycloak as the OIDC issuer. | Replaceable | realised | Another issuer that issues OIDC tokens and brokers the login services will do; for example Entra ID. |
 
 ## Recording a deviation
 
