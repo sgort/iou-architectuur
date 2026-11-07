@@ -81,10 +81,10 @@ Each tenant — municipalities, but also the province, national organisations an
 | Property | Value |
 |---|---|
 | `primary` | `#0046ad` |
-| `primaryDark` | `#134F7D` |
+| `primaryDark` | `#003a8e` |
 | `primaryLight` | `#4A8FC0` |
 | `secondary` | `#e70077` |
-| `accent` | `#F5A623` |
+| `accent` | `#fec612` |
 
 ### Dienst Toeslagen
 
@@ -190,7 +190,19 @@ A tenant with exactly one entry in `boards` gets its own landing page at `/<id>`
 --color-background   /* only when the theme sets background; removed otherwise */
 ```
 
+It also sets `data-tenant="<id>"` on `<html>` (and removes it when there is no tenant), which the stylesheets use to switch a whole palette for one tenant.
+
 Tailwind utility classes in the frontend use `var(--color-primary)` etc. as their colour values. This means the entire theme switches dynamically — no page reload, no per-municipality CSS bundle. The single-board landing page uses `var(--color-background, #f6f8fb)`, so a tenant without a `background` keeps the default.
+
+---
+
+## Flevoland's palette
+
+Since v2026.11.0 the Flevoland tenant gets more than the five theme colours: Flevoland IT's own palette, through the shared design tokens. Under `:root[data-tenant="flevoland"]`, `packages/shared/styles/tokens.css` points the `--rba-*` tokens at Flevoland IT's semantic tokens (`packages/shared/styles/flevoland/tokens.css`), and the Tailwind colour scales map each shade onto that palette by role. The result is navy text, Material greys, a `#f8f8f8` page, Flevoland's status colours, brown warning text and yellow fills with dark text; pink stays for accent text and lines.
+
+Every other tenant keeps its theme colours on Tailwind's default scales and the tokens' defaults. Converting the hard-coded colours to tokens shifted a few pale status tints for them by at most ΔE2000 6.9 — each merged tint takes its group's darkest text or lightest background, so no merge lowered contrast. Two contrast issues remain for tenants with light accents ([#412](https://github.com/sgort/ronl-business-api/issues/412)).
+
+The sign-in path — the Keycloak login page and the *Verbinding maken...* screen — uses Flevoland's blues for every tenant, because Keycloak cannot tell tenants apart before sign-in. See [Keycloak deployment](../developer/deployment/keycloak.md).
 
 ---
 

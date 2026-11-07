@@ -37,6 +37,9 @@ packages/frontend/src/
 │   │   ├── QualityProfileTab.tsx  quality profile tab (Scorecard/Matrix)
 │   │   ├── shared.tsx             shared components — only Section
 │   │   └── tokens.ts              shared constants, the Tone type, toneForRatio()
+│   ├── ServiceLinks/
+│   │   ├── ServiceLinks.tsx       Requires / Required by lines on a DMN card
+│   │   └── serviceLinkName.ts     display name of a linked service
 │   ├── GraphView.tsx              D3.js RDF graph visualisation
 │   ├── ResultsTable.tsx           SPARQL results table + CSV export
 │   └── Changelog.tsx              version history display
@@ -89,6 +92,15 @@ interface DmnModel {
   // Vendor metadata
   vendorCount?: number;
   vendors?: VendorService[];
+  // Service dependencies (dct:requires), display only; absent when empty
+  requires?: ServiceLink[];
+  requiredBy?: ServiceLink[];
+}
+
+interface ServiceLink {
+  service: string;        // service URI
+  title?: string;         // the service's dct:title
+  dmnIdentifier?: string; // that service's DMN, when it is in the same list
 }
 
 interface DmnVariable {

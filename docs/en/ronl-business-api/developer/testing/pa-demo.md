@@ -54,14 +54,28 @@ wired into CI.
     `git diff 0625d48 ebec288 -- packages/pa-demo` empty. `Duration 40.64s`,
     serially again.
 
+    **And on 7 November 2026** for v2026.11.1 (`main` at `35fb3a8`), in the
+    working checkout on `acc` at `c6cf3ac`, serially with coverage on
+    Node 22.23.4: **19 files · 109 tests · all passing**, `Duration 38.31s`.
+    The first change in this package's tests since v2026.09.5:
+    `src/demo/shims/tenant.test.ts` went to **6** tests (+3), because
+    v2026.11.0 switched on the tenant marker — the demo's tenant shim now sets
+    `data-tenant="flevoland"` on `<html>`, so the demo shows Flevoland's
+    palette, and the test keeps its `TENANT_MARKER_ENABLED` equal to the
+    frontend's. The demo also imports the shared dashboard chrome,
+    `@ronl/shared/styles/v2-chrome.css`, in its `App.tsx`. Coverage
+    **93.75 / 96.15 / 85.00 / 93.10** (statements 90/96, branches 25/26,
+    functions 34/40, lines 81/87), up from 93.47 / 95.65 / 85.00 / 92.85 on
+    the changed shim.
+
 **At a glance:**
 
 | | |
 |---|---|
 | Runner | Vitest 4 + jsdom, coverage via v8 |
-| Files / tests | 19 / 106 (9 October 2026) |
-| Duration | 40.64 s serially on 9 October, 35.65 s on 3 October; 8.16 s to 19.62 s in parallel runs before that |
-| Playwright | 11 tests in `e2e/plato-demo.spec.ts`, **runs in CI** — 11 passed, 8.7s, on 9 October |
+| Files / tests | 19 / 109 (7 November 2026) |
+| Duration | 38.31 s serially on 7 November, 40.64 s on 9 October, 35.65 s on 3 October; 8.16 s to 19.62 s in parallel runs before that |
+| Playwright | 11 tests in `e2e/plato-demo.spec.ts`, **runs in CI** — 11 passed, 21.8s, on 7 November (8.7s on 9 October) |
 
 ---
 
@@ -140,7 +154,7 @@ visible role bar. The first real build caught a genuine finding.
 | `src/demo/DemoRoleContext.test.tsx` | Role state, including a StrictMode double-invocation regression |
 | `src/demo/RollenRechten.test.tsx` | The role selector and the capability table |
 | `src/demo/pa-cockpit-host.test.ts` · `.auth.test.ts` | The host adapter, pinned against the frontend's equivalent |
-| `src/demo/shims/keycloak.test.ts` · `tenant.test.ts` | The synthetic auth and tenant shims |
+| `src/demo/shims/keycloak.test.ts` · `tenant.test.ts` | The synthetic auth and tenant shims; since v2026.11.0 also the tenant marker, kept equal to the frontend's |
 | `src/demo/Profiel.test.tsx` | That the tenant row names the right *kind* of organisation |
 
 The host adapter test **pins the two places the demo's adapter correctly differs
@@ -170,10 +184,12 @@ real selectors, which would have opened exactly that hole.
 
 `packages/pa-demo/e2e/plato-demo.spec.ts` — **11 tests**, Chromium only.
 
-!!! note "Re-run on 9 October 2026: 11 passed, 8.7s"
-    Run locally on 9 October 2026 for v2026.10.1, with seven workers:
-    **11 passed in 8.7s**, every test between 2.1s and 5.0s. The spec is
-    unchanged since `86af73e`. Before that: **3 October 2026 — 11 passed,
+!!! note "Re-run on 7 November 2026: 11 passed, 21.8s"
+    Run locally on 7 November 2026 for v2026.11.1, with seven workers:
+    **11 passed in 21.8s**, every test between 2.9s and 12.5s, while the
+    developer's full local stack was running beside it. The spec is unchanged
+    since `86af73e`; the demo itself now renders Flevoland's palette. Before
+    that: **9 October 2026 — 11 passed, 8.7s**, **3 October 2026 — 11 passed,
     10.2s**, and **30 August 2026 — 11 passed, 14.7s**. See
     [E2E & live smoke](e2e.md).
 

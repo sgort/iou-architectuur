@@ -28,7 +28,7 @@ ttl-editor/
 ├── lockfile-review.json            # Licence allow-list for the lockfile review
 ├── renovate.json                   # Dependency update policy
 ├── SECURITY-PIPELINE.md            # Pins, required checks, accepted risks
-├── .nvmrc                          # Exact Node version (24.21.0); CI reads it
+├── .nvmrc                          # Exact Node version (24.22.1); CI reads it
 ├── .npmrc                          # min-release-age=14 — npm's 14-day cooldown
 ├── .env.development                # Local: backend :3001, Operaton :8081
 ├── .env.production                 # Loaded by every `vite build`
@@ -63,6 +63,7 @@ ttl-editor/
 │   │       ├── ServiceTab.jsx
 │   │       ├── CostSection.jsx     # Embedded in ServiceTab
 │   │       ├── OutputSection.jsx   # Embedded in ServiceTab
+│   │       ├── RequiredServicesSection.jsx # Embedded in ServiceTab — dct:requires
 │   │       ├── OrganizationTab.jsx
 │   │       ├── LegalTab.jsx
 │   │       ├── RulesTab.jsx        # RPP: Rules
@@ -91,6 +92,7 @@ ttl-editor/
 │   │   ├── validators.js           # Form validation
 │   │   ├── triplydbHelper.js       # TriplyDB API integration, buildGraphIRI
 │   │   ├── ronlHelper.js           # RONL vocabulary SPARQL queries
+│   │   ├── serviceCatalogHelper.js # Published services in the dataset, for dct:requires
 │   │   ├── iknowParser.js          # iKnow XML parser
 │   │   ├── problem.js              # Reads the backend's RFC 9457 error detail
 │   │   └── buildInfo.js            # Build SHA and run number, injected at build time
@@ -178,7 +180,7 @@ Class-based TTL generation. Each tab section has a corresponding generate method
 
 ### `src/parseTTL.enhanced.js`
 
-Full TTL parser. Handles vocabulary detection, multi-line values, namespace resolution, date parsing, array extraction (keywords), and DMN block capture and preservation. Returns a data structure matching the editor state shape for direct use in `useEditorState`. A subject typed `cprmv:Rule` becomes a policy rule only when it sits under `CPRMV_RULE_BASE`; any other `cprmv:Rule` — a cell-level grounding resource — is preserved with the DMN block.
+Full TTL parser. Handles vocabulary detection, multi-line values, namespace resolution, date parsing, array extraction (keywords, and the services a service `dct:requires`, including object lists continued over several lines), and DMN block capture and preservation. A bare `<uri> a cpsv:PublicService .` stub is skipped, so it can never take over the service section. Returns a data structure matching the editor state shape for direct use in `useEditorState`. A subject typed `cprmv:Rule` becomes a policy rule only when it sits under `CPRMV_RULE_BASE`; any other `cprmv:Rule` — a cell-level grounding resource — is preserved with the DMN block.
 
 ### `src/config/vocabularies.config.js`
 

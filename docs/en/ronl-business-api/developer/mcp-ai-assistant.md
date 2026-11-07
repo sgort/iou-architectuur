@@ -29,7 +29,7 @@ The AI assistant connects to one or more **MCP providers** registered in `McpReg
   <figcaption>MCP chat source selector.</figcaption>
 </figure>
 
-Five providers are registered. Each is independently enabled via its env var and appears in `GET /v1/mcp/sources` only when connected. `edocs` is registered first, so it renders leftmost in the source selector.
+Five providers are registered. Each is independently enabled via its env var, and every enabled provider appears in `GET /v1/mcp/sources` with a `connected` flag. A source that is not connected is shown as *(offline)* in the source selector and cannot be selected; the dock preselects only the connected ones. `edocs` is registered first, so it renders leftmost in the source selector.
 
 | Source ID  | Display name        | Transport                  | Tools | Description |
 |------------|---------------------|-----------------------------|-------|-------------|
@@ -127,11 +127,13 @@ Requires `TRIPLYDB_ENDPOINT` and `TRIPLYDB_TOKEN`. If the connection fails at st
 
 The `CprmvMcpProvider` connects to the CPRMV HTTP MCP server at `acc.cprmv.open-regels.nl/mcp` using `StreamableHTTPClientTransport` — it is a remote HTTP endpoint, not a local subprocess. It exposes 3 tools:
 
-`rules_rules__rule_id_path__get` — retrieves a specific rule or rule set from BWB (national law), CVDR (municipal regulations), or EU CELLAR (European publications); supports path navigation to individual articles
+`rules_rules` — retrieves a specific rule or rule set from BWB (national law), CVDR (municipal regulations), or EU CELLAR (European publications); supports path navigation to individual articles
 
-`ref_ref__referencemethod___reference__get` — resolves a rule reference by Juriconnect method (jci 1.3 / 1.31); supports `artikel`, `hoofdstuk`, `paragraaf`, `onderdeel`, `lid`
+`ref_ref_get` — resolves a rule reference by Juriconnect method (jci 1.3 / 1.31); supports `artikel`, `hoofdstuk`, `paragraaf`, `onderdeel`, `lid`
 
-`celex_cellar_by_celex__celexid___language___format__get` — finds EU CELLAR publications by CELEX id; returns ruleset IDs usable with the rules tool
+`celex_cellar_by_celex` — finds EU CELLAR publications by CELEX id; returns ruleset IDs usable with `rules_rules`
+
+These are the names fastmcp 4 gives the CPRMV API's operations; earlier fastmcp versions generated longer ones (`rules_rules__rule_id_path__get` and the like). Because a fastmcp upgrade in CPRMV can rename them, the provider's `allowedTools()` filter — used on the normal and the session-reconnect path — logs a warning naming the missing and the listed tools whenever an allowed tool is absent, so a rename shows in the startup log instead of quietly emptying the source.
 
 Requires `CPRMV_MCP_ENABLED=true`. `CPRMV_URL` defaults to `https://acc.cprmv.open-regels.nl/mcp`.
 
@@ -244,7 +246,7 @@ Each `McpProvider` maintains its own `ALLOWED_TOOLS` set as a curation gate. Onl
 | `EdocsMcpProvider`    | `workspace_list`, `workspace_documents`, `document_profile`, `document_versions`                                          |
 | `OperatonMcpProvider` | `processDefinition_list/count/getByKey`, `processInstance_list/count/get`, `task_list/count/getById`, `decision_list/getByKey`, `deployment_list/count/getById`, `incident_list/count` |
 | `TriplyDbMcpProvider` | `dmn_list`, `dmn_get`, `dmn_chain_links`, `dmn_enhanced_chain_links`, `dmn_semantic_equivalences`, `organization_list`, `service_list`, `rule_list`, `concept_list`, `service_rules_metadata`, `sparql_query` |
-| `CprmvMcpProvider`    | `rules_rules__rule_id_path__get`, `ref_ref__referencemethod___reference__get`, `celex_cellar_by_celex__celexid___language___format__get` |
+| `CprmvMcpProvider`    | `rules_rules`, `ref_ref_get`, `celex_cellar_by_celex` |
 | `LdeMcpProvider`      | `bundle_list`, `bundle_get`, `form_list`, `form_get`, `document_list`, `document_get`                                     |
 
 To enable or disable a tool, add or remove its name from the provider's `ALLOWED_TOOLS` set. No other code changes are required.
@@ -341,9 +343,9 @@ EDOCS_MCP_CLIENT_ID=edocs-mcp-client
 EDOCS_MCP_CLIENT_SECRET=<secret-from-the-local-Keycloak-admin-console>
 
 # Process Engine (required)
-OPERATON_BASE_URL=https://operaton.open-regels.nl/engine-rest
-OPERATON_USERNAME=demo
-OPERATON_PASSWORD=<password>
+OPERATON_BASE_URL=<the engine's engine-rest URL>
+OPERATON_USERNAME=<the backend's service account>
+OPERATON_PASSWORD=<its password>
 
 # Knowledge Graph (optional)
 TRIPLYDB_MCP_ENABLED=true
@@ -415,6 +417,8 @@ az webapp log tail --name ronl-business-api-acc --resource-group rg-ronl-acc
 ## Troubleshooting
 
 **`503 MCP_NOT_CONNECTED`** — All providers selected for the request are unavailable. Individual provider failures are non-fatal — the backend continues without them. Check `GET /v1/mcp/sources` to see which providers are connected. For the Process Engine specifically: verify `MCP_ENABLED=true`, `OPERATON_BASE_URL`, `OPERATON_USERNAME`, and `OPERATON_PASSWORD` are correct, and that the App Service runtime is `NODE|22-lts` (the child process will silently fail on Node 20). For `LdeMcpProvider`: verify `LDE_DATABASE_URL` is reachable and uses `sslmode=verify-full` (not `sslmode=require`) to avoid a pg-connection-string SSL warning.
+
+**A source shows *(offline)*** — its provider failed to connect at startup. Since v2026.10.4 every provider closes and clears a half-open client when its connect fails, then rethrows so the registry logs the error; before that, a failed connect could leave the source reported as connected and every chat failing with *"Not connected"*. A source whose tool listing throws during a chat is left out of that chat with a warning instead of failing it. Check the backend's startup log for the provider's error.
 
 **eDOCS source shows connected, but every tool call fails** — this is expected, not a bug, if the DM server itself is unreachable from the App Service. `EdocsMcpProvider.connect()` and its `ListTools` handler never touch Keycloak or the eDOCS DM server — they're a pure stdio MCP handshake and a static tool list — so the source will show up **active and selectable** in the source selector regardless of DM-server reachability. The Keycloak token fetch and the call to `/v1/edocs/*` only happen lazily, inside a tool call. If the DM server is unreachable, the failure surfaces as a `502 EDOCS_ERROR` tool-call error mid-conversation instead of a greyed-out "(offline)" button. Confirm the underlying issue with `GET /v1/edocs/status` (`reachable`/`authenticated` fields) or `az webapp log tail` — look for `"listWorkspaces failed"` and the raw error message, since a pure network error (no HTTP response at all, e.g. `ETIMEDOUT`/`ENOTFOUND`) never reaches `logUpstreamError`'s upstream-body logging.
 

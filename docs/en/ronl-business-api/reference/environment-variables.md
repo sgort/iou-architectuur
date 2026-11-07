@@ -73,6 +73,8 @@ component: RONL Business API
 |---|---|---|
 | `OPERATON_BASE_URL` | Yes | `https://operaton.open-regels.nl/engine-rest` |
 | `OPERATON_TIMEOUT` | `30000` | Operaton request timeout in ms |
+| `OPERATON_USERNAME` | Yes on ACC/PROD | The backend's service account on the engine. The engine's REST API requires a login since v2026.11.1, and `validateConfig` refuses a production start (`NODE_ENV=production`, which ACC and PROD both run) without it. Used by `OperatonService`, the external-task worker and the assistant's Operaton tools |
+| `OPERATON_PASSWORD` | Yes on ACC/PROD | Its password; same rule |
 
 ### MCP AI Assistant
 
@@ -81,6 +83,7 @@ component: RONL Business API
 | `MCP_ENABLED`       | No                    | `false` | Enables the MCP client and `POST /v1/mcp/chat`. Must be `true` on ACC/PROD. |
 | `MCP_SKIP_HEALTH_CHECK` | No | `false` | Skips provider health checks on startup. Useful when providers start slowly on first deployment. |
 | `ANTHROPIC_API_KEY` | Yes | — | Anthropic API key. Required in every environment, whatever `MCP_ENABLED` says: the boot fails without it, and in production also when it is still a placeholder value. |
+| `LLM_STUB_ENABLED` | No | `false` | Lists the stub model (`stub-model`) the E2E suite chats with; it calls no LLM. On in `.env.example` and on ACC. The backend refuses to start with it on when `DEPLOYMENT_ENV` is `production`. |
 | `OPENAI_API_KEY` | No | — | Enables `OpenAILlmProvider` and exposes `gpt-4o` and `gpt-4o-mini` in the model selector. Leave unset to use Anthropic only. Requires the `openai` package: `npm install openai --workspace=@ronl/backend`. |
 | `TRIPLYDB_MCP_ENABLED` | No | `false` | Enables the TriplyDB Knowledge Graph MCP provider. |
 | `TRIPLYDB_ENDPOINT` | Conditional | — | SPARQL endpoint URL. Required when `TRIPLYDB_MCP_ENABLED=true`. Use `https://api.open-regels.triply.cc/datasets/stevengort/RONL/services/RONL/sparql` for the canonical RONL graph. |

@@ -48,7 +48,12 @@ packages/frontend/src/
 ├── components/
 │   ├── process/                   # The process view, shared by the Infra-board and the Taken inbox
 │   │   ├── PhaseStepper.tsx       # Phase stepper (RIP phases, or a process's phase set)
-│   │   ├── PhaseSwimlane.tsx      # SVG BPMN swimlane
+│   │   ├── ProcessView.tsx        # The one process rendering: stepper slot, title bar, legend, swimlane
+│   │   ├── PhaseSwimlane.tsx      # SVG BPMN swimlane — imported only inside this folder
+│   │   ├── processMarks.ts        # Task marks, the viewer's lanes, legend entries, gateway kinds
+│   │   ├── useViewer.ts           # The viewer (user, roles) from the Keycloak token
+│   │   ├── status.ts              # Node status vocabulary: labels, glyphs, token colours
+│   │   ├── ProcessVarsDisclosure.tsx  # "Procesgegevens", folded by default
 │   │   ├── ProcessWhere.tsx       # "Waar sta ik": compact phase stepper under the task header
 │   │   ├── ProcessLaneSteps.tsx   # "Processtappen per rol"
 │   │   ├── ProcessOverlay.tsx     # Modal: full stepper, breadcrumb, legend, swimlane
@@ -57,7 +62,7 @@ packages/frontend/src/
 │   │   ├── laneSteps.ts           # Derivations behind "Processtappen per rol"
 │   │   ├── phaseSet.ts            # A model's phase set as stepper phases; phaseRef, captions
 │   │   ├── swimlaneText.ts        # Condition expressions as readable flow labels
-│   │   ├── process-view.css       # Stepper and swimlane styles, scoped under .pbd
+│   │   ├── process-view.css       # Stepper, legend and swimlane styles, scoped under .pbd
 │   │   └── caseworker-process.css # Caseworker additions (one-line rules; not prettier-formatted)
 │   ├── CaseworkerDashboardV2/     # V2 shell parts: SectionRouter, TakenInbox, CommandPalette,
 │   │   │                          #   PaletteActions, paletteActionsContext, AssistantDock,
@@ -360,6 +365,8 @@ else root.style.removeProperty("--color-background");
 ```
 
 All Tailwind utility classes and component styles reference these custom properties, so the entire UI re-themes without a page reload.
+
+`applyTenantTheme` also sets `data-tenant="<id>"` on `<html>` (`TENANT_MARKER_ENABLED` in `services/tenant.ts`; pa-demo's tenant shim keeps its own copy, held equal by a test). The stylesheets use it to switch a whole palette for one tenant: since v2026.11.0, `:root[data-tenant="flevoland"]` points the shared tokens at Flevoland IT's semantic tokens. See [Styling guidelines](#styling-guidelines) and [Municipality themes](../reference/municipality-themes.md).
 
 ---
 
@@ -692,18 +699,45 @@ belongs to, and `hasLanes`.
 derivations as pure functions, so the rules are unit-tested and the components
 only render.
 
+### One rendering: `ProcessView`
+
+Since v2026.10.3 every diagram of a process goes through `ProcessView`: the
+Caseworker's process overview (`ProcessOverlay`) and the Infra-board's project
+page (`ProjectDetail`). A dashboard passes data — the model, node statuses,
+the open tasks — and an optional stepper; who is looking comes from the
+Keycloak token through `useViewer`. `processMarks.ts` derives the rest as pure
+functions:
+
+- **Task marks**: *jouw taak* on the viewer's own task, *geclaimd* on a task a
+  colleague has claimed, *open* on an unclaimed one; every task that is not the
+  viewer's own gets a dashed outline.
+- **The viewer's lanes**, marked *jouw rol*, from the roles in the token.
+- **The legend**, which lists only what the diagram shows: *Afgerond*, *Loopt*,
+  the other statuses present, *Jouw taak*, *Geclaimd*, *Open taak*, *Jouw rol*
+  with the roles, *Automatisch (script / DMN)*, *Beslissing*, *Tegelijk / alles
+  klaar* and *Nog niet / niet doorlopen*.
+- **Gateway kinds**: a decision is drawn as a diamond with `?` and its question
+  above it, a parallel split or join as a bar captioned *tegelijk* or *alles
+  klaar*, an exclusive merge as a small dot. `laneSteps.ts` uses the same kinds,
+  so the Caseworker's step list tags a gateway KEUZE, TEGELIJK or SAMENKOMST and
+  names an unnamed one *Beslissing*, *Tegelijk*, *Alles klaar* or *Samenkomst*
+  rather than by its element id.
+
+Lanes without nodes get slim rows, and no label is a bare element id. The
+status vocabulary lives in `status.ts` (re-exported from
+`pages/infra-board/rip-model.ts`), with colours from the shared tokens.
+`process-view-guard.test.ts` fails when a file outside `components/process`
+imports `PhaseSwimlane`, so a new dashboard cannot draw a swimlane around the
+shared rendering. `e2e/process-view.spec.ts` checks the rules that hold whatever
+the engine state — see [E2E](testing/e2e.md).
+
 ### Styling
 
-`process-view.css` carries the stepper and swimlane styles moved verbatim from
-the Infra-board, still scoped under `.pbd`, so the Infra-board renders exactly
-as before. A caseworker container opts in by carrying the `pbd` class — only
-the two wrappers do, `ProcessWhere`'s `.cwp-where` and `ProcessOverlay`'s
-`.cwp-ov-panel`, not the inbox around them. `PhaseSwimlane` adds `.cwp-swim` to
-its root when it is given any caseworker prop (`myLaneKeys`, `claimedLabel`,
-`onOpenCall`, `scrollToNodeId`), and that class scopes the caseworker restyling
-of elements the Infra-board also draws, such as the claimed-node tab and the
-label clamp. Aligning the two boards' styling is open as #277.
-`caseworker-process.css` is written as one-line rules, as its header says; the
+`process-view.css` carries the stepper, legend and swimlane styles, scoped
+under `.pbd`; `ProcessView` carries that class itself, so it styles wherever it
+is placed. The Caseworker-only scope `.cwp-swim` is gone since v2026.10.3: the
+claimed-node tab, the label clamp and the lane marks are one look on both
+boards (#277, closed). `caseworker-process.css` is written as one-line rules, as its header says; the
 root `format` and `check-format` scripts cover only `ts`, `tsx`, `json` and
 `md`, so they leave it alone — do not run Prettier on it by hand.
 
@@ -778,6 +812,27 @@ The dashboard skips an id the backend returns that the bundle has no card for, s
 ---
 
 ## Styling guidelines
+
+**Colours come from the shared tokens.** `packages/shared/styles/tokens.css` holds one `:root` block of `--rba-*` tokens — Flevoland's fixed brand colours, the themed brand chained to the tenant's `--color-primary`, neutrals, and status colours by role (`--rba-ok-*`, `--rba-warn-*`, `--rba-bad-*`) — and the caseworker app, PA-Cockpit and pa-demo load it. Flevoland IT's own token file sits in `packages/shared/styles/flevoland/`. Since v2026.11.0 the stylesheets and inline styles hold no neutral, brand or status hex value: the 22 left in the stylesheets are data and category colours, each listed with its reason, and three tests guard it:
+
+| Test | Fails when |
+|---|---|
+| `css-hex.test.ts` | A stylesheet gains a hex colour outside the per-file list, or a listed one is no longer used — this one runs in CI |
+| `inline-colours.test.ts` | A colour written inline in TS/TSX is not a token and not one of the data colours listed per file (chart series, lanes, categories) |
+| `css-tokens.test.ts` | A stylesheet uses an undefined `--rba-*` token, or a host stops loading the token file |
+
+**Tailwind's colour scales follow the tenant.** `tailwind.config.js` points the gray, slate, red, green, blue, amber, orange and yellow scales at `--twc-*` variables (`src/styles/tailwind-palette.css`) whose defaults are Tailwind's own values, so a tenant without a palette renders as before; Flevoland maps each shade onto its palette by role. `tailwind-palette.test.ts` compiles the app's CSS both ways and compares every declaration.
+
+**The dashboard chrome is shared.** `packages/shared/styles/v2-chrome.css` holds the declarations Caseworker V2 (and so the Infra-board and Woo) and PA-Cockpit had in common. Each app imports it first, in its `App.tsx`, so the dashboard stylesheets after it still override it; accent colours stay in the host files.
+
+**Checking a colour or stylesheet change:**
+
+| Command | What it does |
+|---|---|
+| `npm run lint:css` | Stylelint over every stylesheet: no hex colours, no duplicate selectors, no `!important`, and `rba/selector-root-class` (every selector in a scoped stylesheet starts with its root class). Report-only — warnings, in no workflow or hook |
+| `npm run lint:css:summary` | The same warnings, counted |
+| `npm run check:css-equivalence` | Compares changed stylesheets with `acc` for every tenant and fails on a colour moving by more than ΔE2000 1.0 |
+| `npm run check:css-move` | Compares each app's whole cascade, read from its import graph, at `acc` and in the working tree, per tenant — proves that moving rules between files changes nothing |
 
 **Use Tailwind utility classes:**
 

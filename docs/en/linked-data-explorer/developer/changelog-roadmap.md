@@ -8,6 +8,46 @@ component: Linked Data Explorer
 
 ## Changelog
 
+### v2026.11.1 — The Backend Logs In to Operaton (November 2026)
+
+> How it is built: [Backend](backend.md#operaton-service). Configuration: [Deployment](deployment.md) and [Local Development](local-development.md). Measured suites: [Testing](testing.md).
+
+**Operaton requires a login, and the backend sends one.** The engine's REST API no longer answers anonymous calls (ronl-business-api#415). Every call the backend makes — the shared client that evaluates and deploys, the external-task worker and the health probe — now sends basic auth from `OPERATON_USERNAME` and `OPERATON_PASSWORD`. `OPERATON_API_KEY`, sent as a bearer token Operaton never accepted, is removed. On ACC and production the backend does not start without both credentials; the tier decides, not `NODE_ENV`, since ACC runs `NODE_ENV=acceptance`. Local development and test runs start without them, and `.env.example` carries the `ldeBackend` account that the RONL Business API's local stack creates.
+
+**Values in an engine URL path are encoded.** Every value the backend places in an Operaton URL path — the decision key of both evaluate calls, and both requests that fetch a DMN's XML — now passes through `engineSegment()`, which percent-encodes it and refuses `.` and `..`. A request to this backend can no longer be steered to a different engine endpoint under the backend's credentials.
+
+**Shipped before it was released.** The code reached production on 5 November with the promotion of v2026.11.0 (#325), before its own release was cut; v2026.11.1 (#327) records it under its own number.
+
+---
+
+### v2026.11.0 — The Services a DMN's Service Requires (November 2026)
+
+> What it shows: [DMN Discovery & Chain Building](../features/dmn-chain-building.md) and the [user guide](../user-guide/chain-building.md). How it is built: [Backend](backend.md#dmn-discovery) and [Frontend](frontend.md). Measured suites: [Testing](testing.md).
+
+**Requires and Required by.** A public service can declare the services it relies on with `dct:requires`, which the CPSV Editor writes since ttl-editor#223. `GET /v1/dmns` now gives a DMN whose service takes part in such a link `requires` and `requiredBy`: `ServiceLink` objects naming the other service by URI, with its title and its DMN identifier when known, read from one query per endpoint. *Required by* is derived from the same pairs, so it covers the endpoint being viewed. Both keys are left out when empty, so a dataset without `dct:requires` answers exactly as before, and a failed query costs the list nothing.
+
+**On the cards, for context only.** The cards in Available DMNs, the cards in the Chain Composer and the single-DMN info card of the Modeler's *Link to DMN/DRD* panel list *Requires:* and *Required by:* when there is something to list. A linked service is named by its DMN identifier, else its title, else the last part of its URI, with the URI as tooltip, and the links keep a stable order between refreshes. The order of execution stays in the BPMN.
+
+**The OpenAPI document.** A new `ServiceLink` schema and two optional arrays on `DmnModel`, and no new route. A contract test pins `GET /v1/dmns` with a DMN carrying both lists.
+
+**Also in this release.** `@types/n3` 1.26.5 and `typescript-eslint` 8.72.0 in the backend.
+
+---
+
+### v2026.10.3 — Node 24.22.1, Advisories Closed, and Semgrep False Positives Suppressed in Code (October 2026)
+
+> The pipeline: [Deployment](deployment.md). Setup: [Local Development](local-development.md). Measured suites: [Testing](testing.md).
+
+**Node 24.22.1.** Semgrep flagged Node 24.21.0 for CVE-2026-111497, an out-of-bounds write in the Brotli decoder. Renovate's update stopped at 24.22.0, still affected, because 24.22.1 was inside the 14-day cooldown. `.nvmrc`, `engines.node` (`>=24.22.1`, at the root and in the backend) and the Node literals in the dependency-audit, dependency-review, SBOM and zizmor workflows moved together. Both App Services already ran 24.22.1, so this closed no live exposure: CI and development now run what production runs.
+
+**Advisories.** follow-redirects 1.16.1 closes two high advisories reachable in production through axios, in which credential headers could survive a cross-origin redirect. A lockfile-only refresh covers 22 more, among them body-parser, dompurify, markdown-it, qs and undici in production. Most fixes were younger than the cooldown, so that refresh ran with a shorter cooldown on the command line only, the exception `.npmrc` allows for security fixes. `@vitest/mocker` (development only), `@tiptap/core` and `deepmerge` stay open; the last two are triaged as accepted risk.
+
+**Semgrep false positives suppressed in code.** Two verified false positives — `detect-non-literal-regexp` on `renameProcessId` and `path-join-resolve-traversal` in `build-openapi.cjs` — carry a `nosemgrep` comment naming the full rule id, with the reason beside it.
+
+**Also in this release.** Frontend: bpmn-js 18.31.0, the properties panel 5.65.2, React 19.3.1. Backend: fast-xml-parser 5.11.2, pg 8.23.1, Spectral CLI 6.17.0. `concurrently` 10.0.6, which fixes a critical, development-only advisory in shell-quote, and `lint-staged` 17.6.0. The release's changelog also lists the SBOM correction that reached production on its own in #298; it is described under v2026.10.2.
+
+---
+
 ### v2026.10.2 — Phases Set in the Modeler, and a Process Id That Belongs to One Organisation (October 2026)
 
 > How to set phases: [BPMN Modeler](../features/bpmn-modeler.md) and the [user guide](../user-guide/bpmn-modeler.md). How it is built: [BPMN Modeler (developer)](bpmn-modeler.md). Storage: [Asset Storage](asset-storage.md). The pipeline: [Deployment](deployment.md). Measured suites: [Testing](testing.md).

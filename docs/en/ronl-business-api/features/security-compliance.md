@@ -33,6 +33,12 @@ The eDOCS routes under `/v1/edocs` are closed to citizens and to unknown machine
 !!! warning "Accepted risk: a browser-held token can reach eDOCS as its owner"
     The broker endpoint requires Keycloak's `read-token` role in the caller's access token, so every user holds it and `ronl-business-api`'s access tokens carry it — including the token the browser holds. A stolen Keycloak access token can therefore read its owner's stored Entra token from Keycloak's broker endpoint and reach eDOCS as that person outside the Business API's audit, for the Entra ID token's remaining life (about an hour). The stored refresh token is of no use without the client secret. The risk is accepted pending a decision on a backend-only path ([issue 325](https://github.com/sgort/ronl-business-api/issues/325)).
 
+### The process engine
+
+The process engine behind the API requires a login of its own. Since v2026.11.1 its REST API answers only callers that present credentials, and checks each account's permissions; the Business API, its background worker and the assistant's engine tools each call it as a service account, and a production deployment refuses to start without those credentials. Two things stay public on purpose, because published rules are meant to be consulted and executed by anyone: reading the rule definitions and evaluating a decision, which go through a read-only account that can see no case and change nothing. Before this release the engine's REST API was reachable without credentials ([#415](https://github.com/sgort/ronl-business-api/issues/415)). The remaining route to the engine without a login of one's own is the Linked Data Explorer's backend, whose deploy operations do not yet establish who may call them ([sgort/linked-data-explorer#163](https://github.com/sgort/linked-data-explorer/issues/163), open).
+
+Every value the Business API places in an engine address is encoded and checked, so a crafted identifier in a request cannot steer its call to a different engine operation.
+
 ---
 
 ## Secrets management

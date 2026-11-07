@@ -99,7 +99,7 @@ When a `BusinessRuleTask` is selected in the properties panel, a **Link to DMN/D
 - **DRDs (Unified Chains)** — DRD templates saved locally from the Chain Builder
 - **Single DMNs** — individual decision models from the active TriplyDB endpoint
 
-Selecting an option auto-populates `camunda:decisionRef` with the correct identifier and suggests a value for `camunda:resultVariable`. A visual info card below the dropdown confirms the selection, with purple styling for DRDs and blue for single DMNs. DRD cards also show the chain composition (which DMNs the DRD combines).
+Selecting an option auto-populates `camunda:decisionRef` with the correct identifier and suggests a value for `camunda:resultVariable`. A visual info card below the dropdown confirms the selection, with purple styling for DRDs and blue for single DMNs. DRD cards also show the chain composition (which DMNs the DRD combines); a single DMN's card also lists the services its service requires and is required by, when they are published.
 
 ---
 

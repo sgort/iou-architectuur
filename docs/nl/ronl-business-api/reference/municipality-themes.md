@@ -45,4 +45,8 @@ component: RONL Business API
 
 ---
 
+## Flevoland's palette
+
+---
+
 ## Adding a theme

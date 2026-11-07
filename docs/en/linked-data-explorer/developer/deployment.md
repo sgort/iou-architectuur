@@ -31,7 +31,7 @@ The production backend job declares `environment: production`. Its only protecti
 
 ## Frontend deployment
 
-The frontend builds to a static site on the Node version pinned in `.nvmrc` (24.21.0), which the workflows read with `node-version-file`:
+The frontend builds to a static site on the Node version pinned in `.nvmrc` (24.22.1), which the workflows read with `node-version-file`:
 
 ```
 merge into acc (ACC)   /   called by the promotion (production)
@@ -58,7 +58,7 @@ The only committed `staticwebapp.config.json` is the public ROPA site's, in `pac
 
 ## Backend deployment
 
-The backend builds TypeScript and runs on Azure App Service (Linux, `NODE|24-lts`), building and testing on the Node version pinned in `.nvmrc` (24.21.0). Both backend workflows run the same steps:
+The backend builds TypeScript and runs on Azure App Service (Linux, `NODE|24-lts`), building and testing on the Node version pinned in `.nvmrc` (24.22.1). Both backend workflows run the same steps:
 
 ```
 merge into acc (ACC)   /   called by the promotion (production)
@@ -99,6 +99,8 @@ az webapp config appsettings set \
     CORS_ORIGIN="…" \
     TRIPLYDB_ENDPOINT="https://api.open-regels.triply.cc/..." \
     OPERATON_BASE_URL="https://operaton.open-regels.nl/engine-rest" \
+    OPERATON_USERNAME="…" \
+    OPERATON_PASSWORD="…" \
     LOG_LEVEL=info
 ```
 
@@ -115,6 +117,8 @@ az webapp config appsettings set \
     CORS_ORIGIN="…" \
     TRIPLYDB_ENDPOINT="https://api.open-regels.triply.cc/..." \
     OPERATON_BASE_URL="https://operaton.open-regels.nl/engine-rest" \
+    OPERATON_USERNAME="…" \
+    OPERATON_PASSWORD="…" \
     LOG_LEVEL=info
 ```
 
@@ -124,7 +128,7 @@ az webapp config appsettings set \
 |---|---|---|
 | `DEPLOYMENT_ENV` | falls back to `NODE_ENV` | The tier `/v1/health` and the root page report: `acc` or `prod`. |
 | `CORS_ORIGIN` | `http://localhost:3000` | Comma-separated allowlist. **An update replaces the whole value** — see below. |
-| `OPERATON_API_KEY` | unset | Carried by the shared Operaton client. Processes deploy only through it, so Operaton credentials never come from a request. |
+| `OPERATON_USERNAME` / `OPERATON_PASSWORD` | unset | The engine login, sent as basic auth by every call to Operaton (since v2026.11.1). **Required on ACC and production**: when the tier (`DEPLOYMENT_ENV`, else `NODE_ENV`) reads ACC or PROD, the backend refuses to start without both. Processes deploy only through this client, so Operaton credentials never come from a request. `OPERATON_API_KEY` is removed. |
 | `TRIPLYDB_ALLOWED_HOSTS` | `api.open-regels.triply.cc` | Hosts a TriplyDB call that forwards a caller's token may go to; the URL must also be `https:`. |
 | `ALLOW_LOCAL_ENDPOINTS` | off | Admits `http:` and local addresses as caller-supplied endpoints. **For local development only**; enabled only by the exact value `true`, and never set on ACC or production. |
 

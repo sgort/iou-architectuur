@@ -12,7 +12,7 @@ This guide sets up the Linked Data Explorer on a workstation: the frontend, the 
 
 | Requirement | Why |
 |---|---|
-| **Node.js 24.21.0** | The version `.nvmrc` names, and the one CI builds and tests on. `package.json` requires `>=24.21.0`, at the root and in `packages/backend`. |
+| **Node.js 24.22.1** | The version `.nvmrc` names, and the one CI builds and tests on. `package.json` requires `>=24.22.1`, at the root and in `packages/backend`. |
 | **npm 11.10 or newer** (recommended) | `.npmrc` sets `min-release-age=14`, a 14-day cooldown on newly published versions. Older npm ignores the setting without a warning, so `scripts/check-deps.sh` warns at every dev-server start and push when npm is older than 11.10. |
 | **bash on `PATH`** | The root scripts run `bash scripts/check-deps.sh`, and the backend's `dev` script runs `bash scripts/check-docker.sh`. |
 | **Docker** | The backend's Docker check calls `docker info` and `docker inspect` from that bash. |
@@ -89,6 +89,7 @@ The keys that matter locally:
 | `TRIPLYDB_ENDPOINT` | The `DMN-discovery` SPARQL service on `api.open-regels.triply.cc` | Default SPARQL endpoint (required) |
 | `ALLOW_LOCAL_ENDPOINTS` | `true` | Admits `http:` and local SPARQL endpoints (see below) |
 | `OPERATON_BASE_URL` | `http://localhost:8081/engine-rest` | The local `ronl-operaton` container (required) |
+| `OPERATON_USERNAME` / `OPERATON_PASSWORD` | `ldeBackend` / `ldeBackend` | The engine login, sent as basic auth. The account is created by the `operaton-accounts` one-shot in the RONL Business API's `docker-compose.yml`. Not required to start locally, but the engine refuses calls without it. On ACC and production both are required. |
 | `LOG_LEVEL` / `LOG_FORMAT` | `info` / `json` | `json` writes one JSON object per line. Any other value, such as `pretty`, writes coloured, timestamped lines. |
 | `EDOCS_STUB_MODE` | `true` | eDOCS calls are stubbed. Stub mode is also the default when the key is absent. |
 | `DATABASE_URL` | `postgresql://lde_user:lde_password@localhost:5432/lde_assets` | Asset storage (see [PostgreSQL setup](#postgresql-setup-local)) |

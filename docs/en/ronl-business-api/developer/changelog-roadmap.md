@@ -8,6 +8,68 @@ component: RONL Business API
 
 ## Changelog
 
+## v2026.11.1 — The Process Engine Asks Who Is Calling (November 2026)
+
+> The engine and its proxy: [Operaton deployment](deployment/operaton.md), [Caddy](deployment/caddy.md), [Operaton access patterns](operaton-access-patterns.md). Running it locally: [Local development](local-development.md). Measured suites: [Testing](testing/overview.md).
+
+**The engine's REST API requires a login.** Until this release anyone who knew the engine's address could read cases and start or change them, outside every check the Business API makes ([#415](https://github.com/sgort/ronl-business-api/issues/415)). The VM engine is now pinned to Operaton 1.0.0 with REST authentication and its own permission checks on, and its CORS off. Reading the rules — definitions, their XML, deployments and their resources — and evaluating a decision stay public: the reverse proxy forwards such a request, when it carries no credentials of its own, as a read-only account the engine itself limits to exactly that. Everything else needs the caller's own credentials. The proxy sets a single `Access-Control-Allow-Origin: *` on the public paths only, and strips the engine's copy, which browsers would otherwise reject as a double header. A test harness in `deployment/vm/operaton/test/` runs the same engine version and proxy and proves the rules: 22 engine checks and 57 proxy checks.
+
+**Every caller sends credentials, and a deployment without them does not start.** The backend's external-task worker posted fetch-and-lock, complete and failure without credentials; it now uses `OPERATON_USERNAME` and `OPERATON_PASSWORD` like the rest of the backend, and `validateConfig` refuses a production start (ACC and PROD both run `NODE_ENV=production`) without them. `GET /v1/decision/:key` used a bare request without credentials; it now goes through `OperatonService`. Every value the service places in an engine URL path goes through `engineSegment()` — encoded, with `.` and `..` refused — because the backend calls the engine as an administrative account and Express has already decoded route parameters.
+
+**The local engine behaves like the VM's.** `docker compose up` gives the local Operaton the same login and permission checks, switches off the invoice example (which does not start on an empty database with authorization on), and runs a new one-shot, `operaton-accounts`, which provisions local service accounts with the same script as the VM. The E2E helpers and the RIP scripts send credentials too; they default to the stack's local admin only for a local engine and stop with a message anywhere else.
+
+**Also in this release.** The project carries the EUPL v1.2 as a `LICENSE` file. follow-redirects 1.16.2 for an advisory in the backend's runtime tree, under the `.npmrc` urgent-security exception; the GitHub Actions `setup-node` 7.1.0, `upload-artifact` 7.0.2 and `zizmor-action` 0.8.0; the Keycloak compose files' Postgres image pinned by digest; prettier 3.9.10, concurrently 10.0.6, `@testing-library/user-event` 14.6.8 and alpine 3.24.3 in the local stack.
+
+**Found while documenting it.** The temporary access log the rollout added to the engine's proxy block is still in `deployment/vm/caddy/Caddyfile`, and the VM's Caddy image is a floating `caddy:2-alpine` while the harness pins 2.10.2.
+
+---
+
+## v2026.11.0 — Flevoland's Colours, and Every Dashboard Scanned for Accessibility (November 2026)
+
+> Tenant themes: [Municipality themes](../reference/municipality-themes.md). How the styles are organised: [Frontend development](frontend-development.md#styling-guidelines). The login theme: [Keycloak deployment](deployment/keycloak.md). The scans: [E2E](testing/e2e.md).
+
+**The Flevoland tenant takes Flevoland's own palette.** Flevoland IT's token file lives in `packages/shared/styles/flevoland/`, and the shared `--rba-*` tokens point at its semantic tokens when `<html>` carries `data-tenant="flevoland"`, which the theme loader now sets. Navy text, Material greys, a `#f8f8f8` page, Flevoland's status colours, and yellow fills with dark text; pink stays for accent text and lines. Tailwind's gray, slate, red, green, blue, amber, orange and yellow scales point at `--twc-*` variables whose defaults are Tailwind's own, so other tenants render as before. Every neutral, brand and status colour in the stylesheets and inline styles now comes from the tokens: hex values went from 369 to 22, all data and category colours, and a test fails CI on any new one.
+
+**The sign-in path has one look.** Keycloak cannot tell tenants apart before sign-in, so its login page takes Flevoland's colours, from a copy of the token file kept in step by `npm run sync:keycloak-tokens` and a test. The *Verbinding maken...* screen uses the same blues instead of flashing Tailwind's lighter blue on the way back from Keycloak or Entra ID. The theme now exists once, in `keycloak-themes/ronl/`; the unmounted copy under `deployment/vm/keycloak/themes/` is gone, and the PROD compose file mounts the themes as the VM does.
+
+**One stylesheet for the dashboard chrome.** The 294 declarations Caseworker V2 and PA-Cockpit had in common live once in `packages/shared/styles/v2-chrome.css`; `npm run check:css-move` proves such a move changes no cascade, per tenant, and `npm run check:css-equivalence` that no colour moves by more than ΔE2000 1.0.
+
+**Accessibility is checked in the E2E suite.** `accessibility.spec.ts` scans ten page types with axe-core at WCAG 2.0–2.2 levels A and AA — the landing page, the sign-in screen, three Keycloak forms, the four Flevoland dashboards and Caseworker V2 for Heusden. A critical or serious violation fails unless it is listed in `e2e/a11y-baseline.ts`, and a listed one that no longer occurs fails too. The first run against ACC found the PA-Cockpit score total at 4.23:1 contrast; it now reads 6.13:1.
+
+**Found while documenting it.** The release notes call the ⌘K search hint "fixed in #405", but [#405](https://github.com/sgort/ronl-business-api/issues/405) is still open and `e2e/a11y-baseline.ts` lists the hint as a known finding on all five dashboards.
+
+---
+
+## v2026.10.4 — An Offline Source Says So, and the Assistant Joins the E2E Suite (October 2026)
+
+> The assistant: [MCP AI Assistant](mcp-ai-assistant.md), [LLM providers](llm-provider-architecture.md). Settings: [Environment variables](../reference/environment-variables.md). The Node versions: [CI/CD](cicd.md).
+
+**A source that cannot connect is shown offline instead of breaking every chat.** The CPRMV server had stopped serving its MCP endpoint, but its provider had set its client before the connect failed, so `/v1/mcp/sources` reported it connected, the dock preselected it, and every chat failed with "Not connected". All five providers now close and clear a half-open client when connect fails, so the source shows *(offline)* and cannot be selected; and `McpRegistry` leaves out a connected source whose tool listing throws, so a provider dying mid-session cannot take a chat down ([#396](https://github.com/sgort/ronl-business-api/issues/396)).
+
+**CPRMV's tools follow their new names.** fastmcp 4, which CPRMV now pins, names its three tools `rules_rules`, `ref_ref_get` and `celex_cellar_by_celex`. The allowlist uses those names, and logs a warning naming the missing and the listed tools when an allowed one is absent, so the next rename shows in the startup log ([#397](https://github.com/sgort/ronl-business-api/issues/397)).
+
+**A stub model lets the E2E suite chat.** `StubLlmProvider` calls nothing external and answers *"Stub model: received N tools."*, while the chat still runs through the real MCP registry. It is offered only with `LLM_STUB_ENABLED=true`, registered last so it is never the default, and refused at start-up on a production tier. `assistant.spec.ts` asks it a question through the dock and reports any offline source in the Playwright report.
+
+**Node and dependencies.** `.nvmrc` moves to Node 22.23.4 and the workflows' tooling Node to 24.22.1, the releases that fix CVE-2026-111497. `@modelcontextprotocol/sdk` ^1.32.1 closes four advisories; a lockfile refresh brings the production advisories from 30 to 2, under the `.npmrc` urgent-security exception ([#394](https://github.com/sgort/ronl-business-api/issues/394), the rest in [#395](https://github.com/sgort/ronl-business-api/issues/395)). The release SBOM is generated with the npm the SBOM workflow uses, so the strict check no longer fails on the tool field alone. stylelint 17.16.
+
+---
+
+## v2026.10.3 — One Process View for Every Dashboard, and the Projects Between Phases (October 2026)
+
+> What a user sees: [Infra-board](../user-guide/infra-board.md), [Caseworker](../user-guide/caseworker.md). How it is built: [Frontend development](frontend-development.md#the-process-view).
+
+**ProcessView draws every BPMN diagram the same way.** `components/process/ProcessView.tsx` combines a stepper slot, title bar, legend and swimlane; a dashboard passes the data, and the viewer comes from the Keycloak token (`useViewer`). The marks on tasks, the viewer's lanes and the legend are derived in `processMarks.ts`, and the legend lists only what the diagram shows. The Caseworker overview moved onto it first, then the Infra-board's project page, which so gains the Caseworker look: *jouw rol* on the viewer's lanes, *jouw taak* on the viewer's own task, *geclaimd* on a colleague's, a dashed outline on every task that is not the viewer's. The separate Caseworker styling of the swimlane is gone ([#277](https://github.com/sgort/ronl-business-api/issues/277), closed), and `process-view-guard.test.ts` fails when anything outside `components/process` imports the swimlane directly.
+
+**Gateways say what they are.** A decision is a diamond with a question mark and its question above it; a parallel split or join is a bar captioned *tegelijk* or *alles klaar*; an exclusive merge is a small dot. The Caseworker's step list names an unnamed gateway by its kind instead of its element id. *Procesgegevens* is folded by default in both task panels, and claiming a task on the Infra-board refreshes its open tasks at once.
+
+**The portfolio keeps the projects between phases.** It was fed only by running instances, so a project that had finished a phase but not started the next dropped out of it. `GET /v1/rip/phases/completed` returns every phase's finished instances under the same rules as `/phases/active`, and the portfolio draws a project's furthest finished phase as *wachtend* until it runs again: *Wacht op start van* and the next phase, or *RIP afgerond* after R6.1 ([#383](https://github.com/sgort/ronl-business-api/pull/383)).
+
+**The decision document fallback splits a list.** When no completed user task carries a reference, `getDecisionDocument` now takes the first entry of a comma-separated `ronl:documentRef` instead of the whole string ([#371](https://github.com/sgort/ronl-business-api/issues/371), found while documenting v2026.10.2).
+
+**Shared design tokens, and stylelint reporting.** `packages/shared/styles/tokens.css` holds the `--rba-*` tokens the caseworker app and PA-Cockpit load; 192 hex values became tokens without a visual change. Stylelint runs report-only (`npm run lint:css`, `lint:css:summary`), in no workflow or hook. A Semgrep false positive on the eDOCS author merge is suppressed inline with its reason.
+
+---
+
 ## v2026.10.2 — Every Dependency Weighed, Signatures Verified, and the Decision Document of the Path Taken (October 2026)
 
 > The workflows: [CI/CD](cicd.md). The document a case produces: [Frontend development](frontend-development.md). Multi-output decisions: [BPMN Design Criteria](../reference/bpmn-design-criteria.md). Measured suites: [Testing](testing/overview.md).
@@ -24,7 +86,7 @@ component: RONL Business API
 
 **Also in this release.** lint-staged 17.6, and an unused helper removed from `dependency-review.mjs`.
 
-**Found while documenting it.** The decision document's fallback takes the first `ronl:documentRef` as written and does not split a comma-separated list, where the path-taken rule does ([#371](https://github.com/sgort/ronl-business-api/issues/371)).
+**Found while documenting it.** The decision document's fallback takes the first `ronl:documentRef` as written and does not split a comma-separated list, where the path-taken rule does ([#371](https://github.com/sgort/ronl-business-api/issues/371)) — fixed in v2026.10.3.
 
 ---
 
@@ -1663,6 +1725,12 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 | Background archiving records "namens" the employee | v2026.10.1 |
 | [A board opens with the Flevoland account, and a refused board is explained](deployment/entra-id.md) | v2026.10.1 |
 | Lockfile review required on `acc` | v2026.10.1 |
+| [One process view for every dashboard — legend, marks and gateway shapes shared by the Caseworker and the Infra-board](frontend-development.md#the-process-view) | v2026.10.3 |
+| [The Infra-board portfolio keeps projects waiting between phases](../user-guide/infra-board.md) | v2026.10.3 |
+| [An offline assistant source is shown as offline; the assistant runs in the E2E suite on a stub model](mcp-ai-assistant.md) | v2026.10.4 |
+| [Flevoland's palette for the Flevoland tenant, through shared tokens](../reference/municipality-themes.md) | v2026.11.0 |
+| [Accessibility scans with axe-core on every page type](testing/e2e.md) | v2026.11.0 |
+| [The process engine's REST API requires a login; reading and evaluating the rules stays public](deployment/operaton.md) | v2026.11.1 |
 
 !!! note "This table has a gap"
     Rows run from v1.0.0 to v3.0.7 and then jump to the September 2026 entries

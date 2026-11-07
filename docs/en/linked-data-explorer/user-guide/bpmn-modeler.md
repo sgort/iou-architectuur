@@ -51,7 +51,7 @@ Select a **BusinessRuleTask** on the canvas. The properties panel on the right s
    - **🔗 DRDs (Unified Chains)** — DRD templates saved from the Chain Builder
    - **📋 Single DMNs** — individual decision models from the active TriplyDB endpoint
 3. Select an option. The `camunda:decisionRef` field auto-populates with the correct identifier and a suggested `camunda:resultVariable` value appears.
-4. An info card confirms your selection. DRD cards show the constituent DMNs the DRD combines; single DMN cards show the decision identifier.
+4. An info card confirms your selection. DRD cards show the constituent DMNs the DRD combines; single DMN cards show the decision identifier and, when published, the services the decision's service requires and is required by.
 
 ---
 

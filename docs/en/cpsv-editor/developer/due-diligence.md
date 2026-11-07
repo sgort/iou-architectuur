@@ -26,7 +26,7 @@ Form-based authoring of CPSV-AP 3.2.0 compliant service descriptions. Ten tabs c
 
 | Tab | What it captures | Key standards |
 |---|---|---|
-| Service | Identifier, name, description, sector, thematic area, keywords | CPSV-AP, DCAT |
+| Service | Identifier, name, description, sector, thematic area, keywords, required services (`dct:requires`) | CPSV-AP, DCAT |
 | Organization | Competent authority, homepage, geographic jurisdiction, logo | CV, FOAF, ORG |
 | Legal | BWB/CVDR legislation reference, version, RONL analysis & method concepts | ELI, SKOS, RONL vocabulary |
 | Rules | Temporal business rules with validity periods and confidence levels | CPRMV 0.4.1 |
@@ -36,7 +36,7 @@ Form-based authoring of CPSV-AP 3.2.0 compliant service descriptions. Ten tabs c
 | Cost / Output | Service cost and output descriptions (embedded in Service tab) | CV |
 | Changelog | Version history tracking | Custom |
 
-Additional capabilities: TTL import with full round-trip fidelity (`parseTTL.enhanced.js`, ~810 lines), TTL export with live preview, form validation, CPRMV JSON import, and a "clear all" reset.
+Additional capabilities: TTL import with full round-trip fidelity (`parseTTL.enhanced.js`, ~840 lines), TTL export with live preview, form validation, CPRMV JSON import, and a "clear all" reset.
 
 ### 2 — Vendor Integration
 
@@ -105,13 +105,13 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 | Frontend | React 19, Vite, Tailwind CSS, Lucide icons |
 | State management | React hooks (`useEditorState`, `useArrayHandlers`), no external state library |
 | Build & lint | Vite, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
-| Testing | Vitest 5, `@testing-library/react`, Playwright — 776 tests across 62 files, all passing (measured 10 October 2026), at 90.28% statements, 88.42% branches, 78.92% functions and 90.96% lines; plus 4 end-to-end journeys ([Testing](testing.md)) |
+| Testing | Vitest 5, `@testing-library/react`, Playwright — 812 tests across 65 files, all passing (measured 7 November 2026), at 90.55% statements, 88.75% branches, 79.80% functions and 91.19% lines; plus 4 end-to-end journeys ([Testing](testing.md)) |
 | TTL parsing | Custom hand-written parser (no RDF library dependency) |
 | DMN parsing | Browser DOMParser (XML) |
 | External APIs | TriplyDB REST + SPARQL, Operaton REST (Camunda-compatible), RONL SPARQL vocabulary |
-| Backend dependency | Shared Express server (Linked Data Explorer repo) for CORS-proxied SPARQL queries, TriplyDB service updates, and DMN syntactic validation (libxmljs2) |
+| Backend dependency | Shared Express server (Linked Data Explorer repo) for CORS-proxied SPARQL queries (the RONL vocabulary and the published-services list), TriplyDB service updates, DMN syntactic validation (libxmljs2), DMN deploy and evaluate, pre-publish SHACL validation and the DSO import |
 | Hosting | Azure Static Web Apps (acc branch → acceptance, main → production) |
-| CI/CD | GitHub Actions: lint, tests and the production build on the runner (Node 24.21.0 from `.nvmrc`), uploaded to Azure Static Web Apps with `skip_app_build`; on every pull request a required lockfile review and verification of registry signatures and provenance attestations; a daily dependency audit, a quarterly dependency review, and an SBOM per release of every production package ([Deployment](deployment.md)) |
+| CI/CD | GitHub Actions: lint, tests and the production build on the runner (Node 24.22.1 from `.nvmrc`), uploaded to Azure Static Web Apps with `skip_app_build`; on every pull request a required lockfile review and verification of registry signatures and provenance attestations; a daily dependency audit, a quarterly dependency review, and an SBOM per release of every production package ([Deployment](deployment.md)) |
 
 ---
 
@@ -121,7 +121,7 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 
 **What to assess:**
 
-- **No RDF library.** TTL parsing and generation are entirely hand-written (a ~810-line parser and a ~1,640-line generator). This works but is fragile for edge cases. Evaluate whether introducing a lightweight RDF/JS library (e.g. N3.js) would reduce maintenance burden vs. the cost of migration.
+- **No RDF library.** TTL parsing and generation are entirely hand-written (a ~840-line parser and a ~1,660-line generator). This works but is fragile for edge cases. Evaluate whether introducing a lightweight RDF/JS library (e.g. N3.js) would reduce maintenance burden vs. the cost of migration.
 
 - **App.jsx orchestration.** The main `App.jsx` (1,243 lines) has been partially modularized: data state lives in `useEditorState`, array CRUD operations in `useArrayHandlers`, TTL import logic in `importHandler.js`, and TTL generation in `ttlGenerator.js`. What remains in App.jsx is UI orchestration (tab rendering, message/status management), the publish workflow (~300 lines of step-by-step progress tracking), and glue code wiring state to child components. Further extraction targets: the publish handler could become a custom hook (`usePublishWorkflow`), and the tab navigation + message system could be separated from the data wiring.
 
@@ -129,7 +129,7 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 
 - **localStorage for config.** TriplyDB credentials are stored in localStorage. Fine for a prototype, but for a production tool used across teams, consider a proper secrets/config management approach.
 
-- **Shared backend.** The Express backend is owned by the Linked Data Explorer repo. The CPSV Editor depends on it for three things: CORS-proxied SPARQL queries (RONL vocabulary), TriplyDB service re-indexing, and DMN syntactic validation (the five-layer validator uses libxmljs2, which requires a Node.js runtime). Any changes to the backend affect the CPSV Editor. Clarify ownership, versioning (API v1 header is already in place), and deployment coupling.
+- **Shared backend.** The Express backend is owned by the Linked Data Explorer repo. The CPSV Editor depends on it for CORS-proxied SPARQL queries (the RONL vocabulary, and since v2026.11.0 the public services published to the dataset), TriplyDB service re-indexing, DMN syntactic validation (the five-layer validator uses libxmljs2, which requires a Node.js runtime), DMN deploy and evaluate against Operaton, pre-publish SHACL validation, and the DSO import. Any changes to the backend affect the CPSV Editor. Clarify ownership, versioning (API v1 header is already in place), and deployment coupling.
 
 - **Separation opportunity.** The four domains (editor, vendor, publishing, DMN) are loosely coupled via the shared editor state. A modular architecture — whether as separate routes/lazy-loaded modules within the SPA, or as independent micro-frontends sharing a TTL data contract — would improve maintainability and allow independent release cycles. A first step in that direction has landed: since v2026.09.2 the four heaviest tabs — `ChangelogTab`, `CPRMVTab`, `DMNTab` and `VendorTab` — are lazy-loaded, taking the entry chunk from 685.71 to 392.74 kB.
 

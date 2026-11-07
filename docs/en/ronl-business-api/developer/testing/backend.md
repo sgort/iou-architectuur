@@ -4,23 +4,23 @@ component: RONL Business API
 
 # Backend suite
 
-`packages/backend`, Jest with the `ts-jest` preset. **105 files · 2638 tests ·
-all passing · nothing skipped · `Time: 110.806 s`** under `--runInBand`,
-followed by *"✓ all 136 documented operations were checked against a real
+`packages/backend`, Jest with the `ts-jest` preset. **109 files · 2681 tests ·
+all passing · nothing skipped · `Time: 137.576 s`** under `--runInBand`,
+followed by *"✓ all 137 documented operations were checked against a real
 response"*. Coverage is on by default; see
 [Coverage](coverage.md#backend-by-area) for the per-area figures.
 
-Measured on **11 October 2026** for v2026.10.2 — the release in production,
-`main` at `7117914` — with `npx jest --coverage --runInBand` followed by
+Measured on **7 November 2026** for v2026.11.1 — the release in production,
+`main` at `35fb3a8` — with `npx jest --coverage --runInBand` followed by
 `node scripts/check-conformance-coverage.cjs`, which is exactly what
 `npm run test:serial --workspace=packages/backend` runs, in the working
-checkout on `acc` at `c51ec0a` (a tree identical to `7117914`) after
-`npm run deps:check` reported *"Dependencies are ready."*, on Node 22.23.3,
+checkout on `acc` at `c6cf3ac` (a tree identical to `35fb3a8`) after
+`npm run deps:check` reported *"Dependencies are ready."*, on Node 22.23.4,
 the version `.nvmrc` names. The package total is the runner's own. The
 per-file and per-area counts are not printed by Jest's default reporter, so
-on 11 October they were read from Jest's JSON report of the same run
-(`--json`), which lists every test of every file; the 105 files sum to the
-runner's 2638. Through 9 October every file's count was parsed from its
+they were read from Jest's JSON report of the same run (`--json`), which
+lists every test of every file; the 109 files sum to the runner's 2681, as
+the 105 did to 2638 on 11 October. Through 9 October every file's count was parsed from its
 source with the TypeScript compiler, `.each` tables and literal `for … of`
 loops expanded — never a grep for `it(`, which miscounts parameterised and
 multi-line cases. Two tables are not literals and were resolved by hand:
@@ -34,9 +34,11 @@ runner's 2633 exactly at `ebec288`, and 2457 and every per-area figure the
     `&& node scripts/check-conformance-coverage.cjs`. Jest runs the suite as
     before; the script then fails the run unless **every operation in the
     OpenAPI document was compared against a real response** at least once. On
-    11 October it printed *"✓ all 136 documented operations were checked
-    against a real response"* — the same number as on 3 and 9 October.
-    v2026.10.2 documented no operation and removed none; it rewrote the
+    7 November it printed *"✓ all 137 documented operations were checked
+    against a real response"*: v2026.10.3 documented
+    `GET /v1/rip/phases/completed`, the finished instances of every RIP phase
+    the Infra-board portfolio reads. On 11 October it was 136, as on 3 and
+    9 October: v2026.10.2 documented no operation and removed none; it rewrote the
     description of `/v1/process/{instanceId}/decision-document` and its
     `/v1/m2m` twin to say which document they return. On 9 October the
     number held by one in and one out: v2026.10.1 documented
@@ -46,21 +48,36 @@ runner's 2633 exactly at `ebec288`, and 2457 and every per-area figure the
     404. On 3 October it was 133 from 30 September plus the two Besluitvorming
     lists and `POST /v1/m2m/process/history`.
 
-    **That figure, and 2638 / 105, are this package's alone.** The repository
-    runs **331 test files and 5074 tests** across five workspaces — see
+    **That figure, and 2681 / 109, are this package's alone.** The repository
+    runs **348 test files and 5318 tests** across five workspaces — see
     [Overview](overview.md). Quoting the backend's count as a repository total
     understates the suite by over two thousand tests.
 
-!!! note "2011 → 2008 → 2028 → 2072 → 2198 → 2202 → 2370 → 2457 → 2633 → 2638, and nothing was lost on the way"
+!!! note "2011 → 2008 → 2028 → 2072 → 2198 → 2202 → 2370 → 2457 → 2633 → 2638 → 2681, and nothing was lost on the way"
     The suite reported **2011** for several releases, of which 2008 ran and
     **three were permanently skipped**. Those three guarded the
     `PHASE_NOT_MODELLED` branch of the RIP phase model. v2026.09.7 made an
     unmodelled phase unrepresentable (issue #85), the branch went, and the
     three skipped cases went with it — a deletion of dead tests rather than a
-    regression. The **2638** measured here is growth on that 2008 base. No
+    regression. The **2681** measured here is growth on that 2008 base. No
     workspace in this repository skips anything.
 
-    **v2026.10.2 added +5 tests and no file** against the 9 October
+    **v2026.10.3 to v2026.11.1 added +43 tests and four files** against the
+    11 October measurement of v2026.10.2 (105 files, 2638) — 19 in the new
+    files and 24 in existing ones:
+
+    | File | Tests | What changed |
+    |---|---:|---|
+    | `utils/engine-segment.test.ts` | **8** (new) | `engineSegment()`: encoding, `:` kept for definition IDs, an empty value, `.` and `..` refused (v2026.11.1) |
+    | `utils/operaton-auth.test.ts` | **5** (new) | `operatonBasicAuth()`, the credentials the external-task worker sends (v2026.11.1) |
+    | `services/llm/StubLlmProvider.test.ts` | **3** (new) | The E2E suite's stub model: listed only with the flag, the fixed reply naming the tool count (v2026.10.4) |
+    | `utils/config.llmStub.test.ts` | **3** (new) | The flag, and the refusal to start with it on in production (v2026.10.4) |
+    | `services/operaton.service.test.ts` | 197 → **203** | `firstDocumentRef` splitting a `documentRef` list (#371), encoded path values, and `getDecisionDefinition` (v2026.10.3, v2026.11.1) |
+    | `src/routes` (`rip.routes`, `decision.routes`) | 702 → **708** | `GET /v1/rip/phases/completed`; `GET /v1/decision/:key` through the service |
+    | `src/services` other files | +10 | Credentials on every worker call; a failed connect clearing the client in each of the five MCP providers; `McpRegistry` leaving out a source whose listing throws; CPRMV's fastmcp-4 tool names and the missing-tool warning |
+    | `utils/config.test.ts` | **42** (+2) | `OPERATON_USERNAME` and `OPERATON_PASSWORD` required in production |
+
+    **History: v2026.10.2 added +5 tests and no file** against the 9 October
     measurement of v2026.10.1 (105 files, 2633), all five in one file:
 
     | File | Tests | What changed |
@@ -177,18 +194,18 @@ per-file 80% branch floor in `jest.config.js` rides along with it rather than
 needing a coverage job of its own — and so do the OpenAPI coverage gate, an
 ordinary test file, and the conformance-coverage check that `npm test` runs
 after Jest. Since v2026.09.7 `azure-backend-acc.yml` also
-triggers on `pull_request`, so these 2638 tests run *before* a merge rather than
+triggers on `pull_request`, so these 2681 tests run *before* a merge rather than
 only after one — and since **19 September 2026 that run is a required check**,
 so a red backend suite now blocks the merge to `acc` outright. See
 [Overview → What actually gates a merge](overview.md#what-actually-gates-a-merge).
 
 | Area | Files | Tests |
 |---|---:|---:|
-| `src/routes` | 21 | 702 |
-| `src/services` | 28 | 652 |
+| `src/routes` | 21 | 708 |
+| `src/services` | 29 | 671 |
 | `src/pa-monitoring` | 16 | 583 |
 | `src/rip-swimlane` | 2 | 206 |
-| `src/utils` | 15 | 150 |
+| `src/utils` | 18 | 168 |
 | `src/media-aggregator` | 8 | 112 |
 | `src/auth` | 4 | 88 |
 | `src/mcp-servers` | 3 | 63 |
@@ -196,13 +213,13 @@ so a red backend suite now blocks the merge to `acc` outright. See
 | `src/middleware` | 4 | 39 |
 
 !!! success "Both columns are current, and they sum"
-    Re-derived on 11 October 2026: the Files column accounts for all **105**
-    files and the Tests column sums to **2638**, the measured total, every
+    Re-derived on 7 November 2026: the Files column accounts for all **109**
+    files and the Tests column sums to **2681**, the measured total, every
     file's count read from Jest's JSON report of the measured run (see the
     note at the top of this page). Earlier versions of this page carried a
     Files column from one date and a Tests column from another that fell
     274 short, with a warning attached; that gap is closed and has stayed
-    closed across eight re-derivations.
+    closed across nine re-derivations.
 
     **One area moved in v2026.10.2, and no file was added**: `src/services`
     647 → **652**, on `operaton.service.test.ts`. The other nine are

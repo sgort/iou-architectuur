@@ -4,9 +4,9 @@ component: RONL Business API
 
 # Shared Package
 
-`packages/shared` (`@ronl/shared`) carries the TypeScript types and constant data shared across the workspace — and, deliberately, no logic at all. It has no runtime dependencies and must be built before a consuming package can be built or type-checked.
+`packages/shared` (`@ronl/shared`) carries the TypeScript types and constant data shared across the workspace, and since v2026.10.3 the shared stylesheets — and, deliberately, no logic at all. It has no runtime dependencies and must be built before a consuming package can be built or type-checked.
 
-It is consumed by the backend, the frontend and the PA-demo. The demo's imports are **type-only** and erased before the bundler sees them, so a shared-only change cannot alter its compiled output — but `packages/shared/**` still appears in the demo's CI path filter, so that a breaking type change fails there rather than surfacing later at an unrelated pull request.
+It is consumed by the backend, the frontend and the PA-demo. The demo's TypeScript imports are **type-only** and erased before the bundler sees them, but since v2026.11.0 it also imports `@ronl/shared/styles/v2-chrome.css` (`packages/pa-demo/src/App.tsx`), so a change to the shared stylesheets does alter its build. `packages/shared/**` is in the demo's CI path filter either way.
 
 !!! note "This is not the only workspace package"
     [`@ronl/pa-cockpit`](pa-cockpit-package.md) is the other one: the Public Affairs cockpit, imported by both the caseworker frontend and the public demo. Unlike `shared` it ships React components and carries a host contract.
@@ -99,6 +99,18 @@ export const CITIZEN_SERVICES = [
 ```
 
 An `own-tenant` service is offered only when its process is deployed under the citizen's own tenant; a `cross-tenant` service is offered to every citizen when exactly one tenant deploys it, and that tenant handles the case (Zorgtoeslag at Dienst Toeslagen). The backend derives the dashboard's cards from it (`GET /v1/process/available`) and uses it to decide whether a citizen's start may land under another tenant than their own; the frontend gives each id its label, icon and form (`pages/citizen/citizenServiceUi.ts`). `CitizenServiceId` and `CitizenServiceScope` are derived from the same constant.
+
+### Stylesheets
+
+`packages/shared/styles/` is imported by path (`@ronl/shared/styles/…`), not built:
+
+| File | What it holds | Loaded by |
+|---|---|---|
+| `tokens.css` | One `:root` block of `--rba-*` design tokens: Flevoland's fixed brand colours, the themed brand chained to the tenant's `--color-primary`, neutrals, status colours by role and fill tokens; under `:root[data-tenant="flevoland"]` they point at Flevoland IT's semantic tokens | The frontend (`App.tsx`) and PA-Cockpit (`styles.css`), and so the PA-demo |
+| `v2-chrome.css` | The dashboard chrome Caseworker V2 and PA-Cockpit share, as grouped rules on the tokens | The frontend and the PA-demo, first, in their `App.tsx` |
+| `flevoland/` | Flevoland IT's `tokens.css` and its element styles (`base.css`, kept for the next step of the Flevoland look, [#405](https://github.com/sgort/ronl-business-api/issues/405)) | Through `tokens.css` |
+
+See [Frontend development — Styling guidelines](frontend-development.md#styling-guidelines) for the rules and the tests that hold them.
 
 ---
 

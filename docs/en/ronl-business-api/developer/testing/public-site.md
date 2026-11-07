@@ -5,9 +5,18 @@ component: RONL Business API
 # Public site suite
 
 `packages/public-site`, Vitest with jsdom. **34 files · 275 tests · all
-passing · 71.32s** without file parallelism.
+passing · 69.20s** without file parallelism.
 
-!!! success "Re-measured at v2026.10.1: nothing changed, and the figures held"
+!!! success "Re-measured at v2026.11.1: nothing changed, and the figures held"
+    Re-run on **7 November 2026** for v2026.11.1 (`main` at `35fb3a8`), in the
+    working checkout on `acc` at `c6cf3ac`, a tree identical to `35fb3a8`,
+    serially with coverage on Node 22.23.4: **34 files · 275 tests · all
+    passing · `Duration 69.20s`**, coverage **96.68 / 97.41 / 95.09 / 97.23** —
+    every figure as on 9 and 11 October. The four releases since did not
+    touch this package's tests; v2026.11.0's colour work leaves the public
+    site out on purpose (its stylesheets are exempt from the token rules).
+
+!!! note "History: re-measured at v2026.10.1, nothing changed, and the figures held"
     Re-run on **9 October 2026** for v2026.10.1 (`main` at `ebec288`), in the
     working checkout on `acc` at `0ea4985`, a tree identical to `ebec288`,
     with `npm run test:serial --workspace=packages/public-site` on
@@ -156,6 +165,13 @@ margin had narrowed from 0.63 of a point to 0.39 by 28 September; the
 preservation, a deep link with pre-applied filters, keyboard-only navigation,
 and three axe-core accessibility scans (home, results, a detail page) asserting
 no critical or serious violations.
+
+!!! success "Re-run on 7 November 2026: 6 passed with one worker"
+    **Measured 7 November 2026 for v2026.11.1** with `--workers=1`, against
+    the developer's already-running backend: **6 passed in 20.8s**, every
+    test between 0.7s and 6.2s. No default parallel run was made this time,
+    so whether the two search-journey timeouts below still occur under six
+    workers is not re-measured. The spec is unchanged since `2443adc`.
 
 !!! warning "Re-run on 9 October 2026: 6/6 serially, 2 timeouts in the parallel run — as on 3 October"
     **Measured 9 October 2026 for v2026.10.1**, against the developer's

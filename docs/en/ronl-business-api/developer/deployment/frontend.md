@@ -69,6 +69,7 @@ on:
       - 'packages/frontend/**'
       - 'packages/shared/**'
       - 'packages/pa-cockpit/**'
+      - 'keycloak-themes/**'
       - '.github/workflows/azure-frontend-acc.yml'
       - 'package-lock.json'
       - 'package.json'
@@ -110,7 +111,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
 
@@ -184,10 +185,12 @@ jobs:
 **Triggers:**
 
 - A push to `acc` that changes `packages/frontend/**`, `packages/shared/**`,
-  `packages/pa-cockpit/**`, the root `package-lock.json` or `package.json`,
-  `.nvmrc` or the workflow file itself. The root lockfile and manifest are
-  there because every workspace resolves through them: a lockfile-only change
-  moves this app's dependencies too.
+  `packages/pa-cockpit/**`, `keycloak-themes/**`, the root `package-lock.json`
+  or `package.json`, `.nvmrc` or the workflow file itself. The root lockfile and
+  manifest are there because every workspace resolves through them: a
+  lockfile-only change moves this app's dependencies too. The Keycloak login
+  theme is there since v2026.11.0 because its guard tests (`keycloak-theme.test.ts`,
+  `css-hex.test.ts`) run in this suite; the theme itself is not deployed by it.
 - Every pull request to `acc`, with no path filter on the trigger: the
   `changes` job applies the same paths, so the required check **Build and
   Deploy ACC Frontend** reports on every pull request. A pull request is
@@ -298,7 +301,7 @@ git push origin acc
 The workflow automatically:
 
 1. Checks out code
-2. Sets up Node.js from `.nvmrc` (22.23.3)
+2. Sets up Node.js from `.nvmrc` (22.23.4)
 3. Installs dependencies with `npm ci` and builds `@ronl/shared`
 4. Lints, then runs the PA cockpit tests, the frontend tests and the
    performance budget

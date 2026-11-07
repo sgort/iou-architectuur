@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # Service, Organisation & Legal Definition
 
 The editor's three foundational tabs — Service, Organisation, and Legal — cover the mandatory descriptive metadata required by CPSV-AP 3.2.0 for any Dutch government public service.
@@ -8,7 +12,7 @@ The editor's three foundational tabs — Service, Organisation, and Legal — co
 
 The Service tab captures metadata about the public service itself, modelled as `cpsv:PublicService`. This is the anchor entity that all other data links to.
 
-Key fields include the service's unique identifier (used to construct RDF URIs throughout the document), its official title and description, thematic classification, sector (government level), language, keywords, and cost and output specifications.
+Key fields include the service's unique identifier (used to construct RDF URIs throughout the document), its official title and description, thematic classification, sector (government level), language, keywords, the services it requires, and cost and output specifications.
 
 The identifier field has special significance: the editor sanitises it automatically, replacing spaces with hyphens and removing invalid URI characters. The resulting value is used as the base for every URI in the exported Turtle file, so a stable, descriptive identifier is important.
 
@@ -18,6 +22,8 @@ The identifier field has special significance: the editor sanitises it automatic
 </figure>
 
 The **Cost** and **Output** sections within the Service tab implement `cv:Cost` and `cv:Output` from CPSV-AP 3.2.0, allowing services to document fees and the deliverables citizens receive.
+
+**Required services** (`dct:requires`, CPSV-AP's *requires* on a public service) record which other public services this one relies on — a subsidy amount, say, that is only computed once the right to the subsidy has been established. The editor offers the public services already published to the configured TriplyDB dataset, read through the Linked Data Explorer backend's SPARQL proxy without credentials, and accepts a pasted URI for one that is not published yet. The relation is context only: execution order and conditions live in the BPMN. The exported Turtle carries one `dct:requires` per service and no stub for the required service, which is described in its own graph — so the file-local SHACL check reports one advisory class error on `dct:requires` ([linked-data-explorer#315](https://github.com/sgort/linked-data-explorer/issues/315)), which does not block publishing.
 
 ---
 

@@ -6,7 +6,7 @@ component: Linked Data Explorer
 
 The LDE backend integrates with **OpenText eDOCS** — the document management system used by Province of Flevoland — to automatically file process documents into project workspaces as part of the RIP Phase 1 workflow.
 
-The integration uses the **external task pattern**: Operaton polls the LDE backend worker via `fetchAndLock` rather than the backend calling Operaton. This keeps the coupling loose and makes the integration resilient to temporary eDOCS unavailability.
+The integration uses the **external task pattern**: the LDE backend's worker polls Operaton with `fetchAndLock` for tasks on its topics, and completes or fails each one itself, rather than Operaton calling the backend. Every one of those calls logs in with the engine credentials (`OPERATON_USERNAME` and `OPERATON_PASSWORD`, since v2026.11.1). This keeps the coupling loose and makes the integration resilient to temporary eDOCS unavailability.
 
 ---
 
@@ -19,7 +19,7 @@ sequenceDiagram
     participant E as EdocsService
     participant D as eDOCS REST API
 
-    O->>W: fetchAndLock (topic: rip-edocs-workspace)
+    W->>O: fetchAndLock (topic: rip-edocs-workspace)
     W->>E: ensureWorkspace(projectNumber, projectName)
     E->>D: POST /connect → X-DM-DST token
     E->>D: GET /workspaces?filter=projectNumber
@@ -31,7 +31,7 @@ sequenceDiagram
     E-->>W: { workspaceId, workspaceName, created }
     W->>O: complete task (sets edocsWorkspaceId)
 
-    O->>W: fetchAndLock (topic: rip-edocs-document)
+    W->>O: fetchAndLock (topic: rip-edocs-document)
     W->>E: uploadDocument(workspaceId, filename, content, metadata)
     E->>D: POST /documents (with _restapi.ref.id: workspaceId)
     D-->>E: { DOCNUMBER: "2993898" }

@@ -97,6 +97,7 @@ in `src/utils/constants.js`).
 | `dct:title` | Any | Literal | 1..n | Language-tagged (`@nl`) |
 | `dct:description` | Any | Literal | 0..n | Language-tagged (`@nl`) |
 | `dct:language` | PublicService | URI | 0..n | LinguisticSystem URI; the referenced node is typed `dct:LinguisticSystem` in-graph |
+| `dct:requires` | PublicService | PublicService URI | 0..n | ✅ v2026.11.0 — the services this one makes use of; context only, order lives in the BPMN. Deliberately **not** typed in-graph: a bare `a cpsv:PublicService` stub would fail `PublicServiceShape`, so the file-local check reports one advisory class error ([linked-data-explorer#315](https://github.com/sgort/linked-data-explorer/issues/315)) |
 | `dct:spatial` | PublicOrganisation | URI | 1..* | ✅ v1.10.0 — **Mandatory** (replaces `cv:spatial`); the referenced node is typed `dct:Location` in-graph to satisfy `PublicOrganisationShape` without entailment |
 | `dct:type` | Output | URI | 0..1 | Classification |
 

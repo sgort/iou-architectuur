@@ -8,6 +8,34 @@ component: CPSV Editor
 
 ## Changelog
 
+### v2026.11.0 — A Service Names the Services It Requires (November 2026)
+
+> The field: [Filling In the Tabs](../user-guide/filling-in-the-tabs.md#service-tab) and [Service, Organisation & Legal Definition](../features/service-organisation-legal.md). The property: [Field Mapping](../reference/field-mapping.md) and [Namespace & Property Reference](../reference/namespace-property-reference.md). Measured suites: [Testing](testing.md).
+
+**The Service tab records which services this one relies on.** A *Required services (dct:requires)* field lists them, by title where the editor knows it, each with a **Remove** button. A picker offers the public services already published to the configured TriplyDB dataset, leaving out this service and those already listed, with **Add** and **Refresh list**; an **Add URI** box takes a service that is not published yet. A pasted value must be an http(s) URI without the characters Turtle forbids inside an IRI, cannot be the service itself and cannot be listed twice; a URI copied out of Turtle with its angle brackets is accepted with the brackets stripped. When no dataset is configured, or the list cannot load, an amber note says so and pasting still works. The relation is context only: execution order and conditions stay in the BPMN.
+
+**The list comes from the dataset, through the shared backend.** `serviceCatalogHelper.js` asks the dataset's SPARQL endpoint for every `cpsv:PublicService` that has a `dct:title`, one entry per service, through the Linked Data Explorer backend's `/v1/triplydb/query` proxy. The proxy forwards no credentials and the API token is never sent, so only a public dataset can be listed; for a private one the list stays empty and pasting is the route.
+
+**Export writes it, import reads it back.** The generator writes one `dct:requires <uri>` line per required service, before `cprmv:hasDecisionModel` — trimmed, without empty entries, and never the service's own URI — so a service that requires nothing generates the same Turtle as before. It deliberately writes no `<uri> a cpsv:PublicService .` stub for the required service. The first version did, and that stub failed four minimum-count checks of `PublicServiceShape` and would have published an untitled service into the dataset. One file-local SHACL class error on `dct:requires` remains, because the required service is described in its own graph; it is advisory, does not block publishing, and is tracked as [linked-data-explorer#315](https://github.com/sgort/linked-data-explorer/issues/315). The importer reads `dct:requires` back — one per line, as a comma list, or as a list that continues onto the next lines, which at first lost every entry after the first and overwrote the sector — and skips a bare PublicService stub, so an older or hand-edited file cannot hand the service section to it.
+
+**The Thuisbatterij example is split into recht and hoogte.** The combined DMN held two unconnected roots, and the editor publishes one decision model per service, so only one of them reached the Linked Data Explorer. `examples/organizations/flevoland/thuisbatterij-split-dmns/` holds each as its own model with its own test cases (9 and 32) and service TTL, and the hoogte service `dct:requires` the recht service.
+
+**Also in this release.** 36 new tests — `parseTTL.requires.test.js` (8), `ttlGenerator.requires.test.js` (6), `serviceCatalogHelper.test.js` (11) and 11 more in `ServiceTab.test.jsx` — bring the suite to 812. Vite 8.3.4, `eslint-plugin-prettier` 5.5.7 and `postcss` 8.5.31.
+
+---
+
+### v2026.10.2 — Node 24.22.1, and the Open Advisories Closed (October 2026)
+
+> How the pipeline pins Node: [Deployment](deployment.md). Measured suites: [Testing](testing.md). The editor itself is unchanged apart from its icon set.
+
+**Node moves to 24.22.1.** Semgrep flagged 24.21.0 for CVE-2026-111497, an out-of-bounds write in the Brotli decoder. The site ships no Node runtime, so the move closes no live exposure; it puts CI and development on the fixed release. `.nvmrc` and the exact literals in the dependency-audit, dependency-review, SBOM and supply-chain-audit workflows move together, and the deploy workflows follow `.nvmrc`.
+
+**The open advisories are closed, all of them in development dependencies.** The audit reported no production advisory before and none of any kind after: undici 8.12.3, zod 4.6.7, Vitest and its coverage provider 5.0.4 (ranges raised to `^5.0.4`), postcss-selector-parser 6.1.5 and source-map-js 1.2.2. Several fixes were younger than the 14-day cooldown, so the update ran as the urgent-security exception `.npmrc` describes, on the command line only: `--min-release-age=6`. Vite 8.3.3 closed six advisories against the dev server, among them OS command injection through `launch-editor`; nothing in the shipped bundle was affected.
+
+**Also in this release.** `lucide-react` 1.57.0, the only runtime change; jsdom 30.1.3, which needed Vitest 5.0.4 for `App.download.test.jsx` to pass; Prettier 3.9.10 and `@babel/parser` 8.0.7.
+
+---
+
 ### v2026.10.1 — Every Dependency Pull Request Reviewed, and Signatures Verified (October 2026)
 
 > How the pipeline checks dependencies now: [Deployment](deployment.md). The mechanism across repositories: [Supply-Chain Pinning](../../contributing/supply-chain.md) and [ICTU Dependency Guideline](../../contributing/ictu-dependency-guideline.md). Measured suites: [Testing](testing.md). The editor itself is unchanged.
@@ -631,6 +659,7 @@ Initial release. React + Tailwind CSS web application. Five-tab interface: Servi
 | [Lockfile review on every dependency pull request](deployment.md), required on `acc` | v2026.10.1 |
 | Registry signatures and provenance verified in the `audit` gate | v2026.10.1 |
 | Dependency criteria and a quarterly dependency review | v2026.10.1 |
+| [Required services (`dct:requires`)](../user-guide/filling-in-the-tabs.md#service-tab) on the Service tab, picked from the published dataset | v2026.11.0 |
 
 ---
 
@@ -654,7 +683,7 @@ Advisory pre-publish SHACL validation shipped in v1.10.0; next up is field-level
 
 **Phase 5 — Advanced Features (2027 Q1)**
 
-Multi-service session management with service catalog, bulk operations, and cross-service references. Completeness scores, compliance metrics, and quality dashboards. Semantic search across services.
+Multi-service session management with service catalog, bulk operations, and cross-service references — the first of which, `dct:requires` between public services, shipped in v2026.11.0. Completeness scores, compliance metrics, and quality dashboards. Semantic search across services.
 
 **Phase 6 — Enterprise Features (2027 Q2+)**
 

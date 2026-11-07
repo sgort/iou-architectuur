@@ -27,6 +27,9 @@ This page documents the three distinct ways to access Operaton within the RONL e
 
 The key insight: Patterns 1 and 2 talk **directly to Operaton**. Pattern 3 talks to the **RONL Business API**, which in turn proxies to Operaton — to the main engine (`OPERATON_BASE_URL`) the tenant-scoped routes use, not to `operaton-doc`. These are not interchangeable — the path structures, authentication mechanisms, and response shapes are all different.
 
+!!! info "The main engine requires a login (since v2026.11.1)"
+    The engine behind `OPERATON_BASE_URL` answers `401` to a request without credentials, except for reading the rules and evaluating a decision, which its reverse proxy keeps public through a read-only account ([#415](https://github.com/sgort/ronl-business-api/issues/415)). The RONL Business API calls it with basic auth as its own service account (`OPERATON_USERNAME` / `OPERATON_PASSWORD`), and so do its external-task worker and the assistant's Operaton tools. The engine's own permission checks are on. See [Operaton deployment](deployment/operaton.md).
+
 ---
 
 ## Pattern 1 — Cockpit (browser)
@@ -166,6 +169,8 @@ When the id for a key moves, the previous id's entries are dropped from all thre
 By default, Operaton returns `404` (not `403`) on resources the caller lacks `READ` permission for when its built-in authorization is enabled. This means that on a default Operaton instance, endpoints like `/process-instance`, `/process-definition`, `/history`, `/deployment`, `/job`, `/incident`, `/user`, and `/group` will return 404 to any caller without explicit authorization grants — including authenticated callers with a valid Bearer token.
 
 The correct solution for controlled environments (where access is governed externally — by OIDC, by Caddy, or by the RONL Business API layer) is `CAMUNDA_BPM_AUTHORIZATION_ENABLED=false`. This is set on `operaton-doc`. Do not set it on production instances that serve multiple tenants through Operaton's own authorization model.
+
+The main engine takes the other route since v2026.11.1: authorization is **on**, and every account the engine knows is granted what it needs — the backends' service accounts sit in `operaton-admin`, and the read-only account behind the public rule paths holds `READ` on definitions and deployments and `CREATE_INSTANCE` on decision definitions, nothing else. `provision-accounts.sh` in `deployment/vm/operaton/` creates them.
 
 ---
 

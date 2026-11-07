@@ -26,6 +26,13 @@ The Service tab models `cpsv:PublicService`.
 
 **Language** (`dct:language`) — Outputs as a LinguisticSystem URI (e.g. `https://publications.europa.eu/resource/authority/language/NLD`).
 
+**Required services** (`dct:requires`) — Optional, any number. The services this service makes use of. This is context only: the order in which they run, and under which conditions, stays in the BPMN. Pick a service published to the configured TriplyDB dataset from **Choose a published service** and click **Add**, or paste the URI of a service that is not published yet and click **Add URI**. **Refresh list** loads the published services again. A pasted value must be an http(s) URI; one copied out of Turtle with its angle brackets is accepted with the brackets stripped. The editor refuses this service's own URI, a URI already listed, and characters Turtle does not allow in an IRI, and says why below the box. Each listed service shows its title where the dataset provides one, and **Remove** takes it off again. If no dataset is configured, or the list cannot be loaded, an amber note says so and pasting still works. The list is read through the Linked Data Explorer backend without your API token, so only a public dataset's services appear.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Required services on the Service tab, with one required service listed by title, the published-services picker with Add and Refresh list, and the URI paste box](../../assets/screenshots/cpsv-editor-service-required-services.png)
+  <figcaption>Required services on the Service tab, with one required service listed by title, the published-services picker with Add and Refresh list, and the URI paste box</figcaption>
+</figure>
+
 **Cost section** — Documents fees associated with the service as `cv:Cost`. Enter amount and currency.
 
 **Output section** — Documents what the citizen receives as `cv:Output`. Enter a title and description.
