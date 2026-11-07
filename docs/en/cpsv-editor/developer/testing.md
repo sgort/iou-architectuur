@@ -14,26 +14,31 @@ The testing roadmap that ran from P0 to P7 is **complete**: every phase has
 landed, and the per-file 80% branch floor is enforced natively by the runner.
 
 !!! info "Figures on this page are measured, not estimated"
-    Every figure below was re-measured against **v2026.10.1** on
-    **10 October 2026** at `2cf6a90` on `acc` — the same tree as `98458fa` on
-    `main` — in the working checkout after a clean `npm run deps:check`, so the
-    installed dependencies matched the lockfile, under Node 24.21.0 — the version
-    `.nvmrc` names, and what CI runs — and **Vitest 5**. The full run with
-    coverage reported **62 files and 776 tests, all passing, in 71 s** (Vitest's
-    own duration). The counts are v2026.10.0's: this release added no test, and
-    moved Vitest from 4.1 to 5. Every phase script, lint and the format check
-    passed on the same checkout.
-    The **end-to-end journeys were run too**, locally against a live stack —
-    the Linked Data Explorer backend on `:3001`, Operaton on `:8081`, and this
-    editor's dev server started by Playwright's own `webServer` on `:3000` —
-    and **4 passed in 42.4 s**, with Playwright 1.63.0.
+    Every unit-suite figure below was re-measured against **v2026.11.0** on
+    **7 November 2026** at `34a51b4` on `acc`, whose application code is the
+    same as `84886c9` on `main` — `acc` is ahead only by two Renovate
+    action-pin commits — in the working checkout after a clean
+    `npm run deps:check`, so the installed dependencies matched the lockfile,
+    under Node 24.22.1 and npm 11.19.1 — the version `.nvmrc` names, and what CI
+    runs — and **Vitest 5.0.4**. The full run with coverage reported **65 files
+    and 812 tests, all passing, in 82.7 s** (Vitest's own duration). v2026.11.0
+    added 36 tests; v2026.10.2 added none. Every phase script, lint, the format
+    check, `check-supply-chain`, `sbom:check` and `audit:signatures` passed on
+    the same checkout.
+    The **end-to-end journeys were not re-run for v2026.11.0.** No spec, the
+    preflight fixture and `playwright.config.js` included, changed after
+    v2026.10.1, when they ran locally against a live stack — the Linked Data
+    Explorer backend on `:3001`, Operaton on `:8081`, and this editor's dev
+    server started by Playwright's own `webServer` on `:3000` — and **4 passed
+    in 42.4 s**, with Playwright 1.63.0, still the locked version.
     Rerun the commands in [Running the tests](#running-the-tests) to reproduce
     them.
 
-**At a glance:** 62 files · **776 tests** · all passing · 71 s for a full run
-with coverage on this measurement, plus **4 end-to-end journeys** run separately.
+**At a glance:** 65 files · **812 tests** · all passing · 82.7 s for a full run
+with coverage on this measurement, plus **4 end-to-end journeys** run separately
+(last run on 10 October 2026).
 
-Coverage: **90.28% statements · 88.42% branches · 78.92% functions · 90.96%
+Coverage: **90.55% statements · 88.75% branches · 79.80% functions · 91.19%
 lines**, with every file at or above the 80% branch floor.
 
 !!! danger "Measure after `npm ci`, never after `npm install`"
@@ -54,20 +59,22 @@ from the repository root after `npm ci`.
 
 | Command | Scope | Suites | Tests |
 |---|---|---:|---:|
-| `npm run test:ci` | Everything, once, with coverage | 62 | 776 |
-| `npm test` | Everything, interactive watch mode | 62 | 776 |
-| `npm run test:generator` | TTL generator regression tests | 8 | 125 |
+| `npm run test:ci` | Everything, once, with coverage | 65 | 812 |
+| `npm test` | Everything, interactive watch mode | 65 | 812 |
+| `npm run test:generator` | TTL generator regression tests | 9 | 131 |
 | `npm run test:roundtrip` | TTL round-trip tests (P1) | 1 | 14 |
 | `npm run test:p2` | Pure-logic utilities (P2) | 8 | 192 |
 | `npm run test:p3` | State hooks (P3) | 3 | 33 |
 | `npm run test:p4` | Network-touching utilities (P4) | 2 | 42 |
-| `npm run test:p5` | Tab components, PreviewPanel, PublishDialog (P5) | 23 | 181 |
+| `npm run test:p5` | Tab components, PreviewPanel, PublishDialog (P5) | 23 | 192 |
 | `npm run test:p6` | `DMNTab`'s full lifecycle (P6) | 6 | 99 |
 | `npm run test:e2e` | Playwright journeys (P7) — **needs a live stack** | 4 | 4 |
 
 Each scoped script has a `:watch` counterpart. The phase scripts overlap
 deliberately — a file can belong to more than one phase — so their counts do
-not sum to 776.
+not sum to 812. Some files belong to no phase script at all:
+`parseTTL.requires.test.js` and `serviceCatalogHelper.test.js` (v2026.11.0)
+run only in the full suite, like `problem.test.js` before them.
 
 ### End-to-end journeys need a live stack
 
@@ -94,6 +101,13 @@ button, with the runner then reporting a timeout on a button several steps from
 the cause. The backend URL is read from `.env.development` rather than
 hardcoded, so the preflight checks the same host the application will call.
 
+Since v2026.11.0 the Service tab asks the backend for the dataset's published
+services as soon as it renders. In the stack-free re-import journey nothing
+answers, so the run logs a failed fetch and a
+`[RequiredServices] Could not load published services` warning, and the tab
+shows its amber "you can still paste a URI" note. That is expected, not a
+failure; the journey asserts nothing about the Service tab's list.
+
 !!! note "UI mode waits for you to press play"
     An idle UI-mode window with an empty trace pane reads as a hang. It is not:
     the runner discovers the tests and then waits, so no dev server starts and
@@ -114,6 +128,10 @@ npm run test:p2
     Use `npm run test:ci` in CI, scripts, or anywhere a process must terminate.
     `--coverage` lives on `test:ci` and not on `npm test`, so a watch run
     reports no coverage figures.
+
+Under heavy machine load Vitest's fork workers can time out while starting, which
+reports files as failed to start although no test failed; rerun the suite on a
+quieter machine before reading anything into it.
 
 ### Linting and formatting
 
@@ -165,7 +183,7 @@ Eight workflows run in this repository. Every job runs on `ubuntu-24.04`.
 |---|---|---|
 | **Deploy ACC (orange-beach)** | `changes`, then `Build and deploy ACC` | `changes` decides whether a pull request touches anything outside `docs/**`, `.claude/**` and `**/*.md`; then Node from `.nvmrc` → `npm ci` → `npm run lint` → `npm run test:ci` → `npm run build` → upload `dist/` to acceptance |
 | **Deploy PROD (white-sky)** | `Build and deploy PROD` | The same sequence without `changes`, deploying production |
-| **Supply-chain audit** (`zizmor.yml`) | `audit` | On Node 24.21.0: zizmor 1.29.0, `renovate-config-validator --strict`, *Lockfile matches package.json* (`npm ci --dry-run --ignore-scripts`), `npm run check-format`, `npm run check-supply-chain`, and *Verify registry signatures* (`npm run audit:signatures`) |
+| **Supply-chain audit** (`zizmor.yml`) | `audit` | On Node 24.22.1: zizmor 1.29.0, `renovate-config-validator --strict`, *Lockfile matches package.json* (`npm ci --dry-run --ignore-scripts`), `npm run check-format`, `npm run check-supply-chain`, and *Verify registry signatures* (`npm run audit:signatures`) |
 | **Supply-chain audit** (`zizmor.yml`) | `lockfile-review`, `lockfile-review-comment` | On every pull request, succeeding at once when `package-lock.json` is unchanged: a read-only job tests and runs the lockfile diff, and a separate job holding the write token posts the review comment — no tests |
 | **Semgrep** (`semgrep.yml`) | `scan` | Semgrep Code and Supply Chain — see [Dependency Scanning](../../contributing/dependency-scanning.md) |
 | **Close preview environments** | `Close ACC staging environment`, `Close PROD staging environment` | Deletes a pull request's Static Web Apps preview when it closes — no tests, but see below |
@@ -234,6 +252,7 @@ Test files are colocated with the source they cover (`foo.js` →
 
 | File | Tests | Style | Covers |
 |---|---:|---|---|
+| `src/parseTTL.requires.test.js` | 8 | Pure unit, inline Turtle | `dct:requires` read back one per line, as a comma list and as an object list continued onto the next lines; a URI containing field names leaks into none of them; bare `a cpsv:PublicService .` stubs before or after the service never become the service; and a round trip keeps the list (v2026.11.0) |
 | `src/parseTTL.roundtrip.test.js` | 14 | Real fixtures, no mocks | Parses a real reference export, regenerates TTL from the parsed state, then parses again — comparing business fields between the two parses rather than diffing against the original file's formatting |
 | `src/utils/ttlGenerator.sections.test.js` | 29 | Pure unit | The skeleton the others sit in: `generate()` assembles a dozen optional sections, each behind its own condition — service identifier and sector, organisation logo, legal resource, temporal rules |
 | `src/utils/ttlGenerator.uris.test.js` | 26 | Pure unit | The URI and date helpers every emitter shares — legal-resource and ruleset URIs, `cprmvValidFrom`, rules-derived dates, CPRMV rule subject URIs. A wrong one does not throw; it publishes a graph that parses and points at the wrong resources |
@@ -242,6 +261,7 @@ Test files are colocated with the source they cover (`foo.js` →
 | `src/utils/ttlGenerator.cellGrounding.test.js` | 18 | Pure unit | Per-cell `cprmv:Rule` emission, concept dedup, nested `hasPart` for compound cells, and the SHACL-conformance rules — see [Cell-Level Legislative Grounding](cell-level-grounding.md) |
 | `src/utils/ttlGenerator.versionTarget.test.js` | 7 | Pure unit | The CPRMV version selector — namespace and shape differences between the `0.4.1` and `0.3.2` targets |
 | `src/utils/ttlGenerator.dateAxis.test.js` | 3 | Pure unit | Rules-derived consolidation dates and duplicate-path rule URIs |
+| `src/utils/ttlGenerator.requires.test.js` | 6 | Pure unit | One `dct:requires` line per entry inside the service block, **no** `cpsv:PublicService` stub for a required service, byte-identical output when nothing is required, never the service requiring itself, and a valid closing line when `dct:requires` is the last property (v2026.11.0) |
 | `src/utils/ttlGenerator.citationStub.test.js` | 8 | Pure unit + the real export | The typed stub minted for a `cprmv:isBasedOn` citation — and **no** stub for a rule the same document already publishes, which asserted a second, contradictory `cprmv:id`. Half the file regenerates the real SZW normenbrief export and checks no subject carries two ids |
 | `src/utils/ttlHelpers.test.js` | 32 | Pure unit | All ten TTL string/URI helpers — escaping, sanitising (filenames, `ruleIdPath`, IRIs), formatting. `sanitizeIri` is checked for idempotence and for leaving structural URI characters (`/`, `:`, `#`, `?`) intact |
 
@@ -290,6 +310,14 @@ it.
 | `src/utils/triplydbHelper.test.js` | 38 | `global.fetch` mock + real `File`/`FormData`/`Blob` | All ten exports: graph-IRI construction, config validation, the three publish paths (including the `@prefix` → `PREFIX` conversion and `INSERT DATA`/`GRAPH` wrapping asserted against the posted body), logo upload, connection testing across every HTTP status branch, and the three `localStorage`-backed config functions |
 | `src/utils/shaclHelper.test.js` | 4 | `global.fetch` mock | `validateTtl` — success, a parsed-but-invalid backend response, and the distinct `unavailable` shape on network failure. SHACL validation is advisory and must never block publishing |
 
+`src/utils/serviceCatalogHelper.test.js` (11 tests, v2026.11.0) is the same kind of
+test — a plain `global.fetch` mock — for the published-services list behind the Service
+tab's required services: the dataset's SPARQL URL, a `null` for each missing config
+field, the query posted through the backend proxy without credentials, one entry per
+service when it has several titles, and an error on a non-ok or unsuccessful response.
+No phase script names it either: `test:p4` still selects only `shaclHelper` and
+`triplydbHelper`.
+
 `src/utils/problem.test.js` (7 tests, v2026.09.6) belongs with these, though no phase
 script names it: it pins `getProblemDetail`, which reads the backend's RFC 9457 `detail`
 first and still understands the older `error.message` and bare-string `error` shapes.
@@ -312,7 +340,7 @@ tests.
 
 ### Tab components and dialogs (P5)
 
-Twenty-three files, 181 tests. Deliberately thin and even: every component
+Twenty-three files, 192 tests. Deliberately thin and even: every component
 renders with realistic props, and one representative interaction proves the
 controlled-component contract. No component is left at zero, and `src/components`
 moved from 3.9% to 41% statements in this phase alone.
@@ -327,6 +355,15 @@ vendor URI rather than a capability flag**, so iKnow gets integration tooling,
 Blueriq gets the contact form, and every other vendor gets an "under development"
 placeholder. Adding a vendor to the concept list gives it a dropdown entry and
 nothing else.
+
+`ServiceTab.test.jsx` gained eleven tests in v2026.11.0, for the *Required services*
+section: the published list without the service itself,
+adding from it and from a pasted URI (trimmed, de-duplicated, angle brackets
+stripped), every rejection — the service's own URI, a non-http(s) value, characters
+Turtle does not allow in an IRI — removal by title, pasting after the list failed
+to load, no fetch without a config, and **Refresh list** fetching again.
+`RequiredServicesSection.jsx` has no test file of its own and is at 100% on all four
+measures through these.
 
 ### `DMNTab` lifecycle (P6)
 
@@ -343,7 +380,8 @@ the branch that requires an uploaded file, so the error it raises can never fire
 ### End-to-end journeys (P7)
 
 Four Playwright specs, three of them run against a live stack rather than mocks.
-Measured on 10 October 2026 against v2026.10.1 on a local stack — the Linked Data
+None of them changed in v2026.10.2 or v2026.11.0, and they were not re-run for
+this release. Last measured on 10 October 2026 against v2026.10.1 on a local stack — the Linked Data
 Explorer backend on `:3001`, Operaton on `:8081`, and the dev server Playwright's
 `webServer` started on `:3000`. The re-import journey ran first and without the
 preflight; the preflight then confirmed both services once, for the other three:
@@ -400,26 +438,30 @@ so the journey is not blocked, and the threshold is documented rather than dodge
 
 ## Coverage
 
-Measured with `npm run test:ci` (Vitest's `--coverage`) against v2026.10.1 on
-10 October 2026, in a checkout whose install `npm run deps:check` confirmed
-against the lockfile.
+Measured with Vitest's `--coverage` (`npx vitest run --coverage`, what
+`npm run test:ci` runs) against v2026.11.0 on 7 November 2026, in a checkout
+whose install `npm run deps:check` confirmed against the lockfile.
 
-**Overall: 90.28% statements · 88.42% branches · 78.92% functions · 90.96%
+**Overall: 90.55% statements · 88.75% branches · 79.80% functions · 91.19%
 lines** — against 54.75% / 40.88% / 38.68% / 55.57% at v2026.09.0. The jump is
 P5, P6 and the branch-floor work landing together; v2026.09.3's two parser guards
 moved `src/utils` a little further. At v2026.10.0 `src/utils` rose again and
 `src/config` fell, to 81.13% branches. v2026.10.1 changed no source file; the
 small moves since v2026.10.0, `src/components` branches among them, come from
 Vitest 5's coverage provider counting the same code slightly differently.
+v2026.11.0's two new source files arrived fully tested — `RequiredServicesSection.jsx`
+at 100% on every measure and `serviceCatalogHelper.js` at 100% statements and 95.65%
+branches — which is what moved `src/utils` and `src/components/tabs` up; `src` rose
+with the parser's new `dct:requires` branches.
 
 | Area | Statements | Branches | Functions | Lines |
 |---|---:|---:|---:|---:|
 | `src/hooks` | 100% | 93.44% | 100% | 100% |
-| `src/utils` | 95.26% | 88.52% | 98.49% | 96.11% |
+| `src/utils` | 95.34% | 88.92% | 98.52% | 96.18% |
 | `src/config` | 90.56% | 81.13% | 75.00% | 90.19% |
 | `src/components` | 84.41% | 88.65% | 85.71% | 87.50% |
-| `src/components/tabs` | 84.48% | **92.18%** | 65.93% | 84.69% |
-| `src` (App, index, parser) | 84.64% | 82.41% | 59.32% | 85.71% |
+| `src/components/tabs` | 85.40% | **92.51%** | 68.36% | 85.47% |
+| `src` (App, index, parser) | 84.87% | 82.54% | 59.32% | 85.91% |
 
 The rows are the runner's own per-directory figures, so `src/components` counts only the
 files directly in that folder — the dialogs and panels — and the tabs have a row of their
@@ -502,9 +544,9 @@ question, deliberately left open.
 ## Adding tests
 
 - **Colocate.** `foo.js` → `foo.test.js`, next to the source.
-- **Split by concern, not by file size.** `ttlGenerator.js` has eight separate
+- **Split by concern, not by file size.** `ttlGenerator.js` has nine separate
   test files — `sections`, `uris`, `entities`, `dmn`, `cellGrounding`,
-  `versionTarget`, `dateAxis`, `citationStub` — rather than one large one:
+  `versionTarget`, `dateAxis`, `citationStub`, `requires` — rather than one large one:
   easier to review, and easier to see what is covered at a glance.
 - **Add a script pair per phase.** Each new phase gets
   `test:<phase>` and `test:<phase>:watch` in `package.json`, passing Vitest

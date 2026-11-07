@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Building DMN Chains
 
 This guide covers the complete chain-building workflow, from discovering DMNs to executing a chain and interpreting results.
@@ -15,6 +19,13 @@ On first load, the backend queries TriplyDB for all published DMN models. The Av
 ## Inspecting DMNs
 
 Each DMN card in the Available DMNs panel shows its title, identifier, variable counts, publishing organisation, and any governance badge. Click on a card to expand it and see the full variable list — inputs in blue, outputs in green, each with its identifier and datatype.
+
+When the DMN's public service declares the services it relies on, the card also shows **Requires:** and, for a service others rely on, **Required by:**. Hover a name to see the service's full URI. These lines are for orientation only: they do not add DMNs to your chain or set its order.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: A DMN card in Available DMNs and the same DMN in the Chain Composer, each listing the services it requires and is required by](../../assets/screenshots/linked-data-explorer-dmn-service-links.png)
+  <figcaption>A DMN card in Available DMNs and the same DMN in the Chain Composer, each listing the services it requires and is required by</figcaption>
+</figure>
 
 Before building a chain, identify which DMNs you want to connect and verify that the output variables of the first match the input variables of the second, either by exact identifier or by shared semantic concept.
 

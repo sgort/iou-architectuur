@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # Field Mapping: CPSV-AP 3.2.0
 
 This page maps each UI field in the editor to its corresponding RDF property and CPSV-AP 3.2.0 compliance status.
@@ -19,12 +23,15 @@ The **SHACL constraint** column references the shape that validates each field d
 | Government level | `service.sector` | `cv:sector` | `cv:sector` | 🎯 Mandatory | `PublicServiceShape` · opt |
 | Keywords | `service.keywords` | `dcat:keyword` | `dct:subject` | ✅ | `PublicServiceShape` · opt |
 | Language | `service.language` | `dct:language` | `dct:language` | 🎯 URI format | `PublicServiceShape` · opt |
+| Required services | `service.requires` | `dct:requires` | `dct:requires` | ✅ http(s) URI, not itself, no duplicates | `PublicServiceShape` · opt ² |
 | Cost amount | `cost.amount` | `cv:hasCost / schema:price` | `cv:hasCost` | 🎯 | `CostShape` · opt ¹ |
 | Cost currency | `cost.currency` | `cv:hasCost / schema:priceCurrency` | `cv:hasCost` | 🎯 | `CostShape` · opt ¹ |
 | Output title | `output.title` | `cv:hasOutput / dct:title` | `cv:hasOutput` | 🎯 | `OutputShape` · req [1,n] |
 | Output description | `output.description` | `cv:hasOutput / dct:description` | `cv:hasOutput` | 🎯 | `OutputShape` · opt |
 
 > ¹ `CostShape` validates `m8g:hasValue` (amount) and `m8g:currency` (currency) — the editor emits `schema:price` / `schema:priceCurrency` instead, so these fields pass SHACL structurally but the cost property names are not validated.
+>
+> ² The required service is a `cpsv:PublicService` described in its own graph, and the editor deliberately writes no stub for it, so the file-local check reports one advisory class error on `dct:requires` ([linked-data-explorer#315](https://github.com/sgort/linked-data-explorer/issues/315)). It does not block publishing.
 
 ---
 

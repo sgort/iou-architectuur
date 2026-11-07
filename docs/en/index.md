@@ -139,13 +139,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.10.2** · *October 2026*
+-   **⚙️ RONL Business API — v2026.11.1** · *November 2026*
 
     ---
 
-    **Every dependency weighed, signatures verified, and the decision document of the path taken**
+    **The engine asks who is calling, Flevoland gets its colours, and one diagram for every board**
 
-    A pull request that adds a direct dependency now gets a checklist of the shared [dependency criteria](ronl-business-api/developer/cicd.md), and a new quarterly workflow opens a review of every direct dependency. The required `audit` job verifies registry signatures and provenance. The release SBOM lists every production package again, and its checks run before it is generated, so they can fail. The decision document now follows the path a case took, so an escalated besluit returns the competent authority's own document, and the examples store [multi-output DMN results](ronl-business-api/reference/bpmn-design-criteria.md) as plain variables. The [suites](ronl-business-api/developer/testing/overview.md) stand at 5,074 unit tests, all passing; the 59 end-to-end tests are unchanged since 9 October.
+    The process engine on the VM now requires a login: reading and evaluating rules stays public through a read-only account, and the backend calls the engine with its own credentials, which a production start no longer does without ([Operaton](ronl-business-api/developer/deployment/operaton.md)). The Caseworker overview and the [Infra-board](ronl-business-api/user-guide/infra-board.md) project page share one process diagram, and the portfolio shows projects waiting between RIP phases. Flevoland's own colours now apply to its tenant and its login page ([municipality themes](ronl-business-api/reference/municipality-themes.md)); CI rejects new hard-coded colours and the end-to-end suite checks accessibility. The [suites](ronl-business-api/developer/testing/overview.md) stand at 5,318 unit tests, all passing, and 78 end-to-end tests: 73 passed, 5 skipped by design.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
@@ -159,23 +159,23 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.10.1** · *October 2026*
+-   **✏️ CPSV Editor — v2026.11.0** · *November 2026*
 
     ---
 
-    **Every dependency pull request reviewed, and signatures verified**
+    **A service can say which services it requires**
 
-    A pull request that changes the lockfile gets a review comment — added, removed and downgraded packages, licences, install scripts, and a checklist for a new direct dependency — and `lockfile-review` is required on `acc`. The `audit` gate verifies registry signatures and provenance, each quarter opens its own dependency review, and the release SBOM lists every production package and is checked before it is regenerated, so the check can finally fail. The editor itself is unchanged: the [suite](cpsv-editor/developer/testing.md) stands at 776 tests on Vitest 5 and four end-to-end journeys, all passing — and the Amsterdam re-import journey no longer needs a stack.
+    The Service tab has a *Required services* section: pick a published service from the list, or paste its URI, and the editor writes `dct:requires` to the published Turtle and reads it back on import ([filling in the tabs](cpsv-editor/user-guide/filling-in-the-tabs.md)). The Thuisbatterij example is split into two services, the second requiring the first. v2026.10.2 moved the toolchain to Node 24.22.1 and refreshed the development dependencies for their advisories. The [suites](cpsv-editor/developer/testing.md) stand at 812 tests, all passing.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.10.2** · *October 2026*
+-   **🔍 Linked Data Explorer — v2026.11.1** · *November 2026*
 
     ---
 
-    **Phases set in the Modeler, and a process id that belongs to one organisation**
+    **Services that require each other, and an engine that asks for credentials**
 
-    The [Modeler](linked-data-explorer/features/bpmn-modeler.md) now sets a process's phases for RBA's caseworker stepper — own or Awb phases on the process, *Start van fase* on a node — draws badges computed with a port of RBA's own rule, and checks the phases before a deploy. A stored process is unique per organisation and process id, RoPA records nest under the shell that calls them, and the examples store multi-output DMN results as plain variables. CI verifies registry signatures, reviews every new direct dependency against shared criteria, and its SBOM checks can now fail. The [suites](linked-data-explorer/developer/testing.md) stand at 3,418 tests, all passing.
+    Every DMN now says which services it requires and which require it, read from the published `dct:requires` links and shown on the DMN cards, in the Chain Composer and in the BPMN modeler ([chain building](linked-data-explorer/features/dmn-chain-building.md)). The backend calls Operaton with a username and password, refuses to start on acceptance or production without them, and encodes every value it puts in an engine path ([deployment](linked-data-explorer/developer/deployment.md)). The toolchain moved to Node 24.22.1. The [suites](linked-data-explorer/developer/testing.md) stand at 3,463 tests, all passing.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

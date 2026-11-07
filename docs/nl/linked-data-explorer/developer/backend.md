@@ -108,6 +108,8 @@ GET /v1/dmns?endpoint={sparql_endpoint_url}
 
 Bevraagt TriplyDB op alle `cprmv:DecisionModel`-resources op het opgegeven endpoint. Retourneert modellen met volledige variabelenlijsten en governance-/leveranciersmetadata. Per endpoint 5 minuten gecached.
 
+Sinds v2026.11.0 kan elk model ook `requires` en `requiredBy` dragen: de services die zijn publieke dienstverlening met `dct:requires` declareert, en de services op hetzelfde endpoint die haar declareren. Elke entry is een `ServiceLink` — de service-URI, de `dct:title` en, als die service een DMN in de lijst heeft, de DMN-identifier — gesorteerd op URI. Een sleutel staat er alleen als de lijst niet leeg is, en een mislukte `dct:requires`-query laat beide weg in plaats van de lijst te laten mislukken. De koppelingen zijn alleen context; de backend handelt er niet naar.
+
 ```
 GET /v1/dmns/:identifier?endpoint={url}
 ```
@@ -505,6 +507,8 @@ findSemanticEquivalences(endpoint: string): Promise<SemanticEquivalence[]>
 
 De query `findEnhancedChainLinks` gebruikt een `BIND(IF(...))`-patroon om elke koppeling te categoriseren als `exact`, `semantic` of `both`, en expandeert vervolgens `both`-entries na de query in twee afzonderlijke records. Dit is het mechanisme dat beschreven wordt in [Enhanced Validation](enhanced-validation.md).
 
+`getServiceRequirements` haalt alle `dct:requires`-paren op het endpoint op in één query, na de ene geaggregeerde query voor de leveranciersaantallen, ontdubbelt de paren (een service met titels in meerdere talen levert er één op) en laat koppelingen naar zichzelf weg. `attachServiceLinks` zet daarna `requires` en `requiredBy` op elke DMN, gematcht op de service-URI. Net als de leveranciersaantallen valt de query bij een fout terug op een lege lijst.
+
 Een aparte `norms.service.ts` handelt de `cprmv:Rule`-publicatieformaat-query af die `/v1/norms` ondersteunt. Hij bouwt de query dynamisch op — filter-clauses (rulesetid exact-match, applicable-date `CONTAINS`) worden pas geïnjecteerd na upstream regex-validatie — en aggregeert vervolgens ouder/kind-rijen tot geneste objecten met deterministische sleutelvolgorde die overeenkomt met `cprmv-example.json`. Hetzelfde bestand bevat de selectie voor `/v2/norms`: `selectInForce` kiest per regelset de laatste periode die op of vóór `valid_on` begint; `narrowDatasetVersions` beperkt `dataset_versions` tot de records van die periode; en `getNormsInForce` draait de v1-rules-query zonder datumfilter en past beide toe, zodat de datum nooit in SPARQL terechtkomt. Wat de twee routeversies delen — invoervalidatie, cacheheaders en de JSON-envelop — staat in `routes/norms.shared.ts`, zodat ze op die onderdelen niet uit elkaar kunnen lopen.
 
 ---
@@ -546,6 +550,10 @@ Request payload mapt naar het variabelenformaat van Operaton:
 
 Voor DRD-uitvoering wordt hetzelfde endpoint gebruikt met de DRD-entry-point-identifier. Operaton handelt interne beslissingsafhankelijkheidsevaluatie af.
 
+**Authenticatie.** De REST-API van Operaton vereist een login (sinds v2026.11.1). `utils/operaton-auth.ts` bouwt basic-auth-credentials uit `OPERATON_USERNAME` en `OPERATON_PASSWORD`, en de gedeelde axios-client stuurt ze bij elke aanroep mee; de external task worker en de healthcheck gebruiken dezelfde helper. Ontbreekt een van beide, dan wordt niets meegestuurd; daar rekenen lokale ontwikkeling en de tests op. Op ACC en productie weigert `validateConfig` te starten zonder beide.
+
+**Waarden in het pad worden gecodeerd.** Elke waarde die in een URL-pad van de engine terechtkomt — de beslissingssleutel van beide evaluate-aanroepen, en de sleutel en definitie-id achter `fetchDmnXml` — gaat door `utils/engine-segment.ts`. `engineSegment()` percent-codeert de waarde, laat `:` leesbaar voor definitie-id's (`key:version:uuid`) en weigert een lege waarde, `.` en `..`. Express decodeert routeparameters voordat een handler ze ziet, dus zonder deze stap kon een request een ander engine-endpoint bereiken met de credentials van de backend.
+
 ---
 
 ## eDOCS-service
@@ -573,6 +581,8 @@ Wanneer `EDOCS_STUB_MODE=true`, retourneren alle methoden realistische nepdata e
 | `rip-edocs-document`  | `edocsWorkspaceId`, `documentTemplateId`, `edocsDocumentVariableName`, + templatevariabelen | `<edocsDocumentVariableName>` (bijv. `edocsIntakeReportId`)       |
 
 `documentTemplateId` en `edocsDocumentVariableName` worden per ServiceTask geïnjecteerd via `camunda:inputParameter` in het BPMN, waardoor de enkele topic handler herbruikbaar is over alle drie de documentuploadstappen in het RIP Fase 1-proces.
+
+Zijn aanroepen naar Operaton — `fetchAndLock`, `complete` en `failure` — sturen dezelfde basic-auth-credentials mee als de gedeelde client (sinds v2026.11.1).
 
 De worker start binnen de callback van `app.listen()` en stopt in zowel de `SIGTERM`- als `SIGINT`-handlers.
 
@@ -643,11 +653,11 @@ Dit verving in v2026.09.5 vijf verschillende envelopes. `POST /v1/dmns/evaluate/
 - **Bij de route** controleert `utils/outboundUrl.ts` elk door de aanroeper opgegeven SPARQL-endpoint — op `GET /norms`, de DMN-leesroutes, ketenuitvoering, de vendor-leesroutes, samengevoegde SHACL-validatie en `POST /triplydb/query` — en weigert het met `400 INVALID_INPUT` wanneer het geen `https:` is, credentials bevat of naar een intern adres verwijst. Interne adressen worden herkend in elke tekstuele IPv4- en IPv6-vorm, ook de IPv6-vormen waarin een IPv4-adres is opgenomen.
 - **Bij het verbinden** levert `utils/outboundHttp.ts` de axios-client die elk request naar een door de aanroeper gekozen host gebruikt. De agents weigeren een naam die naar een intern adres *resolvet*, redirects worden opnieuw gecontroleerd, en de client zet `proxy: false`, omdat axios anders `HTTP(S)_PROXY` volgt met een tunnelagent die de controle overslaat.
 
-TriplyDB-aanroepen die het token van de aanroeper doorsturen gaan alleen naar `https:`-hosts in `TRIPLYDB_ALLOWED_HOSTS`. Processen worden alleen naar de geconfigureerde Operaton gedeployd, via de gedeelde client met `OPERATON_API_KEY` — een request kan de Operaton-URL niet meer opgeven en geen credentials meesturen. `ALLOW_LOCAL_ENDPOINTS=true` laat `http:` en lokale adressen toe voor lokale ontwikkeling, en staat nooit aan op ACC of productie.
+TriplyDB-aanroepen die het token van de aanroeper doorsturen gaan alleen naar `https:`-hosts in `TRIPLYDB_ALLOWED_HOSTS`. Processen worden alleen naar de geconfigureerde Operaton gedeployd, via de gedeelde client, die inlogt met `OPERATON_USERNAME` en `OPERATON_PASSWORD` — een request kan de Operaton-URL niet meer opgeven en geen credentials meesturen. `ALLOW_LOCAL_ENDPOINTS=true` laat `http:` en lokale adressen toe voor lokale ontwikkeling, en staat nooit aan op ACC of productie.
 
 **CSP-rapporten** — `POST /v1/csp-reports` ontvangt de Content-Security-Policy-schendingsrapporten van de frontend in beide formaten (`application/csp-report` en `application/reports+json`, tot 64 KB) en logt per schending één waarschuwingsregel. Er wordt niets opgeslagen.
 
-**Omgevingsvariabelen** — alle gevoelige configuratie (TriplyDB-endpoint-URL's, Operaton API-URL's, CORS-origins, eDOCS-credentials) wordt opgeslagen in omgevingsvariabelen en nooit hardcoded. eDOCS-specifieke variabelen: `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, `EDOCS_PASSWORD`, `EDOCS_STUB_MODE`.
+**Omgevingsvariabelen** — alle gevoelige configuratie (TriplyDB-endpoint-URL's, Operaton API-URL's, CORS-origins, eDOCS-credentials) wordt opgeslagen in omgevingsvariabelen en nooit hardcoded. De Operaton-login: `OPERATON_USERNAME` en `OPERATON_PASSWORD`, verplicht op ACC en productie. eDOCS-specifieke variabelen: `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, `EDOCS_PASSWORD`, `EDOCS_STUB_MODE`.
 
 **Foutresponses** — de centrale error handler schrobt stack traces en interne context voordat responses worden teruggegeven aan clients, om te garanderen dat geen implementatiedetails worden blootgelegd.
 

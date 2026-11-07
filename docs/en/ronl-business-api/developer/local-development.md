@@ -14,9 +14,9 @@ The release it describes is the one in the header above.
 
 | Tool | Version | Why |
 |---|---|---|
-| Node.js | **22.23.3** (`.nvmrc`); `engines` asks for `>=22` | Backend and front-end runtimes. The Azure App Services run `NODE|22-lts` |
-| npm | `engines` asks for `>=10`; **11.10 or newer** recommended | Node 22.23.3 bundles npm 10.9.9, which silently ignores the 14-day `min-release-age` cooldown in the root `.npmrc`. `deps:check` warns and suggests `npm install -g npm@11` |
-| Docker with Compose v2 | `docker compose …` | The five local services |
+| Node.js | **22.23.4** (`.nvmrc`); `engines` asks for `>=22` | Backend and front-end runtimes. The Azure App Services run `NODE|22-lts` |
+| npm | `engines` asks for `>=10`; **11.10 or newer** recommended | Node 22.23.4 bundles npm 10.9.9, which silently ignores the 14-day `min-release-age` cooldown in the root `.npmrc`. `deps:check` warns and suggests `npm install -g npm@11` |
+| Docker with Compose v2 | `docker compose …` | The six local services |
 | Git | — | Includes Git for Windows' **bash**, see below |
 | **bash** | Any recent bash | The install, the dev start and the checks are bash scripts |
 
@@ -139,7 +139,7 @@ committed `.env.development` files (see [Front-end configuration](#front-end-con
 |---|---|
 | `NODE_EXTRA_CA_CERTS`, `NODE_TLS_REJECT_UNAUTHORIZED=0` | Both ship **commented out**; leave them so unless you sit behind a corporate proxy that intercepts TLS. There, point `NODE_EXTRA_CA_CERTS` at your own copy of the proxy's CA file — the proper fix. `NODE_TLS_REJECT_UNAUTHORIZED=0` is a development-only workaround that switches off TLS certificate checking for every outbound HTTPS call the backend makes: Keycloak JWKS, Operaton, BRP, the LLM providers |
 | `ANTHROPIC_API_KEY` | Must be **non-empty**, or the backend refuses to start with `Configuration validation failed: ANTHROPIC_API_KEY is required`. The shipped placeholder passes the check in development; the AI assistant works only with a real key |
-| `OPERATON_BASE_URL` | Keep `http://localhost:8081/engine-rest` with `OPERATON_USERNAME`/`OPERATON_PASSWORD` = `demo`/`demo`. `OPERATON_M2M_BASE_URL` ships commented out; leave it so, and `/v1/m2m` uses this same engine |
+| `OPERATON_BASE_URL` | Keep `http://localhost:8081/engine-rest` with `OPERATON_USERNAME`/`OPERATON_PASSWORD` as `.env.example` ships them, the local `rbaBackend` account; the engine refuses requests without them. `OPERATON_M2M_BASE_URL` ships commented out; leave it so, and `/v1/m2m` uses this same engine |
 | `DATABASE_URL` | `postgresql://audit_user:audit_password@localhost:5432/audit_logs`, the database and user the Postgres container creates on first start |
 | `LDE_MCP_ENABLED` | Ships `true`, with `LDE_DATABASE_URL` pointing at `lde_assets` as `lde_user`/`lde_password`. `init-databases.sql` creates that database and role, but empty: the schema belongs to the Linked Data Explorer, so the provider connects and has nothing to read, and the assistant's LDE tools answer with an error when called. A `postgres-data` volume created before the script had that block has no `lde_assets` at all — see [Postgres](#the-docker-stack) below. Set the flag to `false` if you do not need the LDE tools |
 
@@ -184,7 +184,7 @@ when nothing listens on `:3001`; the rest of the frontend works without it.
 npm run docker:up        # docker compose up -d
 ```
 
-`docker-compose.yml` defines five services on one bridge network,
+`docker-compose.yml` defines six services on one bridge network,
 `ronl-network`. Every image is pinned by tag **and** digest, and Renovate keeps
 the digests current (`docker:pinDigests` in `renovate.json`).
 
@@ -192,8 +192,9 @@ the digests current (`docker:pinDigests` in `renovate.json`).
 |---|---|---|---|---|
 | `keycloak` | `ronl-keycloak` | `quay.io/keycloak/keycloak:23.0` | 8080 | Its database is the `keycloak` DB in Postgres |
 | `postgres` | `ronl-postgres` | `postgres:16-alpine` | 5432 | Volume `postgres-data` |
-| `operaton-init` | `ronl-operaton-init` | `alpine:3.24.2` | — | Runs once and exits |
+| `operaton-init` | `ronl-operaton-init` | `alpine:3.24.3` | — | Runs once and exits |
 | `operaton` | `ronl-operaton` | `operaton/operaton:2.1.5` | 8081 → 8080 | Volume `operaton-data` |
+| `operaton-accounts` | `ronl-operaton-accounts` | `curlimages/curl:8.22.0` | — | Runs once on every up and exits |
 | `redis` | `ronl-redis` | `redis:7.2-alpine` | 6379 | Volume `redis-data`, append-only file on |
 
 **Keycloak** runs `start-dev --import-realm` with admin account `admin`/`admin`.
@@ -255,10 +256,22 @@ The local Operaton engine starts in two steps, both in `docker-compose.yml`.
    volume, so no external database is involved. It runs with
    `TZ=Europe/Amsterdam` and `-XX:MaxRAMPercentage=70.0`, and listens on host
    port **8081**. Its healthcheck is a TCP probe on the container's port 8080.
+   Since v2026.11.1 it also has the VM engine's security settings: REST
+   authentication and authorization checks on, and its own CORS off. The
+   invoice example is off, because it does not start on an empty database with
+   authorization on.
+3. **`operaton-accounts`** waits for the engine to be healthy and runs
+   `deployment/vm/operaton/provision-accounts.sh` — the script the VM uses — to
+   create the local service accounts `rbaBackend` and `ldeBackend` and the
+   read-only `publicReader`, with local-only passwords set in
+   `docker-compose.yml`. It is idempotent, so it runs on every `docker compose up`.
 
 The engine REST API is at `http://localhost:8081/engine-rest`, and the Operaton
-web apps are served on `http://localhost:8081`. The backend's
-`.env.example` uses `demo`/`demo` for both.
+web apps are served on `http://localhost:8081`. **The REST API requires a
+login**, as on the VM. The backend's `.env.example` uses the `rbaBackend`
+service account; the engine's admin account, `demo`, still works for the web
+apps and for scripts. The local engine runs Operaton 2.1.5, the VM's 1.0.0
+([#423](https://github.com/sgort/ronl-business-api/issues/423)).
 
 ### The engine starts empty
 
@@ -520,7 +533,7 @@ docker exec -it ronl-redis redis-cli ping      # PONG
 | OpenAPI | `http://localhost:3002/v1/openapi.json` | — |
 | Keycloak admin console | `http://localhost:8080` | `admin` / `admin` |
 | Operaton web apps | `http://localhost:8081` | `demo` / `demo` |
-| Operaton REST API | `http://localhost:8081/engine-rest` | `demo` / `demo` |
+| Operaton REST API | `http://localhost:8081/engine-rest` | Basic auth: the `rbaBackend` service account, or `demo` |
 | PostgreSQL | `localhost:5432` | `postgres` / `postgres`; `audit_user` / `audit_password` for `audit_logs` |
 | Redis | `localhost:6379` | — |
 | LDE backend (optional, sibling repo) | `http://localhost:3001/v1` | — |

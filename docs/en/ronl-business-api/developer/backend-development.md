@@ -4,7 +4,7 @@ component: RONL Business API
 
 # Backend Development
 
-The backend is `packages/backend` (`@ronl/backend`) — a Node.js 22 Express application written in TypeScript. The repository pins the runtime in `.nvmrc` at `22.23.3`, and the root `engines.node` is `>=22`; both App Service plans run `NODE|22-lts`.
+The backend is `packages/backend` (`@ronl/backend`) — a Node.js 22 Express application written in TypeScript. The repository pins the runtime in `.nvmrc` at `22.23.4`, and the root `engines.node` is `>=22`; both App Service plans run `NODE|22-lts`.
 
 ---
 
@@ -165,7 +165,7 @@ healthCheck(): Promise<{ status: 'up' | 'down' | 'stub'; reachable: boolean; aut
 
 When `EDOCS_STUB_MODE=true` (the default), all methods return realistic fake data and log what they would have done. The stub is transparent — callers cannot distinguish it from a live server.
 
-`externalTaskWorker.service.ts` polls Operaton's external task API (`POST /external-task/fetchAndLock`) using long-polling (`asyncResponseTimeout: 20 000 ms`). It handles three topics:
+`externalTaskWorker.service.ts` polls Operaton's external task API (`POST /external-task/fetchAndLock`) using long-polling (`asyncResponseTimeout: 20 000 ms`). Every call — fetch-and-lock, complete and failure — carries `OPERATON_USERNAME` / `OPERATON_PASSWORD` as basic auth (`operatonBasicAuth()` in `utils/operaton-auth.ts`), because the engine requires a login since v2026.11.1. It handles three topics:
 
 | Topic | Reads | Writes |
 |---|---|---|
@@ -178,6 +178,15 @@ The worker uploads as the service account. When the process carries `edocsAuthor
 The worker is started inside the `app.listen()` callback and stopped in both `SIGTERM` and `SIGINT` handlers. It will not begin polling until the HTTP server is fully bound.
 
 For configuration and live-mode switchover, see [Copilot Studio — eDOCS OAuth Integration](copilot-studio-edocs.md).
+
+---
+
+## Calling the engine
+
+The engine's REST API requires a login since v2026.11.1, and the backend calls it as its own service account, which has administrative rights there. Two rules follow for any new engine call:
+
+- **Go through `OperatonService`** (`services/operaton.service.ts`), which sends the configured credentials, rather than a bare `fetch` or `axios` call. `GET /v1/decision/:key` was the last route that did not; it now uses `operatonService.getDecisionDefinition()`. A direct call that cannot go through the service takes its credentials from `operatonBasicAuth()`.
+- **Put every value in an engine URL path through `engineSegment()`** (`utils/engine-segment.ts`). Express has already decoded route parameters, so a key such as `../../process-instance?x=` would otherwise reach another engine endpoint with the backend's rights. `engineSegment()` applies `encodeURIComponent`, keeps `:` readable for definition IDs, and throws on an empty value, `.` and `..`. All 39 path interpolations in `operaton.service.ts` use it.
 
 ---
 

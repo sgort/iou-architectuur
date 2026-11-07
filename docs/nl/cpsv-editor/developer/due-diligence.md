@@ -28,7 +28,7 @@ Formuliergebaseerde authoring van CPSV-AP 3.2.0-conforme dienstbeschrijvingen. T
 
 | Tabblad | Wat het vastlegt | Belangrijkste standaarden |
 |---|---|---|
-| Dienst | Identificatie, naam, beschrijving, sector, thematisch gebied, trefwoorden | CPSV-AP, DCAT |
+| Dienst | Identificatie, naam, beschrijving, sector, thematisch gebied, trefwoorden, vereiste diensten (`dct:requires`) | CPSV-AP, DCAT |
 | Organisatie | Bevoegd gezag, homepage, geografische jurisdictie, logo | CV, FOAF, ORG |
 | Juridisch | BWB/CVDR-wetgevingsreferentie, versie, RONL-analyse- & methodeconcepten | ELI, SKOS, RONL-vocabulaire |
 | Regels | Temporele bedrijfsregels met geldigheidsperioden en betrouwbaarheidsniveaus | CPRMV 0.4.1 |
@@ -38,7 +38,7 @@ Formuliergebaseerde authoring van CPSV-AP 3.2.0-conforme dienstbeschrijvingen. T
 | Kosten / Output | Dienstkosten en outputbeschrijvingen (ingebed in het tabblad Dienst) | CV |
 | Wijzigingslog | Versiegeschiedenis | Eigen formaat |
 
-Aanvullende mogelijkheden: TTL-import met volledige round-trip trust (`parseTTL.enhanced.js`, ~810 regels), TTL-export met live voorbeeldweergave, formuliervalidatie, CPRMV JSON-import en een "alles wissen"-reset.
+Aanvullende mogelijkheden: TTL-import met volledige round-trip trust (`parseTTL.enhanced.js`, ~840 regels), TTL-export met live voorbeeldweergave, formuliervalidatie, CPRMV JSON-import en een "alles wissen"-reset.
 
 ### 2 — Leveranciersintegratie
 
@@ -107,13 +107,13 @@ De `useDsoImport`-hook (`src/hooks/useDsoImport.js`, v1.9.6) verwerkt een deep-l
 | Frontend | React 19, Vite, Tailwind CSS, Lucide-iconen |
 | Statusbeheer | React hooks (`useEditorState`, `useArrayHandlers`), geen externe state-library |
 | Build & lint | Vite, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
-| Testen | Vitest 5, `@testing-library/react`, Playwright — 776 tests in 62 bestanden, alle geslaagd (gemeten op 10 oktober 2026), met 90,28% statements, 88,42% branches, 78,92% functions en 90,96% lines; plus 4 end-to-end-journeys ([Testing](testing.md)) |
+| Testen | Vitest 5, `@testing-library/react`, Playwright — 812 tests in 65 bestanden, alle geslaagd (gemeten op 7 november 2026), met 90,55% statements, 88,75% branches, 79,80% functions en 91,19% lines; plus 4 end-to-end-journeys ([Testing](testing.md)) |
 | TTL-parsing | Eigen handgeschreven parser (geen RDF-library-afhankelijkheid) |
 | DMN-parsing | Browser DOMParser (XML) |
 | Externe API's | TriplyDB REST + SPARQL, Operaton REST (Camunda-compatibel), RONL SPARQL-vocabulaire |
-| Backend-afhankelijkheid | Gedeelde Express-server (Linked Data Explorer-repo) voor CORS-geproxyde SPARQL-queries, TriplyDB-service-updates en DMN-syntactische validatie (libxmljs2) |
+| Backend-afhankelijkheid | Gedeelde Express-server (Linked Data Explorer-repo) voor CORS-geproxyde SPARQL-queries (de RONL-vocabulaire en de lijst gepubliceerde diensten), TriplyDB-service-updates, DMN-syntactische validatie (libxmljs2), het deployen en evalueren van DMN's, de SHACL-validatie vóór publicatie en de DSO-import |
 | Hosting | Azure Static Web Apps (acc-branch → acceptatie, main → productie) |
-| CI/CD | GitHub Actions: lint, tests en de productiebuild op de runner (Node 24.21.0 uit `.nvmrc`), geüpload naar Azure Static Web Apps met `skip_app_build`; bij elke pull request een verplichte lockfile-review en controle van registry-handtekeningen en provenance-attestaties; een dagelijkse dependency-audit, een driemaandelijkse dependency-review en een SBOM per release van elk productiepakket ([Deployment](deployment.md)) |
+| CI/CD | GitHub Actions: lint, tests en de productiebuild op de runner (Node 24.22.1 uit `.nvmrc`), geüpload naar Azure Static Web Apps met `skip_app_build`; bij elke pull request een verplichte lockfile-review en controle van registry-handtekeningen en provenance-attestaties; een dagelijkse dependency-audit, een driemaandelijkse dependency-review en een SBOM per release van elk productiepakket ([Deployment](deployment.md)) |
 
 ---
 
@@ -123,7 +123,7 @@ De `useDsoImport`-hook (`src/hooks/useDsoImport.js`, v1.9.6) verwerkt een deep-l
 
 **Wat te beoordelen:**
 
-- **Geen RDF-library.** TTL-parsing en -generatie zijn volledig handgeschreven (een parser van ~810 regels en een generator van ~1640 regels). Dit werkt maar is fragiel voor randgevallen. Evalueer of het introduceren van een lichtgewicht RDF/JS-library (bijv. N3.js) de onderhoudslast zou verlagen versus de kosten van migratie.
+- **Geen RDF-library.** TTL-parsing en -generatie zijn volledig handgeschreven (een parser van ~840 regels en een generator van ~1660 regels). Dit werkt maar is fragiel voor randgevallen. Evalueer of het introduceren van een lichtgewicht RDF/JS-library (bijv. N3.js) de onderhoudslast zou verlagen versus de kosten van migratie.
 
 - **App.jsx-orkestratie.** De hoofd-`App.jsx` (1243 regels) is gedeeltelijk gemodulariseerd: datastatus leeft in `useEditorState`, array-CRUD-operaties in `useArrayHandlers`, TTL-importlogica in `importHandler.js` en TTL-generatie in `ttlGenerator.js`. Wat in App.jsx overblijft is UI-orkestratie (tabweergave, bericht-/statusbeheer), de publicatieworkflow (~300 regels stap-voor-stap voortgangsregistratie) en code die status aan child componenten koppelt. Verdere extractiedoelen: de publicatie-handler zou een custom hook kunnen worden (`usePublishWorkflow`), en de tabnavigatie + berichtensysteem kan worden gescheiden van de data wiring.
 
@@ -131,7 +131,7 @@ De `useDsoImport`-hook (`src/hooks/useDsoImport.js`, v1.9.6) verwerkt een deep-l
 
 - **localStorage voor configuratie.** TriplyDB-credentials worden opgeslagen in localStorage. Prima voor een prototype, maar voor een productietool die door meerdere teams wordt gebruikt, behoeft een andere secrets-/configuratiebeheer­aanpak.
 
-- **Gedeelde backend.** De Express-backend is onderdeel van de Linked Data Explorer-repo. De CPSV Editor is ervan afhankelijk voor drie zaken: CORS-geproxyde SPARQL-queries (RONL-vocabulaire), TriplyDB-service-herindexering en DMN-syntactische validatie (de vijflaagse validator gebruikt libxmljs2, dat een Node.js-runtime vereist). Wijzigingen aan de backend beïnvloeden de CPSV Editor. Verduidelijk eigenaarschap, versiebeheer (API v1-header is reeds aanwezig) en deploykoppeling.
+- **Gedeelde backend.** De Express-backend is onderdeel van de Linked Data Explorer-repo. De CPSV Editor is ervan afhankelijk voor CORS-geproxyde SPARQL-queries (de RONL-vocabulaire en, sinds v2026.11.0, de publieke diensten die in de dataset zijn gepubliceerd), TriplyDB-service-herindexering, DMN-syntactische validatie (de vijflaagse validator gebruikt libxmljs2, dat een Node.js-runtime vereist), het deployen en evalueren van DMN's op Operaton, de SHACL-validatie vóór publicatie en de DSO-import. Wijzigingen aan de backend beïnvloeden de CPSV Editor. Verduidelijk eigenaarschap, versiebeheer (API v1-header is reeds aanwezig) en deploykoppeling.
 
 - **Separatiemogelijkheid.** De vier domeinen (editor, leverancier, publicatie, DMN) zijn losjes gekoppeld via de gedeelde editor-state. Een modulaire architectuur — of als aparte routes/lazy-loaded modules binnen de SPA (Single Page Application), of als onafhankelijke micro-frontends die een TTL-datacontract delen — zou de onderhoudbaarheid verbeteren en onafhankelijke release-cycli mogelijk maken. Een eerste stap in die richting is gezet: sinds v2026.09.2 worden de vier zwaarste tabbladen — `ChangelogTab`, `CPRMVTab`, `DMNTab` en `VendorTab` — lazy geladen, waardoor de entry-chunk van 685,71 naar 392,74 kB ging.
 

@@ -4,7 +4,9 @@ component: RONL Business API
 
 # Keycloak Deployment (VM)
 
-Keycloak runs in Docker on the VM (`open-regels.nl`). Two fully isolated instances run in parallel: ACC and PROD. Each has its own PostgreSQL database container and custom RONL theme.
+Keycloak runs in Docker on the VM (`open-regels.nl`). Two fully isolated instances run in parallel: ACC and PROD. Each has its own PostgreSQL database container (`postgres:16-alpine`, pinned by digest) and the custom RONL theme.
+
+The theme exists once in the repository, in `keycloak-themes/ronl/`: the local stack loads it from there, and the VM's `/opt/keycloak/themes` folder, which both compose files mount, is filled from it by hand. The older copy under `deployment/vm/keycloak/themes/` was mounted by nothing and has been removed. Automating the VM side is [#196](https://github.com/sgort/ronl-business-api/issues/196).
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: Keycloak Custom Theme Login Page](../../../../assets/screenshots/ronl-keycloak-digid-login.png)
@@ -19,22 +21,21 @@ Keycloak runs in Docker on the VM (`open-regels.nl`). Two fully isolated instanc
 ronl-business-api/
 ├── deployment/vm/keycloak/
 │   ├── acc/
-│   │   ├── docker-compose.yml      # ACC configuration
-│   │   ├── README.md               # ACC setup guide
+│   │   ├── docker-compose.yml      # ACC configuration; mounts /opt/keycloak/themes
 │   │   └── .env.example            # ACC environment template
-│   ├── prod/
-│   │   ├── docker-compose.yml      # PROD configuration
-│   │   ├── README.md               # PROD setup guide
-│   │   └── .env.example            # PROD environment template
-│   └── themes/
-│       └── ronl/                   # Custom RONL theme
-│           └── login/
-│               ├── login.ftl       # FreeMarker template
-│               ├── theme.properties
-│               ├── resources/css/
-│               │   └── login.css   # Custom styles
-│               └── messages/
-│                   └── messages_nl.properties
+│   └── prod/
+│       ├── docker-compose.yml      # PROD configuration; mounts /opt/keycloak/themes
+│       └── .env.example            # PROD environment template
+├── keycloak-themes/
+│   └── ronl/                       # Custom RONL theme — the one copy
+│       └── login/
+│           ├── login.ftl           # FreeMarker template
+│           ├── theme.properties
+│           ├── resources/css/
+│           │   ├── flevoland-tokens.css  # Copy of Flevoland IT's token file
+│           │   └── login.css       # Custom styles, on those tokens
+│           └── messages/
+│               └── messages_nl.properties
 └── config/keycloak/
     └── ronl-realm.json             # Realm configuration (users, clients, mappers)
 ```
@@ -67,7 +68,7 @@ The RONL theme provides a consistent visual experience from the MijnOmgeving lan
 
 **Visual Design:**
 
-- ✅ Blue gradient header (`from-blue-600 to-blue-700`)
+- ✅ Flevoland's colours for every tenant: Keycloak has one client for all tenants and cannot tell them apart before sign-in, so the page uses Flevoland IT's semantic tokens (`flevoland-tokens.css`), with a header gradient from the brand primary to its active shade. The DigiD, eHerkenning and eIDAS buttons keep their own colours. The front end's *Verbinding maken...* screen uses the same blues
 - ✅ Modern rounded input fields with focus states
 - ✅ Custom styled buttons with hover animations
 - ✅ Responsive mobile-first design
@@ -88,10 +89,11 @@ The RONL theme provides a consistent visual experience from the MijnOmgeving lan
 ```
 ronl/login/
 ├── login.ftl                          # Main login template
-├── theme.properties                   # Theme configuration
+├── theme.properties                   # Theme configuration; styles=css/flevoland-tokens.css css/login.css
 ├── resources/
 │   └── css/
-│       └── login.css                  # Custom styles (~500 lines)
+│       ├── flevoland-tokens.css       # Kept in step by `npm run sync:keycloak-tokens` and a test
+│       └── login.css                  # Custom styles, semantic tokens only
 └── messages/
     └── messages_nl.properties         # Dutch translations (40+ strings)
 ```
@@ -205,7 +207,7 @@ On your local machine:
 cd ~/Development/ronl-business-api
 
 # Create theme tarball
-cd deployment/vm/keycloak/themes
+cd keycloak-themes
 tar -czf ronl-theme.tar.gz ronl/
 
 # Upload to VM
@@ -434,20 +436,23 @@ When theme files change (CSS updates, translations, etc.):
 ```bash
 cd ~/Development/ronl-business-api
 
-# Make changes to theme files
-nano deployment/vm/keycloak/themes/ronl/login/resources/css/login.css
+# On a feature branch: change the theme files
+nano keycloak-themes/ronl/login/resources/css/login.css
+# After a change to Flevoland IT's token file, refresh the theme's copy
+npm run sync:keycloak-tokens
 
-# Commit changes
-git add deployment/vm/keycloak/themes/
-git commit -m "style: update Keycloak theme styling [no ci]"
-git push origin acc
+git add keycloak-themes/
+git commit -m "style: update Keycloak theme styling"
+git push origin <your-branch>   # then open a pull request into acc
 ```
+
+A change under `keycloak-themes/` runs the acceptance frontend workflow, whose suite holds the theme's guard tests (`keycloak-theme.test.ts`, `css-hex.test.ts`). Deploy to the VM once the pull request is merged.
 
 ### Step 2 — Deploy to VM
 
 ```bash
 # Create new tarball
-cd deployment/vm/keycloak/themes
+cd keycloak-themes
 tar -czf ronl-theme.tar.gz ronl/
 
 # Upload to VM
@@ -497,7 +502,7 @@ Store backups off-VM (e.g., Azure Blob Storage with a 30-day retention policy).
 ### Theme Backup
 
 Theme files are version-controlled in the Git repository:
-- `deployment/vm/keycloak/themes/ronl/`
+- `keycloak-themes/ronl/`
 
 No separate backup needed—restore from Git if needed.
 

@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # TriplyDB Publishing
 
 The editor can publish service metadata directly to a TriplyDB knowledge graph without any manual file handling. The publish feature is available via the **Publish** button in the bottom-right of the application.
@@ -50,6 +54,8 @@ Each step transitions from pending to complete as it finishes. On success, the d
 ## Configuration
 
 Publishing requires four values: the TriplyDB base URL, account name, dataset name, and an API token. The token is stored in browser localStorage — it is never transmitted to any server other than the configured TriplyDB instance.
+
+The same base URL, account and dataset also feed the Service tab's **Required services** picker, which lists the public services already published to that dataset. That query goes through the shared backend's SPARQL proxy and never carries the API token, so a private dataset lists nothing there and a URI has to be pasted instead.
 
 An optional **Test Connection** button verifies credentials before publishing, without uploading any data.
 

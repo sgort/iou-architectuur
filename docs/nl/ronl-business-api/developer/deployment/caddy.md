@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Caddy (Reverse Proxy)
 
 !!! info "Documentatie in ontwikkeling"
@@ -24,6 +28,10 @@
 ---
 
 ## Deploying Caddy
+
+---
+
+## Operaton
 
 ---
 

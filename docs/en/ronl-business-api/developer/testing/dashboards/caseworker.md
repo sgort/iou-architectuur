@@ -7,21 +7,30 @@ component: RONL Business API
 The caseworker portal is the oldest and largest board, and the one whose
 end-to-end journeys exercise the full Operaton stack.
 
-**Frontend: 52 files · 587 tests**, including the shared process view.
-**E2E: 4 specs · 4 tests**, all passing on 9 October 2026.
+**Frontend: 59 files · 646 tests**, including the shared process view.
+**E2E: 4 specs · 4 tests**, all passing on 7 November 2026.
 
 ---
 
 ## Frontend
 
-Re-derived on **9 October 2026** at `ebec288` (v2026.10.1). The frontend
-package was measured the same day — 130 files, 1540 tests, all passing — but
-Vitest's console reports only that total, so the per-file and per-area counts
-below are taken from the source, each test file parsed with its `.each`
-tables expanded. Summed over the whole package the method gives exactly the
-runner's 1540.
+Measured on **7 November 2026** at `c6cf3ac`, a tree identical to `main`
+at `35fb3a8` (v2026.11.1): the frontend package ran 143 files and 1738 tests,
+all passing, and the per-file and per-area counts below are read from
+Vitest's JSON report of that run, which sums to the runner's total.
 
-**v2026.10.1 took eleven tests off this board and added none of its own.**
+**v2026.10.3 to v2026.11.1 changed nothing in this board's own directories
+and grew the shared process view by 59 tests.** `components/process/` went
+from 8 files and 123 tests to **14 files and 182**: ProcessView, the one
+rendering the Caseworker overview and the Infra-board's project page now share,
+brought six new files, and the swimlane and overlay tests grew with the legend,
+the task marks and the gateway shapes. `TakenInbox.test.tsx` kept its 32 with
+*Procesgegevens* now its own folded component. The colour work of v2026.11.0
+added no test to this board: its guards (`css-hex.test.ts`,
+`css-tokens.test.ts` and the rest) sit at the package root and belong to no
+board.
+
+**History, 9 October: v2026.10.1 took eleven tests off this board and added none of its own.**
 The DVTP sections went from the caseworker dashboard, and their two test
 files with them — `CaseworkerDashboard/DvtpStartSection.test.tsx` (5) and
 `DvtpTakenSection.test.tsx` (7). `pages/CaseworkerDashboardV2.test.tsx` went
@@ -56,7 +65,7 @@ detail draws its phase stepper and swimlane with the same components.
 |---|---:|---:|
 | `components/CaseworkerDashboard` (shared section library) | 26 | 232 |
 | `components/CaseworkerDashboardV2` (including `regelsimulatie/`) | 16 | 193 |
-| **`components/process`** (the process view, shared with the Infra-board) | 8 | 123 |
+| **`components/process`** (the process view, shared with the Infra-board) | 14 | 182 |
 | `pages/caseworker-v2` (`modes.config`) | 1 | 24 |
 | `pages/CaseworkerDashboardV2.test.tsx` | 1 | 15 |
 
@@ -89,27 +98,34 @@ Largest files outside `components/process/`:
 | `CaseworkerDashboard/TaskFormViewer.test.tsx` | 14 | Rendering and submitting an Operaton task form |
 | `pages/CaseworkerDashboardV2.test.tsx` | 15 | The page container — since v2026.10.1 logging out to the user's own tenant landing page |
 
-**The process view** — new in v2026.09.14, all but one file new then:
+**The process view** — new in v2026.09.14, and since v2026.10.3 the one
+rendering every dashboard uses (ProcessView):
 
 | File | Tests | Covers |
 |---|---:|---|
-| `process/PhaseSwimlane.test.tsx` | 38 | The swimlane renderer, moved here from `InfraBoardDashboard/` (22 tests there): collision stacking, the caseworker additions, readable gateway labels (`edgeLabelText`) and the roomier density |
-| `process/laneSteps.test.ts` | 19 | Pure step-list logic: lane metadata, which lanes are the user's, the trail and the hand-overs between lanes |
-| `process/ProcessLaneSteps.test.tsx` | 13 | *Processtappen per rol* — the steps grouped by role |
-| `process/ProcessOverlay.test.tsx` | 13 | The whole-process overlay with its stepper and swimlane |
+| `process/PhaseSwimlane.test.tsx` | 48 | The swimlane renderer, moved here from `InfraBoardDashboard/` (22 tests there): collision stacking, readable gateway labels (`edgeLabelText`), the roomier density, and since v2026.10.3 the gateway shapes, the task marks and slim empty lanes (38 on 9 October) |
+| `process/laneSteps.test.ts` | 23 | Pure step-list logic: lane metadata, which lanes are the user's, the trail, the hand-overs between lanes, and gateways named by kind (19 on 9 October) |
+| `process/processMarks.test.ts` | 21 | **New in v2026.10.3.** Task marks (mine, claimed, open), the viewer's lanes, the legend entries — only what the diagram shows — gateway kinds and bare-id labels |
+| `process/ProcessOverlay.test.tsx` | 17 | The whole-process overlay, since v2026.10.3 drawn through ProcessView (13 on 9 October) |
+| `process/ProcessLaneSteps.test.tsx` | 15 | *Processtappen per rol* — the steps grouped by role (13 on 9 October) |
 | `process/ProcessWhere.test.tsx` | 12 | *Waar sta ik* — the phase and the step on the stepper; since v2026.10.0 nothing for a process without phases, and a process's own declared phases numbered and captioned under its own label (9 on 30 September) |
 | `process/useTaskProcessContext.test.ts` | 11 | Loading a task's process context across the call chain |
 | `process/processContext.test.ts` | 10 | `buildProcessContext` — splicing a sub-process's history into its parent's, in engine order, and carrying a declared phase set (9 on 30 September) |
 | `process/PhaseStepper.test.tsx` | 7 | The phase stepper, shared with the Infra-board |
+| `process/ProcessView.test.tsx` | 6 | **New in v2026.10.3.** Stepper slot, title bar, legend and swimlane assembled from a dashboard's data and the viewer |
+| `process/ProcessVarsDisclosure.test.tsx` | 3 | **New in v2026.10.3.** *Procesgegevens*, folded by default |
+| `process/process-view-guard.test.ts` | 3 | **New in v2026.10.3.** Nothing outside `components/process` imports `PhaseSwimlane` |
+| `process/status.test.ts` | 3 | **New in v2026.10.3.** The node status vocabulary and its token colours |
+| `process/useViewer.test.ts` | 3 | **New in v2026.10.3.** The viewer read from the Keycloak token |
 
-Coverage on 9 October (statements / branches):
-`components/CaseworkerDashboard` **94.2 / 94.51**,
-`components/CaseworkerDashboardV2` **91.98 / 93.22**, the `regelsimulatie`
-sub-directory 98.33 / 88.59, and `components/process` **99.16 / 91.18**.
+Coverage on 7 November (statements / branches), from the run's
+`coverage-final.json`: `components/CaseworkerDashboard` **94.2 / 94.51**,
+`components/CaseworkerDashboardV2` **92.69 / 93.36**, the `regelsimulatie`
+sub-directory 98.33 / 88.59, and `components/process` **99.33 / 92.46**.
 `BesluitOverzichtSection.tsx` is still the lowest file in the frontend by
 branches, at **80.43%** — half a point above the floor — and
 `process/phaseSet.ts`, the phase set a process declares, is at 83.33%; they
-are the only two files below 85 in the repository; see
+are still the only two files below 85 in the repository; see
 [Coverage](../coverage.md#frontend-by-area).
 
 !!! note "The simulator carries a real performance budget"
@@ -135,12 +151,19 @@ untenanted SVB, SZW and Heusdenpas decisions, and informs the applicant —
 the first journey on this board for an organisation other than Flevoland and
 Dienst Toeslagen.
 
-**All four were measured on 9 October 2026**, as part of the full frontend
-run against the developer's already-running local stack (42 passed,
-5 skipped, 2.6m): **one test each, all passing** — `caseworker-journey` in
-15.0s, `heusdenpas-journey` in 11.8s, `thuisbatterij-journey` in 7.7s and
-`zorgtoeslag-journey` in 6.2s. On 3 October the first three passed in 24.5s,
-8.4s and 6.1s. See [E2E & live smoke](../e2e.md#coverage-per-board), which
+**All four were measured on 7 November 2026**, as part of the full frontend
+run against the developer's already-running local stack (56 passed,
+5 skipped, 6.4m): **one test each, all passing** — `caseworker-journey` in
+20.6s, `heusdenpas-journey` in 27.9s, `thuisbatterij-journey` in 11.4s and
+`zorgtoeslag-journey` in 9.5s. On 9 October they passed in 15.0s, 11.8s,
+7.7s and 6.2s.
+
+Two specs new since then touch this board without belonging to it alone:
+`process-view.spec.ts` checks the Caseworker's process overview against the
+shared ProcessView rules (one of its three tests, passing), and
+`accessibility.spec.ts` scans Caseworker V2 for Flevoland and for Heusden
+(two of its ten, both passing). Both are attributed on
+[E2E & live smoke](../e2e.md#coverage-per-board). See [E2E & live smoke](../e2e.md#coverage-per-board), which
 also tabulates v2026.10.1's specs for the citizen portal and the landing
 pages — they reach this board's login but belong to no board.
 

@@ -4,7 +4,7 @@ component: RONL Business API
 
 # Woo-dashboard — tests
 
-**Frontend: 15 files · 77 tests. E2E: none yet.**
+**Frontend: 15 files · 77 tests. E2E: no spec drives it; one accessibility scan loads it.**
 
 The Woo dashboard is the most thinly tested of the four boards by test count,
 while reporting high coverage percentages. Both things are true at once, and
@@ -15,13 +15,13 @@ reassurance.
 
 ## Frontend
 
-Re-derived on **9 October 2026** at `ebec288` (v2026.10.1), where every count
-and coverage figure below is the same as on 30 September and 3 October —
-neither v2026.10.0 nor v2026.10.1 touched this board. The frontend package was
-measured the same day — 130 files, 1540 tests, all passing — but Vitest's
-console reports only that total, so the counts below are taken from the
-source, each test file parsed with its `.each` tables expanded; summed over
-the whole package the method gives exactly the runner's 1540.
+Measured on **7 November 2026** at `c6cf3ac`, a tree identical to `main`
+at `35fb3a8` (v2026.11.1): the frontend package ran 143 files and 1738 tests,
+all passing, and the counts below are read from Vitest's JSON report of that
+run. Every count is the same as on 30 September and 3 and 9 October. The
+releases since touched this board's source only to move its colours onto the
+shared tokens (`charts.tsx`, `WooNoAccessPanel.tsx`, `dashboard-woo.css`); no
+test changed.
 
 | Area | Files | Tests |
 |---|---:|---:|
@@ -71,10 +71,13 @@ the latter up from 96.55 / 84.12 / 94.44 / 98.01.
 
 ## E2E
 
-**None.** There is no Playwright spec that drives this board — verified against
-`packages/frontend/e2e/` on 30 August 2026, at `ae06c9e` on 30 September, in
-the full frontend run of 3 October and in that of 9 October, whose 47 tests
-include none that drives this board — `login-redirect` only checks that
+**No spec drives this board.** Verified against `packages/frontend/e2e/` on
+30 August 2026, at `ae06c9e` on 30 September, in the full frontend runs of
+3 and 9 October, and in that of 7 November, whose 61 tests include none that
+drives it. Since v2026.11.0 `accessibility.spec.ts` signs in as
+`test-woo-flevoland`, waits for `/dashboard/woo` and scans it with axe-core
+(one test, passing on 7 November) — that proves the page renders and meets the
+accessibility baseline, not that any of its sections work. Otherwise `login-redirect` only checks that
 `test-woo-flevoland` lands on it, and v2026.10.1's `landing-access-denied`
 opens the Woo card as a caseworker to assert the landing page's
 *Geen toegang tot Woo-dashboard* dialog, which is the landing page's

@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # DMN Discovery & Chain Building
 
 The Chain Builder is the central feature of the Linked Data Explorer. It queries the active TriplyDB endpoint for all published DMN decision models, displays them with their input and output variables, and lets you compose them into executable chains.
@@ -17,6 +21,17 @@ When you open the Chain Builder, it queries TriplyDB using the CPRMV vocabulary 
     The DMN picker (and the `/v1/dmns` endpoint) match `cprmv:DecisionModel` under **both** the legacy `0.3.0` namespace and the current `0.4.1` namespace (`https://standaarden.open-regels.nl/standards/cprmv/0.4.1#`). DMNs published by the CPSV Editor under 0.4.1 (e.g. `vast_bedrag_op_vestiging`) therefore appear in the picker alongside older 0.3.0 data until the 0.3.0 data is migrated.
 
 Expanding a card reveals its full variable list: input variables in blue, output variables in green, each with its name, identifier, and datatype (`Integer`, `String`, `Boolean`, `Date`).
+
+### Services a DMN relies on
+
+A public service can declare the services it relies on with `dct:requires`, which the CPSV Editor publishes. When it does, the card of its DMN shows **Requires:** with those services, and the card of a DMN whose service is relied on shows **Required by:**. *Required by* is worked out from the declarations on the endpoint you are viewing. A linked service is named by its DMN identifier when it has a DMN in the list, else by its title, else by the last part of its URI; hovering a name shows the full URI. The same lines appear on the cards in the Chain Composer and on the info card of the BPMN Modeler's **Link to DMN/DRD** panel.
+
+The links are context only. They do not add a DMN to a chain or decide the order of execution, which stays in the BPMN process.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: A DMN card in Available DMNs and the same DMN in the Chain Composer, each listing the services it requires and is required by](../../assets/screenshots/linked-data-explorer-dmn-service-links.png)
+  <figcaption>A DMN card in Available DMNs and the same DMN in the Chain Composer, each listing the services it requires and is required by</figcaption>
+</figure>
 
 ---
 

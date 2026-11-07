@@ -10,10 +10,12 @@ Infra-board is portfolio steering for infrastructure projects. It organises proj
 
 On opening the board you see projects grouped by phase, with their status and RIP information, so the portfolio's progress is visible in one view.
 
+**A project between two phases stays in view.** When a project has finished a phase and the next has not been started yet, the portfolio shows it at the phase it finished, marked *wachtend* and labelled *… afgerond · wacht op start van* the next phase — the same projects Beheer lists under *Starten*. The rail's **Wacht op start** counts them. A project that has finished R6.1 reads **RIP afgerond**. On the *Per fase* board a waiting card names the phase it waits for, and opening the project shows the finished phase and what comes next.
+
 Since September 2026 the **Faseladder reads twelve of twelve deelprocessen inzetbaar** — every RIP phase from R2.1 through R6.1 is modelled and deployed, where previously only R2.1 was. Three things follow for you:
 
 - **Finishing a phase readies the project for the next one.** A completed instance moves its project into the following phase's *Starten* list automatically, so you no longer start each phase from a standing position.
-- **Every phase has a real diagram.** Opening a project shows the process drawn from the model actually deployed on the engine, not a hand-maintained sketch — including its rework loops, and coloured by what genuinely ran when you select a finished rung.
+- **Every phase has a real diagram.** Opening a project shows the process drawn from the model actually deployed on the engine, not a hand-maintained sketch — including its rework loops, and coloured by what genuinely ran when you select a finished rung. It looks the same as the Caseworker's process overview: a legend that lists only what the diagram shows, the lanes you work in marked **jouw rol**, your own task marked **jouw taak** and a colleague's claimed task **geclaimd**, and a dashed outline on every task that is not yours. A decision is a diamond with a question mark and its question above it; a parallel split or join is a bar captioned *tegelijk* or *alles klaar*.
 - **A task shows every document it carries.** Where a process step produces more than one deliverable, the diagram gives it one badge per document rather than naming only the first. R2.2's *Opstellen concept VO* is the clearest case: it yields both an **Ontwerptoelichting** and an **Objectenboom**, and both are named on the node.
 
 <figure markdown style="width:100%; margin:0;">
@@ -53,6 +55,12 @@ nothing is entered twice.
 outside the board — by a script, or by someone else — the live rows pick it up
 when you come back to the tab, and when you switch between Mijn dag, Portfolio
 and Beheer. A page reload is no longer needed for it to appear.
+
+---
+
+## Working on a task
+
+In a task's panel the process variables, **Procesgegevens**, start folded: **Gegevens tonen** opens them. Claiming a task refreshes the project's open tasks at once, so the diagram's marks follow straight away.
 
 ---
 

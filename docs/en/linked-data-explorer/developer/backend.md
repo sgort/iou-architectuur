@@ -118,6 +118,8 @@ GET /v1/dmns?endpoint={sparql_endpoint_url}
 
 Queries TriplyDB for all `cprmv:DecisionModel` resources at the given endpoint. Returns models with full variable lists and governance/vendor metadata. Cached per endpoint for 5 minutes.
 
+Since v2026.11.0 each model can also carry `requires` and `requiredBy`: the services its public service declares with `dct:requires`, and the services on the same endpoint that declare it. Each entry is a `ServiceLink` — the service URI, its `dct:title`, and its DMN identifier when that service has a DMN in the list — sorted by URI. A key is present only when its list is non-empty, and a failed `dct:requires` query leaves both out rather than failing the list. The links are context only; the backend does not act on them.
+
 ```
 GET /v1/dmns/:identifier?endpoint={url}
 ```
@@ -516,6 +518,8 @@ findSemanticEquivalences(endpoint: string): Promise<SemanticEquivalence[]>
 
 The `findEnhancedChainLinks` query uses a `BIND(IF(...))` pattern to categorise each link as `exact`, `semantic`, or `both`, then expands `both` entries into two separate records post-query. This is the mechanism described in [Enhanced Validation](enhanced-validation.md).
 
+`getServiceRequirements` fetches every `dct:requires` pair on the endpoint in one query, after the one aggregated vendor-count query, deduplicates the pairs (a service with titles in several languages yields one) and drops self-links. `attachServiceLinks` then sets `requires` and `requiredBy` on each DMN, matched on its service URI. Like the vendor counts, the query degrades to an empty list on failure.
+
 A separate `norms.service.ts` handles the `cprmv:Rule` publish-format query backing `/v1/norms`. It builds the query dynamically — filter clauses (rulesetid exact-match, applicable date `CONTAINS`) are injected only after upstream regex validation — then aggregates parent/child rows into nested objects with deterministic key ordering matching `cprmv-example.json`. The same file holds the `/v2/norms` selection: `selectInForce` picks, per ruleset, the latest period starting on or before `valid_on`; `narrowDatasetVersions` narrows `dataset_versions` to that period's records; and `getNormsInForce` runs the v1 rules query without a date filter and applies both, so the date never reaches SPARQL. What the two route versions share — input validation, cache headers and the JSON envelope — lives in `routes/norms.shared.ts`, so they cannot drift apart on those parts.
 
 ---
@@ -557,6 +561,10 @@ Request payload maps to Operaton's variable format:
 
 For DRD execution, the same endpoint is used with the DRD entry-point identifier. Operaton handles internal decision dependency evaluation.
 
+**Authentication.** Operaton's REST API requires a login (since v2026.11.1). `utils/operaton-auth.ts` builds basic-auth credentials from `OPERATON_USERNAME` and `OPERATON_PASSWORD`, and the shared axios client sends them on every call; the external task worker and the health probe use the same helper. When either value is missing nothing is sent, which local development and the tests rely on. On ACC and production `validateConfig` refuses to start without both.
+
+**Path values are encoded.** Every value placed in an engine URL path — the decision key of both evaluate calls, and the key and definition id behind `fetchDmnXml` — goes through `utils/engine-segment.ts`. `engineSegment()` percent-encodes the value, leaves `:` readable for definition ids (`key:version:uuid`), and throws on an empty value, `.` or `..`. Express decodes route parameters before a handler sees them, so without this a request could reach a different engine endpoint under the backend's credentials.
+
 ---
 
 ## eDOCS service
@@ -584,6 +592,8 @@ When `EDOCS_STUB_MODE=true`, all methods return realistic fake data and log what
 | `rip-edocs-document`  | `edocsWorkspaceId`, `documentTemplateId`, `edocsDocumentVariableName`, + template variables | `<edocsDocumentVariableName>` (e.g. `edocsIntakeReportId`)        |
 
 `documentTemplateId` and `edocsDocumentVariableName` are injected per ServiceTask via `camunda:inputParameter` in the BPMN, making the single topic handler reusable across all three document upload steps in the RIP Phase 1 process.
+
+Its calls to Operaton — `fetchAndLock`, `complete` and `failure` — send the same basic-auth credentials as the shared client (since v2026.11.1).
 
 The worker starts inside the `app.listen()` callback and stops in both `SIGTERM` and `SIGINT` handlers.
 
@@ -684,11 +694,11 @@ cannot permanently block a retry.
 
 The connect-time layer was finished in v2026.09.6: the client now pins the http adapter and HTTP/1 on **every** request rather than relying on the default, and a refused redirect surfaces as `EOUTBOUNDREFUSED` instead of a generic connection error. The unreachable `::/128` and `::1/128` entries were dropped from the internal-address list, `test-connection` gained its own request schema with `apiToken` optional, and the credential-leak test now searches the whole call rather than part of it.
 
-TriplyDB calls that forward the caller's token go only to `https:` hosts in `TRIPLYDB_ALLOWED_HOSTS`. Processes deploy only to the configured Operaton, through the shared client that carries `OPERATON_API_KEY` — a request can no longer name the Operaton URL or supply credentials. `ALLOW_LOCAL_ENDPOINTS=true` admits `http:` and local addresses for local development, and is never set on ACC or production.
+TriplyDB calls that forward the caller's token go only to `https:` hosts in `TRIPLYDB_ALLOWED_HOSTS`. Processes deploy only to the configured Operaton, through the shared client, which logs in with `OPERATON_USERNAME` and `OPERATON_PASSWORD` — a request can no longer name the Operaton URL or supply credentials. `ALLOW_LOCAL_ENDPOINTS=true` admits `http:` and local addresses for local development, and is never set on ACC or production.
 
 **CSP reports** — `POST /v1/csp-reports` receives the frontend's Content-Security-Policy violation reports in both formats (`application/csp-report` and `application/reports+json`, up to 64 KB) and logs one warning line per violation. It stores nothing.
 
-**Environment variables** — all sensitive configuration (TriplyDB endpoint URLs, Operaton API URLs, CORS origins, eDOCS credentials) is stored in environment variables and never hardcoded. eDOCS-specific variables: `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, `EDOCS_PASSWORD`, `EDOCS_STUB_MODE`.
+**Environment variables** — all sensitive configuration (TriplyDB endpoint URLs, Operaton API URLs, CORS origins, eDOCS credentials) is stored in environment variables and never hardcoded. The Operaton login: `OPERATON_USERNAME` and `OPERATON_PASSWORD`, required on ACC and production. eDOCS-specific variables: `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, `EDOCS_PASSWORD`, `EDOCS_STUB_MODE`.
 
 **Error responses** — the central error handler scrubs stack traces and internal context before returning responses to clients, ensuring no implementation details are exposed.
 

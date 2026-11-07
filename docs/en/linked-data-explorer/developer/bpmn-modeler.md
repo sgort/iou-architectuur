@@ -403,7 +403,7 @@ The call still uses the legacy `/api/dmns/...` alias, which the backend serves t
 
 The organization goes in Operaton's native `tenant-id` field.
 
-Processes deploy **only to the configured Operaton**. `deployProcess()` always uses the shared client, built from `OPERATON_BASE_URL` and carrying `OPERATON_API_KEY`, so Operaton credentials stay on the backend. For older frontends, an `operatonUrl` equal to the configured one is still accepted; any other answers `400`, and `operatonUsername` and `operatonPassword` are ignored. All three fields are deprecated.
+Processes deploy **only to the configured Operaton**. `deployProcess()` always uses the shared client, built from `OPERATON_BASE_URL` and logging in with `OPERATON_USERNAME` and `OPERATON_PASSWORD`, so Operaton credentials stay on the backend. For older frontends, an `operatonUrl` equal to the configured one is still accepted; any other answers `400`, and `operatonUsername` and `operatonPassword` are ignored. All three fields are deprecated.
 
 After Operaton accepts the deployment, the route finds the stored process by the id in the BPMN within the deploy's organisation — or creates a minimal row when none exists — and stamps it as deployed, recording the Operaton actually used. A minimal row's `lde_id` is `${organization}:${bpmnProcessId}` (the bare process id without an organisation), so one organisation's deploy can neither find nor overwrite another's row with the same process id. Saving a process takes `bpmnProcessId` from the saved XML, so renaming the process id no longer leaves a stale value that makes the next deploy create a second row.
 
@@ -435,6 +435,8 @@ const loadOptions = async () => {
 ```
 
 The dropdown renders two `<optgroup>` elements: "🔗 DRDs (Unified Chains)" and "📋 Single DMNs". Selection auto-populates `camunda:decisionRef` and suggests a `camunda:resultVariable` value (derived from the decision title, camelCased).
+
+For a single DMN, the info card under the dropdown also renders `ServiceLinks` with the DMN's `requires` and `requiredBy` (since v2026.11.0) — nothing when both are absent, and never for a DRD.
 
 ### DmnTemplateSelector pre-selection
 

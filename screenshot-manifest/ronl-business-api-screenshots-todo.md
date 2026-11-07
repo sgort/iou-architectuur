@@ -1,9 +1,45 @@
 # RONL Business API — screenshots to capture
 
-!!! note "Nothing outstanding — reviewed 11 October 2026 for v2026.10.2"
-    Nothing requested for v2026.10.2 (first section below). Rows 16–20 were captured on 9 October.
-    Row 20 shows the Keycloak login form on its own rather than beside the landing page; the figure's
-    text says so. Rows 11–15 still hold.
+!!! warning "Outstanding — six REPLACE rows for v2026.11.1, plus eight optional colour-only re-shoots"
+    The sync to v2026.11.1 shipped on **7 November 2026** without these captures: rows 21–26 below
+    are stale views the pages still embed, and rows 27–34 are optional. Rows 11–20 still hold, apart
+    from the colours rows 27–34 name.
+
+## Sync v2026.10.2 → v2026.11.1 — six REPLACE, eight optional
+
+Reviewed on 7 November 2026 for **v2026.10.3**, **v2026.10.4**, **v2026.11.0** and **v2026.11.1**, all
+in production. Two changes made captured views stale: since v2026.10.3 every process diagram is drawn by
+the shared ProcessView (legend listing only what the diagram shows, *jouw taak* / *geclaimd* / open
+marks, a dashed outline on others' tasks, a decision diamond with `?`, *tegelijk* / *alles klaar* bars,
+slim empty lanes), and since v2026.11.0 the Flevoland tenant and the Keycloak login page use
+Flevoland IT's palette (navy text, Material greys, a `#f8f8f8` page, yellow fills with dark text;
+Flevoland `primaryDark` `#003a8e`, `accent` `#fec612`). No new figure is proposed.
+
+| # | Status | File | Embedding page | What it must show | What is stale |
+|---|---|---|---|---|---|
+| 21 | **REPLACE** | `ronl-business-api-rip-phase-swimlane.png` | `user-guide/infra-board.md:22` | A project page on the Infra-board: the phase diagram drawn by ProcessView, with its legend, the lanes the user works in marked **jouw rol**, a task marked **jouw taak** or **geclaimd**, and a decision diamond or parallel bar | Drawn before ProcessView (v2026.10.3): no legend of that kind, no task marks, old gateway shapes; old colours |
+| 22 | **REPLACE** | `ronl-business-api-infra-board.png` | `user-guide/infra-board.md:29` | The Portfolio with at least one project waiting between phases (*… afgerond · wacht op start van …*) and the rail's **Wacht op start** count | No waiting rows (v2026.10.3); old Flevoland colours |
+| 23 | **REPLACE** | `ronl-business-api-caseworker-process-overlay.png` | `user-guide/caseworker.md:106` | The Caseworker process overview for a laned task, with the new legend and marks | Overlay moved onto ProcessView (v2026.10.3): legend entries and marks changed; old colours |
+| 24 | **REPLACE** | `ronl-business-api-caseworker-declared-phases-swimlanes.png` | `user-guide/caseworker.md:119` | The same overview for a Besluitvorming task, six declared phases above the swimlane | As row 23 |
+| 25 | **REPLACE** | `ronl-theme-consistency.png` | `developer/deployment/keycloak.md:63` | The Keycloak login form in the RONL theme on Flevoland's tokens | The theme's gradient and colours changed to Flevoland IT's tokens (v2026.11.0) |
+| 26 | **REPLACE** | `ronl-keycloak-digid-login.png` | `developer/deployment/keycloak.md:12` | The Keycloak login page with the DigiD option, in the current theme; its caption ("blue gradient header") may need a word once re-shot | As row 25 |
+| 27 | optional (colour only) | `ronl-business-api-landing-page.png` | `user-guide/getting-started.md:16` | As row 16, in Flevoland's palette | Colours only |
+| 28 | optional (colour only) | `ronl-business-api-caseworker-board.png` | `user-guide/caseworker.md:16` | As row 11, in Flevoland's palette; the step list's gateway tags may read TEGELIJK / SAMENKOMST | Colours; gateway naming |
+| 29 | optional (colour only) | `ronl-business-api-caseworker-declared-phases.png` | `user-guide/caseworker.md:76` | As row 14 | Colours only |
+| 30 | optional (colour only) | `ronl-business-api-caseworker-besluiten.png` | `user-guide/caseworker.md:165` | As row 13 | Colours only |
+| 31 | optional (colour only) | `ronl-business-api-pa-cockpit-board.png` | `user-guide/pa-cockpit.md:14` | The PA-Cockpit board in Flevoland's palette | Colours only |
+| 32 | optional (colour only) | `ronl-business-api-woo-dashboard-board.png` | `user-guide/woo-dashboard.md:14` | The Woo-dashboard in Flevoland's palette | Colours only |
+| 33 | optional (colour only) | `ronl-business-api-pa-demo-plato.png` | `user-guide/pa-demo.md:17` | The public demo, which now sets the Flevoland tenant marker | Colours only |
+| 34 | optional (colour only) | `ronl-business-api-pa-demo-rollen.png` | `user-guide/pa-demo.md:50` | The demo's *Rollen & rechten* page | Colours only |
+
+**Capture on acceptance, as a Flevoland account** (`test-infra-flevoland` for rows 21–22 with a
+project in R2.x and one finished-but-not-started; `test-caseworker-flevoland` or
+`test-besluit-flevoland` for 23–24 and 28–30), signed out for 25–27.
+
+**Considered and not captured:** the assistant's *(offline)* source and the stub model (an E2E
+fixture, not offered in production); the axe-core scans (no surface); the Operaton engine login and
+the Caddy rules (no surface in the application); Heusden and the other tenants (their colours moved
+by at most ΔE2000 6.9 — not worth a re-shoot); the public site (exempt from the palette).
 
 ## Sync v2026.10.1 → v2026.10.2 — no screenshots requested
 

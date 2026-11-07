@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Caddy Reverse Proxy
 
 Caddy handles TLS termination, automatic Let's Encrypt certificate provisioning, and reverse-proxy routing for all VM-hosted services (Keycloak ACC, Keycloak PROD, Operaton).
@@ -8,10 +12,15 @@ Caddy handles TLS termination, automatic Let's Encrypt certificate provisioning,
 
 ```
 deployment/vm/caddy/
-└── Caddyfile       # Reverse proxy configuration
+├── Caddyfile                    # Reverse proxy configuration
+├── operaton-engine-rest.caddy   # The rules for Operaton's REST API, imported by the Caddyfile
+├── docker-compose.yml           # The Caddy container as it runs on the VM
+├── README.md
+├── Caddyfile.backup-*           # Two dated backups copied from the VM
+└── static/                      # security.txt per site, and the key it names
 ```
 
-The `Caddyfile` is version-controlled but must be copied to the VM and loaded by the Caddy container. It is **not** committed with secrets.
+The directory is a copy of what the VM runs, taken from the VM in v2026.11.1 and kept in step by hand: nothing deploys it automatically ([#196](https://github.com/sgort/ronl-business-api/issues/196)). It is **not** committed with secrets: the one secret the Operaton rules need comes from `caddy.env`, which exists only on the VM.
 
 ---
 
@@ -27,9 +36,12 @@ keycloak.open-regels.nl {
 }
 
 operaton.open-regels.nl {
-    reverse_proxy operaton:8080
+    import operaton-engine-rest.caddy
+    # ...static files and security headers
 }
 ```
+
+The Operaton block does not proxy the engine wholesale; see [Operaton](#operaton) below.
 
 Caddy automatically provisions and renews Let's Encrypt certificates for all listed domains. HTTP requests are automatically redirected to HTTPS.
 
@@ -72,8 +84,10 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    env_file: ./caddy.env   # VM-only; read by operaton-engine-rest.caddy
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./operaton-engine-rest.caddy:/etc/caddy/operaton-engine-rest.caddy:ro
       - caddy-data:/data
       - caddy-config:/config
     restart: always
@@ -98,6 +112,24 @@ docker compose logs -f caddy    # verify certificate provisioning
 ```
 
 Caddy is ready when you see: `certificate obtained successfully`
+
+The image is the floating tag `caddy:2-alpine`, while the Operaton test harness pins Caddy 2.10.2; pinning the VM's images waits on #196. A change to `caddy.env` needs `docker compose up -d` (a recreate), not a reload.
+
+---
+
+## Operaton
+
+Since v2026.11.1 Operaton's REST API requires a login ([#415](https://github.com/sgort/ronl-business-api/issues/415)), and `operaton-engine-rest.caddy`, imported into the engine's site block, keeps the rules public:
+
+- A request **without credentials** that reads definitions, their XML, deployments or their resources, or that evaluates a decision, is forwarded with the read-only account's credentials, which the engine limits to exactly that. The proxy takes that account's header from `OPERATON_PUBLIC_READER_AUTH` in `caddy.env`.
+- **Every other request** is forwarded unchanged: without the caller's own credentials the engine answers `401`.
+- **CORS** — `*`, without credentials — is answered on the public paths only. The proxy strips the CORS headers the engine might send, so a browser never receives `Access-Control-Allow-Origin` twice.
+- The rules use named matchers only, so the `handle` blocks keep the order they are written in.
+
+The rules are proven by `deployment/vm/operaton/test/check-allowlist.sh` against the same Caddy and engine versions, including path tricks and kept caller credentials. See [Operaton deployment](operaton.md) for the engine side.
+
+!!! note "A temporary access log"
+    The rollout added an access log of every request to the engine's REST API, so no caller would be missed before the login went on. At v2026.11.1 it is still in the `Caddyfile`; the rollout's last step removes it.
 
 ---
 
@@ -155,7 +187,7 @@ keycloak.open-regels.nl {
 
 operaton.open-regels.nl {
     import security_headers
-    reverse_proxy operaton:8080
+    import operaton-engine-rest.caddy
 }
 ```
 

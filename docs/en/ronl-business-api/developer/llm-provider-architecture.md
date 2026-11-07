@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # LLM Provider Architecture
 
 The AI Assistant decouples the agentic loop from any specific LLM SDK through a `LlmProvider` interface and a `LlmRegistry` singleton. Adding a new LLM (Mistral, Azure OpenAI, Google Gemini, etc.) requires only implementing the interface and registering the provider at startup — no changes to the chat service, routes, or frontend are needed.
@@ -44,6 +48,8 @@ Each provider's `streamTurn()` implementation converts these to its SDK's native
 ```typescript
 llmRegistry.register(new AnthropicLlmProvider());
 llmRegistry.register(new OpenAILlmProvider());
+// Listed only when LLM_STUB_ENABLED is on; registered last, so never the default.
+llmRegistry.register(new StubLlmProvider());
 ```
 
 `llmRegistry.getProvider(modelId)` is called by `runChatStream()` to resolve which provider handles the request. `llmRegistry.getAvailableModels()` returns all models from connected providers, used by `GET /v1/mcp/models`.
@@ -73,6 +79,16 @@ Uses `openai`. Enabled when `OPENAI_API_KEY` is set.
 |---------------|---------------|
 | `gpt-4o`      | GPT-4o        |
 | `gpt-4o-mini` | GPT-4o Mini   |
+
+### `StubLlmProvider`
+
+A deterministic test model for the E2E suite, added in v2026.10.4. It calls nothing external: every turn answers *"Stub model: received N tools."*, where N is the number of tools the chat offered it. The chat still runs through the real MCP registry, so a non-zero N proves the selected sources listed their tools — which is what `e2e/assistant.spec.ts` checks.
+
+| Model ID     | Display name     |
+|--------------|------------------|
+| `stub-model` | Stub model (E2E) |
+
+It is available only when `LLM_STUB_ENABLED=true` (on in `.env.example` and on ACC), and registered last so it is never the default choice. `validateConfig` refuses to start a backend whose `DEPLOYMENT_ENV` is `production` with the flag on, because production users would see it in the model list.
 
 ---
 

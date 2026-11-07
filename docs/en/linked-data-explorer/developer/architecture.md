@@ -135,6 +135,7 @@ See [Deployment](deployment.md) for the full list. Key variables:
 |---|---|
 | `TRIPLYDB_ENDPOINT` | Default SPARQL endpoint URL |
 | `OPERATON_BASE_URL` | Operaton engine REST base URL |
+| `OPERATON_USERNAME` / `OPERATON_PASSWORD` | The engine login, sent as basic auth; required on ACC and production |
 | `CORS_ORIGIN` | Comma-separated list of allowed frontend origins |
 | `NODE_ENV` | `development`, `acceptance`, or `production` |
 | `PORT` | Backend listen port (default 3001 local, 8080 Azure) |
