@@ -175,7 +175,7 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     **Services that require each other, and an engine that asks for credentials**
 
-    Every DMN now says which services it requires and which require it, read from the published `dct:requires` links and shown on the DMN cards, in the Chain Composer and in the BPMN modeler ([chain building](linked-data-explorer/features/dmn-chain-building.md)). The backend calls Operaton with a username and password, refuses to start on acceptance or production without them, and encodes every value it puts in an engine path ([deployment](linked-data-explorer/developer/deployment.md)). The toolchain moved to Node 24.22.1. The [suites](linked-data-explorer/developer/testing.md) stand at 3,463 tests, all passing.
+    A public service can now declare the services it requires with `dct:requires`, an optional link. Where it does, its DMN shows which services it requires and which require it, on the DMN cards, in the Chain Composer and in the BPMN modeler ([chain building](linked-data-explorer/features/dmn-chain-building.md)). The backend calls Operaton with a username and password, refuses to start on acceptance or production without them, and encodes every value it puts in an engine path ([deployment](linked-data-explorer/developer/deployment.md)). The toolchain moved to Node 24.22.1. The [suites](linked-data-explorer/developer/testing.md) stand at 3,463 tests, all passing.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
