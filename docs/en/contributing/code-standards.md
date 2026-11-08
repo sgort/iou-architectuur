@@ -1,22 +1,26 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-11
+  date: 2026-11-08
   against:
-    CPSV Editor: "2cf6a90"
-    Linked Data Explorer: "a87f64b"
-    RONL Business API: "c51ec0a"
+    CPSV Editor: "34a51b4"
+    Linked Data Explorer: "4300700"
+    RONL Business API: "c6cf3ac"
 ---
 
 # Code Standards
 
 !!! info "Verification status"
-    All three repositories' claims were re-checked on **11 October 2026**, against
-    `2cf6a90`, `a87f64b` and `c51ec0a`: rulesets read from the API per ruleset, workflow
+    All three repositories' claims were re-checked on **8 November 2026**, against
+    `34a51b4`, `4300700` and `c6cf3ac`: rulesets read from the API per ruleset, workflow
     files enumerated and their steps, triggers and filters read from source, and both
     hook files read from each repository.
 
-    **What moved is CI, not the hooks.** The BPMN fingerprint checks that ran only in
+    **Nothing moved in the hooks or the gates by 7 November.** What moved were versions —
+    Node and three action pins, on [Supply-Chain Pinning](supply-chain.md) — and one
+    test-level gate in the RONL Business API, in its frontend row below.
+
+    **On 11 October, what had moved was CI, not the hooks.** The BPMN fingerprint checks that ran only in
     `pre-push` now also run in each repository's required `audit` job; since 6 October
     2026 a `lockfile-review` check is required on `acc` in all three; every `audit` job
     verifies registry signatures; and each repository gained a quarterly
@@ -186,7 +190,7 @@ which calls the four production workflows in order, since v2026.09.12 the daily
 | Workflow pair | Lint | Type-check | Tests | Notes |
 |---|:---:|:---:|:---:|---|
 | `azure-backend-*` | ✅ | – | ✅ | Builds, uploads the artifact, and since v2026.09.10 deploys it over OIDC (`azure/login` then `az webapp deploy`), then waits until `/v1/health` reports the deployed commit. The four deploy steps are skipped on a pull request. Also lints the OpenAPI document. Since 29 September 2026 ([#269](https://github.com/sgort/ronl-business-api/issues/269)) the backend's `npm test` and `test:serial` end with `scripts/check-conformance-coverage.cjs`, which fails when the OpenAPI document holds an operation no test compared against a real response — so both backend workflows run it |
-| `azure-frontend-*` | ✅ | – | ✅ | Also runs `npm run test:perf`, the wall-clock budget, as a step of its own |
+| `azure-frontend-*` | ✅ | – | ✅ | Also runs `npm run test:perf`, the wall-clock budget, as a step of its own. Since v2026.11.0 its suite includes `css-hex.test.ts`, which fails on any new hard-coded hex colour in the stylesheets and the Keycloak login theme, and the acceptance filter names `keycloak-themes/**` so a theme-only change runs it. Stylelint (`npm run lint:css`, report-only) is a root script that no hook and no workflow runs, and neither is its own `test:stylelint` |
 | `azure-publicsite-*` | ✅ | ✅ | ✅ | Its build additionally gates on a prerender and a bundle-cleanliness check |
 | `azure-pa-demo-*` | ✅ | ✅ | ✅ | The acc workflow also installs Chromium and runs the Playwright E2E suite before the bundle gate; the production one does not. Since v2026.10.1 the Chromium install has a ten-minute `timeout-minutes` of its own |
 
@@ -553,8 +557,12 @@ GUI image. The script groups commits by git tag, and the remote holds only the t
 `2026.07.0` and `2026.07.1`, while the committed changelog names releases up to
 `2026.09.15-2` — so a changelog generated from the remote's history files everything
 after `2026.07.1` under *Unreleased*. The job runs in `docker:latest`, an image without
-Node, so the step may not complete at all; the pipelines are not visible from outside the
-project, so that has not been observed.
+Node, and the step does not complete: in pipeline 737 on `c47096b` (15 September 2026) its
+log reads `env: can't execute 'node': No such file or directory`. Because the command is the
+first half of an `&&` list, that failure does not stop the job — `build_gui` passed and
+built the GUI image with the committed `changelog.json` — so the step is a no-op rather
+than a broken build. The remote still holds only the tags `2026.07.0` and `2026.07.1`
+(read on 8 November 2026).
 
 ### What it does not have
 

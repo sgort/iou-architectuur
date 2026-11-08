@@ -23,8 +23,8 @@ Each DMN card in the Available DMNs panel shows its title, identifier, variable 
 When the DMN's public service declares the services it relies on, the card also shows **Requires:** and, for a service others rely on, **Required by:**. Hover a name to see the service's full URI. These lines are for orientation only: they do not add DMNs to your chain or set its order.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: A DMN card in Available DMNs and the same DMN in the Chain Composer, each listing the services it requires and is required by](../../assets/screenshots/linked-data-explorer-dmn-service-links.png)
-  <figcaption>A DMN card in Available DMNs and the same DMN in the Chain Composer, each listing the services it requires and is required by</figcaption>
+  ![Screenshot: Available DMNs with a Requires: line on one card and a Required by: line on the service it relies on, and the requiring DMN in the Chain Composer listing the service it requires](../../assets/screenshots/linked-data-explorer-dmn-service-links.png)
+  <figcaption>Available DMNs with a Requires: line on one card and a Required by: line on the service it relies on, and the requiring DMN in the Chain Composer listing the service it requires</figcaption>
 </figure>
 
 Before building a chain, identify which DMNs you want to connect and verify that the output variables of the first match the input variables of the second, either by exact identifier or by shared semantic concept.

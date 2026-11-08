@@ -317,7 +317,7 @@ Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/05-appli
 **Eén API-laag tussen alle portalen en de procesengine** (AB-13). De werkomgeving,
 MijnOmgeving en de publieke site praten alleen met de RONL Business API. Die
 controleert wie iets mag, legt het vast, en praat met de engine. De engine zelf is
-nog direct bereikbaar (risico R-01).
+nog van buitenaf bereikbaar, al vraagt wijzigen nu een login (risico R-01).
 
 **De engine spreekt de Camunda 7 REST-API** (AB-14). IOU kiest Operaton. Een andere
 engine met dezelfde API kan; een engine met een andere API (zoals Camunda 8)
@@ -650,7 +650,7 @@ Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/08-secur
 **Afscherming**
 
 - **De engine nooit van buitenaf bereikbaar** (AB-13). De portalen gaan via de
-  RONL Business API, maar de engine zelf is nog direct bereikbaar (risico R-01).
+  RONL Business API, maar de engine zelf is nog van buitenaf bereikbaar, al vraagt wijzigen nu een login (risico R-01).
 - **Een aparte publieke laag die alleen leest** (AB-22). Zonder inloggen, met een
   limiet op het aantal verzoeken. Waar de publieke site iets laat versturen, vraagt
   hij eerst een rekenkundige proef van de browser, tegen geautomatiseerd misbruik.
@@ -665,7 +665,7 @@ Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/08-secur
   opgevraagd wanneer nodig, niet gekopieerd.
 - **Verwerkingsregister per proces** (AB-27), openbaar zonder contactgegevens.
 - **Een taalmodel-assistent is uw eigen keuze** (AB-31). De RONL Business API
-  vraagt er nu in productie nog een sleutel voor (risico R-08). Gebruikt u hem,
+  vraagt er nu in elke omgeving nog een sleutel voor (risico R-08). Gebruikt u hem,
   dan gaan gegevens naar een externe dienst; beoordeel dat op AVG en
   verwerkersovereenkomst.
 
@@ -723,7 +723,7 @@ Gebaseerd op de faseringstabel van een compacte gemeentelijke PSA.
 
    […]
 
-6. Sleutel- en geheimbeheer, inclusief het periodiek vervangen van sleutels.
+6. Sleutel- en geheimbeheer, inclusief het periodiek vervangen van sleutels en van de wachtwoorden van de accounts waarmee de backends de engine aanroepen.
 
    […]
 
@@ -937,16 +937,16 @@ Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/11-decis
 | AB-01 | IOU neemt standaarden die nog in ontwikkeling zijn stap voor stap over, en geeft terug wat het daarbij leert. Een functie die een nieuwere versie nodig heeft, staat bewust uit tot die versie is uitgerold; de rest werkt door. | Kern | gerealiseerd | IOU en CPRMV groeien zo samen; voor DMN stelt IOU een Nederlands toepassingsprofiel voor, [DMN-AP NL](https://github.com/sgort/ttl-editor/blob/main/docs/dmn-ap-nl-voorstel.md). Zie [Hoe IOU zich ontwikkelt](https://iou-architectuur.open-regels.nl/nl/psa/#hoe-iou-zich-ontwikkelt). |
 | AB-02 | Elke stap levert zijn product op in een open formaat; niets wordt overgetypt. | Kern | deels | Van dienstbeschrijving tot uitvoering klopt dit. De stap van juridische interpretatie (Norm Editor) naar dienstbeschrijving (CPSV Editor) gaat nog met de hand. |
 | AB-03 | Gedeelde producten gebruiken CPSV-AP 3.2.0, CPRMV 0.4.2, BPMN 2.0, DMN 1.3, RDF/Turtle, SKOS/NL-SBB en ELI, BWB, CVDR en JuriConnect voor verwijzingen naar wetgeving. | Kern | deels | De CPSV Editor schrijft nog CPRMV 0.4.1. |
-| AB-04 | Open source is de standaard (EUPL-1.2). Een gesloten product kan alleen achter een vervangbare koppeling. | Kern | deels | CPSV Editor, Linked Data Explorer, RONL Business API en CPRMV hebben EUPL-1.2; de Norm Editor heeft Apache-2.0. De RONL Business API vraagt in productie een gesloten taaldienst (zie AB-31). |
+| AB-04 | Open source is de standaard (EUPL-1.2). Een gesloten product kan alleen achter een vervangbare koppeling. | Kern | deels | CPSV Editor, Linked Data Explorer, RONL Business API en CPRMV hebben EUPL-1.2; de Norm Editor heeft Apache-2.0. De RONL Business API vraagt een gesloten taaldienst (zie AB-31). |
 | AB-05 | API's volgen de API Design Rules en hebben een OpenAPI 3.1-beschrijving die automatisch wordt gecontroleerd. | Kern | deels | RONL Business API en Linked Data Explorer wel; CPRMV en de Norm Editor nog niet. |
 | AB-06 | Publieke dienstverlening wordt beschreven en gepubliceerd met de CPSV Editor. | Kern | gerealiseerd | |
 | AB-07 | Regels worden vastgelegd in CPRMV: een regelset hoort bij een publieke dienst, verwijst naar de wet waarop hij berust, en heeft een geldigheidsperiode. | Kern | deels | De CPSV Editor koppelt een regelset aan de wet met een andere relatie dan CPRMV voorschrijft. CPRMV is nog een eerste openbare werkversie. |
-| AB-08 | Processen worden ontworpen in de Linked Data Explorer en alleen via zijn backend uitgerold, als één bundel van proces, formulieren en documentsjablonen. | Kern | deels | Zo rolt de Linked Data Explorer uit. Maar zolang de engine direct bereikbaar is, kan een uitrol er ook omheen (zie AB-13). |
+| AB-08 | Processen worden ontworpen in de Linked Data Explorer en alleen via zijn backend uitgerold, als één bundel van proces, formulieren en documentsjablonen. | Kern | deels | Zo rolt de Linked Data Explorer uit. Een uitrol buiten de Linked Data Explorer om vraagt nu een login op de engine, maar de backends loggen in met volledige beheerrechten, en de Linked Data Explorer controleert zelf nog niet wie uitrolt (zie AB-13, AB-20). |
 | AB-09 | Beslismodellen worden gevonden met standaard SPARQL; regels worden afgenomen via de versie-2-API voor normen, met een vaste stabiliteitsbelofte. | Kern | gerealiseerd | De versie-1-API is uitgefaseerd en verdwijnt op 1 november 2028. |
 | AB-10 | Elke gepubliceerde dienst staat in één eigen graaf per organisatie en dienst, op een vast adres. | Kern | gerealiseerd | Opnieuw publiceren overschrijft de graaf; er blijft geen geschiedenis bewaard (risico R-06). |
 | AB-11 | Gedeelde producten worden vóór publicatie gevalideerd tegen de SHACL-shapes van CPSV-AP, CPRMV en RONL; een fout blokkeert publicatie. Tijdens het opstellen is de controle een advies. | Kern | nog niet | De controle bestaat, maar blokkeert nooit. |
 | AB-12 | Juridische interpretatie wordt vastgelegd in FLINT, gekoppeld aan de brontekst. De Norm Editor is IOU's gereedschap daarvoor. | Vervangbaar | deels | Twee van de zes onderdelen van de Norm Editor zijn nog niet gebouwd, en geen ander onderdeel leest FLINT al in. |
-| AB-13 | Een Business API staat tussen elk portaal en de procesengine; de engine is nooit van buitenaf bereikbaar. | Kern | deels | De portalen lopen via de RONL Business API. De engine zelf is nog direct bereikbaar. |
+| AB-13 | Een Business API staat tussen elk portaal en de procesengine; de engine is nooit van buitenaf bereikbaar. | Kern | deels | De portalen lopen via de RONL Business API. De engine zelf is nog van buitenaf bereikbaar. Wie iets wil wijzigen of starten, moet nu inloggen; het lezen en uitvoeren van gepubliceerde beslisregels staat bewust open, via een account dat alleen mag lezen. |
 | AB-14 | Processen en beslissingen draaien op een engine met de Camunda 7 REST-API; IOU kiest Operaton. | Vervangbaar | gerealiseerd | Camunda 7 Enterprise past; Camunda 8 vraagt een herbouw. |
 | AB-15 | De organisatie reist mee met elke uitrol en elke zaak. Een beslismodel wordt één keer uitgerold en gedeeld; verschillen per organisatie staan in de beslistabel zelf. | Kern | gerealiseerd | |
 | AB-16 | Gepubliceerde producten staan in een SPARQL 1.1-triplestore; IOU kiest TriplyDB. | Vervangbaar | gerealiseerd | **Onder herziening**: IOU overweegt Apache Jena Fuseki. |
@@ -964,7 +964,7 @@ Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/11-decis
 | AB-28 | Elk IOU-onderdeel bouwt reproduceerbaar: niets wat een build ophaalt is ongepind, elke release heeft een CycloneDX-SBOM, updates wachten een vaste periode af, en de ICTU-richtlijn voor afhankelijkheden wordt wekelijks gemeten. | Kern | deels | CPSV Editor, Linked Data Explorer en RONL Business API wel; CPRMV en de Norm Editor nog niet. |
 | AB-29 | Elk onderdeel heeft zelfstandige releases met kalenderversies; wijzigingen bereiken acceptatie en productie alleen via een pull request. | Kern | deels | CPSV Editor, Linked Data Explorer en RONL Business API wel. CPRMV volgt de versie van zijn specificatie; de Norm Editor kent alleen een productiebranch. |
 | AB-30 | Productie wordt geleverd via een standaard leverstraat met een kwaliteitspoort. | Kern | nog niet | Alle onderdelen leveren nu via het spoor voor snelle prototypes. |
-| AB-31 | Een taalmodel-assistent is optioneel en de keuze van de organisatie. | Eigen keuze | nog niet | De RONL Business API start in productie niet zonder sleutel voor een gesloten taaldienst. |
+| AB-31 | Een taalmodel-assistent is optioneel en de keuze van de organisatie. | Eigen keuze | nog niet | De RONL Business API start in geen enkele omgeving zonder sleutel voor een gesloten taaldienst. |
 | AB-32 | IOU kiest Keycloak als OIDC-uitgever. | Vervangbaar | gerealiseerd | Een andere uitgever die OIDC-tokens uitgeeft en de inlogvoorzieningen koppelt, kan; bijvoorbeeld Entra ID. |
 
 ### Onze afwijkingen
@@ -977,14 +977,14 @@ Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/11-decis
 
 | ID | Risico | Raakt | Wat u ondertussen doet | Issue | Geldt voor ons? | Onze maatregel |
 |---|---|---|---|---|---|---|
-| R-01 | De procesengine is direct bereikbaar, buiten de controles van de Business API om. | AB-08, AB-13 | Plaats de engine in uw eigen netwerk zo dat alleen de backends hem bereiken. | Gemeld bij het onderdeel; link volgt na herstel | […] | […] |
+| R-01 | De procesengine is nog van buitenaf bereikbaar. Wijzigen vraagt een login, maar wie de inloggegevens heeft, komt buiten de controles van de Business API om bij de engine, en de backends gebruiken accounts met volledige rechten. Mislukte inlogpogingen van buitenaf kunnen de backends tijdelijk van de engine afsluiten. | AB-08, AB-13 | Plaats de engine in uw eigen netwerk zo dat alleen de backends hem bereiken. Geef elke backend een eigen account met alleen de rechten die hij nodig heeft. | [ronl-business-api#415](https://github.com/sgort/ronl-business-api/issues/415) heeft alleen het deel gedicht waarvoor geen login nodig was; het risico blijft open | […] | […] |
 | R-02 | De ontwerptools accepteren schrijfacties zonder dat vaststaat wie ze doet. | AB-17, AB-20, AB-21 | Maak de ontwerptools alleen bereikbaar binnen uw netwerk, achter de inlogvoorziening van uw organisatie. | Gemeld bij het onderdeel; link volgt na herstel | […] | […] |
 | R-03 | Toegang voor inwoners en ondernemers werkt nog niet echt: DigiD en eIDAS staan uit, eHerkenning ontbreekt, de BRP is een testvoorziening. | AB-19, AB-26 | Beperk de ingebruikname tot fase 1. Plan de aansluiting op DigiD, eHerkenning en de BRP als eigen project vóór fase 2. | — | […] | […] |
 | R-04 | Wat de CPSV Editor schrijft, wijkt af van CPRMV 0.4.2, en CPRMV is zelf nog een werkversie. Dat hoort bij hoe IOU en CPRMV samen groeien, maar het betekent dat gedeelde regels tussen versies kunnen verschillen. | AB-03, AB-07 | Valideer gepubliceerde regels tegen de CPRMV-shapes, volg de ontwikkeling van CPRMV, en geef wat u tegenkomt terug aan IOU. | — | […] | […] |
 | R-05 | SHACL-validatie geeft alleen advies; een product met fouten kan worden gepubliceerd. | AB-11 | Spreek af dat niemand publiceert zolang de validatie fouten meldt. | — | […] | […] |
 | R-06 | Een gepubliceerde dienstbeschrijving houdt geen geschiedenis bij: opnieuw publiceren overschrijft de vorige versie. Dat raakt de Archiefwet. | AB-10 | Archiveer elke gepubliceerde versie zelf, met datum, in uw archiefvoorziening. | — | […] | […] |
 | R-07 | Niet elk onderdeel voldoet aan de bouw- en API-afspraken, en er is nog geen standaard leverstraat. | AB-05, AB-28, AB-29, AB-30 | Neem CPRMV en de Norm Editor op in uw eigen acceptatietest; neem geen release in productie zonder die test. | — | […] | […] |
-| R-08 | De RONL Business API vraagt in productie een gesloten taaldienst. | AB-04, AB-31 | Beoordeel de taaldienst op AVG en verwerkersovereenkomst, of wacht tot hij optioneel is. | — | […] | […] |
+| R-08 | De RONL Business API vraagt in elke omgeving een gesloten taaldienst. | AB-04, AB-31 | Beoordeel de taaldienst op AVG en verwerkersovereenkomst, of wacht tot hij optioneel is. | — | […] | […] |
 | R-09 | Eén onderdeel leest rechtstreeks de database van een ander; wijzigingen aan die database kunnen het breken. | AB-25 | Neem beide onderdelen altijd samen op in uw acceptatietest. | — | […] | […] |
 | R-10 | Er wordt geen bewaartermijn toegepast op auditgegevens. | AB-23 | Stel uw bewaartermijn vast en richt het opschonen zelf in. | — | […] | […] |
 | R-11 | De juridische interpretatie wordt met de hand overgenomen in de dienstbeschrijving, en de Norm Editor is nog niet compleet. | AB-02, AB-12 | Leg vast wie de overname controleert, en hoe. | — | […] | […] |

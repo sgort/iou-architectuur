@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-11
+  date: 2026-11-08
   against:
-    CPSV Editor: "2cf6a90"
-    Linked Data Explorer: "a87f64b"
-    RONL Business API: "c51ec0a"
+    CPSV Editor: "34a51b4"
+    Linked Data Explorer: "4300700"
+    RONL Business API: "c6cf3ac"
 ---
 
 # Controls at a Glance
@@ -45,7 +45,7 @@ run, and **Branch Protection** is what turns the rest from checks into gates.
 | **Linked Data Explorer** | pull request · `audit` · `scan` · `deploy` · `Build and Deploy Frontend` · `Build and Deploy ROPA Site` · `lockfile-review` · no deletion · no force-push | pull request · `audit` · `scan` · no deletion · no force-push |
 | **RONL Business API** | pull request · `audit` · `scan` · `build` · `Build and Deploy ACC Frontend` · `Build and Deploy ACC PA Demo` · `Build and Deploy ACC Public Site` · `lockfile-review` · no deletion · no force-push | pull request · `audit` · `scan` · no deletion · no force-push |
 
-Read from the API on 11 October 2026 with `gh api repos/<owner>/<repo>/rules/branches/<branch>`,
+Read from the API on 8 November 2026 with `gh api repos/<owner>/<repo>/rules/branches/<branch>`,
 which reports the effective rules from every ruleset at once. Three things this table does
 not say, and all three matter:
 
@@ -125,10 +125,10 @@ is addressed, and what the controls do not yet reach:
 | R1, R11 — vet before adding; re-check maintenance quarterly | [Dependency Scanning](dependency-scanning.md#criteria-for-a-dependency-and-a-quarterly-review) | the criteria are one document, in the Linked Data Explorer, applied by the lockfile review's new-dependency checklist and by a quarterly `dependency-review.yml` in all three ([linked-data-explorer#250](https://github.com/sgort/linked-data-explorer/issues/250), closed). The first reviews were run by hand on 10 October 2026 ([ttl-editor#210](https://github.com/sgort/ttl-editor/issues/210), [linked-data-explorer#290](https://github.com/sgort/linked-data-explorer/issues/290), [ronl-business-api#362](https://github.com/sgort/ronl-business-api/issues/362), all closed); the first scheduled one is due on 2 January 2027 |
 | R2–R4 — no floating tags, exact pins, hash pins and `npm ci` | [Supply-Chain Pinning](supply-chain.md#what-this-does-not-protect) | the RONL Business API's VM container images (`deployment/vm/`: the two Keycloak compose files, acceptance and production, still carry Keycloak and Postgres without a digest; Skosmos is digest-pinned, on `:latest` — [#196](https://github.com/sgort/ronl-business-api/issues/196)), and its break-glass deploy scripts, which still install without the lockfile. The App Service runtime is decided rather than open — the platform pins a major and nothing finer — and the RONL Business API's backend has deployed from the lockfile in CI since 20 September 2026. The runner image and **the build that ships** were on this list until 19 September 2026 |
 | R5 — internal registry, verified origin | [Supply-Chain Pinning](supply-chain.md#the-gate-also-verifies-registry-signatures) | registry signatures and provenance attestations are verified in the required `audit` job of all three since 10 October 2026; the internal registry or proxy is an ICTU infrastructure question before a repository one — [linked-data-explorer#249](https://github.com/sgort/linked-data-explorer/issues/249), open |
-| R6 — a cooldown of at least 7 days | [Supply-Chain Pinning](supply-chain.md#the-cooldown-stops-at-the-manifest) | the cooldown now exists at the package-manager level too, but `npm ci` ignores it by design and npm older than 11.10 ignores it silently — which leaves the RONL Business API, whose `.nvmrc` names Node 22.23.3 and so npm 10.9.9, uncovered on its own toolchain |
+| R6 — a cooldown of at least 7 days | [Supply-Chain Pinning](supply-chain.md#the-cooldown-stops-at-the-manifest) | the cooldown now exists at the package-manager level too, but `npm ci` ignores it by design and npm older than 11.10 ignores it silently — which leaves the RONL Business API, whose `.nvmrc` names Node 22.23.4 and so npm 10.9.9, uncovered on its own toolchain |
 | R7, R8 — assess majors; update on a schedule | [Dependency Scanning](dependency-scanning.md#renovate-maintains-dependencies-not-the-tree) | the first-patch rule exists since 25 September 2026 but covers npm alone — action, runner, Node and Docker majors wait on Dependency Dashboard approval, which, on the stricter reading of R7, leaves no written assessment |
 | R9 — reviewed MR, whole pipeline green, no automerge | [Branch Protection](branch-protection.md#what-the-rulesets-still-do-not-require) | met on `acc` since 19 September 2026, and since 6 October 2026 every `acc` also requires `lockfile-review`, which fails on a package resolved outside the registry or without an integrity hash and puts licence changes, new install scripts, downgrades and new direct dependencies in front of the reviewer ([linked-data-explorer#248](https://github.com/sgort/linked-data-explorer/issues/248), closed); no `main` requires a build or a test |
-| R10 — daily audit, including released versions | [Dependency Scanning](dependency-scanning.md#what-nothing-watches-between-merges) | a daily audit of `acc` and `main` and a committed SBOM per release exist in all three since 24 and 26 September 2026, and the audit has caught real advisories in all three — the Linked Data Explorer ([#240](https://github.com/sgort/linked-data-explorer/issues/240)), the RONL Business API ([#303](https://github.com/sgort/ronl-business-api/issues/303), [#323](https://github.com/sgort/ronl-business-api/issues/323)) and the CPSV Editor ([#202](https://github.com/sgort/ttl-editor/issues/202)); still open are the alerts neither fixed nor dismissed with a reason, in all three, the audit passing moderates and development-only advisories, and nothing re-analysing a stored SBOM |
+| R10 — daily audit, including released versions | [Dependency Scanning](dependency-scanning.md#what-nothing-watches-between-merges) | a daily audit of `acc` and `main` and a committed SBOM per release exist in all three since 24 and 26 September 2026, and the audit has caught real advisories in all three — the Linked Data Explorer ([#240](https://github.com/sgort/linked-data-explorer/issues/240)), the RONL Business API ([#303](https://github.com/sgort/ronl-business-api/issues/303), [#323](https://github.com/sgort/ronl-business-api/issues/323)) and the CPSV Editor ([#202](https://github.com/sgort/ttl-editor/issues/202)), and since 11 October 2026 again in the Linked Data Explorer ([#305](https://github.com/sgort/linked-data-explorer/issues/305), [#313](https://github.com/sgort/linked-data-explorer/issues/313)) and the RONL Business API ([#389](https://github.com/sgort/ronl-business-api/issues/389), [#410](https://github.com/sgort/ronl-business-api/issues/410)); still open are **a production high, the Linked Data Explorer's `follow-redirects` (#313, open since 31 October 2026)**, the alerts neither fixed nor dismissed with a reason, in all three, the audit passing moderates and development-only advisories, and nothing re-analysing a stored SBOM |
 
 The finding the assessment ranked first has since been closed. In the CPSV Editor and the
 Linked Data Explorer's frontend, **the build that passed the tests was not the build that

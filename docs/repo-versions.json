@@ -1,26 +1,18 @@
 {
-  "docs_built": "2026-11-07",
+  "docs_built": "2026-11-08",
   "last_patch": {
-    "date": "2026-11-07",
-    "kind": "Component sync",
-    "summary": "CPSV Editor v2026.11.0, Linked Data Explorer v2026.11.1 and RONL Business API v2026.11.1, all in production: services that declare the services they require (dct:requires) and see them in the Linked Data Explorer, a process engine that asks for credentials from every backend, Flevoland’s own colours, and one process diagram for the Caseworker and the Infra-board.",
+    "date": "2026-11-08",
+    "kind": "Weekly pass",
+    "summary": "Weekly pass at TTL 34a51b4, LDE 4300700 and RBA c6cf3ac, the first to include the Project Start Architecture: its decisions re-checked on all five components’ main, with the engine’s new login written into AB-08, AB-13 and R-01 and no status changed; the contributing pages re-checked and re-stamped for Node 24.22.1, the daily audit’s October catches and the RONL Business API’s colour gate; ICTU scores 41, 39 and 39, with 18 October, 25 October and 1 November reconstructed after the holiday gap and the first fall in the series; the two screenshots of the 7 November sync captured.",
     "previous": {
-      "date": "2026-10-11",
-      "kind": "Component sync and weekly pass",
-      "summary": "RONL Business API v2026.10.2 in production: a checklist for every new dependency and a quarterly review of all of them, registry signatures and provenance verified in the audit gate, release SBOMs that list every production package with checks that can fail, and the decision document of the path a case took; it found that the decision document’s fallback does not split a list of document references. Weekly pass at TTL 2cf6a90, LDE a87f64b and RBA c51ec0a: the contributing pages re-checked and re-stamped for the required lockfile review, signature verification, the dependency criteria and the first quarterly reviews, and SBOM checks that can fail; ICTU scores 42, 41 and 40, up from 35, 34 and 33."
+      "date": "2026-11-07",
+      "kind": "Component sync",
+      "summary": "CPSV Editor v2026.11.0, Linked Data Explorer v2026.11.1 and RONL Business API v2026.11.1, all in production: services that declare the services they require (dct:requires) and see them in the Linked Data Explorer, a process engine that asks for credentials from every backend, Flevoland’s own colours, and one process diagram for the Caseworker and the Infra-board."
     },
     "open_findings": [
       {
-        "label": "ttl-editor#238",
-        "url": "https://github.com/sgort/ttl-editor/issues/238"
-      },
-      {
-        "label": "linked-data-explorer#328",
-        "url": "https://github.com/sgort/linked-data-explorer/issues/328"
-      },
-      {
-        "label": "ronl-business-api#433",
-        "url": "https://github.com/sgort/ronl-business-api/issues/433"
+        "label": "iou-architectuur#132",
+        "url": "https://github.com/sgort/iou-architectuur/issues/132"
       }
     ]
   },

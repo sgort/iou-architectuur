@@ -722,6 +722,138 @@ assessments:
           stub, `node-cache`), 1 accepted pending #367, 17 kept. Run by hand;
           a stricter reading keeps 3 until the schedule has run.
 
+  - date: 2026-10-18
+    kind: reconstructed
+    heads:
+      TTL: 2cf6a90
+      LDE: a87f64b
+      RBA: e1f3bca
+    note: >-
+      A week without a pass, and without much to score. The CPSV Editor's and
+      the Linked Data Explorer's `acc` had not moved since 10 October; the
+      RONL Business API's took feature work and `stylelint`, the first new
+      direct dependency the `lockfile-review` checklist listed — merged with
+      its boxes unticked. No Renovate pull request merged in any of the three
+      that week, and every daily audit passed. No cell moved.
+    scores:
+      TTL: [3, 4, 3, 4, 2, 4, 5, 5, 4, 4, 4]
+      LDE: [3, 4, 3, 4, 2, 4, 5, 4, 4, 4, 4]
+      RBA: [3, 4, 3, 4, 2, 4, 4, 4, 4, 4, 4]
+
+  - date: 2026-10-25
+    kind: reconstructed
+    heads:
+      TTL: 2cf6a90
+      LDE: a87f64b
+      RBA: e1f3bca
+    note: >-
+      The week the monitoring worked and the response did not. Nothing reached
+      `acc` in any of the three, so the heads are last week's, and no Renovate
+      pull request had merged for a fortnight or more. From 21 October the
+      daily audit failed every day in the Linked Data Explorer and the RONL
+      Business API on production highs, and neither issue it opened had a fix
+      or a written acceptance by the Sunday. The first scores to fall in the
+      series.
+    scores:
+      TTL: [3, 4, 3, 4, 2, 4, 5, 4, 4, 4, 4]
+      LDE: [3, 4, 3, 4, 2, 4, 5, 3, 4, 3, 4]
+      RBA: [3, 4, 3, 4, 2, 4, 4, 3, 4, 3, 4]
+    changes:
+      - component: TTL
+        recommendation: R8
+        from: 5
+        to: 4
+        why: >-
+          No Renovate pull request had merged since 5 October, and the
+          lock-file maintenance that earned the 5 had not merged since
+          1 October: #196 was held by a recorded test failure (#200), and the
+          `vite` security update #214 had waited five days. Twelve merged in
+          the 30 days, all before 6 October.
+      - component: LDE
+        recommendation: R8
+        from: 4
+        to: 3
+        why: >-
+          Nothing from Renovate merged after 10 October: eight in 30 days, all
+          before then, and lock-file maintenance #301 open since 12 October.
+      - component: RBA
+        recommendation: R8
+        from: 4
+        to: 3
+        why: >-
+          Nothing merged after 10 October — ten in 30 days, against 27 a
+          fortnight earlier. The MCP SDK security update #391 had waited three
+          days and lock-file maintenance #387 six.
+      - component: LDE
+        recommendation: R10
+        from: 4
+        to: 3
+        why: >-
+          The audit failed on schedule every day from 21 October and opened
+          #305 for production highs — `follow-redirects` and `markdown-it` by
+          Dependabot's record — with two development criticals open since
+          10 October. Five days on, nothing was fixed or accepted in writing.
+          Reconstructed from the run history; worth ±1.
+      - component: RBA
+        recommendation: R10
+        from: 4
+        to: 3
+        why: >-
+          The same from 21 October: #389, production highs in
+          `follow-redirects` and the MCP SDK, unanswered by the Sunday, and
+          three development criticals open since 7 to 13 October. Sixteen
+          open alerts, none dismissed. Reconstructed; worth ±1.
+
+  - date: 2026-11-01
+    kind: reconstructed
+    heads:
+      TTL: a62de66
+      LDE: 216039e
+      RBA: 0e3a838
+    note: >-
+      A catch-up week. On 29 October all three cleared their backlog in one
+      day — the Semgrep triage, a lockfile refresh for advisories, Node
+      24.22.1 (22.23.4 in the RONL Business API) and the waiting Renovate
+      pull requests — and both red audits went green. Two days later a new
+      `follow-redirects` high turned them red again. A catch-up is not a
+      cadence, and the lock-file maintenance pull requests were still open,
+      so nothing moved back.
+    scores:
+      TTL: [3, 4, 3, 4, 2, 4, 5, 4, 4, 4, 4]
+      LDE: [3, 4, 3, 4, 2, 4, 5, 3, 4, 3, 4]
+      RBA: [3, 4, 3, 4, 2, 4, 4, 3, 4, 3, 4]
+
+  - date: 2026-11-08
+    kind: measured
+    heads:
+      TTL: 34a51b4
+      LDE: 4300700
+      RBA: c6cf3ac
+    note: >-
+      Renovate merges came back to a weekly rhythm, but lock-file maintenance
+      has not merged in any of the three for at least four weeks. The RONL
+      Business API fixed its second audit failure in six days and wrote down,
+      for the first time, which advisories it accepts and why; the Linked Data
+      Explorer's audit has been red since 31 October. The rulesets, Renovate
+      configuration and cooldowns are unchanged since 11 October.
+    scores:
+      TTL: [3, 4, 3, 4, 2, 4, 5, 4, 4, 4, 4]
+      LDE: [3, 4, 3, 4, 2, 4, 5, 3, 4, 3, 4]
+      RBA: [3, 4, 3, 4, 2, 4, 4, 3, 4, 4, 4]
+    changes:
+      - component: RBA
+        recommendation: R10
+        from: 3
+        to: 4
+        why: >-
+          The audit opened #410 for the `follow-redirects` high on 31 October
+          and closed it on 6 November with #417; the scheduled run on
+          7 November passed. #395 records what the 29 October refresh could not
+          clear — React Router 7's open redirect accepted until the major, four
+          development-only advisories with their reason — the first written
+          acceptance in the series. Not 5: eight alerts open, none dismissed
+          on the alert itself.
+
 # The test work of the same period, which the guideline above barely scores.
 # Counted from the tree at each weekly commit: files whose name ends in
 # `.test.*` or `.spec.*`, end-to-end specs under an `e2e/` directory, the
@@ -764,3 +896,19 @@ tests:
     TTL: {files: 69, e2e: 4, ci: 5, workflows: 8, floor: true}
     LDE: {files: 163, e2e: 0, ci: 8, workflows: 12, floor: true}
     RBA: {files: 352, e2e: 17, ci: 11, workflows: 14, floor: true}
+  - date: 2026-10-18
+    TTL: {files: 69, e2e: 4, ci: 5, workflows: 8, floor: true}
+    LDE: {files: 163, e2e: 0, ci: 8, workflows: 12, floor: true}
+    RBA: {files: 361, e2e: 18, ci: 11, workflows: 14, floor: true}
+  - date: 2026-10-25
+    TTL: {files: 69, e2e: 4, ci: 5, workflows: 8, floor: true}
+    LDE: {files: 163, e2e: 0, ci: 8, workflows: 12, floor: true}
+    RBA: {files: 361, e2e: 18, ci: 11, workflows: 14, floor: true}
+  - date: 2026-11-01
+    TTL: {files: 69, e2e: 4, ci: 5, workflows: 8, floor: true}
+    LDE: {files: 163, e2e: 0, ci: 8, workflows: 12, floor: true}
+    RBA: {files: 371, e2e: 19, ci: 11, workflows: 14, floor: true}
+  - date: 2026-11-08
+    TTL: {files: 72, e2e: 4, ci: 5, workflows: 8, floor: true}
+    LDE: {files: 166, e2e: 0, ci: 8, workflows: 12, floor: true}
+    RBA: {files: 374, e2e: 20, ci: 11, workflows: 14, floor: true}

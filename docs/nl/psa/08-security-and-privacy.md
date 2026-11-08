@@ -2,11 +2,11 @@
 title: "8. Beveiliging en privacy"
 scope: cross-cutting
 verified:
-  date: 2026-11-06
+  date: 2026-11-08
   against:
-    CPSV Editor: "0412e9b"
-    Linked Data Explorer: "814c4bb"
-    RONL Business API: "ff6c362"
+    CPSV Editor: "84886c9"
+    Linked Data Explorer: "189435e"
+    RONL Business API: "35fb3a8"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -45,7 +45,7 @@ vervanging van.
 **Afscherming**
 
 - **De engine nooit van buitenaf bereikbaar** (AB-13). De portalen gaan via de
-  RONL Business API, maar de engine zelf is nog direct bereikbaar (risico R-01).
+  RONL Business API, maar de engine zelf is nog van buitenaf bereikbaar, al vraagt wijzigen nu een login (risico R-01).
 - **Een aparte publieke laag die alleen leest** (AB-22). Zonder inloggen, met een
   limiet op het aantal verzoeken. Waar de publieke site iets laat versturen, vraagt
   hij eerst een rekenkundige proef van de browser, tegen geautomatiseerd misbruik.
@@ -60,7 +60,7 @@ vervanging van.
   opgevraagd wanneer nodig, niet gekopieerd.
 - **Verwerkingsregister per proces** (AB-27), openbaar zonder contactgegevens.
 - **Een taalmodel-assistent is uw eigen keuze** (AB-31). De RONL Business API
-  vraagt er nu in productie nog een sleutel voor (risico R-08). Gebruikt u hem,
+  vraagt er nu in elke omgeving nog een sleutel voor (risico R-08). Gebruikt u hem,
   dan gaan gegevens naar een externe dienst; beoordeel dat op AVG en
   verwerkersovereenkomst.
 
@@ -104,7 +104,8 @@ Gebaseerd op de faseringstabel van een compacte gemeentelijke PSA.
 - Hoe u de ontwerptools en de engine afschermt zolang IOU dat niet zelf doet.
 - Het betrouwbaarheidsniveau per dienst in fase 2.
 - Wie kwetsbaarheden meldt en oppakt, en hoe u IOU informeert.
-- Sleutel- en geheimbeheer, inclusief het periodiek vervangen van sleutels.
+- Sleutel- en geheimbeheer, inclusief het periodiek vervangen van sleutels en van
+  de wachtwoorden van de accounts waarmee de backends de engine aanroepen.
 - Of u een taalmodel-assistent gebruikt, en onder welke voorwaarden.
 
 ## Verder lezen

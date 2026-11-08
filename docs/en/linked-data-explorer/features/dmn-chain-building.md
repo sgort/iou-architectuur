@@ -29,8 +29,8 @@ A public service can declare the services it relies on with `dct:requires`, whic
 The links are context only. They do not add a DMN to a chain or decide the order of execution, which stays in the BPMN process.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: A DMN card in Available DMNs and the same DMN in the Chain Composer, each listing the services it requires and is required by](../../assets/screenshots/linked-data-explorer-dmn-service-links.png)
-  <figcaption>A DMN card in Available DMNs and the same DMN in the Chain Composer, each listing the services it requires and is required by</figcaption>
+  ![Screenshot: Available DMNs with a Requires: line on one card and a Required by: line on the service it relies on, and the requiring DMN in the Chain Composer listing the service it requires](../../assets/screenshots/linked-data-explorer-dmn-service-links.png)
+  <figcaption>Available DMNs with a Requires: line on one card and a Required by: line on the service it relies on, and the requiring DMN in the Chain Composer listing the service it requires</figcaption>
 </figure>
 
 ---

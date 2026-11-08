@@ -15,7 +15,6 @@ IOU Architecture Docs
 │
 ├── English (/)
 │   ├── Home
-│   ├── IOU Architecture (slides)
 │   ├── Project Start Architecture
 │   ├── RONL Business API
 │   │   ├── Overview
@@ -89,8 +88,12 @@ IOU Architecture Docs
     the code font cannot draw them at column width, and `hooks/code_glyphs.py` warns when
     a box diagram uses one.
 
+    The **IOU Architecture** slide deck has no tab since 8 November 2026: the tab
+    bar no longer fitted at desktop width. The page is listed under `not_in_nav` in
+    `mkdocs.yml` and reached from the slide-deck table on the home page.
+
     The Dutch tree mirrors the English one, and falls back to the English page where no
-    Dutch counterpart exists. As of 11 October 2026 that is seven pages: **OpenAPI
+    Dutch counterpart exists. As of 8 November 2026 that is seven pages: **OpenAPI
     Rendering**, the Linked Data Explorer's two **API Specification** pages (v1 and,
     since 6 October 2026, v2) and the RONL Business API's, the CPSV Editor's **Data Model Diagrams**, the **IOU
     Architecture** slide deck, and the Norm Editor's **Changelog & Roadmap**.

@@ -1,18 +1,18 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-11
+  date: 2026-11-08
   against:
-    CPSV Editor: "2cf6a90"
-    Linked Data Explorer: "a87f64b"
-    RONL Business API: "c51ec0a"
+    CPSV Editor: "34a51b4"
+    Linked Data Explorer: "4300700"
+    RONL Business API: "c6cf3ac"
 ---
 
 # Build Provenance
 
 !!! info "Verification status"
-    All four implementations were re-checked on **11 October 2026**, against
-    `2cf6a90`, `a87f64b` and `c51ec0a`, by reading every workflow that carries the
+    All four implementations were re-checked on **8 November 2026**, against
+    `34a51b4`, `4300700` and `c6cf3ac`, by reading every workflow that carries the
     `env:` block — eight files, unchanged in number — and both production backends'
     `/v1/health`.
 
@@ -70,20 +70,21 @@ The SHA alone is a **code id**, not a build id — two deployments of the identi
 commit share it. The run number is what makes the pair unique per artifact.
 
 **In a called workflow the run number is the caller's.** Since the Linked Data Explorer
-(v2026.09.7) and the RONL Business API (v2026.09.11) deploy production through
+(v2026.09.7) and the RONL Business API (v2026.09.10) deploy production through
 `promote-to-production.yml`, every production build id carries the *promotion's* run
 number, and every deploy in one promotion shares it: on 27 September 2026 the Linked
 Data Explorer's production frontend bundle and its backend's `/v1/health` both read
 `build 4148c9a · #2`, and the RONL Business API's public-site bundle and backend both
-read `2443adc` and `3` — Promote to Production runs #2 and #3. On 11 October 2026 the RONL
-Business API's backend read `7117914` with run `8`, its latest promotion, and the Linked Data
-Explorer's read `build 03f48bd · #5` — not its latest promotion, #6 at `82f461f`, which
-carried only the SBOM fix, decided that nothing needed deploying, and skipped all three
-deploys. The pair is still unique
+read `2443adc` and `3` — Promote to Production runs #2 and #3. On 8 November 2026 the RONL
+Business API's backend read `35fb3a8` with run `11`, and the Linked Data Explorer's
+`build 189435e · #9` — each its latest promotion, both of 7 November. On 11 October the
+Linked Data Explorer's had read `build 03f48bd · #5`, not its latest promotion, #6 at
+`82f461f`, which carried only the SBOM fix, decided that nothing needed deploying, and
+skipped all three deploys. The pair is still unique
 per promotion, which is what it is for; it now names *which promotion* rather than
 *which execution of that deploy workflow*. Acceptance is unchanged — its workflows are
 not called — and so is the CPSV Editor, whose production workflow still triggers itself
-(its latest run, `Deploy PROD` #106, built `98458fa` on 10 October 2026).
+(its latest run, `Deploy PROD` #110, built `84886c9` on 7 November 2026).
 
 ---
 
@@ -362,7 +363,7 @@ from "the values reached the artifact".
   serving fails instead of passing. On 19 September 2026 production's backend reported
   `build ec4792f · #19` — the same commit as its frontend, from a different workflow,
   with a different run number, for the reason given above. The RONL Business API's
-  backend has had the same since v2026.09.11: `build-info.json` written by both backend
+  backend has had the same since v2026.09.10: `build-info.json` written by both backend
   workflows (`sha`, `run`, `runId`), reported under `data.build` in its wrapped
   `/v1/health`, and a post-deploy loop that fails unless `build.sha` equals the deployed
   commit.

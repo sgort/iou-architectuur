@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-11
+  date: 2026-11-08
   against:
-    CPSV Editor: "2cf6a90"
-    Linked Data Explorer: "a87f64b"
-    RONL Business API: "c51ec0a"
+    CPSV Editor: "34a51b4"
+    Linked Data Explorer: "4300700"
+    RONL Business API: "c6cf3ac"
 ---
 
 # The GitLab Mirror
@@ -65,8 +65,15 @@ unchanged: the CPSV Editor in sync at `2cf6a90` / `98458fa` and the RONL Busines
 `a87f64b` — the SBOM fix promoted to `main` without a release, so the mirror's `acc` waits
 for the next one.
 
+On 8 November 2026, by `git ls-remote` against both remotes, with the check re-read and
+unchanged: the Linked Data Explorer in sync at `4300700` / `189435e` and the RONL Business
+API at `c6cf3ac` / `35fb3a8` (`acc` / `main`). The CPSV Editor's `main` is in sync at
+`84886c9`; its GitLab `acc` is at `8b57ef2`, an ancestor seven commits behind GitHub's
+`34a51b4` — two Renovate action-pin pull requests merged after the v2026.11.0 release, which
+the next release reconciles.
+
 **Two of the three release procedures run a second check straight after this one** — the
-CPSV Editor's since v2026.09.6 and the RONL Business API's since v2026.09.11.
+CPSV Editor's since v2026.09.6 and the RONL Business API's since v2026.09.10.
 `npm run check-previews` lists the Static Web Apps preview environments Azure actually has
 against the pull requests GitHub has open, and prints the exact
 `az staticwebapp environment delete` command for each orphan. It exists for the same

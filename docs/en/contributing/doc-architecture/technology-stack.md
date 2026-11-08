@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-11
+  date: 2026-11-08
   against:
-    CPSV Editor: "2cf6a90"
-    Linked Data Explorer: "a87f64b"
-    RONL Business API: "c51ec0a"
+    CPSV Editor: "34a51b4"
+    Linked Data Explorer: "4300700"
+    RONL Business API: "c6cf3ac"
 ---
 
 # Technology Stack
@@ -127,12 +127,12 @@ mean.
 A contributing page makes claims about repository configuration — workflows,
 `SECURITY-PIPELINE.md`, `renovate.json`, runner configs and their thresholds. **Most
 changes to those produce no new build.** Every frontend deploy workflow is
-path-filtered, as read on 11 October 2026:
+path-filtered, as read on 8 November 2026:
 
 | Repository | The frontend build fires on | Does not fire on |
 |---|---|---|
 | Linked Data Explorer | `packages/frontend/**`, its own workflow file, the root `package.json` / `package-lock.json`, and `.nvmrc` | Other workflows, `SECURITY-PIPELINE.md`, `renovate.json`, backend runner config |
-| RONL Business API | `packages/frontend/**`, `packages/shared/**` and `packages/pa-cockpit/**`, its own workflow file, the root `package.json` / `package-lock.json`, and `.nvmrc` | The same |
+| RONL Business API | `packages/frontend/**`, `packages/shared/**` and `packages/pa-cockpit/**`, since v2026.11.0 `keycloak-themes/**` (the login theme's guard tests run in this suite), its own workflow file, the root `package.json` / `package-lock.json`, and `.nvmrc` | The same |
 | CPSV Editor | Everything except `docs/**`, `.claude/**` and `**/*.md` | `SECURITY-PIPELINE.md` and every other Markdown record |
 
 So a build id is silent about exactly the changes that falsify these pages. The

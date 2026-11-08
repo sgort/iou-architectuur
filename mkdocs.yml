@@ -110,7 +110,6 @@ hooks:
 # Navigation structure
 nav:
   - Home: index.md
-  - IOU Architecture (slides): iou-architecture-deck.md
   - 🧭 Project Start Architecture:
     - About this PSA: psa/index.md
     - 1. Executive summary: psa/01-executive-summary.md
@@ -308,9 +307,9 @@ nav:
         - DRD Generation: linked-data-explorer/features/drd-generation.md
         - DMN Validator: linked-data-explorer/features/dmn-validator.md
         - SHACL Validator: linked-data-explorer/features/shacl-validator.md
-        - RIP Phase Ladder: en/linked-data-explorer/features/rip-phase-ladder.md
-        - RIP R2.1 Bundle: en/linked-data-explorer/features/rip-phase1-bundle.md
-        - RIP R2.2 VO Bundle: en/linked-data-explorer/features/rip-r22-bundle.md
+        - RIP Phase Ladder: linked-data-explorer/features/rip-phase-ladder.md
+        - RIP R2.1 Bundle: linked-data-explorer/features/rip-phase1-bundle.md
+        - RIP R2.2 VO Bundle: linked-data-explorer/features/rip-r22-bundle.md
         - Besluitvorming Gedelegeerd Bundle: linked-data-explorer/features/besluitvorming-gedelegeerd-bundle.md
         - Semantic Analysis: linked-data-explorer/features/semantic-analysis.md
         - BPMN Modeler: linked-data-explorer/features/bpmn-modeler.md
@@ -346,7 +345,7 @@ nav:
         - Backend Architecture: linked-data-explorer/developer/backend.md
         - Asset Storage: linked-data-explorer/developer/asset-storage.md
         - DB Type Layer: linked-data-explorer/developer/db-type-layer.md
-        - eDOCS Integration: en/linked-data-explorer/developer/edocs-integration.md
+        - eDOCS Integration: linked-data-explorer/developer/edocs-integration.md
         - Enhanced Validation & Semantic Detection: linked-data-explorer/developer/enhanced-validation.md
         - Chain Export: linked-data-explorer/developer/chain-export.md
         - DRD Generation: linked-data-explorer/developer/drd-generation.md
@@ -503,4 +502,5 @@ watch:
 
 not_in_nav: |
   includes/abbreviations.md
+  iou-architecture-deck.md
   nl/contributing/documentation-guide.md

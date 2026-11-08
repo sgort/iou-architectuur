@@ -2,11 +2,11 @@
 title: "5. Application architecture"
 scope: cross-cutting
 verified:
-  date: 2026-11-06
+  date: 2026-11-08
   against:
-    CPSV Editor: "0412e9b"
-    Linked Data Explorer: "814c4bb"
-    RONL Business API: "ff6c362"
+    CPSV Editor: "84886c9"
+    Linked Data Explorer: "189435e"
+    RONL Business API: "35fb3a8"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -24,7 +24,7 @@ components you install.
 **One API layer between all portals and the process engine** (AB-13). The work
 environment, MijnOmgeving and the public site talk only to the RONL Business API.
 It checks who may do what, records it, and talks to the engine. The engine itself
-is still directly reachable (risk R-01).
+is still reachable from outside, although changes now require a login (risk R-01).
 
 **The engine speaks the Camunda 7 REST API** (AB-14). IOU chooses Operaton.
 Another engine with the same API is possible; an engine with a different API

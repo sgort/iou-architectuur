@@ -2,11 +2,11 @@
 title: "1. Managementsamenvatting"
 scope: cross-cutting
 verified:
-  date: 2026-11-06
+  date: 2026-11-08
   against:
-    CPSV Editor: "0412e9b"
-    Linked Data Explorer: "814c4bb"
-    RONL Business API: "ff6c362"
+    CPSV Editor: "84886c9"
+    Linked Data Explorer: "189435e"
+    RONL Business API: "35fb3a8"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -43,7 +43,7 @@ zelf mee is, en wat u invult.
 - **Hosting, omgevingen, bewaartermijnen en beheer zijn uw eigen keuze.**
 
 **Waar IOU nu staat.** IOU is als referentie nog niet af. De grootste open punten:
-de engine is nog direct bereikbaar (R-01), de ontwerptools controleren nog niet wie
+de engine is nog van buitenaf bereikbaar (R-01), de ontwerptools controleren nog niet wie
 ze gebruikt (R-02), DigiD en eHerkenning zijn nog niet actief (R-03), en er is nog
 geen standaard leverstraat (R-07). Op test en acceptatie breekt de keten naar uw
 eigen voorzieningen (R-14); IOU raadt aan daar test- en acceptatieomgevingen voor

@@ -2,11 +2,11 @@
 title: "11. Architectural decisions and risks"
 scope: cross-cutting
 verified:
-  date: 2026-11-06
+  date: 2026-11-08
   against:
-    CPSV Editor: "0412e9b"
-    Linked Data Explorer: "814c4bb"
-    RONL Business API: "ff6c362"
+    CPSV Editor: "84886c9"
+    Linked Data Explorer: "189435e"
+    RONL Business API: "35fb3a8"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -31,16 +31,16 @@ What the tiers and statuses mean is explained on
 | AB-01 | IOU adopts standards that are still evolving step by step, and feeds back what it learns. A function that needs a newer version stays deliberately off until that version is deployed; the rest keeps working. | Core | realised | This is how IOU and CPRMV grow together; for DMN, IOU proposes a Dutch application profile, [DMN-AP NL](https://github.com/sgort/ttl-editor/blob/main/docs/dmn-ap-nl-proposal.md). See [How IOU develops](index.md#how-iou-develops). |
 | AB-02 | Every step delivers its artefact in an open format; nothing is re-typed. | Core | partly | True from service description to execution. The step from legal interpretation (Norm Editor) to service description (CPSV Editor) is still manual. |
 | AB-03 | Shared artefacts use CPSV-AP 3.2.0, CPRMV 0.4.2, BPMN 2.0, DMN 1.3, RDF/Turtle, SKOS/NL-SBB, and ELI, BWB, CVDR and JuriConnect for references to legislation. | Core | partly | The CPSV Editor still writes CPRMV 0.4.1. |
-| AB-04 | Open source is the default (EUPL-1.2). A closed product is allowed only behind a replaceable interface. | Core | partly | CPSV Editor, Linked Data Explorer, RONL Business API and CPRMV are EUPL-1.2; the Norm Editor is Apache-2.0. The RONL Business API requires a closed language-model service in production (see AB-31). |
+| AB-04 | Open source is the default (EUPL-1.2). A closed product is allowed only behind a replaceable interface. | Core | partly | CPSV Editor, Linked Data Explorer, RONL Business API and CPRMV are EUPL-1.2; the Norm Editor is Apache-2.0. The RONL Business API requires a closed language-model service (see AB-31). |
 | AB-05 | APIs follow the API Design Rules and have an OpenAPI 3.1 description that is checked automatically. | Core | partly | RONL Business API and Linked Data Explorer yes; CPRMV and the Norm Editor not yet. |
 | AB-06 | Public services are described and published with the CPSV Editor. | Core | realised | |
 | AB-07 | Rules are recorded in CPRMV: a rule set belongs to a public service, refers to the law it is based on, and has a validity period. | Core | partly | The CPSV Editor links a rule set to the law with a different relation than CPRMV prescribes. CPRMV is still a first public working draft. |
-| AB-08 | Processes are designed in the Linked Data Explorer and deployed only through its backend, as one bundle of process, forms and document templates. | Core | partly | This is how the Linked Data Explorer deploys. But as long as the engine is directly reachable, a deployment can bypass it (see AB-13). |
+| AB-08 | Processes are designed in the Linked Data Explorer and deployed only through its backend, as one bundle of process, forms and document templates. | Core | partly | This is how the Linked Data Explorer deploys. Deploying around the Linked Data Explorer now requires a login on the engine, but the backends sign in with full administrative rights, and the Linked Data Explorer does not yet check who deploys (see AB-13, AB-20). |
 | AB-09 | Decision models are found with standard SPARQL; rules are consumed through the version-2 norms API, under a fixed stability promise. | Core | realised | The version-1 API is deprecated and is removed on 1 November 2028. |
 | AB-10 | Every published service lives in its own graph per organisation and service, at a fixed address. | Core | realised | Republishing overwrites the graph; no history is kept (risk R-06). |
 | AB-11 | Shared artefacts are validated against the SHACL shapes of CPSV-AP, CPRMV and RONL before publication; an error blocks publication. While drafting, the check is advisory. | Core | not yet | The check exists, but never blocks. |
 | AB-12 | Legal interpretation is recorded in FLINT, linked to the source text. The Norm Editor is IOU's tool for it. | Replaceable | partly | Two of the Norm Editor's six parts are not yet built, and no other component reads FLINT yet. |
-| AB-13 | A Business API stands between every portal and the process engine; the engine is never reachable from outside. | Core | partly | The portals go through the RONL Business API. The engine itself is still directly reachable. |
+| AB-13 | A Business API stands between every portal and the process engine; the engine is never reachable from outside. | Core | partly | The portals go through the RONL Business API. The engine itself is still reachable from outside. Changing or starting anything now requires a login; reading and evaluating published decision rules stays open on purpose, through a read-only account. |
 | AB-14 | Processes and decisions run on an engine with the Camunda 7 REST API; IOU chooses Operaton. | Replaceable | realised | Camunda 7 Enterprise fits; Camunda 8 means a rebuild. |
 | AB-15 | The organisation travels with every deployment and every case. A decision model is deployed once and shared; differences per organisation are in the decision table itself. | Core | realised | |
 | AB-16 | Published artefacts live in a SPARQL 1.1 triple store; IOU chooses TriplyDB. | Replaceable | realised | **Under review**: IOU is considering Apache Jena Fuseki. |
@@ -58,7 +58,7 @@ What the tiers and statuses mean is explained on
 | AB-28 | Every IOU component builds reproducibly: nothing a build fetches is unpinned, every release has a CycloneDX SBOM, updates wait a fixed period, and the ICTU dependency guideline is measured weekly. | Core | partly | CPSV Editor, Linked Data Explorer and RONL Business API yes; CPRMV and the Norm Editor not yet. |
 | AB-29 | Every component has independent releases with calendar versions; changes reach acceptance and production only through a pull request. | Core | partly | CPSV Editor, Linked Data Explorer and RONL Business API yes. CPRMV follows the version of its specification; the Norm Editor has only a production branch. |
 | AB-30 | Production is delivered through a standard delivery pipeline with a quality gate. | Core | not yet | All components currently deliver through the rapid-prototyping track. |
-| AB-31 | A language-model assistant is optional and the organisation's choice. | Organisation's own | not yet | The RONL Business API does not start in production without a key for a closed language-model service. |
+| AB-31 | A language-model assistant is optional and the organisation's choice. | Organisation's own | not yet | The RONL Business API does not start in any environment without a key for a closed language-model service. |
 | AB-32 | IOU chooses Keycloak as the OIDC issuer. | Replaceable | realised | Another issuer that issues OIDC tokens and brokers the login services will do; for example Entra ID. |
 
 ## Recording a deviation
@@ -77,20 +77,22 @@ there you simply record your choice, in the chapter where it belongs.
 ## Risks
 
 Every decision IOU has partly or not yet realised appears below as a risk. A security gap that is still open is described here in general terms,
-without a link to its issue; the link follows once the gap is closed. There
+without a link to its issue; the link follows once the gap is closed. Where
+part of a gap is closed while the risk stays open, we link the issue for that
+part and say that the risk stays open. There
 are also risks that touch no decision but apply to every implementation. Take
 over what applies to you, and add your own.
 
 | ID | Risk | Affects | What you do meanwhile | Issue |
 |---|---|---|---|---|
-| R-01 | The process engine is directly reachable, bypassing the Business API's checks. | AB-08, AB-13 | Place the engine in your own network so that only the backends can reach it. | Filed with the component; link follows once fixed |
+| R-01 | The process engine is still reachable from outside. Changes require a login, but anyone holding the credentials reaches the engine around the Business API's checks, and the backends use accounts with full rights. Failed logins from outside can temporarily cut the backends off from the engine. | AB-08, AB-13 | Place the engine in your own network so that only the backends can reach it. Give each backend its own account with only the rights it needs. | [ronl-business-api#415](https://github.com/sgort/ronl-business-api/issues/415) closed only the part that needed no login; the risk stays open |
 | R-02 | The design tools accept writes without establishing who makes them. | AB-17, AB-20, AB-21 | Make the design tools reachable only inside your network, behind your organisation's login service. | Filed with the component; link follows once fixed |
 | R-03 | Access for residents and businesses does not really work yet: DigiD and eIDAS are switched off, eHerkenning is missing, the BRP is a test service. | AB-19, AB-26 | Limit adoption to phase 1. Plan the connection to DigiD, eHerkenning and the BRP as a project of its own before phase 2. | — |
 | R-04 | What the CPSV Editor writes differs from CPRMV 0.4.2, and CPRMV itself is still a working draft. That is part of how IOU and CPRMV grow together, but it means shared rules can differ between versions. | AB-03, AB-07 | Validate published rules against the CPRMV shapes, follow CPRMV's development, and feed what you find back to IOU. | — |
 | R-05 | SHACL validation is advisory only; an artefact with errors can be published. | AB-11 | Agree that nobody publishes while validation reports errors. | — |
 | R-06 | A published service description keeps no history: republishing overwrites the previous version. This affects the Archiefwet (Public Records Act). | AB-10 | Archive every published version yourself, with its date, in your archive system. | — |
 | R-07 | Not every component meets the build and API agreements, and there is no standard delivery pipeline yet. | AB-05, AB-28, AB-29, AB-30 | Include CPRMV and the Norm Editor in your own acceptance test; take no release into production without that test. | — |
-| R-08 | The RONL Business API requires a closed language-model service in production. | AB-04, AB-31 | Assess the service against the GDPR and a processing agreement, or wait until it is optional. | — |
+| R-08 | The RONL Business API requires a closed language-model service in every environment. | AB-04, AB-31 | Assess the service against the GDPR and a processing agreement, or wait until it is optional. | — |
 | R-09 | One component reads another's database directly; changes to that database can break it. | AB-25 | Always include both components together in your acceptance test. | — |
 | R-10 | No retention period is applied to audit data. | AB-23 | Set your retention period and arrange the clean-up yourself. | — |
 | R-11 | The legal interpretation is carried into the service description by hand, and the Norm Editor is not yet complete. | AB-02, AB-12 | Record who checks the transfer, and how. | — |

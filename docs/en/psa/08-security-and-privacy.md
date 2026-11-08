@@ -2,11 +2,11 @@
 title: "8. Security and privacy"
 scope: cross-cutting
 verified:
-  date: 2026-11-06
+  date: 2026-11-08
   against:
-    CPSV Editor: "0412e9b"
-    Linked Data Explorer: "814c4bb"
-    RONL Business API: "ff6c362"
+    CPSV Editor: "84886c9"
+    Linked Data Explorer: "189435e"
+    RONL Business API: "35fb3a8"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -45,8 +45,8 @@ them.
 **Shielding**
 
 - **The engine is never reachable from outside** (AB-13). The portals go through
-  the RONL Business API, but the engine itself is still directly reachable
-  (risk R-01).
+  the RONL Business API, but the engine itself is still reachable from outside,
+  although changes now require a login (risk R-01).
 - **A separate public layer that only reads** (AB-22). Without login, with a limit
   on the number of requests. Where the public site lets someone submit something,
   it first asks the browser for a computational proof, against automated abuse.
@@ -62,7 +62,7 @@ them.
 - **Record of processing activities per process** (AB-27), public without contact
   details.
 - **A language-model assistant is your own choice** (AB-31). The RONL Business API
-  still requires a key for one in production (risk R-08). If you use it, data goes
+  still requires a key for one in every environment (risk R-08). If you use it, data goes
   to an external service; assess that against the GDPR and a processing agreement.
 
 **Building and delivering**
@@ -106,7 +106,8 @@ Based on the phasing table of a compact municipal PSA.
 - How you shield the design tools and the engine as long as IOU does not.
 - The level of assurance per service in phase 2.
 - Who reports and handles vulnerabilities, and how you inform IOU.
-- Key and secret management, including regular key rotation.
+- Key and secret management, including regular rotation of keys and of the
+  passwords of the accounts the backends use to call the engine.
 - Whether you use a language-model assistant, and on which conditions.
 
 ## Further reading

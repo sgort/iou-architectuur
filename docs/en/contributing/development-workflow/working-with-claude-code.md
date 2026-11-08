@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-11
+  date: 2026-11-08
   against:
-    CPSV Editor: "2cf6a90"
-    Linked Data Explorer: "a87f64b"
-    RONL Business API: "c51ec0a"
+    CPSV Editor: "34a51b4"
+    Linked Data Explorer: "4300700"
+    RONL Business API: "c6cf3ac"
 ---
 
 # Working with Claude Code
@@ -23,13 +23,13 @@ marketplaces: Anthropic's `claude-plugins-official`, and `thedotmack` for `claud
 | Plugin | Version | Enabled | What it contributes |
 |---|---|:---:|---|
 | [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.12.1 | ✅ | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
-| [`superpowers`](https://github.com/obra/superpowers) | 6.4.1 | ✅ | The brainstorm → plan → execute structure for multi-step work, and a TDD skills library |
-| `github` | `f359d43b4060` | – | The official GitHub MCP server: issues, pull requests, reviews, repository search |
-| `semgrep` | 2.3.0 | ✅ | Scans generated code for security findings — SAST, secrets, and supply-chain |
+| [`superpowers`](https://github.com/obra/superpowers) | 7.0.0 | ✅ | The brainstorm → plan → execute structure for multi-step work, and a TDD skills library |
+| `github` | `0412be76f50a` | – | The official GitHub MCP server: issues, pull requests, reviews, repository search |
+| `semgrep` | 2.7.0 | ✅ | Scans generated code for security findings — SAST, secrets, and supply-chain |
 | `typescript-lsp` | 1.0.0 | – | TypeScript/JavaScript language server: go-to-definition, find references, error checking |
 
 !!! note "Versions in that table are a snapshot, not a contract"
-    The table shows the re-read of 11 October 2026, recorded last below. It was
+    The table shows the re-read of 8 November 2026, recorded last below. It was
     first read from `~/.claude/plugins/installed_plugins.json` on 12 September 2026,
     and already moved twice while this page was being written. `claude-mem`'s
     marketplace was configured with `autoUpdate: true` when this page was first
@@ -76,6 +76,12 @@ marketplaces: Anthropic's `claude-plugins-official`, and `thedotmack` for `claud
     marketplaces. Only `github` moved, `d182ca456ca0` → `f359d43b4060`, updated that
     morning; `thedotmack` still reads `autoUpdate: false`.
 
+    **Re-read on 8 November 2026.** Five plugins, all at user scope, the same three
+    enabled and the same two disabled, from the same two marketplaces. `superpowers`
+    moved 6.4.1 → 7.0.0 and `semgrep` 2.3.0 → 2.7.0, both on 29 October; `github`
+    `f359d43b4060` → `0412be76f50a` on 7 November. `claude-mem` still reads 13.12.1, and
+    `thedotmack` still `autoUpdate: false`.
+
 !!! warning "Enabled is not the same as reachable"
     An enabled MCP-backed plugin can still fail to connect in a given session —
     `semgrep` on a cached connection failure, for one. The session reports this at
@@ -111,11 +117,11 @@ Two notes on that table, because both are easy to get wrong:
   still resolve 5.9.3, and `ttl-editor` — now built with Vite, with no `react-scripts`
   — resolves 6.0.3, transitively, with no `typescript` in its own `package.json`. The
   Norm Editor has no `typescript` dependency, and this documentation repository is
-  Python/MkDocs, so the plugin would do nothing in either. **As of 11 October 2026 the
+  Python/MkDocs, so the plugin would do nothing in either. **As of 8 November 2026 the
   plugin is disabled, and on the maintainer's workstation `typescript-language-server`
   is still not on the `PATH`** — so enabling it again would do nothing anywhere until
   the server is installed as described above. The lockfile readings hold at the
-  11 October heads: 5.9.3 in the first two, 6.0.3 in `ttl-editor`.
+  8 November heads: 5.9.3 in the first two, 6.0.3 in `ttl-editor`.
 
 `semgrep` deserves a specific mention: it is the assistant-side counterpart to the
 [supply-chain gate](../supply-chain.md) in CI. One scans what is being written, the

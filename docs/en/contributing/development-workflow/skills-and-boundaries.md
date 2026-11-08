@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-11
+  date: 2026-11-08
   against:
-    CPSV Editor: "2cf6a90"
-    Linked Data Explorer: "a87f64b"
-    RONL Business API: "c51ec0a"
+    CPSV Editor: "34a51b4"
+    Linked Data Explorer: "4300700"
+    RONL Business API: "c6cf3ac"
 ---
 
 # Skills & Boundaries
@@ -69,7 +69,7 @@ precisely the test.
 
 The assistant operates inside a set of recorded boundaries: things it will not do
 unprompted, and approvals it will not infer from an earlier one. `~/.claude/CLAUDE.md`
-is the authority for the full set — **sixteen rules** as of 11 October 2026 — and is
+is the authority for the full set — **sixteen rules** as of 8 November 2026 — and is
 not reproduced here in full, because a copy would drift. The set has grown since the
 2026-08-19 consolidation, most recently on 30 September, when two were added:
 suppressing Semgrep false positives in code rather than in the Semgrep UI, and changing
