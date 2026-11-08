@@ -2,11 +2,11 @@
 title: "1. Executive summary"
 scope: cross-cutting
 verified:
-  date: 2026-11-06
+  date: 2026-11-08
   against:
-    CPSV Editor: "0412e9b"
-    Linked Data Explorer: "814c4bb"
-    RONL Business API: "ff6c362"
+    CPSV Editor: "84886c9"
+    Linked Data Explorer: "189435e"
+    RONL Business API: "35fb3a8"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -44,7 +44,7 @@ got with it, and what you fill in.
   organisation's own choice.**
 
 **Where IOU stands.** IOU is not finished as a reference. The biggest open
-points: the engine is still directly reachable (R-01), the design tools do not yet
+points: the engine is still reachable from outside (R-01), the design tools do not yet
 check who uses them (R-02), DigiD and eHerkenning are not yet active (R-03), and
 there is no standard delivery pipeline yet (R-07). On test and acceptance the
 chain to your own systems breaks (R-14); IOU recommends setting up test and

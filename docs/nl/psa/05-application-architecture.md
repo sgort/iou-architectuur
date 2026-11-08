@@ -2,11 +2,11 @@
 title: "5. Applicatiearchitectuur"
 scope: cross-cutting
 verified:
-  date: 2026-11-06
+  date: 2026-11-08
   against:
-    CPSV Editor: "0412e9b"
-    Linked Data Explorer: "814c4bb"
-    RONL Business API: "ff6c362"
+    CPSV Editor: "84886c9"
+    Linked Data Explorer: "189435e"
+    RONL Business API: "35fb3a8"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -24,7 +24,7 @@ elkaar communiceren. Hier verbindt u de stappen uit
 **Eén API-laag tussen alle portalen en de procesengine** (AB-13). De werkomgeving,
 MijnOmgeving en de publieke site praten alleen met de RONL Business API. Die
 controleert wie iets mag, legt het vast, en praat met de engine. De engine zelf is
-nog direct bereikbaar (risico R-01).
+nog van buitenaf bereikbaar, al vraagt wijzigen nu een login (risico R-01).
 
 **De engine spreekt de Camunda 7 REST-API** (AB-14). IOU kiest Operaton. Een andere
 engine met dezelfde API kan; een engine met een andere API (zoals Camunda 8)

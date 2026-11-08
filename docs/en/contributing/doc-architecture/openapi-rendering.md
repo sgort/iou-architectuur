@@ -1,10 +1,10 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-11
+  date: 2026-11-08
   against:
-    Linked Data Explorer: "a87f64b"
-    RONL Business API: "c51ec0a"
+    Linked Data Explorer: "4300700"
+    RONL Business API: "c6cf3ac"
 ---
 
 # OpenAPI Rendering
@@ -163,7 +163,7 @@ its acceptance `CORS_ORIGIN` includes `https://acc.iou-architectuur.open-regels.
 so Test Request works from both documentation tiers.
 
 Measured against the Linked Data Explorer's acceptance backend on 16 September 2026
-(and identically again on 27 September, 4 October and 11 October), varying only the
+(and identically again on 27 September, 4 October, 11 October and 8 November), varying only the
 `Origin` header on `GET /v1/health`:
 
 | `Origin` sent | Status | `Access-Control-Allow-Origin` |
@@ -173,7 +173,7 @@ Measured against the Linked Data Explorer's acceptance backend on 16 September 2
 | `https://acc.linkeddata.open-regels.nl` | 200 | echoed |
 | `http://localhost:8000` | 200 | absent |
 
-Measured against the RONL Business API's acceptance backend on 11 October 2026 (identical to 4 October):
+Measured against the RONL Business API's acceptance backend on 8 November 2026 (identical to 4 and 11 October):
 
 | `Origin` sent | Status | `Access-Control-Allow-Origin` |
 |---|---|---|
@@ -203,7 +203,7 @@ made the Linked Data Explorer's table possible: a disallowed origin no longer an
     Azure Static Web Apps reads `staticwebapp.config.json` from the app artifact
     root, and `mkdocs build` never copies the file into `site/`.
 
-    Verified 16 September 2026, and again on 27 September and 11 October: neither `iou-architectuur.open-regels.nl` nor
+    Verified 16 September 2026, and again on 27 September, 11 October and 8 November: neither `iou-architectuur.open-regels.nl` nor
     `acc.iou-architectuur.open-regels.nl` returns a `Content-Security-Policy` or
     `X-Frame-Options` header, and both return `Referrer-Policy: same-origin`
     where the file declares `strict-origin-when-cross-origin`.

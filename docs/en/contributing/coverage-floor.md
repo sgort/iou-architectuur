@@ -1,23 +1,24 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-11
+  date: 2026-11-08
   against:
-    CPSV Editor: "2cf6a90"
-    Linked Data Explorer: "a87f64b"
-    RONL Business API: "c51ec0a"
+    CPSV Editor: "34a51b4"
+    Linked Data Explorer: "4300700"
+    RONL Business API: "c6cf3ac"
 ---
 
 # The Coverage Floor
 
-!!! info "What was re-checked on 11 October 2026, and what was not"
-    The **CI and ruleset claims** on this page were re-checked on 11 October 2026
-    against `2cf6a90`, `a87f64b` and `c51ec0a`: which workflows run the suites, on
+!!! info "What was re-checked on 8 November 2026, and what was not"
+    The **CI and ruleset claims** on this page were re-checked on 8 November 2026
+    against `34a51b4`, `4300700` and `c6cf3ac`: which workflows run the suites, on
     which triggers, and which checks each branch requires. The floor has been blocking
     on `acc` in all three since 19 September 2026. Every `main` now requires `audit`
     and `scan`, and none requires a build or a test.
 
-    **That re-check ran no suite.** The package-level figures below were measured on
+    **That re-check ran no suite**, and the coverage configurations are unchanged since
+    11 October 2026 in all three. The package-level figures below were measured on
     12 September 2026 against `f5bae6a`, `be6bc54` and `311d732`, the RONL Business
     API's by running all five suites with coverage rather than reading a record. The
     per-file figures for the files nearest the floor come from the component syncs of
@@ -410,7 +411,7 @@ caught it.
 
     RONL Business API's backend workflow did not deploy when its trigger landed in
     v2026.09.7 — it ended at an uploaded artifact, so the change was the trigger
-    alone. Since v2026.09.11 it deploys too, over OIDC, and its four deploy-side
+    alone. Since v2026.09.10 it deploys too, over OIDC, and its four deploy-side
     steps are gated on the event the same way: the two workflows have converged.
 
 !!! tip "A package outside the measurement is not covered — it is unmeasured"

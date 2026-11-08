@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-10-11
+  date: 2026-11-08
   against:
-    CPSV Editor: "2cf6a90"
-    Linked Data Explorer: "a87f64b"
-    RONL Business API: "c51ec0a"
+    CPSV Editor: "34a51b4"
+    Linked Data Explorer: "4300700"
+    RONL Business API: "c6cf3ac"
 ---
 
 # Branch Protection
@@ -19,7 +19,7 @@ how a merge is allowed to land. The checks themselves are documented on their ow
 the [Coverage Floor](coverage-floor.md) — and the
 [controls index](controls.md) is the one-page summary of where each holds.
 
-All three repositories' rulesets were read from the API again on 11 October 2026. On
+All three repositories' rulesets were read from the API again on 8 November 2026. On
 19 September **all three `acc` rulesets** gained the build and deploy checks: each now
 requires the build and deploy
 checks alongside `audit` and `scan`, so a red test suite blocks a merge to `acc` rather
@@ -59,7 +59,7 @@ is rejected outright** in all three repositories, including for releases and inc
 for the repository owner. Linked Data Explorer adopted the same ruleset in v2026.08.7;
 all three are named `acc supply-chain gate` and carry zero bypass actors.
 
-They are not identical in shape. Read per ruleset from the API on 11 October 2026:
+They are not identical in shape. Read per ruleset from the API on 8 November 2026:
 
 | | `acc` | `main` |
 |---|---|---|
