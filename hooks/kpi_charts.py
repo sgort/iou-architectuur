@@ -8,7 +8,7 @@ leaving a placeholder on a line of its own:
     <!-- ictu:totals -->      totals per component over time, as a line chart
     <!-- ictu:heatmap -->     the current per-recommendation scores, as a grid
     <!-- ictu:movement -->    what each week added, per component
-    <!-- ictu:changes -->     the week-by-week reasons, as a table
+    <!-- ictu:changes -->     the reasons for the last three passes, as a table
 
 Why generate rather than write the tables by hand: the series is re-scored
 every week, and a hand-maintained table and chart drift apart the first time
@@ -130,11 +130,17 @@ def _delta_badge(delta):
     return f"<span class=\"ictu-up\">+{delta}</span>" if delta > 0 else f"<span class=\"ictu-down\">{delta}</span>"
 
 
+# How many passes the reasons table shows. Only measured entries count: a week
+# reconstructed afterwards had no pass, and the full record stays in the data file.
+CHANGES_PASSES = 3
+
+
 def _changes_table(data):
-    """Every cell that moved, per assessment, with the reason."""
+    """Every cell that moved in the last few passes, with the reason."""
     comps = {c["key"]: c["name"] for c in _components(data)}
     rows = ["| Week | Component | | Change | Why |", "|---|---|---|---|---|"]
-    for entry in data["assessments"]:
+    passes = [e for e in data["assessments"] if _measured(e)][-CHANGES_PASSES:]
+    for entry in reversed(passes):
         for change in entry.get("changes", []):
             rows.append(
                 "| {date} | {comp} | {rid} | {frm} → {to} | {why} |".format(

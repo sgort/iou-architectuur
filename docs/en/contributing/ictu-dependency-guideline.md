@@ -166,6 +166,10 @@ The cells that held, held for a reason:
 - **The RONL Business API's R6 stays 4**: its `.nvmrc` now names 22.23.4, which bundles npm
   10.9.9, and npm ignores the cooldown silently below 11.10.
 
+The table gives the reasons for the cells that moved in the last three passes, newest first.
+Weeks without a pass, reconstructed afterwards, are left out; their moves are described above,
+and every reason for every week stays in `docs/data/ictu-assessments.yml`.
+
 <!-- ictu:changes -->
 
 ## How the earlier weeks were reconstructed
