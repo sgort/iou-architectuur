@@ -50,6 +50,18 @@ declares right now. Every `/v2` route is described — the backend's tests fail
 when one is not. **Test Request** calls acceptance and never production, on
 purpose.
 
+!!! tip "Tick a parameter to send it"
+    In **Test Request**, a query or header parameter is sent only when its row
+    is ticked. Typing a value into a row does not tick it, and an unticked
+    value is silently left out, so the service answers as if the parameter
+    were absent. The checkbox is the only reliable sign of what is sent: the
+    address shown at the top of the panel does not list the query string,
+    even for a parameter that is ticked and sent.
+
+    For example, `GET /norms` with `valid_on` typed in but not ticked returns
+    `"valid_on"` as today's date — the documented default when the parameter is
+    absent — rather than the date you typed.
+
 This reference renders `/v2/openapi.json`. The `/v1` routes have their own
 document, rendered the same way on [API Specification (v1)](api-specification.md);
 `/v1/norms` is deprecated in favour of `/v2/norms` — see the

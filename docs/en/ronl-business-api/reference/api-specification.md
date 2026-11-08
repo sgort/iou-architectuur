@@ -70,6 +70,14 @@ included — the backend's tests fail when one is not, or when a described
 operation was never checked against a real response. **Test Request** calls
 acceptance and never production, on purpose.
 
+!!! tip "Tick a parameter to send it"
+    In **Test Request**, a query or header parameter is sent only when its row
+    is ticked. Typing a value into a row does not tick it, and an unticked
+    value is silently left out, so the service answers as if the parameter
+    were absent. The checkbox is the only reliable sign of what is sent: the
+    address shown at the top of the panel does not list the query string,
+    even for a parameter that is ticked and sent.
+
 Deploying process definitions belongs to the Linked Data Explorer — see its
 [API Specification](../../linked-data-explorer/reference/api-specification.md).
 For versioning, the response envelope, the error format and how the document is
