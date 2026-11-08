@@ -15,7 +15,6 @@ IOU Architecture Docs
 │
 ├── English (/)
 │   ├── Home
-│   ├── IOU Architecture (slides)
 │   ├── Project Start Architecture
 │   ├── RONL Business API
 │   │   ├── Overview
@@ -88,6 +87,10 @@ IOU Architecture Docs
     missing. It is shown one level deep now, like the others. The tree carries no emoji:
     the code font cannot draw them at column width, and `hooks/code_glyphs.py` warns when
     a box diagram uses one.
+
+    The **IOU Architecture** slide deck has no tab since 8 November 2026: the tab
+    bar no longer fitted at desktop width. The page is listed under `not_in_nav` in
+    `mkdocs.yml` and reached from the slide-deck table on the home page.
 
     The Dutch tree mirrors the English one, and falls back to the English page where no
     Dutch counterpart exists. As of 8 November 2026 that is seven pages: **OpenAPI

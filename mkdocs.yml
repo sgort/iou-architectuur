@@ -110,7 +110,6 @@ hooks:
 # Navigation structure
 nav:
   - Home: index.md
-  - IOU Architecture (slides): iou-architecture-deck.md
   - 🧭 Project Start Architecture:
     - About this PSA: psa/index.md
     - 1. Executive summary: psa/01-executive-summary.md
@@ -503,4 +502,5 @@ watch:
 
 not_in_nav: |
   includes/abbreviations.md
+  iou-architecture-deck.md
   nl/contributing/documentation-guide.md
