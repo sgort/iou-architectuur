@@ -26,6 +26,26 @@ stopped for the run. A first attempt minutes earlier stopped in
 `globalSetup`, because the backend and Keycloak were not reachable yet — the
 gate doing its job, not a test result.
 
+!!! warning "Not re-run for v2026.11.2 — every figure on this page is from 7 November"
+    v2026.11.2 (12 November 2026, `main` at `ad0fd62`) added and removed no
+    spec, so the inventory above stands: twenty specs, 78 tests. It changed
+    one spec and the two libraries the suites run on, and **neither is
+    measured yet**:
+
+    - **axe-core 4.14.0** (from 4.13.0), which arrived with the lockfile
+      refresh, turns on `label-content-name-mismatch`. It flagged the ⌘K
+      button on Caseworker V2 and PA-Cockpit, whose `aria-label` replaced its
+      visible text (WCAG 2.5.3); the label is gone in the same release
+      ([#444](https://github.com/sgort/ronl-business-api/pull/444)).
+      `e2e/a11y-baseline.ts` is unchanged, and its header still names 4.13.
+    - **Playwright 1.64.1** (from 1.63.0) makes `locator.waitFor` wait for a
+      pending navigation. The sign-in scan in `accessibility.spec.ts` answers
+      Keycloak's authorize navigation with a 204, which never finishes, so it
+      now waits for *Verbinding maken...* with `page.waitForFunction`.
+
+    The suites were not run against either version for this release; the
+    next run of the frontend suite is the first measurement of both.
+
 !!! success "Re-run on 7 November — three new specs, fourteen more tests"
     v2026.10.3 to v2026.11.1 added **three frontend specs and 14 tests**, and
     the runner collected **61 tests across eighteen specs** — 56 passed and

@@ -20,14 +20,19 @@ export happen in the browser and work without it. These features call the backen
 |---|---|---|
 | RONL analysis and method concepts, loaded **on mount** | `POST /v1/triplydb/query` | `src/utils/ronlHelper.js`, `src/hooks/useEditorState.js` |
 | SHACL validation | `POST /v1/shacl/validate` | `src/utils/shaclHelper.js` |
-| TriplyDB publishing — the service-update step | `POST /v1/triplydb/update-service` | `src/utils/triplydbHelper.js` |
-| DMN validate, deploy and evaluate | `POST /v1/dmns/validate`, `/v1/dmns/deploy`, `/v1/dmns/evaluate/{key}` | `src/components/tabs/DMNTab.jsx` |
+| Where publishing goes, for the required-services picker, loaded **on mount** | `GET /v1/triplydb/publish-target` | `src/utils/triplydbHelper.js`, `src/hooks/useEditorState.js` |
+| TriplyDB publishing and its connection test, as the signed-in author | `POST /v1/triplydb/publish`, `/v1/triplydb/test-connection` | `src/utils/triplydbHelper.js` |
+| DMN validate, deploy and evaluate, and whether test deploys are offered | `POST /v1/dmns/validate`, `/v1/dmns/deploy`, `/v1/dmns/evaluate/{key}`; `GET /v1/dmns/deploy/options` | `src/components/tabs/DMNTab.jsx` |
 | DSO handoff from the LDE (`?dsoImport=dmn`) | `GET /v1/dso/toepasbare-regels/{id}/dmn` | `src/hooks/useDsoImport.js` |
 
 Because the RONL concepts load as soon as the editor opens, starting the editor without a
 backend is not silent: the Legal tab reports "Failed to load concepts from TriplyDB" and
 the Vendor tab "Failed to load vendors from TriplyDB". Locally, the usual cause is not
 TriplyDB but a backend that is not running.
+
+Signing in does not go through this backend: the browser talks to Keycloak directly, at
+`VITE_KEYCLOAK_URL` (see [the local stack](#the-local-stack)). The backend verifies the
+token the editor then sends with a deploy or a publish.
 
 The same backend serves the Linked Data Explorer. Changing it for the editor can break
 the explorer, and the other way round.
@@ -57,7 +62,7 @@ the explorer, and the other way round.
 │  Docker (ronl-business-api stack)   Remote services         │
 │  • ronl-operaton  localhost:8081    • TriplyDB              │
 │  • ronl-postgres  localhost:5432      api.open-regels.      │
-│                                       triply.cc             │
+│  • ronl-keycloak  localhost:8080      triply.cc             │
 │                                     • DSO APIs              │
 │                                       (pre-production)      │
 └─────────────────────────────────────────────────────────────┘
@@ -69,14 +74,19 @@ Operaton is **not** remote in local development. The LDE backend's
 ronl-business-api stack, and the editor's `.env.development` sets `VITE_OPERATON_URL` to
 `http://localhost:8081`. TriplyDB and the DSO APIs stay remote.
 
+Since v2026.11.1 Keycloak is local too. The editor's `.env.development` sets
+`VITE_KEYCLOAK_URL` to `http://localhost:8080`, the `ronl-keycloak` container from the same
+stack, realm `ronl`. The browser signs in there directly, and the backend fetches the
+realm's keys from it to verify a token. Without it the editor still works, signed out.
+
 ---
 
 ## Prerequisites
 
 | Tool | Version | Why |
 |---|---|---|
-| Node.js | 24.22.1 | `.nvmrc`. CI installs exactly this version (`node-version-file: .nvmrc`). The LDE repository pins its own version in its own `.nvmrc`, currently the same version. |
-| npm | 11.10 or newer | `.npmrc` sets a 14-day cooldown (`min-release-age=14`) that older npm ignores without a warning. Node 24.22.1 bundles npm 11.19. npm 10 also crashes on anything that re-resolves the tree (`npm install <package>`, `npm update`) — see below. |
+| Node.js | 24.22.2 | `.nvmrc`. CI installs exactly this version (`node-version-file: .nvmrc`). The LDE repository pins its own version in its own `.nvmrc`, currently the same version. |
+| npm | 11.10 or newer | `.npmrc` sets a 14-day cooldown (`min-release-age=14`) that older npm ignores without a warning. Node 24.22.2 bundles npm 11.19. npm 10 also crashes on anything that re-resolves the tree (`npm install <package>`, `npm update`) — see below. |
 | bash | on `PATH` | `npm start` runs `npm run deps:check`, which is `bash scripts/check-deps.sh`; the pre-push hook runs it too. On Windows, npm runs scripts through `cmd.exe`, so `bash` must be found on `PATH` — Git for Windows provides one. |
 | Git | — | |
 | Docker | — | Only to run the LDE backend: its `dev` script refuses to start without the `ronl-postgres` and `ronl-operaton` containers. |
@@ -177,6 +187,12 @@ npm appends the arguments after `--` to the end of the script string, so this ru
 CLI accepts `--port`, and a CLI option overrides the config file. Starting the editor
 this way has not been tested end to end.
 
+Sign-in adds a constraint of its own. Keycloak's `ttl-editor` client accepts one exact
+origin: the `TTL_ORIGIN` that ronl-business-api's `scripts/keycloak-add-lde-clients.sh`
+registered, whose example is `http://localhost:3002`, next to the LDE on 3000. Sign in
+from the port the client was registered for; from any other, Keycloak refuses the
+redirect. The end-to-end journeys run the editor on 3000 — see [Testing](testing.md).
+
 ### Start the LDE backend
 
 The backend needs three things before it starts: Docker containers, a `.env`, and an
@@ -196,6 +212,7 @@ docker compose up -d postgres operaton
 |---|---|---|
 | `ronl-postgres` | 5432 | PostgreSQL 16 |
 | `ronl-operaton` | 8081 → 8080 | Operaton 2.1.5 on an H2 file database. Its health check allows a 60-second start period. |
+| `ronl-keycloak` | 8080 | Keycloak 23, realm `ronl`. Not part of the backend's Docker check, but needed to sign in, and by the backend to verify a token: start it with `docker compose up -d keycloak` |
 
 Starting `operaton` also runs the one-shot `operaton-init` service, which fixes
 ownership of the volume first. Once the containers exist, `docker start ronl-postgres
@@ -259,7 +276,7 @@ Vite mode:
 |---|---|
 | `.env.development` | `npm start` (Vite dev server, development mode) |
 | `.env.production` | `npm run build`, locally **and** in both deploy workflows (production mode) |
-| `.env.acceptance` | Nothing. No script passes `--mode acceptance`. The ACC workflow builds in production mode and overrides `VITE_BACKEND_URL` with the acceptance backend. |
+| `.env.acceptance` | Nothing. No script passes `--mode acceptance`. The ACC workflow builds in production mode and overrides `VITE_BACKEND_URL` and `VITE_KEYCLOAK_URL` with the acceptance backend and Keycloak. |
 | `.env.example` | Nothing — a template listing the variables. |
 
 For a personal override, Vite also reads `.env.development.local`; `.gitignore` excludes
@@ -267,13 +284,14 @@ it and the other `.local` variants.
 
 | Variable | Purpose | `.env.development` | Fallback when unset |
 |---|---|---|---|
-| `VITE_BACKEND_URL` | The LDE backend — SPARQL proxy, SHACL validation, TriplyDB service update, DSO handoff, DMN validate/deploy/evaluate | `http://localhost:3001` | `http://localhost:3001` in `DMNTab.jsx`, `useDsoImport.js`, `shaclHelper.js` and `triplydbHelper.js`; **`https://acc.backend.linkeddata.open-regels.nl`** in `ronlHelper.js` |
+| `VITE_BACKEND_URL` | The LDE backend — SPARQL proxy, SHACL validation, TriplyDB publishing, DSO handoff, DMN validate/deploy/evaluate | `http://localhost:3001` | `http://localhost:3001` in `DMNTab.jsx`, `useDsoImport.js`, `shaclHelper.js` and `triplydbHelper.js`; **`https://acc.backend.linkeddata.open-regels.nl`** in `ronlHelper.js` |
 | `VITE_OPERATON_URL` | The Operaton base the DMN tab shows as its **Base URL**, and from which it builds the evaluate URL it **publishes** as `cprmv:implementedBy` | `http://localhost:8081` | `https://operaton.open-regels.nl` |
+| `VITE_KEYCLOAK_URL` | Keycloak for sign-in, realm `ronl`, client `ttl-editor` | `http://localhost:8080` | None: the sign-in cannot start, and the editor stays signed out |
 | `VITE_ENV` | Set in every `.env` file, read nowhere in `src/` | `development` | — |
 | `VITE_BUILD_SHA`, `VITE_BUILD_RUN` | Build provenance, injected by the deploy workflows — see [Build Provenance](../../contributing/build-provenance.md) | — | local build |
 
 The fallbacks only matter when a mode's file does not set the variable; `.env.development`
-sets both URLs, so a normal `npm start` uses `localhost` throughout.
+sets all three URLs, so a normal `npm start` uses `localhost` throughout.
 
 !!! warning "`VITE_OPERATON_URL` decides what a published DMN claims, not where it deploys"
     Deploy and evaluate both go through the Linked Data Explorer backend, which

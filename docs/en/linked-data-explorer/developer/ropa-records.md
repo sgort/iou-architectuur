@@ -4,7 +4,7 @@ component: Linked Data Explorer
 
 # RoPA Records Implementation
 
-The RoPA Records feature implements GDPR Article 30 record-keeping for deployed process bundles. It adds two PostgreSQL tables, a transactional service layer, authenticated asset routes, a CORS-open public endpoint, a full LDE editor UI, and a standalone static public site.
+The RoPA Records feature implements GDPR Article 30 record-keeping for deployed process bundles. It adds two PostgreSQL tables, a transactional service layer, asset routes whose writes need a sign-in, a CORS-open public endpoint, a full LDE editor UI, and a standalone static public site.
 
 ---
 
@@ -135,9 +135,9 @@ The unique index on `bpmn_process_id` is what makes the seed idempotent — `ON 
 
 ## API routes
 
-### Authenticated routes — `/v1/assets/ropa`
+### Asset routes — `/v1/assets/ropa`
 
-Registered in `routes/index.ts` alongside the other asset routes. All require the same database availability check as the other asset routes.
+Registered in `routes/index.ts` alongside the other asset routes. All require the same database availability check as the other asset routes. Since v2026.11.2 the `POST` and `DELETE` routes also require a token with `lde-author` ([Backend — Sign-in](backend.md#sign-in)); until then none checked who called. The `GET` routes stay open.
 
 | Method | Path | Description |
 |---|---|---|

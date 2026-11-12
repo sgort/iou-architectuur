@@ -77,12 +77,12 @@ Pull requests are filtered differently in each deploy workflow:
 ```
 checkout (persist-credentials: false)
        ↓
-setup-node (node-version-file: .nvmrc → 24.22.1)  →  npm ci
+setup-node (node-version-file: .nvmrc → 24.22.2)  →  npm ci
        ↓
 npm run lint  →  npm run test:ci        ← a failure here blocks the deploy
        ↓
 Build: npm run build
-       with VITE_BACKEND_URL, VITE_BUILD_SHA, VITE_BUILD_RUN
+       with VITE_BACKEND_URL (on ACC also VITE_KEYCLOAK_URL), VITE_BUILD_SHA, VITE_BUILD_RUN
        fails if dist/index.html is missing
        ↓
 Azure/static-web-apps-deploy
@@ -99,7 +99,7 @@ check exists because the deploy action, given an empty or wrong directory,
 uploads it and reports success. Before v2026.09.7 the action built the bundle
 itself, with Oryx inside its own container, on a Node the repository never
 chose (Node 22.22.0); production now runs on the `.nvmrc`-pinned Node, currently
-24.22.1. Renovate's `nvm` manager maintains `.nvmrc`.
+24.22.2. Renovate's `nvm` manager maintains `.nvmrc`.
 
 Every `uses:` reference is pinned to a commit digest rather than a tag, each
 job declares least-privilege `permissions:`, and the checkout step does not
@@ -191,7 +191,7 @@ copy is the durable one.
 - **Cooldown.** The root `.npmrc` sets `min-release-age=14`, so npm will not
   resolve a version published less than 14 days ago — covering lock-file
   maintenance and workstation installs, which Renovate's own 14-day cooldown
-  cannot reach. npm 11.10 or newer honours it (Node 24.22.1 bundles 11.19);
+  cannot reach. npm 11.10 or newer honours it (Node 24.22.2 bundles 11.19);
   `npm ci` ignores it by design, so CI is neither blocked nor protected by it.
 - **Majors.** Renovate never offers an npm package's `X.0.0`, so the earliest a
   major can arrive is its first patch, and majors wait for Dependency Dashboard
@@ -246,7 +246,12 @@ production mode, so it loads `.env.production` — for both environments.
 |---|---|---|
 | `VITE_BACKEND_URL` | The Build step, per environment, overriding `.env.production` | `https://acc.backend.linkeddata.open-regels.nl` (ACC), `https://backend.linkeddata.open-regels.nl` (PROD) |
 | `VITE_OPERATON_URL` | `.env.production` | `https://operaton.open-regels.nl` — the same engine for both environments |
+| `VITE_KEYCLOAK_URL` | ACC: the Build step, overriding `.env.production`. PROD: `.env.production` | `https://acc.keycloak.open-regels.nl` (ACC), `https://keycloak.open-regels.nl` (PROD); realm `ronl`, client `ttl-editor` |
 | `VITE_BUILD_SHA`, `VITE_BUILD_RUN` | The Build step, from `github.sha` and `github.run_number` | Build provenance shown in the Changelog tab |
+
+Until v2026.11.1 the ACC build set only `VITE_BACKEND_URL`, so it took `VITE_KEYCLOAK_URL`
+from `.env.production` and sent its sign-in to the production Keycloak, which has no
+client for it.
 
 `.env.acceptance` exists but is loaded by nothing: only `--mode acceptance`
 would read it, and no workflow passes that. Locally, `npm start` uses
@@ -258,4 +263,11 @@ so the build id has exactly one source. The release version identifies a
 release, not a build of it: ACC and PROD can serve different builds of the same
 version, and the SHA and run number tell them apart.
 
-The TriplyDB base URL, account, dataset and API token are entered by the user at runtime and stored in browser localStorage.
+No TriplyDB credential is part of the build or of the browser. Publishing goes through the
+Linked Data Explorer backend, which holds the TriplyDB base URL, account and token
+(`TRIPLYDB_BASE_URL`, `TRIPLYDB_ACCOUNT`, `TRIPLYDB_API_TOKEN`); the editor keeps only the
+chosen dataset name in `localStorage`.
+
+Each environment's Keycloak `ttl-editor` client is registered by ronl-business-api's
+`scripts/keycloak-add-lde-clients.sh` with one exact origin, so a pull request's preview
+environment, on a host of its own, cannot sign in unless its origin is added to the client.

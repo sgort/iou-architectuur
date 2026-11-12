@@ -14,10 +14,15 @@ end-to-end journeys exercise the full Operaton stack.
 
 ## Frontend
 
-Measured on **7 November 2026** at `c6cf3ac`, a tree identical to `main`
-at `35fb3a8` (v2026.11.1): the frontend package ran 143 files and 1738 tests,
-all passing, and the per-file and per-area counts below are read from
+Measured on **12 November 2026** at `4e28ed7`, a tree identical to `main`
+at `ad0fd62` (v2026.11.2): the frontend package ran 143 files and 1738 tests,
+all passing, every per-file count the same as on 7 November for v2026.11.1, and the per-file and per-area counts below are read from
 Vitest's JSON report of that run, which sums to the runner's total.
+
+**v2026.11.2 changed one assertion here and no count:**
+`pages/CaseworkerDashboardV2.test.tsx` now finds the ⌘K button by its visible
+text, *Spring naar een sectie…*, because the button lost its `aria-label`
+(WCAG 2.5.3, *Label in Name*).
 
 **v2026.10.3 to v2026.11.1 changed nothing in this board's own directories
 and grew the shared process view by 59 tests.** `components/process/` went

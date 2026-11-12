@@ -8,6 +8,24 @@ component: RONL Business API
 
 ## Changelog
 
+## v2026.11.2 — The Authoring Tools Sign In Through the RONL Keycloak (November 2026)
+
+> The clients and the role: [Keycloak realm](../reference/keycloak-realm.md), [Keycloak deployment](deployment/keycloak.md). The header exception: [Caddy](deployment/caddy.md#security-headers). The engine image: [Operaton deployment](deployment/operaton.md). The ⌘K buttons: [Frontend development](frontend-development.md#the-k-action).
+
+**The Linked Data Explorer and the ttl-editor sign in through the same Keycloak.** `scripts/keycloak-add-lde-clients.sh` adds what they need to the `ronl` realm: the realm role `lde-author`, which the Linked Data Explorer's backend requires for every change to the shared library, and the public PKCE clients `linked-data-explorer` and `ttl-editor`, each with its own role, username and full-name mappers, so their tokens carry `realm_access.roles`, `preferred_username` and `name` whatever the realm's default scopes are ([linked-data-explorer#163](https://github.com/sgort/linked-data-explorer/issues/163)). Like the other Keycloak scripts it creates or updates in place and offers `--dry-run`; the realm import file is not changed. `--with-e2e` adds the confidential client `lde-e2e` and a user of that name for the Linked Data Explorer's fixture deploy, and `--with-test-author` adds `test-author-flevoland`, a Flevoland employee test account holding `lde-author`; both options are refused against production. On 12 November 2026 both clients existed on ACC and on PROD.
+
+**keycloak-js can run its third-party-cookie check.** The Keycloak sites' header snippet set `X-Frame-Options: SAMEORIGIN` on every response, including the pages under `/realms/*/protocol/openid-connect/3p-cookies/` that keycloak-js loads in a hidden frame before every silent `check-sso`. Blocked, the Linked Data Explorer and the ttl-editor could not pick up a session after the sign-in popup or on reload. Caddy now removes the header on that path only, and every other Keycloak response keeps it. On 12 November 2026 the change was live on both Keycloak sites.
+
+**The ⌘K buttons say what they show.** axe-core 4.14, which arrived with the lockfile refresh, checks that a control's accessible name contains its visible text (WCAG 2.5.3, *Label in Name*). The ⌘K buttons on Caseworker V2 and PA-Cockpit had `aria-label="Snel navigeren"` in place of their visible *Spring naar …* text; the label is gone, as it already was on the Infra-board and Woo. The sign-in scan in `accessibility.spec.ts` now waits with `page.waitForFunction`, because since Playwright 1.64 `locator.waitFor` also waits for the pending navigation to Keycloak, which the scan never lets finish ([#444](https://github.com/sgort/ronl-business-api/pull/444)). This fix is part of v2026.11.2 but missing from the in-app changelog: it was merged after the release bump.
+
+**The VM's engine image is pinned by digest.** `deployment/vm/operaton/prod/docker-compose.yml` names `operaton/operaton:1.0.0@sha256:74659f07…`, the image the VM already runs, so a re-pull cannot move it. The upgrade off 1.0.0 stays with [#423](https://github.com/sgort/ronl-business-api/issues/423); Renovate's pull requests for 1.1.5 and 2.2.0 were closed in its favour.
+
+**Dependencies.** A lockfile refresh under the fourteen-day release-age rule, with no downgrades: among others axios 1.21.0 (now also the declared range in `pa-cockpit`), `@modelcontextprotocol/sdk` 1.32.2, pg 8.23.1, qs 6.16.2, hono 4.13.14, axe-core 4.14.0 and Playwright 1.64.1. Five runtime packages are new, pulled in by those updates: temporal-polyfill, temporal-spec, temporal-utils, `@codemirror/streamparser` and micromark-util-edit-map. The tooling workflows move to Node 24.22.2, which bundles the same npm 11.19.1, so the release SBOM — 493 components — is still generated with that npm. `curlimages/curl` 8.23.0 in the local stack; vite ^6.4.5 and vitest ^4.1.12 in `pa-cockpit`.
+
+**Found while documenting it.** The release notes name express 5.3.0 and jose 6.2.13; both are the copies nested under the MCP SDK — the backend's own express stays 4.22.3 — and the lockfile has jose 6.2.14. The comment above the pinned Operaton image still says digest pinning "comes with #196", and `e2e/a11y-baseline.ts` still says it was measured with axe-core 4.13. The findings recorded for v2026.11.1 ([#433](https://github.com/sgort/ronl-business-api/issues/433)) are all still open: the ⌘K hint is still called "fixed in #405", `test:stylelint` runs in no workflow or hook, the temporary engine-rest access log is still in the `Caddyfile`, and the VM's Caddy image still floats.
+
+---
+
 ## v2026.11.1 — The Process Engine Asks Who Is Calling (November 2026)
 
 > The engine and its proxy: [Operaton deployment](deployment/operaton.md), [Caddy](deployment/caddy.md), [Operaton access patterns](operaton-access-patterns.md). Running it locally: [Local development](local-development.md). Measured suites: [Testing](testing/overview.md).
@@ -1731,6 +1749,7 @@ Utrecht, Amsterdam, Rotterdam, Den Haag — each with isolated data, custom them
 | [Flevoland's palette for the Flevoland tenant, through shared tokens](../reference/municipality-themes.md) | v2026.11.0 |
 | [Accessibility scans with axe-core on every page type](testing/e2e.md) | v2026.11.0 |
 | [The process engine's REST API requires a login; reading and evaluating the rules stays public](deployment/operaton.md) | v2026.11.1 |
+| [The Linked Data Explorer and the ttl-editor sign in through the RONL Keycloak: the `lde-author` role and their clients, by script](../reference/keycloak-realm.md) | v2026.11.2 |
 
 !!! note "This table has a gap"
     Rows run from v1.0.0 to v3.0.7 and then jump to the September 2026 entries

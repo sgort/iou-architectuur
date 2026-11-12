@@ -73,9 +73,18 @@ The **Evaluation URL** preview below it shows the URL the editor will actually c
 
 ## Step 4: Deploy to Operaton
 
-Click **Deploy to Operaton**. The editor posts the DMN file to the backend's `POST /v1/dmns/deploy`, which forwards it to the engine.
+What the Deploy button does depends on whether you are signed in, and with which role — see [Signing in](getting-started.md#signing-in).
 
-On success, the button changes to **Deployed — ID: {deployment-id}** and the deployment ID and timestamp are stored. These are included in the Turtle output.
+- **Signed in with `lde-author`.** Click **Deploy to Operaton**. The editor posts the DMN file, with your sign-in token, to the backend's `POST /v1/dmns/deploy`, which forwards it to the engine. On success, the button changes to **Deployed — ID: {deployment-id}** and the deployment ID and timestamp are stored. These are included in the Turtle output.
+- **Signed out or view only, where the backend offers test deploys.** The button reads **Test deploy to Operaton**, with a line below it: *Deploys to the test tenant TestOnly, removed automatically after 48 hours. Refused if a decision key already exists in the engine.* On success it reads **Test deploy — ID: {id}…, removed after 48 hours**, and every evaluation after it is sent to the tenant `TestOnly`. The Linked Data Explorer backend offers this on local development and acceptance.
+- **Signed out or view only, where it does not** — production. **Deploy to Operaton** is locked, with *Sign in to deploy* or *You need permission to deploy* beside it.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: The DMN File card on production while signed out, with the Deploy to Operaton button greyed out behind a lock icon and the hint Sign in to deploy beside it](../../assets/screenshots/cpsv-editor-dmn-deploy-locked.png)
+  <figcaption>Signed out on production, Deploy is locked; acceptance offers a test deploy in its place</figcaption>
+</figure>
+
+A refused deploy shows its reason directly under the button: the backend's own message, or *Too many test deploys from this address; try again later.* A test deployment's ID is stored like any other and appears in a downloaded Turtle file, although the deployment itself is gone after 48 hours.
 
 ---
 

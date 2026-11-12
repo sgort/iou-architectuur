@@ -85,13 +85,14 @@ See also: [CPSV Editor documentation](../cpsv-editor/index.md).
 
 | Layer | Technology | Version |
 |---|---|---|
-| Frontend framework | React | 19.3.0 |
+| Frontend framework | React | 19.3.1 |
 | Language | TypeScript | 5.9.3 |
-| Build tool | Vite | 6.4.3 |
+| Build tool | Vite | 6.4.5 |
 | Graph visualisation | D3.js | 7.9.0 |
-| BPMN editor | bpmn-js | 18.28.0 |
+| BPMN editor | bpmn-js | 18.31.1 |
 | Form editor | @bpmn-io/form-js | 1.26.1 |
 | Drag-and-drop | dnd-kit (core / sortable) | 6.3.1 / 10.0.0 |
+| Sign-in | keycloak-js (realm `ronl`) | 23.0.7 |
 | Backend framework | Node.js + Express | 24 / 4.22.3 |
 | DMN engine | Operaton | — |
 | Knowledge graph | TriplyDB | — |

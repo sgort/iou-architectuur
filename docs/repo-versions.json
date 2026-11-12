@@ -1,18 +1,26 @@
 {
-  "docs_built": "2026-11-08",
+  "docs_built": "2026-11-12",
   "last_patch": {
-    "date": "2026-11-08",
-    "kind": "Weekly pass",
-    "summary": "Weekly pass at TTL 34a51b4, LDE 4300700 and RBA c6cf3ac, the first to include the Project Start Architecture: its decisions re-checked on all five components’ main, with the engine’s new login written into AB-08, AB-13 and R-01 and no status changed; the contributing pages re-checked and re-stamped for Node 24.22.1, the daily audit’s October catches and the RONL Business API’s colour gate; ICTU scores 41, 39 and 39, with 18 October, 25 October and 1 November reconstructed after the holiday gap and the first fall in the series; the two screenshots of the 7 November sync captured.",
+    "date": "2026-11-12",
+    "kind": "Component sync",
+    "summary": "CPSV Editor v2026.11.1, Linked Data Explorer v2026.11.2 and RONL Business API v2026.11.2, all in production: the design tools ask who is writing — sign-in through Keycloak with an author role for deploying, publishing and saving, test deploys for everyone else on acceptance — and publishing to TriplyDB goes through the Linked Data Explorer backend, so no token is kept in the browser.",
     "previous": {
-      "date": "2026-11-07",
-      "kind": "Component sync",
-      "summary": "CPSV Editor v2026.11.0, Linked Data Explorer v2026.11.1 and RONL Business API v2026.11.1, all in production: services that declare the services they require (dct:requires) and see them in the Linked Data Explorer, a process engine that asks for credentials from every backend, Flevoland’s own colours, and one process diagram for the Caseworker and the Infra-board."
+      "date": "2026-11-08",
+      "kind": "Weekly pass",
+      "summary": "Weekly pass at TTL 34a51b4, LDE 4300700 and RBA c6cf3ac, the first to include the Project Start Architecture: its decisions re-checked on all five components’ main, with the engine’s new login written into AB-08, AB-13 and R-01 and no status changed; the contributing pages re-checked and re-stamped for Node 24.22.1, the daily audit’s October catches and the RONL Business API’s colour gate; ICTU scores 41, 39 and 39, with 18 October, 25 October and 1 November reconstructed after the holiday gap and the first fall in the series; the two screenshots of the 7 November sync captured."
     },
     "open_findings": [
       {
-        "label": "iou-architectuur#132",
-        "url": "https://github.com/sgort/iou-architectuur/issues/132"
+        "label": "ttl-editor#249",
+        "url": "https://github.com/sgort/ttl-editor/issues/249"
+      },
+      {
+        "label": "linked-data-explorer#340",
+        "url": "https://github.com/sgort/linked-data-explorer/issues/340"
+      },
+      {
+        "label": "ronl-business-api#445",
+        "url": "https://github.com/sgort/ronl-business-api/issues/445"
       }
     ]
   },
@@ -20,16 +28,16 @@
     {
       "name": "RONL Business API",
       "icon": "⚙️",
-      "version": "v2026.11.1",
+      "version": "v2026.11.2",
       "environment": "prod",
-      "commit": "35fb3a8...",
-      "commit_date": "2026-11-07",
+      "commit": "ad0fd62...",
+      "commit_date": "2026-11-12",
       "build": {
-        "sha": "35fb3a8",
-        "run": 11,
-        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/42374931255"
+        "sha": "ad0fd62",
+        "run": 12,
+        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/43246704971"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/35fb3a8ae11d8819ad4a7c68c34bcd578b2c2598",
+      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/ad0fd62cd71b696a6cad2dba86fd88f34d7ddc55",
       "ci_repo": "https://github.com/sgort/ronl-business-api"
     },
     {
@@ -45,31 +53,31 @@
     {
       "name": "CPSV Editor",
       "icon": "✏️",
-      "version": "v2026.11.0",
+      "version": "v2026.11.1",
       "environment": "prod",
-      "commit": "84886c9...",
-      "commit_date": "2026-11-07",
+      "commit": "6910bb8...",
+      "commit_date": "2026-11-12",
       "build": {
-        "sha": "84886c9",
-        "run": 110,
-        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/42374631040"
+        "sha": "6910bb8",
+        "run": 114,
+        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/43278506962"
       },
-      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/84886c9b56df5bad9df89594618e3d07eee8be74",
+      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/6910bb87488cebe43b1ced3645639d02a14f56f6",
       "ci_repo": "https://github.com/sgort/ttl-editor"
     },
     {
       "name": "Linked Data Explorer",
       "icon": "🔍",
-      "version": "v2026.11.1",
+      "version": "v2026.11.2",
       "environment": "prod",
-      "commit": "189435e...",
-      "commit_date": "2026-11-07",
+      "commit": "e11e4ef...",
+      "commit_date": "2026-11-12",
       "build": {
-        "sha": "189435e",
-        "run": 9,
-        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/42375976224"
+        "sha": "e11e4ef",
+        "run": 11,
+        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/43271802879"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/189435e3269bf5b7d5a10c29919eab467ee4719a",
+      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/e11e4ef0eb7ea0676a3769230ff1e5edb7d6d8b1",
       "ci_repo": "https://github.com/sgort/linked-data-explorer"
     },
     {

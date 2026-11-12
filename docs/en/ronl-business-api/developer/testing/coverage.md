@@ -4,17 +4,28 @@ component: RONL Business API
 
 # Coverage
 
-Measured on **7 November 2026** against **v2026.11.1**, the release in
-production (`main` at `35fb3a8`), in the working checkout on `acc` at
-`c6cf3ac` — a tree identical to `35fb3a8` — after `npm run deps:check`
+Measured on **12 November 2026** against **v2026.11.2**, the release in
+production (`main` at `ad0fd62`), in the working checkout on `acc` at
+`4e28ed7` — a tree identical to `ad0fd62` — after `npm run deps:check`
 reported *"Dependencies are ready."*, on **Node 22.23.4**, the version
 `.nvmrc` names. Each package was measured serially, one workspace at a
 time: the backend by `npx jest --coverage --runInBand`, the Jest command its
 `test:serial` runs, and the four Vitest packages with coverage and
 `--no-file-parallelism`, as their `npm run test:serial` runs them. All five collect coverage, as their `npm test`
 counterparts do. Every figure on this page is read from the
-`coverage/coverage-final.json` each of those runs wrote, and checked against
-the run's own totals.
+`coverage/coverage-final.json` each of those runs wrote — the same coverage
+map each runner's JSON report carries — and checked against the run's own
+totals.
+
+!!! success "Re-measured at v2026.11.2: every figure reproduced"
+    Every package total, every per-area row and every per-file figure on this
+    page came out of the 12 November runs exactly as on 7 November, for
+    v2026.11.1: the 345 instrumented files carry the same covered and total
+    counts for statements, branches, functions and lines. v2026.11.2 changed
+    two covered source files, `pages/CaseworkerDashboardV2.tsx` and
+    `pages/PADashboardV2.tsx`, by removing an `aria-label` attribute, which
+    adds and removes no statement or branch. The sections below keep their
+    7 November wording where they describe what moved before.
 
 !!! warning "Read the backend from `coverage-final.json`, not from a stale summary"
     None of the five runner configs asks for istanbul's `json-summary`
@@ -22,7 +33,7 @@ the run's own totals.
     A copy left in `packages/backend/coverage/` by an earlier run that did
     ask for it — the one in this checkout dates from 30 September — is not
     overwritten, and reads 98.90 / 95.14 / 97.98 / 99.20: the 30 September
-    figures, not today's — still so on 7 November. The backend figures below
+    figures, not today's — still so on 12 November. The backend figures below
     come from the `coverage-final.json` that run wrote, timestamped the same
     afternoon. To get a
     summary file, ask for it, as
@@ -91,9 +102,9 @@ hundredth is the noise the *last two decimals* warning below describes.
     give a repository-wide branch figure of 95.16% instead of 94.22%: nearly a
     point of pure arithmetic error, in the flattering direction. The
     denominators differ by two orders of magnitude here, so the distinction is
-    not academic. On 7 November the counts were summed from each workspace's
-    `coverage/coverage-final.json`, which every one of the five runs writes —
-    each file's timestamp matching that afternoon's run; each workspace's own
+    not academic. On 12 November, as on 7 November, the counts were summed
+    from each workspace's `coverage/coverage-final.json`, which every one of
+    the five runs writes — each file's timestamp matching that evening's run; each workspace's own
     total reproduces the table row above, and the four Vitest totals match
     the covered/total counts in the run's own *Coverage summary* block.
 
@@ -175,10 +186,10 @@ hundredth is the noise the *last two decimals* warning below describes.
     A file below the line exits the run non-zero and names that file, locally
     and in CI alike — `npm test` already collects coverage in every workspace,
     so nothing needed a separate coverage job. **The five thresholds are
-    unchanged at `c6cf3ac`** — no runner config changed in v2026.10.3 to
-    v2026.11.1 — **and no file was named in any of the five runs of this
+    unchanged at `4e28ed7`** — no runner config changed in v2026.10.3 to
+    v2026.11.2 — **and no file was named in any of the five runs of this
     pass**; reading every file entry in the five workspaces' coverage reports
-    on 7 November confirms it independently: **zero of 345 files below 80%
+    on 12 November confirms it independently: **zero of 345 files below 80%
     branches** — 108 in backend, 139 in frontend, 38 in pa-cockpit, 16 in
     pa-demo and 44 in public-site. The backend gained three source files since
     11 October, `utils/engine-segment.ts`, `utils/operaton-auth.ts` and
@@ -285,16 +296,16 @@ hundredth is the noise the *last two decimals* warning below describes.
 
     See [Coverage Floor](../../../contributing/coverage-floor.md).
 
-!!! note "The configs' own comments say 26 — corrected on 28 September, and three high on 7 November"
+!!! note "The configs' own comments say 26 — corrected on 28 September, and three high on 12 November"
     Through v2026.09.13 all five runner configs claimed a functions floor would
     fail 31 files, a figure the reports had contradicted on 20, 24, 26 and
     28 September, which each measured 26. `391b1a8` (v2026.09.14) corrected the
     comments to **26** and dated the measurement 28 September; they are
-    unchanged at `c6cf3ac`. Measured since, the figure was **23** on
-    30 September, **24** on 3 October, **23** on 9 and 11 October and is
-    **23** on 7 November:
+    unchanged at `4e28ed7`. Measured since, the figure was **23** on
+    30 September, **24** on 3 October, **23** on 9 and 11 October and on
+    7 November, and is **23** on 12 November:
 
-    | Workspace | Comment until v2026.09.13 | Comment since `391b1a8` | Measured, 30 Sep | Measured, 3 Oct | Measured, 9 Oct | Measured, 11 Oct | Measured, 7 Nov |
+    | Workspace | Comment until v2026.09.13 | Comment since `391b1a8` | Measured, 30 Sep | Measured, 3 Oct | Measured, 9 Oct | Measured, 11 Oct | Measured, 7 and 12 Nov |
     |---|---:|---:|---:|---:|---:|---:|---:|
     | `frontend` | 11 | 10 | 8 | 9 | 8 | 8 | **8** |
     | `pa-cockpit` | 10 | 8 | 7 | 7 | 7 | 7 | **7** |
@@ -560,7 +571,7 @@ Sub-directories report separately rather than rolling up into their parent, and
 istanbul truncates to two decimals rather than rounding. Match these against
 `npm test --workspace=@ronl/backend -- --coverageReporters=text`.
 
-**Re-derived on 7 November 2026** from the run's own
+**Re-derived on 7 November 2026, and reproduced to the decimal on 12 November for v2026.11.2** from the run's own
 `coverage/coverage-final.json`, grouped per directory the way istanbul's text
 reporter groups them and truncated to two decimals the same way. The rows
 reconcile to the package total in the table at the top of this page, which is
@@ -698,7 +709,7 @@ both at **86.36%** branches.
 
 ## Frontend by area
 
-**Re-derived on 7 November 2026**, from the serial run, for the reason
+**Re-derived on 7 November 2026, and reproduced to the decimal on 12 November for v2026.11.2**, from the serial run, for the reason
 given in *Which frontend run the aggregate uses* at the top of this page.
 The rows reconcile to the 95.67 / 93.40 / 91.99 / 96.09 package total above.
 Vitest's text table omits fully covered files, so the rows are grouped from
@@ -810,7 +821,7 @@ pages: [Caseworker](dashboards/caseworker.md),
 
 ## pa-cockpit by area
 
-**Re-derived on 7 November 2026**. v2026.11.0 moved the package's colours
+**Re-derived on 7 November 2026, and reproduced to the decimal on 12 November for v2026.11.2**. v2026.11.0 moved the package's colours
 onto the shared tokens; no test changed. These rows reconcile to the 92.61 /
 93.89 / 89.57 / 93.13 package total above, and all seven are identical to
 9 and 11 October. Six of them are also identical to 30 September and 3 October;
@@ -854,7 +865,7 @@ that an 80% functions floor would fail.
 
 ## Public site by area
 
-**Re-derived on 7 November 2026**, on a package no release since v2026.10.0
+**Re-derived on 7 November 2026, and reproduced to the decimal on 12 November for v2026.11.2**, on a package no release since v2026.10.0
 has touched. These rows reconcile to the 96.68 / 97.41 / 95.09 /
 97.23 package total above, and all six are identical to 9 and 11 October. Five of
 them are also identical to 3 October; the sixth, `src/pages`, read 97.29%
@@ -907,7 +918,7 @@ deliberately not covered.
 
 ## pa-demo by area
 
-**Re-derived on 7 November 2026**, and every row below reconciles to the
+**Re-derived on 7 November 2026, and reproduced to the decimal on 12 November for v2026.11.2**, and every row below reconciles to the
 **All files** row rather than predating it. Four rows reproduced to the
 decimal against every pass since 24 September; the fifth, `src/demo/shims`,
 moved for the first time since v2026.09.5, because v2026.11.0 switched on the

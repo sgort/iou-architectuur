@@ -100,6 +100,23 @@ opnieuw inpakken zou die dubbel verpakken.
 
 Beide routes zijn beschreven in de [API Specification](../reference/api-specification.md).
 
+Sinds v2026.11.2 hangt het gedrag van `deploy` af van wie hem aanroept. Met een token met `lde-author` (zie [Inloggen](#sign-in)) deployt hij zonder tenant, zoals voorheen. Zonder token maakt hij een **testdeploy** waar `TEST_DEPLOY_ENABLED=true` staat, en antwoordt hij overal elders `401 UNAUTHENTICATED`. Een token dat wel wordt meegestuurd maar ongeldig is of de rol mist, wordt geweigerd en niet als anoniem behandeld.
+
+Een testdeploy gaat naar de Operaton-tenant `TestOnly`:
+
+- hoogstens 10 per uur per clientadres, genomen uit de laatste `X-Forwarded-For`-waarde, die de front end van Azure toevoegt (`429 TEST_DEPLOY_RATE_LIMITED`);
+- een decision key die al buiten `TestOnly` bestaat, wordt geweigerd met `409 TEST_DEPLOY_KEY_EXISTS`; een key die alleen onder `TestOnly` bestaat, krijgt een nieuwe versie;
+- de resourcenaam wordt teruggebracht tot zijn stam plus `.dmn`, zodat een anonieme aanroeper alleen een beslismodel kan deployen, nooit een proces;
+- het antwoord bevat ook `tenantId` en `expiresAt`, en een opruimronde elk uur (`startTestDeployCleanup()` in `services/testDeploy.service.ts`) verwijdert elke `TestOnly`-deployment 48 uur na het deploymoment.
+
+`evaluate/:decisionKey` blijft open. De route accepteert `?tenantId=TestOnly` om een testdeploy te evalueren, en antwoordt `400 INVALID_PARAM` voor elke andere tenant.
+
+```
+GET /v1/dmns/deploy/options
+```
+
+Open, zonder invoer. Antwoordt `{ testDeploy: { enabled, tenantId, ttlHours } }`, zodat de CPSV Editor en deze frontend een testdeploy kunnen aanbieden zonder build-time-instelling.
+
 ### DMN-discovery
 
 ```
@@ -164,18 +181,15 @@ Voert de keten sequentieel uit, met flattening van outputs naar inputs tussen st
 POST /v1/dmns/drd/deploy
 ```
 
-Voegt gedeployde DMN's samen tot één DRD en deployt die naar Operaton. Zie [DRD-generatie](drd-generation.md).
+Voegt gedeployde DMN's samen tot één DRD en deployt die naar Operaton. Vereist sinds v2026.11.2 `lde-author`. Zie [DRD-generatie](drd-generation.md).
 
 ### eDOCS
 
 ```
 GET  /v1/edocs/status
-POST /v1/edocs/workspaces/ensure
-POST /v1/edocs/documents
-GET  /v1/edocs/workspaces/:workspaceId/documents
 ```
 
-Integreert met het OpenText eDOCS-documentmanagementsysteem. Gebruikt door het RIP Fase 1-proces om project-workspaces aan te maken en documenten te dossieren. In stub-modus (`EDOCS_STUB_MODE=true`, default) retourneren alle methoden realistische nepresponses zodat het proces end-to-end draait voordat een live eDOCS-server beschikbaar is.
+Meldt of het OpenText eDOCS-documentmanagementsysteem bereikbaar is. Het RIP Fase 1-proces dossiert zijn documenten via de [external task worker](#external-task-worker), die de eDOCS-service rechtstreeks aanroept. De drie schrijfroutes die er ook waren — `POST /workspaces/ensure`, `POST /documents` en `GET /workspaces/:workspaceId/documents` — hadden geen client, en v2026.11.2 heeft ze verwijderd. In stub-modus (`EDOCS_STUB_MODE=true`, default) retourneren alle methoden realistische nepresponses zodat het proces end-to-end draait voordat een live eDOCS-server beschikbaar is.
 
 Zie [eDOCS-integratie](edocs-integration.md), en de [API Specification](../reference/api-specification.md) voor request- en responsedetails.
 
@@ -195,6 +209,22 @@ Request body:
 ```
 
 Voert een SPARQL-query uit tegen een door de aanroeper opgegeven endpoint. **Elke query die de Query Editor van de frontend verstuurt gaat hierlangs** — de editor haalt endpoints niet langer vanuit de browser op, en de vroegere fallback-proxy `api.allorigins.win` is verdwenen. Het endpoint passeert eerst de [uitgaande controle](#outbound-guard): het moet `https:` zijn, geen credentials bevatten en naar een openbaar adres verwijzen, anders antwoordt de route `400 INVALID_INPUT` voordat er een request wordt gedaan.
+
+#### Publiceren (v2026.11.2)
+
+```
+GET  /v1/triplydb/publish-target
+POST /v1/triplydb/publish
+POST /v1/triplydb/update-service
+POST /v1/triplydb/list-graphs
+POST /v1/triplydb/test-connection
+```
+
+De CPSV Editor publiceert via deze routes (ttl-editor#234), zodat een TriplyDB-token nooit in een browser komt. De backend publiceert naar het account dat `TRIPLYDB_BASE_URL` en `TRIPLYDB_ACCOUNT` noemen, met `TRIPLYDB_API_TOKEN`; een instance, account of token van de aanroeper wordt genegeerd. Zonder account en token, of met een basis-URL die niet `https:` is op een host in `TRIPLYDB_ALLOWED_HOSTS`, start de backend gewoon en antwoorden deze routes `503`.
+
+- `publish-target` is open en geeft `{ baseUrl, account }` terug, nooit het token. De CPSV Editor bouwt er zijn keuzelijst voor vereiste diensten mee.
+- `publish` vereist `lde-author`. De route neemt `dataset`, `graph` (een IRI onder `https://regels.overheid.nl/graphs/`), `filename`, `ttl` en optioneel `logos` (gewone bestandsnamen met `data:image/`-URL's). Hij uploadt de Turtle naar de graaf, daarna de logo's als assets, en synchroniseert dan de service van de dataset. Een mislukte upload antwoordt `502`. Een mislukt logo of een mislukte service-synchronisatie laat de publicatie niet mislukken; die worden gemeld in `logos[].ok` en in `serviceUpdated` en `serviceError`. Elke poging schrijft één logregel met de gebruiker, organisatie, dienst, graaf, dataset en uitkomst. Het token staat in geen enkel antwoord en geen enkele logregel.
+- `update-service`, `list-graphs` en `test-connection` vereisen `lde-author` en werken op het account van de server. Dataset- en servicenamen moeten de eigen regel van TriplyDB volgen, 1 tot 40 letters, cijfers of koppeltekens, wat een schrijfactie ook binnen het account houdt. `test-connection` antwoordt `404` alleen wanneer TriplyDB zegt dat de dataset niet bestaat, en `502`, met de status van TriplyDB, bij elke andere fout.
 
 ### Normen
 
@@ -474,7 +504,7 @@ POST   /v1/assets/documents
 DELETE /v1/assets/documents/:id
 ```
 
-Persisteert BPMN-processen, formulierschema's en documenttemplates naar PostgreSQL. Alle routes retourneren `503 DB_NOT_CONFIGURED` wanneer `DATABASE_URL` ontbreekt. De upserts, de deploymarkering en het verwijderen van een ROPA-record valideren hun invoer voordat die Postgres bereikt, en antwoorden `400 INVALID_INPUT` met een detail dat elk afgekeurd veld noemt; de controles volgen de eigen constraints van de database, en een lege titel, id of naam wordt geweigerd op de velden die een record identificeren.
+Persisteert BPMN-processen, formulierschema's en documenttemplates naar PostgreSQL. Lezen is open. Elke schrijfactie — de `POST`- en `DELETE`-routes en de deploymarkering, `PATCH /v1/assets/bpmn/:id/deploy` — vereist sinds v2026.11.2 `lde-author` (zie [Inloggen](#sign-in)). Alle routes retourneren `503 DB_NOT_CONFIGURED` wanneer `DATABASE_URL` ontbreekt. De upserts, de deploymarkering en het verwijderen van een ROPA-record valideren hun invoer voordat die Postgres bereikt, en antwoorden `400 INVALID_INPUT` met een detail dat elk afgekeurd veld noemt; de controles volgen de eigen constraints van de database, en een lege titel, id of naam wordt geweigerd op de velden die een record identificeren.
 
 Een opgeslagen proces is uniek per organisatie en proces-id. `POST /v1/assets/bpmn` antwoordt `409 PROCESS_ID_TAKEN` wanneer een ander opgeslagen proces in dezelfde organisatie het `bpmnProcessId` al heeft, en schrijft niets; het probleem bevat `bpmnProcessId`, `organization` en `existing` (`id`, `name` en `status` van het proces dat het id heeft), zodat de Modeler kan aanbieden dat proces te vervangen of het nieuwe een ander id te geven. `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId` accepteert een optionele `?organization=` die het opzoeken tot één organisatie beperkt; een lege waarde betekent rijen zonder organisatie, en zonder de parameter tellen de rijen van elke organisatie mee. Zie [Asset-opslag](asset-storage.md) voor de service-architectuur en de [API Specification](../reference/api-specification.md) voor de vorm van requests en responses.
 
@@ -646,6 +676,13 @@ Dit verving in v2026.09.5 vijf verschillende envelopes. `POST /v1/dmns/evaluate/
 
 **CORS** — alleen origins die in `CORS_ORIGIN` staan zijn toegestaan. In productie is dit beperkt tot `https://linkeddata.open-regels.nl` en `https://cpsv.open-regels.nl`; acceptatie laat daarnaast beide omgevingen van de IOU-architectuurdocumentatie toe. Elke andere origin krijgt een gewone respons zonder `Access-Control-Allow-Origin`-header, die de browser vervolgens weigert — **behalve op de vier openbare, alleen-lezen mounts**, `/v1/ropa/public`, `/v1/bundles/public`, `/v1/openapi.json` en `/v2/openapi.json`, die bewust elke origin toestaan voor `GET` en `OPTIONS`. `isPublicPath` herkent die mounts of een pad daaronder, nooit een zusterroute die alleen hetzelfde voorvoegsel deelt; zie [RoPA Records — de openbare routes](ropa-records.md#publieke-route).
 
+<a id="sign-in"></a>**Inloggen** — sinds v2026.11.2 ([#163](https://github.com/sgort/linked-data-explorer/issues/163)) vereisen de routes die gedeelde gegevens wijzigen een access token van de Keycloak-realm `ronl`, meegestuurd als `Authorization: Bearer`. `middleware/auth.middleware.ts` controleert het met `jsonwebtoken` en `jwks-rsa` tegen de gepubliceerde sleutels van de realm. Het token moet RS256-ondertekend zijn door de realm, uitgegeven aan een client uit `AUTH_CLIENTS` (default `linked-data-explorer,ttl-editor,lde-e2e`), en de realmrol `lde-author` dragen.
+
+- `requireAuthor` antwoordt `401 UNAUTHENTICATED` wanneer het token ontbreekt, ongeldig of verlopen is, en `403 FORBIDDEN` wanneer de rol ontbreekt.
+- `optionalAuthor`, alleen gebruikt door `POST /v1/dmns/deploy`, laat een request zonder `Authorization`-header anoniem door, maar controleert een header die wel aanwezig is precies zoals `requireAuthor` dat doet.
+
+De gesloten routes zijn de deploys (`/dmns/drd/deploy` en `/dmns/process/deploy`), de schrijfacties op assets en RoPA, `DELETE /cache/clear` en de vier TriplyDB-schrijfroutes. Ze zijn gesloten op `/v1` en op de verouderde `/api/*`-aliassen, en `routes/write-auth.test.ts` controleert elke mount. Lezen, valideren, SPARQL-queries en ketenuitvoering blijven open. Het OpenAPI-document declareert een `bearerAuth`-schema op 17 operaties. `KEYCLOAK_URL` is verplicht op ACC en productie; lokaal is de default `http://localhost:8080`.
+
 **Invoervalidatie** — request-inputs worden gecontroleerd voordat een serviceaanroep wordt gedaan, en een afgekeurde invoer antwoordt `400 INVALID_INPUT` met de betrokken velden, in plaats van als 500 terug te komen uit een achterliggend systeem. De grootte van de request body is beperkt tot 10 MB.
 
 <a id="outbound-guard"></a>**Uitgaande controle** — de backend vraagt nooit een host op die een aanroeper noemde zonder die te controleren (v2026.09.5, [#142](https://github.com/sgort/linked-data-explorer/issues/142)). Er zijn twee lagen:
@@ -653,11 +690,11 @@ Dit verving in v2026.09.5 vijf verschillende envelopes. `POST /v1/dmns/evaluate/
 - **Bij de route** controleert `utils/outboundUrl.ts` elk door de aanroeper opgegeven SPARQL-endpoint — op `GET /norms`, de DMN-leesroutes, ketenuitvoering, de vendor-leesroutes, samengevoegde SHACL-validatie en `POST /triplydb/query` — en weigert het met `400 INVALID_INPUT` wanneer het geen `https:` is, credentials bevat of naar een intern adres verwijst. Interne adressen worden herkend in elke tekstuele IPv4- en IPv6-vorm, ook de IPv6-vormen waarin een IPv4-adres is opgenomen.
 - **Bij het verbinden** levert `utils/outboundHttp.ts` de axios-client die elk request naar een door de aanroeper gekozen host gebruikt. De agents weigeren een naam die naar een intern adres *resolvet*, redirects worden opnieuw gecontroleerd, en de client zet `proxy: false`, omdat axios anders `HTTP(S)_PROXY` volgt met een tunnelagent die de controle overslaat.
 
-TriplyDB-aanroepen die het token van de aanroeper doorsturen gaan alleen naar `https:`-hosts in `TRIPLYDB_ALLOWED_HOSTS`. Processen worden alleen naar de geconfigureerde Operaton gedeployd, via de gedeelde client, die inlogt met `OPERATON_USERNAME` en `OPERATON_PASSWORD` — een request kan de Operaton-URL niet meer opgeven en geen credentials meesturen. `ALLOW_LOCAL_ENDPOINTS=true` laat `http:` en lokale adressen toe voor lokale ontwikkeling, en staat nooit aan op ACC of productie.
+`TRIPLYDB_ALLOWED_HOSTS` noemt de hosts waar het eigen publicatiedoel van de backend, `TRIPLYDB_BASE_URL`, naar mag wijzen; die URL moet ook `https:` zijn, anders blijft publiceren uit. Processen worden alleen naar de geconfigureerde Operaton gedeployd, via de gedeelde client, die inlogt met `OPERATON_USERNAME` en `OPERATON_PASSWORD` — een request kan de Operaton-URL niet meer opgeven en geen credentials meesturen. `ALLOW_LOCAL_ENDPOINTS=true` laat `http:` en lokale adressen toe voor lokale ontwikkeling, en staat nooit aan op ACC of productie.
 
 **CSP-rapporten** — `POST /v1/csp-reports` ontvangt de Content-Security-Policy-schendingsrapporten van de frontend in beide formaten (`application/csp-report` en `application/reports+json`, tot 64 KB) en logt per schending één waarschuwingsregel. Er wordt niets opgeslagen.
 
-**Omgevingsvariabelen** — alle gevoelige configuratie (TriplyDB-endpoint-URL's, Operaton API-URL's, CORS-origins, eDOCS-credentials) wordt opgeslagen in omgevingsvariabelen en nooit hardcoded. De Operaton-login: `OPERATON_USERNAME` en `OPERATON_PASSWORD`, verplicht op ACC en productie. eDOCS-specifieke variabelen: `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, `EDOCS_PASSWORD`, `EDOCS_STUB_MODE`.
+**Omgevingsvariabelen** — alle gevoelige configuratie (TriplyDB-endpoint-URL's, Operaton API-URL's, CORS-origins, eDOCS-credentials) wordt opgeslagen in omgevingsvariabelen en nooit hardcoded. De Operaton-login: `OPERATON_USERNAME` en `OPERATON_PASSWORD`, verplicht op ACC en productie. Het inloggen: `KEYCLOAK_URL`, verplicht op ACC en productie, met `KEYCLOAK_REALM` en `AUTH_CLIENTS`; `TEST_DEPLOY_ENABLED` zet anonieme testdeploys aan. Het TriplyDB-publicatieaccount: `TRIPLYDB_BASE_URL`, `TRIPLYDB_ACCOUNT` en `TRIPLYDB_API_TOKEN`, waarvan het token de backend nooit verlaat. eDOCS-specifieke variabelen: `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, `EDOCS_PASSWORD`, `EDOCS_STUB_MODE`.
 
 **Foutresponses** — de centrale error handler schrobt stack traces en interne context voordat responses worden teruggegeven aan clients, om te garanderen dat geen implementatiedetails worden blootgelegd.
 

@@ -72,7 +72,7 @@ You can also add bindings manually without using Discover Variables — fill in 
 
 ## Saving and exporting
 
-- **Save** (canvas toolbar) — persists the document to `localStorage`. The button is disabled when there are no unsaved changes.
+- **Save** (canvas toolbar) — persists the document to `localStorage` and, signed in with the `lde-author` role, to the shared library; signed out, it stays in this browser ([Signing in](getting-started.md#signing-in)). The button is disabled when there are no unsaved changes.
 - **Save as…** — creates a copy of the current document with a new name. Useful for creating variant templates.
 - **Export .document** — downloads the template as a JSON file. The exported file can be loaded into another LDE instance with the **Import .document file** button (upload icon) in the document list.
 

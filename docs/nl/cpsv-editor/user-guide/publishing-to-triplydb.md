@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # Publishing to TriplyDB
 
 !!! info "Documentatie in ontwikkeling"
@@ -27,7 +31,7 @@
 
 ---
 
-## API token security
+## Who can publish
 
 ---
 

@@ -35,7 +35,7 @@ The engine's `.env` stays out of the repository through the `deployment/vm/**/.e
 
 ## The engine
 
-`prod/docker-compose.yml` names the image **`operaton/operaton:1.0.0`** — the version the VM runs, which a once-pulled `latest` turned out to be. Upgrading it to the 2.x line the local stack uses is [#423](https://github.com/sgort/ronl-business-api/issues/423); pinning it by digest comes with #196. The engine stores its data in H2 on a volume, and `JAVA_OPTS` switches on three settings:
+`prod/docker-compose.yml` names the image **`operaton/operaton:1.0.0`** — the version the VM runs, which a once-pulled `latest` turned out to be. Since v2026.11.2 it is pinned by digest as well — `operaton/operaton:1.0.0@sha256:74659f07…` — so a re-pull cannot move it. Upgrading it to the 2.x line the local stack uses is [#423](https://github.com/sgort/ronl-business-api/issues/423); Renovate's pull requests for 1.1.5 and 2.2.0 were closed in its favour. The engine stores its data in H2 on a volume, and `JAVA_OPTS` switches on three settings:
 
 | Setting | Effect |
 |---|---|

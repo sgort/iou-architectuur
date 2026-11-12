@@ -12,7 +12,7 @@ This guide sets up the Linked Data Explorer on a workstation: the frontend, the 
 
 | Requirement | Why |
 |---|---|
-| **Node.js 24.22.1** | The version `.nvmrc` names, and the one CI builds and tests on. `package.json` requires `>=24.22.1`, at the root and in `packages/backend`. |
+| **Node.js 24.22.2** | The version `.nvmrc` names, and the one CI builds and tests on. `package.json` requires `>=24.22.1`, at the root and in `packages/backend`. |
 | **npm 11.10 or newer** (recommended) | `.npmrc` sets `min-release-age=14`, a 14-day cooldown on newly published versions. Older npm ignores the setting without a warning, so `scripts/check-deps.sh` warns at every dev-server start and push when npm is older than 11.10. |
 | **bash on `PATH`** | The root scripts run `bash scripts/check-deps.sh`, and the backend's `dev` script runs `bash scripts/check-docker.sh`. |
 | **Docker** | The backend's Docker check calls `docker info` and `docker inspect` from that bash. |
@@ -90,6 +90,10 @@ The keys that matter locally:
 | `ALLOW_LOCAL_ENDPOINTS` | `true` | Admits `http:` and local SPARQL endpoints (see below) |
 | `OPERATON_BASE_URL` | `http://localhost:8081/engine-rest` | The local `ronl-operaton` container (required) |
 | `OPERATON_USERNAME` / `OPERATON_PASSWORD` | `ldeBackend` / `ldeBackend` | The engine login, sent as basic auth. The account is created by the `operaton-accounts` one-shot in the RONL Business API's `docker-compose.yml`. Not required to start locally, but the engine refuses calls without it. On ACC and production both are required. |
+| `KEYCLOAK_URL` / `KEYCLOAK_REALM` | `http://localhost:8080` / `ronl` | The Keycloak whose tokens the write routes accept: the RONL Business API's local one. Its `scripts/keycloak-add-lde-clients.sh` creates the realm role `lde-author` and the clients `linked-data-explorer`, `ttl-editor` and `lde-e2e`, which the realm import does not carry. Give your user `lde-author` to save, deploy and publish |
+| `AUTH_CLIENTS` | `linked-data-explorer,ttl-editor,lde-e2e` | Clients whose tokens are accepted |
+| `TEST_DEPLOY_ENABLED` | `true` | A signed-out DMN deploy goes to tenant `TestOnly` instead of answering `401` |
+| `TRIPLYDB_BASE_URL` / `TRIPLYDB_ACCOUNT` / `TRIPLYDB_API_TOKEN` | commented out | The publishing account. Without account and token, publishing answers `503` and everything else works |
 | `LOG_LEVEL` / `LOG_FORMAT` | `info` / `json` | `json` writes one JSON object per line. Any other value, such as `pretty`, writes coloured, timestamped lines. |
 | `EDOCS_STUB_MODE` | `true` | eDOCS calls are stubbed. Stub mode is also the default when the key is absent. |
 | `DATABASE_URL` | `postgresql://lde_user:lde_password@localhost:5432/lde_assets` | Asset storage (see [PostgreSQL setup](#postgresql-setup-local)) |
@@ -98,7 +102,7 @@ The keys that matter locally:
 
 **Why `ALLOW_LOCAL_ENDPOINTS`.** Since v2026.09.5, the backend refuses any caller-supplied endpoint that does not use `https:` or that points to an internal address, including `localhost`. That is right for ACC and production and wrong for a laptop, where the useful endpoints are local. `ALLOW_LOCAL_ENDPOINTS=true` admits them. It takes effect only for the exact value `true`. For the same reason, the frontend's **Local Jena** endpoint preset appears only in development builds. See the [outbound guard](backend.md#outbound-guard).
 
-The backend's Jest setup, `scripts/jest-env.cjs`, pins `ALLOW_LOCAL_ENDPOINTS=false` and `TRIPLYDB_ALLOWED_HOSTS` to their production values before any module reads `.env`. This setting in your `.env` therefore does not change what the tests assert. Without that pin, 46 outbound-guard tests failed on a machine configured for local Jena.
+The backend's Jest setup, `scripts/jest-env.cjs`, pins `ALLOW_LOCAL_ENDPOINTS=false` and `TRIPLYDB_ALLOWED_HOSTS` to their production values, and `TEST_DEPLOY_ENABLED` to `false`, before any module reads `.env`. This setting in your `.env` therefore does not change what the tests assert. Without that pin, 46 outbound-guard tests failed on a machine configured for local Jena.
 
 ---
 

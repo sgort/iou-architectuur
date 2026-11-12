@@ -3,7 +3,16 @@
 !!! warning "Outstanding — six REPLACE rows for v2026.11.1, plus eight optional colour-only re-shoots"
     The sync to v2026.11.1 shipped on **7 November 2026** without these captures: rows 21–26 below
     are stale views the pages still embed, and rows 27–34 are optional. Rows 11–20 still hold, apart
-    from the colours rows 27–34 name.
+    from the colours rows 27–34 name. The sync to v2026.11.2 (12 November 2026) added none.
+
+## Sync v2026.11.1 → v2026.11.2 — no screenshots requested
+
+Reviewed on 12 November 2026 for **v2026.11.2**, in production. The release adds a Keycloak script
+for the Linked Data Explorer and ttl-editor clients, a Caddy header exception for Keycloak's
+third-party-cookie check, a digest pin on the VM's Operaton image, dependency updates, and the
+⌘K buttons' accessible name on Caseworker V2 and PA-Cockpit (#444). The last removes an
+`aria-label` and changes no pixel; the others have no surface in this application. No captured
+view went stale, and no new figure is proposed.
 
 ## Sync v2026.10.2 → v2026.11.1 — six REPLACE, eight optional
 
@@ -213,7 +222,7 @@ work. One change is visible, and it earns a figure.
 
 | # | Status | File | Embedding page | What it must show | Trigger |
 |---|---|---|---|---|---|
-| 8 | ⬜ **NEW** | `ronl-business-api-public-site-begrippen-io.png` | `user-guide/public-site.md` | A **rule's detail page** at `publiek.open-regels.nl`, scrolled to its concepts, with the chips **divided into two headed groups** — *Invoer — gegevens die de regels nodig hebben (n)* and *Uitvoer — wat de regels bepalen (n)* — each heading carrying its own count | v2026.09.11 |
+| 8 | ✅ **NEW** (24 Sep) | `ronl-business-api-public-site-begrippen-io.png` | `user-guide/public-site.md` | A **rule's detail page** at `publiek.open-regels.nl`, scrolled to its concepts, with the chips **divided into two headed groups** — *Invoer — gegevens die de regels nodig hebben (n)* and *Uitvoer — wat de regels bepalen (n)* — each heading carrying its own count | v2026.09.11 |
 
 ### Why this one is worth capturing
 

@@ -44,6 +44,56 @@ drained by the pass of 27 September, everything queued from 27 September to 3 Oc
    pass installs nothing. Bears on: `technology-stack.md`, `the-gitlab-mirror.md` if it describes the Flevoland remote.
    (Was 11 October carry-over 3.)
 
+### 12 November 2026 — CPSV Editor v2026.11.0 → v2026.11.1 (production, `6910bb8`)
+
+1. **Optional sign-in, and deploying and publishing by role.** The editor signs in through Keycloak (realm `ronl`, client
+   `ttl-editor`, `keycloak-js` 23.0.7, a new runtime dependency; dd7e87f) and presents the token to the Linked Data Explorer.
+   Deploy, publish, update-service, list-graphs and test-connection need `lde-author`; anyone else gets a test deploy into
+   tenant `TestOnly`, offered only off production (4334a55). Bears on PSA **AB-17** (its note says the design tools check no
+   tokens yet), **AB-20** (now authenticated and role-authorised, not per organisation), **AB-23** (a publish writes one log
+   line, not an audit record), **R-02**, **AB-32** (the editor now uses Keycloak), and **AB-28** (`keycloak-js` 23.0.7 dates
+   from December 2023, the same in all three repositories); `supply-chain.md` for the dependency.
+2. **The TriplyDB token has left the browser.** Publishing is one call to the Linked Data Explorer's
+   `POST /v1/triplydb/publish`; the backend holds the token and an old browser copy is deleted on load (e8749d5, closes
+   ttl-editor#234). Bears on PSA chapters 6–8 (where the secret lives, data flows), **R-02**, and the #234 Issue cell, which can
+   now carry a link if the gap is judged closed.
+3. **Node 24.22.2** in `.nvmrc` and the five tooling-workflow literals. **Pins on `main`:** setup-node v7.1.0, upload-artifact
+   v7.0.2; `acc` is ahead with zizmor-action v0.8.0 (`e82375e`). Still 8 workflows; rulesets, Renovate, hooks and `.npmrc`
+   unchanged. Bears on: `supply-chain.md`, `code-standards.md`, `ci-posture-deck.md` (the `main`/`acc` footnote).
+
+### 12 November 2026 — Linked Data Explorer v2026.11.1 → v2026.11.2 (production, `e11e4ef`)
+
+1. **Writes need a Keycloak token with `lde-author`** (#163, closed 12 November): `requireAuthor` on 16 handlers,
+   `optionalAuthor` on `POST /v1/dmns/deploy`, 17 operations marked `bearerAuth`; `KEYCLOAK_URL` is required on acceptance and
+   production. Signed-out deploys go to tenant `TestOnly` on localhost and acceptance only (rate-limited, swept after 48 hours).
+   Bears on PSA **AB-17** (now false for the LDE), **AB-20** (writes authenticated and authorised; only publish is logged —
+   probably still *deels*), **AB-21**, **R-02** (partly mitigated; the anonymous test deploy is a deliberate exception) and
+   **AB-32** (a second consumer); and the R-02/AB-20 Issue cells, now that #163 is closed.
+2. **Routes and secrets:** the three eDOCS write routes are removed; `POST /v1/triplydb/publish`,
+   `GET /v1/triplydb/publish-target` and `GET /v1/dmns/deploy/options` are new; the TriplyDB token is a backend secret on the
+   App Service. The CSP adds the Keycloak origin and `frame-src`, and `frame-ancestors` moves from `'none'` to `'self'`. Bears
+   on PSA chapters 7–8 and `openapi-rendering.md` if it records the CSP.
+3. **Node 24.22.2** in `.nvmrc` and five workflow literals (engines stay `>=24.22.1`); setup-node v7.1.0, upload-artifact v7.0.2
+   and zizmor-action v0.8.0 recorded in `SECURITY-PIPELINE.md` (zizmor stays 1.29.0). Still 12 workflows, rulesets and hooks
+   unchanged; new SBOM `linked-data-explorer-2026.11.2.cdx.json`. Bears on: `supply-chain.md`, `controls.md`.
+4. **follow-redirects 1.16.2** (`bfc7a50`) fixes the open high, but the scheduled audit on `acc` failed again on 12 November
+   before #301 merged, and #313 is still open: re-check the next scheduled run. Bears on: `dependency-scanning.md`, the ICTU
+   R10 cell.
+5. **The per-file branch floor did its job:** it failed the acceptance deploy checks on three new files until tests were added
+   (`9112835`). Evidence for `coverage-floor.md`.
+
+### 12 November 2026 — RONL Business API v2026.11.1 → v2026.11.2 (production, `ad0fd62`)
+
+1. **Keycloak for the design tools:** `scripts/keycloak-add-lde-clients.sh` adds the `lde-author` role and the public PKCE
+   clients `linked-data-explorer` and `ttl-editor` (b74db31, 57f3943), live on acceptance and production. Caddy drops
+   `X-Frame-Options` on the Keycloak third-party-cookie path only (2549feb). Bears on PSA **AB-20**, **R-02** and **AB-32**;
+   **R-01** and **AB-13** are unchanged by this release.
+2. **The VM's Operaton 1.0.0 is pinned by digest** (568b23f); the VM's Caddy image (`caddy:2-alpine`) still floats. Bears on
+   PSA **AB-28** and `supply-chain.md` (the container footnote on the ICTU page too).
+3. **Node 24.22.2** in the four tooling workflows (2ba78fa). Still 14 workflows; rulesets, hooks, Renovate,
+   `SECURITY-PIPELINE.md`, `.nvmrc` and `.npmrc` unchanged. The lockfile refresh used no cooldown exception; SBOM 2026.11.2
+   lists 493 components (npm 11.19.1). Bears on: `code-standards.md`, `supply-chain.md`, `dependency-scanning.md`.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

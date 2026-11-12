@@ -21,12 +21,12 @@ graph TD
 
 ## Write-through cache strategy
 
-On **save**, each service:
+On **save** by a signed-in author, each service:
 
 1. Writes the updated record to `localStorage` immediately — the UI reflects the change synchronously with zero latency.
 2. Fires a background `fetch` to `POST /v1/assets/{type}` — no `await`, no spinner. If the network call fails, a warning is logged to the browser console but the user experience is unaffected.
 
-On **delete**, each service:
+On **delete** by a signed-in author, each service:
 
 1. Removes the record from `localStorage` immediately.
 2. Fires a background `DELETE /v1/assets/{type}/:id`.
@@ -34,6 +34,18 @@ On **delete**, each service:
 One refusal is not swallowed. When the backend answers a BPMN save with `409 PROCESS_ID_TAKEN`, `BpmnService.saveProcessDetailed()` returns the conflict, and the BPMN Modeler shows it: a save that renames a process to a process id the organisation already uses is reported as not saved, and an import with such an id asks whether to replace the existing process or give the import another process id.
 
 Examples are seeded on the frontend from static files in `public/examples/` and from `defaultTemplates.ts`, and carry `status: 'example'`. Seeding saves them through the same service call as a user edit, so every example with `readonly: false` is written to the backend too. Only records with `readonly: true` are never written: the BPMN example `example_dvtp_toestemming` and the document template `example_dvtp_consent_receipt`. Hydration keeps those two from `localStorage` and takes everything else from the server.
+
+---
+
+## Signed-out saves
+
+Since v2026.11.2 the backend refuses asset writes without `lde-author` ([Backend — Sign-in](backend.md#sign-in)), and the three services do not try. A save by a user without the role writes the record to `localStorage` with `localOnly: true` and never contacts the backend. The same happens to an author's save whose token can no longer be refreshed, or that the backend answers with `401` or `403`: the item stays in this browser, marked, instead of being lost. A later save by an author sends it and clears the mark. Read-only examples are never marked.
+
+The lists show such an item with an *only in this browser* badge. While the user cannot save to the shared library, a notice above each list says so.
+
+Hydration keeps a local-only item unless the server holds a copy at least as recent: then someone saved it since, and the server copy wins. A signed-out edit of a shared process, form or template is newer than its server copy, so it stays, still marked, instead of vanishing on reload.
+
+Delete follows the same rule. Signed out, only a local-only item can be deleted, and only from this browser; a shared item shows a locked Delete.
 
 ---
 

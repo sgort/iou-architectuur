@@ -415,6 +415,7 @@ Changes reach those realms through the admin REST API instead, with the idempote
 | New realm roles, such as `rip-*` or `besluit-*` | `keycloak-add-rip-roles.sh`, with `ROLE_PREFIX` for roles other than `rip-` |
 | The `email`, `given_name` and `family_name` token claims for ValidSign | `keycloak-add-token-claim-mappers.sh` |
 | The Entra ID identity provider for Flevoland, with the token storage eDOCS needs: stored tokens, the `broker` `read-token` role in `default-roles-ronl`, and the `broker-roles` client mapper on `ronl-business-api` | `keycloak-add-entra-idp.sh` |
+| The `lde-author` role and the clients `linked-data-explorer` and `ttl-editor`, with which the Linked Data Explorer and the ttl-editor sign in; optionally the `lde-e2e` client and user, and the `test-author-flevoland` account (see [Keycloak realm](../../reference/keycloak-realm.md#clients-added-by-script-linked-data-explorer-and-ttl-editor)) | `keycloak-add-lde-clients.sh` |
 
 ```bash
 # From a checkout of ronl-business-api, in Git Bash. Creates the five besluit-* roles;
@@ -423,7 +424,7 @@ KEYCLOAK_URL=https://acc.keycloak.open-regels.nl ROLE_PREFIX=besluit- GRANT_USER
   bash scripts/keycloak-add-rip-roles.sh
 ```
 
-Each script prompts for the Keycloak admin password when `ADMIN_PASSWORD` is unset; `keycloak-add-rip-roles.sh` and `keycloak-add-entra-idp.sh` also accept `--dry-run`. Test users and per-user roles are added in the admin console. See [Entra ID — Rolling out to an environment](entra-id.md#rolling-out-to-an-environment) for the order in which to run them.
+Each script prompts for the Keycloak admin password when `ADMIN_PASSWORD` is unset; `keycloak-add-rip-roles.sh`, `keycloak-add-entra-idp.sh` and `keycloak-add-lde-clients.sh` also accept `--dry-run`. `keycloak-add-lde-clients.sh` needs `LDE_ORIGIN` and `TTL_ORIGIN` as well, and refuses its two test-account options, `--with-e2e` and `--with-test-author`, against production (`keycloak.open-regels.nl`). Test users and per-user roles are added in the admin console. See [Entra ID — Rolling out to an environment](entra-id.md#rolling-out-to-an-environment) for the order in which to run them.
 
 ---
 

@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # Saving & Executing DRDs
 
 When a chain is DRD-compatible (green validation), you can save it as a Decision Requirements Diagram template. This deploys a unified DRD to Operaton and stores the template locally for reuse.
@@ -14,11 +18,13 @@ When a chain is DRD-compatible (green validation), you can save it as a Decision
 
 The system assembles the DMN XML with proper `<informationRequirement>` wiring, deploys it to Operaton, and stores the template in your browser's local storage. A success message shows the Operaton deployment ID.
 
+Because it deploys, **Save as DRD** needs a sign-in with the `lde-author` role ([Signing in](getting-started.md#signing-in)). Signed out, the button shows a lock and the modal says *Sign in to deploy*.
+
 ---
 
 ## Saving a sequential template
 
-If the chain has amber validation (sequential execution required), clicking **Save** opens the same modal but shows a sequential template badge instead of a DRD badge. The template is saved locally for reuse but is not deployed to Operaton as a unified DRD.
+If the chain has amber validation (sequential execution required), clicking **Save** opens the same modal but shows a sequential template badge instead of a DRD badge. The template is saved locally for reuse but is not deployed to Operaton as a unified DRD, so it needs no sign-in.
 
 ---
 

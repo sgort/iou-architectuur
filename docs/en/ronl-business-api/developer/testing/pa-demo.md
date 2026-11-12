@@ -68,14 +68,21 @@ wired into CI.
     functions 34/40, lines 81/87), up from 93.47 / 95.65 / 85.00 / 92.85 on
     the changed shim.
 
+    **And on 12 November 2026** for v2026.11.2 (`main` at `ad0fd62`), in the
+    working checkout on `acc` at `4e28ed7`, the same way: **19 files · 109
+    tests · all passing**, `Duration 36.69s`, coverage **93.75 / 96.15 / 85.00 /
+    93.10** with the same counts — every figure as on 7 November. v2026.11.2
+    changed nothing in this package but its version; PA-Cockpit, which the
+    demo compiles in, moved to vite ^6.4.5 and vitest ^4.1.12.
+
 **At a glance:**
 
 | | |
 |---|---|
 | Runner | Vitest 4 + jsdom, coverage via v8 |
-| Files / tests | 19 / 109 (7 November 2026) |
-| Duration | 38.31 s serially on 7 November, 40.64 s on 9 October, 35.65 s on 3 October; 8.16 s to 19.62 s in parallel runs before that |
-| Playwright | 11 tests in `e2e/plato-demo.spec.ts`, **runs in CI** — 11 passed, 21.8s, on 7 November (8.7s on 9 October) |
+| Files / tests | 19 / 109 (12 November 2026, as on 7 November) |
+| Duration | 36.69 s serially on 12 November, 38.31 s on 7 November, 40.64 s on 9 October, 35.65 s on 3 October; 8.16 s to 19.62 s in parallel runs before that |
+| Playwright | 11 tests in `e2e/plato-demo.spec.ts`, **runs in CI** — 11 passed, 21.8s, on 7 November (8.7s on 9 October); not re-run locally for v2026.11.2 |
 
 ---
 
