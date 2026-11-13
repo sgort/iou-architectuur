@@ -89,6 +89,22 @@ Three confidential clients authenticate with a service account and no user:
 
 ---
 
+## Clients added by script: `linked-data-explorer` and `ttl-editor`
+
+Since v2026.11.2 the Linked Data Explorer and the ttl-editor sign their users in through this realm. What they need is not in the realm export: `scripts/keycloak-add-lde-clients.sh` adds it, from the definitions in `scripts/keycloak-lde-clients.json`. A local realm that has been imported again therefore needs the script again.
+
+| Added | What it is |
+|---|---|
+| Realm role `lde-author` | May change the shared library of the Linked Data Explorer and the ttl-editor: save, delete, deploy and publish. The script grants it only to the two test accounts below |
+| Client `linked-data-explorer` | Public client, standard flow only, PKCE with `S256`; redirect URIs, web origin and post-logout redirect from `LDE_ORIGIN` |
+| Client `ttl-editor` | The same, from `TTL_ORIGIN` |
+| Client and user `lde-e2e` | Only with `--with-e2e`: a confidential client with direct access grants, and a user holding `lde-author`, for the Linked Data Explorer's fixture deploy. Never on production |
+| User `test-author-flevoland` | Only with `--with-test-author`: a Flevoland employee test account (`municipality = flevoland`, `organisation_type = province`, `assurance_level = hoog`) holding `lde-author`, for trying the author path by hand. Never on production |
+
+Each of the two public clients carries its own `realm_roles`, `username` and `full name` mappers, so its tokens hold `realm_access.roles`, `preferred_username` and `name` whatever the realm's default client scopes are. The script creates what is missing and updates what exists in place, leaves a mapper added by hand alone, and accepts `--dry-run`. The two test accounts' passwords come from `LDE_E2E_PASSWORD` and `TEST_AUTHOR_PASSWORD`, prompted when unset, and are never stored in the repository; the script recognises production as `keycloak.open-regels.nl`.
+
+---
+
 ## Identity provider: `entra-flevoland`
 
 An OIDC provider for Provincie Flevoland's Entra ID, configured by `scripts/keycloak-add-entra-idp.sh` rather than by the realm export, because it carries a client secret. Its mappers set `municipality = flevoland`, `organisation_type = province` and `assurance_level = substantieel`, and map the Entra app roles `IOU_ADMIN`, `IOU_USERS`, `IOU_PA` and `IOU_INFRA` to `admin`, `caseworker`, `public-affairs` and `infra-projectteam`, on every login. The provider is hidden on the Keycloak login form (`hideOnLogin`); Flevoland employees reach it through the landing page. It stores the Entra tokens it receives (`storeToken`, with `offline_access` in its default scope), so the backend can act in eDOCS as the person; the same script adds the `broker` client's `read-token` role to `default-roles-ronl` and the `broker-roles` client mapper to `ronl-business-api`. None of this is in the realm export. See [Entra ID](../developer/deployment/entra-id.md).
@@ -253,6 +269,7 @@ This also removes what was added to the local realm by hand or by script; run `s
 | New realm roles | `keycloak-add-rip-roles.sh` — creates every role in the realm file whose name starts with `ROLE_PREFIX` (default `rip-`), and grants them all to `GRANT_USER` (default `test-infra-flevoland` for `rip-`, empty for any other prefix; empty grants nothing) |
 | The ValidSign token claims | `keycloak-add-token-claim-mappers.sh` |
 | The Entra ID identity provider, its token storage, the `read-token` default role and the `broker-roles` client mapper | `keycloak-add-entra-idp.sh` |
+| The `lde-author` role and the clients for the Linked Data Explorer and the ttl-editor | `keycloak-add-lde-clients.sh` — with `LDE_ORIGIN` and `TTL_ORIGIN`; `--with-e2e` and `--with-test-author` add test accounts, refused against production |
 
 For the besluit roles, for example:
 

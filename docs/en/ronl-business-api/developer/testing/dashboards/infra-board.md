@@ -17,9 +17,9 @@ work that happens inside it.
 
 ## Frontend
 
-Measured on **7 November 2026** at `c6cf3ac`, a tree identical to `main`
-at `35fb3a8` (v2026.11.1): the frontend package ran 143 files and 1738 tests,
-all passing, and the counts below are read from Vitest's JSON report of that
+Measured on **12 November 2026** at `4e28ed7`, a tree identical to `main`
+at `ad0fd62` (v2026.11.2): the frontend package ran 143 files and 1738 tests,
+all passing, every per-file count the same as on 7 November for v2026.11.1, and the counts below are read from Vitest's JSON report of that
 run.
 
 **v2026.10.3 added 19 tests to this board and no file.** The project page

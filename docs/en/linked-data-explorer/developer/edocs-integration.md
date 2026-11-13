@@ -145,10 +145,10 @@ Document;<library>;<document_number>;<version>
  
 For example: `Document;DOCUVITP;2993896;R`
  
-The document number matches the `documentNumber` field returned by `POST /v1/edocs/documents` and stored as the process variable (e.g. `edocsIntakeReportId`).
+The document number matches the `documentNumber` field returned by `uploadDocument()` in the external task worker and stored as the process variable (e.g. `edocsIntakeReportId`).
  
 ---
  
 ## REST endpoints
  
-See the [API Specification](../reference/api-specification.md) for full request and response documentation of all four `/v1/edocs` endpoints.
+See the [API Specification](../reference/api-specification.md) for the request and response of `GET /v1/edocs/status`, the one eDOCS endpoint left. v2026.11.2 removed the three write routes, which had no client: the worker calls `EdocsService` directly.

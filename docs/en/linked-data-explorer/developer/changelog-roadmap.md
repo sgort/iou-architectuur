@@ -8,6 +8,26 @@ component: Linked Data Explorer
 
 ## Changelog
 
+### v2026.11.2 — Signing In to Change Shared State (November 2026)
+
+> What a user sees: [Getting Started — Signing in](../user-guide/getting-started.md#signing-in). How it is built: [Backend](backend.md#sign-in), [Frontend](frontend.md#sign-in) and [Asset Storage](asset-storage.md#signed-out-saves). Configuration: [Deployment](deployment.md) and [Local Development](local-development.md). Measured suites: [Testing](testing.md).
+
+**Changing shared state needs a sign-in** ([#163](https://github.com/sgort/linked-data-explorer/issues/163)). Reading, validating, querying and executing chains stay open. Every route that changes shared state now needs an access token from the Keycloak realm `ronl` carrying the realm role `lde-author`. That covers the DRD and process deploys, saving and deleting BPMN processes, forms, document templates and RoPA records, the deploy mark, clearing the cache, and the TriplyDB writes, on `/v1` and on the deprecated `/api/*` aliases alike. Without a valid token the backend answers `401 UNAUTHENTICATED`, and without the role `403 FORBIDDEN`. The OpenAPI document declares a `bearerAuth` scheme on the 17 operations concerned. On ACC and production the backend does not start without `KEYCLOAK_URL`.
+
+**Signing in, in the app.** The header has a **Sign in** menu with two routes, *Flevoland-account* and *Medewerker*, through the same Keycloak realm as the RONL Business API. Sign-in and sign-out run in a popup, so the open process and any unsaved edits stay where they are. A user without `lde-author` sees **View only** next to their name. Signed out, Deploy, Save as DRD, Refresh Cache and RoPA Save and Delete are locked and say *Sign in to …*. Saving a BPMN process, form or document template still works, but the item stays in this browser, marked *only in this browser*, until an author saves it again.
+
+**Test deploys without a sign-in, where the tier allows them.** With `TEST_DEPLOY_ENABLED=true`, meant for localhost and ACC, a signed-out `POST /v1/dmns/deploy` deploys the DMN to the Operaton tenant `TestOnly`. The backend allows at most 10 per hour from one address and refuses a decision key that already exists outside `TestOnly`. It removes test deploys 48 hours after they were made. Evaluate accepts `?tenantId=TestOnly` and no other tenant, and `GET /v1/dmns/deploy/options` tells the editors whether test deploys are on. Signed in as an author, the route deploys without a tenant, as before.
+
+**Publishing to TriplyDB goes through the backend** (ttl-editor#234). The CPSV Editor no longer holds a TriplyDB token. `POST /v1/triplydb/publish` acts as the signed-in author, with the backend's own token: it uploads the service's Turtle into its graph, uploads its logos and syncs the dataset's service. It logs one line per attempt. `GET /v1/triplydb/publish-target` gives the base URL and account, never the token. `update-service`, `list-graphs` and `test-connection` now use the server's token too and ignore a caller's. `test-connection` answers `404` only when the dataset does not exist, and `502` when TriplyDB fails in any other way.
+
+**The unused eDOCS write routes are gone.** Only `GET /v1/edocs/status` remains. The external-task worker files documents as before, calling the eDOCS service directly.
+
+**Also in this release.** Node 24.22.2. `follow-redirects` 1.16.2 clears the high advisory GHSA-mrwp-f3q8-3g9p, which had failed the daily dependency audit since 9 November. `bpmn-js` 18.31.1, `vite` 6.4.5, `vitest` 4.1.12 and `axios` 1.21.0. New GitHub Actions pins: setup-node v7.1.0, upload-artifact v7.0.2 and zizmor-action v0.8.0. The e2e fixtures script now signs in as the `lde-e2e` account before it deploys.
+
+**Shipped in two steps.** The sign-in reached production on 12 November with promotion #333, before the release was cut. v2026.11.2 (#339) followed the same day and added the TriplyDB publishing.
+
+---
+
 ### v2026.11.1 — The Backend Logs In to Operaton (November 2026)
 
 > How it is built: [Backend](backend.md#operaton-service). Configuration: [Deployment](deployment.md) and [Local Development](local-development.md). Measured suites: [Testing](testing.md).
@@ -1443,7 +1463,7 @@ The following items are planned but not yet scheduled. Phase 1 features (v0.1–
 
 **Database migration**
 
-Move chain templates and BPMN processes from `localStorage` to a server-side database. Enables user authentication and ownership, process versioning with history, and public sharing with access control. PostgreSQL is the planned backend, consistent with the RONL Business API stack.
+Move chain templates and BPMN processes from `localStorage` to a server-side database. Enables user authentication and ownership, process versioning with history, and public sharing with access control. Sign-in for changes to shared state shipped in v2026.11.2, through the realm role `lde-author`. Ownership per user is still to come. PostgreSQL is the planned backend, consistent with the RONL Business API stack.
 
 **Collaborative editing**
 

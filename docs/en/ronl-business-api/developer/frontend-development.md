@@ -750,6 +750,13 @@ registered actions beside the static sections from `modes.config`. The Taken
 inbox registers **Proces van deze taak bekijken**, which opens the overlay,
 while the selected task's process has lanes.
 
+The top-bar button that opens the palette carries no `aria-label`. Its
+accessible name is its visible text — *Spring naar een sectie…*, on
+PA-Cockpit *Spring naar een dossier of sectie…* — because WCAG 2.5.3
+(*Label in Name*) requires the name to contain what the button shows, and
+the axe-core scan in the E2E suite checks it (since v2026.11.2). The unit
+tests find the button by that text.
+
 ---
 
 ## Adding a new page

@@ -12,7 +12,7 @@ This guide walks you through the Linked Data Explorer for the first time, from o
 
 - Access to [linkeddata.open-regels.nl](https://linkeddata.open-regels.nl) or the [acceptance environment](https://acc.linkeddata.open-regels.nl)
 - A modern browser (Chrome, Firefox, Safari, or Edge — latest two versions)
-- No login required for the reference TriplyDB endpoint
+- No sign-in for looking around, querying and running chains. Saving to the shared library, deploying and publishing need one — see [Signing in](#signing-in)
 
 ---
 
@@ -47,6 +47,27 @@ rail left both unreachable.
 !!! info "The in-app tutorial was removed in v2026.09.2"
     A **HelpCircle** icon used to open a guided tutorial inside the application.
     It is gone, and this page is where that walkthrough now lives.
+
+---
+
+## Signing in
+
+You can open every view, run queries and execute chains without signing in. Changing what others see needs a sign-in with the `lde-author` role: saving processes, forms and document templates to the shared library, deploying, saving a chain as a DRD, refreshing the DMN cache, and saving or deleting RoPA records.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: The right end of the header with the Sign in menu open, listing its two routes, Flevoland-account and Medewerker](../../assets/screenshots/linked-data-explorer-sign-in-menu.png)
+  <figcaption>The Sign in menu in the header, with its two routes</figcaption>
+</figure>
+
+1. Click **Sign in** at the right of the header.
+2. Choose **Flevoland-account** to sign in with your province account, or **Medewerker** for an employee account with a password.
+3. Complete the sign-in in the popup. It closes by itself, and the page keeps what you had open.
+
+Signed in, the header shows your name and **Sign out**. If your account does not have the `lde-author` role, a **View only** label appears next to your name, and a note explains that saving to the shared library, deploying and publishing are locked. Ask an administrator for the role, then sign in again.
+
+Signed out, a locked button shows a lock and says *Sign in to …*. You can still save processes, forms and document templates: they stay in this browser, marked *only in this browser*, until you save them again as an author.
+
+If your browser blocks the popup, the sign-in opens in the same tab instead.
 
 ---
 

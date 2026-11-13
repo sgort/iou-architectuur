@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # DRD Generation
 
 When all variable connections in a chain are exact identifier matches, the chain can be saved as a **Decision Requirements Diagram (DRD)** — a single, unified DMN artifact deployed to Operaton. This replaces multiple sequential API calls with one call that evaluates the entire chain internally.
@@ -26,5 +30,6 @@ A saved DRD template appears in **My Templates** with a purple 🔗 DRD badge. I
 ## Limitations
 
 - Chains with semantic (non-exact) variable connections cannot be saved as DRDs. The validation system explicitly blocks the DRD save path for such chains. See [Semantic Analysis](semantic-analysis.md) for why.
+- Saving a DRD deploys it, so **Save as DRD** needs a sign-in with the `lde-author` role. A sequential template still saves locally without one.
 - DRD templates are stored in browser `localStorage` in Phase 1. A database migration is planned for Phase 2.
 - Export and versioning of DRD XML is planned for Phase 2.

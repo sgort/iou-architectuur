@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # TriplyDB Publish Implementation
 
 !!! info "Documentatie in ontwikkeling"
@@ -21,13 +25,13 @@
 
 ## API functions
 
-### `publishToTriplyDB(config, ttlContent, logoData?)`
+### `publishToTriplyDB(publish)`
 
 ### `testTriplyDBConnection(config)`
 
 ---
 
-## Token storage
+## What the browser keeps
 
 ---
 
@@ -35,4 +39,4 @@
 
 ---
 
-## Backend proxy deployment checklist
+## Backend deployment checklist

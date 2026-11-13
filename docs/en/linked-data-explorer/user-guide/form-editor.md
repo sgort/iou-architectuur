@@ -74,7 +74,7 @@ Select any component on the canvas to edit its properties on the right:
 
 ## Saving a form
 
-Click **Save** in the toolbar. The button activates only when there are unsaved changes. The schema is persisted to `localStorage` and immediately available in the BPMN Modeler.
+Click **Save** in the toolbar. The button activates only when there are unsaved changes. The schema is persisted to `localStorage` and immediately available in the BPMN Modeler. Signed in with the `lde-author` role, it is also saved to the shared library; otherwise it stays in this browser, marked *only in this browser* ([Signing in](getting-started.md#signing-in)).
 
 ---
 
@@ -110,7 +110,7 @@ Double-click a form name in the list to activate inline editing. Press **Enter**
 
 ## Deleting a form
 
-Click the trash icon on a form entry. A confirmation dialog appears before the form is removed from `localStorage` and the backend. Example forms cannot be deleted: the trash icon answers with *Cannot delete example forms*.
+Click the trash icon on a form entry. A confirmation dialog appears before the form is removed from `localStorage` and the backend. Signed out, only forms kept in this browser can be deleted. Example forms cannot be deleted: the trash icon answers with *Cannot delete example forms*.
 
 !!! note
     If a deleted form is still referenced by a `camunda:formRef` in a saved BPMN process, that reference becomes unresolvable. The BPMN Modeler will still show the form ID in the properties panel, but the deploy modal will list it as an unmatched form reference.

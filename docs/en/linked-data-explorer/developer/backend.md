@@ -95,6 +95,23 @@ re-wrapping would double-wrap them.
 
 Both are described in the [API Specification](../reference/api-specification.md).
 
+Since v2026.11.2, `deploy` behaves according to who calls it. With a token carrying `lde-author` (see [Sign-in](#sign-in)) it deploys without a tenant, as before. Without a token it makes a **test deploy** where `TEST_DEPLOY_ENABLED=true`, and answers `401 UNAUTHENTICATED` everywhere else. A token that is present but invalid, or lacks the role, is refused rather than treated as anonymous.
+
+A test deploy goes to the Operaton tenant `TestOnly`:
+
+- at most 10 per hour from one client address, taken from the last `X-Forwarded-For` entry, the one Azure's front end appends (`429 TEST_DEPLOY_RATE_LIMITED`);
+- a decision key that already exists outside `TestOnly` is refused with `409 TEST_DEPLOY_KEY_EXISTS`; one that exists only under `TestOnly` gets a new version;
+- the resource name is reduced to its stem plus `.dmn`, so an anonymous caller can only ever deploy a decision model, never a process;
+- the answer adds `tenantId` and `expiresAt`, and an hourly sweep (`startTestDeployCleanup()` in `services/testDeploy.service.ts`) removes every `TestOnly` deployment 48 hours after its deploy time.
+
+`evaluate/:decisionKey` stays open. It accepts `?tenantId=TestOnly` to evaluate a test deploy, and answers `400 INVALID_PARAM` for any other tenant.
+
+```
+GET /v1/dmns/deploy/options
+```
+
+Open, and takes no input. Answers `{ testDeploy: { enabled, tenantId, ttlHours } }`, so the CPSV Editor and this frontend can offer a test deploy without a build-time setting.
+
 ### Deploy target (v2026.09.6)
 
 ```
@@ -174,18 +191,15 @@ Executes the chain sequentially, flattening outputs into inputs between steps. R
 POST /v1/dmns/drd/deploy
 ```
 
-Assembles deployed DMNs into a single DRD and deploys it to Operaton. See [DRD Generation](drd-generation.md).
+Assembles deployed DMNs into a single DRD and deploys it to Operaton. Requires `lde-author` since v2026.11.2. See [DRD Generation](drd-generation.md).
 
 ### eDOCS
 
 ```
 GET  /v1/edocs/status
-POST /v1/edocs/workspaces/ensure
-POST /v1/edocs/documents
-GET  /v1/edocs/workspaces/:workspaceId/documents
 ```
 
-Integrates with the OpenText eDOCS document management system. Used by the RIP Phase 1 process to create project workspaces and file documents. In stub mode (`EDOCS_STUB_MODE=true`, default) all methods return realistic fake responses so the process runs end-to-end before a live eDOCS server is available.
+Reports whether the OpenText eDOCS document management system is reachable. The RIP Phase 1 process files its documents through the [external task worker](#external-task-worker), which calls the eDOCS service directly. The three write routes that also existed — `POST /workspaces/ensure`, `POST /documents` and `GET /workspaces/:workspaceId/documents` — had no client, and v2026.11.2 removed them. In stub mode (`EDOCS_STUB_MODE=true`, default) all methods return realistic fake responses so the process runs end-to-end before a live eDOCS server is available.
 
 See [eDOCS Integration](edocs-integration.md), and the [API Specification](../reference/api-specification.md) for request and response details.
 
@@ -205,6 +219,22 @@ Request body:
 ```
 
 Runs a SPARQL query against a caller-supplied endpoint. **Every query the frontend's Query Editor sends comes through here** — the editor no longer fetches endpoints from the browser, and its former `api.allorigins.win` fallback proxy is gone. The endpoint passes the [outbound guard](#outbound-guard) first: it must be `https:`, carry no credentials and resolve to a public address, or the route answers `400 INVALID_INPUT` before any request is made.
+
+#### Publishing (v2026.11.2)
+
+```
+GET  /v1/triplydb/publish-target
+POST /v1/triplydb/publish
+POST /v1/triplydb/update-service
+POST /v1/triplydb/list-graphs
+POST /v1/triplydb/test-connection
+```
+
+The CPSV Editor publishes through these routes (ttl-editor#234), so a TriplyDB token never reaches a browser. The backend publishes to the account named by `TRIPLYDB_BASE_URL` and `TRIPLYDB_ACCOUNT`, with `TRIPLYDB_API_TOKEN`; a caller's instance, account or token is ignored. Without an account and a token, or with a base URL that is not `https:` on a host in `TRIPLYDB_ALLOWED_HOSTS`, the backend still starts and these routes answer `503`.
+
+- `publish-target` is open and returns `{ baseUrl, account }`, never the token. The CPSV Editor builds its required-services picker from it.
+- `publish` requires `lde-author`. It takes `dataset`, `graph` (an IRI under `https://regels.overheid.nl/graphs/`), `filename`, `ttl` and optional `logos` (plain file names with `data:image/` URLs). It uploads the Turtle into the graph, then the logos as assets, then syncs the dataset's service. A failed upload answers `502`. A failed logo or service sync does not fail the publish; it is reported in `logos[].ok` and in `serviceUpdated` and `serviceError`. Every attempt writes one log line naming the user, organisation, service, graph, dataset and outcome. The token appears in no response and no log line.
+- `update-service`, `list-graphs` and `test-connection` require `lde-author` and work on the server's account. Dataset and service names must follow TriplyDB's own rule, 1 to 40 letters, digits or hyphens, which also keeps a write inside the account. `test-connection` answers `404` only when TriplyDB says the dataset does not exist, and `502`, naming TriplyDB's status, for any other failure.
 
 ### Norms
 
@@ -483,7 +513,7 @@ POST   /v1/assets/documents
 DELETE /v1/assets/documents/:id
 ```
 
-Persists BPMN processes, form schemas, and document templates to PostgreSQL. All routes return `503 DB_NOT_CONFIGURED` when `DATABASE_URL` is absent. The upserts, the deploy mark and the ROPA delete validate their input before it reaches Postgres and answer `400 INVALID_INPUT` with a detail naming every field that failed; the checks follow the database's own constraints, and a blank title, id or name is refused on the fields that identify a record.
+Persists BPMN processes, form schemas, and document templates to PostgreSQL. Reads are open. Every write — the `POST` and `DELETE` routes and the deploy mark, `PATCH /v1/assets/bpmn/:id/deploy` — requires `lde-author` since v2026.11.2 (see [Sign-in](#sign-in)). All routes return `503 DB_NOT_CONFIGURED` when `DATABASE_URL` is absent. The upserts, the deploy mark and the ROPA delete validate their input before it reaches Postgres and answer `400 INVALID_INPUT` with a detail naming every field that failed; the checks follow the database's own constraints, and a blank title, id or name is refused on the fields that identify a record.
 
 A stored process is unique per organisation and process id. `POST /v1/assets/bpmn` answers `409 PROCESS_ID_TAKEN` when another stored process in the same organisation already has the `bpmnProcessId`, and writes nothing; the problem carries `bpmnProcessId`, `organization` and `existing` (`id`, `name` and `status` of the process that holds the id), so the Modeler can offer to replace that process or rename the new one. `GET /v1/assets/bpmn/by-bpmn-id/:bpmnProcessId` takes an optional `?organization=` that limits the lookup to one organisation, an empty value meaning rows without one; without it every organisation's rows count. See [Asset Storage](asset-storage.md) for the service architecture and the [API Specification](../reference/api-specification.md) for request and response shapes.
 
@@ -685,6 +715,13 @@ cannot permanently block a retry.
 
 **CORS** — only origins listed in `CORS_ORIGIN` are permitted. In production this is restricted to `https://linkeddata.open-regels.nl` and `https://cpsv.open-regels.nl`; acceptance also admits both tiers of the IOU architecture documentation site. Any other origin gets an ordinary response with no `Access-Control-Allow-Origin` header, which the browser then refuses — **except on the four public read-only mounts**, `/v1/ropa/public`, `/v1/bundles/public`, `/v1/openapi.json` and `/v2/openapi.json`, which answer any origin for `GET` and `OPTIONS` by design. `isPublicPath` matches those mounts or a path below them, never a sibling route that shares the prefix; see [RoPA Records — the public routes](ropa-records.md#public-route-v1ropapublic).
 
+<a id="sign-in"></a>**Sign-in** — since v2026.11.2 ([#163](https://github.com/sgort/linked-data-explorer/issues/163)), the routes that change shared state require an access token from the Keycloak realm `ronl`, sent as `Authorization: Bearer`. `middleware/auth.middleware.ts` checks it with `jsonwebtoken` and `jwks-rsa` against the realm's published keys. The token must be signed RS256 by the realm, issued to a client listed in `AUTH_CLIENTS` (default `linked-data-explorer,ttl-editor,lde-e2e`), and carry the realm role `lde-author`.
+
+- `requireAuthor` answers `401 UNAUTHENTICATED` when the token is missing, invalid or expired, and `403 FORBIDDEN` when the role is missing.
+- `optionalAuthor`, used only by `POST /v1/dmns/deploy`, lets a request without an `Authorization` header through anonymously, but checks a header that is present exactly as `requireAuthor` does.
+
+The closed routes are the deploys (`/dmns/drd/deploy` and `/dmns/process/deploy`), the asset and RoPA writes, `DELETE /cache/clear` and the four TriplyDB writes. They are closed on `/v1` and on the deprecated `/api/*` aliases alike, and `routes/write-auth.test.ts` checks every mount. Reads, validation, SPARQL queries and chain execution stay open. The OpenAPI document declares a `bearerAuth` scheme on 17 operations. `KEYCLOAK_URL` is required on ACC and production; locally it defaults to `http://localhost:8080`.
+
 **Input validation** — request inputs are checked before any service call, and a failure answers `400 INVALID_INPUT` naming the fields at fault rather than surfacing as a 500 from a downstream system. Request body size is limited to 10 MB.
 
 <a id="outbound-guard"></a>**Outbound guard** — the backend never requests a host a caller named without checking it (v2026.09.5, [#142](https://github.com/sgort/linked-data-explorer/issues/142)). There are two layers:
@@ -694,11 +731,11 @@ cannot permanently block a retry.
 
 The connect-time layer was finished in v2026.09.6: the client now pins the http adapter and HTTP/1 on **every** request rather than relying on the default, and a refused redirect surfaces as `EOUTBOUNDREFUSED` instead of a generic connection error. The unreachable `::/128` and `::1/128` entries were dropped from the internal-address list, `test-connection` gained its own request schema with `apiToken` optional, and the credential-leak test now searches the whole call rather than part of it.
 
-TriplyDB calls that forward the caller's token go only to `https:` hosts in `TRIPLYDB_ALLOWED_HOSTS`. Processes deploy only to the configured Operaton, through the shared client, which logs in with `OPERATON_USERNAME` and `OPERATON_PASSWORD` — a request can no longer name the Operaton URL or supply credentials. `ALLOW_LOCAL_ENDPOINTS=true` admits `http:` and local addresses for local development, and is never set on ACC or production.
+`TRIPLYDB_ALLOWED_HOSTS` names the hosts the backend's own publishing target, `TRIPLYDB_BASE_URL`, may point to; that URL must also be `https:`, or publishing stays off. Processes deploy only to the configured Operaton, through the shared client, which logs in with `OPERATON_USERNAME` and `OPERATON_PASSWORD` — a request can no longer name the Operaton URL or supply credentials. `ALLOW_LOCAL_ENDPOINTS=true` admits `http:` and local addresses for local development, and is never set on ACC or production.
 
 **CSP reports** — `POST /v1/csp-reports` receives the frontend's Content-Security-Policy violation reports in both formats (`application/csp-report` and `application/reports+json`, up to 64 KB) and logs one warning line per violation. It stores nothing.
 
-**Environment variables** — all sensitive configuration (TriplyDB endpoint URLs, Operaton API URLs, CORS origins, eDOCS credentials) is stored in environment variables and never hardcoded. The Operaton login: `OPERATON_USERNAME` and `OPERATON_PASSWORD`, required on ACC and production. eDOCS-specific variables: `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, `EDOCS_PASSWORD`, `EDOCS_STUB_MODE`.
+**Environment variables** — all sensitive configuration (TriplyDB endpoint URLs, Operaton API URLs, CORS origins, eDOCS credentials) is stored in environment variables and never hardcoded. The Operaton login: `OPERATON_USERNAME` and `OPERATON_PASSWORD`, required on ACC and production. The sign-in: `KEYCLOAK_URL`, required on ACC and production, with `KEYCLOAK_REALM` and `AUTH_CLIENTS`; `TEST_DEPLOY_ENABLED` turns on anonymous test deploys. The TriplyDB publishing account: `TRIPLYDB_BASE_URL`, `TRIPLYDB_ACCOUNT` and `TRIPLYDB_API_TOKEN`, whose token never leaves the backend. eDOCS-specific variables: `EDOCS_BASE_URL`, `EDOCS_LIBRARY`, `EDOCS_USER_ID`, `EDOCS_PASSWORD`, `EDOCS_STUB_MODE`.
 
 **Error responses** — the central error handler scrubs stack traces and internal context before returning responses to clients, ensuring no implementation details are exposed.
 

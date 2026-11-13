@@ -28,9 +28,9 @@ ttl-editor/
 ├── lockfile-review.json            # Licence allow-list for the lockfile review
 ├── renovate.json                   # Dependency update policy
 ├── SECURITY-PIPELINE.md            # Pins, required checks, accepted risks
-├── .nvmrc                          # Exact Node version (24.22.1); CI reads it
+├── .nvmrc                          # Exact Node version (24.22.2); CI reads it
 ├── .npmrc                          # min-release-age=14 — npm's 14-day cooldown
-├── .env.development                # Local: backend :3001, Operaton :8081
+├── .env.development                # Local: backend :3001, Operaton :8081, Keycloak :8080
 ├── .env.production                 # Loaded by every `vite build`
 ├── .env.acceptance                 # Loaded by nothing unless --mode acceptance
 ├── .env.example
@@ -42,6 +42,8 @@ ttl-editor/
 │   ├── favicon.svg, favicon.ico, favicon-96x96.png, apple-touch-icon.png
 │   ├── manifest.json, web-app-manifest-192x192.png, web-app-manifest-512x512.png
 │   ├── robots.txt
+│   ├── auth-callback.html, auth-callback.js       # Sign-in popup lands here, reports, closes
+│   ├── silent-check-sso.html, silent-check-sso.js # Hidden-frame session check on reload
 │   ├── CognitatieAnnotationExport.xml
 │   └── examples/
 │       └── organizations/svb/      # RONL_BerekenLeeftijden_CPRMV.dmn
@@ -52,12 +54,14 @@ ttl-editor/
 │   ├── index.jsx                   # React entry point
 │   ├── index.css                   # Global styles, Tailwind imports
 │   ├── parseTTL.enhanced.js        # TTL parser with DMN preservation
-│   ├── setupTests.js               # Vitest setup
+│   ├── setupTests.js               # Vitest setup; every test runs as an author
 │   ├── logo.svg
 │   │
 │   ├── components/
+│   │   ├── LockedAction.jsx        # Deploy/Publish button, locked without lde-author
 │   │   ├── PreviewPanel.jsx        # Live TTL preview side panel
-│   │   ├── PublishDialog.jsx       # TriplyDB publish dialog + pre-publish SHACL panel
+│   │   ├── PublishDialog.jsx       # Publish dialog: dataset name + pre-publish SHACL panel
+│   │   ├── SignInMenu.jsx          # Header sign-in: Flevoland-account, Medewerker, View only
 │   │   └── tabs/
 │   │       ├── index.js            # Barrel export — the four lazy tabs deliberately excluded
 │   │       ├── ServiceTab.jsx
@@ -78,10 +82,12 @@ ttl-editor/
 │   ├── hooks/
 │   │   ├── useEditorState.js       # Centralised state management
 │   │   ├── useArrayHandlers.js     # DRY CRUD for array-based fields
-│   │   └── useDsoImport.js         # DSO → DMN deep-link import
+│   │   ├── useDsoImport.js         # DSO → DMN deep-link import
+│   │   └── useAuth.js              # Sign-in state, and useLockedAction for the hint
 │   │
 │   ├── utils/
 │   │   ├── index.js                # Barrel export
+│   │   ├── auth.js                 # Keycloak sign-in (realm ronl), authHeaders()
 │   │   ├── constants.js            # Shared constants, TTL_NAMESPACES, EMPTY_DMN_DATA, CPRMV_RULE_BASE
 │   │   ├── ttlGenerator.js         # TTL generation class
 │   │   ├── ttlHelpers.js           # TTL string/IRI helpers (escapeTTLString, sanitizeIri, …)
@@ -90,7 +96,7 @@ ttl-editor/
 │   │   ├── shaclHelper.js          # Pre-publish SHACL validation
 │   │   ├── dmnHelpers.js           # DMN-specific utilities
 │   │   ├── validators.js           # Form validation
-│   │   ├── triplydbHelper.js       # TriplyDB API integration, buildGraphIRI
+│   │   ├── triplydbHelper.js       # Publishing through the LDE backend, buildGraphIRI
 │   │   ├── ronlHelper.js           # RONL vocabulary SPARQL queries
 │   │   ├── serviceCatalogHelper.js # Published services in the dataset, for dct:requires
 │   │   ├── iknowParser.js          # iKnow XML parser
@@ -102,11 +108,14 @@ ttl-editor/
 │   │   ├── roadmap.json            # Planned features for ChangelogTab
 │   │   └── cprmv-example.json      # Conformant 0.4.1 example for CPRMV "Load Example"
 │   │
+│   ├── testing/
+│   │   └── authState.js            # Test double for utils/auth, used by setupTests
+│   │
 │   └── config/
 │       ├── vocabularies.config.js  # RDF vocabulary mappings for parser
 │       └── iknow-mappings/         # iKnow default field mapping templates
 │
-├── e2e/                            # Playwright journeys and the stack preflight fixture
+├── e2e/                            # Playwright journeys, the stack preflight, the lde-e2e sign-in
 ├── e2e-fixtures/                   # Journey fixtures, with a provenance manifest
 ├── examples/                       # Reference TTL/DMN exports; round-trip test fixtures
 │   └── organizations/              # Per-organisation examples and test cases

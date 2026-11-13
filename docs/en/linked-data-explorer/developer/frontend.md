@@ -40,13 +40,21 @@ packages/frontend/src/
 │   ├── ServiceLinks/
 │   │   ├── ServiceLinks.tsx       Requires / Required by lines on a DMN card
 │   │   └── serviceLinkName.ts     display name of a linked service
+│   ├── common/
+│   │   ├── SignInMenu.tsx         header sign-in: two routes, View only, Sign out
+│   │   ├── LockedAction.tsx       a button locked with "Sign in to …"
+│   │   └── LocalOnly.tsx          the "only in this browser" badge and list notice
 │   ├── GraphView.tsx              D3.js RDF graph visualisation
 │   ├── ResultsTable.tsx           SPARQL results table + CSV export
 │   └── Changelog.tsx              version history display
+├── hooks/
+│   └── useAuth.ts                 sign-in state, useLockedAction, useDeleteLock
 ├── services/
+│   ├── auth.ts                    keycloak-js: popup sign-in, silent check-sso, authHeaders()
 │   ├── sparqlService.ts           SPARQL query execution + result parsing
 │   └── templateService.ts         localStorage CRUD for templates + processes
 ├── utils/
+│   ├── authProblem.ts             a 401 or 403 as the sign-in message
 │   ├── exportService.ts           JSON + BPMN 2.0 export logic
 │   ├── exportFormats.ts           export format definitions
 │   ├── bpmnTemplates.ts           default BPMN XML templates
@@ -156,7 +164,7 @@ The inline `<style>` block that used to sit in `index.html` lives in `src/index.
 
 ## Content-Security-Policy
 
-`vite/cspPlugin.ts` writes `staticwebapp.config.json` into the build output during `build:acc` and `build:prod`, where Azure Static Web Apps reads it. The policy is served as `Content-Security-Policy-Report-Only`, built from the same `VITE_API_BASE_URL` the app uses, so each environment's `connect-src` names that environment's backend. Every allowed source is there because something in the built app needs it: Google Fonts for the Inter typeface, TriplyDB's assets API for organisation logos in `img-src`, and `data:` for the BPMN icon font and diagram images. Violations are reported to the backend's `POST /v1/csp-reports`. See [Deployment](deployment.md#staticwebappconfigjson-is-generated-not-committed) for how it is shipped.
+`vite/cspPlugin.ts` writes `staticwebapp.config.json` into the build output during `build:acc` and `build:prod`, where Azure Static Web Apps reads it. The policy is served as `Content-Security-Policy-Report-Only`, built from the same `VITE_API_BASE_URL` the app uses, so each environment's `connect-src` names that environment's backend. Every allowed source is there because something in the built app needs it: Google Fonts for the Inter typeface, TriplyDB's assets API for organisation logos in `img-src`, and `data:` for the BPMN icon font and diagram images. Since v2026.11.2 the Keycloak origin from `VITE_KEYCLOAK_URL` joins `connect-src`, and the policy adds `frame-src 'self'` with that Keycloak and relaxes `frame-ancestors` from `'none'` to `'self'`, because the silent session check frames Keycloak, which redirects the frame back to the app. Without a Keycloak URL nothing is framed. Violations are reported to the backend's `POST /v1/csp-reports`. See [Deployment](deployment.md#staticwebappconfigjson-is-generated-not-committed) for how it is shipped.
 
 ---
 
@@ -176,6 +184,16 @@ saveBpmnProcess(process: BpmnProcess): void
 
 ---
 
+## Sign-in
+
+Since v2026.11.2 ([#163](https://github.com/sgort/linked-data-explorer/issues/163)), `services/auth.ts` signs in with keycloak-js against realm `ronl`, client `linked-data-explorer` — the same login as the RONL Business API. `SignInMenu` in the header offers two routes: **Flevoland-account** goes to Entra with the `idpHint` `entra-flevoland`, and **Medewerker** opens the realm's employee password page through the login hint `__medewerker__`. A visitor who never signed in is not redirected on load.
+
+Sign-in and sign-out open Keycloak in a popup centred on the browser window. The popup returns to `public/auth-callback.html`, which reports on the `BroadcastChannel` `lde-auth` and closes. The app then picks up the session with a silent check-sso in a hidden frame (`public/silent-check-sso.html`), with PKCE `S256`. The page never reloads, so an open process and unsaved edits stay. A blocked popup falls back to the full-page redirect. After a sign-in, a flag in `localStorage` makes the next load run the silent check, so the session survives a reload.
+
+`authHeaders()` refreshes the token before a write and returns no header when that fails, so the write takes the signed-out path. `hooks/useAuth.ts` exposes the state, and `useLockedAction(verb)` locks a button with *Sign in to …* or, signed in without `lde-author`, *You need permission to …*. That locks Deploy on the BPMN canvas, **Save as DRD** in the Chain Builder (which deploys), **Refresh Cache** and RoPA Save and Delete. `utils/authProblem.ts` turns a `401` or `403` from the backend into the same message. A user without the role sees a **View only** label and, once per tab, a dismissible note saying what is locked. Signed-out saves of processes, forms and document templates stay in the browser; see [Asset Storage](asset-storage.md#signed-out-saves).
+
+---
+
 ## Environment variables (Vite)
 
 All environment variables are prefixed `VITE_` and read at build time:
@@ -183,6 +201,7 @@ All environment variables are prefixed `VITE_` and read at build time:
 | Variable | Default (development) | Description |
 |---|---|---|
 | `VITE_API_BASE_URL` | `http://localhost:3001` | Backend API base URL |
+| `VITE_KEYCLOAK_URL` | `http://localhost:8080` | The Keycloak serving realm `ronl`, for sign-in. ACC uses `https://acc.keycloak.open-regels.nl`, production `https://keycloak.open-regels.nl` |
 | `VITE_CPSV_EDITOR_URL` | `http://localhost:3002` | The CPSV Editor the DSO → DMN publish handoff deep-links to. Run it on a non-3000 port locally, since LDE's dev server also uses 3000 |
 
 Build targets: `npm run build:prod` (production), `npm run build:acc` (acceptance), `npm run dev` (development). The deploy workflows use `build:acc` and `build:prod`; each mode reads its own `.env.<mode>` file.

@@ -33,7 +33,7 @@ The export always includes the full set of namespace declarations, all populated
 A **CPRMV version selector** next to the preview/export controls chooses which CPRMV vocabulary version the generated Turtle targets, applied consistently to the live preview, the **Download TTL** action, and publishing to TriplyDB (v1.10.5).
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: The editor toolbar showing the CPRMV version selector (0.4.1 / 0.3.2) styled as a toolbar control next to the Import, Show Preview and Clear All buttons](../../assets/screenshots/cpsv-editor-cprmv-version-selector.png)
+  ![Screenshot: The editor header, signed out, with Sign in above the toolbar and the CPRMV version selector open on 0.4.1 and 0.3.2, between Import TTL File and Show Preview and Clear All](../../assets/screenshots/cpsv-editor-cprmv-version-selector.png)
   <figcaption>The CPRMV version selector in the toolbar, driving preview, export and publish</figcaption>
 </figure>
 

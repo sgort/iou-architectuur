@@ -31,6 +31,10 @@ component: RONL Business API
 
 ---
 
+## Clients added by script: `linked-data-explorer` and `ttl-editor`
+
+---
+
 ## Identity provider: `entra-flevoland`
 
 ---

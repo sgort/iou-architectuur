@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # Getting Started
 
 !!! info "Documentatie in ontwikkeling"
@@ -12,6 +16,10 @@
 ---
 
 ## Prerequisites
+
+---
+
+## Signing in
 
 ---
 

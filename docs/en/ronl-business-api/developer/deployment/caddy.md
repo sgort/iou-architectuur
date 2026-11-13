@@ -162,33 +162,38 @@ All VM containers communicate over a shared Docker network named `npm-network`. 
 
 ### Security headers
 
-Add a reusable `import` snippet to apply security headers to all proxied services:
+Each kind of site imports its own header snippet, defined at the top of the `Caddyfile`: `basic_security_headers` for CPRMV, `keycloak_security_headers` for both Keycloak sites, `enhanced_security_headers` for the Operaton sites, and one each for Skosmos and Nextcloud. The Keycloak snippet is the least restrictive, because OAuth and OIDC need it to be:
 
 ```
-(security_headers) {
-    header {
-        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
-        X-Content-Type-Options "nosniff"
-        X-Frame-Options "SAMEORIGIN"
-        X-XSS-Protection "1; mode=block"
-        Referrer-Policy "strict-origin-when-cross-origin"
-    }
+(keycloak_security_headers) {
+    header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    header X-Content-Type-Options "nosniff"
+    header X-Frame-Options "SAMEORIGIN"
+    @kc_3p_cookies path /realms/*/protocol/openid-connect/3p-cookies/*
+    header @kc_3p_cookies -X-Frame-Options
+    header X-XSS-Protection "1; mode=block"
+    header Referrer-Policy "strict-origin-when-cross-origin"
+    header Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
 }
 
 acc.keycloak.open-regels.nl {
-    import security_headers
+    # ...static files
+    import keycloak_security_headers
     reverse_proxy keycloak-acc:8080
 }
+```
 
-keycloak.open-regels.nl {
-    import security_headers
-    reverse_proxy keycloak-prod:8080
-}
+`keycloak.open-regels.nl` imports the same snippet in front of `keycloak-prod:8080`.
 
-operaton.open-regels.nl {
-    import security_headers
-    import operaton-engine-rest.caddy
-}
+**Keycloak's third-party-cookie check is the one exception to `SAMEORIGIN`** (since v2026.11.2). Before every silent `check-sso`, keycloak-js loads two pages under `/realms/<realm>/protocol/openid-connect/3p-cookies/` in a hidden frame on the application's origin. Keycloak serves them frameable on purpose — they have no UI and only test cookies — but the snippet's `SAMEORIGIN` blocked them, so the Linked Data Explorer and the ttl-editor could not pick up a session after the sign-in popup or on reload ([linked-data-explorer#163](https://github.com/sgort/linked-data-explorer/issues/163)). Caddy defers a header deletion until the response is written, so the `-X-Frame-Options` on that path wins over the line above it; the login pages keep their framing protection.
+
+To check a site, request both paths with `GET` — Keycloak answers `HEAD` with `405`:
+
+```bash
+# No X-Frame-Options on the cookie check...
+curl -s -D - -o /dev/null https://acc.keycloak.open-regels.nl/realms/ronl/protocol/openid-connect/3p-cookies/step1.html | grep -i x-frame
+# ...and SAMEORIGIN everywhere else
+curl -s -D - -o /dev/null https://acc.keycloak.open-regels.nl/realms/ronl/account | grep -i x-frame
 ```
 
 ### Rate limiting

@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # RoPA Records
 
 This guide walks through creating a complete RoPA record for a deployed process bundle — from opening the editor to activating the record for public publication.
@@ -8,6 +12,7 @@ This guide walks through creating a complete RoPA record for a deployed process 
 
 - A process bundle must already exist in the BPMN Modeler with at least one linked form (so the **Hydrate from forms** button has something to read).
 - The LDE backend must be connected to PostgreSQL — the RoPA feature requires database access.
+- You are signed in with the `lde-author` role ([Signing in](getting-started.md#signing-in)). Signed out, **Save** and **Delete** are locked.
 
 ---
 

@@ -20,10 +20,15 @@ after `src/routes` and `src/services`. **E2E: 2 specs · 7 tests**, still in
 the frontend package.
 
 Measured serially, with coverage and without file parallelism, on
-**7 November 2026** for v2026.11.1 (`main` at `35fb3a8`), in the working
-checkout on `acc` at `c6cf3ac`, a tree identical to `35fb3a8`, on Node 22.23.4:
-**515 of 515 passing**, `Duration 116.83s` (136.61s on 9 October, 133.53s on
-3 October, 35.32s in the parallel run of 30 September). v2026.11.0 moved the
+**12 November 2026** for v2026.11.2 (`main` at `ad0fd62`), in the working
+checkout on `acc` at `4e28ed7`, a tree identical to `ad0fd62`, on Node 22.23.4:
+**515 of 515 passing**, `Duration 102.79s` (116.83s on 7 November, 136.61s on
+9 October, 133.53s on 3 October, 35.32s in the parallel run of 30 September).
+v2026.11.2 changed one assertion and no count: `pages/PADashboardV2.test.tsx`
+finds the ⌘K button by its visible text, *Spring naar een dossier of
+sectie…*, now that the button has no `aria-label` (WCAG 2.5.3); its
+development dependencies moved to vite ^6.4.5 and vitest ^4.1.12. Every count
+and percentage reproduced the 7 November figures exactly. v2026.11.0 moved the
 package's colours onto the shared tokens and its shared chrome into
 `packages/shared/styles/v2-chrome.css`; no test changed, and every count and
 percentage reproduced the 9 and 11 October figures exactly. Coverage **92.61 % statements · 93.89 % branches ·
@@ -37,7 +42,7 @@ a file, and no file is below 85% either: the lowest is
 !!! note "Six releases of identical counts, then +39 tests"
     43 files and 476 tests at v2026.09.7, v2026.09.9, v2026.09.11, v2026.09.12
     and v2026.09.13 — and **43 files and 515 tests** at v2026.09.15 and every
-    release since, through v2026.11.1. Every one
+    release since, through v2026.11.2. Every one
     of the 39 is from the two branch-margin commits: `391b1a8` (#256) added four
     to `DossierRow.test.tsx`, taking a file that sat at exactly 80.00% branches
     to 100 and exposing a latent crash when a dossier had no `kompas`, fixed in
@@ -69,10 +74,11 @@ a file, and no file is below 85% either: the lowest is
     consume it too and watch `packages/pa-cockpit/**` in their path filters,
     but run only pa-demo's own suite.
 
-!!! note "Every figure on this page is from 7 November 2026"
-    The package counts and coverage, the `src/pa-monitoring` backend figure
-    (16 files, 583 tests, unchanged) and the two E2E specs were all measured on
-    **7 November 2026**, the E2E specs against the developer's
+!!! note "The unit figures are from 12 November 2026, the E2E figures from 7 November"
+    The package counts and coverage and the `src/pa-monitoring` backend figure
+    (16 files, 583 tests, unchanged) were measured on **12 November 2026**, and
+    reproduced 7 November's. The two E2E specs were not re-run for v2026.11.2:
+    their figures are from **7 November 2026**, against the developer's
     already-running local stack, as on 3 and 9 October. The per-file tables
     below were derived on 9 October; no file in them has changed since. See
     [E2E & live smoke](../e2e.md).

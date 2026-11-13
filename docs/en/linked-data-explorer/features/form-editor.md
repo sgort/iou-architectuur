@@ -64,7 +64,7 @@ The canvas is a full `@bpmn-io/form-js` visual editor. A component palette on th
 
 The canvas toolbar provides:
 
-- **Save** — persists the current schema to `localStorage`. The button is active only when unsaved changes exist.
+- **Save** — persists the current schema to `localStorage` and, for a signed-in author, to the shared library; signed out, the form stays in this browser, marked *only in this browser*. The button is active only when unsaved changes exist.
 - **Export `.form`** — downloads the schema as a `.form` JSON file compatible with Camunda Modeler and Operaton.
 - **Close** — returns to the empty-state view.
 
@@ -72,7 +72,7 @@ The canvas toolbar provides:
 
 ## Storage
 
-Forms are stored in PostgreSQL via the LDE backend under the key `linkedDataExplorer_formSchemas`, cached locally in `localStorage` for instant synchronous access. On editor load, the service fetches the authoritative list from `GET /v1/assets/forms` and replaces the local cache. All schemas use:
+Forms are stored in PostgreSQL via the LDE backend under the key `linkedDataExplorer_formSchemas`, cached locally in `localStorage` for instant synchronous access. On editor load, the service fetches the authoritative list from `GET /v1/assets/forms` and replaces the local cache. A save without the `lde-author` role stays in this browser; see [Asset Storage](../developer/asset-storage.md#signed-out-saves). All schemas use:
 
 ```json
 {

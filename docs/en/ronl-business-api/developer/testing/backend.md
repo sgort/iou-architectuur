@@ -5,18 +5,21 @@ component: RONL Business API
 # Backend suite
 
 `packages/backend`, Jest with the `ts-jest` preset. **109 files · 2681 tests ·
-all passing · nothing skipped · `Time: 137.576 s`** under `--runInBand`,
+all passing · nothing skipped · `Time: 198.029 s`** under `--runInBand`,
 followed by *"✓ all 137 documented operations were checked against a real
 response"*. Coverage is on by default; see
 [Coverage](coverage.md#backend-by-area) for the per-area figures.
 
-Measured on **7 November 2026** for v2026.11.1 — the release in production,
-`main` at `35fb3a8` — with `npx jest --coverage --runInBand` followed by
+Measured on **12 November 2026** for v2026.11.2 — the release in production,
+`main` at `ad0fd62` — with `npx jest --coverage --runInBand` followed by
 `node scripts/check-conformance-coverage.cjs`, which is exactly what
 `npm run test:serial --workspace=packages/backend` runs, in the working
-checkout on `acc` at `c6cf3ac` (a tree identical to `35fb3a8`) after
+checkout on `acc` at `4e28ed7` (a tree identical to `ad0fd62`) after
 `npm run deps:check` reported *"Dependencies are ready."*, on Node 22.23.4,
-the version `.nvmrc` names. The package total is the runner's own. The
+the version `.nvmrc` names. Every count on this page reproduced the
+7 November measurement of v2026.11.1 file for file: v2026.11.2 changed no
+backend test, and only the time moved (137.576 s on 7 November). The package
+total is the runner's own. The
 per-file and per-area counts are not printed by Jest's default reporter, so
 they were read from Jest's JSON report of the same run (`--json`), which
 lists every test of every file; the 109 files sum to the runner's 2681, as
@@ -34,8 +37,8 @@ runner's 2633 exactly at `ebec288`, and 2457 and every per-area figure the
     `&& node scripts/check-conformance-coverage.cjs`. Jest runs the suite as
     before; the script then fails the run unless **every operation in the
     OpenAPI document was compared against a real response** at least once. On
-    7 November it printed *"✓ all 137 documented operations were checked
-    against a real response"*: v2026.10.3 documented
+    12 November it printed *"✓ all 137 documented operations were checked
+    against a real response"*, as on 7 November: v2026.10.3 documented
     `GET /v1/rip/phases/completed`, the finished instances of every RIP phase
     the Infra-board portfolio reads. On 11 October it was 136, as on 3 and
     9 October: v2026.10.2 documented no operation and removed none; it rewrote the
@@ -213,7 +216,7 @@ so a red backend suite now blocks the merge to `acc` outright. See
 | `src/middleware` | 4 | 39 |
 
 !!! success "Both columns are current, and they sum"
-    Re-derived on 7 November 2026: the Files column accounts for all **109**
+    Re-derived on 12 November 2026, unchanged since 7 November: the Files column accounts for all **109**
     files and the Tests column sums to **2681**, the measured total, every
     file's count read from Jest's JSON report of the measured run (see the
     note at the top of this page). Earlier versions of this page carried a

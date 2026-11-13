@@ -8,6 +8,22 @@ component: CPSV Editor
 
 ## Changelog
 
+### v2026.11.1 — Signed In: Deploy and Publish as an Author (November 2026)
+
+> Signing in: [Getting Started](../user-guide/getting-started.md#signing-in). Deploying: [The DMN Tab](../user-guide/dmn-tab.md#step-4-deploy-to-operaton) and [DMN Orchestration](../features/dmn-orchestration.md). Publishing: [Publishing to TriplyDB](../user-guide/publishing-to-triplydb.md), [TriplyDB Publishing](../features/triplydb-publishing.md) and [TriplyDB Publish Implementation](triplydb-publish-implementation.md). What it changes for security: [Due Diligence](due-diligence.md). Measured suites: [Testing](testing.md).
+
+**Signing in is optional, and the editor works without it.** A **Sign in** menu on its own line above the toolbar offers two routes, as on the RONL Business API's landing pages: **Flevoland-account**, straight to Entra, and **Medewerker**, the realm's employee password page. Both sign in at Keycloak realm `ronl` with the client `ttl-editor`, through `keycloak-js` with PKCE. The login runs in a popup, so the service being edited stays on the page; a blocked popup falls back to a full-page redirect. A returning user's session is restored by a silent check in a hidden frame, and only in a browser that signed in before: a first-time visitor is never sent to Keycloak. An account without the `lde-author` role is shown as **View only**, with a note that can be dismissed.
+
+**Deploying and publishing follow the role.** An author deploys to Operaton as before, now with a token. Anyone else gets **Test deploy to Operaton** where the backend offers one (`GET /v1/dmns/deploy/options`): a deployment to the tenant `TestOnly`, removed after 48 hours and refused if a decision key already exists in the engine, after which every evaluation goes to that tenant. The Linked Data Explorer backend offers test deploys on local development and acceptance and not on production, so there a signed-out user sees a locked **Deploy** with *Sign in to deploy*. A refused deploy now shows its reason directly under the button. **Publish** is locked without `lde-author`.
+
+**Publishing goes through the backend, as the signed-in author.** Publishing is one call to the Linked Data Explorer backend's `POST /v1/triplydb/publish`, made with the author's token. The backend holds the TriplyDB instance, account and token, uploads the Turtle and the logos, syncs the dataset's service, and writes a log line saying who published what and how it went. The Publish dialog asks only for the dataset name: Base URL, Account, API Token and the token reminder are gone, and **Test Connection** checks the dataset through the backend. The editor keeps only `{ dataset }` in `localStorage`, and a token an older version stored there is removed the first time the editor loads. The Service tab's required-services picker now takes the base URL and account from the backend's `GET /v1/triplydb/publish-target`. This closes [ttl-editor#234](https://github.com/sgort/ttl-editor/issues/234).
+
+**Also in this release.** Clear All now also empties a DMN file loaded in the DMN tab: the tab stays mounted while hidden, so it is remounted rather than only reset (ttl-editor#87). The acceptance build signs in at the acceptance Keycloak: it builds in production mode, and without its own `VITE_KEYCLOAK_URL` it sent the sign-in to production's, which answered *Client niet gevonden*. The three end-to-end journeys that deploy sign in as `lde-e2e` first, with the password read from `LDE_E2E_PASSWORD`. Node 24.22.2, `lucide-react` 1.64.0, Vite 8.3.5, `@babel/parser` 8.0.10, `actions/setup-node` v7.1.0 and `actions/upload-artifact` v7.0.2, and a lock-file refresh of 65 updates, three of them runtime: React and React DOM 19.3.1 and `lucide-react`.
+
+**The suite grows by 46 tests, to 858 in 70 files.** Five files are new — `auth.test.js` (24), `DMNTab.signin.test.jsx` (9), `SignInMenu.test.jsx` (8), `LockedAction.test.jsx` (4) and `authState.test.js` (3) — and every suite now runs signed in as an author through a test double unless it sets another state. `triplydbHelper.test.js` went from 38 to 32 tests with the code it covers. Coverage rose on every measure, to 91.35% statements, 89.29% branches, 82.15% functions and 92.03% lines.
+
+---
+
 ### v2026.11.0 — A Service Names the Services It Requires (November 2026)
 
 > The field: [Filling In the Tabs](../user-guide/filling-in-the-tabs.md#service-tab) and [Service, Organisation & Legal Definition](../features/service-organisation-legal.md). The property: [Field Mapping](../reference/field-mapping.md) and [Namespace & Property Reference](../reference/namespace-property-reference.md). Measured suites: [Testing](testing.md).
@@ -660,6 +676,8 @@ Initial release. React + Tailwind CSS web application. Five-tab interface: Servi
 | Registry signatures and provenance verified in the `audit` gate | v2026.10.1 |
 | Dependency criteria and a quarterly dependency review | v2026.10.1 |
 | [Required services (`dct:requires`)](../user-guide/filling-in-the-tabs.md#service-tab) on the Service tab, picked from the published dataset | v2026.11.0 |
+| [Sign-in](../user-guide/getting-started.md#signing-in) with Keycloak realm `ronl`; deploying and publishing need `lde-author`, with a test deploy where the backend offers one | v2026.11.1 |
+| [Publishing through the backend](triplydb-publish-implementation.md), as the signed-in author: no TriplyDB token in the browser | v2026.11.1 |
 
 ---
 
@@ -687,4 +705,4 @@ Multi-service session management with service catalog, bulk operations, and cros
 
 **Phase 6 — Enterprise Features (2027 Q2+)**
 
-Automated regression testing and CI/CD integration for service definitions. User accounts, role-based access control, organisational workspaces, and audit logging.
+Automated regression testing and CI/CD integration for service definitions. Sign-in, one role (`lde-author`) and a log line per publish shipped in v2026.11.1; organisational workspaces, authorisation per organisation and a durable audit log remain.

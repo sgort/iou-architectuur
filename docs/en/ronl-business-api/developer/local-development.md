@@ -194,7 +194,7 @@ the digests current (`docker:pinDigests` in `renovate.json`).
 | `postgres` | `ronl-postgres` | `postgres:16-alpine` | 5432 | Volume `postgres-data` |
 | `operaton-init` | `ronl-operaton-init` | `alpine:3.24.3` | — | Runs once and exits |
 | `operaton` | `ronl-operaton` | `operaton/operaton:2.1.5` | 8081 → 8080 | Volume `operaton-data` |
-| `operaton-accounts` | `ronl-operaton-accounts` | `curlimages/curl:8.22.0` | — | Runs once on every up and exits |
+| `operaton-accounts` | `ronl-operaton-accounts` | `curlimages/curl:8.23.0` | — | Runs once on every up and exits |
 | `redis` | `ronl-redis` | `redis:7.2-alpine` | 6379 | Volume `redis-data`, append-only file on |
 
 **Keycloak** runs `start-dev --import-realm` with admin account `admin`/`admin`.

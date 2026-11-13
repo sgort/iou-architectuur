@@ -52,7 +52,7 @@ Both integrations live within the same Vendor tab, demonstrating the pattern for
 
 ### 3 — Publishing to TriplyDB
 
-A PublishDialog component handles uploading the generated TTL content to a TriplyDB triple store. Two upload methods are implemented: FormData-based file upload (`publishToTriplyDB`) and SPARQL UPDATE insertion (`publishToTriplyDB_SPARQL`). The publish workflow is a multi-step process with progress tracking: validate → generate TTL → upload to TriplyDB → upload logos (organization + vendor) → update SPARQL service → confirm. Supports configurable account/dataset/token (persisted in localStorage), connection testing, graph IRI generation based on organization + service identifiers, and SPARQL service re-indexing (via the shared Express backend to avoid CORS).
+A PublishDialog component publishes the generated TTL to a TriplyDB triple store — since v2026.11.1 through the shared Express backend, as the signed-in author, in one call (`publishToTriplyDB` → `POST /v1/triplydb/publish`). The backend holds the TriplyDB account and token, uploads the Turtle into a graph IRI built from the organization and service identifiers, uploads the organization and vendor logos, re-indexes the dataset's SPARQL service and logs who published. The dialog tracks progress (validate → generate TTL → publish), checks the dataset through the backend on request, and keeps only the dataset name in localStorage. Publishing needs the realm role `lde-author`.
 
 When the dialog opens it also runs an **advisory pre-publish SHACL validation** (`shaclHelper.js` → `POST /v1/shacl/validate`), rendering a layered CPRMV 0.4.1 / CPSV-AP 3.2.0 / RONL result. It never blocks publishing and degrades to a neutral amber state when the backend is unreachable. It validates the editor's *regenerated* output, which can differ from an imported source file because import normalises legacy terms to the 0.4.1 vocabulary.
 
@@ -102,16 +102,16 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 19, Vite, Tailwind CSS, Lucide icons |
+| Frontend | React 19, Vite, Tailwind CSS, Lucide icons, `keycloak-js` (sign-in) |
 | State management | React hooks (`useEditorState`, `useArrayHandlers`), no external state library |
 | Build & lint | Vite, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
-| Testing | Vitest 5, `@testing-library/react`, Playwright — 812 tests across 65 files, all passing (measured 7 November 2026), at 90.55% statements, 88.75% branches, 79.80% functions and 91.19% lines; plus 4 end-to-end journeys ([Testing](testing.md)) |
+| Testing | Vitest 5, `@testing-library/react`, Playwright — 858 tests across 70 files, all passing (measured 12 November 2026), at 91.35% statements, 89.29% branches, 82.15% functions and 92.03% lines; plus 4 end-to-end journeys ([Testing](testing.md)) |
 | TTL parsing | Custom hand-written parser (no RDF library dependency) |
 | DMN parsing | Browser DOMParser (XML) |
-| External APIs | TriplyDB REST + SPARQL, Operaton REST (Camunda-compatible), RONL SPARQL vocabulary |
-| Backend dependency | Shared Express server (Linked Data Explorer repo) for CORS-proxied SPARQL queries (the RONL vocabulary and the published-services list), TriplyDB service updates, DMN syntactic validation (libxmljs2), DMN deploy and evaluate, pre-publish SHACL validation and the DSO import |
+| External APIs | Keycloak (OIDC sign-in, realm `ronl`) directly from the browser; TriplyDB, Operaton (Camunda-compatible REST), the RONL SPARQL vocabulary and the DSO APIs only through the shared backend |
+| Backend dependency | Shared Express server (Linked Data Explorer repo) for CORS-proxied SPARQL queries (the RONL vocabulary and the published-services list), TriplyDB publishing as the signed-in author, DMN syntactic validation (libxmljs2), DMN deploy and evaluate, pre-publish SHACL validation and the DSO import |
 | Hosting | Azure Static Web Apps (acc branch → acceptance, main → production) |
-| CI/CD | GitHub Actions: lint, tests and the production build on the runner (Node 24.22.1 from `.nvmrc`), uploaded to Azure Static Web Apps with `skip_app_build`; on every pull request a required lockfile review and verification of registry signatures and provenance attestations; a daily dependency audit, a quarterly dependency review, and an SBOM per release of every production package ([Deployment](deployment.md)) |
+| CI/CD | GitHub Actions: lint, tests and the production build on the runner (Node 24.22.2 from `.nvmrc`), uploaded to Azure Static Web Apps with `skip_app_build`; on every pull request a required lockfile review and verification of registry signatures and provenance attestations; a daily dependency audit, a quarterly dependency review, and an SBOM per release of every production package ([Deployment](deployment.md)) |
 
 ---
 
@@ -123,13 +123,13 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 
 - **No RDF library.** TTL parsing and generation are entirely hand-written (a ~840-line parser and a ~1,660-line generator). This works but is fragile for edge cases. Evaluate whether introducing a lightweight RDF/JS library (e.g. N3.js) would reduce maintenance burden vs. the cost of migration.
 
-- **App.jsx orchestration.** The main `App.jsx` (1,243 lines) has been partially modularized: data state lives in `useEditorState`, array CRUD operations in `useArrayHandlers`, TTL import logic in `importHandler.js`, and TTL generation in `ttlGenerator.js`. What remains in App.jsx is UI orchestration (tab rendering, message/status management), the publish workflow (~300 lines of step-by-step progress tracking), and glue code wiring state to child components. Further extraction targets: the publish handler could become a custom hook (`usePublishWorkflow`), and the tab navigation + message system could be separated from the data wiring.
+- **App.jsx orchestration.** The main `App.jsx` (1,190 lines) has been partially modularized: data state lives in `useEditorState`, array CRUD operations in `useArrayHandlers`, TTL import logic in `importHandler.js`, and TTL generation in `ttlGenerator.js`. What remains in App.jsx is UI orchestration (tab rendering, message/status management), the publish workflow (~230 lines: form validation, TTL generation and one backend call, with its progress and result states), and glue code wiring state to child components. Further extraction targets: the publish handler could become a custom hook (`usePublishWorkflow`), and the tab navigation + message system could be separated from the data wiring.
 
 - **Automated tests — addressed.** This was originally raised here as *"no automated tests for TTL output"*: the only test file was a CRA stub and validation happened manually against example files. A phased suite landed in v2026.07.0, including the high-value round-trip coverage suggested here — parse a real reference export, regenerate, re-parse, compare — and found two genuine defects immediately, one of which had been silently dropping data on re-import since a predicate rename. All eight phases, P0–P7, are complete: at v2026.09.4 the suite stands at **751 tests across 61 files**, plus three Playwright journeys against a live stack, and every file is held to an **80% branch floor enforced by the runner**. The UI layer this bullet once named as untested is covered: `DMNTab.jsx` 98.34% branches, `importHandler.js` 100% statements, `ttlGenerator.js` 94.89% and `parseTTL.enhanced.js` 94.50% statements. The remaining weakness is narrower and specific: `App.jsx` clears the branch floor at 81.48% but reads **53.70% functions** — whole handlers no test calls, which a branch floor does not see. See [Testing](testing.md).
 
-- **localStorage for config.** TriplyDB credentials are stored in localStorage. Fine for a prototype, but for a production tool used across teams, consider a proper secrets/config management approach.
+- **localStorage for config — resolved.** TriplyDB credentials used to be stored in localStorage. Since v2026.11.1 the browser keeps only the dataset name; the token lives in the Linked Data Explorer backend, and one an older version stored is removed on first load.
 
-- **Shared backend.** The Express backend is owned by the Linked Data Explorer repo. The CPSV Editor depends on it for CORS-proxied SPARQL queries (the RONL vocabulary, and since v2026.11.0 the public services published to the dataset), TriplyDB service re-indexing, DMN syntactic validation (the five-layer validator uses libxmljs2, which requires a Node.js runtime), DMN deploy and evaluate against Operaton, pre-publish SHACL validation, and the DSO import. Any changes to the backend affect the CPSV Editor. Clarify ownership, versioning (API v1 header is already in place), and deployment coupling.
+- **Shared backend.** The Express backend is owned by the Linked Data Explorer repo. The CPSV Editor depends on it for CORS-proxied SPARQL queries (the RONL vocabulary, and since v2026.11.0 the public services published to the dataset), TriplyDB publishing (as the signed-in author, since v2026.11.1), DMN syntactic validation (the five-layer validator uses libxmljs2, which requires a Node.js runtime), DMN deploy and evaluate against Operaton, pre-publish SHACL validation, and the DSO import. Any changes to the backend affect the CPSV Editor. Clarify ownership, versioning (API v1 header is already in place), and deployment coupling.
 
 - **Separation opportunity.** The four domains (editor, vendor, publishing, DMN) are loosely coupled via the shared editor state. A modular architecture — whether as separate routes/lazy-loaded modules within the SPA, or as independent micro-frontends sharing a TTL data contract — would improve maintainability and allow independent release cycles. A first step in that direction has landed: since v2026.09.2 the four heaviest tabs — `ChangelogTab`, `CPRMVTab`, `DMNTab` and `VendorTab` — are lazy-loaded, taking the entry chunk from 685.71 to 392.74 kB.
 
@@ -139,27 +139,27 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 
 ## Authentication & Authorization for Production Publishing
 
-The prototype has no user authentication. A user publishing a government service description to the production TriplyDB instance acts on behalf of a competent authority — that is a formal mandate that must be verifiable. The current codebase handles credentials as follows:
+Since v2026.11.1 the editor has sign-in. A user signs in at Keycloak realm `ronl`, the login the Linked Data Explorer and the RONL Business API share — client `ttl-editor`, the authorization code flow with PKCE — either through Flevoland's Entra or with an employee password. Signing in is optional: editing, import, validation and download work without it. The two actions that change shared state need the realm role `lde-author`:
 
-| Integration point | Current auth mechanism |
+| Integration point | Auth mechanism at v2026.11.1 |
 |---|---|
-| TriplyDB publishing | Personal API token, entered by the user, stored in browser localStorage |
-| Operaton deployment & testing | None in the editor — deploy and evaluate go through the Linked Data Explorer backend, which sends an optional bearer token (`OPERATON_API_KEY`) to the engine |
-| Shared Express backend (LDE) | No authentication — endpoints are open |
+| TriplyDB publishing | The author's bearer token to the Linked Data Explorer backend's `POST /v1/triplydb/publish`, which requires `lde-author` and publishes with its own TriplyDB account and token. The browser keeps only the dataset name |
+| Operaton deployment & testing | Deploy sends the author's token to `POST /v1/dmns/deploy`. Without a token the backend makes it a test deploy to the tenant `TestOnly`, removed after 48 hours — enabled on acceptance, not on production. Evaluate is open. The backend reaches the engine with its own optional `OPERATON_API_KEY` |
+| Shared Express backend (LDE) | Verifies Keycloak tokens. Every route the editor uses to change shared state requires `lde-author` — publish, test-connection, update-service, list-graphs — except deploy, which without a token is a test deploy where one is enabled. The routes the editor reads stay open: the SPARQL proxy, DMN and SHACL validation, evaluate, `publish-target` and `deploy/options` |
 | Azure Static Web Apps | Deployment tokens in GitHub Secrets (CI/CD only, no user auth) |
 
-None of these mechanisms establish who the user is, which organization they represent, or whether they are authorized to publish on behalf of that organization. For a production environment this is a prerequisite, not an enhancement.
-
-**What needs to change.** The production publishing flow must authenticate the user through the IAM infrastructure that already exists for Dutch government organizations and civil servants. The typical approach is to integrate an OpenID Connect (OIDC) identity provider — either the organization's own IdP (e.g. Microsoft Entra ID / Azure AD, which most government organizations already operate) or a federated government IdP. The authentication should yield a verifiable identity claim (who is this person, which organization do they belong to) that the backend can use to authorize the publish action.
+That establishes **who** the user is and that they may change the shared library. It does not establish **on whose behalf** they publish: the role is a single flag, so any author can publish a description for any organization into any dataset of the backend's TriplyDB account. A publication that carries a competent authority's mandate needs that link.
 
 **Advice for the DevOps team:**
 
-- **Backend-mediated publishing.** In production, the publish action should not go directly from the browser to TriplyDB with a user-supplied API token. Instead, the authenticated user should request publication through the backend, which holds the TriplyDB service credentials and can enforce authorization rules (does this user have the right to publish for this organization, to this dataset/graph?). This also eliminates the localStorage token storage issue.
+- **Backend-mediated publishing — done.** Since v2026.11.1 the browser never holds a TriplyDB token. The backend holds the service credentials and accepts a publish only from an author, which also removed the localStorage token ([ttl-editor#234](https://github.com/sgort/ttl-editor/issues/234)).
 
-- **Operaton credentials — addressed in part.** The editor holds no Operaton credential: deploy and evaluate are proxied by the Linked Data Explorer backend, which calls the engine server-to-server with its own optional `OPERATON_API_KEY`. What remains is the next point — the proxy itself is open to any caller.
+- **Authorization per organization — open.** Map an author to the organizations they may publish for — a token claim or a Keycloak group — and have the backend refuse a publish whose `organization` is not among them, and possibly restrict the datasets as well.
 
-- **Backend authentication.** The shared Express backend currently has no authentication middleware. Adding an OIDC token verification middleware (validating JWT access tokens from the organization's IdP) would protect all three backend functions (SPARQL proxy, TriplyDB publishing, DMN validation) in one layer.
+- **Operaton credentials — addressed in part.** The editor holds no Operaton credential: deploy and evaluate are proxied by the Linked Data Explorer backend, which calls the engine server-to-server with its own optional `OPERATON_API_KEY`. A deploy now needs an author, or is confined to the `TestOnly` tenant; evaluate is still open to any caller.
 
-- **Audit trail.** When a publication carries the weight of a mandate from a competent authority, an audit log recording who published what, when, and on whose behalf becomes essential. The backend is the natural place for this.
+- **Backend authentication — done for writes.** The shared backend verifies Keycloak tokens against the realm's keys and requires `lde-author` on the routes that write. The read routes remain open.
 
-- **Scope.** This applies specifically to the production environment. The development and acceptance environments can continue to operate with the current prototype-level credentials for rapid iteration.
+- **Audit trail — a log line, not yet a record.** Every publish attempt writes one log line: who, which organization and service, which graph and dataset, and the outcome (`published`, `published-with-warning` or `failed`). That is the raw material for an audit trail; a store with a retention period, which a mandate would need, does not exist yet.
+
+- **Scope.** The one write a signed-out user can make is the test deploy, and only where the backend's `TEST_DEPLOY_ENABLED` is `true`: on 12 November 2026 acceptance answered `enabled: true` and production `enabled: false` (`GET /v1/dmns/deploy/options`).

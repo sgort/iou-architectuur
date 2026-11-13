@@ -118,6 +118,13 @@ The canvas shows the result as you go: a solid badge on a node that starts a pha
 
 The Modeler can deploy your process — including subprocess BPMNs, linked forms and document templates — to Operaton in a single step.
 
+Deploying needs a sign-in with the `lde-author` role (see [Signing in](getting-started.md#signing-in)). Signed out, the **Deploy** button shows a lock and *Sign in to deploy*.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: BPMN Modeler signed out, with the Sign in menu open at the top right: the Deploy button in the canvas toolbar locked with the hint Sign in to deploy, and above the process list the notice Saved in this browser. Sign in to save it to the shared library.](../../assets/screenshots/linked-data-explorer-signed-out-locks.png)
+  <figcaption>Signed out: Deploy is locked, and the process list says that saves stay in this browser</figcaption>
+</figure>
+
 Click the **Deploy** button in the canvas toolbar. The deploy modal opens and lists:
 
   - The current BPMN file
@@ -169,6 +176,8 @@ Because the BPMN and all its forms and document templates land in the same Opera
 ## Storage
 
 Processes are stored in PostgreSQL via the LDE backend and cached in browser `localStorage` for instant access. On editor load, the service fetches the authoritative list from the server and replaces the local cache. If the backend is unreachable, the local cache is used as a fallback without any error surfaced to the user.
+
+Signed out, or without the `lde-author` role, a saved process stays in this browser only. Its card carries an *only in this browser* badge, and a notice above the list says so. Sign in and save it again to put it in the shared library. Signed out, you can delete only such local processes; a shared process shows a locked Delete.
 
 Seeded example processes are fetched from `public/examples/` on the frontend. They are editable and are written to the database when saved, like your own processes — except the DvTP example, the one seeded record marked `readonly`, which stays in local storage only.
 

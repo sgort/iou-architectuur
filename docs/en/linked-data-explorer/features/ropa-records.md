@@ -114,7 +114,7 @@ The Status tab controls the publication lifecycle of the record.
 | **Active** | Publicly visible via `GET /v1/ropa/public` — appears on the public site |
 | **Archived** | Hidden from public site — retained for audit purposes |
 
-Activating a record shows a confirmation dialog: *"Activating this record will make it publicly visible on ropa.flevoland.nl. Continue?"* Status changes take effect after saving the record with the **Save** button in the top bar.
+Activating a record shows a confirmation dialog: *"Activating this record will make it publicly visible on ropa.flevoland.nl. Continue?"* Status changes take effect after saving the record with the **Save** button in the top bar. Saving and deleting records needs a sign-in with the `lde-author` role; signed out, both buttons are locked.
 
 ---
 

@@ -5,9 +5,17 @@ component: RONL Business API
 # Public site suite
 
 `packages/public-site`, Vitest with jsdom. **34 files · 275 tests · all
-passing · 69.20s** without file parallelism.
+passing · 58.25s** without file parallelism.
 
-!!! success "Re-measured at v2026.11.1: nothing changed, and the figures held"
+!!! success "Re-measured at v2026.11.2: nothing changed, and the figures held"
+    Re-run on **12 November 2026** for v2026.11.2 (`main` at `ad0fd62`), in the
+    working checkout on `acc` at `4e28ed7`, a tree identical to `ad0fd62`,
+    serially with coverage on Node 22.23.4: **34 files · 275 tests · all
+    passing · `Duration 58.25s`**, coverage **96.68 / 97.41 / 95.09 / 97.23** —
+    every figure as on 7 November and on 9 and 11 October. v2026.11.2 did not
+    touch this package. The Playwright suite below was not re-run.
+
+!!! note "History: re-measured at v2026.11.1, nothing changed, and the figures held"
     Re-run on **7 November 2026** for v2026.11.1 (`main` at `35fb3a8`), in the
     working checkout on `acc` at `c6cf3ac`, a tree identical to `35fb3a8`,
     serially with coverage on Node 22.23.4: **34 files · 275 tests · all

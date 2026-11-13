@@ -31,7 +31,7 @@ The production backend job declares `environment: production`. Its only protecti
 
 ## Frontend deployment
 
-The frontend builds to a static site on the Node version pinned in `.nvmrc` (24.22.1), which the workflows read with `node-version-file`:
+The frontend builds to a static site on the Node version pinned in `.nvmrc` (24.22.2), which the workflows read with `node-version-file`:
 
 ```
 merge into acc (ACC)   /   called by the promotion (production)
@@ -48,7 +48,7 @@ The two build commands differ because they inject different `VITE_API_BASE_URL` 
 
 ### `staticwebapp.config.json` is generated, not committed
 
-The frontend's Static Web Apps configuration is written **at build time** by a Vite plugin, `packages/frontend/vite/cspPlugin.ts`, into the build output — where Azure Static Web Apps reads it. It carries a `Content-Security-Policy-Report-Only` header built from the same `VITE_API_BASE_URL` the application uses, so ACC's policy names the ACC backend in `connect-src` and production's names production's, together with `Reporting-Endpoints`, `X-Content-Type-Options: nosniff` and `Referrer-Policy: strict-origin-when-cross-origin`. A missing or invalid API URL **fails the build** rather than producing a policy that points nowhere.
+The frontend's Static Web Apps configuration is written **at build time** by a Vite plugin, `packages/frontend/vite/cspPlugin.ts`, into the build output — where Azure Static Web Apps reads it. It carries a `Content-Security-Policy-Report-Only` header built from the same `VITE_API_BASE_URL` the application uses, so ACC's policy names the ACC backend in `connect-src` and production's names production's, together with `Reporting-Endpoints`, `X-Content-Type-Options: nosniff` and `Referrer-Policy: strict-origin-when-cross-origin`. A missing or invalid API URL **fails the build** rather than producing a policy that points nowhere. Since v2026.11.2 the plugin also takes `VITE_KEYCLOAK_URL`: its origin joins `connect-src`, and the policy admits the silent session-check frame with `frame-src 'self'` plus that Keycloak, and `frame-ancestors 'self'` instead of `'none'`. An invalid Keycloak URL fails the build too.
 
 Violations are reported to `POST /v1/csp-reports` on the same backend, which logs one line per violation — look for `[CSP] violation` in `az webapp log tail` — and stores nothing. The policy is report-only until those reports justify switching it to enforcing.
 
@@ -58,7 +58,7 @@ The only committed `staticwebapp.config.json` is the public ROPA site's, in `pac
 
 ## Backend deployment
 
-The backend builds TypeScript and runs on Azure App Service (Linux, `NODE|24-lts`), building and testing on the Node version pinned in `.nvmrc` (24.22.1). Both backend workflows run the same steps:
+The backend builds TypeScript and runs on Azure App Service (Linux, `NODE|24-lts`), building and testing on the Node version pinned in `.nvmrc` (24.22.2). Both backend workflows run the same steps:
 
 ```
 merge into acc (ACC)   /   called by the promotion (production)
@@ -101,6 +101,10 @@ az webapp config appsettings set \
     OPERATON_BASE_URL="https://operaton.open-regels.nl/engine-rest" \
     OPERATON_USERNAME="…" \
     OPERATON_PASSWORD="…" \
+    KEYCLOAK_URL="https://acc.keycloak.open-regels.nl" \
+    TEST_DEPLOY_ENABLED=true \
+    TRIPLYDB_ACCOUNT="…" \
+    TRIPLYDB_API_TOKEN="…" \
     LOG_LEVEL=info
 ```
 
@@ -119,8 +123,13 @@ az webapp config appsettings set \
     OPERATON_BASE_URL="https://operaton.open-regels.nl/engine-rest" \
     OPERATON_USERNAME="…" \
     OPERATON_PASSWORD="…" \
+    KEYCLOAK_URL="https://keycloak.open-regels.nl" \
+    TRIPLYDB_ACCOUNT="…" \
+    TRIPLYDB_API_TOKEN="…" \
     LOG_LEVEL=info
 ```
+
+Production leaves `TEST_DEPLOY_ENABLED` unset, so it has no anonymous test deploys.
 
 `SCM_DO_BUILD_DURING_DEPLOYMENT=false` must be set on both App Service instances — the build happens in GitHub Actions, not on Azure.
 
@@ -129,7 +138,13 @@ az webapp config appsettings set \
 | `DEPLOYMENT_ENV` | falls back to `NODE_ENV` | The tier `/v1/health` and the root page report: `acc` or `prod`. |
 | `CORS_ORIGIN` | `http://localhost:3000` | Comma-separated allowlist. **An update replaces the whole value** — see below. |
 | `OPERATON_USERNAME` / `OPERATON_PASSWORD` | unset | The engine login, sent as basic auth by every call to Operaton (since v2026.11.1). **Required on ACC and production**: when the tier (`DEPLOYMENT_ENV`, else `NODE_ENV`) reads ACC or PROD, the backend refuses to start without both. Processes deploy only through this client, so Operaton credentials never come from a request. `OPERATON_API_KEY` is removed. |
-| `TRIPLYDB_ALLOWED_HOSTS` | `api.open-regels.triply.cc` | Hosts a TriplyDB call that forwards a caller's token may go to; the URL must also be `https:`. |
+| `KEYCLOAK_URL` | `http://localhost:8080`, but none when the tier is ACC or PROD | The Keycloak serving realm `ronl`, whose tokens the write routes accept (since v2026.11.2). **Required on ACC and production**: the backend refuses to start without it. ACC's Keycloak is `https://acc.keycloak.open-regels.nl`, production's `https://keycloak.open-regels.nl`. |
+| `KEYCLOAK_REALM` | `ronl` | The realm. |
+| `AUTH_CLIENTS` | `linked-data-explorer,ttl-editor,lde-e2e` | Clients whose tokens are accepted, matched against the token's `azp`. Production has no `lde-e2e` client, so `linked-data-explorer,ttl-editor` is the tighter value there. |
+| `TEST_DEPLOY_ENABLED` | off | Anonymous test deploys to tenant `TestOnly`. Enabled only by the exact value `true`; meant for localhost and ACC, and left unset on production. |
+| `TRIPLYDB_BASE_URL` | `https://api.open-regels.triply.cc` | Where the editors publish (since v2026.11.2). Must be `https:` on a host in `TRIPLYDB_ALLOWED_HOSTS`. |
+| `TRIPLYDB_ACCOUNT` / `TRIPLYDB_API_TOKEN` | unset | The publishing account and its token, held only by the backend. Without both, the backend still starts and the publishing routes answer `503`. |
+| `TRIPLYDB_ALLOWED_HOSTS` | `api.open-regels.triply.cc` | Hosts `TRIPLYDB_BASE_URL` may name; the URL must also be `https:`. |
 | `ALLOW_LOCAL_ENDPOINTS` | off | Admits `http:` and local addresses as caller-supplied endpoints. **For local development only**; enabled only by the exact value `true`, and never set on ACC or production. |
 
 !!! danger "`CORS_ORIGIN` replaces, it does not append"
@@ -245,12 +260,14 @@ At each release, once both environments are deployed, run these against ACC and 
 | Outbound guard | `GET /v1/dmns?endpoint=https://169.254.169.254/latest/meta-data/` | `400`, `application/problem+json`, `code: INVALID_INPUT` — an internal address is refused before any request is made |
 | Malformed body | `POST /v1/dmns/validate` with the body `{"bad` | `400`, `application/problem+json`, `code: MALFORMED_BODY` |
 | CSP collector | `POST /v1/csp-reports`, `Content-Type: application/csp-report` | `204` |
-| Frontend policy | response headers of the frontend root | `Content-Security-Policy-Report-Only` present, with `connect-src 'self'` and **that environment's** backend |
+| Frontend policy | response headers of the frontend root | `Content-Security-Policy-Report-Only` present, with `connect-src 'self'`, **that environment's** backend and its Keycloak, and `frame-src 'self'` with the same Keycloak |
 | Frontend headers | the same response | `Reporting-Endpoints`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` |
 | DSO paging | `POST /v1/dso/activiteiten/oin?env=prod` with the OIN of Provincie Zuid-Holland, `00000001002306608000` | every page combined — the item count equals `page.totalElements` |
 | SPARQL through the backend | `POST /v1/triplydb/query`, `ASK { ?s ?p ?o }` against the RONL endpoint | `{"boolean": true}` |
 | Public ROPA | `GET /v1/ropa/public`, and the public ROPA site | `200` for both |
 | Asset status | `GET /v1/assets/forms` | no form without a `status` |
+| Writes closed | `POST /v1/dmns/drd/deploy` without a token | `401`, `application/problem+json`, `code: UNAUTHENTICATED` |
+| Test deploys | `GET /v1/dmns/deploy/options` | `testDeploy.enabled` is `true` on ACC and `false` on production |
 
 The CSP collector check sends one synthetic report, which the backend logs as a violation; give it a `document-uri` that says it is a probe, so the log line cannot be mistaken for a real one.
 

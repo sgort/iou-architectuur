@@ -139,13 +139,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.11.1** · *November 2026*
+-   **⚙️ RONL Business API — v2026.11.2** · *November 2026*
 
     ---
 
-    **The engine asks who is calling, Flevoland gets its colours, and one diagram for every board**
+    **The authoring tools sign in through the RONL Keycloak**
 
-    The process engine on the VM now requires a login: reading and evaluating rules stays public through a read-only account, and the backend calls the engine with its own credentials, which a production start no longer does without ([Operaton](ronl-business-api/developer/deployment/operaton.md)). The Caseworker overview and the [Infra-board](ronl-business-api/user-guide/infra-board.md) project page share one process diagram, and the portfolio shows projects waiting between RIP phases. Flevoland's own colours now apply to its tenant and its login page ([municipality themes](ronl-business-api/reference/municipality-themes.md)); CI rejects new hard-coded colours and the end-to-end suite checks accessibility. The [suites](ronl-business-api/developer/testing/overview.md) stand at 5,318 unit tests, all passing, and 78 end-to-end tests: 73 passed, 5 skipped by design.
+    A script adds the `lde-author` role and the sign-in clients for the Linked Data Explorer and the CPSV Editor to the realm, on acceptance and production alike ([Keycloak realm](ronl-business-api/reference/keycloak-realm.md#clients-added-by-script-linked-data-explorer-and-ttl-editor)). Caddy now lets Keycloak's third-party-cookie check be framed, and nothing else ([Caddy](ronl-business-api/developer/deployment/caddy.md)). The VM's Operaton image is pinned by digest, and the quick-navigation buttons have an accessible name that matches what they show. The [suites](ronl-business-api/developer/testing/overview.md) stand at 5,318 unit tests, all passing; the end-to-end figures are from 7 November.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
@@ -159,23 +159,23 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.11.0** · *November 2026*
+-   **✏️ CPSV Editor — v2026.11.1** · *November 2026*
 
     ---
 
-    **A service can say which services it requires**
+    **Sign in to deploy and publish, and no TriplyDB token in the browser**
 
-    The Service tab has a *Required services* section: pick a published service from the list, or paste its URI, and the editor writes `dct:requires` to the published Turtle and reads it back on import ([filling in the tabs](cpsv-editor/user-guide/filling-in-the-tabs.md)). The Thuisbatterij example is split into two services, the second requiring the first. v2026.10.2 moved the toolchain to Node 24.22.1 and refreshed the development dependencies for their advisories. The [suites](cpsv-editor/developer/testing.md) stand at 812 tests, all passing.
+    The editor now offers an optional sign-in through Keycloak ([getting started](cpsv-editor/user-guide/getting-started.md#signing-in)). An author — an account with the `lde-author` role — deploys DMNs and publishes to TriplyDB; anyone else can still build and export, and on acceptance can make a test deploy that is removed after 48 hours ([DMN tab](cpsv-editor/user-guide/dmn-tab.md)). Publishing is one call to the Linked Data Explorer backend, which holds the TriplyDB token and records who published, so the dialog asks only for the dataset ([publishing](cpsv-editor/user-guide/publishing-to-triplydb.md)). Clear All now empties the DMN tab too. The [suites](cpsv-editor/developer/testing.md) stand at 858 tests, all passing.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.11.1** · *November 2026*
+-   **🔍 Linked Data Explorer — v2026.11.2** · *November 2026*
 
     ---
 
-    **Services that require each other, and an engine that asks for credentials**
+    **Signing in to change shared state**
 
-    A public service can now declare the services it requires with `dct:requires`, an optional link. Where it does, its DMN shows which services it requires and which require it, on the DMN cards, in the Chain Composer and in the BPMN modeler ([chain building](linked-data-explorer/features/dmn-chain-building.md)). The backend calls Operaton with a username and password, refuses to start on acceptance or production without them, and encodes every value it puts in an engine path ([deployment](linked-data-explorer/developer/deployment.md)). The toolchain moved to Node 24.22.1. The [suites](linked-data-explorer/developer/testing.md) stand at 3,463 tests, all passing.
+    Anything that changes what others see — deploying a DMN, a DRD or a process, saving assets, refreshing the cache, saving or deleting a RoPA record, publishing to TriplyDB — now needs a sign-in with the `lde-author` role ([getting started](linked-data-explorer/user-guide/getting-started.md#signing-in)). Reading and evaluating stay open. Signed out, a deploy on acceptance goes to a test tenant that is cleared after 48 hours, and saved processes, forms and templates stay in your own browser. The backend now publishes to TriplyDB for the CPSV Editor, with its own token, and the eDOCS write routes are gone ([backend](linked-data-explorer/developer/backend.md)). The [suites](linked-data-explorer/developer/testing.md) stand at 3,663 tests; one timed out under load in the full run and passed on its own.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

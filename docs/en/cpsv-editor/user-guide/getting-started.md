@@ -12,8 +12,28 @@ component: CPSV Editor
 
 **To run the editor locally:**
 
-- Node.js 24.22.1, the version pinned in the repository's `.nvmrc`
+- Node.js 24.22.2, the version pinned in the repository's `.nvmrc`
 - npm
+
+---
+
+## Signing in
+
+Signing in is optional. Everything except deploying and publishing works signed out: editing, importing, validating and downloading Turtle.
+
+Click **Sign in** at the top right of the header and choose a route:
+
+- **Flevoland-account** — straight to Flevoland's own sign-in.
+- **Medewerker** — the employee password page.
+
+The sign-in opens in a popup, so the service you are editing stays where it is. When it is done the popup closes, and the header shows your name and **Sign out**. If the browser blocks the popup, the whole page goes to the sign-in and comes back. A browser that has signed in once restores the session on the next visit without asking.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: The editor header with the Sign in menu open, offering Flevoland-account and Medewerker; the menu covers the right end of the toolbar, leaving Import TTL File and the CPRMV selector in view, above the Service tab of an imported service](../../assets/screenshots/cpsv-editor-sign-in.png)
+  <figcaption>The Sign in menu in the header</figcaption>
+</figure>
+
+Deploying to Operaton and publishing to TriplyDB need the `lde-author` role, the same role the Linked Data Explorer uses. An account without it is shown as **View only**, with a note that can be dismissed; ask an administrator for the role. Signed out or view only, the **Publish** button is locked, and the DMN tab's **Deploy** is either locked or, on acceptance, a test deploy — see [The DMN Tab](dmn-tab.md#step-4-deploy-to-operaton).
 
 ---
 
@@ -59,8 +79,8 @@ The typical workflow for a new service definition follows these steps:
 8. **Download TTL** — Click **Download TTL** to export the compliant Turtle file.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: The editor in its initial empty state showing the tab navigation and the Service tab with empty fields and the Validate and Download TTL buttons visible](../../assets/screenshots/cpsv-editor-empty-state.png)
-  <figcaption>The editor in its initial empty state</figcaption>
+  ![Screenshot: The editor in its initial empty state, signed out: Sign in above the toolbar, the CPRMV selector, the Service tab with empty fields down to Required services, Service Cost and Service Output, and at the bottom Validate, a locked Publish with the hint Sign in to publish, and Download TTL](../../assets/screenshots/cpsv-editor-empty-state.png)
+  <figcaption>The editor in its initial empty state, signed out</figcaption>
 </figure>
 
 ---
@@ -79,4 +99,4 @@ If you have an existing `.ttl` file:
 
 ## Clearing the editor
 
-Click **Clear All** in the header to reset all fields. A confirmation dialog — **Clear All Fields?** — prevents accidental data loss; confirm with **Clear All Data**.
+Click **Clear All** in the header to reset all fields. A confirmation dialog — **Clear All Fields?** — prevents accidental data loss; confirm with **Clear All Data**. It also empties the DMN tab, including a DMN file you loaded there.

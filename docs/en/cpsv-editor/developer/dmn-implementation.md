@@ -76,6 +76,10 @@ Data** button on a TTL that arrived carrying a DMN block (both in `DMNTab.jsx`),
 its first-run default rather than to blank. All three also empty the Concepts tab,
 since its concepts were generated from the DMN being cleared.
 
+**Clear All** also remounts the DMN tab. The tab stays mounted while hidden and keeps an
+uploaded file in its own state, so clearing `dmnData` alone left the file showing.
+`App.jsx` gives the tab a `key` that Clear All increments (v2026.11.1, ttl-editor#87).
+
 ---
 
 ## Syntactic validation
