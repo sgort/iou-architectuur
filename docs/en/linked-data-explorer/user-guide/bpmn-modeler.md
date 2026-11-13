@@ -121,8 +121,8 @@ The Modeler can deploy your process — including subprocess BPMNs, linked forms
 Deploying needs a sign-in with the `lde-author` role (see [Signing in](getting-started.md#signing-in)). Signed out, the **Deploy** button shows a lock and *Sign in to deploy*.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: BPMN Modeler signed out, the Deploy button in the canvas toolbar locked with the hint Sign in to deploy, and in the process list a process marked only in this browser under the notice that saves stay in this browser](../../assets/screenshots/linked-data-explorer-signed-out-locks.png)
-  <figcaption>Signed out: Deploy is locked, and a saved process stays in this browser</figcaption>
+  ![Screenshot: BPMN Modeler signed out, with the Sign in menu open at the top right: the Deploy button in the canvas toolbar locked with the hint Sign in to deploy, and above the process list the notice Saved in this browser. Sign in to save it to the shared library.](../../assets/screenshots/linked-data-explorer-signed-out-locks.png)
+  <figcaption>Signed out: Deploy is locked, and the process list says that saves stay in this browser</figcaption>
 </figure>
 
 Click the **Deploy** button in the canvas toolbar. The deploy modal opens and lists:

@@ -29,7 +29,7 @@ Click **Sign in** at the top right of the header and choose a route:
 The sign-in opens in a popup, so the service you are editing stays where it is. When it is done the popup closes, and the header shows your name and **Sign out**. If the browser blocks the popup, the whole page goes to the sign-in and comes back. A browser that has signed in once restores the session on the next visit without asking.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: The editor header with the Sign in menu open, offering Flevoland-account and Medewerker, above the toolbar with Import TTL File, the CPRMV selector, Show Preview and Clear All](../../assets/screenshots/cpsv-editor-sign-in.png)
+  ![Screenshot: The editor header with the Sign in menu open, offering Flevoland-account and Medewerker; the menu covers the right end of the toolbar, leaving Import TTL File and the CPRMV selector in view, above the Service tab of an imported service](../../assets/screenshots/cpsv-editor-sign-in.png)
   <figcaption>The Sign in menu in the header</figcaption>
 </figure>
 
@@ -79,8 +79,8 @@ The typical workflow for a new service definition follows these steps:
 8. **Download TTL** — Click **Download TTL** to export the compliant Turtle file.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: The editor in its initial empty state showing the tab navigation and the Service tab with empty fields and the Validate and Download TTL buttons visible](../../assets/screenshots/cpsv-editor-empty-state.png)
-  <figcaption>The editor in its initial empty state</figcaption>
+  ![Screenshot: The editor in its initial empty state, signed out: Sign in above the toolbar, the CPRMV selector, the Service tab with empty fields down to Required services, Service Cost and Service Output, and at the bottom Validate, a locked Publish with the hint Sign in to publish, and Download TTL](../../assets/screenshots/cpsv-editor-empty-state.png)
+  <figcaption>The editor in its initial empty state, signed out</figcaption>
 </figure>
 
 ---

@@ -27,16 +27,16 @@ stale UI.
 `docs/assets/screenshots/`; a non-strict `mkdocs build` reports zero
 missing-image warnings.
 
-## Sync v2026.11.1 → v2026.11.2 — two NEW, open
+## Sync v2026.11.1 → v2026.11.2 — two NEW, captured 13 November 2026
 
 Reviewed on 12 November 2026 for **v2026.11.2**, in production. The release adds sign-in for
-everything that changes shared state (linked-data-explorer#163). The figures are in the pages
-already; the files are not captured yet.
+everything that changes shared state (linked-data-explorer#163). Both files were captured on
+13 November 2026, and the alt texts and captions were checked against them.
 
 | # | Status | File | Embedding page(s) | What it must show | Trigger |
 |---|---|---|---|---|---|
-| 1 | **NEW** (open) | `linked-data-explorer-sign-in-menu.png` | `user-guide/getting-started.md` (Signing in) | The right end of the header with the **Sign in** menu open, listing *Flevoland-account* and *Medewerker* | v2026.11.2 — sign-in (`ec9659b`, `200f6df`) |
-| 2 | **NEW** (open) | `linked-data-explorer-signed-out-locks.png` | `features/bpmn-modeler.md` (One-click deploy), `user-guide/bpmn-modeler.md` (Deploying to Operaton) | The BPMN Modeler signed out: the canvas **Deploy** button with its lock and the hint *Sign in to deploy*, and in the process list a process with the *only in this browser* badge under the notice *Saved in this browser. Sign in to save it to the shared library.* Save a process while signed out to get one | v2026.11.2 — locked actions and signed-out saves (`91c48d9`, `00db801`) |
+| 1 | ✅ **DONE** (was NEW, captured 13 November 2026) | `linked-data-explorer-sign-in-menu.png` | `user-guide/getting-started.md` (Signing in) | The right end of the header with the **Sign in** menu open, listing *Flevoland-account* and *Medewerker* | v2026.11.2 — sign-in (`ec9659b`, `200f6df`) |
+| 2 | ✅ **DONE** (was NEW, captured 13 November 2026) | `linked-data-explorer-signed-out-locks.png` | `features/bpmn-modeler.md` (One-click deploy), `user-guide/bpmn-modeler.md` (Deploying to Operaton) | The BPMN Modeler signed out: the canvas **Deploy** button with its lock and the hint *Sign in to deploy*, and in the process list a process with the *only in this browser* badge under the notice *Saved in this browser. Sign in to save it to the shared library.* Save a process while signed out to get one. As captured, the notice is there but no process in frame carries the badge (the notice shows to anyone who is not an author, `LocalOnly.tsx:18-21`), and the Sign in menu is open too; the alt text and caption describe that. Optional re-shoot: a signed-out save scrolled into view with its badge | v2026.11.2 — locked actions and signed-out saves (`91c48d9`, `00db801`) |
 
 **Prose only:** the *View only* label and its note, the locked Refresh Cache, Save as DRD and
 RoPA Save and Delete — small, and described on the pages.

@@ -7,8 +7,8 @@ component: CPSV Editor
 The editor can publish service metadata directly to a TriplyDB knowledge graph without any manual file handling. The publish feature is available via the **Publish** button in the bottom-right of the application. It needs a signed-in account with the `lde-author` role; without one the button is locked.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: The publish dialog showing the advisory SHACL panel, the note that you publish as yourself, the Dataset Name field, and the "Test Connection" and "Publish to TriplyDB" buttons](../../assets/screenshots/cpsv-editor-publish-dialog.png)
-  <figcaption>The TriplyDB publish dialog</figcaption>
+  ![Screenshot: The publish dialog for an imported service: the pre-publish SHACL panel reporting 2 errors and 0 warnings, with the remark that you can still publish; the note that you publish as yourself; the Dataset Name field set to RONL; Test Connection, answered by Dataset RONL is available; and Publish to TriplyDB](../../assets/screenshots/cpsv-editor-publish-dialog.png)
+  <figcaption>The TriplyDB publish dialog: the SHACL check found two errors, and Publish to TriplyDB stays available</figcaption>
 </figure>
 
 ---

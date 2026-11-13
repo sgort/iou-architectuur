@@ -16,8 +16,8 @@ Ensure:
 - The **CPRMV version selector** (`0.4.1` / `0.3.2`) is set to the version your consumer expects — it drives the published Turtle just as it drives the preview and download (v1.10.5). See [CPRMV vocabulary version](../features/import-export.md#cprmv-vocabulary-version-041-032).
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Publish modal with the pre-publish SHACL panel, the note that you publish as yourself, and the Dataset Name field](../../assets/screenshots/cpsv-editor-publish-dialog.png)
-  <figcaption>The TriplyDB publish dialog</figcaption>
+  ![Screenshot: The publish dialog for an imported service: the pre-publish SHACL panel reporting 2 errors and 0 warnings, with the remark that you can still publish; the note that you publish as yourself; the Dataset Name field set to RONL; Test Connection, answered by Dataset RONL is available; and Publish to TriplyDB](../../assets/screenshots/cpsv-editor-publish-dialog.png)
+  <figcaption>The TriplyDB publish dialog: the SHACL check found two errors, and Publish to TriplyDB stays available</figcaption>
 </figure>
 
 ---
@@ -31,8 +31,8 @@ Ensure:
 5. Click **Publish to TriplyDB**.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Publish dialog in "publishing" state showing the progress bar, four step indicators (Validating, Generating TTL, Uploading, Updating service) with the first three showing ✓ and the fourth showing a spinner](../../assets/screenshots/cpsv-editor-publish-progress.png)
-  <figcaption>Publish dialog in "publishing" state showing the progress bar, four step indicators (Validating, Generating TTL, Uploading to TriplyDB, Updating service)</figcaption>
+  ![Screenshot: The publish dialog while publishing: a spinner beside Publishing to TriplyDB..., the progress bar a little over half full, a tick beside Validating form, Generating TTL and Uploading to TriplyDB, an open circle beside Updating service, and the Publishing... button disabled](../../assets/screenshots/cpsv-editor-publish-progress.png)
+  <figcaption>While the backend publishes, Uploading to TriplyDB already has its tick, and Updating service does not get one</figcaption>
 </figure>
 
 ---
