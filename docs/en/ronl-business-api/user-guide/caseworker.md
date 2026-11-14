@@ -39,7 +39,7 @@ Each row shows the process's name and a **Start process** button. What the butto
 If a start fails, a notice explains why and the list stays as it was. When there is nothing you may start, the section reads **Er zijn geen processen die u kunt starten.**
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker's Werk mode at Caribisch Nederland, with Proces starten under Taken in the rail, a list of startable processes each with a coloured Start process button, and the green notice confirming that a process has started as a dossier](../../assets/screenshots/ronl-business-api-caseworker-proces-starten.png)
+  ![Screenshot: Caseworker's Werk mode at Caribisch Nederland, signed in as test-caseworker-bes, with Proces starten under Taken in the rail, one startable process, Ingezetenecriteria voor een lijst gevallen, with its coloured Start process button, and above it the green notice that it has started as dossier bes-1794666754325 and that the first task is under Taken](../../assets/screenshots/ronl-business-api-caseworker-proces-starten.png)
   <figcaption>Proces starten — the processes a caseworker may start, and the confirmation after a start</figcaption>
 </figure>
 

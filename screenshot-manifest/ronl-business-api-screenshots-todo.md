@@ -1,13 +1,13 @@
 # RONL Business API — screenshots to capture
 
-!!! warning "Outstanding — two NEW rows for v2026.11.3, six REPLACE rows for v2026.11.1, plus eight optional colour-only re-shoots"
-    The sync to v2026.11.3 (14 November 2026) embeds two figures that do not exist yet, rows 35 and
-    36, so both pages show a broken image until they are captured. The sync to v2026.11.1 shipped on
+!!! warning "Outstanding — six REPLACE rows for v2026.11.1, plus eight optional colour-only re-shoots"
+    The two NEW rows for v2026.11.3 (14 November 2026), rows 35 and 36, were captured the same day.
+    The sync to v2026.11.1 shipped on
     **7 November 2026** without its captures: rows 21–26 are stale views the pages still embed, and
     rows 27–34 are optional. Rows 11–20 still hold, apart from the colours rows 27–34 name. The sync
     to v2026.11.2 (12 November 2026) added none.
 
-## Sync v2026.11.2 → v2026.11.3 — two NEW, open
+## Sync v2026.11.2 → v2026.11.3 — two NEW, captured 14 November 2026
 
 Reviewed on 14 November 2026 for **v2026.11.3**, in production (`origin/main` `f54e4f0`, documented
 from `ad0fd62`). Two changes have a surface nothing captured yet shows: the new tenant Caribisch
@@ -17,8 +17,8 @@ views are unchanged, and the dynamic-list fix and the BRP reporting change no pi
 
 | # | Status | File | Embedding page | What it must show | Trigger |
 |---|---|---|---|---|---|
-| 35 | **NEW** | `ronl-business-api-tenant-landing-bes.png` | `user-guide/getting-started.md:62` (§ Organisation landing pages, *Voor inwoners*) | `mijn.open-regels.nl/bes` signed out: the wide Caribisch Nederland logo, the hero *Eén werkvoorraad voor drie eilanden.*, and below it the **Voor inwoners** section — *Bon bini · Welcome · Welkom*, the Bonaire, Sint Eustatius and Saba chips with their flags, the three services (Aanvraag doen, Melding maken, Status volgen) and **Inloggen met DigiD**. Caption: "Caribisch Nederland's landing page, with the section for residents" | `1b5e81d`, `a819d57` (tenant `bes`, `CitizenEntry`) |
-| 36 | **NEW** | `ronl-business-api-caseworker-proces-starten.png` | `user-guide/caseworker.md:42` (§ Proces starten) | Caseworker V2 at Caribisch Nederland, **Werk** mode: the rail with **Proces starten** under **Taken**, at least one process row with its coloured **Start process** button, ideally with the green notice *… is gestart als dossier … De eerste taak staat onder Taken.* | `667fa6d`, `8a7714a` (`GET /v1/process/startable`, `ProcesStartenSection`) |
+| 35 | ✅ **DONE** (was NEW, captured 14 November 2026) | `ronl-business-api-tenant-landing-bes.png` | `user-guide/getting-started.md:62` (§ Organisation landing pages, *Voor inwoners*) | `mijn.open-regels.nl/bes` signed out: the wide Caribisch Nederland logo, the hero *Eén werkvoorraad voor drie eilanden.*, and below it the **Voor inwoners** section — *Bon bini · Welcome · Welkom*, the Bonaire, Sint Eustatius and Saba chips with their flags, the three services (Aanvraag doen, Melding maken, Status volgen) and **Inloggen met DigiD**. As captured, no address bar is in frame, so the alt text names no URL. Caption: "Caribisch Nederland's landing page, with the section for residents" | `1b5e81d`, `a819d57` (tenant `bes`, `CitizenEntry`) |
+| 36 | ✅ **DONE** (was NEW, captured 14 November 2026) | `ronl-business-api-caseworker-proces-starten.png` | `user-guide/caseworker.md:42` (§ Proces starten) | Caseworker V2 at Caribisch Nederland, **Werk** mode: the rail with **Proces starten** under **Taken**, at least one process row with its coloured **Start process** button, ideally with the green notice *… is gestart als dossier … De eerste taak staat onder Taken.* As captured, on the local stack as `test-caseworker-bes`: one row, *Ingezetenecriteria voor een lijst gevallen*, and the notice for dossier `bes-1794666754325`; the alt text says one process, not a list | `667fa6d`, `8a7714a` (`GET /v1/process/startable`, `ProcesStartenSection`) |
 
 **Capture row 35 on acceptance**, signed out; acceptance serves the page already.
 
