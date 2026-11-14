@@ -89,6 +89,15 @@ The owning tenant is written into the instance's `municipality` process variable
 
 This tenant scoping is covered by an automated end-to-end test — see [Testing](../developer/testing/dashboards/caseworker.md#e2e).
 
+### Who may start it
+
+A process model may also say who may start it: `camunda:candidateStarterGroups` on the process element, a comma-separated list of groups, which here are Keycloak realm roles. The Linked Data Explorer's Modeler edits it under *Candidate starter*. `utils/starter-groups.ts` reads it from the process with the requested key — a deployed file can hold one process per pool, so the first is not necessarily the one asked about — trims each entry and drops empty ones. A process that declares none is open to whoever the tenant rules above let start it, so every process modelled before the attribute was read starts as it did.
+
+- **At start.** After the tenant rules, `POST /v1/process/:key/start` reads the starter groups of the definition the start will run — the resolved tenant's, else the caller's, else the untenanted one. If they are declared and the caller holds none of them, the start is refused with `403 NOT_CANDIDATE_STARTER` (*U mag dit proces niet starten.*), no instance is created, and the audit log records a failure with reason `STARTER_GROUP`. When the groups cannot be read, the error propagates and the start fails: it never goes ahead on a guess.
+- **The list of what a caseworker may start.** `GET /v1/process/startable` returns, as `data`, the processes the signed-in member of staff may start: the latest definitions of their tenant and the untenanted ones that **declare** a starter group among the caller's roles. A process that declares none is left out, so the list holds only processes modelled to be started this way. Each key is resolved the way a start resolves it, so nothing listed is refused there, and a key deployed ambiguously is left out. Each entry has `key`, `name` and `hasStartForm` — whether one of the process's own start events (not a subprocess's) carries a `camunda:formRef` — sorted by name. Citizens are refused with `403 FORBIDDEN`; when Operaton cannot be asked, it answers `503 SERVICES_UNAVAILABLE`.
+
+The caseworker's [Proces starten](../user-guide/caseworker.md#proces-starten) section is built on that list. How to make a process appear there is described in [Frontend development](../developer/frontend-development.md#making-a-process-startable-by-caseworkers).
+
 ---
 
 ## Citizen services

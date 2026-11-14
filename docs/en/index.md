@@ -139,13 +139,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.11.2** · *November 2026*
+-   **⚙️ RONL Business API — v2026.11.3** · *November 2026*
 
     ---
 
-    **The authoring tools sign in through the RONL Keycloak**
+    **Caribisch Nederland, and a place to start a process**
 
-    A script adds the `lde-author` role and the sign-in clients for the Linked Data Explorer and the CPSV Editor to the realm, on acceptance and production alike ([Keycloak realm](ronl-business-api/reference/keycloak-realm.md#clients-added-by-script-linked-data-explorer-and-ttl-editor)). Caddy now lets Keycloak's third-party-cookie check be framed, and nothing else ([Caddy](ronl-business-api/developer/deployment/caddy.md)). The VM's Operaton image is pinned by digest, and the quick-navigation buttons have an accessible name that matches what they show. The [suites](ronl-business-api/developer/testing/overview.md) stand at 5,318 unit tests, all passing; the end-to-end figures are from 7 November.
+    Bonaire, Sint Eustatius and Saba have their own landing page at `/bes`, with a section where residents sign in with DigiD ([getting started](ronl-business-api/user-guide/getting-started.md#voor-inwoners)). **Proces starten** lets a caseworker start any process whose model names a group they belong to, and the backend refuses everyone else ([Caseworker](ronl-business-api/user-guide/caseworker.md#proces-starten), [Processes](ronl-business-api/features/processes.md#who-may-start-it)). Dynamic lists in forms now save and show their rows, and an unreachable BRP is reported as such — in the error, in the health check, and by a daily certificate check ([troubleshooting](ronl-business-api/developer/troubleshooting.md#the-citizen-timeline-is-blank)). The [suites](ronl-business-api/developer/testing/overview.md) stand at 5,417 unit tests in 351 files, all passing, and the 84 end-to-end tests were re-run on 14 November.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

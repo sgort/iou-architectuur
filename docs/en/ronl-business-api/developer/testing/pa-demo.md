@@ -75,14 +75,20 @@ wired into CI.
     changed nothing in this package but its version; PA-Cockpit, which the
     demo compiles in, moved to vite ^6.4.5 and vitest ^4.1.12.
 
+    **And on 14 November 2026** for v2026.11.3 (`main` at `f54e4f0`), in the
+    working checkout at `6f86b10`, the same way: **19 files · 109 tests · all
+    passing**, `Duration 24.67s`, coverage **93.75 / 96.15 / 85.00 / 93.10**
+    with the same counts — every figure as on 7 and 12 November. v2026.11.3
+    changed nothing in this package or in PA-Cockpit but their versions.
+
 **At a glance:**
 
 | | |
 |---|---|
 | Runner | Vitest 4 + jsdom, coverage via v8 |
-| Files / tests | 19 / 109 (12 November 2026, as on 7 November) |
-| Duration | 36.69 s serially on 12 November, 38.31 s on 7 November, 40.64 s on 9 October, 35.65 s on 3 October; 8.16 s to 19.62 s in parallel runs before that |
-| Playwright | 11 tests in `e2e/plato-demo.spec.ts`, **runs in CI** — 11 passed, 21.8s, on 7 November (8.7s on 9 October); not re-run locally for v2026.11.2 |
+| Files / tests | 19 / 109 (14 November 2026, as on 7 and 12 November) |
+| Duration | 24.67 s serially on 14 November, 36.69 s on 12 November, 38.31 s on 7 November, 40.64 s on 9 October, 35.65 s on 3 October; 8.16 s to 19.62 s in parallel runs before that |
+| Playwright | 11 tests in `e2e/plato-demo.spec.ts`, **runs in CI** — 11 passed, 7.7s, on 14 November (21.8s on 7 November, 8.7s on 9 October) |
 
 ---
 
@@ -191,8 +197,11 @@ real selectors, which would have opened exactly that hole.
 
 `packages/pa-demo/e2e/plato-demo.spec.ts` — **11 tests**, Chromium only.
 
-!!! note "Re-run on 7 November 2026: 11 passed, 21.8s"
-    Run locally on 7 November 2026 for v2026.11.1, with seven workers:
+!!! note "Re-run on 14 November 2026: 11 passed, 7.7s"
+    Run locally on 14 November 2026 for v2026.11.3, with seven workers:
+    **11 passed in 7.7s**, every test between 1.8s and 4.6s, while the
+    developer's full local stack was running beside it; the spec is
+    unchanged. On 7 November 2026, for v2026.11.1, with seven workers:
     **11 passed in 21.8s**, every test between 2.9s and 12.5s, while the
     developer's full local stack was running beside it. The spec is unchanged
     since `86af73e`; the demo itself now renders Flevoland's palette. Before

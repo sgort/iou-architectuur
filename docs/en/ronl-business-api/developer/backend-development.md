@@ -56,9 +56,10 @@ packages/backend/
     ├── rip-swimlane/             # BPMN swimlane parsing: Infra-board phases and any laned process
     │   └── __fixtures__/         # RIP processes; awb/ (Awb-phase processes); declared/ (processes that declare their own phases)
     ├── mcp-servers/              # eDOCS, LDE and TriplyDB MCP servers
-    ├── services/                 # Operaton, audit, eDOCS, ValidSign, Doccle, … plus llm/, mcp/, document/
+    ├── services/                 # Operaton, audit, eDOCS, ValidSign, Doccle, brp-upstream, … plus llm/, mcp/, document/
     ├── types/                    # audit.types.ts, auth.types.ts
-    └── utils/                    # config, cors-origin, client-ip, logger, errors, problem (sendProblem), …
+    └── utils/                    # config, cors-origin, client-ip, logger, errors, problem (sendProblem),
+                                  #   operaton-variables, starter-groups, …
 ```
 
 Tests sit beside the file they cover as `*.test.ts`.
@@ -186,7 +187,7 @@ For configuration and live-mode switchover, see [Copilot Studio — eDOCS OAuth 
 The engine's REST API requires a login since v2026.11.1, and the backend calls it as its own service account, which has administrative rights there. Two rules follow for any new engine call:
 
 - **Go through `OperatonService`** (`services/operaton.service.ts`), which sends the configured credentials, rather than a bare `fetch` or `axios` call. `GET /v1/decision/:key` was the last route that did not; it now uses `operatonService.getDecisionDefinition()`. A direct call that cannot go through the service takes its credentials from `operatonBasicAuth()`.
-- **Put every value in an engine URL path through `engineSegment()`** (`utils/engine-segment.ts`). Express has already decoded route parameters, so a key such as `../../process-instance?x=` would otherwise reach another engine endpoint with the backend's rights. `engineSegment()` applies `encodeURIComponent`, keeps `:` readable for definition IDs, and throws on an empty value, `.` and `..`. All 39 path interpolations in `operaton.service.ts` use it.
+- **Put every value in an engine URL path through `engineSegment()`** (`utils/engine-segment.ts`). Express has already decoded route parameters, so a key such as `../../process-instance?x=` would otherwise reach another engine endpoint with the backend's rights. `engineSegment()` applies `encodeURIComponent`, keeps `:` readable for definition IDs, and throws on an empty value, `.` and `..`. All 41 path interpolations in `operaton.service.ts` use it (counted at v2026.11.3).
 
 ---
 

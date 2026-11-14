@@ -20,10 +20,12 @@ after `src/routes` and `src/services`. **E2E: 2 specs · 7 tests**, still in
 the frontend package.
 
 Measured serially, with coverage and without file parallelism, on
-**12 November 2026** for v2026.11.2 (`main` at `ad0fd62`), in the working
-checkout on `acc` at `4e28ed7`, a tree identical to `ad0fd62`, on Node 22.23.4:
-**515 of 515 passing**, `Duration 102.79s` (116.83s on 7 November, 136.61s on
-9 October, 133.53s on 3 October, 35.32s in the parallel run of 30 September).
+**14 November 2026** for v2026.11.3 (`main` at `f54e4f0`), in the working
+checkout at `6f86b10`, a tree identical to `f54e4f0`:
+**515 of 515 passing**, `Duration 74.79s` (102.79s on 12 November, 116.83s on
+7 November, 136.61s on 9 October, 133.53s on 3 October, 35.32s in the
+parallel run of 30 September). Every count and percentage reproduced the
+12 November figures exactly; v2026.11.3 changed only the package's version.
 v2026.11.2 changed one assertion and no count: `pages/PADashboardV2.test.tsx`
 finds the ⌘K button by its visible text, *Spring naar een dossier of
 sectie…*, now that the button has no `aria-label` (WCAG 2.5.3); its
@@ -42,7 +44,7 @@ a file, and no file is below 85% either: the lowest is
 !!! note "Six releases of identical counts, then +39 tests"
     43 files and 476 tests at v2026.09.7, v2026.09.9, v2026.09.11, v2026.09.12
     and v2026.09.13 — and **43 files and 515 tests** at v2026.09.15 and every
-    release since, through v2026.11.2. Every one
+    release since, through v2026.11.3. Every one
     of the 39 is from the two branch-margin commits: `391b1a8` (#256) added four
     to `DossierRow.test.tsx`, taking a file that sat at exactly 80.00% branches
     to 100 and exposing a latent crash when a dossier had no `kompas`, fixed in
@@ -74,12 +76,11 @@ a file, and no file is below 85% either: the lowest is
     consume it too and watch `packages/pa-cockpit/**` in their path filters,
     but run only pa-demo's own suite.
 
-!!! note "The unit figures are from 12 November 2026, the E2E figures from 7 November"
-    The package counts and coverage and the `src/pa-monitoring` backend figure
-    (16 files, 583 tests, unchanged) were measured on **12 November 2026**, and
-    reproduced 7 November's. The two E2E specs were not re-run for v2026.11.2:
-    their figures are from **7 November 2026**, against the developer's
-    already-running local stack, as on 3 and 9 October. The per-file tables
+!!! note "Every figure on this page is from 14 November 2026"
+    The package counts and coverage, the `src/pa-monitoring` backend figure
+    (16 files, 583 tests, unchanged) and the two E2E specs were all measured
+    on **14 November 2026**, the E2E specs against the developer's
+    already-running local stack, as on 3 and 9 October and 7 November. The per-file tables
     below were derived on 9 October; no file in them has changed since. See
     [E2E & live smoke](../e2e.md).
 
@@ -172,9 +173,9 @@ edited for problem details in v2026.10.0:
 
 Plus 174 tests in the six source clients under `pa-monitoring/sources`: EU
 (73), media (27), EP texts submitted (24), TK (21), OB (19) and agenda (10).
-Coverage on 7 November (statements / branches): `pa-monitoring`
+Coverage on 14 November (statements / branches): `pa-monitoring`
 98.95 / 89.35, `pa-monitoring/sources` 98.13 / 93.05 — as on
-30 September and 3 and 9 October; `pa-monitoring`'s lines moved 99.16 → 98.99 when `pa.routes.ts`
+30 September, 3 and 9 October and 7 November; `pa-monitoring`'s lines moved 99.16 → 98.99 when `pa.routes.ts`
 and `pa-dossiers.routes.ts` began answering problems.
 
 ---
@@ -184,10 +185,11 @@ and `pa-dossiers.routes.ts` began answering problems.
 Two Playwright specs, run with the same `playwright.config.ts` as the rest of
 the frontend suite.
 
-**Re-measured 7 November 2026: 7 tests, all passing**, as part of the full
-frontend run against the developer's already-running local stack (56 passed,
-5 skipped, 6.4m) — the five mock-mode tests in 4.8–8.3s each and the two
-live-authoring tests in 7.4s and 6.4s. On 9 October: 7 passing, mock mode in
+**Re-measured 14 November 2026: 7 tests, all passing**, as part of the full
+frontend run against the developer's already-running local stack (60 passed,
+7 skipped, 3.9m) — the five mock-mode tests in 2.0–3.0s each and the two
+live-authoring tests in 4.8s and 2.9s. On 7 November: 7 passing, mock mode
+in 4.8–8.3s and live authoring in 7.4s and 6.4s. On 9 October: 7 passing, mock mode in
 2.2–3.3s and live authoring in 4.7s and 3.3s. On 3 October: 7 passing, mock mode in
 2.4–4.5s and live authoring in 6.9s and 4.7s. Before that, 30 August 2026 against
 `acc` at `15dfbf9`: 7 passing, in a run of 27 in 1.9m. The count is unchanged
@@ -196,9 +198,9 @@ additionally run six consecutive times while chasing a flake, passing 2/2 each
 time in 7.3–11.7s.
 
 See [Coverage per board](../e2e.md#coverage-per-board) for how these seven sit
-against the other fifty-four. Since v2026.11.0 `accessibility.spec.ts` also
+against the other sixty. Since v2026.11.0 `accessibility.spec.ts` also
 scans the PA-Cockpit dashboard with axe-core (one test, passing on
-7 November); its first run against ACC found the score total (`.pac-total b`)
+7 and 14 November); its first run against ACC found the score total (`.pac-total b`)
 at 4.23:1 contrast, now 6.13:1.
 
 | Spec | Tests | Covers |

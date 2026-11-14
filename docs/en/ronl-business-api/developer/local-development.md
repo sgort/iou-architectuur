@@ -352,7 +352,7 @@ To run a single server, use its root script: `npm run dev:backend`,
 
 ## Test users
 
-`config/keycloak/ronl-realm.json` defines **27 users**, all with password
+`config/keycloak/ronl-realm.json` defines **29 users**, all with password
 **`test123`** and assurance level `hoog`. The `municipality` attribute is the
 user's tenant.
 
@@ -364,6 +364,8 @@ user's tenant.
 | amsterdam | `test-caseworker-amsterdam` | caseworker |
 | heusden | `test-citizen-heusden` | citizen |
 | heusden | `test-caseworker-heusden` | caseworker |
+| bes | `test-citizen-bes` | citizen |
+| bes | `test-caseworker-bes` | caseworker |
 | rotterdam | `test-citizen-rotterdam` | citizen |
 | rotterdam | `test-caseworker-rotterdam` | caseworker |
 | denhaag | `test-citizen-denhaag` | citizen |
@@ -389,6 +391,14 @@ user's tenant.
 The landing pages pre-fill these names: the board cards and the top-bar
 **Inloggen** on `/` use the board's Flevoland test user, and a tenant page such
 as `/heusden` uses `test-caseworker-heusden` and `test-citizen-heusden`.
+
+The two Caribisch Nederland users, which `/bes` pre-fills, were added to the file
+in v2026.11.3. A Keycloak started before then keeps its realm without them,
+because the realm is imported only into an empty volume (see [The Docker
+stack](#the-docker-stack)). To sign in as them, reset the volumes
+(`npm run docker:down:volumes && npm run docker:up`, which also clears the audit
+database and the Operaton deployments) or add the two users in the admin
+console.
 
 The Keycloak admin console is at `http://localhost:8080` with `admin`/`admin`.
 
@@ -431,12 +441,19 @@ A healthy local stack answers `200`. This response was captured from the local s
 }
 ```
 
+Since v2026.11.3 `dependencies` also carries `brp`, the BRP upstream the
+citizen timeline reads; the capture above predates it. Its entry has the same
+shape — `status` with `latency`, or `status` `down` with an `error` — and is
+measured by a `HEAD` request to the BRP mock with a 5-second timeout, so a local
+stack reports it only when it can reach the internet.
+
 - `status` is `healthy` only when **Keycloak and Operaton** are both up; then
   the endpoint answers `200`. Otherwise it answers **`503`** as problem details
   (`application/problem+json`, code `SERVICE_DEGRADED`), with the same report,
   its `status` `degraded`, under the `data` extension member. A down dependency
   carries an `error` field instead of `latency`.
 - `cache` is Redis. It is reported but never makes the check fail.
+- `brp` is reported the same way, and never makes the check fail either.
 - `build` is `null` in a working tree; the deploy workflow fills it in.
 - `environment` comes from `DEPLOYMENT_ENV`, falling back to `NODE_ENV`.
 

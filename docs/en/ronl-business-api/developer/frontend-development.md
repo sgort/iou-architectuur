@@ -67,7 +67,7 @@ packages/frontend/src/
 │   ├── CaseworkerDashboardV2/     # V2 shell parts: SectionRouter, TakenInbox, CommandPalette,
 │   │   │                          #   PaletteActions, paletteActionsContext, AssistantDock,
 │   │   │                          #   RegelSimulatie, GegevenswoordenboekV2, NoAccessPanel,
-│   │   │                          #   SectionErrorBoundary
+│   │   │                          #   SectionErrorBoundary, ProcesStartenSection
 │   │   └── regelsimulatie/        # Simulation engine, chart and panels
 │   ├── CaseworkerDashboard/       # Sections the V2 shell routes to (Nieuws, Berichten,
 │   │                              #   RegelCatalogus, ProcesBibliotheek, HR onboarding,
@@ -80,9 +80,9 @@ packages/frontend/src/
 │   ├── WooDashboard/              # Woo sections: Overzicht, Verzoeken, Proces, Publicatie,
 │   │                              #   Register, Bezwaar, Tijdigheid, router, dock, charts
 │   ├── PADashboardV2/             # PA dock and section router for the host
-│   ├── LoginChoice/               # BoardCard, BoardPreview, SingleBoardLanding,
+│   ├── LoginChoice/               # BoardCard, BoardPreview, SingleBoardLanding, CitizenEntry,
 │   │                              #   AccessDeniedDialog (with their CSS)
-│   ├── ProcessStartFormViewer.tsx # Citizen start form (@bpmn-io/form-js)
+│   ├── ProcessStartFormViewer.tsx # Start form (@bpmn-io/form-js): citizen services, Proces starten
 │   ├── StartFailureNotice.tsx     # The notice under a failed citizen start (#171)
 │   ├── DecisionViewer.tsx         # Final decision of a completed citizen process
 │   ├── AltchaWidget.tsx
@@ -112,8 +112,8 @@ packages/frontend/public/
 ├── tenants.json                   # Municipality configurations (loaded at runtime)
 ├── timeline-config.json
 ├── og-image-acc.png, og-image-prod.png  # Link-preview images, one per environment
-├── og-image-<id>-{acc,prod}.png   # Per single-board tenant: amsterdam, heusden, toeslagen, unive
-├── tenants/                       # Tenant logos: amsterdam/, heusden/, toeslagen/
+├── og-image-<id>-{acc,prod}.png   # Per single-board tenant: amsterdam, heusden, bes, toeslagen, unive
+├── tenants/                       # Tenant logos: amsterdam/, heusden/, toeslagen/, bes/ (with flags/)
 ├── pa/                            # PA cockpit assets
 └── staticwebapp.config.json       # Azure SWA routing configuration
 packages/frontend/scripts/
@@ -139,7 +139,7 @@ Both routes render `LoginChoice`, which waits for `tenants.json` and asks `resol
 | `/<id>` for anything else — unknown, disabled, several boards, or a reserved id (`auth`, `dashboard`, `assets`, `tenants`, `api`, `t`, `pa`) | A redirect to `/`; a mixed-case id redirects to its lower-case path |
 | `/?tenant=<id>` (the URL before tenants had paths) | A redirect to `/<id>` |
 
-The single-board tenants today are Gemeente Amsterdam, Gemeente Heusden, Dienst Toeslagen and Univé Verzekeringen, each with `boards: ["caseworker"]`. Both layouts start their logins through the same hook, `useLandingLogin()` in `pages/login-choice/landing-login.ts`.
+The single-board tenants today are Gemeente Amsterdam, Gemeente Heusden, Caribisch Nederland (`bes`), Dienst Toeslagen and Univé Verzekeringen, each with `boards: ["caseworker"]`. Both layouts start their logins through the same hook, `useLandingLogin()` in `pages/login-choice/landing-login.ts`.
 
 **The board grid (`/`)** offers these ways in:
 
@@ -153,7 +153,9 @@ The single-board tenants today are Gemeente Amsterdam, Gemeente Heusden, Dienst 
 
 All four cards show before sign-in; the grid does not filter by role. `FLEVOLAND_IDP` is `'entra-flevoland'`, exported from `services/identity-providers.ts` so the landing page can name the provider without importing `keycloak-js`. The alias must match the provider `scripts/keycloak-add-entra-idp.sh` creates and the redirect URI registered in Flevoland's Entra app registration — renaming it means changing all three. **Bekijk de borden** beside the hero button is a secondary anchor to `#boards`; it starts no login.
 
-**The single-board page (`/<id>`)** is tenant-first: the tenant's logo (or its name, when `logo` is absent), its colours, copy chosen by `organisationType` from `pages/login-choice/single-board.copy.ts` (a province falls back to the municipality copy), an illustrative Caseworker preview, and the ronl. mark only in the footer. Its controls are **Inloggen als medewerker** (`startMedewerkerLogin(board.route, 'test-caseworker-<id>')`), the top-bar **Inloggen** (the same hint, no board target) and **Inwoner? Log in met DigiD** (`startIdpLogin('digid', 'test-citizen-<id>')`). It has no Entra button: Entra ID exists only for Flevoland.
+**The single-board page (`/<id>`)** is tenant-first: the tenant's logo (or its name, when `logo` is absent), its colours, copy chosen by `organisationType` from `pages/login-choice/single-board.copy.ts` (a province falls back to the municipality copy) with the tenant's own `copy` merged over it — field by field, and the preview's fields one level down — an illustrative Caseworker preview, and the ronl. mark only in the footer. Its controls are **Inloggen als medewerker** (`startMedewerkerLogin(board.route, 'test-caseworker-<id>')`), the top-bar **Inloggen** (the same hint, no board target) and **Inwoner? Log in met DigiD** (`startIdpLogin('digid', 'test-citizen-<id>')`). It has no Entra button: Entra ID exists only for Flevoland.
+
+A tenant with `citizen` in `tenants.json` gets one more section, between the hero and the points: `CitizenEntry.tsx`, with an eyebrow and optional greetings (each in a `lang`-tagged span), optional island chips, a list of services and a button that calls `startIdpLogin('digid', 'test-citizen-<id>')`. Every value is rendered as text. Its CSS lives in `single-board.css`, scoped under `.lcp-single`, which also caps the top-bar logo at 36 px below 560 px so a wide logo fits beside **Inloggen**. Caribisch Nederland is the only tenant with it; the fields are in [Municipality themes](../reference/municipality-themes.md#tenantconfig-schema).
 
 ```typescript
 function startIdpLogin(idp: LandingIdp, usernameHint?: string) {
@@ -576,7 +578,7 @@ The `<div ref={containerRef} />` must be present in the DOM **before** `form.imp
 
 **`packages/frontend/src/components/ProcessStartFormViewer.tsx`**
 
-Renders the start form for a BPMN process in the citizen dashboard.
+Renders the start form for a BPMN process — in the citizen dashboard, and in the caseworker's Proces starten section for a process that has one.
 
 | Prop | Type | Description |
 |---|---|---|
@@ -818,6 +820,18 @@ The dashboard skips an id the backend returns that the bundle has no card for, s
 
 ---
 
+## Making a process startable by caseworkers
+
+The caseworker's **Proces starten** section (`CaseworkerDashboardV2/ProcesStartenSection.tsx`) knows no process key: it lists what `GET /v1/process/startable` returns (`businessApi.process.startable()`), so nothing in the frontend changes per process. Making a process appear there takes three steps:
+
+1. **Declare who may start it.** In the Linked Data Explorer's Modeler, set the groups under *Candidate starter* on the process — `camunda:candidateStarterGroups`, a comma-separated list of realm roles such as `caseworker`. A process without it is never listed, and starts as before wherever it already could. See [Processes — Who may start it](../features/processes.md#who-may-start-it).
+2. **Deploy it under the tenant** whose caseworkers should see it, or untenanted to offer it to every tenant's staff. The list is resolved the way a start is, so a key several other tenants deploy is left out.
+3. **Switch the section on for the tenant** by adding `proces-starten` to its `leftPanelSections` in `tenants.json`. The rail item sits under **Taken** in the **Werk** mode (`modes.config.ts`) and, like every tenant-scoped section, shows only for a tenant that lists it; Caribisch Nederland's `projects` list does.
+
+A process whose own start event has a `camunda:formRef` opens `ProcessStartFormViewer` first; any other is started at once with no variables, and the section confirms the dossier number and points to **Taken**. A start the backend refuses (`403 NOT_CANDIDATE_STARTER`, among others) shows `StartFailureNotice`.
+
+---
+
 ## Styling guidelines
 
 **Colours come from the shared tokens.** `packages/shared/styles/tokens.css` holds one `:root` block of `--rba-*` tokens — Flevoland's fixed brand colours, the themed brand chained to the tenant's `--color-primary`, neutrals, and status colours by role (`--rba-ok-*`, `--rba-warn-*`, `--rba-bad-*`) — and the caseworker app, PA-Cockpit and pa-demo load it. Flevoland IT's own token file sits in `packages/shared/styles/flevoland/`. Since v2026.11.0 the stylesheets and inline styles hold no neutral, brand or status hex value: the 22 left in the stylesheets are data and category colours, each listed with its reason, and three tests guard it:
@@ -890,7 +904,7 @@ npm test -- --watch
 - [ ] "Bekijk de borden" renders as the secondary action and only scrolls to `#boards`
 - [ ] The DigiD link and the top-bar "Inloggen" both render
 - [ ] All four board cards render before sign-in; Caseworker, PA-Cockpit and Infra-board carry a **Flevoland-account** button beside **Openen**, Woo does not
-- [ ] `/amsterdam`, `/heusden`, `/toeslagen` and `/unive` show the single-board page in the tenant's colours; `/?tenant=amsterdam` redirects to `/amsterdam`; an unknown `/<id>` redirects to `/`
+- [ ] `/amsterdam`, `/heusden`, `/bes`, `/toeslagen` and `/unive` show the single-board page in the tenant's colours, and `/bes` its **Voor inwoners** section; `/?tenant=amsterdam` redirects to `/amsterdam`; an unknown `/<id>` redirects to `/`
 - [ ] A board opened with an account that lacks its role returns to the landing page with the **Geen toegang tot …** dialog
 - [ ] Changelog panel opens and closes correctly
 - [ ] Mobile responsive (< 640px)

@@ -10,43 +10,62 @@ runs two of them as a signed-in person. None of them runs as part of
 
 | Suite | Where | Specs | Tests | In CI? | Last measured |
 |---|---|---:|---:|---|---|
-| Frontend Playwright | `packages/frontend/e2e/` | **18** | **61** | No | **7 Nov — 56 passed, 5 skipped, 6.4m** |
-| Public-site Playwright | `packages/public-site/e2e/` | 1 | **6** | No | **7 Nov — 6 passed with one worker, 20.8s** |
-| **PA-demo Playwright** | `packages/pa-demo/e2e/` | 1 | **11** | **Yes** — `azure-pa-demo-acc.yml` | **7 Nov — 11 passed, 21.8s** |
+| Frontend Playwright | `packages/frontend/e2e/` | **18** | **67** | No | **14 Nov — 60 passed, 7 skipped, 3.9m** |
+| Public-site Playwright | `packages/public-site/e2e/` | 1 | **6** | No | **14 Nov — 6 passed with one worker, 6.3s; 2 timeouts in the parallel run** |
+| **PA-demo Playwright** | `packages/pa-demo/e2e/` | 1 | **11** | **Yes** — `azure-pa-demo-acc.yml` | **14 Nov — 11 passed, 7.7s** |
 | Live smoke scripts | `scripts/*.sh` | 4 scripts and a wrapper | — | No | never run for these pages |
 
-**78 end-to-end tests, all three suites green — 73 passed, and five tests in
+**84 end-to-end tests, all three suites green — 77 passed, and seven tests in
 the frontend suite skipping themselves by design.** Measured on
-**7 November 2026** for v2026.11.1 (`main` at `35fb3a8`), from the working
-checkout on `acc` at `c6cf3ac`, a tree identical to `35fb3a8`, against the
-full local stack the developer already had running — the frontend on
-`:5173`, the backend on `:3002`, Keycloak on `:8080`, the Linked Data
-Explorer backend on `:3001` and the docker stack; nothing was started or
-stopped for the run. A first attempt minutes earlier stopped in
-`globalSetup`, because the backend and Keycloak were not reachable yet — the
-gate doing its job, not a test result.
+**14 November 2026** for v2026.11.3 (`main` at `f54e4f0`), from the working
+checkout at `6f86b10`, a tree identical to `f54e4f0`, against the full local
+stack the developer already had running — the frontend on `:5173`, the
+backend on `:3002`, Keycloak on `:8080` and the Linked Data Explorer backend
+on `:3001`, with the `bes` test users present; nothing was started or stopped
+for the run. The public site's six count as passed from its serial run; its
+default parallel run had two timeouts — see below.
 
-!!! warning "Not re-run for v2026.11.2 — every figure on this page is from 7 November"
-    v2026.11.2 (12 November 2026, `main` at `ad0fd62`) added and removed no
-    spec, so the inventory above stands: twenty specs, 78 tests. It changed
-    one spec and the two libraries the suites run on, and **neither is
-    measured yet**:
+!!! success "Re-run on 14 November — six more tests, and the first run on axe-core 4.14.0 and Playwright 1.64.1"
+    v2026.11.3 added no spec and changed one:
+    **`landing-single-board.spec.ts`** takes the new organisation **`bes`**
+    (Caribisch Nederland) as a third entry in its `TENANTS` loop — five tests
+    per tenant — and gains one test of its own, *"/bes: the citizen section
+    pre-fills the tenant test citizen"*. The runner collected **67 tests
+    across eighteen specs** — 60 passed and seven skipped, each skip one the
+    spec declares:
 
-    - **axe-core 4.14.0** (from 4.13.0), which arrived with the lockfile
-      refresh, turns on `label-content-name-mismatch`. It flagged the ⌘K
-      button on Caseworker V2 and PA-Cockpit, whose `aria-label` replaced its
-      visible text (WCAG 2.5.3); the label is gone in the same release
-      ([#444](https://github.com/sgort/ronl-business-api/pull/444)).
-      `e2e/a11y-baseline.ts` is unchanged, and its header still names 4.13.
-    - **Playwright 1.64.1** (from 1.63.0) makes `locator.waitFor` wait for a
-      pending navigation. The sign-in scan in `accessibility.spec.ts` answers
-      Keycloak's authorize navigation with a 204, which never finishes, so it
-      now waits for *Verbinding maken...* with `page.waitForFunction`.
+    - **`landing-single-board`** (19 tests, 13 passed, **6 skipped**) — the
+      two link-preview tests per tenant skip on a local target, now for
+      `/amsterdam`, `/heusden` and `/bes`. The three `/bes` tests that ran —
+      one exact *"Inloggen"*, the caseworker CTA in the tenant's colours, the
+      DigiD link — and the `/bes` citizen-section test passed. The CTA test
+      signs in as `test-caseworker-bes`, so the suite needs the `bes` test
+      users in the realm it runs against: locally, a re-imported realm.
+    - **`rip-r21-journey`** skipped itself at run time, by the same guard as
+      on 7 November: *"1 R2.1 instance(s) already running:
+      flevoland-1791834489920 … This spec cannot tell a foreign instance from
+      its own"*. A guard, not a failure; the R2.1 work did not run.
 
-    The suites were not run against either version for this release; the
-    next run of the frontend suite is the first measurement of both.
+    It was also the first measurement of the two library moves of
+    v2026.11.2, which the 12 November pass left unmeasured: **axe-core
+    4.14.0**, whose `label-content-name-mismatch` rule had flagged the ⌘K
+    button before v2026.11.2 removed its `aria-label`, and **Playwright
+    1.64.1**, under which the sign-in scan waits for *Verbinding maken...*
+    with `page.waitForFunction`. All ten `accessibility` scans passed against
+    the unchanged `e2e/a11y-baseline.ts`, the sign-in scan in 2.1s.
+    `assistant` passed with **eDOCS** and **Legislation (CPRMV)** annotated as
+    offline sources.
 
-!!! success "Re-run on 7 November — three new specs, fourteen more tests"
+    **The public-site suite went red in its default run and green serially**,
+    as on 3 and 9 October: with six workers, 4 passed and 2 failed — both a
+    `locator.waitFor` timeout after 10s on the first *Regel* filter checkbox,
+    in *search → filter → detail → back* and *a deep link with filters
+    pre-applied* — and with `--workers=1` it passed **6/6 in 6.3s**. Recorded
+    as **6/6 serially; 2 timeouts in the parallel run**, not as a defect; see
+    [Public-site Playwright suite](#public-site-playwright-suite). **pa-demo
+    passed 11/11 in 7.7s.**
+
+!!! note "History: re-run on 7 November — three new specs, fourteen more tests"
     v2026.10.3 to v2026.11.1 added **three frontend specs and 14 tests**, and
     the runner collected **61 tests across eighteen specs** — 56 passed and
     five skipped, each skip one the spec declares:
@@ -216,7 +235,8 @@ will fail its preconditions.
 
 Re-read at `86af73e` on 24 September 2026; the configs are unchanged at
 `2443adc` (v2026.09.12), `963fe24` (v2026.09.13), `ae06c9e` (v2026.09.15),
-`0625d48` (v2026.10.0), `ebec288` (v2026.10.1) and `35fb3a8` (v2026.11.1).
+`0625d48` (v2026.10.0), `ebec288` (v2026.10.1), `35fb3a8` (v2026.11.1) and
+`f54e4f0` (v2026.11.3).
 All eighteen frontend specs need the live stack; none of them can run cold.
 
 | Config | Declares `webServer`? | Has a `globalSetup`? | What must already be up |
@@ -276,19 +296,19 @@ Four things follow from that table:
     **24** at `86af73e`, and still 24 at `2443adc`, `ae06c9e` and `0625d48`;
     across the fifteen at `ebec288` it gives **34**. The runner reported
     **27** across ten of them on 30 August, **28** across eleven on 3 October,
-    **47** across fifteen on 9 October, and **61** across eighteen on
-    7 November. `accessibility.spec.ts` declares six `test(` calls and runs
+    **47** across fifteen on 9 October, **61** across eighteen on
+    7 November and **67** across the same eighteen on 14 November. `accessibility.spec.ts` declares six `test(` calls and runs
     ten, one of them inside a loop over five dashboards; `process-view.spec.ts`
     and `assistant.spec.ts` skip at run time when their tier has nothing to
     open or no stub model. `login-redirect.spec.ts` alone
     declares one `test(` and runs five, because the cases are parameterised;
-    `landing-single-board.spec.ts` declares six and runs thirteen, from loops
-    over two tenants, two paths and two redirect targets; and `citizen-services.spec.ts`
+    `landing-single-board.spec.ts` declares seven and runs nineteen, from
+    loops over three tenants, two paths and two redirect targets; and `citizen-services.spec.ts`
     declares one and runs three. `rip-r21-journey.spec.ts` contains **two**
     `test.skip(true, reason)` calls *inside* test bodies, runtime skips that a
     naive grep reads as skipped declarations, and one of which fired on 3 and
     9 October; `landing-single-board`'s `test.skip(isLocalTarget, …)` skips a
-    whole block, four tests, on a local target. None of that is visible from
+    whole block, six tests since v2026.11.3, on a local target. None of that is visible from
     the source text.
 
     This is why `thuisbatterij-journey.spec.ts` was listed without a test count
@@ -441,34 +461,36 @@ The single worker is deliberate: two specs race to claim an identically-named
 task for the same caseworker against the shared local Operaton engine, so the
 suite trades parallelism for correctness.
 
-**Measured 7 November 2026: 61 tests across 18 specs — 56 passed, 5 skipped,
-6.4m**, one worker, against the developer's already-running local stack.
-Nothing failed and nothing was retried. The previous run, on 9 October 2026,
-was 47 tests across the 15 specs there were then: 42 passed, 5 skipped, 2.6m;
+**Measured 14 November 2026: 67 tests across 18 specs — 60 passed, 7 skipped,
+3.9m** (234.4s by the runner's own report), one worker, against the
+developer's already-running local stack. Nothing failed and nothing was
+retried. The previous runs: 7 November 2026, 61 tests across the same
+18 specs, 56 passed, 5 skipped, 6.4m; 9 October 2026,
+47 tests across the 15 specs there were then: 42 passed, 5 skipped, 2.6m;
 on 3 October 2026, 28 tests across 11 specs: 27 passed, 1 skipped, 2.8m;
 before that, on 30 August 2026 against `acc` at `15dfbf9`, 27 tests across
 10 specs, 27 passed, 1.9m.
 
-| Spec | Tests | 7 November | Covers |
+| Spec | Tests | 14 November | Covers |
 |---|---:|---|---|
-| **`accessibility.spec.ts`** | **10** | **10 passed**, 80.6s in all | **New in v2026.11.0.** One axe-core scan per page type — landing, sign-in screen, three Keycloak forms, four Flevoland dashboards, Caseworker V2 for Heusden — against `e2e/a11y-baseline.ts` |
-| **`landing-single-board.spec.ts`** | **13** | **9 passed, 4 skipped** — the link-preview tests, on a local target | **New in v2026.10.1.** The organisation landing pages `/amsterdam` and `/heusden`: the single-board layout, the caseworker login in the tenant's colours, the DigiD link with the tenant's test citizen, the per-tenant link preview, and the redirects from `/?tenant=` and to the grid |
-| `infra-board-journey.spec.ts` | 7 | 7 passed, 59.3s in all | The Infra-board, including a full sweep asserting no failed request and no console error |
+| **`landing-single-board.spec.ts`** | **19** | **13 passed, 6 skipped** — the link-preview tests, on a local target | **New in v2026.10.1.** The organisation landing pages `/amsterdam`, `/heusden` and, since v2026.11.3, **`/bes`**: the single-board layout, the caseworker login in the tenant's colours, the DigiD link with the tenant's test citizen, the per-tenant link preview, `/bes`'s citizen section, and the redirects from `/?tenant=` and to the grid |
+| **`accessibility.spec.ts`** | **10** | **10 passed**, 39.1s in all (80.6s on 7 November) | **New in v2026.11.0.** One axe-core scan per page type — landing, sign-in screen, three Keycloak forms, four Flevoland dashboards, Caseworker V2 for Heusden — against `e2e/a11y-baseline.ts` |
+| `infra-board-journey.spec.ts` | 7 | 7 passed, 38.2s in all | The Infra-board, including a full sweep asserting no failed request and no console error |
 | `pa-mock-journey.spec.ts` | 5 | 5 passed | PA cockpit mock mode against the real store |
 | `login-redirect.spec.ts` | 5 | 5 passed | Role-based landing, parameterised per role |
 | **`citizen-services.spec.ts`** | **3** | **3 passed** | **New in v2026.10.1.** The service cards each organisation's test citizen sees, parameterised per citizen (#344) |
 | `protected-route.spec.ts` | 3 | 3 passed | Route guards |
-| **`process-view.spec.ts`** | **3** | **3 passed**, 20.7s in all | **New in v2026.10.3.** The shared ProcessView rules on the Caseworker overlay and the Infra-board project page, and the task marks and parallel bars on a controlled R2.4 instance |
+| **`process-view.spec.ts`** | **3** | **3 passed**, 9.8s in all | **New in v2026.10.3.** The shared ProcessView rules on the Caseworker overlay and the Infra-board project page, and the task marks and parallel bars on a controlled R2.4 instance |
 | `pa-live-authoring.spec.ts` | 2 | 2 passed | Authoring against the live backend and a real database |
 | **`landing-access-denied.spec.ts`** | **2** | **2 passed** | **New in v2026.10.1.** The no-access dialog on the landing page, and the Flevoland-account button on the boards with an Entra role |
 | `rip-r21-journey.spec.ts` | 1 | **skipped** — an R2.1 instance already running on the engine | **The R2.1 phase, all twelve tasks, ending in the signing panel** |
-| **`assistant.spec.ts`** | **1** | **passed, 6.9s** — two sources reported offline | **New in v2026.10.4.** The assistant dock chatting through every connected source on the stub model |
-| `caseworker-journey.spec.ts` | 1 | passed, 20.6s | The caseworker journey end to end — since v2026.10.1 through the Dutch Kapvergunning forms |
-| **`heusdenpas-journey.spec.ts`** | **1** | **passed, 27.9s** | **New in v2026.10.1.** A fourth deep two-persona journey: a Heusden citizen applies for a Heusdenpas, three untenanted decisions grant it, and the Heusden caseworker decides and informs |
-| `thuisbatterij-journey.spec.ts` | 1 | passed, 11.4s | A citizen applies for a Thuisbatterij subsidy, the six-decision `RechtEnHoogteSubsidieThuisbatterij` DRD evaluates, and the caseworker reviews the resulting task |
-| `tenant-isolation.spec.ts` | 1 | passed, 10.7s | Tenant scoping |
-| `zorgtoeslag-journey.spec.ts` | 1 | passed, 9.5s | The zorgtoeslag journey |
-| `smoke.spec.ts` | 1 | passed, 1.2s | Boot and render |
+| **`assistant.spec.ts`** | **1** | **passed, 3.6s** — eDOCS and Legislation (CPRMV) reported offline | **New in v2026.10.4.** The assistant dock chatting through every connected source on the stub model |
+| `caseworker-journey.spec.ts` | 1 | passed, 9.3s | The caseworker journey end to end — since v2026.10.1 through the Dutch Kapvergunning forms |
+| **`heusdenpas-journey.spec.ts`** | **1** | **passed, 11.5s** | **New in v2026.10.1.** A fourth deep two-persona journey: a Heusden citizen applies for a Heusdenpas, three untenanted decisions grant it, and the Heusden caseworker decides and informs |
+| `thuisbatterij-journey.spec.ts` | 1 | passed, 6.5s | A citizen applies for a Thuisbatterij subsidy, the six-decision `RechtEnHoogteSubsidieThuisbatterij` DRD evaluates, and the caseworker reviews the resulting task |
+| `tenant-isolation.spec.ts` | 1 | passed, 7.7s | Tenant scoping |
+| `zorgtoeslag-journey.spec.ts` | 1 | passed, 5.4s | The zorgtoeslag journey |
+| `smoke.spec.ts` | 1 | passed, 0.8s | Boot and render |
 
 !!! note "What the Heusdenpas journey guards beyond its own service"
     Read from the spec at `ebec288`. Every step of it submits a form with a
@@ -636,27 +658,28 @@ running on the local engine. The spec cannot tell a foreign instance from its
 own — a fallback-started R2.1 carries no project number, so every one looks
 identical — and working the wrong one to completion would report a pass on
 someone else's process, so it refuses and names the instance to finish or
-delete first. The R2.1 work has still not been driven end to end on these
-pages since 30 August.
+delete first. **On 14 November it did the same**, naming
+`flevoland-1791834489920`. The R2.1 work has still not been driven end to
+end on these pages since 30 August.
 
 ### Coverage per board
 
-The 61 tests do not spread evenly, and ten of the eighteen specs belong to
+The 67 tests do not spread evenly, and ten of the eighteen specs belong to
 no single board. This table is the one to check before claiming a board has or
 lacks end-to-end coverage — the per-board pages defer to it.
 
 | Board | Specs | Tests | Which |
 |---|---:|---:|---|
-| [Infra-board](dashboards/infra-board.md) | 2 | **8** | `infra-board-journey` (7, the shell), `rip-r21-journey` (1, the work — skipped on 3 and 9 October and 7 November, see above) |
+| [Infra-board](dashboards/infra-board.md) | 2 | **8** | `infra-board-journey` (7, the shell), `rip-r21-journey` (1, the work — skipped on 3 and 9 October and 7 and 14 November, see above) |
 | [PA cockpit](dashboards/pa-cockpit.md) | 2 | **7** | `pa-mock-journey` (5), `pa-live-authoring` (2) |
 | [Caseworker](dashboards/caseworker.md) | 4 | **4** | `caseworker-journey` (1), `zorgtoeslag-journey` (1), `thuisbatterij-journey` (1), `heusdenpas-journey` (1, new in v2026.10.1) — each ending in a caseworker's task; the first three match the Dutch task names as well as the English ones since v2026.09.14 |
 | [Woo-dashboard](dashboards/woo-dashboard.md) | 0 | **0** | — |
-| *Citizen portal and landing pages* | 3 | **18** | `landing-single-board` (13, four of them skipped on a local target), `citizen-services` (3), `landing-access-denied` (2) — all new in v2026.10.1 |
+| *Citizen portal and landing pages* | 3 | **24** | `landing-single-board` (19, six of them skipped on a local target: five per tenant for `/amsterdam`, `/heusden` and — since v2026.11.3 — `/bes`, the `/bes` citizen section, one old-link redirect and two grid redirects), `citizen-services` (3), `landing-access-denied` (2) — all new in v2026.10.1 |
 | *Shared across boards* | 3 | **14** | `accessibility` (10: the landing page, the sign-in screen, three Keycloak forms, and the Caseworker V2, Infra-board, Woo and PA-Cockpit dashboards for Flevoland plus Caseworker V2 for Heusden — one scan each), `process-view` (3: the Caseworker overlay, the Infra-board project page, and the marks on a controlled Infra-board instance), `assistant` (1: the caseworker's assistant dock) — all new since 9 October |
 | *No single board* | 4 | **10** | `login-redirect` (5), `protected-route` (3), `tenant-isolation` (1), `smoke` (1) |
 
 The last three rows are the reason a naive per-board sum of the boards alone
-does not reach 61. The shared row touches the boards without driving any of
+does not reach 67. The shared row touches the boards without driving any of
 their work: the accessibility scans load a page and check it, which is why
 the Woo-dashboard row still reads zero although one scan opens it. The citizen's dashboard and the organisation landing pages
 are not boards and have no board page of their own — their unit tests are
@@ -664,13 +687,16 @@ counted on [Overview](overview.md) among the frontend files that belong to no
 board — and authentication redirects, route guards, tenant scoping and the
 boot smoke test cut across every board and belong to none.
 
-No board row moved since 9 October; the three new specs are shared. On
+On 14 November only the *Citizen portal and landing pages* row moved,
+18 → **24**, on `bes`'s landing page; no board row has moved since 9 October,
+and the three specs new on 7 November are shared. On
 9 October the Caseworker row was the one that moved: `heusdenpas-journey.spec.ts`
 is a fourth deep journey ending in a caseworker's decision, and the first for
 an organisation other than Flevoland and Dienst Toeslagen.
 
-No spec drives Besluitvorming, the caseworker section v2026.10.0 added; it is
-covered by unit tests only — see [Caseworker](dashboards/caseworker.md#e2e).
+No spec drives Besluitvorming, the caseworker section v2026.10.0 added, or
+*Proces starten*, the one v2026.11.3 added; both are covered by unit tests
+only — see [Caseworker](dashboards/caseworker.md#e2e).
 
 !!! warning "Re-derive this table from the spec directory, not from the release being synced"
     The Infra-board specs landed on 24 August 2026 and this documentation
@@ -763,10 +789,14 @@ Covered on [Public site suite](public-site.md#playwright-suite) — six tests
 including three axe-core accessibility scans, and the one suite here that
 starts its own dev server.
 
+**Re-run on 14 November 2026**, against the developer's already-running
+backend — and, as on 3 and 9 October, red in its default run and green
+serially, the same two tests in the same way: **6/6 serially; 2 timeouts in
+the parallel run**.
+
 **Re-run on 7 November 2026** with `--workers=1` only, against the
 developer's already-running backend: **6 passed in 20.8s**. No default
-parallel run was made, so whether the two timeouts below still occur under
-six workers was not re-measured.
+parallel run was made that day.
 
 **Re-run on 9 October 2026**, against the developer's already-running
 backend — and, as on 3 October, the one suite in the pass that went red
@@ -774,6 +804,8 @@ before it went green, the same two tests in the same way:
 
 | Run | Workers | Result | Time |
 |---|---:|---|---:|
+| 14 Nov, default | 6 | **4 passed, 2 failed** — the same two, each a `TimeoutError` from `locator.waitFor` after 10s on the first `getByRole('checkbox', { name: /Regel/ })` | 15.3s |
+| 14 Nov, `--workers=1` | 1 | **6 passed** | 6.3s |
 | 7 Nov, `--workers=1` | 1 | **6 passed** | 20.8s |
 | 9 Oct, default (`fullyParallel: true`, no `workers` set) | 6 | **4 passed, 2 failed** — `publiek.spec.ts:6` *search → filter → detail → back preserves the filtered URL* and `:27` *a deep link with filters pre-applied renders those filters checked*, each a `TimeoutError` after 10s waiting for `getByRole('checkbox', { name: /Regel/ })` | 16.8s |
 | 9 Oct, `--workers=1` | 1 | **6 passed** | 6.4s |
@@ -787,8 +819,8 @@ results, passed in the same parallel run, and the serial run passed all six
 against the same backend. That is consistent with contention, not with a
 missing backend (which fails three, serially too), and nothing failed on its
 own. It is worth
-watching rather than dismissing — two passes a week apart now agree on
-exactly which wait gives way: if this suite is wired into CI — see
+watching rather than dismissing — three passes, on 3 and 9 October and
+14 November, now agree on exactly which wait gives way: if this suite is wired into CI — see
 [Overview → Roadmap](overview.md#roadmap) — that 10-second wait under
 parallel workers is the first thing the run will test. The spec is unchanged
 since `2443adc` and still in no workflow. See

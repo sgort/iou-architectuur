@@ -210,7 +210,7 @@ The candidate groups the RIP process models address their tasks to. A task list 
 
 ## Test users
 
-The export defines 27 test users, all with password `test123` and `assurance_level = hoog`. The `ronl-business-api` client allows direct access grants, so a test token can be requested with a username and password.
+The export defines 29 test users, all with password `test123` and `assurance_level = hoog`. The `ronl-business-api` client allows direct access grants, so a test token can be requested with a username and password.
 
 | Username | `municipality` | `organisation_type` | Realm roles |
 |---|---|---|---|
@@ -220,6 +220,8 @@ The export defines 27 test users, all with password `test123` and `assurance_lev
 | `test-caseworker-amsterdam` | `amsterdam` | `municipality` | `caseworker` |
 | `test-citizen-heusden` | `heusden` | `municipality` | `citizen` |
 | `test-caseworker-heusden` | `heusden` | `municipality` | `caseworker` |
+| `test-citizen-bes` | `bes` | `municipality` | `citizen` |
+| `test-caseworker-bes` | `bes` | `municipality` | `caseworker` |
 | `test-citizen-rotterdam` | `rotterdam` | `municipality` | `citizen` |
 | `test-caseworker-rotterdam` | `rotterdam` | `municipality` | `caseworker` |
 | `test-citizen-denhaag` | `denhaag` | `municipality` | `citizen` |
@@ -249,6 +251,8 @@ The export defines 27 test users, all with password `test123` and `assurance_lev
 For Besluitvorming onder gedelegeerde bevoegdheid, `test-indiener-flevoland` prepares a besluit and `test-besluit-flevoland` holds the four other lanes. `test-caseworker-flevoland`, the everyday Flevoland caseworker, can prepare a besluit too. Both besluit accounts have an e-mail address, which signing with ValidSign needs.
 
 `test-pa-flevoland` opens the PA-cockpit and `test-woo-flevoland` the Woo board.
+
+`test-citizen-bes` and `test-caseworker-bes`, for Caribisch Nederland, are the names its landing page at `/bes` pre-fills; the citizen maps to the same test BSN as the other test citizens, `999992235`. They were added to the export in v2026.11.3, and only to the export: that release created neither of them in the ACC or PROD realm, and a local Keycloak whose realm is older than the file does not have them until it is re-imported (see [Changing the realm](#changing-the-realm)).
 
 ---
 

@@ -4,23 +4,24 @@ component: RONL Business API
 
 # CI/CD
 
-RONL Business API runs **fourteen GitHub Actions workflows**: an
+RONL Business API runs **fifteen GitHub Actions workflows**: an
 acceptance/production pair for each of four packages; two scanning workflows —
 the supply-chain `audit` gate and a Semgrep `scan`; three that watch dependencies
 rather than a commit — the daily `dependency-audit`, the quarterly
-`dependency-review` and the release SBOM; and the
+`dependency-review` and the release SBOM; one that watches an upstream's TLS
+certificate, the daily `upstream-certs`; and the
 **promotion workflow** that orchestrates the four production deploys. They hold
-**twenty-seven jobs**. Twenty-three of them choose a runner, and every one of those
+**twenty-eight jobs**. Twenty-four of them choose a runner, and every one of those
 names `ubuntu-24.04`, never `ubuntu-latest`; the other four are the promotion's
-calls into the production workflows, whose own jobs are among the twenty-three. That
+calls into the production workflows, whose own jobs are among the twenty-four. That
 label is one GitHub moves to a new Ubuntu release on its own schedule, so
 pinning it means a change of OS release arrives as a diff here rather than
 silently. The label pins the *release*, not the image — GitHub
 rebuilds the image about weekly, and a hosted runner cannot pin it by digest.
 
-!!! info "`acc` and `main` carry the same fourteen files, and deliberately different shapes"
-    Re-verified on 11 October 2026 (v2026.10.2): `origin/acc` at `c51ec0a`
-    and `origin/main` at `7117914` carry an identical tree, `.github/workflows/`
+!!! info "`acc` and `main` carry the same fifteen files, and deliberately different shapes"
+    Re-verified on 14 November 2026 (v2026.11.3): `origin/acc` at `6f86b10`
+    and `origin/main` at `f54e4f0` carry an identical tree, `.github/workflows/`
     included.
     `main` was once four workflows behind and carried none of the pinning or
     gating described below — closing that gap was a CI-alignment programme that
@@ -44,6 +45,7 @@ rebuilds the image about weekly, and a hosted runner cannot pin it by digest.
 | `dependency-audit.yml` | schedule (05:17 UTC daily), `workflow_dispatch`, PR touching its own files | — | No — the `dependency-audit` job |
 | `dependency-review.yml` | schedule (06:23 UTC on day 2 of each quarter), `workflow_dispatch`, PR touching the workflow, `dependency-review.mjs` or `lockfile-diff.mjs` | — | No — the `dependency-review` job |
 | `sbom.yml` | push to `main`, `workflow_dispatch`, PR touching the SBOM tooling | — | No — the `release-sbom` job |
+| `upstream-certs.yml` | schedule (05:41 UTC daily), `workflow_dispatch`, PR touching the workflow, `check-upstream-certs.mjs` or its test | — | No — the `upstream-certs` job |
 | `promote-to-production.yml` | push to `main` (**no paths filter**), `workflow_dispatch` | — | No — it *calls* the four below |
 | `azure-backend-acc.yml` | push + PR to `acc` | `acc.api.open-regels.nl` | **Yes** — except on a pull request |
 | `azure-backend-prod.yml` | `workflow_call`, `workflow_dispatch` | `api.open-regels.nl` | **Yes** |
@@ -58,8 +60,9 @@ All eight Azure workflows support `workflow_dispatch`, and for the four
 production ones that is now the **only** manual route into Azure — and the
 escape hatch if the promotion workflow itself is broken. Neither scanning
 workflow supports it: both are meant to run from the events themselves and
-nothing else. `dependency-audit.yml`, `dependency-review.yml` and `sbom.yml`
-do, so an audit, a dependency review or an SBOM can be produced on demand.
+nothing else. `dependency-audit.yml`, `dependency-review.yml`, `sbom.yml` and
+`upstream-certs.yml` do, so an audit, a dependency review, an SBOM or a
+certificate check can be produced on demand.
 
 !!! note "The four production workflows no longer trigger on a push"
     They carry `workflow_call:` and `workflow_dispatch:` and nothing more. A
@@ -159,8 +162,8 @@ unsatisfiable `needs` graph — it simply deploys nothing.
 
 ## Scanning, audit and SBOM workflows
 
-None of the five deploys anything. The two scanners carry no `paths:` filter:
-both must reach every pull request regardless of what it touched. The other three
+None of the six deploys anything. The two scanners carry no `paths:` filter:
+both must reach every pull request regardless of what it touched. The other four
 run on a pull request only when it touches their own tooling.
 
 ### `audit` — the required check
@@ -386,6 +389,39 @@ recommendation 11 again every quarter (sgort/linked-data-explorer#250).
 The first review, for 2026-Q4, is issue 362: of 85 direct dependencies, 3 failed
 a criterion and 19 needed a judgement, with follow-up issues 363 to 367.
 
+### `upstream-certs` — daily
+
+An upstream this API depends on but does not host can break without a commit
+anywhere. On 13 November 2026 the BRP mock's reverse proxy served a certificate
+for another host: every handshake from the backend failed with
+`ERR_TLS_CERT_ALTNAME_INVALID`, the citizen timeline went blank on ACC and PROD,
+and nothing here noticed. `/v1/health` now reports the upstream under
+`dependencies.brp` (see [Troubleshooting](troubleshooting.md#the-citizen-timeline-is-blank)),
+but only once it has broken; `upstream-certs.yml` warns before.
+
+It runs at 05:41 UTC daily — off the hour, like the daily audit — and on
+`workflow_dispatch`, and on a pull request that touches the workflow,
+`scripts/check-upstream-certs.mjs` or its test. Like every scheduled workflow it
+runs from the default branch, `acc`. It is not a required check on either branch.
+Its one job, `upstream-certs`, runs on Node `'24.22.2'`:
+
+1. **Test the check script** — `node scripts/check-upstream-certs.test.mjs`.
+2. **Check the certificates.** `check-upstream-certs.mjs` opens a TLS connection
+   to each host in its `HOSTS` list — today only `brp-api-mock.open-regels.nl` —
+   and reads the certificate, sending no request. It fails when a certificate
+   does not validate for its hostname or expires within 14 days. Exit 0 is clean,
+   1 a finding; anything higher is clamped to 2, "could not run", which is not
+   clean either.
+3. **Open, update or close one tracking issue**, titled *Upstream TLS certificate
+   invalid or expiring* and labelled `bug` and `prod-impact`; this step is what
+   the job's `issues: write` is for. A clean run closes an open issue with a
+   comment. The step is skipped on a pull request.
+4. **Fail the job** on any status but 0, so the run is red as well.
+
+The job is called `upstream-certs`, not `audit`, for the reason given under
+[`dependency-audit`](#dependency-audit-daily-on-acc-and-main). Add a host to
+`HOSTS` for any other upstream served from outside Azure.
+
 ### `release-sbom` — an SBOM for every release
 
 A promotion to `main` is the release here: there are no tags and no GitHub
@@ -438,7 +474,7 @@ on a promotion, what is deployed.
     lockfile filter above replaced it (#368).
 
 !!! warning "An SBOM is comparable only with one generated by the same npm"
-    The committed `ronl-business-api-2026.11.2.cdx.json` lists 493 components and
+    The committed `ronl-business-api-2026.11.3.cdx.json` lists 493 components and
     records npm 11.19.1 in its `metadata.tools`, the npm Node 24.22.2 bundles.
     Because `--check` compares that field too, and because npm 10 resolves the
     tree differently, a local `npm run sbom:check` under Node 22.23.4's bundled
@@ -462,7 +498,8 @@ deployed artifact on a major the host does not run.
 - The root `engines.node` is `>=22`, and `engines.npm` is `>=10.0.0`.
 - `dependency-audit.yml`, `dependency-review.yml` and `sbom.yml` name an exact
   `'24.22.2'`: they read lockfiles — both branches', in the audit's case — and
-  should not change Node with the tree they read.
+  should not change Node with the tree they read. `upstream-certs.yml` names the
+  same literal, so Renovate moves all of them together.
 - `zizmor.yml` names the same exact `'24.22.2'`, deliberately on a different
   major from `.nvmrc`:
   its `renovate-config-validator` step needs Node 24, because `renovate`

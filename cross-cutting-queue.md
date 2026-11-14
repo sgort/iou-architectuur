@@ -94,6 +94,30 @@ drained by the pass of 27 September, everything queued from 27 September to 3 Oc
    `SECURITY-PIPELINE.md`, `.nvmrc` and `.npmrc` unchanged. The lockfile refresh used no cooldown exception; SBOM 2026.11.2
    lists 493 components (npm 11.19.1). Bears on: `code-standards.md`, `supply-chain.md`, `dependency-scanning.md`.
 
+### 14 November 2026 — RONL Business API v2026.11.2 → v2026.11.3 (production, `f54e4f0`)
+
+1. **A fifteenth workflow, `upstream-certs.yml`** (25b5c14, 16daf1c): daily at 05:41 UTC and on demand, it fails when an
+   upstream certificate does not validate for its host or expires within 14 days, and opens, updates or closes a tracking
+   issue (`issues: write` on its one job). Scheduled, so it runs on the default branch `acc` only; not a required check on
+   either ruleset. Node 24.22.2, actions digest-pinned. `SECURITY-PIPELINE.md` now reads "45 `uses:` references across 15
+   workflows, all 45 digest-pinned" (`:42`) and has a section "Upstream certificates, daily". Bears on `code-standards.md`
+   (workflow count and table), `supply-chain.md` (43 → 45 pins, the clock-driven workflows, the `issues: write` grants)
+   and PSA **AB-28**.
+2. **The BRP upstream is monitored** (25b5c14, ronl-business-api#446): after the 13 November certificate outage, a transport
+   error answers `502 BRP_UPSTREAM_UNREACHABLE` and `/v1/health` reports `dependencies.brp` (optional, never degrades the
+   report). The mock serves acceptance and production alike (`services/brp-upstream.ts:13`). Bears on PSA **AB-26**,
+   **R-03** and **R-14**.
+3. **Who may start a process is decided by the model and enforced by the backend** (667fa6d, dde7355, 6584c83):
+   `POST /v1/process/:key/start` refuses with `403 NOT_CANDIDATE_STARTER` when the definition declares
+   `camunda:candidateStarterGroups` the user lacks, and fails closed when it cannot read them; `GET /v1/process/startable`
+   lists what a caseworker may start. Processes declaring no groups are unaffected. Bears on PSA **AB-18** (authorisation in
+   the backend, fail-closed), **AB-08** (the LDE model now carries who may start it) and **AB-19**.
+4. **A new organisation, Caribisch Nederland (`bes`)** (1b5e81d): its own tenant and theme, a citizen entry on its landing.
+   Test users only in the local realm import (27 → 29); nothing added to acceptance or production Keycloak. Bears on PSA
+   **AB-15**.
+5. No change to rulesets, hooks, Renovate, `.nvmrc` or `.npmrc`. Lockfile: version bumps only; SBOM 2026.11.3 lists 493
+   components (npm 11.19.1). Findings: ronl-business-api#453.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

@@ -7,19 +7,30 @@ component: RONL Business API
 The caseworker portal is the oldest and largest board, and the one whose
 end-to-end journeys exercise the full Operaton stack.
 
-**Frontend: 59 files · 646 tests**, including the shared process view.
-**E2E: 4 specs · 4 tests**, all passing on 7 November 2026.
+**Frontend: 60 files · 667 tests**, including the shared process view.
+**E2E: 4 specs · 4 tests**, all passing on 14 November 2026. *Proces
+starten*, new in v2026.11.3, has no E2E.
 
 ---
 
 ## Frontend
 
-Measured on **12 November 2026** at `4e28ed7`, a tree identical to `main`
-at `ad0fd62` (v2026.11.2): the frontend package ran 143 files and 1738 tests,
-all passing, every per-file count the same as on 7 November for v2026.11.1, and the per-file and per-area counts below are read from
+Measured on **14 November 2026** at `6f86b10`, a tree identical to `main`
+at `f54e4f0` (v2026.11.3): the frontend package ran 144 files and 1781 tests,
+all passing, and the per-file and per-area counts below are read from
 Vitest's JSON report of that run, which sums to the runner's total.
 
-**v2026.11.2 changed one assertion here and no count:**
+**v2026.11.3 added one file and 21 tests here, for *Proces starten*:**
+the caseworker starts a process the organisation's model lets them start,
+from the *Werk* rail. `CaseworkerDashboardV2/ProcesStartenSection.test.tsx`
+is new, with **17**; `pages/caseworker-v2/modes.config.test.ts` went 24 →
+**27** — the section sits in *Werk* directly under *Taken*, needs no role
+beyond being signed in, and shows only for a tenant that lists it,
+Caribisch Nederland (`bes`) for now — and
+`CaseworkerDashboardV2/SectionRouter.test.tsx` 31 → **32**, routing
+`proces-starten` to it. No other file on this board changed.
+
+**History, 12 November: v2026.11.2 changed one assertion here and no count:**
 `pages/CaseworkerDashboardV2.test.tsx` now finds the ⌘K button by its visible
 text, *Spring naar een sectie…*, because the button lost its `aria-label`
 (WCAG 2.5.3, *Label in Name*).
@@ -69,9 +80,9 @@ detail draws its phase stepper and swimlane with the same components.
 | Area | Files | Tests |
 |---|---:|---:|
 | `components/CaseworkerDashboard` (shared section library) | 26 | 232 |
-| `components/CaseworkerDashboardV2` (including `regelsimulatie/`) | 16 | 193 |
+| `components/CaseworkerDashboardV2` (including `regelsimulatie/`) | 17 | 211 |
 | **`components/process`** (the process view, shared with the Infra-board) | 14 | 182 |
-| `pages/caseworker-v2` (`modes.config`) | 1 | 24 |
+| `pages/caseworker-v2` (`modes.config`) | 1 | 27 |
 | `pages/CaseworkerDashboardV2.test.tsx` | 1 | 15 |
 
 **Besluitvorming** — new in v2026.10.0, in the shared section library:
@@ -91,10 +102,11 @@ Largest files outside `components/process/`:
 | File | Tests | Covers |
 |---|---:|---|
 | `CaseworkerDashboardV2/TakenInbox.test.tsx` | 32 | The task list — filters, the phase hint, the *Procesgegevens* bar, the process view a selected task opens, and since v2026.10.0 the signing panel in place of the form for a task that must be signed, nothing while the signing spec is still loading, the fallback form when it cannot be fetched, and a refreshed list after a decline (28 on 30 September) |
-| `CaseworkerDashboardV2/SectionRouter.test.tsx` | 31 | Section routing and the shell's state machine |
-| `pages/caseworker-v2/modes.config.test.ts` | 24 | Mode configuration, a pure data module, read against the real `tenants.json` |
+| `CaseworkerDashboardV2/SectionRouter.test.tsx` | 32 | Section routing and the shell's state machine; since v2026.11.3 `proces-starten` too |
+| `pages/caseworker-v2/modes.config.test.ts` | 27 | Mode configuration, a pure data module, read against the real `tenants.json`; since v2026.11.3 where *Proces starten* sits and which tenant shows it |
 | `CaseworkerDashboardV2/regelsimulatie/simEngine.test.ts` | 22 | The deterministic budget-exhaustion simulator |
 | `CaseworkerDashboard/McpChatSection.test.tsx` | 20 | The MCP chat surface |
+| **`CaseworkerDashboardV2/ProcesStartenSection.test.tsx`** | **17** | **New in v2026.11.3.** *Proces starten*: a row per process with a *Start process* button, nothing to start, a process without a start form started at once and confirmed with a pointer to *Taken*, one with a form opened first, failures and their fallbacks, and an error when the list cannot be loaded |
 | `CaseworkerDashboard/IouGebruiksscenarioSection.test.tsx` | 17 | Usage-scenario section |
 | `CaseworkerDashboard/RegelCatalogus.test.tsx` | 16 | The rule catalogue |
 | `CaseworkerDashboardV2/RegelSimulatie.test.tsx` | 16 | The rule-simulation section |
@@ -123,10 +135,14 @@ rendering every dashboard uses (ProcessView):
 | `process/status.test.ts` | 3 | **New in v2026.10.3.** The node status vocabulary and its token colours |
 | `process/useViewer.test.ts` | 3 | **New in v2026.10.3.** The viewer read from the Keycloak token |
 
-Coverage on 7 November (statements / branches), from the run's
-`coverage-final.json`: `components/CaseworkerDashboard` **94.2 / 94.51**,
-`components/CaseworkerDashboardV2` **92.69 / 93.36**, the `regelsimulatie`
-sub-directory 98.33 / 88.59, and `components/process` **99.33 / 92.46**.
+Coverage on 14 November (statements / branches), from the run's
+coverage map: `components/CaseworkerDashboard` **94.2 / 94.51**,
+`components/CaseworkerDashboardV2` **92.92 / 93.66** (92.69 / 93.36 on
+7 and 12 November), the `regelsimulatie` sub-directory 98.33 / 88.59, and
+`components/process` **99.33 / 92.46**. The new
+`ProcesStartenSection.tsx` reads **95.34 / 96.96**, with 90% functions —
+32 of 33 branches, which the release notes give as 96.97%, rounded rather
+than truncated.
 `BesluitOverzichtSection.tsx` is still the lowest file in the frontend by
 branches, at **80.43%** — half a point above the floor — and
 `process/phaseSet.ts`, the phase set a process declares, is at 83.33%; they
@@ -156,12 +172,12 @@ untenanted SVB, SZW and Heusdenpas decisions, and informs the applicant —
 the first journey on this board for an organisation other than Flevoland and
 Dienst Toeslagen.
 
-**All four were measured on 7 November 2026**, as part of the full frontend
-run against the developer's already-running local stack (56 passed,
-5 skipped, 6.4m): **one test each, all passing** — `caseworker-journey` in
-20.6s, `heusdenpas-journey` in 27.9s, `thuisbatterij-journey` in 11.4s and
-`zorgtoeslag-journey` in 9.5s. On 9 October they passed in 15.0s, 11.8s,
-7.7s and 6.2s.
+**All four were measured on 14 November 2026**, as part of the full
+frontend run against the developer's already-running local stack (60 passed,
+7 skipped, 3.9m): **one test each, all passing** — `caseworker-journey` in
+9.3s, `heusdenpas-journey` in 11.5s, `thuisbatterij-journey` in 6.5s and
+`zorgtoeslag-journey` in 5.4s. On 7 November they passed in 20.6s, 27.9s,
+11.4s and 9.5s; on 9 October in 15.0s, 11.8s, 7.7s and 6.2s.
 
 Two specs new since then touch this board without belonging to it alone:
 `process-view.spec.ts` checks the Caseworker's process overview against the
@@ -183,6 +199,13 @@ fixtures now carry.
 No spec drives **Besluitvorming** yet: the *Besluit voorbereiden* start and
 the *Lopende* and *Afgeronde besluiten* lists are covered by the unit tests
 above only, and so is the signing panel in the caseworker inbox.
+
+**Proces starten has no E2E either.** No spec opens the section or starts a
+process from it; `ProcesStartenSection.test.tsx`, `modes.config.test.ts` and
+`SectionRouter.test.tsx` above are its only tests. v2026.11.3's one E2E
+change, the `bes` entries in `landing-single-board.spec.ts`, signs
+`test-caseworker-bes` in to this board from the landing page but goes no
+further — see [Coverage per board](../e2e.md#coverage-per-board).
 
 !!! note "The other three specs measured here before are cross-cutting, not caseworker"
     This section used to read *"five specs, twelve tests"*, counting

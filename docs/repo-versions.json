@@ -1,26 +1,18 @@
 {
-  "docs_built": "2026-11-12",
+  "docs_built": "2026-11-14",
   "last_patch": {
-    "date": "2026-11-12",
+    "date": "2026-11-14",
     "kind": "Component sync",
-    "summary": "CPSV Editor v2026.11.1, Linked Data Explorer v2026.11.2 and RONL Business API v2026.11.2, all in production: the design tools ask who is writing — sign-in through Keycloak with an author role for deploying, publishing and saving, test deploys for everyone else on acceptance — and publishing to TriplyDB goes through the Linked Data Explorer backend, so no token is kept in the browser.",
+    "summary": "RONL Business API v2026.11.3, in production: a new organisation, Caribisch Nederland at /bes, whose landing page gives residents their own DigiD login; Proces starten, where a caseworker starts any process its model lets them start, with the backend refusing everyone else; dynamic lists that save; and an unreachable BRP named in the API and in health, its certificate checked daily.",
     "previous": {
-      "date": "2026-11-08",
-      "kind": "Weekly pass",
-      "summary": "Weekly pass at TTL 34a51b4, LDE 4300700 and RBA c6cf3ac, the first to include the Project Start Architecture: its decisions re-checked on all five components’ main, with the engine’s new login written into AB-08, AB-13 and R-01 and no status changed; the contributing pages re-checked and re-stamped for Node 24.22.1, the daily audit’s October catches and the RONL Business API’s colour gate; ICTU scores 41, 39 and 39, with 18 October, 25 October and 1 November reconstructed after the holiday gap and the first fall in the series; the two screenshots of the 7 November sync captured."
+      "date": "2026-11-12",
+      "kind": "Component sync",
+      "summary": "CPSV Editor v2026.11.1, Linked Data Explorer v2026.11.2 and RONL Business API v2026.11.2, all in production: the design tools ask who is writing — sign-in through Keycloak with an author role for deploying, publishing and saving, test deploys for everyone else on acceptance — and publishing to TriplyDB goes through the Linked Data Explorer backend, so no token is kept in the browser."
     },
     "open_findings": [
       {
-        "label": "ttl-editor#249",
-        "url": "https://github.com/sgort/ttl-editor/issues/249"
-      },
-      {
-        "label": "linked-data-explorer#340",
-        "url": "https://github.com/sgort/linked-data-explorer/issues/340"
-      },
-      {
-        "label": "ronl-business-api#445",
-        "url": "https://github.com/sgort/ronl-business-api/issues/445"
+        "label": "ronl-business-api#453",
+        "url": "https://github.com/sgort/ronl-business-api/issues/453"
       }
     ]
   },
@@ -28,16 +20,16 @@
     {
       "name": "RONL Business API",
       "icon": "⚙️",
-      "version": "v2026.11.2",
+      "version": "v2026.11.3",
       "environment": "prod",
-      "commit": "ad0fd62...",
-      "commit_date": "2026-11-12",
+      "commit": "f54e4f0...",
+      "commit_date": "2026-11-14",
       "build": {
-        "sha": "ad0fd62",
-        "run": 12,
-        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/43246704971"
+        "sha": "f54e4f0",
+        "run": 14,
+        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/43599078893"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/ad0fd62cd71b696a6cad2dba86fd88f34d7ddc55",
+      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/f54e4f054f3bcd2e38d24b045cbf54cffa3bb0db",
       "ci_repo": "https://github.com/sgort/ronl-business-api"
     },
     {

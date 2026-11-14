@@ -8,9 +8,9 @@ component: RONL Business API
 
 Caseworker is the personal work queue for case handlers. It brings together the tasks, claims and deadlines that belong to your cases, shows where each task stands in its process, and has a built-in assistant to help with quick assessment.
 
-On opening the board you land on the **Taken** inbox in the **Werk** mode: your tasks on the left, the one you pick on the right, so you can take up the next piece of work without hunting for it across other boards.
+On opening the board you land on the **Taken** inbox in the **Werk** mode: your tasks on the left, the one you pick on the right, so you can take up the next piece of work without hunting for it across other boards. At Caribisch Nederland, **Werk** also lists **Proces starten** under **Taken**, where a caseworker starts a new case — see [Proces starten](#proces-starten).
 
-Caseworker is also the one board of Gemeente Amsterdam, Gemeente Heusden, Dienst Toeslagen and Univé Verzekeringen, whose caseworkers open it with **Inloggen als medewerker** on their own organisation's landing page — see [Organisation landing pages](getting-started.md#organisation-landing-pages). Each organisation's caseworkers see the tasks of their own organisation's cases: at Gemeente Heusden, for example, the tasks of the Heusdenpas applications residents submit in the [citizen portal](citizen-portal.md#heusdenpas).
+Caseworker is also the one board of Gemeente Amsterdam, Gemeente Heusden, Caribisch Nederland, Dienst Toeslagen and Univé Verzekeringen, whose caseworkers open it with **Inloggen als medewerker** on their own organisation's landing page — see [Organisation landing pages](getting-started.md#organisation-landing-pages). Each organisation's caseworkers see the tasks of their own organisation's cases: at Gemeente Heusden, for example, the tasks of the Heusdenpas applications residents submit in the [citizen portal](citizen-portal.md#heusdenpas).
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: RONL Business API Caseworker Taken inbox with a task selected, its Awb-fase hint in the list, the Waar sta ik stepper, the folded Procesgegevens bar and the steps grouped per role](../../assets/screenshots/ronl-business-api-caseworker-board.png)
@@ -26,6 +26,22 @@ The inbox has three columns: filters, the list, and the selected task.
 The filter column offers **Alle taken**, **Te laat**, **Vandaag**, **Deze week**, **Mijn claim** and **Openstaand**, each with the number of tasks it holds. **↺ Vernieuwen** reloads the list. The list is sorted by deadline, soonest first; tasks without a deadline come last.
 
 Each task in the list shows its name, whether it is **Open** or **Geclaimd**, the key of the process it belongs to, and its deadline — **Deadline** followed by the date, or **Te laat —** followed by the date once it has passed. When the task's process is drawn in lanes and marks its phases, the list also shows the phase the task sits in: **Awb-fase 4+5**, for example, for a process that follows the Awb phases, or **Fase 2** for one that declares its own (see [A process's own phases](#a-processs-own-phases)).
+
+## Proces starten
+
+**Proces starten**, under **Taken** in the **Werk** mode, lists every process you may start. It is offered where an organisation has switched it on — so far only Caribisch Nederland. Which processes appear is decided by the process models, not by the board: a process is listed when its model names a group you belong to as one that may start it. A process that names no such groups is not listed here, and is started where it always was.
+
+Each row shows the process's name and a **Start process** button. What the button does depends on the process:
+
+- **A process without a start form starts at once.** A green notice confirms it — the process's name, then **is gestart als dossier** with the dossier number, and **De eerste taak staat onder Taken.** The new case's first task is then in your [task list](#the-task-list).
+- **A process with a start form shows the form first.** Filling it in and submitting it starts the process, and the same confirmation appears. **Terug naar de lijst** returns to the list without starting anything.
+
+If a start fails, a notice explains why and the list stays as it was. When there is nothing you may start, the section reads **Er zijn geen processen die u kunt starten.**
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Caseworker's Werk mode at Caribisch Nederland, with Proces starten under Taken in the rail, a list of startable processes each with a coloured Start process button, and the green notice confirming that a process has started as a dossier](../../assets/screenshots/ronl-business-api-caseworker-proces-starten.png)
+  <figcaption>Proces starten — the processes a caseworker may start, and the confirmation after a start</figcaption>
+</figure>
 
 ## Opening a task
 

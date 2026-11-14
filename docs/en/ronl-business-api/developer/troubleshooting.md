@@ -142,7 +142,8 @@ report under the `data` extension member, its `status` `"degraded"`:
     "dependencies": {
       "keycloak": { "status": "up", "latency": 9 },
       "operaton": { "status": "down", "error": "<the connection error>" },
-      "cache": { "status": "up" }
+      "cache": { "status": "up" },
+      "brp": { "status": "up", "latency": 41 }
     }
   },
   "type": "about:blank",
@@ -168,6 +169,30 @@ Check `docker compose ps` and `docker compose logs operaton`, and check that
 the shared remote engine.  
 If `cache` is `"down"`: Redis (`ronl-redis`) is not reachable. This does not
 make the check fail; the PA monitoring cache falls back to live fetches.
+If `brp` is `"down"`: the BRP upstream the citizen timeline reads cannot be
+reached — see [The citizen timeline is blank](#the-citizen-timeline-is-blank).
+This does not make the check fail either.
+
+---
+
+### The citizen timeline is blank
+
+The timeline in MijnOmgeving reads the BRP through `POST /v1/brp/personen`,
+which the backend forwards to a BRP mock hosted outside Azure
+(`services/brp-upstream.ts`). When that request fails before any HTTP answer
+comes back — DNS, the connection, the TLS handshake or the timeout — the
+backend answers **`502`** with code `BRP_UPSTREAM_UNREACHABLE`, and logs the
+transport error's code (`transportError`, such as
+`ERR_TLS_CERT_ALTNAME_INVALID` or `ENOTFOUND`) without putting it in the
+response. An HTTP error from the mock itself is passed on with its own status.
+
+`/v1/health` shows the same state under `dependencies.brp`: `status` `"down"`
+with the reason in `error`, measured by a `HEAD` request with a 5-second
+timeout. On 13 November 2026 the mock's reverse proxy served a certificate for
+another host, and the timeline went blank on ACC and PROD; that is what this
+reports, and the daily `upstream-certs` workflow now checks the certificate
+(see [CI/CD](cicd.md#upstream-certs-daily)). The mock is not part of this
+repository, so the fix is with whoever runs it.
 
 ---
 
@@ -299,7 +324,7 @@ Verify the users exist in Keycloak:
 
 1. Open Keycloak Admin → **Users**
 2. Search for `test-citizen-utrecht`
-3. The realm holds 22 test users across eight tenants, all with password
+3. The realm holds 29 test users across ten tenants, all with password
    `test123`; see [Local Development — Test users](local-development.md#test-users)
 
 If the users are missing, the realm import did not run, or ran from an older

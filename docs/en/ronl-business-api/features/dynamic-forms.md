@@ -43,6 +43,8 @@ The fetched schema is rendered by a form-rendering runtime that interprets the J
 
 Submitting a start form forwards its variables directly to the process-start request; submitting a task form completes the task with its variables, handing control back to the engine exactly as described in [Tasks — Completing](tasks.md#completing). In both cases the form only ever produces process variables — it has no side effects of its own outside that submission.
 
+A value that is an object or a list — the rows of a form-js dynamic list, for example — is stored as an Operaton `Json` variable. The engine accepts such a variable only as text, so the backend serialises it on the way in (`toOperatonVariable` in `utils/operaton-variables.ts`, used by the task-complete, process-start, decision and machine-to-machine routes). On the way out, reading a running instance's variables re-reads every `Json` variable without deserialising and parses its text, so a task form pre-filled with a dynamic list shows its rows, and submitting the form writes them back unchanged rather than over an empty list.
+
 ---
 
 ## Document templates
