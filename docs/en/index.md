@@ -139,13 +139,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.11.3** · *November 2026*
+-   **⚙️ RONL Business API — v2026.11.4** · *November 2026*
 
     ---
 
-    **Caribisch Nederland, and a place to start a process**
+    **Ended cases show their lists, and three releases' findings resolved**
 
-    Bonaire, Sint Eustatius and Saba have their own landing page at `/bes`, with a section where residents sign in with DigiD ([getting started](ronl-business-api/user-guide/getting-started.md#voor-inwoners)). **Proces starten** lets a caseworker start any process whose model names a group they belong to, and the backend refuses everyone else ([Caseworker](ronl-business-api/user-guide/caseworker.md#proces-starten), [Processes](ronl-business-api/features/processes.md#who-may-start-it)). Dynamic lists in forms now save and show their rows, and an unreachable BRP is reported as such — in the error, in the health check, and by a daily certificate check ([troubleshooting](ronl-business-api/developer/troubleshooting.md#the-citizen-timeline-is-blank)). The [suites](ronl-business-api/developer/testing/overview.md) stand at 5,417 unit tests in 351 files, all passing, and the 84 end-to-end tests were re-run on 14 November.
+    A dynamic list in an ended case now comes back as its rows, in the archive and the history routes, while decision results stay objects; one malformed value no longer fails a read ([dynamic forms](ronl-business-api/features/dynamic-forms.md#submitting)). **Proces starten** also recognises a start form attached by `formKey`, and its button reads **Start proces** ([Caseworker](ronl-business-api/user-guide/caseworker.md#proces-starten)). A promotion that changes only the lockfile now deploys all four applications, the stylelint and script tests run in CI, the Keycloak test-account guard recognises production by host name, and the VM's Caddy is pinned ([CI/CD](ronl-business-api/developer/cicd.md)). Released with v2026.11.3 the same day: Caribisch Nederland at `/bes`, with a DigiD login for residents ([getting started](ronl-business-api/user-guide/getting-started.md#voor-inwoners)).
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

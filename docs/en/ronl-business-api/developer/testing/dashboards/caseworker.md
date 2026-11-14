@@ -7,7 +7,7 @@ component: RONL Business API
 The caseworker portal is the oldest and largest board, and the one whose
 end-to-end journeys exercise the full Operaton stack.
 
-**Frontend: 60 files · 667 tests**, including the shared process view.
+**Frontend: 60 files · 668 tests**, including the shared process view.
 **E2E: 4 specs · 4 tests**, all passing on 14 November 2026. *Proces
 starten*, new in v2026.11.3, has no E2E.
 
@@ -15,12 +15,18 @@ starten*, new in v2026.11.3, has no E2E.
 
 ## Frontend
 
-Measured on **14 November 2026** at `6f86b10`, a tree identical to `main`
-at `f54e4f0` (v2026.11.3): the frontend package ran 144 files and 1781 tests,
-all passing, and the per-file and per-area counts below are read from
-Vitest's JSON report of that run, which sums to the runner's total.
+Measured on **14 November 2026** on `acc` at `4579486`, a tree identical to
+`main` at `67bac28` (v2026.11.4): the frontend package ran 144 files and
+1782 tests, all passing, and the per-file and per-area counts below are read
+from Vitest's JSON report of that run, which sums to the runner's total.
 
-**v2026.11.3 added one file and 21 tests here, for *Proces starten*:**
+**v2026.11.4 added one test here and no file.**
+`CaseworkerDashboardV2/ProcesStartenSection.test.tsx` went 17 → **18**: the
+button now reads *Start proces*, and the new test keeps the visible text in
+the button's accessible name while the process starts, *Bezig…* (WCAG 2.5.3,
+*Label in Name*). No other file on this board changed.
+
+**History, 14 November: v2026.11.3 added one file and 21 tests here, for *Proces starten*:**
 the caseworker starts a process the organisation's model lets them start,
 from the *Werk* rail. `CaseworkerDashboardV2/ProcesStartenSection.test.tsx`
 is new, with **17**; `pages/caseworker-v2/modes.config.test.ts` went 24 →
@@ -80,7 +86,7 @@ detail draws its phase stepper and swimlane with the same components.
 | Area | Files | Tests |
 |---|---:|---:|
 | `components/CaseworkerDashboard` (shared section library) | 26 | 232 |
-| `components/CaseworkerDashboardV2` (including `regelsimulatie/`) | 17 | 211 |
+| `components/CaseworkerDashboardV2` (including `regelsimulatie/`) | 17 | 212 |
 | **`components/process`** (the process view, shared with the Infra-board) | 14 | 182 |
 | `pages/caseworker-v2` (`modes.config`) | 1 | 27 |
 | `pages/CaseworkerDashboardV2.test.tsx` | 1 | 15 |
@@ -106,7 +112,7 @@ Largest files outside `components/process/`:
 | `pages/caseworker-v2/modes.config.test.ts` | 27 | Mode configuration, a pure data module, read against the real `tenants.json`; since v2026.11.3 where *Proces starten* sits and which tenant shows it |
 | `CaseworkerDashboardV2/regelsimulatie/simEngine.test.ts` | 22 | The deterministic budget-exhaustion simulator |
 | `CaseworkerDashboard/McpChatSection.test.tsx` | 20 | The MCP chat surface |
-| **`CaseworkerDashboardV2/ProcesStartenSection.test.tsx`** | **17** | **New in v2026.11.3.** *Proces starten*: a row per process with a *Start process* button, nothing to start, a process without a start form started at once and confirmed with a pointer to *Taken*, one with a form opened first, failures and their fallbacks, and an error when the list cannot be loaded |
+| **`CaseworkerDashboardV2/ProcesStartenSection.test.tsx`** | **18** | **New in v2026.11.3**, with 17. *Proces starten*: a row per process with a *Start proces* button (since v2026.11.4; its accessible name starts with the visible text, *Bezig…* included), nothing to start, a process without a start form started at once and confirmed with a pointer to *Taken*, one with a form opened first, failures and their fallbacks, and an error when the list cannot be loaded |
 | `CaseworkerDashboard/IouGebruiksscenarioSection.test.tsx` | 17 | Usage-scenario section |
 | `CaseworkerDashboard/RegelCatalogus.test.tsx` | 16 | The rule catalogue |
 | `CaseworkerDashboardV2/RegelSimulatie.test.tsx` | 16 | The rule-simulation section |
@@ -135,14 +141,16 @@ rendering every dashboard uses (ProcessView):
 | `process/status.test.ts` | 3 | **New in v2026.10.3.** The node status vocabulary and its token colours |
 | `process/useViewer.test.ts` | 3 | **New in v2026.10.3.** The viewer read from the Keycloak token |
 
-Coverage on 14 November (statements / branches), from the run's
-coverage map: `components/CaseworkerDashboard` **94.2 / 94.51**,
+Coverage on 14 November for v2026.11.3 (statements / branches), from the
+run's coverage map: `components/CaseworkerDashboard` **94.2 / 94.51**,
 `components/CaseworkerDashboardV2` **92.92 / 93.66** (92.69 / 93.36 on
 7 and 12 November), the `regelsimulatie` sub-directory 98.33 / 88.59, and
-`components/process` **99.33 / 92.46**. The new
-`ProcesStartenSection.tsx` reads **95.34 / 96.96**, with 90% functions —
-32 of 33 branches, which the release notes give as 96.97%, rounded rather
-than truncated.
+`components/process` **99.33 / 92.46**; these area rows were not
+re-derived for v2026.11.4. `ProcesStartenSection.tsx`, new in v2026.11.3,
+read **95.34 / 96.96**, with 90% functions — 32 of 33 branches, which the
+release notes give as 96.97%, rounded rather than truncated — and reads
+**95.45 / 96.96 / 90.00 / 95.12** at v2026.11.4, statements and lines up a
+little on the reworked button.
 `BesluitOverzichtSection.tsx` is still the lowest file in the frontend by
 branches, at **80.43%** — half a point above the floor — and
 `process/phaseSet.ts`, the phase set a process declares, is at 83.33%; they

@@ -4,25 +4,27 @@ component: RONL Business API
 
 # Backend suite
 
-`packages/backend`, Jest with the `ts-jest` preset. **111 files · 2737 tests ·
-all passing · nothing skipped · `Time: 102.285 s`** under `--runInBand`,
+`packages/backend`, Jest with the `ts-jest` preset. **111 files · 2753 tests ·
+all passing · nothing skipped · `Time: 127.35 s`** under `--runInBand`,
 followed by *"✓ all 138 documented operations were checked against a real
 response"*. Coverage is on by default; see
 [Coverage](coverage.md#backend-by-area) for the per-area figures.
 
-Measured on **14 November 2026** for v2026.11.3 — the release in production,
-`main` at `f54e4f0` — with `npx jest --coverage --runInBand` followed by
+Measured on **14 November 2026** for v2026.11.4 — the release in production,
+`main` at `67bac28` — with `npx jest --coverage --runInBand` followed by
 `node scripts/check-conformance-coverage.cjs`, which is exactly what
-`npm run test:serial --workspace=packages/backend` runs, in the working
-checkout at `6f86b10` (a tree identical to `f54e4f0`); `.nvmrc` names
-Node 22.23.4. v2026.11.3 added two files and 56 tests to the 2681 of
+`npm run test:serial --workspace=packages/backend` runs, on `acc` at
+`4579486` (a tree identical to `67bac28`); `.nvmrc` names Node 22.23.4.
+About 173 seconds of wall clock, coverage included. v2026.11.4 added no file
+and 16 tests to the 2737 measured earlier the same day for v2026.11.3
+(102.285 s), which had added two files and 56 tests to the 2681 of
 12 November, which had reproduced 7 November file for file (198.029 s on
 12 November, 137.576 s on 7 November). The package total is the runner's
 own. The
 per-file and per-area counts are not printed by Jest's default reporter, so
 they were read from Jest's JSON report of the same run (`--json`), which
-lists every test of every file; the 111 files sum to the runner's 2737, as
-the 109 did to 2681 on 7 and 12 November. Through 9 October every file's count was parsed from its
+lists every test of every file; the 111 files sum to the runner's 2753, as
+they did to 2737 for v2026.11.3 and the 109 to 2681 on 7 and 12 November. Through 9 October every file's count was parsed from its
 source with the TypeScript compiler, `.each` tables and literal `for … of`
 loops expanded — never a grep for `it(`, which miscounts parameterised and
 multi-line cases. Two tables are not literals and were resolved by hand:
@@ -53,21 +55,31 @@ runner's 2633 exactly at `ebec288`, and 2457 and every per-area figure the
     404. On 3 October it was 133 from 30 September plus the two Besluitvorming
     lists and `POST /v1/m2m/process/history`.
 
-    **That figure, and 2737 / 111, are this package's alone.** The repository
-    runs **351 test files and 5417 tests** across five workspaces — see
+    **That figure, and 2753 / 111, are this package's alone.** The repository
+    runs **351 test files and 5434 tests** across five workspaces — see
     [Overview](overview.md). Quoting the backend's count as a repository total
     understates the suite by over two thousand tests.
 
-!!! note "2011 → 2008 → 2028 → 2072 → 2198 → 2202 → 2370 → 2457 → 2633 → 2638 → 2681 → 2737, and nothing was lost on the way"
+!!! note "2011 → 2008 → 2028 → 2072 → 2198 → 2202 → 2370 → 2457 → 2633 → 2638 → 2681 → 2737 → 2753, and nothing was lost on the way"
     The suite reported **2011** for several releases, of which 2008 ran and
     **three were permanently skipped**. Those three guarded the
     `PHASE_NOT_MODELLED` branch of the RIP phase model. v2026.09.7 made an
     unmodelled phase unrepresentable (issue #85), the branch went, and the
     three skipped cases went with it — a deletion of dead tests rather than a
-    regression. The **2737** measured here is growth on that 2008 base. No
+    regression. The **2753** measured here is growth on that 2008 base. No
     workspace in this repository skips anything.
 
-    **v2026.11.3 added +56 tests and two files** against the 12 November
+    **v2026.11.4 added +16 tests and no file** against the measurement of
+    v2026.11.3 earlier on 14 November (111 files, 2737), all of it in three
+    existing files:
+
+    | File | Tests | What changed |
+    |---|---:|---|
+    | `services/operaton.service.test.ts` | 210 → **218** | `getHistoryVariables`: the `Json` values of an ended instance parsed from their text, matched by row id; `Object` variables kept deserialised; `getVariableHints` reading without deserialising; a malformed `Json` value kept as text and logged |
+    | `utils/operaton-variables.test.ts` | 11 → **15** | `fromJsonVariableText`: valid JSON parsed, `null` staying `null`, a non-string returned unchanged, and invalid text returned as it is and reported |
+    | `utils/starter-groups.test.ts` | 14 → **18** | `hasStartForm` counts a `formKey`, an embedded `formKey` too, ignores an empty one, and ignores a `formKey` on a sub-process's start event |
+
+    **History: v2026.11.3 added +56 tests and two files** against the 12 November
     measurement of v2026.11.2 (109 files, 2681) — 21 in the new files and
     35 in existing ones:
 
@@ -214,7 +226,7 @@ per-file 80% branch floor in `jest.config.js` rides along with it rather than
 needing a coverage job of its own — and so do the OpenAPI coverage gate, an
 ordinary test file, and the conformance-coverage check that `npm test` runs
 after Jest. Since v2026.09.7 `azure-backend-acc.yml` also
-triggers on `pull_request`, so these 2737 tests run *before* a merge rather than
+triggers on `pull_request`, so these 2753 tests run *before* a merge rather than
 only after one — and since **19 September 2026 that run is a required check**,
 so a red backend suite now blocks the merge to `acc` outright. See
 [Overview → What actually gates a merge](overview.md#what-actually-gates-a-merge).
@@ -222,10 +234,10 @@ so a red backend suite now blocks the merge to `acc` outright. See
 | Area | Files | Tests |
 |---|---:|---:|
 | `src/routes` | 21 | 732 |
-| `src/services` | 30 | 685 |
+| `src/services` | 30 | 693 |
 | `src/pa-monitoring` | 16 | 583 |
 | `src/rip-swimlane` | 2 | 206 |
-| `src/utils` | 19 | 186 |
+| `src/utils` | 19 | 194 |
 | `src/media-aggregator` | 8 | 112 |
 | `src/auth` | 4 | 88 |
 | `src/mcp-servers` | 3 | 63 |
@@ -234,12 +246,17 @@ so a red backend suite now blocks the merge to `acc` outright. See
 
 !!! success "Both columns are current, and they sum"
     Re-derived on 14 November 2026: the Files column accounts for all **111**
-    files and the Tests column sums to **2737**, the measured total, every
+    files and the Tests column sums to **2753**, the measured total, every
     file's count read from Jest's JSON report of the measured run (see the
     note at the top of this page). Earlier versions of this page carried a
     Files column from one date and a Tests column from another that fell
     274 short, with a warning attached; that gap is closed and has stayed
     closed in every re-derivation since.
+
+    **Two areas moved in v2026.11.4, and no file was added**:
+    `src/services` 685 → **693** (`operaton.service` +8) and `src/utils`
+    186 → **194** (`operaton-variables` +4, `starter-groups` +4). The other
+    eight are unchanged to the test.
 
     **Three areas moved in v2026.11.3, and two files were added**:
     `src/routes` 708 → **732** (`process.routes` +17, `health.routes` +4,

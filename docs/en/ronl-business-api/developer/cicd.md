@@ -168,7 +168,7 @@ run on a pull request only when it touches their own tooling.
 
 ### `audit` — the required check
 
-`zizmor.yml` has three jobs: `audit`, and the two [`lockfile-review`](#lockfile-review-what-a-lockfile-change-contains) jobs. `audit` runs **eleven steps, all of them blocking**:
+`zizmor.yml` has three jobs: `audit`, and the two [`lockfile-review`](#lockfile-review-what-a-lockfile-change-contains) jobs. `audit` runs **fourteen steps, all of them blocking**:
 
 | # | Step | What it does |
 |---|---|---|
@@ -177,14 +177,17 @@ run on a pull request only when it touches their own tooling.
 | 3 | Run zizmor | Workflow static analysis, with zizmor itself pinned to `1.29.0` — maintained by Renovate, which maps the action to the image `ghcr.io/zizmorcore/zizmor`, not bumped by hand |
 | 4 | Validate `renovate.json` | `renovate-config-validator --strict` |
 | 5 | Lockfile matches `package.json` | `npm ci --dry-run --ignore-scripts` — resolves and validates without writing `node_modules` |
-| 6 | `npm ci` | So the five steps below run *this* repository's tooling, and check its installed tree, rather than a version named in the workflow |
+| 6 | `npm ci` | So the eight steps below run *this* repository's tooling, and check its installed tree, rather than a version named in the workflow |
 | 7 | `npm run check-format` | Prettier, via the root script the pre-push hook also runs |
-| 8 | `npm run audit:signatures` | The registry signature of every installed package, and the provenance attestation of those that have one — see below |
-| 9 | `npm run check-swimlane-fixtures` | The swimlane parser fixtures against the fingerprints `linked-data-explorer` commits identically — see [Local development](local-development.md) |
-| 10 | `npm run check-shared` | [`@ronl/shared` holds declarations, not logic](shared-package.md#kept-declarations-only) |
-| 11 | `npm run check-supply-chain` | Every digest resolved against the GitHub API, and the register in `SECURITY-PIPELINE.md` compared against the workflows |
+| 8 | `npm run test:stylelint` | The tests of the custom `rba/selector-root-class` rule and the lint summary (`scripts/stylelint/*.test.mjs`). They import stylelint, so they run here, after `npm ci`, rather than in `lockfile-review`, which installs nothing (since v2026.11.4) |
+| 9 | `node scripts/keycloak-add-lde-clients.test.mjs` | The production guard of `keycloak-add-lde-clients.sh`, run against the real script, which stops before any network call — see [Keycloak deployment](deployment/keycloak.md) (since v2026.11.4) |
+| 10 | `node scripts/promotion-targets.test.mjs` | The table of cases for `promotion-targets.sh` — see [The production filters live in a script](#the-production-filters-live-in-a-script) (since v2026.11.4) |
+| 11 | `npm run audit:signatures` | The registry signature of every installed package, and the provenance attestation of those that have one — see below |
+| 12 | `npm run check-swimlane-fixtures` | The swimlane parser fixtures against the fingerprints `linked-data-explorer` commits identically — see [Local development](local-development.md) |
+| 13 | `npm run check-shared` | [`@ronl/shared` holds declarations, not logic](shared-package.md#kept-declarations-only) |
+| 14 | `npm run check-supply-chain` | Every digest resolved against the GitHub API, and the register in `SECURITY-PIPELINE.md` compared against the workflows |
 
-Steps 4 through 11 carry `if: always()`. That makes them run *after* an earlier
+Steps 4 through 14 carry `if: always()`. That makes them run *after* an earlier
 failure, so one run reports on every half of the policy instead of stopping at
 the first — it does **not** make them non-blocking. The job still fails.
 
@@ -195,13 +198,13 @@ finding appears only in the log while every check reads *success*.
 `check-supply-chain` ran that way from its adoption until v2026.09.7 promoted it
 to blocking.
 
-Steps 7, 9 and 10 are in this job rather than in a deploy workflow or a workspace
+Steps 7, 12 and 13 are in this job rather than in a deploy workflow or a workspace
 suite for one reason: `audit` has no paths filter and is the required check, so
 every pull request reaches it — a documentation-only one too, and one made with
 `--no-verify` or in the GitHub UI, which skips the pre-push hook that also runs
 the fixture check.
 
-Step 8, *Verify registry signatures*, is the provenance half of ICTU
+Step 11, *Verify registry signatures*, is the provenance half of ICTU
 recommendation 5, *verify where packages come from*
 (sgort/linked-data-explorer#249). `scripts/audit-signatures.sh` runs `npm audit
 signatures` over the tree step 6 installed — it adds no install of its own —
@@ -779,17 +782,18 @@ directly as its `outputs:` source.
 | Target | Matches (anchored at the repository root) |
 |---|---|
 | `backend` | `packages/backend/`, `packages/shared/`, `azure-backend-prod.yml`, `package-lock.json`, `package.json`, `.nvmrc` |
-| `frontend` | `packages/frontend/`, `packages/shared/`, `packages/pa-cockpit/`, `azure-frontend-prod.yml`, `.nvmrc` |
-| `pa_demo` | `packages/pa-demo/`, `packages/shared/`, `packages/pa-cockpit/`, `azure-pa-demo-prod.yml`, `.nvmrc` |
-| `public_site` | `packages/public-site/`, `azure-publicsite-prod.yml`, `.nvmrc` |
+| `frontend` | `packages/frontend/`, `packages/shared/`, `packages/pa-cockpit/`, `azure-frontend-prod.yml`, `package-lock.json`, `package.json`, `.nvmrc` |
+| `pa_demo` | `packages/pa-demo/`, `packages/shared/`, `packages/pa-cockpit/`, `azure-pa-demo-prod.yml`, `package-lock.json`, `package.json`, `.nvmrc` |
+| `public_site` | `packages/public-site/`, `azure-publicsite-prod.yml`, `package-lock.json`, `package.json`, `.nvmrc` |
 
-Each pattern mirrors the `paths:` filter its acceptance sibling carries, with
-one difference: only `backend` matches the root `package-lock.json` and
-`package.json`. The frontend, PA-demo and public-site patterns do not, so a
-promotion that changes nothing but the lockfile redeploys the backend and none
-of the three static sites, although acceptance built, tested and deployed all
-four from that same change. The acceptance copy is the reference — the two have
-to be kept in step by hand.
+Each pattern mirrors the `paths:` filter its acceptance sibling carries. Since
+v2026.11.4 that includes the root `package-lock.json` and `package.json` in all
+four, so a promotion that changes nothing but the lockfile deploys all four, as
+acceptance built, tested and deployed all four from that same change; before,
+only the backend matched them. `scripts/promotion-targets.test.mjs` holds the
+cases, and runs in `audit`. The acceptance copy is the reference — the two have
+to be kept in step by hand, and one difference remains: the frontend's
+acceptance filter lists `keycloak-themes/**`, its production pattern does not.
 
 Three details in it are load-bearing:
 

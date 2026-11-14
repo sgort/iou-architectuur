@@ -31,15 +31,15 @@ Each task in the list shows its name, whether it is **Open** or **Geclaimd**, th
 
 **Proces starten**, under **Taken** in the **Werk** mode, lists every process you may start. It is offered where an organisation has switched it on — so far only Caribisch Nederland. Which processes appear is decided by the process models, not by the board: a process is listed when its model names a group you belong to as one that may start it. A process that names no such groups is not listed here, and is started where it always was.
 
-Each row shows the process's name and a **Start process** button. What the button does depends on the process:
+Each row shows the process's name and a **Start proces** button, which reads **Bezig…** while the process starts. What the button does depends on the process:
 
 - **A process without a start form starts at once.** A green notice confirms it — the process's name, then **is gestart als dossier** with the dossier number, and **De eerste taak staat onder Taken.** The new case's first task is then in your [task list](#the-task-list).
-- **A process with a start form shows the form first.** Filling it in and submitting it starts the process, and the same confirmation appears. **Terug naar de lijst** returns to the list without starting anything.
+- **A process with a start form shows the form first.** Filling it in and submitting it starts the process, and the same confirmation appears. **Terug naar de lijst** returns to the list without starting anything. If the process uses a form the board cannot show, the form reads **Geen formulier beschikbaar voor dit proces.** and the process cannot be started from here.
 
 If a start fails, a notice explains why and the list stays as it was. When there is nothing you may start, the section reads **Er zijn geen processen die u kunt starten.**
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Caseworker's Werk mode at Caribisch Nederland, signed in as test-caseworker-bes, with Proces starten under Taken in the rail, one startable process, Ingezetenecriteria voor een lijst gevallen, with its coloured Start process button, and above it the green notice that it has started as dossier bes-1794666754325 and that the first task is under Taken](../../assets/screenshots/ronl-business-api-caseworker-proces-starten.png)
+  ![Screenshot: Caseworker's Werk mode at Caribisch Nederland, signed in as test-caseworker-bes, with Proces starten under Taken in the rail, one startable process, Ingezetenecriteria voor een lijst gevallen, with its coloured Start proces button, and above it the green notice that it has started as dossier bes-1794677563095 and that the first task is under Taken](../../assets/screenshots/ronl-business-api-caseworker-proces-starten.png)
   <figcaption>Proces starten — the processes a caseworker may start, and the confirmation after a start</figcaption>
 </figure>
 

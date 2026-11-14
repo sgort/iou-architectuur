@@ -80,6 +80,9 @@ wired into CI.
     passing**, `Duration 24.67s`, coverage **93.75 / 96.15 / 85.00 / 93.10**
     with the same counts — every figure as on 7 and 12 November. v2026.11.3
     changed nothing in this package or in PA-Cockpit but their versions.
+    Re-run the same day for v2026.11.4 (`acc` at `4579486`, a tree identical
+    to `main` at `67bac28`): 19 files · 109 tests · all passing, and the same
+    coverage. v2026.11.4 touched neither package.
 
 **At a glance:**
 

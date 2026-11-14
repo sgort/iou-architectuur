@@ -213,7 +213,8 @@ volume it runs `config/postgres/init-databases.sql`, which creates:
 - in `audit_logs`: the `audit_logs` table with its indexes, and a `tenants`
   table seeded with eight tenants: `utrecht`, `amsterdam`, `rotterdam`,
   `denhaag` (municipalities), `flevoland` (province), `uwv`, `toeslagen`
-  (national agencies) and `unive` (commercial);
+  (national agencies) and `unive` (commercial). Nothing reads that table, as
+  the script itself says: tenants are defined in the frontend's `tenants.json`;
 - the `lde_assets` database and the user `lde_user` / `lde_password`, with
   full privileges on it and on its `public` schema. The database is empty: the
   Linked Data Explorer owns its tables.

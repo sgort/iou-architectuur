@@ -1,11 +1,23 @@
 # RONL Business API — screenshots to capture
 
 !!! warning "Outstanding — six REPLACE rows for v2026.11.1, plus eight optional colour-only re-shoots"
-    The two NEW rows for v2026.11.3 (14 November 2026), rows 35 and 36, were captured the same day.
+    The two NEW rows for v2026.11.3 (14 November 2026), rows 35 and 36, were captured the same day,
+    and row 37, the v2026.11.4 re-shoot of row 36, too.
     The sync to v2026.11.1 shipped on
     **7 November 2026** without its captures: rows 21–26 are stale views the pages still embed, and
     rows 27–34 are optional. Rows 11–20 still hold, apart from the colours rows 27–34 name. The sync
     to v2026.11.2 (12 November 2026) added none.
+
+## Sync v2026.11.3 → v2026.11.4 — one REPLACE, captured 14 November 2026
+
+Reviewed on 14 November 2026 for **v2026.11.4**, in production (`origin/main` `67bac28`). The
+Proces starten button now reads **Start proces** instead of *Start process*, so row 36's capture,
+taken at v2026.11.3, showed the old label. Nothing else in the release changes a captured view: the
+history reads, the start-form rule, CI, Caddy and the Keycloak script change no pixel.
+
+| # | Status | File | Embedding page | What it must show | Trigger |
+|---|---|---|---|---|---|
+| 37 | ✅ **DONE** (was REPLACE of row 36, captured 14 November 2026) | `ronl-business-api-caseworker-proces-starten.png` | `user-guide/caseworker.md` (§ Proces starten) | As row 36, with the row button reading **Start proces**: Werk mode at Caribisch Nederland as `test-caseworker-bes`, the confirmation for dossier `bes-1794677563095` above the one startable process | v2026.11.4 — the button label (#453) |
 
 ## Sync v2026.11.2 → v2026.11.3 — two NEW, captured 14 November 2026
 

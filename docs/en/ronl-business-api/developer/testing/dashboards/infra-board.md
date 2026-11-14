@@ -17,11 +17,11 @@ work that happens inside it.
 
 ## Frontend
 
-Measured on **14 November 2026** at `6f86b10`, a tree identical to `main`
-at `f54e4f0` (v2026.11.3): the frontend package ran 144 files and 1781 tests,
-all passing, every per-file count on this page the same as on 7 and
-12 November, and the counts below are read from Vitest's JSON report of that
-run.
+Measured on **14 November 2026** on `acc` at `4579486`, a tree identical to
+`main` at `67bac28` (v2026.11.4): the frontend package ran 144 files and
+1782 tests, all passing, every per-file count on this page the same as on
+7 and 12 November and in the v2026.11.3 run earlier that day, and the counts
+below are read from Vitest's JSON report of that run.
 
 **v2026.10.3 added 19 tests to this board and no file.** The project page
 now draws its process through the shared ProcessView, with the legend, the

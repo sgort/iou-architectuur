@@ -283,7 +283,7 @@ Run these in `packages/backend`, or from the root with `--workspace=@ronl/backen
 Types shared between backend and frontend are in `packages/shared/src/`. Import them as `@ronl/shared`:
 
 ```typescript
-import { ApiResponse, TenantConfig } from '@ronl/shared';
+import { ApiResponse, OrganisationType } from '@ronl/shared';
 ```
 
 After modifying shared types, rebuild the package before the backend picks up the changes:

@@ -118,6 +118,35 @@ drained by the pass of 27 September, everything queued from 27 September to 3 Oc
 5. No change to rulesets, hooks, Renovate, `.nvmrc` or `.npmrc`. Lockfile: version bumps only; SBOM 2026.11.3 lists 493
    components (npm 11.19.1). Findings: ronl-business-api#453.
 
+### 14 November 2026 — RONL Business API v2026.11.3 → v2026.11.4 (production, `67bac28`)
+
+1. **The `audit` job in `zizmor.yml` grows from eleven to fourteen steps** (ffbc109): `npm run test:stylelint`,
+   `node scripts/keycloak-add-lde-clients.test.mjs` and the new `node scripts/promotion-targets.test.mjs`, all `if: always()`
+   after `npm ci`. The stylelint tests ran in no workflow or hook before. Still 15 workflows and 45 `uses:` references
+   (`SECURITY-PIPELINE.md:42`); no `uses:` added. Bears on `code-standards.md` (what CI runs, the script tests no longer
+   "run by nothing") and the ICTU test-gates row for RBA.
+2. **Lockfile-only promotions deploy all four applications** (ffbc109, `scripts/promotion-targets.sh:45-47`): the
+   frontend, PA-demo and public-site production patterns now include `package-lock.json` and `package.json`, as their ACC
+   filters do. The frontend's production pattern still omits `keycloak-themes/**`, which its ACC filter lists (reported in
+   the findings issue). Bears on `development-workflow/overview.md` (how a release lands) and `supply-chain.md` if it says
+   Renovate's lock-file maintenance reaches production only through the backend.
+3. **The VM's Caddy is pinned by tag and digest** (a3a4db6): `caddy:2.11.9-alpine@sha256:003a9780…` in
+   `deployment/vm/caddy/docker-compose.yml` and the #415 harness alike; `SECURITY-PIPELINE.md:336-351` says two VM images
+   are now pinned (Operaton and Caddy), applied by hand, and #196 still covers the rest. The owner rolled it out on the VM on
+   14 November and removed the temporary engine-rest access log. Bears on `supply-chain.md` (VM images, the #196 boundary)
+   and PSA **AB-28** and any risk naming unpinned VM images.
+4. **`SECURITY-PIPELINE.md` names an open authentication risk under "What the audit cannot see"** (`:504-510`): a design
+   decision (option B, backend-only) was taken on 14 November and is not built yet. Bears on PSA: check that the matching
+   decision and risk read as open, worded generically and **without an issue link**, per the PSA rules.
+5. **Keycloak script guard** (ffbc109, aaeb7b5): `keycloak-add-lde-clients.sh` recognises production by host name and fails
+   closed when it reads none; tested in `audit`. `keycloak-add-entra-idp.sh:94-95` still uses `${VAR,,}`, a hard error on
+   bash 3.2 (reported in the findings issue). Bears on PSA **AB-17**/**AB-20** only if they cite the test-account guard.
+6. **Correction to item 4 of the v2026.11.3 entry above:** per the RBA owner's decision recorded in
+   `docs/superpowers/plans/2026-11-14-v2026.11.3-documentation-findings.md`, `test-caseworker-bes` and `test-citizen-bes`
+   were already in the ACC and PROD realms; the release changed no script for them. Verify before writing it into AB-15.
+7. No change to rulesets, hooks, Renovate, `.nvmrc` or `.npmrc`. `@ronl/shared` now holds only `OrganisationType`.
+   SBOM 2026.11.4 lists 493 components (npm 11.19.1). Findings #453, #445, #433 and #354 closed by #454.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

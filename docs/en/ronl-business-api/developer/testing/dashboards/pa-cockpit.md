@@ -26,6 +26,9 @@ checkout at `6f86b10`, a tree identical to `f54e4f0`:
 7 November, 136.61s on 9 October, 133.53s on 3 October, 35.32s in the
 parallel run of 30 September). Every count and percentage reproduced the
 12 November figures exactly; v2026.11.3 changed only the package's version.
+Re-run the same day for v2026.11.4 (`acc` at `4579486`, a tree identical to
+`main` at `67bac28`), every count and percentage held again: v2026.11.4 did
+not touch this package.
 v2026.11.2 changed one assertion and no count: `pages/PADashboardV2.test.tsx`
 finds the ⌘K button by its visible text, *Spring naar een dossier of
 sectie…*, now that the button has no `aria-label` (WCAG 2.5.3); its

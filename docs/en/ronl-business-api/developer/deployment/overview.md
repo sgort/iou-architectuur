@@ -198,9 +198,12 @@ docker compose up -d
 
 ### Updating Caddy
 
+The image is pinned by tag and digest in `deployment/vm/caddy/docker-compose.yml` and in the Operaton test harness alike (see [Caddy](caddy.md)). Change both, prove the engine-rest rules with the harness, then on the VM:
+
 ```bash
-docker pull caddy:2-alpine
-docker restart caddy
+cd ~/caddy
+docker compose pull
+docker compose up -d
 ```
 
 ### Keycloak database backups

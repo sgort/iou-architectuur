@@ -3,7 +3,7 @@
   "last_patch": {
     "date": "2026-11-14",
     "kind": "Component sync",
-    "summary": "RONL Business API v2026.11.3, in production: a new organisation, Caribisch Nederland at /bes, whose landing page gives residents their own DigiD login; Proces starten, where a caseworker starts any process its model lets them start, with the backend refusing everyone else; dynamic lists that save; and an unreachable BRP named in the API and in health, its certificate checked daily.",
+    "summary": "RONL Business API v2026.11.3 and v2026.11.4, both in production: a new organisation, Caribisch Nederland at /bes, whose landing page gives residents their own DigiD login; Proces starten, where a caseworker starts any process its model lets them start, with the backend refusing everyone else; dynamic lists that save, and since v2026.11.4 show their rows in ended cases too; an unreachable BRP named in the API and in health, its certificate checked daily; and the findings of three releases resolved, with lockfile-only promotions deploying every application and the VM's Caddy pinned.",
     "previous": {
       "date": "2026-11-12",
       "kind": "Component sync",
@@ -11,8 +11,8 @@
     },
     "open_findings": [
       {
-        "label": "ronl-business-api#453",
-        "url": "https://github.com/sgort/ronl-business-api/issues/453"
+        "label": "ronl-business-api#457",
+        "url": "https://github.com/sgort/ronl-business-api/issues/457"
       }
     ]
   },
@@ -20,16 +20,16 @@
     {
       "name": "RONL Business API",
       "icon": "⚙️",
-      "version": "v2026.11.3",
+      "version": "v2026.11.4",
       "environment": "prod",
-      "commit": "f54e4f0...",
+      "commit": "67bac28...",
       "commit_date": "2026-11-14",
       "build": {
-        "sha": "f54e4f0",
-        "run": 14,
-        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/43599078893"
+        "sha": "67bac28",
+        "run": 15,
+        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/43619989558"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/f54e4f054f3bcd2e38d24b045cbf54cffa3bb0db",
+      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/67bac281ff9d66076708dd58136e906e9e899329",
       "ci_repo": "https://github.com/sgort/ronl-business-api"
     },
     {
