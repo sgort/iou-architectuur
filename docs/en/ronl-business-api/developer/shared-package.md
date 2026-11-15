@@ -36,25 +36,12 @@ interface ApiResponse<T = unknown> {
 }
 ```
 
-**`TenantConfig`** — the tenant configuration shape:
+**`OrganisationType`** — the one tenant type the package holds, because it is a claim on the user's token that both sides read:
 ```typescript
 type OrganisationType = 'municipality' | 'province' | 'national' | 'commercial';
-
-interface TenantConfig {
-  id: string;
-  name: string;
-  displayName: string;
-  organisationType: OrganisationType;
-  municipalityCode?: string;
-  organisationCode?: string;
-  theme: TenantTheme;
-  contact: TenantContact;
-  logo?: string;
-  enabled: boolean;
-}
 ```
 
-There is no per-tenant `features` list: which citizen services a tenant offers follows from `CITIZEN_SERVICES` (below) and from what is deployed under the tenant. The frontend reads `tenants.json` with its own, richer `TenantConfig` in `services/tenant.ts` (landing-page boards, logo, link preview, theme background) — see [Municipality Themes](../reference/municipality-themes.md#tenantconfig-schema).
+A tenant's configuration is not shared. The frontend reads `tenants.json` with its own `TenantConfig` in `services/tenant.ts` (landing-page boards, logo, link preview, theme, landing copy) — see [Municipality Themes](../reference/municipality-themes.md#tenantconfig-schema). The package carried an older copy of that type, with `TenantTheme`, `TenantContact` and `TenantRegistry`, until v2026.11.4 removed it: nothing imported it, and it had fallen behind the frontend's. There is no per-tenant `features` list either: which citizen services a tenant offers follows from `CITIZEN_SERVICES` (below) and from what is deployed under the tenant.
 
 **`KeycloakUser`** — the decoded Keycloak token claims, and **`AuthenticatedUser`** — the normalised caller the backend attaches to `req.user`:
 ```typescript

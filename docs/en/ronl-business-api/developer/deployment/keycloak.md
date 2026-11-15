@@ -424,7 +424,7 @@ KEYCLOAK_URL=https://acc.keycloak.open-regels.nl ROLE_PREFIX=besluit- GRANT_USER
   bash scripts/keycloak-add-rip-roles.sh
 ```
 
-Each script prompts for the Keycloak admin password when `ADMIN_PASSWORD` is unset; `keycloak-add-rip-roles.sh`, `keycloak-add-entra-idp.sh` and `keycloak-add-lde-clients.sh` also accept `--dry-run`. `keycloak-add-lde-clients.sh` needs `LDE_ORIGIN` and `TTL_ORIGIN` as well, and refuses its two test-account options, `--with-e2e` and `--with-test-author`, against production (`keycloak.open-regels.nl`). Test users and per-user roles are added in the admin console. See [Entra ID — Rolling out to an environment](entra-id.md#rolling-out-to-an-environment) for the order in which to run them.
+Each script prompts for the Keycloak admin password when `ADMIN_PASSWORD` is unset; `keycloak-add-rip-roles.sh`, `keycloak-add-entra-idp.sh` and `keycloak-add-lde-clients.sh` also accept `--dry-run`. `keycloak-add-lde-clients.sh` needs `LDE_ORIGIN` and `TTL_ORIGIN` as well, and refuses its two test-account options, `--with-e2e` and `--with-test-author`, against production. It recognises production by the host name in `KEYCLOAK_URL`, `keycloak.open-regels.nl`, whatever else the URL carries — scheme, credentials, port, path, query, a trailing dot or letter case — and refuses them too when it can read no host, so the guard fails closed; an IP address is not recognised, so never point the script at production by address. `scripts/keycloak-add-lde-clients.test.mjs` tests the guard, in CI's `audit` job. Test users and per-user roles are added in the admin console. See [Entra ID — Rolling out to an environment](entra-id.md#rolling-out-to-an-environment) for the order in which to run them.
 
 ---
 

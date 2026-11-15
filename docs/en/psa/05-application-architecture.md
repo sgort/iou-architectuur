@@ -2,11 +2,11 @@
 title: "5. Application architecture"
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    CPSV Editor: "84886c9"
-    Linked Data Explorer: "189435e"
-    RONL Business API: "35fb3a8"
+    CPSV Editor: "6910bb8"
+    Linked Data Explorer: "e11e4ef"
+    RONL Business API: "67bac28"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -94,7 +94,7 @@ flowchart LR
 | From | To | For | How |
 |---|---|---|---|
 | Web interfaces | Their own backend | All functions | HTTPS; the browser does not talk to the engine or knowledge graph itself |
-| CPSV Editor | Knowledge graph | Publishing | HTTPS, through TriplyDB's API and the Linked Data Explorer's backend |
+| CPSV Editor | Knowledge graph | Publishing | HTTPS, through the Linked Data Explorer's backend, as a signed-in author |
 | Norm Editor | Knowledge graph | Storing interpretations | HTTPS, through TriplyDB's API |
 | Linked Data Explorer | Knowledge graph | Finding decision models, consuming rules | SPARQL 1.1 |
 | Linked Data Explorer | Process engine | Deploying process bundles; tasks the system performs itself | Camunda 7 REST API |
@@ -109,9 +109,9 @@ deployed version delivers what the connection needs. Until then it stays off, an
 the rest keeps working. This is how IOU can adopt a standard step by step (see
 [About this PSA](index.md#how-iou-develops)).
 
-The design tools do not use tokens yet (AB-20, risk R-02). Where the web
-interfaces of the Linked Data Explorer, the CPSV Editor and the Norm Editor talk
-to their backend, that backend therefore does not yet check who the user is.
+The Linked Data Explorer and the CPSV Editor send a token with every write, which
+the Linked Data Explorer's backend checks. The Norm Editor does not use tokens
+yet: its backend does not check who the user is (AB-20, risk R-02).
 
 ## Phasing
 

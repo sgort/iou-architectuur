@@ -39,20 +39,29 @@ For how access is granted, and what an administrator has to set up per environme
 
 ### Organisation landing pages
 
-The organisations on the platform that use one board — Gemeente Amsterdam, Gemeente Heusden, Dienst Toeslagen and Univé Verzekeringen, each with the Caseworker board — have a landing page of their own at `mijn.open-regels.nl/<organisation>`: `/amsterdam`, `/heusden`, `/toeslagen` and `/unive`.
+The organisations on the platform that use one board — Gemeente Amsterdam, Gemeente Heusden, Caribisch Nederland (the openbare lichamen of Bonaire, Sint Eustatius and Saba), Dienst Toeslagen and Univé Verzekeringen, each with the Caseworker board — have a landing page of their own at `mijn.open-regels.nl/<organisation>`: `/amsterdam`, `/heusden`, `/bes`, `/toeslagen` and `/unive`.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: Gemeente Heusden's landing page at mijn.open-regels.nl/heusden, with the Heusden logo and colours, the Inloggen als medewerker button and the Inwoner? Log in met DigiD link](../../assets/screenshots/ronl-business-api-tenant-landing-heusden.png)
   <figcaption>Gemeente Heusden's own landing page</figcaption>
 </figure>
 
-The page carries the organisation's logo — or its name, where no logo has been supplied — and its colours, and the eyebrow above the title reads **Werkomgeving ·** followed by the organisation's name. The copy fits the kind of organisation: a municipality's page reads **Uw werkvoorraad, overzichtelijk op één plek.**, Dienst Toeslagen's **Aanvragen, wijzigingen en bezwaren in één werkvoorraad.** and Univé's **Al je claims en aanvragen, helder op een rij.** Beside the title, an enlarged picture of the Caseworker board in the organisation's colours shows what the work looks like; its figures are illustrative, not live.
+The page carries the organisation's logo — or its name, where no logo has been supplied — and its colours, and the eyebrow above the title reads **Werkomgeving ·** followed by the organisation's name. The copy fits the kind of organisation: a municipality's page reads **Uw werkvoorraad, overzichtelijk op één plek.**, Dienst Toeslagen's **Aanvragen, wijzigingen en bezwaren in één werkvoorraad.** and Univé's **Al je claims en aanvragen, helder op een rij.** Beside the title, an enlarged picture of the Caseworker board in the organisation's colours shows what the work looks like; its figures are illustrative, not live. An organisation can word its page its own way: Caribisch Nederland's reads **Eén werkvoorraad voor drie eilanden.**
 
 - **Inloggen als medewerker** signs you in and opens the Caseworker board. If your account does not have the Caseworker role, the **Geen toegang tot** dialog described [above](#signing-in) appears on this page.
 - **Inloggen**, in the top bar, signs you in and takes you to the board your role allows.
 - **Inwoner? Log in met DigiD** is the way in for the organisation's residents, to [MijnOmgeving](citizen-portal.md).
 
 There is no Flevoland-account sign-in on these pages; it exists only for Provincie Flevoland.
+
+#### Voor inwoners
+
+An organisation can also give its residents a section of their own on its page, between the title and the three points below it. Caribisch Nederland is the first to do so. Its section, headed **Voor inwoners · Bon bini · Welcome · Welkom**, names the three islands — Bonaire, Sint Eustatius and Saba, each with its flag — and three things a resident can do online: **Aanvraag doen**, **Melding maken** and **Status volgen**. **Inloggen met DigiD** below them signs the resident in with DigiD, to [MijnOmgeving](citizen-portal.md), like the link in the top bar. A page without such a section offers residents only that top-bar link.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: Caribisch Nederland's landing page, signed out: the wide logo with the three island flags, Inwoner? Log in met DigiD and Inloggen in the top bar, the title Eén werkvoorraad voor drie eilanden. with Inloggen als medewerker beside a preview of the Caseworker work queue, and below it the Voor inwoners section with the greetings Bon bini · Welcome · Welkom, the Bonaire, Sint Eustatius and Saba chips, three services and the Inloggen met DigiD button](../../assets/screenshots/ronl-business-api-tenant-landing-bes.png)
+  <figcaption>Caribisch Nederland's landing page, with the section for residents</figcaption>
+</figure>
 
 A link to the page shared in a chat or on social media unfolds into a preview card with the organisation's own title, description and image. An older link of the form `mijn.open-regels.nl/?tenant=<organisation>` leads to the organisation's page, and an address that names no organisation with a page of its own leads to the werkomgeving's landing page. Signing out of a board or of MijnOmgeving takes you back to your own organisation's landing page — for Provincie Flevoland, the werkomgeving's.
 

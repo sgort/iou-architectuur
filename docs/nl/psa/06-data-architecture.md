@@ -2,11 +2,11 @@
 title: "6. Gegevensarchitectuur"
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    CPSV Editor: "84886c9"
-    Linked Data Explorer: "189435e"
-    RONL Business API: "35fb3a8"
+    CPSV Editor: "6910bb8"
+    Linked Data Explorer: "e11e4ef"
+    RONL Business API: "67bac28"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -58,10 +58,10 @@ bijgehouden** (AB-27). Dat is vervangbaar: u mag uw bestaande register gebruiken
 | Persoonsgegevens uit basisregistraties | Bij de bron; opgevraagd wanneer nodig | De bronhouder | Niet gekopieerd |
 | Wettekst | Officiële publicatiebronnen; opgevraagd via de CPRMV API | De wetgever | Niet gekopieerd |
 
-Twee kleinere opslagplekken: de Linked Data Explorer bewaart testgevallen en
-sjablonen voor ketens in de browser van de gebruiker, en de CPSV Editor bewaart
-daar het TriplyDB-token waarmee wordt gepubliceerd (zie
-[hoofdstuk 8](08-security-and-privacy.md)).
+Een kleinere opslagplek: de Linked Data Explorer bewaart testgevallen en
+sjablonen voor ketens in de browser van de gebruiker. Het token waarmee in de
+kennisgraaf wordt gepubliceerd, staat alleen bij de backend van de Linked Data
+Explorer (zie [hoofdstuk 8](08-security-and-privacy.md)).
 
 ## Fasering
 

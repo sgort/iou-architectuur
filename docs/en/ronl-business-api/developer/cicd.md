@@ -4,23 +4,24 @@ component: RONL Business API
 
 # CI/CD
 
-RONL Business API runs **fourteen GitHub Actions workflows**: an
+RONL Business API runs **fifteen GitHub Actions workflows**: an
 acceptance/production pair for each of four packages; two scanning workflows —
 the supply-chain `audit` gate and a Semgrep `scan`; three that watch dependencies
 rather than a commit — the daily `dependency-audit`, the quarterly
-`dependency-review` and the release SBOM; and the
+`dependency-review` and the release SBOM; one that watches an upstream's TLS
+certificate, the daily `upstream-certs`; and the
 **promotion workflow** that orchestrates the four production deploys. They hold
-**twenty-seven jobs**. Twenty-three of them choose a runner, and every one of those
+**twenty-eight jobs**. Twenty-four of them choose a runner, and every one of those
 names `ubuntu-24.04`, never `ubuntu-latest`; the other four are the promotion's
-calls into the production workflows, whose own jobs are among the twenty-three. That
+calls into the production workflows, whose own jobs are among the twenty-four. That
 label is one GitHub moves to a new Ubuntu release on its own schedule, so
 pinning it means a change of OS release arrives as a diff here rather than
 silently. The label pins the *release*, not the image — GitHub
 rebuilds the image about weekly, and a hosted runner cannot pin it by digest.
 
-!!! info "`acc` and `main` carry the same fourteen files, and deliberately different shapes"
-    Re-verified on 11 October 2026 (v2026.10.2): `origin/acc` at `c51ec0a`
-    and `origin/main` at `7117914` carry an identical tree, `.github/workflows/`
+!!! info "`acc` and `main` carry the same fifteen files, and deliberately different shapes"
+    Re-verified on 14 November 2026 (v2026.11.3): `origin/acc` at `6f86b10`
+    and `origin/main` at `f54e4f0` carry an identical tree, `.github/workflows/`
     included.
     `main` was once four workflows behind and carried none of the pinning or
     gating described below — closing that gap was a CI-alignment programme that
@@ -44,6 +45,7 @@ rebuilds the image about weekly, and a hosted runner cannot pin it by digest.
 | `dependency-audit.yml` | schedule (05:17 UTC daily), `workflow_dispatch`, PR touching its own files | — | No — the `dependency-audit` job |
 | `dependency-review.yml` | schedule (06:23 UTC on day 2 of each quarter), `workflow_dispatch`, PR touching the workflow, `dependency-review.mjs` or `lockfile-diff.mjs` | — | No — the `dependency-review` job |
 | `sbom.yml` | push to `main`, `workflow_dispatch`, PR touching the SBOM tooling | — | No — the `release-sbom` job |
+| `upstream-certs.yml` | schedule (05:41 UTC daily), `workflow_dispatch`, PR touching the workflow, `check-upstream-certs.mjs` or its test | — | No — the `upstream-certs` job |
 | `promote-to-production.yml` | push to `main` (**no paths filter**), `workflow_dispatch` | — | No — it *calls* the four below |
 | `azure-backend-acc.yml` | push + PR to `acc` | `acc.api.open-regels.nl` | **Yes** — except on a pull request |
 | `azure-backend-prod.yml` | `workflow_call`, `workflow_dispatch` | `api.open-regels.nl` | **Yes** |
@@ -58,8 +60,9 @@ All eight Azure workflows support `workflow_dispatch`, and for the four
 production ones that is now the **only** manual route into Azure — and the
 escape hatch if the promotion workflow itself is broken. Neither scanning
 workflow supports it: both are meant to run from the events themselves and
-nothing else. `dependency-audit.yml`, `dependency-review.yml` and `sbom.yml`
-do, so an audit, a dependency review or an SBOM can be produced on demand.
+nothing else. `dependency-audit.yml`, `dependency-review.yml`, `sbom.yml` and
+`upstream-certs.yml` do, so an audit, a dependency review, an SBOM or a
+certificate check can be produced on demand.
 
 !!! note "The four production workflows no longer trigger on a push"
     They carry `workflow_call:` and `workflow_dispatch:` and nothing more. A
@@ -159,13 +162,13 @@ unsatisfiable `needs` graph — it simply deploys nothing.
 
 ## Scanning, audit and SBOM workflows
 
-None of the five deploys anything. The two scanners carry no `paths:` filter:
-both must reach every pull request regardless of what it touched. The other three
+None of the six deploys anything. The two scanners carry no `paths:` filter:
+both must reach every pull request regardless of what it touched. The other four
 run on a pull request only when it touches their own tooling.
 
 ### `audit` — the required check
 
-`zizmor.yml` has three jobs: `audit`, and the two [`lockfile-review`](#lockfile-review-what-a-lockfile-change-contains) jobs. `audit` runs **eleven steps, all of them blocking**:
+`zizmor.yml` has three jobs: `audit`, and the two [`lockfile-review`](#lockfile-review-what-a-lockfile-change-contains) jobs. `audit` runs **fourteen steps, all of them blocking**:
 
 | # | Step | What it does |
 |---|---|---|
@@ -174,14 +177,17 @@ run on a pull request only when it touches their own tooling.
 | 3 | Run zizmor | Workflow static analysis, with zizmor itself pinned to `1.29.0` — maintained by Renovate, which maps the action to the image `ghcr.io/zizmorcore/zizmor`, not bumped by hand |
 | 4 | Validate `renovate.json` | `renovate-config-validator --strict` |
 | 5 | Lockfile matches `package.json` | `npm ci --dry-run --ignore-scripts` — resolves and validates without writing `node_modules` |
-| 6 | `npm ci` | So the five steps below run *this* repository's tooling, and check its installed tree, rather than a version named in the workflow |
+| 6 | `npm ci` | So the eight steps below run *this* repository's tooling, and check its installed tree, rather than a version named in the workflow |
 | 7 | `npm run check-format` | Prettier, via the root script the pre-push hook also runs |
-| 8 | `npm run audit:signatures` | The registry signature of every installed package, and the provenance attestation of those that have one — see below |
-| 9 | `npm run check-swimlane-fixtures` | The swimlane parser fixtures against the fingerprints `linked-data-explorer` commits identically — see [Local development](local-development.md) |
-| 10 | `npm run check-shared` | [`@ronl/shared` holds declarations, not logic](shared-package.md#kept-declarations-only) |
-| 11 | `npm run check-supply-chain` | Every digest resolved against the GitHub API, and the register in `SECURITY-PIPELINE.md` compared against the workflows |
+| 8 | `npm run test:stylelint` | The tests of the custom `rba/selector-root-class` rule and the lint summary (`scripts/stylelint/*.test.mjs`). They import stylelint, so they run here, after `npm ci`, rather than in `lockfile-review`, which installs nothing (since v2026.11.4) |
+| 9 | `node scripts/keycloak-add-lde-clients.test.mjs` | The production guard of `keycloak-add-lde-clients.sh`, run against the real script, which stops before any network call — see [Keycloak deployment](deployment/keycloak.md) (since v2026.11.4) |
+| 10 | `node scripts/promotion-targets.test.mjs` | The table of cases for `promotion-targets.sh` — see [The production filters live in a script](#the-production-filters-live-in-a-script) (since v2026.11.4) |
+| 11 | `npm run audit:signatures` | The registry signature of every installed package, and the provenance attestation of those that have one — see below |
+| 12 | `npm run check-swimlane-fixtures` | The swimlane parser fixtures against the fingerprints `linked-data-explorer` commits identically — see [Local development](local-development.md) |
+| 13 | `npm run check-shared` | [`@ronl/shared` holds declarations, not logic](shared-package.md#kept-declarations-only) |
+| 14 | `npm run check-supply-chain` | Every digest resolved against the GitHub API, and the register in `SECURITY-PIPELINE.md` compared against the workflows |
 
-Steps 4 through 11 carry `if: always()`. That makes them run *after* an earlier
+Steps 4 through 14 carry `if: always()`. That makes them run *after* an earlier
 failure, so one run reports on every half of the policy instead of stopping at
 the first — it does **not** make them non-blocking. The job still fails.
 
@@ -192,13 +198,13 @@ finding appears only in the log while every check reads *success*.
 `check-supply-chain` ran that way from its adoption until v2026.09.7 promoted it
 to blocking.
 
-Steps 7, 9 and 10 are in this job rather than in a deploy workflow or a workspace
+Steps 7, 12 and 13 are in this job rather than in a deploy workflow or a workspace
 suite for one reason: `audit` has no paths filter and is the required check, so
 every pull request reaches it — a documentation-only one too, and one made with
 `--no-verify` or in the GitHub UI, which skips the pre-push hook that also runs
 the fixture check.
 
-Step 8, *Verify registry signatures*, is the provenance half of ICTU
+Step 11, *Verify registry signatures*, is the provenance half of ICTU
 recommendation 5, *verify where packages come from*
 (sgort/linked-data-explorer#249). `scripts/audit-signatures.sh` runs `npm audit
 signatures` over the tree step 6 installed — it adds no install of its own —
@@ -386,6 +392,39 @@ recommendation 11 again every quarter (sgort/linked-data-explorer#250).
 The first review, for 2026-Q4, is issue 362: of 85 direct dependencies, 3 failed
 a criterion and 19 needed a judgement, with follow-up issues 363 to 367.
 
+### `upstream-certs` — daily
+
+An upstream this API depends on but does not host can break without a commit
+anywhere. On 13 November 2026 the BRP mock's reverse proxy served a certificate
+for another host: every handshake from the backend failed with
+`ERR_TLS_CERT_ALTNAME_INVALID`, the citizen timeline went blank on ACC and PROD,
+and nothing here noticed. `/v1/health` now reports the upstream under
+`dependencies.brp` (see [Troubleshooting](troubleshooting.md#the-citizen-timeline-is-blank)),
+but only once it has broken; `upstream-certs.yml` warns before.
+
+It runs at 05:41 UTC daily — off the hour, like the daily audit — and on
+`workflow_dispatch`, and on a pull request that touches the workflow,
+`scripts/check-upstream-certs.mjs` or its test. Like every scheduled workflow it
+runs from the default branch, `acc`. It is not a required check on either branch.
+Its one job, `upstream-certs`, runs on Node `'24.22.2'`:
+
+1. **Test the check script** — `node scripts/check-upstream-certs.test.mjs`.
+2. **Check the certificates.** `check-upstream-certs.mjs` opens a TLS connection
+   to each host in its `HOSTS` list — today only `brp-api-mock.open-regels.nl` —
+   and reads the certificate, sending no request. It fails when a certificate
+   does not validate for its hostname or expires within 14 days. Exit 0 is clean,
+   1 a finding; anything higher is clamped to 2, "could not run", which is not
+   clean either.
+3. **Open, update or close one tracking issue**, titled *Upstream TLS certificate
+   invalid or expiring* and labelled `bug` and `prod-impact`; this step is what
+   the job's `issues: write` is for. A clean run closes an open issue with a
+   comment. The step is skipped on a pull request.
+4. **Fail the job** on any status but 0, so the run is red as well.
+
+The job is called `upstream-certs`, not `audit`, for the reason given under
+[`dependency-audit`](#dependency-audit-daily-on-acc-and-main). Add a host to
+`HOSTS` for any other upstream served from outside Azure.
+
 ### `release-sbom` — an SBOM for every release
 
 A promotion to `main` is the release here: there are no tags and no GitHub
@@ -438,7 +477,7 @@ on a promotion, what is deployed.
     lockfile filter above replaced it (#368).
 
 !!! warning "An SBOM is comparable only with one generated by the same npm"
-    The committed `ronl-business-api-2026.11.2.cdx.json` lists 493 components and
+    The committed `ronl-business-api-2026.11.3.cdx.json` lists 493 components and
     records npm 11.19.1 in its `metadata.tools`, the npm Node 24.22.2 bundles.
     Because `--check` compares that field too, and because npm 10 resolves the
     tree differently, a local `npm run sbom:check` under Node 22.23.4's bundled
@@ -462,7 +501,8 @@ deployed artifact on a major the host does not run.
 - The root `engines.node` is `>=22`, and `engines.npm` is `>=10.0.0`.
 - `dependency-audit.yml`, `dependency-review.yml` and `sbom.yml` name an exact
   `'24.22.2'`: they read lockfiles — both branches', in the audit's case — and
-  should not change Node with the tree they read.
+  should not change Node with the tree they read. `upstream-certs.yml` names the
+  same literal, so Renovate moves all of them together.
 - `zizmor.yml` names the same exact `'24.22.2'`, deliberately on a different
   major from `.nvmrc`:
   its `renovate-config-validator` step needs Node 24, because `renovate`
@@ -742,17 +782,18 @@ directly as its `outputs:` source.
 | Target | Matches (anchored at the repository root) |
 |---|---|
 | `backend` | `packages/backend/`, `packages/shared/`, `azure-backend-prod.yml`, `package-lock.json`, `package.json`, `.nvmrc` |
-| `frontend` | `packages/frontend/`, `packages/shared/`, `packages/pa-cockpit/`, `azure-frontend-prod.yml`, `.nvmrc` |
-| `pa_demo` | `packages/pa-demo/`, `packages/shared/`, `packages/pa-cockpit/`, `azure-pa-demo-prod.yml`, `.nvmrc` |
-| `public_site` | `packages/public-site/`, `azure-publicsite-prod.yml`, `.nvmrc` |
+| `frontend` | `packages/frontend/`, `packages/shared/`, `packages/pa-cockpit/`, `azure-frontend-prod.yml`, `package-lock.json`, `package.json`, `.nvmrc` |
+| `pa_demo` | `packages/pa-demo/`, `packages/shared/`, `packages/pa-cockpit/`, `azure-pa-demo-prod.yml`, `package-lock.json`, `package.json`, `.nvmrc` |
+| `public_site` | `packages/public-site/`, `azure-publicsite-prod.yml`, `package-lock.json`, `package.json`, `.nvmrc` |
 
-Each pattern mirrors the `paths:` filter its acceptance sibling carries, with
-one difference: only `backend` matches the root `package-lock.json` and
-`package.json`. The frontend, PA-demo and public-site patterns do not, so a
-promotion that changes nothing but the lockfile redeploys the backend and none
-of the three static sites, although acceptance built, tested and deployed all
-four from that same change. The acceptance copy is the reference — the two have
-to be kept in step by hand.
+Each pattern mirrors the `paths:` filter its acceptance sibling carries. Since
+v2026.11.4 that includes the root `package-lock.json` and `package.json` in all
+four, so a promotion that changes nothing but the lockfile deploys all four, as
+acceptance built, tested and deployed all four from that same change; before,
+only the backend matched them. `scripts/promotion-targets.test.mjs` holds the
+cases, and runs in `audit`. The acceptance copy is the reference — the two have
+to be kept in step by hand, and one difference remains: the frontend's
+acceptance filter lists `keycloak-themes/**`, its production pattern does not.
 
 Three details in it are load-bearing:
 

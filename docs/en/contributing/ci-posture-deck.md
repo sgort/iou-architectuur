@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    CPSV Editor: "34a51b4"
-    Linked Data Explorer: "4300700"
-    RONL Business API: "c6cf3ac"
+    CPSV Editor: "2d201d5"
+    Linked Data Explorer: "5bccbf2"
+    RONL Business API: "4579486"
 ---
 
 # CI Posture Across Repos — Slide Deck
@@ -50,10 +50,10 @@ which is a different question and the one a decision needs answered.
     - **What ships.** Slide 4's clean-up argument predates the move to building on the
       runner; in both applications the tested build is now the shipped build.
     - **The status footnote.** Its commits, `f5bae6a`/`be6bc54` and `f7fe80f`/`daa4816`,
-      are the 12 September heads. The current `acc` heads are `34a51b4` and `4300700`. The
-      Linked Data Explorer's `main`, `189435e`, carries the same tree as its `acc`; the CPSV
-      Editor's, `84886c9`, is behind it by two Renovate action-pin bumps (`setup-node`
-      v7.1.0, `upload-artifact` v7.0.2), in the workflows and the register only.
+      are the 12 September heads. The current `acc` heads are `2d201d5` and `5bccbf2`. The
+      Linked Data Explorer's `main`, `e11e4ef`, carries the same tree as its `acc`; the CPSV
+      Editor's, `6910bb8`, is behind it by the Renovate bump of `zizmor-action` to v0.8.0, in
+      `zizmor.yml` and the register, and by lab material under `examples/lab/`.
     - **How production deploys.** In the Linked Data Explorer a push to `main` now
       starts one ordered *Promote to Production* workflow, which deploys the backend
       before the sites, rather than each deploy workflow firing on its own. See
@@ -197,7 +197,7 @@ release now notices.
 ## Verified against the repositories
 
 The deck's status claims were re-checked on **12 September 2026** rather than taken on
-trust, and re-read against the current `acc` heads on **8 November 2026**:
+trust, and re-read against the current `acc` heads on **15 November 2026**:
 
 - **The rulesets were read from the API**, per branch, with
   `gh api repos/<owner>/<repo>/rules/branches/<branch>`, which reports the effective rules
@@ -220,7 +220,7 @@ trust, and re-read against the current `acc` heads on **8 November 2026**:
 
 - **The pin counts were re-derived** by counting `uses:` references on each `acc` head rather
   than read from a register: the CPSV Editor 21 of 21 across eight workflows, the Linked
-  Data Explorer 35 of 35 across twelve, the RONL Business API 43 of 43 across fourteen. All
+  Data Explorer 35 of 35 across twelve, the RONL Business API 45 of 45 across fifteen. All
   are fully digest-pinned. The counts are action references: each promotion workflow also
   calls the production deploys as local reusable workflows, three in the Linked Data
   Explorer and four in the RONL Business API, which name a path in the same repository
@@ -230,15 +230,15 @@ trust, and re-read against the current `acc` heads on **8 November 2026**:
   the release SBOM, and v2026.10.1 the quarterly dependency review.
 - **`acc` and `main` carried the same code in both applications the deck covers** on
   12 September, when the deck's footnote named the promotion commits `f5bae6a` and
-  `be6bc54`, on 27 September and on 11 October. On 8 November the Linked Data Explorer's
-  `main`, `189435e`, is the same tree as its `acc` head, `4300700`; the CPSV Editor's `main`,
-  `84886c9`, is not, by the two action-pin bumps merged to `acc` (`34a51b4`) after its
-  release.
+  `be6bc54`, on 27 September and on 11 October. On 15 November the Linked Data Explorer's
+  `main`, `e11e4ef`, is the same tree as its `acc` head, `5bccbf2`; the CPSV Editor's `main`,
+  `6910bb8`, is not, by the `zizmor-action` v0.8.0 bump and the lab material merged to `acc`
+  (`2d201d5`) after its release.
 - **Production has run in both**: at the deck's export, the CPSV Editor's *Deploy PROD* at
   `f5bae6a` as run 94 and the Linked Data Explorer's *Deploy Frontend to Production* at
-  `be6bc54` as run 44; on 8 November the latest are *Deploy PROD* #110 at `84886c9`
-  (7 November), and the Linked Data Explorer's *Promote to Production* #9 at `189435e`
-  (7 November) — since v2026.09.7 that workflow is the
+  `be6bc54` as run 44; on 15 November the latest are *Deploy PROD* #114 at `6910bb8`
+  (12 November), and the Linked Data Explorer's *Promote to Production* #11 at `e11e4ef`
+  (12 November) — since v2026.09.7 that workflow is the
   one workflow a push to its `main` deploys through. The deck's
   *"confirmed by eye — 9 Sep"* refers to the first builds, `#88` and `#39`.
 

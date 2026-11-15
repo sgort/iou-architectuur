@@ -74,6 +74,21 @@ Each tenant — municipalities, but also the province, national organisations an
 | `accent` | `#009ee0` |
 | `background` | `#eef1ee` |
 
+### Caribisch Nederland
+
+`bes` · Caribisch Nederland · `organisationType: municipality`
+
+| Property | Value |
+|---|---|
+| `primary` | `#012a87` |
+| `primaryDark` | `#011c5c` |
+| `primaryLight` | `#3a64c8` |
+| `secondary` | `#dc171d` |
+| `accent` | `#f9d90f` |
+| `background` | `#f6f3ea` |
+
+Its logo is `wide`, 52 px high in the landing top bar. It is the first tenant with landing copy of its own (`copy`) and a section for residents (`citizen`), both described below. Its contact fields are empty strings: no contact details are confirmed yet, and each island has its own openbaar lichaam.
+
 ### Flevoland
 
 `flevoland` · Provincie Flevoland · `organisationType: province`
@@ -168,10 +183,30 @@ interface TenantConfig {
   boards?: BoardId[];            // Boards on the landing page; missing means all of them
   logo?: TenantLogo;
   share?: { title: string; description: string };  // Link preview for the /<id> page
+  copy?: TenantCopy;             // Landing copy overrides
+  citizen?: TenantCitizenEntry;  // Section for residents on the landing page
+}
+
+// Merged over the organisation type's landing copy, the preview field by field
+type TenantCopy = Partial<Omit<SingleBoardCopy, 'preview'>> & {
+  preview?: Partial<SingleBoardCopy['preview']>;
+};
+
+interface TenantCitizenEntry {
+  eyebrow: string;                               // e.g. "Voor inwoners"
+  greetings?: { lang: string; text: string }[];  // After the eyebrow, each in its own language
+  title: string;
+  lede: string;
+  islands?: { name: string; flag: string }[];    // Chips, each with a flag image
+  services: { icon: 'doc' | 'pin' | 'clock'; title: string; body: string }[];
+  cta: string;                                   // The DigiD button's label
+  note: string;
 }
 ```
 
-A tenant with exactly one entry in `boards` gets its own landing page at `/<id>` (Amsterdam, Heusden, Dienst Toeslagen and Univé). `share` is written into that page's HTML at build time.
+A tenant with exactly one entry in `boards` gets its own landing page at `/<id>` (Amsterdam, Heusden, Caribisch Nederland at `/bes`, Dienst Toeslagen and Univé). `share` is written into that page's HTML at build time.
+
+Both landing fields are optional; a tenant without them gets its organisation type's copy as it is. `copy` overrides any part of that copy — title, lede, points, and the board preview's figures and rows. `citizen` adds a section between the hero and the points (`CitizenEntry.tsx`), whose button signs a resident in with DigiD, with `test-citizen-<id>` as the login hint; every value in it is rendered as text. A tenant without `citizen` offers residents only the top-bar link.
 
 `tenants.json` lists no citizen services: which services a citizen sees is decided by the `CITIZEN_SERVICES` registry in `@ronl/shared` and by what is deployed under each tenant. A guard test (`citizenServices.test.ts`) fails if a tenant carries a `features` key.
 

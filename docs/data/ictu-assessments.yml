@@ -854,6 +854,57 @@ assessments:
           acceptance in the series. Not 5: eight alerts open, none dismissed
           on the alert itself.
 
+  - date: 2026-11-15
+    kind: measured
+    heads:
+      TTL: 2d201d5
+      LDE: 5bccbf2
+      RBA: 4579486
+    note: >-
+      Lock-file maintenance merged in all three on 12 November, after 38, 31
+      and 24 days open, and the Renovate backlog went with it: on the Sunday
+      one Renovate pull request was open in the CPSV Editor, one in the
+      Linked Data Explorer and none in the RONL Business API. The Linked Data
+      Explorer's refresh carried the `follow-redirects` fix, and its audit,
+      red every day from 31 October to 12 November, has passed since. The
+      sign-in work brought `keycloak-js` into two applications and
+      `jsonwebtoken` and `jwks-rsa` into the Linked Data Explorer's backend,
+      every checklist box unticked. Rulesets, Renovate configuration and
+      cooldowns are unchanged.
+    scores:
+      TTL: [3, 4, 3, 4, 2, 4, 5, 5, 4, 4, 4]
+      LDE: [3, 4, 3, 4, 2, 4, 5, 4, 4, 3, 4]
+      RBA: [3, 4, 3, 4, 2, 4, 4, 4, 4, 4, 4]
+    changes:
+      - component: TTL
+        recommendation: R8
+        from: 4
+        to: 5
+        why: >-
+          Lock-file maintenance #196, open since 5 October, merged on
+          12 November with five other Renovate pull requests — 16 in the
+          30 days, in weekly batches since 29 October, and one open on the
+          Sunday. Every version the refresh changed was at least 15 days old.
+          A stricter reading keeps 4 until a refresh merges within its week.
+      - component: LDE
+        recommendation: R8
+        from: 3
+        to: 4
+        why: >-
+          Lock-file maintenance #301, open since 12 October, merged on
+          12 November with #307, #310, #329 and #330 — 10 in the 30 days,
+          weekly since 29 October — and carried the `follow-redirects` 1.16.2
+          the audit had asked for since 31 October. One open on the Sunday.
+      - component: RBA
+        recommendation: R8
+        from: 3
+        to: 4
+        why: >-
+          Lock-file maintenance #387, open since 19 October, merged on
+          12 November with six others, Operaton pinned by digest (#427) among
+          them — 15 in the 30 days, weekly since 29 October, and none open on
+          the Sunday.
+
 # The test work of the same period, which the guideline above barely scores.
 # Counted from the tree at each weekly commit: files whose name ends in
 # `.test.*` or `.spec.*`, end-to-end specs under an `e2e/` directory, the
@@ -912,3 +963,7 @@ tests:
     TTL: {files: 72, e2e: 4, ci: 5, workflows: 8, floor: true}
     LDE: {files: 166, e2e: 0, ci: 8, workflows: 12, floor: true}
     RBA: {files: 374, e2e: 20, ci: 11, workflows: 14, floor: true}
+  - date: 2026-11-15
+    TTL: {files: 77, e2e: 4, ci: 5, workflows: 8, floor: true}
+    LDE: {files: 175, e2e: 0, ci: 8, workflows: 12, floor: true}
+    RBA: {files: 380, e2e: 20, ci: 12, workflows: 15, floor: true}

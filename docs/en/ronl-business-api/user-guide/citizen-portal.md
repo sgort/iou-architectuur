@@ -12,7 +12,7 @@ MijnOmgeving is where residents apply for the services of their organisation, fo
 
 ## Signing in
 
-Residents sign in with **Inwoner? Log in met DigiD**, at the top of the werkomgeving's landing page or of their own organisation's page — see [Getting Started](getting-started.md#organisation-landing-pages). Where DigiD is not connected, the platform's own sign-in form appears instead; started from an organisation's page, it has that organisation's test resident filled in, such as `test-citizen-heusden`.
+Residents sign in with **Inwoner? Log in met DigiD**, at the top of the werkomgeving's landing page or of their own organisation's page — see [Getting Started](getting-started.md#organisation-landing-pages). An organisation's page may also have a section for residents with its own **Inloggen met DigiD** button, as Caribisch Nederland's does ([Voor inwoners](getting-started.md#voor-inwoners)); it signs you in the same way. Where DigiD is not connected, the platform's own sign-in form appears instead; started from an organisation's page, it has that organisation's test resident filled in, such as `test-citizen-heusden`.
 
 After signing in you land in MijnOmgeving, in your organisation's colours. The header shows **MijnOmgeving** with your organisation's name below it, and on the right your username, your assurance level (**LoA:**) and your roles. **Uitloggen** signs you out and takes you back to your organisation's landing page.
 

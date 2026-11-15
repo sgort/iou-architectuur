@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    CPSV Editor: "34a51b4"
-    Linked Data Explorer: "4300700"
-    RONL Business API: "c6cf3ac"
+    CPSV Editor: "2d201d5"
+    Linked Data Explorer: "5bccbf2"
+    RONL Business API: "4579486"
 ---
 
 # The GitLab Mirror
@@ -71,6 +71,13 @@ API at `c6cf3ac` / `35fb3a8` (`acc` / `main`). The CPSV Editor's `main` is in sy
 `84886c9`; its GitLab `acc` is at `8b57ef2`, an ancestor seven commits behind GitHub's
 `34a51b4` — two Renovate action-pin pull requests merged after the v2026.11.0 release, which
 the next release reconciles.
+
+On 15 November 2026, by `git ls-remote` against both remotes, with the check re-read and
+unchanged: the Linked Data Explorer in sync at `5bccbf2` / `e11e4ef` and the RONL Business
+API at `4579486` / `67bac28` (`acc` / `main`). The CPSV Editor's `main` is in sync at
+`6910bb8`; its GitLab `acc` is at `ab5ff1c`, the v2026.11.1 release, an ancestor twelve
+commits behind GitHub's `2d201d5` — the `zizmor-action` v0.8.0 pull request and the lab
+material merged after the release, which the next release reconciles.
 
 **Two of the three release procedures run a second check straight after this one** — the
 CPSV Editor's since v2026.09.6 and the RONL Business API's since v2026.09.10.

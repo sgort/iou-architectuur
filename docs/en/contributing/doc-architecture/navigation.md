@@ -4,7 +4,7 @@ scope: cross-cutting
 
 # Navigation Structure
 
-The site uses MkDocs Material's tabbed navigation. Each top-level tab corresponds to a major component. Within each tab, pages are grouped into Features, User Guides, Developer Docs, and References.
+The site uses MkDocs Material's tabbed navigation. Apart from Home, the Project Start Architecture and Contributing, each top-level tab corresponds to a component. Within a component tab, pages are grouped into an Overview, Features, User Guides, Developer Docs and References.
 
 ---
 
@@ -93,8 +93,9 @@ IOU Architecture Docs
     `mkdocs.yml` and reached from the slide-deck table on the home page.
 
     The Dutch tree mirrors the English one, and falls back to the English page where no
-    Dutch counterpart exists. As of 8 November 2026 that is seven pages: **OpenAPI
+    Dutch counterpart exists. As of 15 November 2026 that is seven pages: **OpenAPI
     Rendering**, the Linked Data Explorer's two **API Specification** pages (v1 and,
     since 6 October 2026, v2) and the RONL Business API's, the CPSV Editor's **Data Model Diagrams**, the **IOU
-    Architecture** slide deck, and the Norm Editor's **Changelog & Roadmap**.
+    Architecture** slide deck, and the Norm Editor's **Changelog & Roadmap**. The tree
+    was reconciled against `mkdocs.yml` again on 15 November 2026 and still matched.
 

@@ -40,7 +40,7 @@ Beyond the standard OIDC claims, a token carries the attributes the platform rel
 
 ## Roles and authorization
 
-A caller's roles are read from the token's `realm_access.roles` and checked against whatever a given endpoint requires: a route can require the caller to hold at least one of a set of roles, and a caller lacking all of them is rejected with `403 FORBIDDEN`. The same roles decide which candidate groups a caller's task list covers — see [Tasks — Visibility](tasks.md#visibility).
+A caller's roles are read from the token's `realm_access.roles` and checked against whatever a given endpoint requires: a route can require the caller to hold at least one of a set of roles, and a caller lacking all of them is rejected with `403 FORBIDDEN`. The same roles decide which candidate groups a caller's task list covers — see [Tasks — Visibility](tasks.md#visibility) — and, where a process model names the groups that may start it, whether the caller may: the backend refuses anyone outside them with `403 NOT_CANDIDATE_STARTER` (see [Processes — Who may start it](processes.md#who-may-start-it)).
 
 Two operations additionally require a minimum level of assurance, checked against the token's `loa` claim rather than its roles. The levels are ordered `basis`, `midden`, `substantieel`, `hoog`: evaluating a decision requires at least `basis`, and starting a process at least `midden`. A token below the required level, or carrying no recognised level at all, is rejected with `403 INSUFFICIENT_ASSURANCE`.
 

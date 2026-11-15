@@ -4,26 +4,27 @@ component: RONL Business API
 
 # Backend suite
 
-`packages/backend`, Jest with the `ts-jest` preset. **109 files · 2681 tests ·
-all passing · nothing skipped · `Time: 198.029 s`** under `--runInBand`,
-followed by *"✓ all 137 documented operations were checked against a real
+`packages/backend`, Jest with the `ts-jest` preset. **111 files · 2753 tests ·
+all passing · nothing skipped · `Time: 127.35 s`** under `--runInBand`,
+followed by *"✓ all 138 documented operations were checked against a real
 response"*. Coverage is on by default; see
 [Coverage](coverage.md#backend-by-area) for the per-area figures.
 
-Measured on **12 November 2026** for v2026.11.2 — the release in production,
-`main` at `ad0fd62` — with `npx jest --coverage --runInBand` followed by
+Measured on **14 November 2026** for v2026.11.4 — the release in production,
+`main` at `67bac28` — with `npx jest --coverage --runInBand` followed by
 `node scripts/check-conformance-coverage.cjs`, which is exactly what
-`npm run test:serial --workspace=packages/backend` runs, in the working
-checkout on `acc` at `4e28ed7` (a tree identical to `ad0fd62`) after
-`npm run deps:check` reported *"Dependencies are ready."*, on Node 22.23.4,
-the version `.nvmrc` names. Every count on this page reproduced the
-7 November measurement of v2026.11.1 file for file: v2026.11.2 changed no
-backend test, and only the time moved (137.576 s on 7 November). The package
-total is the runner's own. The
+`npm run test:serial --workspace=packages/backend` runs, on `acc` at
+`4579486` (a tree identical to `67bac28`); `.nvmrc` names Node 22.23.4.
+About 173 seconds of wall clock, coverage included. v2026.11.4 added no file
+and 16 tests to the 2737 measured earlier the same day for v2026.11.3
+(102.285 s), which had added two files and 56 tests to the 2681 of
+12 November, which had reproduced 7 November file for file (198.029 s on
+12 November, 137.576 s on 7 November). The package total is the runner's
+own. The
 per-file and per-area counts are not printed by Jest's default reporter, so
 they were read from Jest's JSON report of the same run (`--json`), which
-lists every test of every file; the 109 files sum to the runner's 2681, as
-the 105 did to 2638 on 11 October. Through 9 October every file's count was parsed from its
+lists every test of every file; the 111 files sum to the runner's 2753, as
+they did to 2737 for v2026.11.3 and the 109 to 2681 on 7 and 12 November. Through 9 October every file's count was parsed from its
 source with the TypeScript compiler, `.each` tables and literal `for … of`
 loops expanded — never a grep for `it(`, which miscounts parameterised and
 multi-line cases. Two tables are not literals and were resolved by hand:
@@ -37,8 +38,11 @@ runner's 2633 exactly at `ebec288`, and 2457 and every per-area figure the
     `&& node scripts/check-conformance-coverage.cjs`. Jest runs the suite as
     before; the script then fails the run unless **every operation in the
     OpenAPI document was compared against a real response** at least once. On
-    12 November it printed *"✓ all 137 documented operations were checked
-    against a real response"*, as on 7 November: v2026.10.3 documented
+    14 November it printed *"✓ all 138 documented operations were checked
+    against a real response"*: v2026.11.3 documented
+    `GET /v1/process/startable` (`getStartableProcesses`), the processes a
+    caseworker may start from *Proces starten*. On 7 and 12 November it was
+    137: v2026.10.3 documented
     `GET /v1/rip/phases/completed`, the finished instances of every RIP phase
     the Infra-board portfolio reads. On 11 October it was 136, as on 3 and
     9 October: v2026.10.2 documented no operation and removed none; it rewrote the
@@ -51,21 +55,46 @@ runner's 2633 exactly at `ebec288`, and 2457 and every per-area figure the
     404. On 3 October it was 133 from 30 September plus the two Besluitvorming
     lists and `POST /v1/m2m/process/history`.
 
-    **That figure, and 2681 / 109, are this package's alone.** The repository
-    runs **348 test files and 5318 tests** across five workspaces — see
+    **That figure, and 2753 / 111, are this package's alone.** The repository
+    runs **351 test files and 5434 tests** across five workspaces — see
     [Overview](overview.md). Quoting the backend's count as a repository total
     understates the suite by over two thousand tests.
 
-!!! note "2011 → 2008 → 2028 → 2072 → 2198 → 2202 → 2370 → 2457 → 2633 → 2638 → 2681, and nothing was lost on the way"
+!!! note "2011 → 2008 → 2028 → 2072 → 2198 → 2202 → 2370 → 2457 → 2633 → 2638 → 2681 → 2737 → 2753, and nothing was lost on the way"
     The suite reported **2011** for several releases, of which 2008 ran and
     **three were permanently skipped**. Those three guarded the
     `PHASE_NOT_MODELLED` branch of the RIP phase model. v2026.09.7 made an
     unmodelled phase unrepresentable (issue #85), the branch went, and the
     three skipped cases went with it — a deletion of dead tests rather than a
-    regression. The **2681** measured here is growth on that 2008 base. No
+    regression. The **2753** measured here is growth on that 2008 base. No
     workspace in this repository skips anything.
 
-    **v2026.10.3 to v2026.11.1 added +43 tests and four files** against the
+    **v2026.11.4 added +16 tests and no file** against the measurement of
+    v2026.11.3 earlier on 14 November (111 files, 2737), all of it in three
+    existing files:
+
+    | File | Tests | What changed |
+    |---|---:|---|
+    | `services/operaton.service.test.ts` | 210 → **218** | `getHistoryVariables`: the `Json` values of an ended instance parsed from their text, matched by row id; `Object` variables kept deserialised; `getVariableHints` reading without deserialising; a malformed `Json` value kept as text and logged |
+    | `utils/operaton-variables.test.ts` | 11 → **15** | `fromJsonVariableText`: valid JSON parsed, `null` staying `null`, a non-string returned unchanged, and invalid text returned as it is and reported |
+    | `utils/starter-groups.test.ts` | 14 → **18** | `hasStartForm` counts a `formKey`, an embedded `formKey` too, ignores an empty one, and ignores a `formKey` on a sub-process's start event |
+
+    **History: v2026.11.3 added +56 tests and two files** against the 12 November
+    measurement of v2026.11.2 (109 files, 2681) — 21 in the new files and
+    35 in existing ones:
+
+    | File | Tests | What changed |
+    |---|---:|---|
+    | `utils/starter-groups.test.ts` | **14** (new) | `parseStarterGroups`, `hasStartForm` — a form on a sub-process's start event ignored — and `mayStart`: anyone when a process declares no starter groups, a user holding one of them as a role, names compared case-sensitively; and a file with more than one process, read by key |
+    | `services/brp-upstream.test.ts` | **7** (new) | `brpHealthCheck`: a `HEAD` on the API root, so no BSN is sent; up on any answer below 500, down on a 5xx, on a certificate for another host, an expired certificate, a DNS failure or a timeout; and `transportErrorCode` |
+    | `routes/process.routes.test.ts` | 117 → **134** | Candidate starter groups at start — `403 NOT_CANDIDATE_STARTER`, a matching role, none declared, the deployment the start resolved to, failing closed when the groups cannot be read — and `GET /startable` |
+    | `services/operaton.service.test.ts` | 203 → **210** | `getStarterGroups` and `listStartCandidates`, and a `Json` variable returned as its data rather than the engine node |
+    | `routes/health.routes.test.ts` | 22 → **26** | `/v1/health` reports the BRP upstream beside the other dependencies, stays healthy when it is down and names why, and survives a probe that throws |
+    | `utils/operaton-variables.test.ts` | 7 → **11** | `toOperatonVariable`: an array or object sent as a JSON string, scalars and `null` unchanged |
+    | `routes/brp.routes.test.ts` | 10 → **12** | `502 BRP_UPSTREAM_UNREACHABLE` on a failed TLS handshake, a timeout or a DNS failure |
+    | `routes/task.routes.test.ts` | 57 → **58** | A dynamic list sent to Operaton as a JSON string |
+
+    **History: v2026.10.3 to v2026.11.1 added +43 tests and four files** against the
     11 October measurement of v2026.10.2 (105 files, 2638) — 19 in the new
     files and 24 in existing ones:
 
@@ -197,18 +226,18 @@ per-file 80% branch floor in `jest.config.js` rides along with it rather than
 needing a coverage job of its own — and so do the OpenAPI coverage gate, an
 ordinary test file, and the conformance-coverage check that `npm test` runs
 after Jest. Since v2026.09.7 `azure-backend-acc.yml` also
-triggers on `pull_request`, so these 2681 tests run *before* a merge rather than
+triggers on `pull_request`, so these 2753 tests run *before* a merge rather than
 only after one — and since **19 September 2026 that run is a required check**,
 so a red backend suite now blocks the merge to `acc` outright. See
 [Overview → What actually gates a merge](overview.md#what-actually-gates-a-merge).
 
 | Area | Files | Tests |
 |---|---:|---:|
-| `src/routes` | 21 | 708 |
-| `src/services` | 29 | 671 |
+| `src/routes` | 21 | 732 |
+| `src/services` | 30 | 693 |
 | `src/pa-monitoring` | 16 | 583 |
 | `src/rip-swimlane` | 2 | 206 |
-| `src/utils` | 18 | 168 |
+| `src/utils` | 19 | 194 |
 | `src/media-aggregator` | 8 | 112 |
 | `src/auth` | 4 | 88 |
 | `src/mcp-servers` | 3 | 63 |
@@ -216,13 +245,25 @@ so a red backend suite now blocks the merge to `acc` outright. See
 | `src/middleware` | 4 | 39 |
 
 !!! success "Both columns are current, and they sum"
-    Re-derived on 12 November 2026, unchanged since 7 November: the Files column accounts for all **109**
-    files and the Tests column sums to **2681**, the measured total, every
+    Re-derived on 14 November 2026: the Files column accounts for all **111**
+    files and the Tests column sums to **2753**, the measured total, every
     file's count read from Jest's JSON report of the measured run (see the
     note at the top of this page). Earlier versions of this page carried a
     Files column from one date and a Tests column from another that fell
     274 short, with a warning attached; that gap is closed and has stayed
-    closed across nine re-derivations.
+    closed in every re-derivation since.
+
+    **Two areas moved in v2026.11.4, and no file was added**:
+    `src/services` 685 → **693** (`operaton.service` +8) and `src/utils`
+    186 → **194** (`operaton-variables` +4, `starter-groups` +4). The other
+    eight are unchanged to the test.
+
+    **Three areas moved in v2026.11.3, and two files were added**:
+    `src/routes` 708 → **732** (`process.routes` +17, `health.routes` +4,
+    `brp.routes` +2, `task.routes` +1), `src/services` 29 → **30** files and
+    671 → **685** (`brp-upstream` new, `operaton.service` +7), and
+    `src/utils` 18 → **19** files and 168 → **186** (`starter-groups` new,
+    `operaton-variables` +4). The other seven are unchanged to the test.
 
     **One area moved in v2026.10.2, and no file was added**: `src/services`
     647 → **652**, on `operaton.service.test.ts`. The other nine are

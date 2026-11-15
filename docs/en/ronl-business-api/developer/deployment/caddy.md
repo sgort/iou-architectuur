@@ -79,7 +79,7 @@ Create `~/caddy/docker-compose.yml` on the VM:
 version: '3.8'
 services:
   caddy:
-    image: caddy:2-alpine
+    image: caddy:2.11.9-alpine@sha256:003a97808e781aa9f7e75cc2f43d34d461099031faf5e20faefb9f61126836f0
     container_name: caddy
     ports:
       - "80:80"
@@ -113,7 +113,7 @@ docker compose logs -f caddy    # verify certificate provisioning
 
 Caddy is ready when you see: `certificate obtained successfully`
 
-The image is the floating tag `caddy:2-alpine`, while the Operaton test harness pins Caddy 2.10.2; pinning the VM's images waits on #196. A change to `caddy.env` needs `docker compose up -d` (a recreate), not a reload.
+The image is pinned by tag and digest, `caddy:2.11.9-alpine@sha256:003a9780…`, the same as in the Operaton test harness (`deployment/vm/operaton/test`), so the engine-rest rules are proven on the version the VM runs; the two move together. Until v2026.11.4 the VM ran the floating `caddy:2-alpine`. Pinning the VM's other images waits on #196. A change to `caddy.env` needs `docker compose up -d` (a recreate), not a reload.
 
 ---
 
@@ -128,8 +128,7 @@ Since v2026.11.1 Operaton's REST API requires a login ([#415](https://github.com
 
 The rules are proven by `deployment/vm/operaton/test/check-allowlist.sh` against the same Caddy and engine versions, including path tricks and kept caller credentials. See [Operaton deployment](operaton.md) for the engine side.
 
-!!! note "A temporary access log"
-    The rollout added an access log of every request to the engine's REST API, so no caller would be missed before the login went on. At v2026.11.1 it is still in the `Caddyfile`; the rollout's last step removes it.
+The rollout added a temporary access log of every request to the engine's REST API, so no caller would be missed before the login went on. v2026.11.4 removed it from the `Caddyfile`, which was the rollout's last step.
 
 ---
 

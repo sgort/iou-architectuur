@@ -5,9 +5,22 @@ component: RONL Business API
 # Public site suite
 
 `packages/public-site`, Vitest with jsdom. **34 files · 275 tests · all
-passing · 58.25s** without file parallelism.
+passing · 149.32s** without file parallelism.
 
-!!! success "Re-measured at v2026.11.2: nothing changed, and the figures held"
+!!! success "Re-measured at v2026.11.3 and v2026.11.4: nothing changed, and the figures held"
+    Re-run on **14 November 2026** for v2026.11.3 (`main` at `f54e4f0`), in the
+    working checkout at `6f86b10`, a tree identical to `f54e4f0`, serially with
+    coverage: **34 files · 275 tests · all passing · `Duration 149.32s`**,
+    coverage **96.68 / 97.41 / 95.09 / 97.23** — every figure as on 7 and
+    12 November and on 9 and 11 October. v2026.11.3 did not touch this
+    package. The Playwright suite below was re-run too.
+
+    **And again for v2026.11.4** the same day (`acc` at `4579486`, a tree
+    identical to `main` at `67bac28`): 34 files · 275 tests · all passing,
+    and the same coverage. v2026.11.4 did not touch this package either; the
+    Playwright suite was not re-run for it.
+
+!!! note "History: re-measured at v2026.11.2, nothing changed, and the figures held"
     Re-run on **12 November 2026** for v2026.11.2 (`main` at `ad0fd62`), in the
     working checkout on `acc` at `4e28ed7`, a tree identical to `ad0fd62`,
     serially with coverage on Node 22.23.4: **34 files · 275 tests · all
@@ -174,7 +187,18 @@ preservation, a deep link with pre-applied filters, keyboard-only navigation,
 and three axe-core accessibility scans (home, results, a detail page) asserting
 no critical or serious violations.
 
-!!! success "Re-run on 7 November 2026: 6 passed with one worker"
+!!! warning "Re-run on 14 November 2026: 6/6 serially, 2 timeouts in the parallel run — as on 3 and 9 October"
+    **Measured 14 November 2026 for v2026.11.3**, against the developer's
+    already-running backend: **default run, six parallel workers, 4 passed,
+    2 failed, 15.3s** — *search → filter → detail → back preserves the
+    filtered URL* and *a deep link with filters pre-applied renders those
+    filters checked*, each a `TimeoutError` from `locator.waitFor` after 10s
+    on the first *Regel* filter checkbox — and **6 passed in 6.3s with
+    `--workers=1`**. Recorded as **6/6 serially; 2 timeouts in the parallel
+    run**, not as a defect. The spec is unchanged since `2443adc`; three
+    passes have now failed the same wait under six workers.
+
+!!! note "History: re-run on 7 November 2026, 6 passed with one worker"
     **Measured 7 November 2026 for v2026.11.1** with `--workers=1`, against
     the developer's already-running backend: **6 passed in 20.8s**, every
     test between 0.7s and 6.2s. No default parallel run was made this time,

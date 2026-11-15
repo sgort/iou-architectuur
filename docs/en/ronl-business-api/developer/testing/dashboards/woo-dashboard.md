@@ -15,10 +15,11 @@ reassurance.
 
 ## Frontend
 
-Measured on **12 November 2026** at `4e28ed7`, a tree identical to `main`
-at `ad0fd62` (v2026.11.2): the frontend package ran 143 files and 1738 tests,
-all passing, every per-file count the same as on 7 November for v2026.11.1, and the counts below are read from Vitest's JSON report of that
-run. Every count is the same as on 30 September and 3 and 9 October. The
+Measured on **14 November 2026** on `acc` at `4579486`, a tree identical to
+`main` at `67bac28` (v2026.11.4): the frontend package ran 144 files and
+1782 tests, all passing, every per-file count on this page the same as on
+7 and 12 November and in the v2026.11.3 run earlier that day, and the counts
+below are read from Vitest's JSON report of that run. Every count is the same as on 30 September and 3 and 9 October. The
 releases since touched this board's source only to move its colours onto the
 shared tokens (`charts.tsx`, `WooNoAccessPanel.tsx`, `dashboard-woo.css`); no
 test changed.
@@ -73,10 +74,10 @@ the latter up from 96.55 / 84.12 / 94.44 / 98.01.
 
 **No spec drives this board.** Verified against `packages/frontend/e2e/` on
 30 August 2026, at `ae06c9e` on 30 September, in the full frontend runs of
-3 and 9 October, and in that of 7 November, whose 61 tests include none that
-drives it. Since v2026.11.0 `accessibility.spec.ts` signs in as
+3 and 9 October, and in those of 7 and 14 November, whose 61 and 67 tests
+include none that drives it. Since v2026.11.0 `accessibility.spec.ts` signs in as
 `test-woo-flevoland`, waits for `/dashboard/woo` and scans it with axe-core
-(one test, passing on 7 November) — that proves the page renders and meets the
+(one test, passing on 7 and 14 November) — that proves the page renders and meets the
 accessibility baseline, not that any of its sections work. Otherwise `login-redirect` only checks that
 `test-woo-flevoland` lands on it, and v2026.10.1's `landing-access-denied`
 opens the Woo card as a caseworker to assert the landing page's

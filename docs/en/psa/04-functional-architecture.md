@@ -2,11 +2,11 @@
 title: "4. Functional architecture"
 scope: cross-cutting
 verified:
-  date: 2026-11-06
+  date: 2026-11-15
   against:
-    CPSV Editor: "0412e9b"
-    Linked Data Explorer: "814c4bb"
-    RONL Business API: "ff6c362"
+    CPSV Editor: "6910bb8"
+    Linked Data Explorer: "e11e4ef"
+    RONL Business API: "67bac28"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -59,8 +59,9 @@ The login service has a few fixed roles, and in addition roles per process.
 | Administrator | Administer their own organisation | Core |
 | Process roles | Tasks within one process, such as submitter, lawyer or signatory; linked to tasks in the process model | Organisation's own |
 
-The design tools have no roles yet: they do not check who uses them (AB-20,
-risk R-02).
+In the Linked Data Explorer and the CPSV Editor only a staff member with the
+author role may save, deploy and publish; that role applies to all organisations
+at once. The Norm Editor has no roles yet (AB-20, risk R-02).
 
 ## Phasing
 

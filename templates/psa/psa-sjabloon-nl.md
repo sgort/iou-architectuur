@@ -9,7 +9,7 @@
 | Auteur | […] |
 | Vastgesteld door | […] |
 
-Gebaseerd op de IOU PSA-gids, geverifieerd op 2026-11-06 tegen CPSV Editor 0412e9b, Linked Data Explorer 814c4bb, RONL Business API ff6c362, Norm Editor c47096b, CPRMV 8262d3e.
+Gebaseerd op de IOU PSA-gids, geverifieerd op 2026-11-15 tegen CPSV Editor 6910bb8, Linked Data Explorer e11e4ef, RONL Business API 67bac28, Norm Editor c47096b, CPRMV 8262d3e.
 
 ## Over dit sjabloon
 
@@ -262,8 +262,9 @@ De inlogvoorziening kent een paar vaste rollen, en daarnaast rollen per proces.
 | Beheerder | Beheer van de eigen organisatie | Kern |
 | Procesrollen | Taken binnen één proces, zoals indiener, jurist of ondertekenaar; in het procesmodel gekoppeld aan taken | Eigen keuze |
 
-De ontwerptools kennen nog geen rollen: ze controleren niet wie ze gebruikt
-(AB-20, risico R-02).
+In de Linked Data Explorer en de CPSV Editor mag alleen een medewerker met de rol
+voor auteurs opslaan, uitrollen en publiceren; die rol geldt voor alle
+organisaties tegelijk. De Norm Editor kent nog geen rollen (AB-20, risico R-02).
 
 ### Fasering
 
@@ -356,7 +357,7 @@ Elk onderdeel staat bij de stap waar het hoort. Tussen haakjes staat de laag.
 | Van | Naar | Waarvoor | Hoe |
 |---|---|---|---|
 | Webinterfaces | Hun eigen backend | Alle functies | HTTPS; de browser praat niet zelf met engine of kennisgraaf |
-| CPSV Editor | Kennisgraaf | Publiceren | HTTPS, via de API van TriplyDB en de backend van de Linked Data Explorer |
+| CPSV Editor | Kennisgraaf | Publiceren | HTTPS, via de backend van de Linked Data Explorer, als ingelogde auteur |
 | Norm Editor | Kennisgraaf | Interpretaties opslaan | HTTPS, via de API van TriplyDB |
 | Linked Data Explorer | Kennisgraaf | Beslismodellen vinden, regels afnemen | SPARQL 1.1 |
 | Linked Data Explorer | Procesengine | Procesbundels uitrollen; taken die het systeem zelf uitvoert | Camunda 7 REST-API |
@@ -371,9 +372,9 @@ uitgerolde versie levert wat de koppeling nodig heeft. Tot dan staat ze uit, en
 werkt de rest gewoon door. Zo kan IOU een standaard stap voor stap overnemen
 (zie [Over deze PSA](https://iou-architectuur.open-regels.nl/nl/psa/#hoe-iou-zich-ontwikkelt)).
 
-De ontwerptools gebruiken nog geen tokens (AB-20, risico R-02). Waar de
-webinterfaces van de Linked Data Explorer, de CPSV Editor en de Norm Editor met hun
-backend praten, controleert die backend dus nog niet wie de gebruiker is.
+De Linked Data Explorer en de CPSV Editor sturen bij schrijven een token mee, dat
+de backend van de Linked Data Explorer controleert. De Norm Editor gebruikt nog
+geen tokens: zijn backend controleert niet wie de gebruiker is (AB-20, risico R-02).
 
 ### Fasering
 
@@ -463,10 +464,10 @@ bijgehouden** (AB-27). Dat is vervangbaar: u mag uw bestaande register gebruiken
 | Persoonsgegevens uit basisregistraties | Bij de bron; opgevraagd wanneer nodig | De bronhouder | Niet gekopieerd |
 | Wettekst | Officiële publicatiebronnen; opgevraagd via de CPRMV API | De wetgever | Niet gekopieerd |
 
-Twee kleinere opslagplekken: de Linked Data Explorer bewaart testgevallen en
-sjablonen voor ketens in de browser van de gebruiker, en de CPSV Editor bewaart
-daar het TriplyDB-token waarmee wordt gepubliceerd (zie
-[hoofdstuk 8](https://iou-architectuur.open-regels.nl/nl/psa/08-security-and-privacy/)).
+Een kleinere opslagplek: de Linked Data Explorer bewaart testgevallen en
+sjablonen voor ketens in de browser van de gebruiker. Het token waarmee in de
+kennisgraaf wordt gepubliceerd, staat alleen bij de backend van de Linked Data
+Explorer (zie [hoofdstuk 8](https://iou-architectuur.open-regels.nl/nl/psa/08-security-and-privacy/)).
 
 ### Fasering
 
@@ -542,7 +543,7 @@ namens zichzelf aanroepen, staan bij naam op een lijst van toegestane clients.
 |---|---|---|---|
 | Zaken, taken, beslissingen, formulieren, documenten | RONL Business API | Werkomgeving en MijnOmgeving | Token van de OIDC-uitgever, met rol en organisatie |
 | Publieke catalogi | RONL Business API | Iedereen | Zonder inloggen, alleen lezen, met een limiet op het aantal verzoeken (AB-22) |
-| Normen, beslismodellen, procesbundels | Linked Data Explorer | Andere IOU-onderdelen, andere organisaties | Lezen openbaar; schrijven nog zonder controle (R-02) |
+| Normen, beslismodellen, procesbundels | Linked Data Explorer | Andere IOU-onderdelen, andere organisaties | Lezen openbaar; schrijven met een token van de OIDC-uitgever en de rol voor auteurs (R-02) |
 | Wettekst en verwijzingen | CPRMV API | Iedereen die wettekst nodig heeft | Openbaar |
 | SPARQL | Kennisgraaf | IOU-onderdelen, andere organisaties | Lezen volgens de instelling van de dataset; schrijven met een token |
 
@@ -641,11 +642,13 @@ Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/08-secur
 - **Betrouwbaarheidsniveau per handeling** (AB-19). Een beslissing laten berekenen
   vraagt `basis`, een proces starten `midden`.
 - **Elke schrijfactie geauthenticeerd, geautoriseerd en vastgelegd** (AB-20). De
-  RONL Business API voldoet hieraan. De Linked Data Explorer, de CPSV Editor en de
-  Norm Editor nog niet: wie hun backend kan bereiken, kan er schrijven
-  (risico R-02).
-- **De ontwerptools alleen voor medewerkers** (AB-21). Dat wordt pas afgedwongen
-  als AB-20 is gerealiseerd. Tot dan schermt u ze zelf af.
+  RONL Business API voldoet hieraan. De Linked Data Explorer en de CPSV Editor
+  vragen een login met de rol voor auteurs, maar leggen nog niet vast wie wat deed,
+  en de rol is niet per organisatie. Wie de backend van de Norm Editor kan
+  bereiken, kan er schrijven (risico R-02).
+- **De ontwerptools alleen voor medewerkers** (AB-21). De Linked Data Explorer en
+  de CPSV Editor dwingen dat af met de rol voor auteurs; de Norm Editor nog niet.
+  Die schermt u zelf af.
 
 **Afscherming**
 
@@ -660,7 +663,8 @@ Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/08-secur
 **Vastlegging en privacy**
 
 - **Elk geauthenticeerd verzoek vastgelegd in een aparte auditopslag** (AB-23).
-  Een bewaartermijn wordt nog niet toegepast (risico R-10).
+  Een bewaartermijn wordt nog niet toegepast (risico R-10). Handelingen die buiten
+  de RONL Business API om gaan, vallen daarbuiten (risico R-16).
 - **Gegevens bij de bron** (AB-26): persoonsgegevens uit basisregistraties worden
   opgevraagd wanneer nodig, niet gekopieerd.
 - **Verwerkingsregister per proces** (AB-27), openbaar zonder contactgegevens.
@@ -941,7 +945,7 @@ Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/11-decis
 | AB-05 | API's volgen de API Design Rules en hebben een OpenAPI 3.1-beschrijving die automatisch wordt gecontroleerd. | Kern | deels | RONL Business API en Linked Data Explorer wel; CPRMV en de Norm Editor nog niet. |
 | AB-06 | Publieke dienstverlening wordt beschreven en gepubliceerd met de CPSV Editor. | Kern | gerealiseerd | |
 | AB-07 | Regels worden vastgelegd in CPRMV: een regelset hoort bij een publieke dienst, verwijst naar de wet waarop hij berust, en heeft een geldigheidsperiode. | Kern | deels | De CPSV Editor koppelt een regelset aan de wet met een andere relatie dan CPRMV voorschrijft. CPRMV is nog een eerste openbare werkversie. |
-| AB-08 | Processen worden ontworpen in de Linked Data Explorer en alleen via zijn backend uitgerold, als één bundel van proces, formulieren en documentsjablonen. | Kern | deels | Zo rolt de Linked Data Explorer uit. Een uitrol buiten de Linked Data Explorer om vraagt nu een login op de engine, maar de backends loggen in met volledige beheerrechten, en de Linked Data Explorer controleert zelf nog niet wie uitrolt (zie AB-13, AB-20). |
+| AB-08 | Processen worden ontworpen in de Linked Data Explorer en alleen via zijn backend uitgerold, als één bundel van proces, formulieren en documentsjablonen. | Kern | deels | Zo rolt de Linked Data Explorer uit, en alleen een medewerker met de rol voor auteurs mag dat; zonder inloggen kan buiten productie alleen een beslismodel worden proefuitgerold, in een afgescheiden testomgeving. Een uitrol buiten de Linked Data Explorer om vraagt een login op de engine, maar de backends loggen in met volledige beheerrechten (zie AB-13). |
 | AB-09 | Beslismodellen worden gevonden met standaard SPARQL; regels worden afgenomen via de versie-2-API voor normen, met een vaste stabiliteitsbelofte. | Kern | gerealiseerd | De versie-1-API is uitgefaseerd en verdwijnt op 1 november 2028. |
 | AB-10 | Elke gepubliceerde dienst staat in één eigen graaf per organisatie en dienst, op een vast adres. | Kern | gerealiseerd | Opnieuw publiceren overschrijft de graaf; er blijft geen geschiedenis bewaard (risico R-06). |
 | AB-11 | Gedeelde producten worden vóór publicatie gevalideerd tegen de SHACL-shapes van CPSV-AP, CPRMV en RONL; een fout blokkeert publicatie. Tijdens het opstellen is de controle een advies. | Kern | nog niet | De controle bestaat, maar blokkeert nooit. |
@@ -950,22 +954,22 @@ Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/11-decis
 | AB-14 | Processen en beslissingen draaien op een engine met de Camunda 7 REST-API; IOU kiest Operaton. | Vervangbaar | gerealiseerd | Camunda 7 Enterprise past; Camunda 8 vraagt een herbouw. |
 | AB-15 | De organisatie reist mee met elke uitrol en elke zaak. Een beslismodel wordt één keer uitgerold en gedeeld; verschillen per organisatie staan in de beslistabel zelf. | Kern | gerealiseerd | |
 | AB-16 | Gepubliceerde producten staan in een SPARQL 1.1-triplestore; IOU kiest TriplyDB. | Vervangbaar | gerealiseerd | **Onder herziening**: IOU overweegt Apache Jena Fuseki. |
-| AB-17 | Backends accepteren tokens van één OIDC-uitgever, die de inlogvoorzieningen voor medewerkers en inwoners achter zich koppelt. Welk product de uitgever is, staat in AB-32. | Kern | deels | De RONL Business API wel. De ontwerptools controleren nog geen tokens (zie AB-20). |
-| AB-18 | De backend bepaalt per zaak wie iets mag, en weigert bij twijfel: alleen de eigen organisatie of de aanvrager zelf. | Kern | gerealiseerd | In de RONL Business API. |
+| AB-17 | Backends accepteren tokens van één OIDC-uitgever, die de inlogvoorzieningen voor medewerkers en inwoners achter zich koppelt. Welk product de uitgever is, staat in AB-32. | Kern | deels | De RONL Business API en de Linked Data Explorer wel; de CPSV Editor heeft geen eigen backend en gebruikt die van de Linked Data Explorer. De backend van de Norm Editor controleert nog geen tokens (zie AB-20). |
+| AB-18 | De backend bepaalt per zaak wie iets mag, en weigert bij twijfel: alleen de eigen organisatie of de aanvrager zelf. | Kern | gerealiseerd | In de RONL Business API. Wie een proces mag starten, kan in het procesmodel staan; de backend weigert dan anderen, en ook wanneer hij dat niet kan nagaan. |
 | AB-19 | Handelingen vragen een betrouwbaarheidsniveau: `basis` om een beslissing te laten berekenen, `midden` om een proces te starten. | Kern | deels | De controle werkt. DigiD en eIDAS zijn voorbereid maar uitgeschakeld; eHerkenning is er nog niet. |
-| AB-20 | Elke schrijfactie in elk onderdeel is geauthenticeerd, geautoriseerd en vastgelegd. Publiceren gebeurt namens een bevoegde organisatie. | Kern | deels | De RONL Business API wel. Linked Data Explorer, CPSV Editor en Norm Editor nog niet. |
-| AB-21 | De ontwerptools zijn alleen voor medewerkers; inwoners en ondernemers komen alleen bij de portalen en de publieke site. | Kern | deels | Inwoners krijgen de ontwerptools niet aangeboden, maar die tools dwingen dat nog niet af (zie AB-20). |
+| AB-20 | Elke schrijfactie in elk onderdeel is geauthenticeerd, geautoriseerd en vastgelegd. Publiceren gebeurt namens een bevoegde organisatie. | Kern | deels | De RONL Business API wel. De Linked Data Explorer en de CPSV Editor vragen voor schrijven een login met de rol voor auteurs, maar die rol geldt voor alle organisaties, en alleen publiceren wordt genoteerd, in het gewone log. De Norm Editor nog niet. |
+| AB-21 | De ontwerptools zijn alleen voor medewerkers; inwoners en ondernemers komen alleen bij de portalen en de publieke site. | Kern | deels | De Linked Data Explorer en de CPSV Editor laten alleen medewerkers met de rol voor auteurs schrijven; buiten productie mag iedereen een beslismodel proefuitrollen. De Norm Editor dwingt het nog niet af (zie AB-20). |
 | AB-22 | Publieke catalogi worden live uit de kennisgraaf gelezen, via een aparte publieke laag die alleen leest, zonder inloggen en met een limiet op het aantal verzoeken. | Kern | gerealiseerd | |
-| AB-23 | Elk geauthenticeerd verzoek wordt vastgelegd in een aparte auditopslag. De bewaartermijn bepaalt u zelf. | Kern | deels | De vastlegging werkt; een bewaartermijn wordt nog nergens toegepast. |
+| AB-23 | Elk geauthenticeerd verzoek wordt vastgelegd in een aparte auditopslag. De bewaartermijn bepaalt u zelf. | Kern | deels | In de RONL Business API werkt de vastlegging, met een uitzondering (R-16); een bewaartermijn wordt nog nergens toegepast. De Linked Data Explorer legt nog niets vast in een auditopslag. |
 | AB-24 | Documenten blijven in het documentmanagementsysteem van de organisatie; de zaak bevat alleen een verwijzing. | Eigen keuze | gerealiseerd | |
 | AB-25 | Elk onderdeel beheert zijn eigen gegevens; geen onderdeel leest de database van een ander. | Kern | deels | De RONL Business API leest nog rechtstreeks uit de database van de Linked Data Explorer. |
-| AB-26 | Gegevens blijven bij de bron: basisregistraties worden bevraagd, niet gekopieerd. | Kern | deels | De BRP wordt bevraagd via de Haal Centraal-API, maar nog tegen een testvoorziening. Andere registraties zijn nog niet gekoppeld. |
+| AB-26 | Gegevens blijven bij de bron: basisregistraties worden bevraagd, niet gekopieerd. | Kern | deels | De BRP wordt bevraagd via de Haal Centraal-API, maar in elke omgeving, ook productie, nog tegen een testvoorziening. Andere registraties zijn nog niet gekoppeld. |
 | AB-27 | Het verwerkingsregister (AVG artikel 30) wordt per proces bijgehouden in de Linked Data Explorer en gepubliceerd. | Vervangbaar | gerealiseerd | U mag uw register ook elders bijhouden. |
 | AB-28 | Elk IOU-onderdeel bouwt reproduceerbaar: niets wat een build ophaalt is ongepind, elke release heeft een CycloneDX-SBOM, updates wachten een vaste periode af, en de ICTU-richtlijn voor afhankelijkheden wordt wekelijks gemeten. | Kern | deels | CPSV Editor, Linked Data Explorer en RONL Business API wel; CPRMV en de Norm Editor nog niet. |
 | AB-29 | Elk onderdeel heeft zelfstandige releases met kalenderversies; wijzigingen bereiken acceptatie en productie alleen via een pull request. | Kern | deels | CPSV Editor, Linked Data Explorer en RONL Business API wel. CPRMV volgt de versie van zijn specificatie; de Norm Editor kent alleen een productiebranch. |
 | AB-30 | Productie wordt geleverd via een standaard leverstraat met een kwaliteitspoort. | Kern | nog niet | Alle onderdelen leveren nu via het spoor voor snelle prototypes. |
 | AB-31 | Een taalmodel-assistent is optioneel en de keuze van de organisatie. | Eigen keuze | nog niet | De RONL Business API start in geen enkele omgeving zonder sleutel voor een gesloten taaldienst. |
-| AB-32 | IOU kiest Keycloak als OIDC-uitgever. | Vervangbaar | gerealiseerd | Een andere uitgever die OIDC-tokens uitgeeft en de inlogvoorzieningen koppelt, kan; bijvoorbeeld Entra ID. |
+| AB-32 | IOU kiest Keycloak als OIDC-uitgever. | Vervangbaar | gerealiseerd | De RONL Business API, de Linked Data Explorer en de CPSV Editor gebruiken Keycloak. Een andere uitgever die OIDC-tokens uitgeeft en de inlogvoorzieningen koppelt, kan; bijvoorbeeld Entra ID. |
 
 ### Onze afwijkingen
 
@@ -978,7 +982,7 @@ Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/11-decis
 | ID | Risico | Raakt | Wat u ondertussen doet | Issue | Geldt voor ons? | Onze maatregel |
 |---|---|---|---|---|---|---|
 | R-01 | De procesengine is nog van buitenaf bereikbaar. Wijzigen vraagt een login, maar wie de inloggegevens heeft, komt buiten de controles van de Business API om bij de engine, en de backends gebruiken accounts met volledige rechten. Mislukte inlogpogingen van buitenaf kunnen de backends tijdelijk van de engine afsluiten. | AB-08, AB-13 | Plaats de engine in uw eigen netwerk zo dat alleen de backends hem bereiken. Geef elke backend een eigen account met alleen de rechten die hij nodig heeft. | [ronl-business-api#415](https://github.com/sgort/ronl-business-api/issues/415) heeft alleen het deel gedicht waarvoor geen login nodig was; het risico blijft open | […] | […] |
-| R-02 | De ontwerptools accepteren schrijfacties zonder dat vaststaat wie ze doet. | AB-17, AB-20, AB-21 | Maak de ontwerptools alleen bereikbaar binnen uw netwerk, achter de inlogvoorziening van uw organisatie. | Gemeld bij het onderdeel; link volgt na herstel | […] | […] |
+| R-02 | De Norm Editor accepteert schrijfacties zonder dat vaststaat wie ze doet. De Linked Data Explorer en de CPSV Editor vragen een login met de rol voor auteurs, maar die rol is niet per organisatie, en wat een auteur doet wordt niet in een auditopslag vastgelegd. Buiten productie mag iedereen een beslismodel proefuitrollen in een afgescheiden testomgeving. | AB-17, AB-20, AB-21, AB-23 | Maak de Norm Editor alleen bereikbaar binnen uw netwerk, achter de inlogvoorziening van uw organisatie. Geef de rol voor auteurs alleen aan wie namens uw organisatie mag uitrollen en publiceren. | [linked-data-explorer#163](https://github.com/sgort/linked-data-explorer/issues/163) en [ttl-editor#234](https://github.com/sgort/ttl-editor/issues/234) hebben het deel voor de Linked Data Explorer en de CPSV Editor gedicht; het risico blijft open | […] | […] |
 | R-03 | Toegang voor inwoners en ondernemers werkt nog niet echt: DigiD en eIDAS staan uit, eHerkenning ontbreekt, de BRP is een testvoorziening. | AB-19, AB-26 | Beperk de ingebruikname tot fase 1. Plan de aansluiting op DigiD, eHerkenning en de BRP als eigen project vóór fase 2. | — | […] | […] |
 | R-04 | Wat de CPSV Editor schrijft, wijkt af van CPRMV 0.4.2, en CPRMV is zelf nog een werkversie. Dat hoort bij hoe IOU en CPRMV samen groeien, maar het betekent dat gedeelde regels tussen versies kunnen verschillen. | AB-03, AB-07 | Valideer gepubliceerde regels tegen de CPRMV-shapes, volg de ontwikkeling van CPRMV, en geef wat u tegenkomt terug aan IOU. | — | […] | […] |
 | R-05 | SHACL-validatie geeft alleen advies; een product met fouten kan worden gepubliceerd. | AB-11 | Spreek af dat niemand publiceert zolang de validatie fouten meldt. | — | […] | […] |
@@ -992,3 +996,4 @@ Toelichting in de gids: <https://iou-architectuur.open-regels.nl/nl/psa/11-decis
 | R-13 | Overstappen naar een andere triplestore of hosting vraagt aanpassingen in de code; niet alle adressen zijn instelbaar. | AB-16 | Reken bij een andere triplestore of hosting op ontwikkelwerk, en neem dat op in de planning. | — | […] | […] |
 | R-14 | Op test en acceptatie breekt de keten: de bestaande voorzieningen waaraan IOU koppelt (bijvoorbeeld documentbeheer, ondertekening, identiteitsbeheer, financiën) hebben vaak alleen een productieomgeving. Acceptatie toetst dan een nabootsing, of raakt productiegegevens. | — | Laat beheerders en leveranciers een test- en acceptatieomgeving inrichten voor elke gekoppelde voorziening (route 3 in [hoofdstuk 7](https://iou-architectuur.open-regels.nl/nl/psa/07-integration-architecture/)). Tot die er is: toets met nabootsingen, en leg vast dat de echte koppeling pas in productie voor het eerst wordt gebruikt. | — | […] | […] |
 | R-15 | Een beslismodel kan alle controles doorstaan en toch nooit de juiste uitkomst geven: DMN eist niet dat een model aantoont dat het werkt, en zegt niet hoe het naar de wet verwijst. | AB-03 | Test elk beslismodel met testgevallen vóór uitrol, ook op de uitkomsten die het moet kunnen geven. Volg de ontwikkeling van [DMN-AP NL](https://github.com/sgort/ttl-editor/blob/main/docs/dmn-ap-nl-voorstel.md). | — | […] | […] |
+| R-16 | Het token waarmee de RONL Business API namens een medewerker een gekoppelde voorziening aanroept, is nog niet afgeschermd van de browser van die medewerker. Handelingen bij die voorziening kunnen daardoor buiten de auditopslag om gaan, binnen de rechten die de medewerker daar zelf heeft. IOU heeft de oplossing gekozen; die is nog niet gebouwd. | AB-23 | Laat de gekoppelde voorziening zelf vastleggen wie wat doet, en geef de koppeling niet meer rechten dan ze nodig heeft. | Gemeld bij het onderdeel; link volgt na herstel | […] | […] |

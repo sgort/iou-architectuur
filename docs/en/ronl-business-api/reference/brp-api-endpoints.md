@@ -17,7 +17,7 @@ component: RONL Business API
 3. [Error Responses](#error-responses)
 4. [Test Data & BSN Mapping](#test-data-bsn-mapping)
 
-`POST /v1/brp/personen` is the only BRP operation the API serves. It forwards the request body to the Haal Centraal BRP mock at `https://brp-api-mock.open-regels.nl/haalcentraal/api/brp`.
+`POST /v1/brp/personen` is the only BRP operation the API serves. It forwards the request body to the Haal Centraal BRP mock at `https://brp-api-mock.open-regels.nl/haalcentraal/api/brp`, the base URL in `services/brp-upstream.ts`, for ACC and PROD alike. Whether the mock can be reached is also reported by `GET /v1/health`, under `dependencies.brp`.
 
 ---
 
@@ -242,6 +242,19 @@ Errors are RFC 9457 problem details (`application/problem+json`). When the BRP A
 
 The upstream body above is illustrative; `details` carries whatever the BRP API returned.
 
+When the request never gets an HTTP answer — DNS, the connection, the TLS handshake or the timeout failed — the endpoint answers `502` with code `BRP_UPSTREAM_UNREACHABLE` and no `details`. The transport error's code is logged as `transportError`, not returned: it describes infrastructure the caller cannot act on.
+
+```json
+{
+  "type": "about:blank",
+  "status": 502,
+  "title": "Brp upstream unreachable",
+  "detail": "The BRP API could not be reached",
+  "instance": "/v1/brp/personen",
+  "code": "BRP_UPSTREAM_UNREACHABLE"
+}
+```
+
 ### Example Request (cURL)
 
 ```bash
@@ -375,7 +388,8 @@ Every error is RFC 9457 problem details, served as `application/problem+json`: `
 | 401 | `INVALID_TOKEN` | JWT token invalid or expired | Re-authenticate |
 | 4xx | `BRP_API_ERROR` | The BRP API refused the request; the status is the BRP API's own, its body is in `details` | Check the query against the BRP API |
 | 429 | `RATE_LIMIT_EXCEEDED` | Too many requests | Wait and retry after the `RateLimit-Reset` seconds |
-| 5xx | `BRP_API_ERROR` | The BRP API failed or could not be reached; the status is the BRP API's own, or `500` when there was no response | Retry or contact support |
+| 5xx | `BRP_API_ERROR` | The BRP API answered with a server error; the status is the BRP API's own, or `500` for an error that is not an HTTP failure | Retry or contact support |
+| 502 | `BRP_UPSTREAM_UNREACHABLE` | The BRP API could not be reached: DNS, the connection, the TLS handshake or the timeout failed | Check `dependencies.brp` in `/v1/health`; see [Troubleshooting](../developer/troubleshooting.md#the-citizen-timeline-is-blank) |
 
 ### Example Error Responses
 
@@ -436,6 +450,7 @@ A token without a `bsn` claim is mapped to a test BSN by its Keycloak username, 
 | `test-caseworker-utrecht` | 999992235 | utrecht | Same persona |
 | `test-citizen-amsterdam` | 999992235 | amsterdam | Same persona, Amsterdam tenant |
 | `test-citizen-heusden` | 999992235 | heusden | Same persona, Heusden tenant |
+| `test-citizen-bes` | 999992235 | bes | Same persona, Caribisch Nederland tenant |
 | `test-citizen-rotterdam` | 999992235 | rotterdam | Same persona, Rotterdam tenant |
 | `test-citizen-denhaag` | 999992235 | denhaag | Same persona, Den Haag tenant |
 | `test-citizen-flevoland` | 999992235 | flevoland | Same persona, Flevoland tenant |

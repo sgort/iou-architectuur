@@ -157,6 +157,7 @@ That is not hypothetical. On acceptance on 28 September 2026, R2.2 was redeploye
 | `getCachedBpmnXml` | process-definition id | The XML is immutable for a given id, so it never needs invalidating |
 | The parsed swimlane model | process-definition id, plus the phase | One cache for both boards: `GET /v1/process/definition/key/:key/swimlane`, which serves the caseworker process view, passes the process key as the phase |
 | `boardOwner` | process-definition id | `null` — deployed but carrying no tag — is cached too; a lookup that *threw* is not |
+| Starter groups and `hasStartForm` | — | Not cached themselves: `getStarterGroups` and `listStartCandidates` parse them from `getCachedBpmnXml` on every call, so a redeploy that changes who may start a process is seen at once |
 
 When the id for a key moves, the previous id's entries are dropped from all three. The separate phase-BPMN cache that used to sit beside these is gone rather than re-keyed: the XML fetch already had a cache keyed correctly.
 

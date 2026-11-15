@@ -1,20 +1,27 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    CPSV Editor: "34a51b4"
-    Linked Data Explorer: "4300700"
-    RONL Business API: "c6cf3ac"
+    CPSV Editor: "2d201d5"
+    Linked Data Explorer: "5bccbf2"
+    RONL Business API: "4579486"
 ---
 
 # Code Standards
 
 !!! info "Verification status"
-    All three repositories' claims were re-checked on **8 November 2026**, against
-    `34a51b4`, `4300700` and `c6cf3ac`: rulesets read from the API per ruleset, workflow
+    All three repositories' claims were re-checked on **15 November 2026**, against
+    `2d201d5`, `5bccbf2` and `4579486`: rulesets read from the API per ruleset, workflow
     files enumerated and their steps, triggers and filters read from source, and both
-    hook files read from each repository.
+    hook files confirmed unchanged in each repository.
+
+    **What moved by 14 November was CI in the RONL Business API.** It gained a fifteenth
+    workflow, the daily `upstream-certs`; its required `audit` job now also runs the stylelint
+    rule tests, the Keycloak production-guard test and the promotion-target tests; and a
+    lockfile-only promotion now redeploys all four of its applications. Elsewhere only versions
+    moved — Node 24.22.2 and the action pins, on [Supply-Chain Pinning](supply-chain.md). No
+    hook changed.
 
     **Nothing moved in the hooks or the gates by 7 November.** What moved were versions —
     Node and three action pins, on [Supply-Chain Pinning](supply-chain.md) — and one
@@ -180,17 +187,21 @@ and a failing test blocks the deploy. That has only been true since 20 August 20
 before then CI and the hooks left the same gap, and RONL Business API's public-site
 package had the only real test gate anywhere.
 
-**RONL Business API** — **fourteen** workflows: an acc/prod pair for each of **four**
+**RONL Business API** — **fifteen** workflows: an acc/prod pair for each of **four**
 deployable packages, the supply-chain `audit`, since v2026.09.7 the Semgrep `scan`,
 since v2026.09.10 `promote-to-production.yml`, which is what a push to `main` starts and
 which calls the four production workflows in order, since v2026.09.12 the daily
-`dependency-audit` and the release `sbom`, and since v2026.10.2 the quarterly
-`dependency-review`:
+`dependency-audit` and the release `sbom`, since v2026.10.2 the quarterly
+`dependency-review`, and since v2026.11.3 the daily `upstream-certs`, which checks the TLS
+certificate of each upstream the API depends on but does not host, and opens a tracking issue
+when one does not validate for its host or expires within 14 days. Being scheduled, it runs
+on `acc` alone, and on a pull request only when its own files change; it is not a required
+check:
 
 | Workflow pair | Lint | Type-check | Tests | Notes |
 |---|:---:|:---:|:---:|---|
 | `azure-backend-*` | ✅ | – | ✅ | Builds, uploads the artifact, and since v2026.09.10 deploys it over OIDC (`azure/login` then `az webapp deploy`), then waits until `/v1/health` reports the deployed commit. The four deploy steps are skipped on a pull request. Also lints the OpenAPI document. Since 29 September 2026 ([#269](https://github.com/sgort/ronl-business-api/issues/269)) the backend's `npm test` and `test:serial` end with `scripts/check-conformance-coverage.cjs`, which fails when the OpenAPI document holds an operation no test compared against a real response — so both backend workflows run it |
-| `azure-frontend-*` | ✅ | – | ✅ | Also runs `npm run test:perf`, the wall-clock budget, as a step of its own. Since v2026.11.0 its suite includes `css-hex.test.ts`, which fails on any new hard-coded hex colour in the stylesheets and the Keycloak login theme, and the acceptance filter names `keycloak-themes/**` so a theme-only change runs it. Stylelint (`npm run lint:css`, report-only) is a root script that no hook and no workflow runs, and neither is its own `test:stylelint` |
+| `azure-frontend-*` | ✅ | – | ✅ | Also runs `npm run test:perf`, the wall-clock budget, as a step of its own. Since v2026.11.0 its suite includes `css-hex.test.ts`, which fails on any new hard-coded hex colour in the stylesheets and the Keycloak login theme, and the acceptance filter names `keycloak-themes/**` so a theme-only change runs it. Stylelint (`npm run lint:css`, report-only) is a root script that no hook and no workflow runs; its own rule tests, `npm run test:stylelint`, have run in the required `audit` job since v2026.11.4 ([#433](https://github.com/sgort/ronl-business-api/issues/433)) |
 | `azure-publicsite-*` | ✅ | ✅ | ✅ | Its build additionally gates on a prerender and a bundle-cleanliness check |
 | `azure-pa-demo-*` | ✅ | ✅ | ✅ | The acc workflow also installs Chromium and runs the Playwright E2E suite before the bundle gate; the production one does not. Since v2026.10.1 the Chromium install has a ten-minute `timeout-minutes` of its own |
 
@@ -213,9 +224,13 @@ acceptance workflows followed in v2026.10.1
 ([#247](https://github.com/sgort/ronl-business-api/issues/247)): their push filters and
 `changes` patterns name both files, so a lockfile-only pull request now builds and tests
 all four packages — deploying no preview unless it is labelled `preview` — and its merge
-deploys them to acceptance. A promotion still does not: `scripts/promotion-targets.sh`
-names the root lockfile for the backend only, so a lockfile-only promotion redeploys the
-backend and none of the three sites.
+deploys them to acceptance. Since v2026.11.4 (14 November 2026) a promotion does too:
+`scripts/promotion-targets.sh` names the root lockfile and `package.json` in all four
+production patterns (`ffbc109`,
+[#354](https://github.com/sgort/ronl-business-api/issues/354)). Until then it named them for
+the backend only, so a lockfile-only promotion redeployed the backend and none of the three
+sites. The script's table of cases, `scripts/promotion-targets.test.mjs`, runs in the
+required `audit` job.
 
 **Linked Data Explorer** — **twelve** workflows in the tree: six deployment workflows,
 the supply-chain `audit` gate added in v2026.08.7, the Semgrep `scan` added in
@@ -277,7 +292,8 @@ when the backend's result is `success` or `skipped`. The production workflows ke
 `scripts/promotion-targets.mjs` and `scripts/promotion-targets.sh`, which fail safe to
 deploying everything when the commit range cannot be read. The Linked Data Explorer's
 `changes` job runs the script's own test first — `node scripts/promotion-targets.test.mjs`
-— so a promotion carries one suite of its own. Two consequences worth knowing: the
+— so a promotion carries one suite of its own; the RONL Business API's equivalent runs in
+the required `audit` job since v2026.11.4, so every pull request runs it instead. Two consequences worth knowing: the
 deploys are jobs inside the promotion's run, so an Actions listing shows *Promote to
 Production* and not the deploys; and if the promotion workflow breaks, nothing deploys,
 and nothing on `main` says so, because its checks are not required. The CPSV Editor is

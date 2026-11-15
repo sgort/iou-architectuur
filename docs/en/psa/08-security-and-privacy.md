@@ -2,11 +2,11 @@
 title: "8. Security and privacy"
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    CPSV Editor: "84886c9"
-    Linked Data Explorer: "189435e"
-    RONL Business API: "35fb3a8"
+    CPSV Editor: "6910bb8"
+    Linked Data Explorer: "e11e4ef"
+    RONL Business API: "67bac28"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -36,11 +36,13 @@ them.
 - **A level of assurance per action** (AB-19). Having a decision evaluated
   requires `basis`, starting a process `midden`.
 - **Every write authenticated, authorised and recorded** (AB-20). The RONL
-  Business API meets this. The Linked Data Explorer, the CPSV Editor and the Norm
-  Editor do not yet: anyone who can reach their backend can write to it
-  (risk R-02).
-- **The design tools for staff only** (AB-21). This is only enforced once AB-20 is
-  realised. Until then, you shield them yourself.
+  Business API meets this. The Linked Data Explorer and the CPSV Editor require a
+  login with the author role, but do not yet record who did what, and the role is
+  not per organisation. Anyone who can reach the Norm Editor's backend can write
+  to it (risk R-02).
+- **The design tools for staff only** (AB-21). The Linked Data Explorer and the
+  CPSV Editor enforce this with the author role; the Norm Editor does not yet.
+  Shield that one yourself.
 
 **Shielding**
 
@@ -56,7 +58,8 @@ them.
 **Recording and privacy**
 
 - **Every authenticated request recorded in a separate audit store** (AB-23). No
-  retention period is applied yet (risk R-10).
+  retention period is applied yet (risk R-10). Actions that go around the RONL
+  Business API fall outside it (risk R-16).
 - **Data at the source** (AB-26): personal data from base registers is fetched
   when needed, not copied.
 - **Record of processing activities per process** (AB-27), public without contact

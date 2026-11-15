@@ -141,11 +141,10 @@ import jwtMiddleware from '../auth/jwt.middleware';
 import { auditLog } from '../middleware/audit.middleware';
 import { createLogger } from '../utils/logger';
 import { sendProblem } from '../utils/problem';
+import { BRP_API_BASE_URL, transportErrorCode } from '../services/brp-upstream';
 
 const router = express.Router();
 const logger = createLogger('brp-routes');
-
-const BRP_API_BASE_URL = 'https://brp-api-mock.open-regels.nl/haalcentraal/api/brp';
 
 /**
  * POST /v1/brp/personen
@@ -199,15 +198,34 @@ router.post('/personen', jwtMiddleware, async (req: Request, res: Response) => {
       data: response.data,
     });
   } catch (error) {
+    // An axios error WITHOUT a response never reached the upstream's HTTP
+    // layer: DNS, TCP, the TLS handshake or the timeout failed. That used to
+    // fall through to a bare 500, which is how a certificate the upstream's
+    // proxy stopped presenting (ERR_TLS_CERT_ALTNAME_INVALID, 13 November
+    // 2026) blanked the citizen timeline on ACC and PROD with nothing in the
+    // response to say why. It is a gateway failure, so: 502 with its own code,
+    // and the transport error code in the log. Not in the response body --
+    // the client cannot act on it and it describes infrastructure.
+    const unreachable = axios.isAxiosError(error) && !error.response;
+
     logger.error('BRP API request failed', {
       error: error instanceof Error ? error.message : 'Unknown error',
       userId: req.user?.userId,
       upstreamStatus: axios.isAxiosError(error) ? error.response?.status : undefined,
+      ...(unreachable ? { transportError: transportErrorCode(error) } : {}),
     });
 
     auditLog(req, 'brp.personen.fetch', 'error', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
+
+    if (unreachable) {
+      return sendProblem(res, req, {
+        status: 502,
+        code: 'BRP_UPSTREAM_UNREACHABLE',
+        detail: 'The BRP API could not be reached',
+      });
+    }
 
     const statusCode = axios.isAxiosError(error) ? error.response?.status || 500 : 500;
     const message = axios.isAxiosError(error)
@@ -220,6 +238,8 @@ router.post('/personen', jwtMiddleware, async (req: Request, res: Response) => {
 
 export default router;
 ```
+
+The base URL lives in `packages/backend/src/services/brp-upstream.ts`, beside `transportErrorCode()` and `brpHealthCheck()`, which `/v1/health` uses to report the upstream under `dependencies.brp`: a `HEAD` on the base URL with a 5-second timeout, where any answer below `500` counts as up, so no BSN is sent to find out. The same URL serves ACC and PROD.
 
 **Registration in `packages/backend/src/routes/registry.ts`:** `index.ts` mounts every entry of `routeRegistry`, in array order.
 
@@ -498,9 +518,19 @@ try {
 
 ### Backend
 
-A BRP answer of 4xx is passed on with its own status, code `BRP_API_ERROR` and the upstream body in a `details` extension member. A thrown error — a 5xx, a timeout, no connection — ends in the `catch`, which answers with the upstream status (or `500`) and the message as `detail`:
+A BRP answer of 4xx is passed on with its own status, code `BRP_API_ERROR` and the upstream body in a `details` extension member. A thrown error ends in the `catch`. When it never reached the BRP API's HTTP layer — DNS, the connection, the TLS handshake or the timeout failed, so axios has no `response` — the route answers `502 BRP_UPSTREAM_UNREACHABLE`, and logs the transport error's code (`transportError`, from `transportErrorCode()` in `services/brp-upstream.ts`) without returning it. A 5xx from the BRP API, or any other error, is answered with the upstream status (or `500`) and the message as `detail`:
 
 ```typescript
+const unreachable = axios.isAxiosError(error) && !error.response;
+// ...
+if (unreachable) {
+  return sendProblem(res, req, {
+    status: 502,
+    code: 'BRP_UPSTREAM_UNREACHABLE',
+    detail: 'The BRP API could not be reached',
+  });
+}
+
 const statusCode = axios.isAxiosError(error) ? error.response?.status || 500 : 500;
 const message = axios.isAxiosError(error)
   ? error.response?.data?.message || error.message
@@ -516,7 +546,8 @@ sendProblem(res, req, { status: statusCode, code: 'BRP_API_ERROR', detail: messa
 | 406 Not Acceptable | Missing Accept header | Added explicit `Accept: application/json` |
 | 401 Unauthorized | Invalid/expired JWT | User must re-login |
 | 404 Not Found | BSN not in BRP | Verify BSN mapping |
-| 500 Server Error | BRP API down | Retry or show maintenance message |
+| 500 Server Error | BRP API answered with a server error | Retry or show maintenance message |
+| 502 `BRP_UPSTREAM_UNREACHABLE` | BRP API not reachable — DNS, connection, TLS handshake or timeout | Check `dependencies.brp` in `/v1/health`; see [Troubleshooting](../developer/troubleshooting.md#the-citizen-timeline-is-blank) |
 | Network Error | CORS or connectivity | Check proxy configuration |
 
 ---

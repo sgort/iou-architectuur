@@ -81,16 +81,16 @@ Successful responses keep their own shapes, described under [Response shapes](#r
 |---|---|---|
 | `400` | A malformed request, a body that does not parse, or a task completion (or machine-to-machine start) that sets a variable fixed at process start | `VALIDATION_ERROR`, `MALFORMED_BODY`, `INVALID_BODY`, `RESERVED_VARIABLE` |
 | `401` | A missing or invalid token, or a person whose eDOCS session can no longer be renewed and must sign in again | `MISSING_TOKEN`, `INVALID_TOKEN`, `UNAUTHORIZED`, `EDOCS_REAUTH_REQUIRED` |
-| `403` | A role, tenant, assurance-level or machine-client check that failed, or eDOCS that cannot be reached as the person or refuses them | `FORBIDDEN`, `TENANT_MISMATCH`, `MISSING_TENANT`, `INSUFFICIENT_ASSURANCE`, `M2M_CLIENT_NOT_ALLOWED`, `EDOCS_CLIENT_NOT_ALLOWED`, `EDOCS_USER_TOKEN_UNAVAILABLE`, `EDOCS_ACCESS_DENIED` |
+| `403` | A role, tenant, assurance-level, starter-group or machine-client check that failed, or eDOCS that cannot be reached as the person or refuses them | `FORBIDDEN`, `TENANT_MISMATCH`, `MISSING_TENANT`, `INSUFFICIENT_ASSURANCE`, `NOT_CANDIDATE_STARTER`, `M2M_CLIENT_NOT_ALLOWED`, `EDOCS_CLIENT_NOT_ALLOWED`, `EDOCS_USER_TOKEN_UNAVAILABLE`, `EDOCS_ACCESS_DENIED` |
 | `404` | A resource that does not exist or is not visible to the caller | resource-specific `*_NOT_FOUND`, `NOT_FOUND` |
 | `409` | A process start whose key several other organisations deploy | `AMBIGUOUS_DEPLOYMENT` |
 | `413` | A request body over the size limit | `PAYLOAD_TOO_LARGE` |
 | `429` | A rate limit | `RATE_LIMIT_EXCEEDED` |
 | `500` | Anything unexpected | `INTERNAL_ERROR` and operation-specific `*_FAILED` codes |
-| `502` | A fault in an upstream system, such as eDOCS or Doccle | `EDOCS_ERROR`, `DOCCLE_ERROR` |
+| `502` | A fault in an upstream system, such as eDOCS or Doccle, or an upstream that could not be reached at all | `EDOCS_ERROR`, `DOCCLE_ERROR`, `BRP_UPSTREAM_UNREACHABLE` |
 | `503` | A required dependency or optional subsystem that is unavailable | `SERVICE_DEGRADED`, `NOT_READY`, `MCP_DISABLED`, `SERVICES_UNAVAILABLE` |
 
-The tenant codes are explained in [Authentication & IAM — Tenancy](authentication-iam.md#tenancy); the eDOCS codes in [eDOCS — Live Testing](../developer/testing/edocs-live-testing.md#people-and-the-service-account). A body the JSON parser refuses is a client error, answered before any route runs: `400 MALFORMED_BODY` for one that does not parse, `413 PAYLOAD_TOO_LARGE` for one over the limit. An unhandled error is caught centrally rather than crashing the request, and in production its `detail` is replaced with a generic one.
+The tenant codes are explained in [Authentication & IAM — Tenancy](authentication-iam.md#tenancy), `NOT_CANDIDATE_STARTER` in [Processes — Who may start it](processes.md#who-may-start-it); the eDOCS codes in [eDOCS — Live Testing](../developer/testing/edocs-live-testing.md#people-and-the-service-account). A body the JSON parser refuses is a client error, answered before any route runs: `400 MALFORMED_BODY` for one that does not parse, `413 PAYLOAD_TOO_LARGE` for one over the limit. An unhandled error is caught centrally rather than crashing the request, and in production its `detail` is replaced with a generic one.
 
 ---
 

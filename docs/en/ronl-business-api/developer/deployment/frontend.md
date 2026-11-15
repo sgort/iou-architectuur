@@ -262,13 +262,13 @@ Same build structure as ACC, but it is **not triggered by a branch at all**:
 
 This is the source file. The build adds one rewrite per single-board tenant
 ahead of these routes — `{ "route": "/amsterdam", "rewrite": "/amsterdam/index.html" }`
-and likewise for `heusden`, `toeslagen` and `unive` — so the shipped
+and likewise for `heusden`, `bes`, `toeslagen` and `unive` — so the shipped
 `dist/staticwebapp.config.json` serves each tenant's own page; see [Step 2](#step-2-github-actions-build).
 
 **What it does:**
 
 - ✅ All app routes (`/`, `/auth`, `/dashboard/...`) → served by `index.html`
-- ✅ A tenant path (`/amsterdam`, `/heusden`, `/toeslagen`, `/unive`) → served by that tenant's `<id>/index.html`, with its own link preview
+- ✅ A tenant path (`/amsterdam`, `/heusden`, `/bes`, `/toeslagen`, `/unive`) → served by that tenant's `<id>/index.html`, with its own link preview
 - ✅ React Router handles routing client-side
 - ✅ Static assets excluded from fallback
 - ✅ Proper cache headers
@@ -326,8 +326,8 @@ dist/
 │   └── [other assets]
 ├── og-image-acc.png           # Link-preview images (copied from public/)
 ├── og-image-prod.png
-├── og-image-<id>-{acc,prod}.png  # One pair per tenant page: amsterdam, heusden, toeslagen, unive
-├── amsterdam/index.html       # A tenant page per single-board tenant (also heusden/, toeslagen/, unive/)
+├── og-image-<id>-{acc,prod}.png  # One pair per tenant page: amsterdam, heusden, bes, toeslagen, unive
+├── amsterdam/index.html       # A tenant page per single-board tenant (also heusden/, bes/, toeslagen/, unive/)
 ├── tenants/                   # Tenant logos (copied from public/)
 ├── tenants.json               # Municipality config (copied from public/)
 └── staticwebapp.config.json   # SPA routing, plus one rewrite per tenant page

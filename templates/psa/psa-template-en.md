@@ -9,7 +9,7 @@
 | Author | […] |
 | Approved by | […] |
 
-Based on the IOU PSA guide, verified on 2026-11-06 against CPSV Editor 0412e9b, Linked Data Explorer 814c4bb, RONL Business API ff6c362, Norm Editor c47096b, CPRMV 8262d3e.
+Based on the IOU PSA guide, verified on 2026-11-15 against CPSV Editor 6910bb8, Linked Data Explorer e11e4ef, RONL Business API 67bac28, Norm Editor c47096b, CPRMV 8262d3e.
 
 ## About this template
 
@@ -261,8 +261,9 @@ The login service has a few fixed roles, and in addition roles per process.
 | Administrator | Administer their own organisation | Core |
 | Process roles | Tasks within one process, such as submitter, lawyer or signatory; linked to tasks in the process model | Organisation's own |
 
-The design tools have no roles yet: they do not check who uses them (AB-20,
-risk R-02).
+In the Linked Data Explorer and the CPSV Editor only a staff member with the
+author role may save, deploy and publish; that role applies to all organisations
+at once. The Norm Editor has no roles yet (AB-20, risk R-02).
 
 ### Phasing
 
@@ -354,7 +355,7 @@ Every component sits at the step it belongs to. The tier is in brackets.
 | From | To | For | How |
 |---|---|---|---|
 | Web interfaces | Their own backend | All functions | HTTPS; the browser does not talk to the engine or knowledge graph itself |
-| CPSV Editor | Knowledge graph | Publishing | HTTPS, through TriplyDB's API and the Linked Data Explorer's backend |
+| CPSV Editor | Knowledge graph | Publishing | HTTPS, through the Linked Data Explorer's backend, as a signed-in author |
 | Norm Editor | Knowledge graph | Storing interpretations | HTTPS, through TriplyDB's API |
 | Linked Data Explorer | Knowledge graph | Finding decision models, consuming rules | SPARQL 1.1 |
 | Linked Data Explorer | Process engine | Deploying process bundles; tasks the system performs itself | Camunda 7 REST API |
@@ -369,9 +370,9 @@ deployed version delivers what the connection needs. Until then it stays off, an
 the rest keeps working. This is how IOU can adopt a standard step by step (see
 [About this PSA](https://iou-architectuur.open-regels.nl/psa/#how-iou-develops)).
 
-The design tools do not use tokens yet (AB-20, risk R-02). Where the web
-interfaces of the Linked Data Explorer, the CPSV Editor and the Norm Editor talk
-to their backend, that backend therefore does not yet check who the user is.
+The Linked Data Explorer and the CPSV Editor send a token with every write, which
+the Linked Data Explorer's backend checks. The Norm Editor does not use tokens
+yet: its backend does not check who the user is (AB-20, risk R-02).
 
 ### Phasing
 
@@ -460,9 +461,10 @@ Explorer** (AB-27). This is replaceable: you may use your existing register.
 | Personal data from base registers | At the source; fetched when needed | The source holder | Not copied |
 | Legal text | Official publication sources; fetched through the CPRMV API | The legislator | Not copied |
 
-Two smaller places of storage: the Linked Data Explorer keeps test cases and chain
-templates in the user's browser, and the CPSV Editor keeps the TriplyDB token used
-for publishing there (see [chapter 8](https://iou-architectuur.open-regels.nl/psa/08-security-and-privacy/)).
+One smaller place of storage: the Linked Data Explorer keeps test cases and chain
+templates in the user's browser. The token used to publish to the knowledge graph
+is held only by the Linked Data Explorer's backend (see
+[chapter 8](https://iou-architectuur.open-regels.nl/psa/08-security-and-privacy/)).
 
 ### Phasing
 
@@ -538,7 +540,7 @@ are listed by name as allowed clients.
 |---|---|---|---|
 | Cases, tasks, decisions, forms, documents | RONL Business API | Work environment and MijnOmgeving | Token from the OIDC issuer, with role and organisation |
 | Public catalogues | RONL Business API | Anyone | Without login, read only, with a limit on the number of requests (AB-22) |
-| Norms, decision models, process bundles | Linked Data Explorer | Other IOU components, other organisations | Reading public; writing still unchecked (R-02) |
+| Norms, decision models, process bundles | Linked Data Explorer | Other IOU components, other organisations | Reading public; writing with a token from the OIDC issuer and the author role (R-02) |
 | Legal text and references | CPRMV API | Anyone who needs legal text | Public |
 | SPARQL | Knowledge graph | IOU components, other organisations | Reading according to the dataset's settings; writing with a token |
 
@@ -637,11 +639,13 @@ Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/08-security
 - **A level of assurance per action** (AB-19). Having a decision evaluated
   requires `basis`, starting a process `midden`.
 - **Every write authenticated, authorised and recorded** (AB-20). The RONL
-  Business API meets this. The Linked Data Explorer, the CPSV Editor and the Norm
-  Editor do not yet: anyone who can reach their backend can write to it
-  (risk R-02).
-- **The design tools for staff only** (AB-21). This is only enforced once AB-20 is
-  realised. Until then, you shield them yourself.
+  Business API meets this. The Linked Data Explorer and the CPSV Editor require a
+  login with the author role, but do not yet record who did what, and the role is
+  not per organisation. Anyone who can reach the Norm Editor's backend can write
+  to it (risk R-02).
+- **The design tools for staff only** (AB-21). The Linked Data Explorer and the
+  CPSV Editor enforce this with the author role; the Norm Editor does not yet.
+  Shield that one yourself.
 
 **Shielding**
 
@@ -657,7 +661,8 @@ Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/08-security
 **Recording and privacy**
 
 - **Every authenticated request recorded in a separate audit store** (AB-23). No
-  retention period is applied yet (risk R-10).
+  retention period is applied yet (risk R-10). Actions that go around the RONL
+  Business API fall outside it (risk R-16).
 - **Data at the source** (AB-26): personal data from base registers is fetched
   when needed, not copied.
 - **Record of processing activities per process** (AB-27), public without contact
@@ -938,7 +943,7 @@ Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/11-decision
 | AB-05 | APIs follow the API Design Rules and have an OpenAPI 3.1 description that is checked automatically. | Core | partly | RONL Business API and Linked Data Explorer yes; CPRMV and the Norm Editor not yet. |
 | AB-06 | Public services are described and published with the CPSV Editor. | Core | realised | |
 | AB-07 | Rules are recorded in CPRMV: a rule set belongs to a public service, refers to the law it is based on, and has a validity period. | Core | partly | The CPSV Editor links a rule set to the law with a different relation than CPRMV prescribes. CPRMV is still a first public working draft. |
-| AB-08 | Processes are designed in the Linked Data Explorer and deployed only through its backend, as one bundle of process, forms and document templates. | Core | partly | This is how the Linked Data Explorer deploys. Deploying around the Linked Data Explorer now requires a login on the engine, but the backends sign in with full administrative rights, and the Linked Data Explorer does not yet check who deploys (see AB-13, AB-20). |
+| AB-08 | Processes are designed in the Linked Data Explorer and deployed only through its backend, as one bundle of process, forms and document templates. | Core | partly | This is how the Linked Data Explorer deploys, and only a staff member with the author role may do so; without signing in, only a decision model can be test-deployed outside production, into a separate test environment. Deploying around the Linked Data Explorer requires a login on the engine, but the backends sign in with full administrative rights (see AB-13). |
 | AB-09 | Decision models are found with standard SPARQL; rules are consumed through the version-2 norms API, under a fixed stability promise. | Core | realised | The version-1 API is deprecated and is removed on 1 November 2028. |
 | AB-10 | Every published service lives in its own graph per organisation and service, at a fixed address. | Core | realised | Republishing overwrites the graph; no history is kept (risk R-06). |
 | AB-11 | Shared artefacts are validated against the SHACL shapes of CPSV-AP, CPRMV and RONL before publication; an error blocks publication. While drafting, the check is advisory. | Core | not yet | The check exists, but never blocks. |
@@ -947,22 +952,22 @@ Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/11-decision
 | AB-14 | Processes and decisions run on an engine with the Camunda 7 REST API; IOU chooses Operaton. | Replaceable | realised | Camunda 7 Enterprise fits; Camunda 8 means a rebuild. |
 | AB-15 | The organisation travels with every deployment and every case. A decision model is deployed once and shared; differences per organisation are in the decision table itself. | Core | realised | |
 | AB-16 | Published artefacts live in a SPARQL 1.1 triple store; IOU chooses TriplyDB. | Replaceable | realised | **Under review**: IOU is considering Apache Jena Fuseki. |
-| AB-17 | Backends accept tokens from one OIDC issuer, which brokers the login services for staff and residents. Which product the issuer is, is AB-32. | Core | partly | The RONL Business API yes. The design tools do not check tokens yet (see AB-20). |
-| AB-18 | The backend decides per case who may do what, and refuses when in doubt: only the owning organisation or the applicant themselves. | Core | realised | In the RONL Business API. |
+| AB-17 | Backends accept tokens from one OIDC issuer, which brokers the login services for staff and residents. Which product the issuer is, is AB-32. | Core | partly | The RONL Business API and the Linked Data Explorer yes; the CPSV Editor has no backend of its own and uses the Linked Data Explorer's. The Norm Editor's backend does not check tokens yet (see AB-20). |
+| AB-18 | The backend decides per case who may do what, and refuses when in doubt: only the owning organisation or the applicant themselves. | Core | realised | In the RONL Business API. Who may start a process can be declared in the process model; the backend then refuses anyone else, and also when it cannot check. |
 | AB-19 | Actions require a level of assurance: `basis` to have a decision evaluated, `midden` to start a process. | Core | partly | The check works. DigiD and eIDAS are prepared but switched off; eHerkenning does not exist yet. |
-| AB-20 | Every write in every component is authenticated, authorised and recorded. Publishing happens on behalf of a competent organisation. | Core | partly | The RONL Business API yes. Linked Data Explorer, CPSV Editor and Norm Editor not yet. |
-| AB-21 | The design tools are for staff only; residents and businesses reach only the portals and the public site. | Core | partly | Residents are not offered the design tools, but the tools do not enforce it yet (see AB-20). |
+| AB-20 | Every write in every component is authenticated, authorised and recorded. Publishing happens on behalf of a competent organisation. | Core | partly | The RONL Business API yes. The Linked Data Explorer and the CPSV Editor require a login with the author role for writes, but that role applies to every organisation, and only publishing is noted, in the ordinary log. The Norm Editor not yet. |
+| AB-21 | The design tools are for staff only; residents and businesses reach only the portals and the public site. | Core | partly | The Linked Data Explorer and the CPSV Editor let only staff with the author role write; outside production anyone may test-deploy a decision model. The Norm Editor does not enforce it yet (see AB-20). |
 | AB-22 | Public catalogues are read live from the knowledge graph, through a separate public layer that only reads, without login and with a limit on the number of requests. | Core | realised | |
-| AB-23 | Every authenticated request is recorded in a separate audit store. You set the retention period. | Core | partly | Recording works; no retention period is applied anywhere yet. |
+| AB-23 | Every authenticated request is recorded in a separate audit store. You set the retention period. | Core | partly | Recording works in the RONL Business API, with one exception (R-16); no retention period is applied anywhere yet. The Linked Data Explorer does not record anything in an audit store yet. |
 | AB-24 | Documents stay in the organisation's document management system; the case holds only a reference. | Organisation's own | realised | |
 | AB-25 | Every component manages its own data; no component reads another's database. | Core | partly | The RONL Business API still reads directly from the Linked Data Explorer's database. |
-| AB-26 | Data stays at the source: base registers are queried, not copied. | Core | partly | The BRP is queried through the Haal Centraal API, but still against a test service. Other registers are not connected yet. |
+| AB-26 | Data stays at the source: base registers are queried, not copied. | Core | partly | The BRP is queried through the Haal Centraal API, but in every environment, production included, still against a test service. Other registers are not connected yet. |
 | AB-27 | The record of processing activities (GDPR article 30) is kept per process in the Linked Data Explorer and published. | Replaceable | realised | You may keep your register elsewhere. |
 | AB-28 | Every IOU component builds reproducibly: nothing a build fetches is unpinned, every release has a CycloneDX SBOM, updates wait a fixed period, and the ICTU dependency guideline is measured weekly. | Core | partly | CPSV Editor, Linked Data Explorer and RONL Business API yes; CPRMV and the Norm Editor not yet. |
 | AB-29 | Every component has independent releases with calendar versions; changes reach acceptance and production only through a pull request. | Core | partly | CPSV Editor, Linked Data Explorer and RONL Business API yes. CPRMV follows the version of its specification; the Norm Editor has only a production branch. |
 | AB-30 | Production is delivered through a standard delivery pipeline with a quality gate. | Core | not yet | All components currently deliver through the rapid-prototyping track. |
 | AB-31 | A language-model assistant is optional and the organisation's choice. | Organisation's own | not yet | The RONL Business API does not start in any environment without a key for a closed language-model service. |
-| AB-32 | IOU chooses Keycloak as the OIDC issuer. | Replaceable | realised | Another issuer that issues OIDC tokens and brokers the login services will do; for example Entra ID. |
+| AB-32 | IOU chooses Keycloak as the OIDC issuer. | Replaceable | realised | The RONL Business API, the Linked Data Explorer and the CPSV Editor use Keycloak. Another issuer that issues OIDC tokens and brokers the login services will do; for example Entra ID. |
 
 ### Our deviations
 
@@ -975,7 +980,7 @@ Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/11-decision
 | ID | Risk | Affects | What you do meanwhile | Issue | Applies to us? | Our measure |
 |---|---|---|---|---|---|---|
 | R-01 | The process engine is still reachable from outside. Changes require a login, but anyone holding the credentials reaches the engine around the Business API's checks, and the backends use accounts with full rights. Failed logins from outside can temporarily cut the backends off from the engine. | AB-08, AB-13 | Place the engine in your own network so that only the backends can reach it. Give each backend its own account with only the rights it needs. | [ronl-business-api#415](https://github.com/sgort/ronl-business-api/issues/415) closed only the part that needed no login; the risk stays open | […] | […] |
-| R-02 | The design tools accept writes without establishing who makes them. | AB-17, AB-20, AB-21 | Make the design tools reachable only inside your network, behind your organisation's login service. | Filed with the component; link follows once fixed | […] | […] |
+| R-02 | The Norm Editor accepts writes without establishing who makes them. The Linked Data Explorer and the CPSV Editor require a login with the author role, but that role is not per organisation, and what an author does is not recorded in an audit store. Outside production anyone may test-deploy a decision model into a separate test environment. | AB-17, AB-20, AB-21, AB-23 | Make the Norm Editor reachable only inside your network, behind your organisation's login service. Give the author role only to those who may deploy and publish on behalf of your organisation. | [linked-data-explorer#163](https://github.com/sgort/linked-data-explorer/issues/163) and [ttl-editor#234](https://github.com/sgort/ttl-editor/issues/234) closed the part for the Linked Data Explorer and the CPSV Editor; the risk stays open | […] | […] |
 | R-03 | Access for residents and businesses does not really work yet: DigiD and eIDAS are switched off, eHerkenning is missing, the BRP is a test service. | AB-19, AB-26 | Limit adoption to phase 1. Plan the connection to DigiD, eHerkenning and the BRP as a project of its own before phase 2. | — | […] | […] |
 | R-04 | What the CPSV Editor writes differs from CPRMV 0.4.2, and CPRMV itself is still a working draft. That is part of how IOU and CPRMV grow together, but it means shared rules can differ between versions. | AB-03, AB-07 | Validate published rules against the CPRMV shapes, follow CPRMV's development, and feed what you find back to IOU. | — | […] | […] |
 | R-05 | SHACL validation is advisory only; an artefact with errors can be published. | AB-11 | Agree that nobody publishes while validation reports errors. | — | […] | […] |
@@ -989,3 +994,4 @@ Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/11-decision
 | R-13 | Moving to another triple store or hosting requires code changes; not every address is configurable. | AB-16 | With another triple store or hosting, expect development work and plan for it. | — | […] | […] |
 | R-14 | On test and acceptance the chain breaks: the existing systems IOU connects to (for example document management, signing, identity management, finance) often have only a production environment. Acceptance then tests an imitation, or touches production data. | — | Have administrators and suppliers set up a test and acceptance environment for every connected system (route 3 in [chapter 7](https://iou-architectuur.open-regels.nl/psa/07-integration-architecture/)). Until then: test against stubs, and record that the real connection is first used in production. | — | […] | […] |
 | R-15 | A decision model can pass every check and still never give the right outcome: DMN does not require a model to prove that it works, nor say how it refers to the law. | AB-03 | Test every decision model with test cases before deployment, including the outcomes it must be able to give. Follow the development of [DMN-AP NL](https://github.com/sgort/ttl-editor/blob/main/docs/dmn-ap-nl-proposal.md). | — | […] | […] |
+| R-16 | The token with which the RONL Business API calls a connected service on a staff member's behalf is not yet shielded from that staff member's browser. Actions at that service can therefore bypass the audit store, within the rights the staff member has there. IOU has chosen the fix; it is not built yet. | AB-23 | Have the connected service record who does what itself, and give the connection no more rights than it needs. | Filed with the component; link follows once fixed | […] | […] |

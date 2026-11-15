@@ -139,13 +139,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.11.2** · *November 2026*
+-   **⚙️ RONL Business API — v2026.11.4** · *November 2026*
 
     ---
 
-    **The authoring tools sign in through the RONL Keycloak**
+    **Ended cases show their lists, and three releases' findings resolved**
 
-    A script adds the `lde-author` role and the sign-in clients for the Linked Data Explorer and the CPSV Editor to the realm, on acceptance and production alike ([Keycloak realm](ronl-business-api/reference/keycloak-realm.md#clients-added-by-script-linked-data-explorer-and-ttl-editor)). Caddy now lets Keycloak's third-party-cookie check be framed, and nothing else ([Caddy](ronl-business-api/developer/deployment/caddy.md)). The VM's Operaton image is pinned by digest, and the quick-navigation buttons have an accessible name that matches what they show. The [suites](ronl-business-api/developer/testing/overview.md) stand at 5,318 unit tests, all passing; the end-to-end figures are from 7 November.
+    A dynamic list in an ended case now comes back as its rows, in the archive and the history routes, while decision results stay objects; one malformed value no longer fails a read ([dynamic forms](ronl-business-api/features/dynamic-forms.md#submitting)). **Proces starten** also recognises a start form attached by `formKey`, and its button reads **Start proces** ([Caseworker](ronl-business-api/user-guide/caseworker.md#proces-starten)). A promotion that changes only the lockfile now deploys all four applications, the stylelint and script tests run in CI, the Keycloak test-account guard recognises production by host name, and the VM's Caddy is pinned ([CI/CD](ronl-business-api/developer/cicd.md)). Released with v2026.11.3 the same day: Caribisch Nederland at `/bes`, with a DigiD login for residents ([getting started](ronl-business-api/user-guide/getting-started.md#voor-inwoners)).
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

@@ -2,11 +2,11 @@
 title: "About this Project Start Architecture"
 scope: cross-cutting
 verified:
-  date: 2026-11-06
+  date: 2026-11-15
   against:
-    CPSV Editor: "0412e9b"
-    Linked Data Explorer: "814c4bb"
-    RONL Business API: "ff6c362"
+    CPSV Editor: "6910bb8"
+    Linked Data Explorer: "e11e4ef"
+    RONL Business API: "67bac28"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
