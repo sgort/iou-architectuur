@@ -1,10 +1,10 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    Linked Data Explorer: "4300700"
-    RONL Business API: "c6cf3ac"
+    Linked Data Explorer: "5bccbf2"
+    RONL Business API: "4579486"
 ---
 
 # OpenAPI Rendering
@@ -143,27 +143,31 @@ acceptance API. The production backend allows only its own two frontends — the
 Linked Data Explorer's and the CPSV Editor's — so no documentation page can reach it
 from a browser.
 
-That split is a decision, not an accident. Neither of the Linked Data Explorer's documents declares
-`securitySchemes` and no global `security`, so every operation is
-unauthenticated — including `POST /dmns/deploy`, `POST /dmns/process/deploy`
-and `DELETE /cache/clear`. Those are already reachable by anything that is not
-a browser, since the origin check passes requests that send no `Origin` at all;
-CORS is a browser policy, not an authorization boundary. But a Send button on a
-public documentation page is a different proposition from an endpoint someone
-has to write a request to reach, so production stays locked to its own
-frontend. On `/v2`, `GET /v2/norms` echoes the acceptance documentation origin, so
-Test Request works there too.
+That split is a decision, not an accident. Since v2026.11.2 the Linked Data Explorer's
+`/v1` document declares one security scheme, `bearerAuth` — a Keycloak access token
+from realm `ronl` carrying the role `lde-author` — and requires it on its
+state-changing operations, among them `POST /dmns/process/deploy` and
+`DELETE /cache/clear`. There is still no global `security`, so reads stay open, and
+`POST /dmns/deploy` takes the token optionally: without one, and only on a tier that
+allows anonymous test deploys (acceptance among them), it deploys to the `TestOnly`
+tenant for 48 hours, at most ten per address per hour. Its `/v2` document declares no
+scheme. Test Request against a secured operation therefore needs a token, as it does
+on the RONL Business API. CORS remains a browser policy, not an authorization
+boundary, and a Send button on a public documentation page is still a different
+proposition from an endpoint someone has to write a request to reach, so production
+stays locked to its own frontend. On `/v2`, `GET /v2/norms` echoes the acceptance
+documentation origin, so Test Request works there too.
 
-The RONL Business API's document is different on both counts. It declares three
-security schemes — `bearerAuth`, a Keycloak-issued JWT that applies to every
-operation by default, `mediaAggregatorKey`, and since 28 September 2026 `m2mOAuth`,
-an OAuth2 client-credentials scheme for the machine-to-machine surface — so Test
+The RONL Business API's document goes further. It declares three security schemes —
+`bearerAuth`, a Keycloak-issued JWT, `mediaAggregatorKey`, and since 28 September 2026
+`m2mOAuth`, an OAuth2 client-credentials scheme for the machine-to-machine surface —
+and, unlike the Linked Data Explorer's, applies `bearerAuth` globally, so Test
 Request against it needs a token for most operations. And since 30 September 2026
 its acceptance `CORS_ORIGIN` includes `https://acc.iou-architectuur.open-regels.nl`,
 so Test Request works from both documentation tiers.
 
 Measured against the Linked Data Explorer's acceptance backend on 16 September 2026
-(and identically again on 27 September, 4 October, 11 October and 8 November), varying only the
+(and identically again on 27 September, 4 October, 11 October, 8 November and 15 November), varying only the
 `Origin` header on `GET /v1/health`:
 
 | `Origin` sent | Status | `Access-Control-Allow-Origin` |
@@ -173,7 +177,7 @@ Measured against the Linked Data Explorer's acceptance backend on 16 September 2
 | `https://acc.linkeddata.open-regels.nl` | 200 | echoed |
 | `http://localhost:8000` | 200 | absent |
 
-Measured against the RONL Business API's acceptance backend on 8 November 2026 (identical to 4 and 11 October):
+Measured against the RONL Business API's acceptance backend on 15 November 2026 (identical to 4 and 11 October and 8 November):
 
 | `Origin` sent | Status | `Access-Control-Allow-Origin` |
 |---|---|---|
@@ -199,11 +203,11 @@ made the Linked Data Explorer's table possible: a disallowed origin no longer an
     `connect-src` there names both acceptance backends —
     `https://acc.backend.linkeddata.open-regels.nl` and `https://acc.api.open-regels.nl`.
     **That file is not applied
-    to either deployment.** Both pipelines publish with `app_location: "site"`,
+    to either deployment.** All three deployment definitions publish with `app_location: "site"`,
     Azure Static Web Apps reads `staticwebapp.config.json` from the app artifact
     root, and `mkdocs build` never copies the file into `site/`.
 
-    Verified 16 September 2026, and again on 27 September, 11 October and 8 November: neither `iou-architectuur.open-regels.nl` nor
+    Verified 16 September 2026, and again on 27 September, 11 October, 8 November and 15 November: neither `iou-architectuur.open-regels.nl` nor
     `acc.iou-architectuur.open-regels.nl` returns a `Content-Security-Policy` or
     `X-Frame-Options` header, and both return `Referrer-Policy: same-origin`
     where the file declares `strict-origin-when-cross-origin`.

@@ -2,11 +2,11 @@
 title: "6. Data architecture"
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    CPSV Editor: "84886c9"
-    Linked Data Explorer: "189435e"
-    RONL Business API: "35fb3a8"
+    CPSV Editor: "6910bb8"
+    Linked Data Explorer: "e11e4ef"
+    RONL Business API: "67bac28"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -57,9 +57,10 @@ Explorer** (AB-27). This is replaceable: you may use your existing register.
 | Personal data from base registers | At the source; fetched when needed | The source holder | Not copied |
 | Legal text | Official publication sources; fetched through the CPRMV API | The legislator | Not copied |
 
-Two smaller places of storage: the Linked Data Explorer keeps test cases and chain
-templates in the user's browser, and the CPSV Editor keeps the TriplyDB token used
-for publishing there (see [chapter 8](08-security-and-privacy.md)).
+One smaller place of storage: the Linked Data Explorer keeps test cases and chain
+templates in the user's browser. The token used to publish to the knowledge graph
+is held only by the Linked Data Explorer's backend (see
+[chapter 8](08-security-and-privacy.md)).
 
 ## Phasing
 

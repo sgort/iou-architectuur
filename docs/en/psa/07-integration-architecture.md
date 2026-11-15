@@ -2,11 +2,11 @@
 title: "7. Integration architecture"
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    CPSV Editor: "84886c9"
-    Linked Data Explorer: "189435e"
-    RONL Business API: "35fb3a8"
+    CPSV Editor: "6910bb8"
+    Linked Data Explorer: "e11e4ef"
+    RONL Business API: "67bac28"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -44,7 +44,7 @@ are listed by name as allowed clients.
 |---|---|---|---|
 | Cases, tasks, decisions, forms, documents | RONL Business API | Work environment and MijnOmgeving | Token from the OIDC issuer, with role and organisation |
 | Public catalogues | RONL Business API | Anyone | Without login, read only, with a limit on the number of requests (AB-22) |
-| Norms, decision models, process bundles | Linked Data Explorer | Other IOU components, other organisations | Reading public; writing still unchecked (R-02) |
+| Norms, decision models, process bundles | Linked Data Explorer | Other IOU components, other organisations | Reading public; writing with a token from the OIDC issuer and the author role (R-02) |
 | Legal text and references | CPRMV API | Anyone who needs legal text | Public |
 | SPARQL | Knowledge graph | IOU components, other organisations | Reading according to the dataset's settings; writing with a token |
 

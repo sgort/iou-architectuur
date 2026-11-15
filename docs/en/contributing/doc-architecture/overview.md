@@ -18,6 +18,7 @@ graph TB
         subgraph "English (Primary)"
             EN_HOME[Home/Index]
             EN_DECK[IOU Architecture slides]
+            EN_PSA[Project Start Architecture]
             EN_RONL[RONL Business API]
             EN_NORM[Norm Editor]
             EN_CPSV[CPSV Editor]
@@ -29,6 +30,7 @@ graph TB
         subgraph "Nederlands (Translation)"
             NL_HOME[Home/Index]
             NL_DECK[IOU Architecture slides]
+            NL_PSA[Project Start Architectuur]
             NL_RONL[RONL Business API]
             NL_NORM[Norm Editor]
             NL_CPSV[CPSV Editor]
@@ -46,6 +48,7 @@ graph TB
     end
 
     EN_HOME --> EN_DECK
+    EN_HOME --> EN_PSA
     EN_HOME --> EN_RONL
     EN_HOME --> EN_NORM
     EN_HOME --> EN_CPSV
@@ -54,6 +57,7 @@ graph TB
     EN_HOME --> EN_CONTRIB
 
     NL_HOME --> NL_DECK
+    NL_HOME --> NL_PSA
     NL_HOME --> NL_RONL
     NL_HOME --> NL_NORM
     NL_HOME --> NL_CPSV
@@ -85,7 +89,7 @@ graph TB
 
 ## Content Sources
 
-English pages are the primary source of truth. Dutch pages are translations or placeholders that link back to the English version until a translation is available. Component documentation is brought into this site by the `/iou-document-patch` skill, which reads each component's changelog at its released commit and patches the affected pages. It covers five components: the three applications, the Norm Editor and CPRMV.
+English pages are the primary source of truth. Dutch pages are translations or placeholders that link back to the English version until a translation is available. Component documentation is brought into this site by the `/iou-document-patch` skill, which reads each component's changelog at its branch of record and patches the affected pages. It covers five components: the three applications, the Norm Editor and CPRMV. Its second mode, the weekly pass, reads no changelog: it re-checks the contributing pages and the Project Start Architecture against the repositories themselves.
 
 ```mermaid
 graph LR

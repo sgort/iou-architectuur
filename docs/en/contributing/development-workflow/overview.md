@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    CPSV Editor: "34a51b4"
-    Linked Data Explorer: "4300700"
-    RONL Business API: "c6cf3ac"
+    CPSV Editor: "2d201d5"
+    Linked Data Explorer: "5bccbf2"
+    RONL Business API: "4579486"
 ---
 
 # Development Workflow
@@ -74,7 +74,14 @@ Production is a second pull request, `acc` → `main`, and what a push to `main`
 does differs by repository. In the Linked Data Explorer (since v2026.09.7) and the RONL
 Business API (since v2026.09.10) it starts one ordered workflow, *Promote to
 Production*: a `changes` job decides which targets the promotion touches, the backend
-deploys first, and each site deploys only if the backend succeeded or was skipped. The
+deploys first, and each site deploys only if the backend succeeded or was skipped.
+Since v2026.11.4 the RONL Business API's `changes` job counts a change to the root
+`package.json` or `package-lock.json` against all four targets, not only the backend.
+`/bump-release` always bumps the root `package.json`, so a promotion that carries a
+release now redeploys all four applications, and a lockfile-only promotion no longer
+deploys the backend alone. One pattern still differs from its acceptance filter: the
+frontend's leaves out `keycloak-themes/**`
+([ronl-business-api#457](https://github.com/sgort/ronl-business-api/issues/457)). The
 production deploy workflows no longer trigger on the push themselves; they are called
 by the promotion. The CPSV Editor has no backend and keeps a single *Deploy PROD*
 workflow that runs on the push to `main`.
@@ -83,8 +90,9 @@ workflow that runs on the push to `main`.
 
 Once a component has shipped, `/iou-document-patch` — defined once, in this
 documentation repository — brings that component's pages into sync with the new
-release. Its weekly pass re-checks these contributing pages against the repositories
-themselves.
+release. Its weekly pass re-checks these contributing pages and the Project Start
+Architecture against the repositories themselves, and adds the week's ICTU
+dependency-guideline assessment.
 
 ## Where to go next
 

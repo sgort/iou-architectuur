@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    CPSV Editor: "34a51b4"
-    Linked Data Explorer: "4300700"
-    RONL Business API: "c6cf3ac"
+    CPSV Editor: "2d201d5"
+    Linked Data Explorer: "5bccbf2"
+    RONL Business API: "4579486"
 ---
 
 # Technology Stack
@@ -25,7 +25,7 @@ The site is built on MkDocs with the Material theme, the mkdocs-static-i18n plug
 | Diagram rendering | Mermaid | via Material |
 | Code font | JetBrains Mono, vendored in `docs/assets/fonts` | 2.304, self-hosted (SIL OFL 1.1) |
 | Hosting | Azure Static Web Apps | — |
-| CI/CD | GitHub Actions | — |
+| CI/CD | GitHub Actions (production), Azure DevOps (acceptance) | — |
 
 Material's default code font, Roboto Mono, has no box-drawing characters, so
 diagrams drawn with them in a fenced block borrowed glyphs from a fallback font at
@@ -127,13 +127,17 @@ mean.
 A contributing page makes claims about repository configuration — workflows,
 `SECURITY-PIPELINE.md`, `renovate.json`, runner configs and their thresholds. **Most
 changes to those produce no new build.** Every frontend deploy workflow is
-path-filtered, as read on 8 November 2026:
+path-filtered, as read on 15 November 2026:
 
 | Repository | The frontend build fires on | Does not fire on |
 |---|---|---|
 | Linked Data Explorer | `packages/frontend/**`, its own workflow file, the root `package.json` / `package-lock.json`, and `.nvmrc` | Other workflows, `SECURITY-PIPELINE.md`, `renovate.json`, backend runner config |
 | RONL Business API | `packages/frontend/**`, `packages/shared/**` and `packages/pa-cockpit/**`, since v2026.11.0 `keycloak-themes/**` (the login theme's guard tests run in this suite), its own workflow file, the root `package.json` / `package-lock.json`, and `.nvmrc` | The same |
 | CPSV Editor | Everything except `docs/**`, `.claude/**` and `**/*.md` | `SECURITY-PIPELINE.md` and every other Markdown record |
+
+Since v2026.11.4 the RONL Business API's production promotion mirrors these filters for the root `package.json` and
+`package-lock.json` as well; the frontend's production pattern still leaves out `keycloak-themes/**`
+([ronl-business-api#457](https://github.com/sgort/ronl-business-api/issues/457)).
 
 So a build id is silent about exactly the changes that falsify these pages. The
 commit on the branch of record is not: it moves with every change.
@@ -256,22 +260,23 @@ them. On 11 September all stamps matched:
 
 ## Build & Deploy Pipeline
 
-This repository has **two** deployment pipelines, on two different hosts, and they are easy to confuse:
+This repository has **three** deployment definitions, on two different hosts, and they are easy to confuse:
 
 | Pipeline | Host | Trigger | Deploys |
 |---|---|---|---|
 | `.github/workflows/azure-static-web-apps-*.yml` | GitHub Actions | Push to `main`, and pull requests against it | The production site; PRs build a preview |
-| `pipeline/azure_ado_pipeline.yml` | Azure DevOps | **Manual only**, since 21 August 2026 | The acceptance site |
+| `azure-static-web-apps-pipeline.yml` (repository root) | Azure DevOps | Push to `acc`, and pull requests against it | The acceptance site |
+| `pipeline/azure_ado_pipeline.yml` | Azure DevOps | **Manual only**, since 21 August 2026 | — |
 
-Both build with MkDocs and publish to Azure Static Web Apps.
+All three build with MkDocs and publish to Azure Static Web Apps.
 
-The Azure DevOps pipeline used to fire on every push to `acc` and on pull requests against it, which is what made `acc` the acceptance branch in practice. It now carries `trigger: none` and `pr: none`, so it runs only when someone starts it by hand. Pushing to `acc` therefore deploys nothing on its own today — but the pipeline is still there, and re-enabling it is a two-line change.
+The acceptance site, `acc.iou-architectuur.open-regels.nl`, is the Static Web App `ambitious-river-0b5e0d303`, and the root `azure-static-web-apps-pipeline.yml` deploys it whenever `acc` is pushed to the `flevoland` remote. On 14 November 2026 it served a commit two minutes after that commit was pushed there, a commit GitHub's `acc` did not yet have. So a push to `acc` on Azure DevOps deploys acceptance; a push to `acc` on GitHub deploys nothing. `pipeline/azure_ado_pipeline.yml` used to fire on every push to `acc` as well; since 21 August 2026 it carries `trigger: none` and `pr: none` and runs only when someone starts it by hand. Which site it targets is set by a pipeline variable, not in the file.
 
 The GitHub remote is not the only one: this repository is also pushed to Azure DevOps (`flevoland`) and to the open-regels GitLab instance. Only the first two run anything.
 
 A third Azure DevOps pipeline, `pipeline/publish-to-github.yml`, deploys no site. It runs on a tag matching `pub/v*` — a plain `v*` tag triggers nothing — exports a sanitised snapshot of that tag (`pipeline/scripts/sanitize.sh`, with the paths `.gitattributes` marks `export-ignore` left out), and after a manual approval on the ADO environment `GitHub-Public` pushes it to the public repository [ProvincieFlevoland/IOU-architectuur](https://github.com/ProvincieFlevoland/IOU-architectuur), with the `pub/` prefix dropped from the tag. `pipeline/publish-github.md` describes the procedure.
 
-Both builds run `mkdocs build --verbose`, not `--strict`, so a broken internal link or a page missing from the nav produces a warning rather than failing the deploy. Run `mkdocs build --strict` locally before pushing if you want that caught.
+None of the builds runs `mkdocs build --strict` — the GitHub workflow and `pipeline/azure_ado_pipeline.yml` run `--verbose`, the root definition plain `mkdocs build -d site` — so a broken internal link or a page missing from the nav produces a warning rather than failing the deploy. Run `mkdocs build --strict` locally before pushing if you want that caught.
 
 ```mermaid
 graph TB

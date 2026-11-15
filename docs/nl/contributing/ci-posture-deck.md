@@ -41,7 +41,10 @@ rapid prototyping.
       uitgeleverde build; de bouw gebeurt op de runner in plaats van in een
       leverancierscontainer.
     - **De statusvoetnoot.** De genoemde commits zijn de koppen van 12 september. De
-      huidige `acc`-koppen zijn `34a51b4` en `4300700`. De `main` van de Linked Data Explorer (`189435e`) draagt dezelfde boom als zijn `acc`; die van de CPSV Editor (`84886c9`) loopt twee Renovate-actiepins achter (`setup-node` v7.1.0 en `upload-artifact` v7.0.2).
+      huidige `acc`-koppen zijn `2d201d5` en `5bccbf2`. De `main` van de Linked Data Explorer (`e11e4ef`)
+      draagt dezelfde boom als zijn `acc`; die van de CPSV Editor (`6910bb8`) loopt achter met de
+      Renovate-update van `zizmor-action` naar v0.8.0 (in `zizmor.yml` en het pinregister) en met
+      labmateriaal onder `examples/lab/`.
 
     De gevraagde beslissing verandert hier niet door: de leveringspijplijn onder het
     prototypingspoor bestaat nog steeds niet.

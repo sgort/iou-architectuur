@@ -1,15 +1,19 @@
 {
-  "docs_built": "2026-11-14",
+  "docs_built": "2026-11-15",
   "last_patch": {
-    "date": "2026-11-14",
-    "kind": "Component sync",
-    "summary": "RONL Business API v2026.11.3 and v2026.11.4, both in production: a new organisation, Caribisch Nederland at /bes, whose landing page gives residents their own DigiD login; Proces starten, where a caseworker starts any process its model lets them start, with the backend refusing everyone else; dynamic lists that save, and since v2026.11.4 show their rows in ended cases too; an unreachable BRP named in the API and in health, its certificate checked daily; and the findings of three releases resolved, with lockfile-only promotions deploying every application and the VM's Caddy pinned.",
+    "date": "2026-11-15",
+    "kind": "Weekly pass",
+    "summary": "The contributing pages and the Project Start Architectuur re-checked against all three applications: fifteen workflows in the RONL Business API, lockfile-only promotions that redeploy every application, the VM's Caddy and Postgres pinned, the Linked Data Explorer's API document asking for sign-in, and a new risk for an authentication gap that is chosen to be fixed but not yet built; the ICTU dependency guideline scored 42, 40 and 40, now that lock-file maintenance has merged in all three.",
     "previous": {
-      "date": "2026-11-12",
+      "date": "2026-11-14",
       "kind": "Component sync",
-      "summary": "CPSV Editor v2026.11.1, Linked Data Explorer v2026.11.2 and RONL Business API v2026.11.2, all in production: the design tools ask who is writing — sign-in through Keycloak with an author role for deploying, publishing and saving, test deploys for everyone else on acceptance — and publishing to TriplyDB goes through the Linked Data Explorer backend, so no token is kept in the browser."
+      "summary": "RONL Business API v2026.11.3 and v2026.11.4, both in production: a new organisation, Caribisch Nederland at /bes, whose landing page gives residents their own DigiD login; Proces starten, where a caseworker starts any process its model lets them start, with the backend refusing everyone else; dynamic lists that save, and since v2026.11.4 show their rows in ended cases too; an unreachable BRP named in the API and in health, its certificate checked daily; and the findings of three releases resolved, with lockfile-only promotions deploying every application and the VM's Caddy pinned."
     },
     "open_findings": [
+      {
+        "label": "linked-data-explorer#342",
+        "url": "https://github.com/sgort/linked-data-explorer/issues/342"
+      },
       {
         "label": "ronl-business-api#457",
         "url": "https://github.com/sgort/ronl-business-api/issues/457"

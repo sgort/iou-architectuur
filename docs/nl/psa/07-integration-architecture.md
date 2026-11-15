@@ -2,11 +2,11 @@
 title: "7. Integratiearchitectuur"
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    CPSV Editor: "84886c9"
-    Linked Data Explorer: "189435e"
-    RONL Business API: "35fb3a8"
+    CPSV Editor: "6910bb8"
+    Linked Data Explorer: "e11e4ef"
+    RONL Business API: "67bac28"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -44,7 +44,7 @@ namens zichzelf aanroepen, staan bij naam op een lijst van toegestane clients.
 |---|---|---|---|
 | Zaken, taken, beslissingen, formulieren, documenten | RONL Business API | Werkomgeving en MijnOmgeving | Token van de OIDC-uitgever, met rol en organisatie |
 | Publieke catalogi | RONL Business API | Iedereen | Zonder inloggen, alleen lezen, met een limiet op het aantal verzoeken (AB-22) |
-| Normen, beslismodellen, procesbundels | Linked Data Explorer | Andere IOU-onderdelen, andere organisaties | Lezen openbaar; schrijven nog zonder controle (R-02) |
+| Normen, beslismodellen, procesbundels | Linked Data Explorer | Andere IOU-onderdelen, andere organisaties | Lezen openbaar; schrijven met een token van de OIDC-uitgever en de rol voor auteurs (R-02) |
 | Wettekst en verwijzingen | CPRMV API | Iedereen die wettekst nodig heeft | Openbaar |
 | SPARQL | Kennisgraaf | IOU-onderdelen, andere organisaties | Lezen volgens de instelling van de dataset; schrijven met een token |
 

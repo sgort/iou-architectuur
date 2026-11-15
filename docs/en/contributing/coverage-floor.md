@@ -1,18 +1,18 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    CPSV Editor: "34a51b4"
-    Linked Data Explorer: "4300700"
-    RONL Business API: "c6cf3ac"
+    CPSV Editor: "2d201d5"
+    Linked Data Explorer: "5bccbf2"
+    RONL Business API: "4579486"
 ---
 
 # The Coverage Floor
 
-!!! info "What was re-checked on 8 November 2026, and what was not"
-    The **CI and ruleset claims** on this page were re-checked on 8 November 2026
-    against `34a51b4`, `4300700` and `c6cf3ac`: which workflows run the suites, on
+!!! info "What was re-checked on 15 November 2026, and what was not"
+    The **CI and ruleset claims** on this page were re-checked on 15 November 2026
+    against `2d201d5`, `5bccbf2` and `4579486`: which workflows run the suites, on
     which triggers, and which checks each branch requires. The floor has been blocking
     on `acc` in all three since 19 September 2026. Every `main` now requires `audit`
     and `scan`, and none requires a build or a test.
@@ -388,6 +388,12 @@ caught it.
     A pull request that drops a file below 80% turns a **required** check red, and the
     merge button goes with it. Since v2026.10.1 that includes a lockfile-only pull
     request in the RONL Business API, whose three site workflows used to skip one.
+    It has blocked a merge since, on new code rather than on a regression. On 12 November 2026 the
+    Linked Data Explorer's sign-in pull request
+    ([#331](https://github.com/sgort/linked-data-explorer/pull/331)) failed its required `deploy`
+    and `Build and Deploy Frontend` checks on three new files below the floor —
+    `testDeploy.service.ts` at 66.7%, `services/auth.ts` at 76.5% and `common/LocalOnly.tsx` at
+    75% — and merged once `9112835` had added their tests, with no threshold touched.
 
     Until that date this said the opposite, correctly: the workflows that enforce the
     floor were named by no ruleset, so a sub-80% file stopped the deploy and left the

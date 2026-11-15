@@ -2,11 +2,11 @@
 title: "5. Applicatiearchitectuur"
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    CPSV Editor: "84886c9"
-    Linked Data Explorer: "189435e"
-    RONL Business API: "35fb3a8"
+    CPSV Editor: "6910bb8"
+    Linked Data Explorer: "e11e4ef"
+    RONL Business API: "67bac28"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -95,7 +95,7 @@ flowchart LR
 | Van | Naar | Waarvoor | Hoe |
 |---|---|---|---|
 | Webinterfaces | Hun eigen backend | Alle functies | HTTPS; de browser praat niet zelf met engine of kennisgraaf |
-| CPSV Editor | Kennisgraaf | Publiceren | HTTPS, via de API van TriplyDB en de backend van de Linked Data Explorer |
+| CPSV Editor | Kennisgraaf | Publiceren | HTTPS, via de backend van de Linked Data Explorer, als ingelogde auteur |
 | Norm Editor | Kennisgraaf | Interpretaties opslaan | HTTPS, via de API van TriplyDB |
 | Linked Data Explorer | Kennisgraaf | Beslismodellen vinden, regels afnemen | SPARQL 1.1 |
 | Linked Data Explorer | Procesengine | Procesbundels uitrollen; taken die het systeem zelf uitvoert | Camunda 7 REST-API |
@@ -110,9 +110,9 @@ uitgerolde versie levert wat de koppeling nodig heeft. Tot dan staat ze uit, en
 werkt de rest gewoon door. Zo kan IOU een standaard stap voor stap overnemen
 (zie [Over deze PSA](index.md#hoe-iou-zich-ontwikkelt)).
 
-De ontwerptools gebruiken nog geen tokens (AB-20, risico R-02). Waar de
-webinterfaces van de Linked Data Explorer, de CPSV Editor en de Norm Editor met hun
-backend praten, controleert die backend dus nog niet wie de gebruiker is.
+De Linked Data Explorer en de CPSV Editor sturen bij schrijven een token mee, dat
+de backend van de Linked Data Explorer controleert. De Norm Editor gebruikt nog
+geen tokens: zijn backend controleert niet wie de gebruiker is (AB-20, risico R-02).
 
 ## Fasering
 

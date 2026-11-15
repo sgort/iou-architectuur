@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    CPSV Editor: "34a51b4"
-    Linked Data Explorer: "4300700"
-    RONL Business API: "c6cf3ac"
+    CPSV Editor: "2d201d5"
+    Linked Data Explorer: "5bccbf2"
+    RONL Business API: "4579486"
 ---
 
 # Dependency Scanning
@@ -297,7 +297,9 @@ necessary is the useful part:
 
 Semgrep runs on `push` and `pull_request` and on nothing else. **Since 24 September 2026
 one workflow in each repository does run on a schedule** — two since 10 October, with the
-quarterly review [below](#criteria-for-a-dependency-and-a-quarterly-review):
+quarterly review [below](#criteria-for-a-dependency-and-a-quarterly-review),
+and three in the RONL Business API since 13 November, with a daily `upstream-certs.yml` that
+checks an upstream's TLS certificate rather than the dependency tree:
 `dependency-audit.yml`, daily at
 05:17 UTC and on demand, runs `npm audit --package-lock-only` against the lockfiles of
 **both `acc` and `main`** — the branch production is built from included — and on a high or
@@ -337,7 +339,7 @@ than wait for an upstream patch; in the fourth it was the patch, taken inside th
   declared as production dependencies. Declaring them as development dependencies
   (`cc9936a`, #208) cleared it.
 
-Four more followed by 7 November 2026, and one of them is still open:
+Four more followed by 7 November 2026, the last of them closing on 13 November:
 
 - **The Linked Data Explorer, 21–29 October 2026**
   ([#305](https://github.com/sgort/linked-data-explorer/issues/305)): a `dompurify` critical
@@ -350,28 +352,30 @@ Four more followed by 7 November 2026, and one of them is still open:
 - **The RONL Business API, 31 October – 6 November 2026**
   ([#410](https://github.com/sgort/ronl-business-api/issues/410)): `follow-redirects`
   (GHSA-mrwp-f3q8-3g9p), fixed by `follow-redirects` 1.16.2 inside the cooldown (`4ffe975`).
-- **The Linked Data Explorer, open since 31 October 2026**
+- **The Linked Data Explorer, 31 October – 13 November 2026**
   ([#313](https://github.com/sgort/linked-data-explorer/issues/313)): the same
-  `follow-redirects` high. Its lockfile still pins 1.16.1 at `4300700`, and the daily audit
-  has failed every day since.
+  `follow-redirects` high, which failed the audit every day until the lock-file maintenance
+  of 12 November ([#301](https://github.com/sgort/linked-data-explorer/pull/301), `bfc7a50`)
+  took the package to 1.16.2 — hours after that day's run. The next run passed and closed the
+  issue.
 
 Dependabot *alerts* still watch the default branch only, which is `acc` in all three, so
-the daily audit is what now sees `main`. Read from the API on 8 November 2026, with the
-11 October figures beside them:
+the daily audit is what now sees `main`. Read from the API on 15 November 2026, with the
+8 November figures beside them:
 
-| Repository | Open alerts | Of which runtime | On 11 October | Dismissed with a reason |
+| Repository | Open alerts | Of which runtime | On 8 November | Dismissed with a reason |
 |---|:-:|---|:-:|:-:|
-| CPSV Editor | **1** | none — `minimatch` medium, development scope | 2 | 0 |
-| Linked Data Explorer | **6** | `follow-redirects` **high**, `@tiptap/core` medium | 10 | 0 |
-| RONL Business API | **8** | `react-router` ×2 medium | 10 | 0 |
+| CPSV Editor | **1** | none — `minimatch` medium, development scope | 1 | 0 |
+| Linked Data Explorer | **4** | `@tiptap/core` medium, `fast-xml-parser` low | 6 | 0 |
+| RONL Business API | **14** | `react-router` ×2 medium; `hono` ×5 and `@hono/node-server` ×2, medium and one low; `fast-xml-parser` low | 8 | 0 |
 
-The fall is the development-tooling wave of early October clearing: the `handlebars`,
-`shell-quote`, `source-map-js` and `sprintf-js` alerts are gone in both monorepos, and the
-Linked Data Explorer's two `dompurify` lows with them. What is new is again almost all
-development scope — `@vitest/mocker` (two medium), `minimatch` (medium, and a high in the
-RONL Business API) and `deepmerge` (low) — which the daily audit lists and does not fail on.
-The exception is the Linked Data Explorer's `follow-redirects` high, a runtime dependency,
-which is the audit failure above.
+Two things moved. The Linked Data Explorer's `follow-redirects` high, the one runtime high,
+was fixed on 12 November with the two development-only `@vitest/mocker` mediums in both
+monorepos. And runtime alerts arrived that the daily audit does not fail on, because none is
+high or critical: a `fast-xml-parser` low in both monorepos on 12 November, and in the RONL
+Business API seven `hono` and `@hono/node-server` alerts on 13 November, six of them medium.
+What remains in development scope — `minimatch` (a high in the RONL Business API),
+`postcss-selector-parser` and `deepmerge` — the audit lists and does not fail on.
 
 **The RONL Business API's drop is what lock-file maintenance does on its first run.** It
 was enabled on 12 September 2026 and had not yet had a Monday; the refresh that followed
@@ -386,7 +390,7 @@ and a `chromedriver` pulled at the floating tag `latest` out of the tree with it
 ICTU's guideline asks for each finding to be mitigated **or explicitly accepted**. Two were
 dismissed with a written reason on 24 September — the RONL Business API's `adm-zip` and
 `elliptic`, neither with a patched version — and both closed as fixed the same day, when
-`keycloak-connect` went. None of the fifteen open today is dismissed, so each is still
+`keycloak-connect` went. None of the nineteen open today is dismissed, so each is still
 neither mitigated nor accepted. Three of them wait on a major queued behind Dependency
 Dashboard approval — Tiptap 3 in the Linked Data Explorer, and React Router 7, with two
 alerts, in the RONL Business API. Every open alert but `deepmerge` has a patched release. The `qs` alerts, and with them the need for
@@ -421,14 +425,14 @@ with the Node `sbom.yml` pins, looked up from nodejs.org (`4df6c1b`), after its 
 release pull request went red on that field alone; the other two still run
 `npm run sbom:check` with the local npm.
 
-Committed so far: the CPSV Editor's 2026.09.6 (backfilled) to 2026.11.0, six in all; the
-Linked Data Explorer's 2026.09.7, 2026.09.8, 2026.10.0 to 2026.10.3, 2026.11.0 and 2026.11.1;
-the RONL Business API's 2026.09.11 to 2026.09.15, 2026.10.0 to 2026.10.4, 2026.11.0 and
-2026.11.1. Nothing yet
+Committed so far: the CPSV Editor's 2026.09.6 (backfilled) to 2026.11.1, seven in all; the
+Linked Data Explorer's 2026.09.7, 2026.09.8, 2026.10.0 to 2026.10.3 and 2026.11.0 to 2026.11.2;
+the RONL Business API's 2026.09.11 to 2026.09.15, 2026.10.0 to 2026.10.4 and 2026.11.0 to
+2026.11.4. Nothing yet
 re-analyses them when a new advisory lands. The other gap is half closed: **every resolved
-package comes straight from the public registry** — 552 in the CPSV Editor's lockfile, 1,527
-in the Linked Data Explorer's, 1,710 in the RONL Business API's at `34a51b4`, `4300700` and
-`c6cf3ac`, all from `registry.npmjs.org` — with no proxy in between. (The only entries
+package comes straight from the public registry** — 556 in the CPSV Editor's lockfile, 1,557
+in the Linked Data Explorer's, 1,549 in the RONL Business API's at `2d201d5`, `5bccbf2` and
+`4579486`, all from `registry.npmjs.org` — with no proxy in between. (The only entries
 resolving elsewhere are the workspace links each monorepo makes to its own packages: 2 and
 6.) Since 10 October 2026 the required `audit` job verifies each package's registry
 signature and, where one exists, its provenance attestation — see

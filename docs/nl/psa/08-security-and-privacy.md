@@ -2,11 +2,11 @@
 title: "8. Beveiliging en privacy"
 scope: cross-cutting
 verified:
-  date: 2026-11-08
+  date: 2026-11-15
   against:
-    CPSV Editor: "84886c9"
-    Linked Data Explorer: "189435e"
-    RONL Business API: "35fb3a8"
+    CPSV Editor: "6910bb8"
+    Linked Data Explorer: "e11e4ef"
+    RONL Business API: "67bac28"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -36,11 +36,13 @@ vervanging van.
 - **Betrouwbaarheidsniveau per handeling** (AB-19). Een beslissing laten berekenen
   vraagt `basis`, een proces starten `midden`.
 - **Elke schrijfactie geauthenticeerd, geautoriseerd en vastgelegd** (AB-20). De
-  RONL Business API voldoet hieraan. De Linked Data Explorer, de CPSV Editor en de
-  Norm Editor nog niet: wie hun backend kan bereiken, kan er schrijven
-  (risico R-02).
-- **De ontwerptools alleen voor medewerkers** (AB-21). Dat wordt pas afgedwongen
-  als AB-20 is gerealiseerd. Tot dan schermt u ze zelf af.
+  RONL Business API voldoet hieraan. De Linked Data Explorer en de CPSV Editor
+  vragen een login met de rol voor auteurs, maar leggen nog niet vast wie wat deed,
+  en de rol is niet per organisatie. Wie de backend van de Norm Editor kan
+  bereiken, kan er schrijven (risico R-02).
+- **De ontwerptools alleen voor medewerkers** (AB-21). De Linked Data Explorer en
+  de CPSV Editor dwingen dat af met de rol voor auteurs; de Norm Editor nog niet.
+  Die schermt u zelf af.
 
 **Afscherming**
 
@@ -55,7 +57,8 @@ vervanging van.
 **Vastlegging en privacy**
 
 - **Elk geauthenticeerd verzoek vastgelegd in een aparte auditopslag** (AB-23).
-  Een bewaartermijn wordt nog niet toegepast (risico R-10).
+  Een bewaartermijn wordt nog niet toegepast (risico R-10). Handelingen die buiten
+  de RONL Business API om gaan, vallen daarbuiten (risico R-16).
 - **Gegevens bij de bron** (AB-26): persoonsgegevens uit basisregistraties worden
   opgevraagd wanneer nodig, niet gekopieerd.
 - **Verwerkingsregister per proces** (AB-27), openbaar zonder contactgegevens.
