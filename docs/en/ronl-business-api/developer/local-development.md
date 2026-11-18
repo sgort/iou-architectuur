@@ -204,6 +204,14 @@ login themes from `./keycloak-themes`. Keycloak imports the realm only when no
 `ronl` realm exists yet. Because the realm lives in the Postgres volume, an
 existing `postgres-data` volume keeps the realm it was created with.
 
+A volume older than the realm file therefore lacks what later releases put
+there. Without the `bsn` attribute and mapper a test citizen has no timeline,
+and without `brp-raadpleger` a caseworker's BRP lookup is refused. Recreate the
+volume (`npm run docker:down:volumes && npm run docker:up`), or run
+`scripts/keycloak-add-brp-raadpleger.sh` with
+`KEYCLOAK_URL=http://localhost:8080`. A re-imported realm accepts sign-ins from
+`http://localhost:5173` only.
+
 **Postgres** runs as `postgres`/`postgres`. On the first start of an empty
 volume it runs `config/postgres/init-databases.sql`, which creates:
 

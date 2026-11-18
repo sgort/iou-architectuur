@@ -34,7 +34,7 @@ Moving the selected date can add or remove sections from view and recompute the 
 
 ## Access and privacy
 
-Viewing a timeline requires authentication, and a caller can only view their own record — never another person's. Reaching this level of assurance is required the same way described in [Authentication & IAM](authentication-iam.md). Every access to timeline data is logged, consistent with the audit trail described in [Security & Compliance](security-compliance.md).
+Viewing a timeline requires authentication at assurance level `hoog` and a citizen service number in the token, and the backend answers such a caller only for their own record. Staff holding the `brp-raadpleger` role can look up other people through the API, but the timeline view is the citizen's own; see [Authentication & IAM](authentication-iam.md#roles-and-authorization). Every access to timeline data is logged, consistent with the audit trail described in [Security & Compliance](security-compliance.md).
 
 ---
 

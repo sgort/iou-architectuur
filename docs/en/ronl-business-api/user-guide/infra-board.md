@@ -42,7 +42,8 @@ number and name travel with the process from the moment it starts, so the
 portfolio, the command palette and the phase page's WIP and Gereed tables all
 show the project rather than a placeholder. The intake form that follows asks
 for the same two fields and **opens already filled in with what you typed**, so
-nothing is entered twice.
+nothing is entered twice. The command palette (**Ctrl+K**) also finds projects
+waiting between phases, as the portfolio lists them, and opens them the same way.
 
 !!! note "A project started some other way is named by its state, not by a dash"
     An instance started outside this screen has no number or name until its
@@ -54,7 +55,8 @@ nothing is entered twice.
 **The board notices a project started elsewhere.** If an instance is started
 outside the board — by a script, or by someone else — the live rows pick it up
 when you come back to the tab, and when you switch between Mijn dag, Portfolio
-and Beheer. A page reload is no longer needed for it to appear.
+and Beheer. A page reload is no longer needed for it to appear. The phase counts
+on the Faseladder refresh with them.
 
 ---
 
@@ -96,6 +98,10 @@ the process follows its "niet akkoord" path.
 
 Your account needs an email address to sign. Without one the panel says so and
 offers no retry: only an administrator can add it.
+
+If your account is the one ValidSign sends its requests from, you cannot sign
+with it. The panel says *U bent de afzender van ValidSign-verzoeken en kunt
+daarom niet zelf ondertekenen.* and offers no retry: let a colleague sign.
 
 !!! note "If the panel looks stuck after you have signed"
     The panel polls for the result, and a signature can complete through either

@@ -69,13 +69,20 @@ The `realm_roles` protocol mapper is missing. Add it in Keycloak Admin:
 
 ### Login redirects to blank page
 
-**Cause:** Invalid redirect URIs in the Keycloak client.
+**Cause:** The address the frontend runs on is not among the Keycloak client's redirect URIs. The `ronl-business-api` client accepts only the addresses listed for it, and Keycloak refuses any other with an error page.
 
 1. **Clients → ronl-business-api → Settings**
-2. Set **Valid Redirect URIs** to `*`
-3. Set **Valid Post Logout Redirect URIs** to `*`
-4. Set **Web Origins** to `+`
-5. Save
+2. Add the origin to **Valid Redirect URIs** as `<origin>/*`. Locally that is `http://localhost:5173/*`. Never use `*`: the client is public, so a code sent to another site could be exchanged for the user's session.
+3. Leave **Valid Post Logout Redirect URIs** and **Web Origins** at `+`
+4. Save
+
+On ACC and PROD, change the list with `scripts/keycloak-restrict-rba-client.sh`; see [Keycloak deployment](deployment/keycloak.md#changing-the-realm-on-acc-and-prod).
+
+---
+
+### Login fails with a PKCE error
+
+The client requires PKCE with `S256`. `keycloak-js` sends it because `initializeKeycloak()` passes `pkceMethod: 'S256'`; a frontend build without that line can no longer sign in.
 
 ---
 
@@ -85,7 +92,7 @@ The `realm_roles` protocol mapper is missing. Add it in Keycloak Admin:
 JWT validation failed: jwt expired
 ```
 
-This is expected — access tokens have a 15-minute lifetime. Log out and log back in. Token refresh is a planned production feature.
+Access tokens have a 15-minute lifetime. The frontend refreshes them while the SSO session is active (see [Authentication with Keycloak JS](frontend-development.md#authentication-with-keycloak-js)), so this error means the session has ended, or the token was used outside the frontend, as in a script. Log out and log back in, or request a new token.
 
 ---
 

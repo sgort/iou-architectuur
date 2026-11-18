@@ -101,6 +101,8 @@ Its logo is `wide`, 52 px high in the landing top bar. It is the first tenant wi
 | `secondary` | `#e70077` |
 | `accent` | `#fec612` |
 
+`accent` stays Flevoland IT's yellow in `tenants.json`, but nothing on screen uses it: the accent fill comes from the shared tokens, see [Flevoland's palette](#flevolands-palette).
+
 ### Dienst Toeslagen
 
 `toeslagen` · Dienst Toeslagen · `organisationType: national`
@@ -233,7 +235,7 @@ Tailwind utility classes in the frontend use `var(--color-primary)` etc. as thei
 
 ## Flevoland's palette
 
-Since v2026.11.0 the Flevoland tenant gets more than the five theme colours: Flevoland IT's own palette, through the shared design tokens. Under `:root[data-tenant="flevoland"]`, `packages/shared/styles/tokens.css` points the `--rba-*` tokens at Flevoland IT's semantic tokens (`packages/shared/styles/flevoland/tokens.css`), and the Tailwind colour scales map each shade onto that palette by role. The result is navy text, Material greys, a `#f8f8f8` page, Flevoland's status colours, brown warning text and yellow fills with dark text; pink stays for accent text and lines.
+Since v2026.11.0 the Flevoland tenant gets more than the five theme colours: Flevoland IT's own palette, through the shared design tokens. Under `:root[data-tenant="flevoland"]`, `packages/shared/styles/tokens.css` points the `--rba-*` tokens at Flevoland IT's semantic tokens (`packages/shared/styles/flevoland/tokens.css`), and the Tailwind colour scales map each shade onto that palette by role. The result is navy text, Material greys, a `#f8f8f8` page, Flevoland's status colours and brown warning text. Filled accents — rail cards, buttons, badges, chips, tab counts and live badges — are pink `#e60078` with white text (4.53:1); pink also stays for accent text and lines. Yellow `#fec612` with dark text remains for the warning fill. The accent fill is one of two values that do not come from Flevoland IT's semantic tokens, and stays so until the next step of the Flevoland look ([#405](https://github.com/sgort/ronl-business-api/issues/405)).
 
 Every other tenant keeps its theme colours on Tailwind's default scales and the tokens' defaults. Converting the hard-coded colours to tokens shifted a few pale status tints for them by at most ΔE2000 6.9 — each merged tint takes its group's darkest text or lightest background, so no merge lowered contrast. Two contrast issues remain for tenants with light accents ([#412](https://github.com/sgort/ronl-business-api/issues/412)).
 

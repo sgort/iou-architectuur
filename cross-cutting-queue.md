@@ -37,6 +37,39 @@ drained by the pass of 27 September, everything queued from 27 September to 3 Oc
    iou-architectuur#132, still open on 15 November. (Was 8 November carry-over 1, 11 October carry-over 1 and 4 October
    carry-over 1 before it.)
 
+### 18 November 2026 — RONL Business API v2026.11.4 → v2026.11.5 and hot fix #473 (production, `1784a72`)
+
+1. **The accepted Semgrep findings have their reasons in git** (#470, `SECURITY-PIPELINE.md:182-213`): one row per package and
+   advisory, six rows (react-router ×2, postcss-selector-parser, minimatch 10, minimatch 9, playwright-core as a false positive).
+   That answers the RONL Business API's half of the 15 November carry-over above; the Linked Data Explorer's two entries are not
+   covered, so iou-architectuur#132 stays open. One more `nosemgrep`, on the certificate probe (`check-upstream-certs.mjs:111`).
+   Bears on `dependency-scanning.md`.
+2. **The `audit` job runs two more script tests** (`zizmor.yml:194-206`): `keycloak-restrict-rba-client.test.mjs` and
+   `keycloak-add-brp-raadpleger.test.mjs`, so sixteen steps. Still 15 workflows and 45 `uses:` references. Bears on
+   `code-standards.md`.
+3. **The frontend's production pattern includes `keycloak-themes/`** (#465, `scripts/promotion-targets.sh:50`), which closes the
+   difference recorded on 15 November; ronl-business-api#457 is closed. Bears on `development-workflow/overview.md`.
+4. **Dependencies:** hono 4.13.16, `@hono/node-server` 2.1.6 and fast-xml-parser 5.12.0 clear eight Dependabot alerts (#469);
+   three remained open on 18 November (two react-router mediums at runtime, one minimatch high in development). supertest 7.3.1;
+   one prettier in the lockfile, the backend's own pin gone (#287); `cheerio` removed (#467). SBOM 2026.11.5 lists 471 components
+   (493 before; npm 11.19.1). Bears on `dependency-scanning.md`, `supply-chain.md`, the ICTU R10 and R3 cells.
+5. **Two new live-realm scripts** change acceptance and production Keycloak: `keycloak-restrict-rba-client.sh` and
+   `keycloak-add-brp-raadpleger.sh`, both already run on both realms. Bears on `controls.md` if it lists how the realms change.
+6. **PSA, for the re-check on `main`; word every open gap generically, without routes, hosts or issue links:**
+   - **AB-17:** the RONL Business API's login client accepts only its own return addresses and requires PKCE (#460). On
+     acceptance a wider pattern remains for preview builds, as an accepted risk.
+   - **AB-18:** a resident can start only the services offered to residents and look up only their own personal record;
+     caseworkers may look up anyone (#463, #464, `packages/backend/src/auth/brp-access.ts`).
+   - **AB-19:** a third action is gated by assurance level: the personal-record lookup, `hoog` for one's own record and
+     `substantieel` for staff with the lookup role. Status probably stays *deels*.
+   - **R-03:** until DigiD is active, the citizen service number in the token is a test value set on test accounts.
+   - **AB-23 / a possible new risk,** if still open on Sunday: the portal exposes the citizen service number in the browser's
+     developer tools, and the record of a personal-data lookup does not always name every person asked for (filed as
+     ronl-business-api#477 and #478; the PSA text carries no link while they are open).
+   - **R-14, R-16, AB-26:** no change found in this range.
+7. **Hot fix #473 is on production in no release:** Flevoland's accent fill. No rule, workflow or hook changed. It bears on no
+   contributing page; `ci-posture-deck.md` and the PSA do not describe tenant colours.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

@@ -6,7 +6,15 @@
     The sync to v2026.11.1 shipped on
     **7 November 2026** without its captures: rows 21–26 are stale views the pages still embed, and
     rows 27–34 are optional. Rows 11–20 still hold, apart from the colours rows 27–34 name. The sync
-    to v2026.11.2 (12 November 2026) added none.
+    to v2026.11.2 (12 November 2026) added none. The sync to v2026.11.5 and #473 (18 November 2026) requests none.
+
+## Sync v2026.11.4 → v2026.11.5 — nothing to capture, one figure retired
+
+Reviewed on 18 November 2026 for **v2026.11.5** and the no-release fix #473, in production (`origin/main` `1784a72`). #473 turns Flevoland's accent fill pink. No figure showed the yellow: every Flevoland capture predates v2026.11.0, so rows 21–34 already show a pink rail with white text, and rows 27–34 stay optional. Row 21-24's reasons are unchanged.
+
+**Retired, not replaced:** `ronl-keycloak-redirect-uris.png` on `developer/deployment/frontend.md` showed ACC's client before #188. The page now gives the settings as a table; the file is removed.
+
+**Considered and not captured:** the `SIGNER_IS_SENDER` message (one sentence in an error state, quoted on the page, and reaching it needs the ValidSign sender's account); Ctrl+K finding a waiting project (same palette, one more row); the Infra-board task surface's defined borders (no figure shows it).
 
 ## Sync v2026.11.3 → v2026.11.4 — one REPLACE, captured 14 November 2026
 
@@ -63,7 +71,7 @@ the shared ProcessView (legend listing only what the diagram shows, *jouw taak* 
 marks, a dashed outline on others' tasks, a decision diamond with `?`, *tegelijk* / *alles klaar* bars,
 slim empty lanes), and since v2026.11.0 the Flevoland tenant and the Keycloak login page use
 Flevoland IT's palette (navy text, Material greys, a `#f8f8f8` page, yellow fills with dark text;
-Flevoland `primaryDark` `#003a8e`, `accent` `#fec612`). No new figure is proposed.
+Flevoland `primaryDark` `#003a8e`, `accent` `#fec612`). No new figure is proposed. Since #473 (18 November 2026) the accent fill is pink `#e60078` with white text, and yellow is the warning fill only.
 
 | # | Status | File | Embedding page | What it must show | What is stale |
 |---|---|---|---|---|---|

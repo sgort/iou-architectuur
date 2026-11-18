@@ -159,6 +159,8 @@ There is no **Taak voltooien**: the task completes itself. Once the document is 
 
 Signing needs an e-mail address on your account. Without one, the panel says **Uw account heeft geen e-mailadres geregistreerd.** and that an administrator has to add it; trying again does not help.
 
+If your account is the one ValidSign sends its requests from, the panel says **U bent de afzender van ValidSign-verzoeken en kunt daarom niet zelf ondertekenen.** and asks you to let a colleague sign; trying again does not help.
+
 ## The assistant
 
 **Vraag de assistent**, at the side of the board, opens the **Assistent** panel beside your work. Closing and reopening it keeps the conversation, and so does reloading the page within the same browser session. The panel can be widened or narrowed by dragging its edge.

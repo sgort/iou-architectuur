@@ -14,8 +14,8 @@ This page maps standards onto what the code does. It is not a certification: not
 |---|---|
 | **BIO** (Baseline Informatiebeveiliging Overheid) | Access management through Keycloak realm roles and tenant checks on every process instance and task; an audit record of every authenticated request, stored in PostgreSQL; HTTP Strict Transport Security on every response. |
 | **NEN 7510** | Listed by the service's root banner among its compliance claims. No control in the code is specific to it. |
-| **AVG / GDPR** | Case access is limited to the owning organisation and the case's own applicant, and every authenticated request is audited. The BRP person lookup's own log lines leave out the citizen service number (BSN) (#241). Two gaps remain: the lookup's audit entry stores the BSN on purpose, and every audit entry is also written to the application log at `info` level, so the BSN reaches that log through the audit record; and no retention period is applied — nothing purges audit records. |
-| **DigiD Norm** | Assurance levels from the token's `loa` claim gate two operations: `basis` for evaluating a decision, `midden` for starting a process. The realm export defines a DigiD SAML broker, disabled, with placeholder endpoints. |
+| **AVG / GDPR** | Case access is limited to the owning organisation and the case's own applicant, and every authenticated request is audited. The BRP person lookup's own log lines leave out the citizen service number (BSN) (#241). A citizen can look up only their own record, and only staff holding `brp-raadpleger` anyone's. Three gaps remain: the lookup's audit entry stores a BSN on purpose, and every audit entry is also written to the application log at `info` level, so that BSN reaches that log through the audit record; no retention period is applied — nothing purges audit records; and the frontend writes the decoded token, with its `bsn` claim, to the browser console ([#477](https://github.com/sgort/ronl-business-api/issues/477)). |
+| **DigiD Norm** | Assurance levels from the token's `loa` claim gate three operations: `basis` for evaluating a decision, `midden` for starting a process, and `hoog` for a citizen's lookup of their own BRP record (`substantieel` for staff with `brp-raadpleger`). The realm export defines a DigiD SAML broker, disabled, with placeholder endpoints. |
 | **NCSC Beveiligingsrichtlijnen** | Supply-chain practice in the pipeline: GitHub Actions pinned to commit digests, a blocking audit gate on every pull request, a daily dependency audit of `acc` and `main`, a fourteen-day cooldown on new dependency versions, Semgrep scanning, and an SBOM committed for every release. |
 
 The root banner's `security.compliance` list (`BIO`, `NEN 7510`, `AVG/GDPR`, `eIDAS`) is a fixed string in the code; nothing checks it.
@@ -46,7 +46,7 @@ Reference: [Nederlandse API Strategie](https://docs.geostandaarden.nl/api/API-St
 
 | Standard | Implementation |
 |---|---|
-| **OpenID Connect 1.0** | OIDC Authorization Code Flow via Keycloak and `keycloak-js`. The frontend does not configure PKCE |
+| **OpenID Connect 1.0** | OIDC Authorization Code Flow with PKCE (`S256`) via Keycloak and `keycloak-js`: the frontend sends it and the realm requires it |
 | **OAuth 2.0 (RFC 6749)** | Bearer access tokens; audience validation against `ronl-business-api` |
 | **JWT (RFC 7519)** | RS256 signed access tokens; the backend accepts no other algorithm |
 | **JWKS (RFC 7517)** | Public key distribution for JWT validation, cached by the backend |

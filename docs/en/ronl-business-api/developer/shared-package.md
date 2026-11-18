@@ -72,6 +72,7 @@ interface AuthenticatedUser {
   email?: string;
   givenName?: string;
   familyName?: string;
+  bsn?: string;
 }
 ```
 
@@ -85,7 +86,7 @@ export const CITIZEN_SERVICES = [
 ] as const;
 ```
 
-An `own-tenant` service is offered only when its process is deployed under the citizen's own tenant; a `cross-tenant` service is offered to every citizen when exactly one tenant deploys it, and that tenant handles the case (Zorgtoeslag at Dienst Toeslagen). The backend derives the dashboard's cards from it (`GET /v1/process/available`) and uses it to decide whether a citizen's start may land under another tenant than their own; the frontend gives each id its label, icon and form (`pages/citizen/citizenServiceUi.ts`). `CitizenServiceId` and `CitizenServiceScope` are derived from the same constant.
+An `own-tenant` service is offered only when its process is deployed under the citizen's own tenant; a `cross-tenant` service is offered to every citizen when exactly one tenant deploys it, and that tenant handles the case (Zorgtoeslag at Dienst Toeslagen). The backend derives the dashboard's cards from it (`GET /v1/process/available`) and uses it to decide whether a citizen's start may land under another tenant than their own, and to refuse a citizen's start of anything it does not list; the frontend gives each id its label, icon and form (`pages/citizen/citizenServiceUi.ts`). `CitizenServiceId` and `CitizenServiceScope` are derived from the same constant.
 
 ### Stylesheets
 
@@ -93,7 +94,7 @@ An `own-tenant` service is offered only when its process is deployed under the c
 
 | File | What it holds | Loaded by |
 |---|---|---|
-| `tokens.css` | One `:root` block of `--rba-*` design tokens: Flevoland's fixed brand colours, the themed brand chained to the tenant's `--color-primary`, neutrals, status colours by role and fill tokens; under `:root[data-tenant="flevoland"]` they point at Flevoland IT's semantic tokens | The frontend (`App.tsx`) and PA-Cockpit (`styles.css`), and so the PA-demo |
+| `tokens.css` | One `:root` block of `--rba-*` design tokens: Flevoland's fixed brand colours, the themed brand chained to the tenant's `--color-primary`, neutrals, status colours by role and fill tokens; under `:root[data-tenant="flevoland"]` they point at Flevoland IT's semantic tokens, apart from `--rba-idle` and the accent fill, which is pink | The frontend (`App.tsx`) and PA-Cockpit (`styles.css`), and so the PA-demo |
 | `v2-chrome.css` | The dashboard chrome Caseworker V2 and PA-Cockpit share, as grouped rules on the tokens | The frontend and the PA-demo, first, in their `App.tsx` |
 | `flevoland/` | Flevoland IT's `tokens.css` and its element styles (`base.css`, kept for the next step of the Flevoland look, [#405](https://github.com/sgort/ronl-business-api/issues/405)) | Through `tokens.css` |
 

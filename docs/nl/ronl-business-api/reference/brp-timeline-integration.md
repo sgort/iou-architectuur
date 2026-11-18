@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # BRP Tijdlijnintegratie - Technische architectuur
 
 !!! info "Documentatie in ontwikkeling"
@@ -31,7 +35,7 @@
 
 ---
 
-## BSN-mapping voor testomgeving
+## De BSN komt uit het token
 
 ---
 

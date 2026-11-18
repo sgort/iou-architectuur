@@ -17,6 +17,8 @@ Keycloak is the only token issuer the Business API accepts. The frontend sends t
 
 Either way, the caller ends up with a Keycloak-issued JWT access token and presents it on every subsequent request as an `Authorization: Bearer` header.
 
+The sign-in uses the Authorization Code Flow with PKCE (`S256`), which Keycloak requires, and Keycloak sends a code only to the addresses listed for the client.
+
 ---
 
 ## Validating a token
@@ -34,7 +36,7 @@ A token that fails any of these steps is rejected with `401 INVALID_TOKEN` befor
 
 ## Claims carried in the token
 
-Beyond the standard OIDC claims, a token carries the attributes the platform relies on for authorization: the caller's identity, their tenant, their organisation type, their realm roles, and a level of assurance reflecting how strongly their identity was established. An optional mandate claim can express that the caller is acting on someone else's behalf, and where the caller is a member of staff, an employee identifier can be carried as well. See [JWT Claims](../reference/jwt-claims.md) for the claim names and the Keycloak mappers that produce them.
+Beyond the standard OIDC claims, a token carries the attributes the platform relies on for authorization: the caller's identity, their tenant, their organisation type, their realm roles, and a level of assurance reflecting how strongly their identity was established. A citizen's token can also carry their citizen service number. An optional mandate claim can express that the caller is acting on someone else's behalf, and where the caller is a member of staff, an employee identifier can be carried as well. See [JWT Claims](../reference/jwt-claims.md) for the claim names and the Keycloak mappers that produce them.
 
 ---
 
@@ -42,7 +44,9 @@ Beyond the standard OIDC claims, a token carries the attributes the platform rel
 
 A caller's roles are read from the token's `realm_access.roles` and checked against whatever a given endpoint requires: a route can require the caller to hold at least one of a set of roles, and a caller lacking all of them is rejected with `403 FORBIDDEN`. The same roles decide which candidate groups a caller's task list covers — see [Tasks — Visibility](tasks.md#visibility) — and, where a process model names the groups that may start it, whether the caller may: the backend refuses anyone outside them with `403 NOT_CANDIDATE_STARTER` (see [Processes — Who may start it](processes.md#who-may-start-it)).
 
-Two operations additionally require a minimum level of assurance, checked against the token's `loa` claim rather than its roles. The levels are ordered `basis`, `midden`, `substantieel`, `hoog`: evaluating a decision requires at least `basis`, and starting a process at least `midden`. A token below the required level, or carrying no recognised level at all, is rejected with `403 INSUFFICIENT_ASSURANCE`.
+Three operations additionally require a minimum level of assurance, checked against the token's `loa` claim rather than its roles. The levels are ordered `basis`, `midden`, `substantieel`, `hoog`: evaluating a decision requires at least `basis`, starting a process at least `midden`, and a lookup in the BRP at least `substantieel` for a holder of `brp-raadpleger` and `hoog` for anyone else. A token below the required level, or carrying no recognised level at all, is rejected with `403 INSUFFICIENT_ASSURANCE`.
+
+A BRP lookup is also limited by subject. `brp-raadpleger`, which every caseworker holds through the `caseworker` role, may look up anyone; anyone else only their own record, named by the `bsn` claim in their token, and is otherwise refused with `403 BSN_CLAIM_MISSING` or `403 BRP_SUBJECT_MISMATCH`.
 
 ---
 
@@ -59,6 +63,7 @@ Every authenticated caller carries a tenant identifier (the `municipality` claim
 
 **Starting a process** stamps the label. The backend first resolves which tenant the process is deployed under (see [Processes — Tenancy](processes.md#tenancy)), then applies the start rule:
 
+- Caller is a citizen and the process is not in the citizen services registry: refused with `403 PROCESS_NOT_OFFERED`, under whatever tenant it is deployed, and no instance is created. The tenant is not what is wrong, so this is not a tenant refusal.
 - Deployed under the caller's own tenant: the case belongs to the caller's tenant.
 - Deployed untenanted (or the lookup failed): a member of staff's case belongs to their own tenant; a citizen (holder of the `citizen` realm role) is refused with `403 TENANT_MISMATCH`, since a citizen's case must belong to a tenant.
 - Deployed under another tenant, caller is a citizen and the process is a cross-tenant citizen service (see [Processes — Citizen services](processes.md#citizen-services)): the case goes to the deploying tenant, and `originTenantId` records the citizen's own tenant.

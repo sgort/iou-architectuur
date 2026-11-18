@@ -30,6 +30,7 @@ RONL Business API validates every request against a JWT access token issued by K
     "municipality": "utrecht",
     "organisation_type": "municipality",
     "realm_access": { "roles": ["citizen"] },
+    "bsn": "999992235",
     "loa": "hoog"
   }
 }
@@ -64,8 +65,9 @@ These claims are added by Keycloak protocol mappers configured on the `ronl-busi
 | `mandate` | string | User Attribute | `mandate` | Representation authority (optional). Passed through to `req.user`; no check reads it |
 | `employeeId` | string | User Attribute | `employee_id` | Present on caseworker accounts onboarded via `HrOnboardingProcess`; absent for citizens and non-onboarded caseworkers |
 | `given_name`, `family_name`, `email` | string | User Property | `firstName`, `lastName`, `email` | Used for signer details; when the name claims are missing, the name is split from `name` or `preferred_username` |
+| `bsn` | string | User Attribute | `bsn` | Citizen service number. A user attribute on the test accounts; where DigiD is real it is to come from the DigiD subject. Absent for staff |
 
-The client maps no `bsn` claim. The frontend reads a `bsn` claim first when it looks up a citizen's service number — the field DigiD fills — and falls back to a fixed mapping for the test usernames.
+The frontend reads the citizen's service number from the `bsn` claim and from nowhere else, and the backend compares a citizen's BRP lookup with the same claim — see [BRP API endpoints](brp-api-endpoints.md#authentication).
 
 For an employee who signs in through Entra ID (the `entra-flevoland` provider), the same client mappers produce the same claims. The values behind them come from identity-provider mappers instead of hand-set user attributes: `municipality` is `flevoland`, `organisation_type` is `province`, `loa` is `substantieel`, and `realm_access.roles` includes the roles mapped from the Entra app roles. `sub` is the Keycloak user's own id, not Entra's. See [Entra ID](../developer/deployment/entra-id.md).
 
@@ -81,9 +83,10 @@ After successful JWT validation in `jwt.middleware.ts`, the claims are mapped on
 | `tenantId` | `municipality` | The `MISSING_TENANT` presence check and every tenant decision |
 | `organisationType` | `organisation_type` | Propagated to process variables |
 | `roles` | `realm_access.roles` | Role checks, the citizen/staff distinction at process start, task candidate groups |
-| `assuranceLevel` | `loa` | Assurance-level checks (`basis` for decision evaluation, `midden` for a process start) |
+| `assuranceLevel` | `loa` | Assurance-level checks (`basis` for decision evaluation, `midden` for a process start, `substantieel` or `hoog` for a BRP lookup) |
 | `mandate` | `mandate` | Carried only |
 | `employeeId` | `employeeId` | HR onboarding profile lookup |
+| `bsn` | `bsn` | A citizen's own-record BRP lookup |
 
 The tenant middleware only checks that `tenantId` is present, answering `403 MISSING_TENANT` when it is not. Which organisation may reach a process instance or task is decided separately, in `auth/tenant-access.ts`, from the instance's `municipality` variable — see [Authentication & IAM — Tenancy](../features/authentication-iam.md#tenancy).
 

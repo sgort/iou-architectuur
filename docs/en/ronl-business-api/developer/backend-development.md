@@ -230,7 +230,7 @@ router.post('/sensitive', jwtMiddleware, async (req, res) => {
 });
 ```
 
-After `jwtMiddleware`, `req.user` is populated from the validated token. `jwt.middleware.ts` also exports `optionalJwtMiddleware`, `requireRoles(...)` and `requireAssuranceLevel(...)`. Tenant decisions for process and task access — `tenantAllows`, `caseReadAllowed`, `denyTenant`, `resolveStartTenant` — live in `auth/tenant-access.ts`, and every tenant refusal answers `403 TENANT_MISMATCH`.
+After `jwtMiddleware`, `req.user` is populated from the validated token. `jwt.middleware.ts` also exports `optionalJwtMiddleware`, `requireRoles(...)` and `requireAssuranceLevel(...)`. Tenant decisions for process and task access — `tenantAllows`, `caseReadAllowed`, `denyTenant`, `resolveStartTenant` — live in `auth/tenant-access.ts`; every tenant refusal answers `403 TENANT_MISMATCH`, and a citizen's start of a process outside the citizen services registry answers `403 PROCESS_NOT_OFFERED`. `auth/brp-access.ts` decides who may look up whom in the BRP.
 
 ---
 

@@ -14,12 +14,22 @@ and the only board with its own end-to-end suite.
     why the frontend's own totals fell between v2026.08.23 and v2026.08.33
     without anything being deleted.
 
-**Package: 43 files · 515 tests.** **Backend: 16 files · 583 tests** in
+**Package: 43 files · 516 tests.** **Backend: 15 files · 551 tests** in
 `src/pa-monitoring` — since v2026.10.1 the third-largest area in the backend,
 after `src/routes` and `src/services`. **E2E: 2 specs · 7 tests**, still in
-the frontend package.
+the frontend package, carried forward from 14 November.
 
 Measured serially, with coverage and without file parallelism, on
+**18 November 2026** at `be0a1f0`, a tree identical to `main` at `1784a72`
+(v2026.11.5 plus hot fix #473): **516 of 516 passing**, `Duration 127.69s`.
+v2026.11.5 added one test, in `BronnenSection.test.tsx` (7 → **8**: a disabled
+flag shows as *uitgeschakeld*), and changed `BronnenSection.tsx`,
+`services/pa.api.ts` and an assertion in `services/pa.api.test.ts` when the
+EP scrape's flag went (#57). The package's four coverage figures
+reproduced; one area row moved by two hundredths, `src/services` lines
+95.28 → 95.26.
+
+Before that, measured serially, with coverage and without file parallelism, on
 **14 November 2026** for v2026.11.3 (`main` at `f54e4f0`), in the working
 checkout at `6f86b10`, a tree identical to `f54e4f0`:
 **515 of 515 passing**, `Duration 74.79s` (102.79s on 12 November, 116.83s on
@@ -44,10 +54,10 @@ which v2026.09.6 wrote into this package's `vitest.config.ts` as
 a file, and no file is below 85% either: the lowest is
 `services/dossierbeheer.api.ts` at 85.10%.
 
-!!! note "Six releases of identical counts, then +39 tests"
+!!! note "Six releases of identical counts, then +39 tests, then one more"
     43 files and 476 tests at v2026.09.7, v2026.09.9, v2026.09.11, v2026.09.12
-    and v2026.09.13 — and **43 files and 515 tests** at v2026.09.15 and every
-    release since, through v2026.11.3. Every one
+    and v2026.09.13 — **43 files and 515 tests** at v2026.09.15 and every
+    release through v2026.11.4 — and **516** at v2026.11.5. Every one
     of the 39 is from the two branch-margin commits: `391b1a8` (#256) added four
     to `DossierRow.test.tsx`, taking a file that sat at exactly 80.00% branches
     to 100 and exposing a latent crash when a dossier had no `kompas`, fixed in
@@ -79,25 +89,23 @@ a file, and no file is below 85% either: the lowest is
     consume it too and watch `packages/pa-cockpit/**` in their path filters,
     but run only pa-demo's own suite.
 
-!!! note "Every figure on this page is from 14 November 2026"
-    The package counts and coverage, the `src/pa-monitoring` backend figure
-    (16 files, 583 tests, unchanged) and the two E2E specs were all measured
-    on **14 November 2026**, the E2E specs against the developer's
-    already-running local stack, as on 3 and 9 October and 7 November. The per-file tables
-    below were derived on 9 October; no file in them has changed since. See
+!!! note "Which figures are from which date"
+    The package counts and coverage and the `src/pa-monitoring` backend figure
+    (15 files, 551 tests) were measured on **18 November 2026**. The two E2E
+    specs were **not re-run**: their figures are carried forward from
+    **14 November 2026**, when they ran against the developer's
+    already-running local stack, as on 3 and 9 October and 7 November. See
     [E2E & live smoke](../e2e.md).
 
 ---
 
 ## The package suite
 
-Re-derived on **9 October 2026** at `ebec288`, where every count is the same
-as at `0625d48` on 3 October and at `ae06c9e` on 30 September. Vitest's console reports only the package
-total, so the per-file counts are taken from the source, each test file parsed
-with its `.each` tables expanded; they sum to exactly the runner's **515**, and
-the same method gives exactly 476 at `963fe24`. The
-table this page carried before was older than the 476 it sat under, and had
-fallen behind most of these files.
+Read on **18 November 2026** from Vitest's JSON report of the measured run:
+every file with eight tests or more. All the package's files sum to exactly the
+runner's **516**. The counts are the same as those derived from the source on
+9 October at `ebec288`, but for `BronnenSection.test.tsx`, which then held
+seven and so fell below this table.
 
 | File | Tests | Covers |
 |---|---:|---|
@@ -122,10 +130,11 @@ fallen behind most of these files.
 | `pages/public-affairs-v2/Vandaag.test.tsx` | 8 | The 30-second start screen |
 | `pages/public-affairs-v2/FeitenCijfers.test.tsx` | 8 | Facts and figures |
 | `pages/public-affairs-v2/modes.gate.test.ts` | 8 | The per-item rail gate — authentication, role and organisation type — which no shipped item uses yet |
+| `components/PADashboardV2/BronnenSection.test.tsx` | 8 | The source list; since v2026.11.5 a disabled flag shows as *uitgeschakeld* (7 on 14 November) |
 
 By directory: `pages/public-affairs-v2` **203**, `services` **118**,
 `components/PADashboardV2/dossierbeheer` **74**, `components/PADashboardV2`
-**73**, `pages` **27**, package root **10**, `modes` **7**, `test` **3**.
+**74**, `pages` **27**, package root **10**, `modes` **7**, `test` **3**.
 
 ### The guards that came with the extraction
 
@@ -155,17 +164,17 @@ seam cannot silently close again.
 
 ## Backend
 
-`src/pa-monitoring` — **583 tests across 16 files**, from the backend run's own
-JSON output on 30 September 2026, unchanged at v2026.10.0 and, parsed from
-the source at `ebec288`, at v2026.10.1 — none of these files gained or lost a
-test since, though `pa.routes.test.ts` and `pa-dossiers.routes.test.ts` were
-edited for problem details in v2026.10.0:
+`src/pa-monitoring` — **551 tests across 15 files**, from the backend run's own
+JSON output on 18 November 2026. v2026.11.5 removed the European Parliament
+scrape and its flag (#57): `sources/ep-texts-submitted.client.test.ts` (24)
+went, and `curation.service.test.ts` fell 61 → **53** with its routing cases,
+from the 583 across 16 files that had held since 30 September:
 
 | File | Tests |
 |---|---:|
 | `pa.routes.test.ts` | 133 |
 | `pa-dossiers.routes.test.ts` | 96 |
-| `curation.service.test.ts` | 61 |
+| `curation.service.test.ts` | 53 |
 | `rules.test.ts` | 38 (pure scoring) |
 | `pa-dossiers.db.test.ts` | 30 |
 | `pa-cache.test.ts` | 23 |
@@ -174,12 +183,13 @@ edited for problem details in v2026.10.0:
 | `query-match.test.ts` | 6 |
 | `rss.test.ts` | 4 |
 
-Plus 174 tests in the six source clients under `pa-monitoring/sources`: EU
-(73), media (27), EP texts submitted (24), TK (21), OB (19) and agenda (10).
-Coverage on 14 November (statements / branches): `pa-monitoring`
-98.95 / 89.35, `pa-monitoring/sources` 98.13 / 93.05 — as on
-30 September, 3 and 9 October and 7 November; `pa-monitoring`'s lines moved 99.16 → 98.99 when `pa.routes.ts`
-and `pa-dossiers.routes.ts` began answering problems.
+Plus 150 tests in the five source clients under `pa-monitoring/sources`: EU
+(73), media (27), TK (21), OB (19) and agenda (10).
+Coverage on 18 November (statements / branches): `pa-monitoring`
+**99.04 / 89.01** and `pa-monitoring/sources` **98.34 / 93.27**, against
+98.95 / 89.35 and 98.13 / 93.05 from 30 September to 14 November;
+`pa-monitoring`'s lines moved 99.16 → 98.99 when `pa.routes.ts`
+and `pa-dossiers.routes.ts` began answering problems, and read 99.08 now.
 
 ---
 
@@ -188,7 +198,7 @@ and `pa-dossiers.routes.ts` began answering problems.
 Two Playwright specs, run with the same `playwright.config.ts` as the rest of
 the frontend suite.
 
-**Re-measured 14 November 2026: 7 tests, all passing**, as part of the full
+**Last measured 14 November 2026, and not re-run on 18 November: 7 tests, all passing**, as part of the full
 frontend run against the developer's already-running local stack (60 passed,
 7 skipped, 3.9m) — the five mock-mode tests in 2.0–3.0s each and the two
 live-authoring tests in 4.8s and 2.9s. On 7 November: 7 passing, mock mode

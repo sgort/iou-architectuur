@@ -4,10 +4,21 @@ component: RONL Business API
 
 # Public site suite
 
-`packages/public-site`, Vitest with jsdom. **34 files · 275 tests · all
-passing · 149.32s** without file parallelism.
+`packages/public-site`, Vitest with jsdom. **35 files · 276 tests · all
+passing · 46.66s** without file parallelism.
 
-!!! success "Re-measured at v2026.11.3 and v2026.11.4: nothing changed, and the figures held"
+!!! success "Re-measured at v2026.11.5 plus hot fix #473: one new file, one new test, coverage held"
+    Re-run on **18 November 2026** at `be0a1f0`, a tree identical to `main` at
+    `1784a72`, serially with coverage: **35 files · 276 tests · all passing ·
+    `Duration 46.66s`**, coverage **96.68 / 97.41 / 95.09 / 97.23** and every
+    per-area row as on 14 November. v2026.11.5 made `scripts/prerender.ts` run
+    only as an entry point (#290), and `scripts/prerender.guard.test.ts` is
+    new, **1 test**: importing it starts no prerender, reads and writes no file,
+    calls no API and sets no exit code. `scripts/` is outside the coverage
+    report. The Playwright suite below was not re-run; its figures are carried
+    forward from 14 November.
+
+!!! note "History: re-measured at v2026.11.3 and v2026.11.4, nothing changed, and the figures held"
     Re-run on **14 November 2026** for v2026.11.3 (`main` at `f54e4f0`), in the
     working checkout at `6f86b10`, a tree identical to `f54e4f0`, serially with
     coverage: **34 files · 275 tests · all passing · `Duration 149.32s`**,
@@ -88,8 +99,8 @@ with `npm run test:serial --workspace=packages/public-site`, coverage
 included, on Node 22.23.3, the version `.nvmrc` names. The suite grew in
 every window up to v2026.10.0 — 30 files and 204 tests at v2026.09.5, 31 and
 225 at v2026.09.7, 32 and 231 at v2026.09.9, 32 and 235 at v2026.09.11
-through v2026.09.13, 33 and 265 at v2026.09.15, **34 and 275** at
-v2026.10.0 — and held at that in v2026.10.1.
+through v2026.09.13, 33 and 265 at v2026.09.15, 34 and 275 at
+v2026.10.0, held at that through v2026.11.4, and **35 and 276** at v2026.11.5.
 
 Coverage is **96.68% statements · 97.41% branches · 95.09% functions · 97.23%
 lines**, and the package passes the per-file 80% branch floor that its
@@ -111,20 +122,16 @@ line, and since v2026.09.15 none is below 85 either. The lowest by branches are
 
 ## Inventory
 
-**Re-derived on 9 October 2026** at `ebec288`, identical to 3 October at
-`0625d48`. The Files column accounts for all **34** files and the Tests
-column sums to **275**, the runner's total. The per-area test counts are
-taken from the source — each test file parsed, with `it.each` tables and the
-`describe.each` in `indexHtml.test.ts` expanded — because this pass used
-Vitest's console reporter, which prints only the package total; the same
-method reproduces the 24 September runner-derived table exactly at
-`963fe24`.
+**Re-read on 18 November 2026** from Vitest's JSON report of the measured run.
+The Files column accounts for all **35** files and the Tests column sums to
+**276**, the runner's total. Only `scripts/` moved since the derivation of
+9 October at `ebec288`.
 
 | Area | Files | Tests | Covers |
 |---|---:|---:|---|
 | `src/pages` | 16 | 137 | Includes a full `herkomst/` provenance-explorer sub-area (`HerkomstExplorer`, `HerkomstTrace`, `HerkomstChip`, `HerkomstBackground`, `herkomstConcepts`, `herkomstData`, `herkomstScroll`, `herkomstTrail` — 8 files) plus the generic `SectionIndex` / `Regelcatalogus` / `Results` / **`Detail` (25)** / `Woordenboek` / static pages |
 | `src/lib` | 8 | 59 | `slug` (kept identical to the backend's slugifier by design), `useQueryState` (URL-backed filters), `search` (`highlight()`), `api` (the typed `/v1/public/*` client, 14 — three new in v2026.09.15 for its base-URL fallbacks, one in v2026.10.0), **`problem` (9, new in v2026.10.0** — reading the message from an RFC 9457 problem's `detail`, or a legacy envelope's `error.message`), `sectionHits` (`mapToHits()`), `prerenderedData` (the seeded-render reader), `buildInfo` |
-| `scripts/` | 2 | 24 | `prerender.test.ts` (14 — `escapeHtml`, `readSiteEnv` per build mode, `buildRobots`, `buildSitemap`, `injectIntoShell`), `check-bundle.test.ts` (10 — the build-time gate that fails if any auth or telemetry string ships in the bundle) |
+| `scripts/` | 3 | 25 | `prerender.test.ts` (14 — `escapeHtml`, `readSiteEnv` per build mode, `buildRobots`, `buildSitemap`, `injectIntoShell`), `check-bundle.test.ts` (10 — the build-time gate that fails if any auth or telemetry string ships in the bundle), **`prerender.guard.test.ts` (1, new in v2026.11.5** — importing `prerender.ts` starts nothing) |
 | `src/components` | 4 | 23 | `chrome` (7), `Footer` (7), `StatusTag` (5, new in v2026.09.9), `TechDetails` (4) |
 | **`src/indexHtml.test.ts`** | 1 | 23 | **New in v2026.09.14.** The link-preview and robots tags in `index.html` as `vite build --mode <mode>` writes them, for production, acceptance, development and test (five tests each), plus the fixed Dutch copy, the title and the card image's size |
 | `src/App.test.tsx` | 1 | 5 | Routing shell — every route registered, `<html lang>` synced to the language switch |
@@ -134,8 +141,9 @@ method reproduces the 24 September runner-derived table exactly at
 !!! success "Both columns are current, and they sum"
     Earlier versions of this page carried a Files column from one date and a
     Tests column from 19 August that summed to 134 against a measured 225, with
-    a warning attached. Re-derived, the columns agree: 34 files, **275** tests.
-    Against 30 September, only `src/lib` moved — 7 files and 49 tests to
+    a warning attached. Re-derived, the columns agree: 35 files, **276** tests.
+    Against 14 November, only `scripts/` moved — 2 files and 24 tests to
+    **3 and 25**. Against 30 September, `src/lib` had moved — 7 files and 49 tests to
     **8 and 59**, `problem.test.ts` and one case in `api.test.ts`. Between
     24 and 30 September, `src/lib` gained 3, `scripts/` 3 and
     `src/components` 1, and `indexHtml.test.ts` arrived with 23.
