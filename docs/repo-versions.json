@@ -1,22 +1,22 @@
 {
-  "docs_built": "2026-11-15",
+  "docs_built": "2026-11-18",
   "last_patch": {
-    "date": "2026-11-15",
-    "kind": "Weekly pass",
-    "summary": "The contributing pages and the Project Start Architectuur re-checked against all three applications: fifteen workflows in the RONL Business API, lockfile-only promotions that redeploy every application, the VM's Caddy and Postgres pinned, the Linked Data Explorer's API document asking for sign-in, and a new risk for an authentication gap that is chosen to be fixed but not yet built; the ICTU dependency guideline scored 42, 40 and 40, now that lock-file maintenance has merged in all three.",
+    "date": "2026-11-18",
+    "kind": "Component sync",
+    "summary": "RONL Business API v2026.11.5 in production, with one fix on production ahead of the next release: the sign-in client accepts only its own addresses and requires PKCE, a BRP lookup is open to caseworkers through a role and otherwise only for your own record, citizens start only the processes offered to them, and signing refuses what cannot work; Flevoland's accent fill is pink with white text.",
     "previous": {
-      "date": "2026-11-14",
-      "kind": "Component sync",
-      "summary": "RONL Business API v2026.11.3 and v2026.11.4, both in production: a new organisation, Caribisch Nederland at /bes, whose landing page gives residents their own DigiD login; Proces starten, where a caseworker starts any process its model lets them start, with the backend refusing everyone else; dynamic lists that save, and since v2026.11.4 show their rows in ended cases too; an unreachable BRP named in the API and in health, its certificate checked daily; and the findings of three releases resolved, with lockfile-only promotions deploying every application and the VM's Caddy pinned."
+      "date": "2026-11-15",
+      "kind": "Weekly pass",
+      "summary": "The contributing pages and the Project Start Architectuur re-checked against all three applications: fifteen workflows in the RONL Business API, lockfile-only promotions that redeploy every application, the VM's Caddy and Postgres pinned, the Linked Data Explorer's API document asking for sign-in, and a new risk for an authentication gap that is chosen to be fixed but not yet built; the ICTU dependency guideline scored 42, 40 and 40, now that lock-file maintenance has merged in all three."
     },
     "open_findings": [
       {
-        "label": "linked-data-explorer#342",
-        "url": "https://github.com/sgort/linked-data-explorer/issues/342"
+        "label": "ronl-business-api#477",
+        "url": "https://github.com/sgort/ronl-business-api/issues/477"
       },
       {
-        "label": "ronl-business-api#457",
-        "url": "https://github.com/sgort/ronl-business-api/issues/457"
+        "label": "ronl-business-api#478",
+        "url": "https://github.com/sgort/ronl-business-api/issues/478"
       }
     ]
   },
@@ -24,16 +24,16 @@
     {
       "name": "RONL Business API",
       "icon": "⚙️",
-      "version": "v2026.11.4",
+      "version": "v2026.11.5",
       "environment": "prod",
-      "commit": "67bac28...",
-      "commit_date": "2026-11-14",
+      "commit": "1784a72...",
+      "commit_date": "2026-11-18",
       "build": {
-        "sha": "67bac28",
-        "run": 15,
-        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/43619989558"
+        "sha": "1784a72",
+        "run": 18,
+        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/44256987035"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/67bac281ff9d66076708dd58136e906e9e899329",
+      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/1784a723e03a57319c6c818bd9e71644f46af1c4",
       "ci_repo": "https://github.com/sgort/ronl-business-api"
     },
     {

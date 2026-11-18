@@ -15,10 +15,10 @@ reassurance.
 
 ## Frontend
 
-Measured on **14 November 2026** on `acc` at `4579486`, a tree identical to
-`main` at `67bac28` (v2026.11.4): the frontend package ran 144 files and
-1782 tests, all passing, every per-file count on this page the same as on
-7 and 12 November and in the v2026.11.3 run earlier that day, and the counts
+Measured on **18 November 2026** at `be0a1f0`, a tree identical to `main` at
+`1784a72` (v2026.11.5 plus hot fix #473): the frontend package ran 144 files
+and 1787 tests, all passing, every per-file count on this page the same as on
+7, 12 and 14 November, and the counts
 below are read from Vitest's JSON report of that run. Every count is the same as on 30 September and 3 and 9 October. The
 releases since touched this board's source only to move its colours onto the
 shared tokens (`charts.tsx`, `WooNoAccessPanel.tsx`, `dashboard-woo.css`); no

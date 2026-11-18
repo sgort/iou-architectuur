@@ -27,7 +27,7 @@ component: RONL Business API
 │  ┌─────────────────────────────────────────────────────────┐  │
 │  │  POST /v1/brp/personen (Proxy Route)                    │  │
 │  │  ┌──────────────┐  ┌────────────┐  ┌────────────────┐   │  │
-│  │  │ JWT Validate │→ │ Audit Log  │→ │ Forward to BRP │   │  │
+│  │  │ JWT Validate │→ │ Access+Log │→ │ Forward to BRP │   │  │
 │  │  └──────────────┘  └────────────┘  └────────────────┘   │  │
 │  └─────────────────────────┬───────────────────────────────┘  │
 └────────────────────────────┼──────────────────────────────────┘
@@ -53,7 +53,7 @@ packages/frontend/src/
 ├── services/
 │   ├── brp.api.ts               # BRP API client (via proxy)
 │   ├── brp.timeline.ts          # Timeline logic & state calculation
-│   └── bsn.mapping.ts           # Test user BSN mapping
+│   └── bsn.mapping.ts           # The BSN from the token's bsn claim
 ├── types/
 │   └── brp.types.ts             # BRP data type definitions
 └── pages/
@@ -64,6 +64,8 @@ packages/frontend/src/
 
 ```
 packages/backend/src/
+├── auth/
+│   └── brp-access.ts            # Who may look up whom
 └── routes/
     └── brp.routes.ts            # POST /v1/brp/personen proxy
 ```
@@ -79,7 +81,7 @@ User clicks "Toon Tijdlijn"
     ↓
 Dashboard.tsx triggers useEffect
     ↓
-getUserBSN(user) → Maps username to BSN (test env)
+getUserBSN(user) → The token's bsn claim
     ↓
 getPersonTimeline(bsn) called
     ↓
@@ -87,7 +89,7 @@ brpApi.getPersonByBSN(bsn)
     ↓
 POST https://acc.api.open-regels.nl/v1/brp/personen
     ↓
-Backend validates JWT, logs, forwards to BRP API
+Backend validates JWT, checks who may look up whom, forwards to BRP API
     ↓
 BRP API returns current person data
     ↓
@@ -126,9 +128,10 @@ PersonalDataPanel re-renders with historical data
 
 1. Accepts authenticated frontend requests
 2. Validates JWT tokens
-3. Audits each lookup, while keeping the BSN out of the application log
-4. Forwards to BRP API
-5. Wraps the BRP answer in `{ success: true, data }`, and answers errors as RFC 9457 problem details
+3. Decides who may look up whom, and refuses with a 403 before the BRP API is called
+4. Audits each lookup, while keeping the BSN out of the route's own log lines
+5. Forwards to BRP API
+6. Wraps the BRP answer in `{ success: true, data }`, and answers errors as RFC 9457 problem details
 
 ### Route Implementation
 
@@ -142,6 +145,7 @@ import { auditLog } from '../middleware/audit.middleware';
 import { createLogger } from '../utils/logger';
 import { sendProblem } from '../utils/problem';
 import { BRP_API_BASE_URL, transportErrorCode } from '../services/brp-upstream';
+import { brpAccess } from '../auth/brp-access';
 
 const router = express.Router();
 const logger = createLogger('brp-routes');
@@ -149,8 +153,33 @@ const logger = createLogger('brp-routes');
 /**
  * POST /v1/brp/personen
  * Proxy to BRP API to avoid CORS issues in frontend
+ *
+ * WHO MAY LOOK UP WHOM (#319, see auth/brp-access.ts). A brp-raadpleger --
+ * every caseworker, through the caseworker composite -- may look up anyone at
+ * assurance level substantieel. Anyone else may look up only their own record:
+ * level hoog, a `bsn` claim on the token, and a query by BSN naming that BSN
+ * only. Refusals are 403 with problem details, decided before the upstream is
+ * called, and audited with the subject that was asked for.
  */
 router.post('/personen', jwtMiddleware, async (req: Request, res: Response) => {
+  if (!req.user) {
+    return sendProblem(res, req, {
+      status: 401,
+      code: 'UNAUTHORIZED',
+      detail: 'Authentication required',
+    });
+  }
+  const requested = (req.body as { burgerservicenummer?: unknown } | undefined)
+    ?.burgerservicenummer;
+  const access = brpAccess(req.user, requested);
+  if (!access.allowed) {
+    auditLog(req, 'brp.personen.fetch', 'failure', {
+      reason: access.code,
+      bsn: Array.isArray(requested) ? requested[0] : undefined,
+    });
+    return sendProblem(res, req, { status: 403, code: access.code, detail: access.detail });
+  }
+
   try {
     // Never log req.body or an upstream body: both carry BSNs (#241). The audit
     // log below records the subject on purpose; the application log must not.
@@ -191,6 +220,7 @@ router.post('/personen', jwtMiddleware, async (req: Request, res: Response) => {
     // Log successful request
     auditLog(req, 'brp.personen.fetch', 'success', {
       bsn: req.body.burgerservicenummer?.[0],
+      via: access.via,
     });
 
     res.json({
@@ -394,51 +424,34 @@ export function extractEvents(personState: PersonState): BRPEvent[] {
 
 ---
 
-## BSN Mapping for Test Environment
+## The BSN Comes From the Token
 
-In production, BSN comes from DigiD via Keycloak. For testing, we map usernames to BSNs.
+The BSN is the token's `bsn` claim: a user attribute on the test realms, and the DigiD subject where DigiD is real.
 
 **File:** `packages/frontend/src/services/bsn.mapping.ts`
 
 ```typescript
 /**
- * Maps Keycloak test usernames to BSN numbers for BRP API demo
- * In production, BSN should come from DigiD via Keycloak user attributes
- */
-
-export const testUserBSNMapping: Record<string, string> = {
-  'test-citizen-utrecht': '999992235', // Wessel Kooyman
-  'test-caseworker-utrecht': '999992235', // Same person for demo
-  'test-citizen-amsterdam': '999992235', // For now, same test data
-  'test-citizen-rotterdam': '999992235', // For now, same test data
-  'test-citizen-denhaag': '999992235', // For now, same test data
-  'test-citizen-flevoland': '999992235', // For now, same test data
-};
-
-/**
- * Get BSN for current user
- * First tries user.bsn attribute from JWT
- * Falls back to username mapping for test users
+ * The signed-in person's BSN, from the token's `bsn` claim only (#319).
+ *
+ * The claim is a user attribute on the test realms and the DigiD subject where
+ * DigiD is real. The backend checks a citizen's BRP lookup against that same
+ * claim, so the username-to-BSN table this file used to hold is gone: a BSN
+ * taken from anywhere else would only be refused.
  */
 export function getUserBSN(user: {
   sub: string;
   preferred_username?: string;
   bsn?: string;
 }): string | null {
-  // If BSN is in the JWT (production with DigiD), use it
   if (user.bsn) {
     return user.bsn;
   }
 
-  // For test users, map username to BSN
-  if (user.preferred_username && user.preferred_username in testUserBSNMapping) {
-    return testUserBSNMapping[user.preferred_username];
-  }
-
-  // No BSN available. Logs the username only, not the whole claims object:
-  // this branch cannot carry a BSN (it is the one where there isn't one), but
-  // `user` also holds `sub` and whatever else the token brought, and none of
-  // that is needed to explain the warning.
+  // Logs the username only, not the whole claims object: this branch cannot
+  // carry a BSN (it is the one where there isn't one), but `user` also holds
+  // `sub` and whatever else the token brought, and none of that is needed to
+  // explain the warning.
   console.warn('No BSN found for user', user.preferred_username ?? '(no username)');
   return null;
 }
@@ -451,8 +464,8 @@ export function getUserBSN(user: {
 ### Authentication & Authorization
 
 1. **JWT Validation** - All `/v1/brp/personen` requests require valid JWT token
-2. **User Context** - The frontend derives the BSN from the authenticated user. The backend does not check it: the route answers for any BSN in the request body
-3. **Audit Logging** - Each lookup is audited as `brp.personen.fetch`, with the queried BSN; the application log carries neither the request body nor the upstream body
+2. **Who may look up whom** - `brp-raadpleger` (every caseworker) may look up anyone at `substantieel`; anyone else only their own record, at `hoog`, by the `bsn` claim. See [BRP API endpoints](brp-api-endpoints.md#authentication)
+3. **Audit Logging** - Each lookup is audited as `brp.personen.fetch`, with the first BSN of the query ([#478](https://github.com/sgort/ronl-business-api/issues/478)); the route's own log lines carry neither the request body nor the upstream body
 4. **Rate Limiting** - The Business API's global limiter applies
 
 ### Privacy
@@ -465,8 +478,8 @@ export function getUserBSN(user: {
 
 For production with real DigiD:
 
-1. **LoA Requirement** - Timeline requires DigiD LoA "hoog" (substantial assurance)
-2. **BSN in Token** - DigiD provides BSN via SAML → Keycloak → JWT
+1. **LoA Requirement** - A citizen's lookup requires `hoog`, and DigiD has to deliver that level
+2. **BSN in Token** - The `bsn` claim is to come from the DigiD subject; today it is a user attribute
 3. **Session Management** - Keycloak handles DigiD session timeout
 4. **Mandate Support** - (Future) Representatives can view citizen timelines with proper mandate
 
@@ -545,7 +558,8 @@ sendProblem(res, req, { status: statusCode, code: 'BRP_API_ERROR', detail: messa
 |-------|-------|----------|
 | 406 Not Acceptable | Missing Accept header | Added explicit `Accept: application/json` |
 | 401 Unauthorized | Invalid/expired JWT | User must re-login |
-| 404 Not Found | BSN not in BRP | Verify BSN mapping |
+| 403 `INSUFFICIENT_ASSURANCE`, `BSN_CLAIM_MISSING`, `BRP_SUBJECT_MISMATCH` | The caller may not make this lookup | See [BRP API endpoints](brp-api-endpoints.md#error-codes) |
+| 404 Not Found | BSN not in BRP | Verify the account's `bsn` attribute |
 | 500 Server Error | BRP API answered with a server error | Retry or show maintenance message |
 | 502 `BRP_UPSTREAM_UNREACHABLE` | BRP API not reachable — DNS, connection, TLS handshake or timeout | Check `dependencies.brp` in `/v1/health`; see [Troubleshooting](../developer/troubleshooting.md#the-citizen-timeline-is-blank) |
 | Network Error | CORS or connectivity | Check proxy configuration |
@@ -554,25 +568,11 @@ sendProblem(res, req, { status: statusCode, code: 'BRP_API_ERROR', detail: messa
 
 ## Configuration Changes Required
 
-### 1. Keycloak Protocol Mapper
+### 1. Keycloak: the `bsn` claim
 
-**Add `preferred_username` to JWT token:**
+The realm export carries the `bsn` mapper. On an existing realm, run `scripts/keycloak-add-brp-raadpleger.sh`.
 
-1. Keycloak Admin Console → Realms → `ronl`
-2. Clients → `ronl-business-api`
-3. Client scopes → `ronl-business-api-dedicated`
-4. Mappers → Add mapper → By configuration → User Property
-5. Configure:
-   - **Name**: `username`
-   - **Property**: `username`
-   - **Token Claim Name**: `preferred_username`
-   - **Claim JSON Type**: `String`
-   - **Add to ID token**: ON
-   - **Add to access token**: ON
-   - **Add to userinfo**: ON
-6. Save
-
-**Why:** Frontend needs `preferred_username` to map test users to BSN numbers.
+**Why:** The frontend and the backend both read the BSN from this claim.
 
 ### 2. Backend TypeScript Configuration
 

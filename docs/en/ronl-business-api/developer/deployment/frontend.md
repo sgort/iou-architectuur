@@ -191,6 +191,8 @@ jobs:
   lockfile-only change moves this app's dependencies too. The Keycloak login
   theme is there since v2026.11.0 because its guard tests (`keycloak-theme.test.ts`,
   `css-hex.test.ts`) run in this suite; the theme itself is not deployed by it.
+  A promotion treats the theme the same way: the frontend's production pattern
+  lists it too.
 - Every pull request to `acc`, with no path filter on the trigger: the
   `changes` job applies the same paths, so the required check **Build and
   Deploy ACC Frontend** reports on every pull request. A pull request is
@@ -585,29 +587,18 @@ curl -I https://acc.mijn.open-regels.nl
 
 ## Keycloak Redirect URIs
 
-**Critical:** Keycloak client must allow redirects from deployed URLs.
+**Critical:** the `ronl-business-api` client accepts only the addresses listed for it, and requires PKCE. A new address for the frontend has to be added before anyone can sign in there.
 
-### ACC Configuration
+The lists are set with `scripts/keycloak-restrict-rba-client.sh`, which reads the client, replaces only these fields, writes it back and probes the result (see [Keycloak deployment](keycloak.md#changing-the-realm-on-acc-and-prod)):
 
-Keycloak Admin Console:
+| Setting | PROD | ACC |
+|---|---|---|
+| Valid redirect URIs | `https://mijn.open-regels.nl/*` and the Static Web App's default address | `https://acc.mijn.open-regels.nl/*`, its default address, and a wildcard for pull request previews |
+| Valid post-logout redirect URIs | `+` | `+` |
+| Web origins | `+` | `*`, because web origins take no pattern and a preview exchanges the code from its own origin |
+| PKCE | `S256` | `S256` |
 
-1. Realm: `ronl`
-2. Clients → `ronl-business-api`
-3. **Valid Redirect URIs:** `https://acc.mijn.open-regels.nl/*`
-4. **Valid Post Logout Redirect URIs:** `+` (inherits from redirect URIs)
-5. **Web Origins:** `https://acc.mijn.open-regels.nl`
-
-<figure markdown style="width:100%; margin:0;">
-  ![Screenshot: Keycloak Client Redirect Configuration](../../../../assets/screenshots/ronl-keycloak-redirect-uris.png)
-  <figcaption>Kecloak Admin Console showing redirects</figcaption>
-</figure>
-
-### PROD Configuration
-
-Same as ACC but with:
-
-- **Valid Redirect URIs:** `https://mijn.open-regels.nl/*`
-- **Web Origins:** `https://mijn.open-regels.nl`
+The preview wildcard matches by prefix, so it would also accept a look-alike host. That risk is accepted on ACC, and the script refuses it for production.
 
 ---
 

@@ -15,7 +15,7 @@ component: RONL Business API
 1. [Authentication](#authentication)
 2. [POST /brp/personen](#post-brppersonen)
 3. [Error Responses](#error-responses)
-4. [Test Data & BSN Mapping](#test-data-bsn-mapping)
+4. [Test Data & the `bsn` Claim](#test-data-the-bsn-claim)
 
 `POST /v1/brp/personen` is the only BRP operation the API serves. It forwards the request body to the Haal Centraal BRP mock at `https://brp-api-mock.open-regels.nl/haalcentraal/api/brp`, the base URL in `services/brp-upstream.ts`, for ACC and PROD alike. Whether the mock can be reached is also reported by `GET /v1/health`, under `dependencies.brp`.
 
@@ -23,7 +23,14 @@ component: RONL Business API
 
 ## Authentication
 
-The endpoint requires a valid JWT token from Keycloak. It checks the token and nothing else: no role, tenant or assurance-level check applies.
+The endpoint requires a valid JWT token from Keycloak, and decides who may look up whom before the BRP API is called (`auth/brp-access.ts`):
+
+| Caller | Assurance level | May look up |
+|---|---|---|
+| Holder of `brp-raadpleger`, which every caseworker has through the `caseworker` composite | `substantieel` or higher, the level an Entra ID login carries | Anyone; the query is not restricted |
+| Anyone else | `hoog` | Only their own record: the token must carry a `bsn` claim, and `burgerservicenummer` must be a non-empty list naming that BSN and nothing else |
+
+A query that is not by BSN can return anyone, so it is refused for the second group. No tenant check applies: a caseworker of any organisation holds the role.
 
 ### Request Headers
 
@@ -46,12 +53,9 @@ Content-Type: application/json
 }
 ```
 
-The backend reads `sub`, `municipality`, `loa` and the realm roles into the request's user, but the BRP route does not act on them. The BSN to query comes from the request body, not from the token.
+The backend reads `sub`, `municipality`, `loa`, the realm roles and `bsn` into the request's user. The BSN to query still comes from the request body; for a caller without `brp-raadpleger` it has to equal the token's `bsn`.
 
-The frontend picks that BSN from the token:
-
-- `bsn` - Burgerservicenummer, when the token carries one (DigiD)
-- `preferred_username` - otherwise, mapped to a test BSN (see [Test Data & BSN Mapping](#test-data-bsn-mapping))
+The frontend takes that BSN from the token's `bsn` claim only. A token without one gets no lookup, and the citizen's **Tijdlijn** tab says no timeline is available.
 
 ---
 
@@ -368,8 +372,8 @@ The endpoint has no limit of its own. It shares the API's global limiter: by def
 
 ### Logging
 
-- A successful lookup writes the audit entry `brp.personen.fetch`, which records the queried BSN on purpose; a failed one writes the same action with the error.
-- The application log never carries the request body, the upstream body or a BSN: it records the user, the tenant, the query type and how many BSNs were asked for.
+- A lookup that is carried out writes the audit entry `brp.personen.fetch` as `success`, with `via` (`brp-raadpleger` or `own-record`). A refusal writes the same action as `failure`, with the code. Both record a BSN on purpose: the first one in the query's `burgerservicenummer`. The others in a list are not recorded, and a query by name or address records none ([#478](https://github.com/sgort/ronl-business-api/issues/478)). A transport or unexpected failure writes the action as `error`, with the message. A 4xx from the BRP API writes no entry of this action.
+- The route's own log lines never carry the request body, the upstream body or a BSN: they record the user, the tenant, the query type and how many BSNs were asked for. Every audit entry is also written to the application log at `info` level, so the audited BSN does reach that log.
 
 ---
 
@@ -386,6 +390,9 @@ Every error is RFC 9457 problem details, served as `application/problem+json`: `
 | 400 | `MALFORMED_BODY` | The request body is not valid JSON | Check request format |
 | 401 | `MISSING_TOKEN` | No `Authorization: Bearer` header | Send the token |
 | 401 | `INVALID_TOKEN` | JWT token invalid or expired | Re-authenticate |
+| 403 | `INSUFFICIENT_ASSURANCE` | Below `substantieel` with `brp-raadpleger`, or below `hoog` without it | Sign in at the required level |
+| 403 | `BSN_CLAIM_MISSING` | No `brp-raadpleger`, and the token carries no `bsn` claim | The account needs a BSN |
+| 403 | `BRP_SUBJECT_MISMATCH` | No `brp-raadpleger`, and the query is not a lookup of the caller's own BSN only | Query your own BSN |
 | 4xx | `BRP_API_ERROR` | The BRP API refused the request; the status is the BRP API's own, its body is in `details` | Check the query against the BRP API |
 | 429 | `RATE_LIMIT_EXCEEDED` | Too many requests | Wait and retry after the `RateLimit-Reset` seconds |
 | 5xx | `BRP_API_ERROR` | The BRP API answered with a server error; the status is the BRP API's own, or `500` for an error that is not an HTTP failure | Retry or contact support |
@@ -436,18 +443,15 @@ When the call to the BRP API fails without a response, `detail` carries the erro
 
 ---
 
-## Test Data & BSN Mapping
+## Test Data & the `bsn` Claim
 
-### Test Environment BSN Mapping
+### Test accounts with a BSN
 
-A token without a `bsn` claim is mapped to a test BSN by its Keycloak username, in the frontend's `services/bsn.mapping.ts`.
-
-#### Available Test Personas
+The test citizens carry their BSN as the Keycloak user attribute `bsn`, which a protocol mapper puts in the token. The realm export holds it, and `scripts/keycloak-add-brp-raadpleger.sh` sets it on the ACC and PROD realms.
 
 | Username | BSN | Municipality | Description |
 |----------|-----|--------------|-------------|
 | `test-citizen-utrecht` | 999992235 | utrecht | Wessel Kooyman (45 jaar, getrouwd, 3 kinderen) |
-| `test-caseworker-utrecht` | 999992235 | utrecht | Same persona |
 | `test-citizen-amsterdam` | 999992235 | amsterdam | Same persona, Amsterdam tenant |
 | `test-citizen-heusden` | 999992235 | heusden | Same persona, Heusden tenant |
 | `test-citizen-bes` | 999992235 | bes | Same persona, Caribisch Nederland tenant |
@@ -455,7 +459,7 @@ A token without a `bsn` claim is mapped to a test BSN by its Keycloak username, 
 | `test-citizen-denhaag` | 999992235 | denhaag | Same persona, Den Haag tenant |
 | `test-citizen-flevoland` | 999992235 | flevoland | Same persona, Flevoland tenant |
 
-**Note:** All mapped test users share one persona (Wessel Kooyman). Any other username without a `bsn` claim gets no BSN.
+**Note:** All seven share one persona (Wessel Kooyman). `test-citizen-uwv`, `test-citizen-toeslagen` and `test-citizen-unive` have no `bsn`, so they have no timeline.
 
 ### Test BSN: 999992235 (Wessel Kooyman)
 
@@ -497,31 +501,26 @@ The test persona has 3 major life events:
 2. **Getrouwd** - February 2, 2002
 3. **Kinderen geboren (drieling)** - March 3, 2003
 
-### BSN Mapping Logic
+### Where the BSN comes from
 
-**Production (with DigiD):**
-```typescript
-// BSN comes from JWT token (DigiD SAML assertion)
-const bsn = user.bsn; // From JWT claim
-```
+The claim is a user attribute on the test realms and is to be the DigiD subject where DigiD is real.
 
-**Without a `bsn` claim** (`packages/frontend/src/services/bsn.mapping.ts`):
+`packages/frontend/src/services/bsn.mapping.ts`:
+
 ```typescript
 export function getUserBSN(user: {
   sub: string;
   preferred_username?: string;
   bsn?: string;
 }): string | null {
-  // If BSN is in the JWT (production with DigiD), use it
   if (user.bsn) {
     return user.bsn;
   }
 
-  // For test users, map username to BSN
-  if (user.preferred_username && user.preferred_username in testUserBSNMapping) {
-    return testUserBSNMapping[user.preferred_username];
-  }
-
+  // Logs the username only, not the whole claims object: this branch cannot
+  // carry a BSN (it is the one where there isn't one), but `user` also holds
+  // `sub` and whatever else the token brought, and none of that is needed to
+  // explain the warning.
   console.warn('No BSN found for user', user.preferred_username ?? '(no username)');
   return null;
 }
@@ -532,12 +531,8 @@ export function getUserBSN(user: {
 To add a new test persona:
 
 1. **Add BSN to mock BRP API** (if you control it)
-2. **Update username mapping:**
-   ```typescript
-   'test-citizen-single': '999991111',  // New BSN
-   ```
-3. **Create Keycloak user** with that username
-4. **Test** by logging in as that user
+2. **Create a Keycloak user** with the `citizen` role and `assurance_level` `hoog`, and **set the attribute** `bsn` on it, with a number from the reserved `99999xxxx` range
+3. **Test** by logging in as that user
 
 ---
 
@@ -546,14 +541,14 @@ To add a new test persona:
 ### Data Protection
 
 - **JWT Validation** - Backend validates signature, expiry, audience
-- **No BSN in the application log** - neither the request body nor the upstream body is logged
-- **Audit Trail** - Every lookup is audited, with the queried BSN; nothing purges audit records
+- **No BSN in the route's own log lines** - neither the request body nor the upstream body is logged; the audit entry, which also reaches the application log, carries one
+- **Audit Trail** - Every lookup is audited, with the first BSN of the query ([#478](https://github.com/sgort/ronl-business-api/issues/478)); nothing purges audit records
 - **Rate Limiting** - The API's global limiter applies
 
 ### Privacy (AVG/GDPR)
 
 - **Data Minimization** - The caller chooses the `fields`; request only those actually needed
-- **No server-side subject check** - The endpoint answers for any BSN in the request body; it is the frontend that queries the signed-in user's own BSN
+- **Server-side subject check** - A caller without `brp-raadpleger` gets only their own record; a `brp-raadpleger` may look up anyone, and the lookup is audited
 - **Retention** - No BRP data is stored by the API; only the audit entries are kept
 
 ### Production Checklist
@@ -562,7 +557,8 @@ Before going to production with real DigiD:
 
 - [ ] Keycloak configured with real DigiD IdP
 - [ ] BSN attribute mapped from DigiD SAML assertion
-- [ ] Keycloak protocol mapper adds BSN to JWT token
+- [ ] Keycloak maps the DigiD subject to the `bsn` claim (today the mapper reads a user attribute)
+- [ ] The frontend no longer writes the decoded token to the browser console ([#477](https://github.com/sgort/ronl-business-api/issues/477))
 - [ ] Backend validates BSN format (9 digits, valid check digit)
 - [ ] Rate limits configured per municipality
 - [ ] Audit logging enabled with 7-year retention

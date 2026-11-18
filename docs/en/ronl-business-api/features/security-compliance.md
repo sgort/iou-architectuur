@@ -28,6 +28,8 @@ Cross-origin access is governed by CORS, which is a browser control, not an acce
 
 Every protected endpoint requires a valid, signature-verified token before any request data is processed — see [Authentication & IAM](authentication-iam.md) for the full validation chain, the role checks a caller's token is subject to, and the tenant boundary that keeps one caller from reaching another tenant's resources. The cross-tenant machine-to-machine routes under `/v1/m2m` additionally require the token to have been issued to a client on `M2M_ALLOWED_CLIENTS`; any other token, a person's included, is refused with `403 M2M_CLIENT_NOT_ALLOWED`.
 
+A lookup in the BRP is limited to the caller's own record, unless the caller holds `brp-raadpleger`, as every caseworker does; see [Authentication & IAM](authentication-iam.md#roles-and-authorization).
+
 The eDOCS routes under `/v1/edocs` are closed to citizens and to unknown machine clients: a person needs the `caseworker` or `admin` role, and a machine client must be on `EDOCS_ALLOWED_CLIENTS`. A person works in eDOCS as themselves, with the Entra ID token Keycloak stored when they signed in with their Flevoland account. The backend reads that token from Keycloak's broker endpoint with the person's own Keycloak token, so it can only ever read the tokens of the person making the request; it keeps them in memory only, per person and bounded, and never logs, returns or stores them. The bearer token the backend keeps on the request for that purpose is non-enumerable, so a log line or a copy of the request's authentication data never carries it. See [eDOCS — Live Testing](../developer/testing/edocs-live-testing.md#people-and-the-service-account).
 
 !!! warning "Accepted risk: a browser-held token can reach eDOCS as its owner"
@@ -43,7 +45,7 @@ Every value the Business API places in an engine address is encoded and checked,
 
 ## Secrets management
 
-Credentials — database connection strings, the Operaton, eDOCS and ValidSign credentials, the Anthropic API key, and the like — are held as environment configuration on the hosting platform, not committed to the repository. Only template files documenting which variables are expected are version-controlled. The Business API's own Keycloak client, `ronl-business-api`, is a public client: it has no client secret to hold. In production the boot refuses a missing Anthropic API key and one still set to a placeholder value.
+Credentials — database connection strings, the Operaton, eDOCS and ValidSign credentials, the Anthropic API key, and the like — are held as environment configuration on the hosting platform, not committed to the repository. Only template files documenting which variables are expected are version-controlled. The Business API's own Keycloak client, `ronl-business-api`, is a public client: it has no client secret to hold. Keycloak therefore sends its authorization codes only to the addresses listed for the client and requires PKCE. In production the boot refuses a missing Anthropic API key and one still set to a placeholder value.
 
 ---
 
@@ -62,9 +64,9 @@ The backend never deletes audit records. `AUDIT_LOG_RETENTION_DAYS` (default 255
 The log level is set by `LOG_LEVEL` (default `info`) in every environment; nothing ties it to the deployment tier. Logs and audit records are not free of personal data:
 
 - The BRP person lookup's own log lines carry no citizen service number (BSN): it logs the user, the tenant, the query type and the number of subjects asked for, and on a failure the upstream status, problem code or error message — never the request body or the BRP response (#241).
-- The same lookup's audit entry stores the BSN it looked up, on purpose. Every audit entry is also written to the application log at `info` level, so that BSN reaches the application log through the audit record.
+- The same lookup's audit entry stores a BSN on purpose, also when the lookup is refused: the first one in the query. It names no other: the rest of a list is left out, so a refused list that starts with the caller's own BSN does not show who else was asked for, and a query by name or address records none ([#478](https://github.com/sgort/ronl-business-api/issues/478)). Every audit entry is also written to the application log at `info` level, so that BSN reaches the application log through the audit record.
 
-The frontend does not write a BSN to the browser console.
+The BRP client does not write a BSN to the browser console, but the sign-in code does: until [#477](https://github.com/sgort/ronl-business-api/issues/477) is fixed, the frontend logs the whole decoded token there each time it reads the signed-in user, and a citizen's token carries the `bsn` claim. The claim is a user attribute on test accounts, so today that number is a test number.
 
 An unhandled error is answered with a generic message in production. Handled errors can carry upstream detail: a failed process start returns Operaton's own error message and the engine URL, and a BRP error returns the BRP response.
 

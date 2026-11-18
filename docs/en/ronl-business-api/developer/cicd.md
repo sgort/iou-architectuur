@@ -177,17 +177,19 @@ run on a pull request only when it touches their own tooling.
 | 3 | Run zizmor | Workflow static analysis, with zizmor itself pinned to `1.29.0` — maintained by Renovate, which maps the action to the image `ghcr.io/zizmorcore/zizmor`, not bumped by hand |
 | 4 | Validate `renovate.json` | `renovate-config-validator --strict` |
 | 5 | Lockfile matches `package.json` | `npm ci --dry-run --ignore-scripts` — resolves and validates without writing `node_modules` |
-| 6 | `npm ci` | So the eight steps below run *this* repository's tooling, and check its installed tree, rather than a version named in the workflow |
+| 6 | `npm ci` | So the ten steps below run *this* repository's tooling, and check its installed tree, rather than a version named in the workflow |
 | 7 | `npm run check-format` | Prettier, via the root script the pre-push hook also runs |
 | 8 | `npm run test:stylelint` | The tests of the custom `rba/selector-root-class` rule and the lint summary (`scripts/stylelint/*.test.mjs`). They import stylelint, so they run here, after `npm ci`, rather than in `lockfile-review`, which installs nothing (since v2026.11.4) |
 | 9 | `node scripts/keycloak-add-lde-clients.test.mjs` | The production guard of `keycloak-add-lde-clients.sh`, run against the real script, which stops before any network call — see [Keycloak deployment](deployment/keycloak.md) (since v2026.11.4) |
-| 10 | `node scripts/promotion-targets.test.mjs` | The table of cases for `promotion-targets.sh` — see [The production filters live in a script](#the-production-filters-live-in-a-script) (since v2026.11.4) |
-| 11 | `npm run audit:signatures` | The registry signature of every installed package, and the provenance attestation of those that have one — see below |
-| 12 | `npm run check-swimlane-fixtures` | The swimlane parser fixtures against the fingerprints `linked-data-explorer` commits identically — see [Local development](local-development.md) |
-| 13 | `npm run check-shared` | [`@ronl/shared` holds declarations, not logic](shared-package.md#kept-declarations-only) |
-| 14 | `npm run check-supply-chain` | Every digest resolved against the GitHub API, and the register in `SECURITY-PIPELINE.md` compared against the workflows |
+| 10 | `node scripts/keycloak-restrict-rba-client.test.mjs` | `keycloak-restrict-rba-client.sh` refuses a wildcard or a path in its origins, run against the real script, which stops before any network call |
+| 11 | `node scripts/keycloak-add-brp-raadpleger.test.mjs` | `keycloak-add-brp-raadpleger.sh` refuses a test BSN outside the reserved `99999xxxx` range, likewise before any network call |
+| 12 | `node scripts/promotion-targets.test.mjs` | The table of cases for `promotion-targets.sh` — see [The production filters live in a script](#the-production-filters-live-in-a-script) (since v2026.11.4) |
+| 13 | `npm run audit:signatures` | The registry signature of every installed package, and the provenance attestation of those that have one — see below |
+| 14 | `npm run check-swimlane-fixtures` | The swimlane parser fixtures against the fingerprints `linked-data-explorer` commits identically — see [Local development](local-development.md) |
+| 15 | `npm run check-shared` | [`@ronl/shared` holds declarations, not logic](shared-package.md#kept-declarations-only) |
+| 16 | `npm run check-supply-chain` | Every digest resolved against the GitHub API, and the register in `SECURITY-PIPELINE.md` compared against the workflows |
 
-Steps 4 through 14 carry `if: always()`. That makes them run *after* an earlier
+Steps 4 through 16 carry `if: always()`. That makes them run *after* an earlier
 failure, so one run reports on every half of the policy instead of stopping at
 the first — it does **not** make them non-blocking. The job still fails.
 
@@ -198,13 +200,13 @@ finding appears only in the log while every check reads *success*.
 `check-supply-chain` ran that way from its adoption until v2026.09.7 promoted it
 to blocking.
 
-Steps 7, 12 and 13 are in this job rather than in a deploy workflow or a workspace
+Steps 7, 14 and 15 are in this job rather than in a deploy workflow or a workspace
 suite for one reason: `audit` has no paths filter and is the required check, so
 every pull request reaches it — a documentation-only one too, and one made with
 `--no-verify` or in the GitHub UI, which skips the pre-push hook that also runs
 the fixture check.
 
-Step 11, *Verify registry signatures*, is the provenance half of ICTU
+Step 13, *Verify registry signatures*, is the provenance half of ICTU
 recommendation 5, *verify where packages come from*
 (sgort/linked-data-explorer#249). `scripts/audit-signatures.sh` runs `npm audit
 signatures` over the tree step 6 installed — it adds no install of its own —
@@ -292,6 +294,12 @@ step with the workspace list.
 It covers what `check-supply-chain` structurally cannot: that step verifies
 GitHub Actions digest pins resolve to the versions their comments claim, and
 says nothing at all about the packages in the lockfile.
+
+A false positive in the code is suppressed inline: a comment with the reason,
+then `// nosemgrep: <full rule id>` above the line. Supply Chain findings have
+no such mechanism, and Semgrep's API does not return a triage comment, so
+`SECURITY-PIPELINE.md` keeps the record: one row per accepted package and
+advisory, with the finding ids, the decision, the reason and when to look again.
 
 `scan` **is** a required status check on `acc`, promoted once its baseline had
 been triaged — a workflow that runs but cannot block is advice, not a gate.
@@ -414,7 +422,9 @@ Its one job, `upstream-certs`, runs on Node `'24.22.2'`:
    and reads the certificate, sending no request. It fails when a certificate
    does not validate for its hostname or expires within 14 days. Exit 0 is clean,
    1 a finding; anything higher is clamped to 2, "could not run", which is not
-   clean either.
+   clean either. It connects with `rejectUnauthorized: false` because it has to
+   finish the handshake to describe a bad certificate, and judges by
+   `socket.authorized`; the line carries a `nosemgrep` with that reason.
 3. **Open, update or close one tracking issue**, titled *Upstream TLS certificate
    invalid or expiring* and labelled `bug` and `prod-impact`; this step is what
    the job's `issues: write` is for. A clean run closes an open issue with a
@@ -553,7 +563,7 @@ would mean something else; the recorded cost is that a package publishing `X.0.0
 and never a patch is never offered that major, which takes a per-package
 exception with its reason.
 
-The local development stack in `docker-compose.yml` pins all five images by tag
+The local development stack in `docker-compose.yml` pins all six images by tag
 **and** digest, maintained by Renovate through `docker:pinDigests` in
 `renovate.json`'s `extends`. The compose files under `deployment/vm/` are
 deliberately left unpinned: nothing in this repository applies them, so a digest
@@ -782,7 +792,7 @@ directly as its `outputs:` source.
 | Target | Matches (anchored at the repository root) |
 |---|---|
 | `backend` | `packages/backend/`, `packages/shared/`, `azure-backend-prod.yml`, `package-lock.json`, `package.json`, `.nvmrc` |
-| `frontend` | `packages/frontend/`, `packages/shared/`, `packages/pa-cockpit/`, `azure-frontend-prod.yml`, `package-lock.json`, `package.json`, `.nvmrc` |
+| `frontend` | `packages/frontend/`, `packages/shared/`, `packages/pa-cockpit/`, `keycloak-themes/`, `azure-frontend-prod.yml`, `package-lock.json`, `package.json`, `.nvmrc` |
 | `pa_demo` | `packages/pa-demo/`, `packages/shared/`, `packages/pa-cockpit/`, `azure-pa-demo-prod.yml`, `package-lock.json`, `package.json`, `.nvmrc` |
 | `public_site` | `packages/public-site/`, `azure-publicsite-prod.yml`, `package-lock.json`, `package.json`, `.nvmrc` |
 
@@ -791,9 +801,11 @@ v2026.11.4 that includes the root `package-lock.json` and `package.json` in all
 four, so a promotion that changes nothing but the lockfile deploys all four, as
 acceptance built, tested and deployed all four from that same change; before,
 only the backend matched them. `scripts/promotion-targets.test.mjs` holds the
-cases, and runs in `audit`. The acceptance copy is the reference — the two have
-to be kept in step by hand, and one difference remains: the frontend's
-acceptance filter lists `keycloak-themes/**`, its production pattern does not.
+cases, and runs in `audit`. The acceptance copy is the reference, and the two
+have to be kept in step by hand. The frontend pattern includes
+`keycloak-themes/`, although the frontend deploy does not ship the theme, because
+the theme's guard tests run in the frontend suite: a theme-only promotion runs
+that suite on `main` as it did on `acc`, and redeploys the frontend.
 
 Three details in it are load-bearing:
 

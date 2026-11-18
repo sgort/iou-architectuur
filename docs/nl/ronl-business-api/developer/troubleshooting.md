@@ -1,3 +1,7 @@
+---
+component: RONL Business API
+---
+
 # Probleemoplossing
 
 !!! info "Documentatie in ontwikkeling"
@@ -22,6 +26,8 @@
 ### Roles not appearing in JWT
 
 ### Login redirects to blank page
+
+### Login fails with a PKCE error
 
 ### Token expired
 

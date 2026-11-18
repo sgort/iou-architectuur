@@ -25,6 +25,14 @@ on `:3001`, with the `bes` test users present; nothing was started or stopped
 for the run. The public site's six count as passed from its serial run; its
 default parallel run had two timeouts — see below.
 
+!!! warning "Not re-run for v2026.11.5: every figure on this page is carried forward from 14 November"
+    The suites were not run on 18 November, when the unit tests were measured
+    for v2026.11.5 plus hot fix #473 (`main` at `1784a72`). No spec, helper or
+    Playwright configuration changed between `67bac28` and `1784a72`, and the
+    inventory is still 20 spec files, so the counts stand. The results do not
+    extend to the new release: the application under the specs changed, and
+    **nothing on this page says E2E passed against v2026.11.5**.
+
 !!! success "Re-run on 14 November — six more tests, and the first run on axe-core 4.14.0 and Playwright 1.64.1"
     v2026.11.3 added no spec and changed one:
     **`landing-single-board.spec.ts`** takes the new organisation **`bes`**

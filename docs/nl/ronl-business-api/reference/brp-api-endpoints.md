@@ -27,7 +27,7 @@ component: RONL Business API
 
 ---
 
-## Testdata en BSN-mapping
+## Testdata en de `bsn`-claim
 
 ---
 

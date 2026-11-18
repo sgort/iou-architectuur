@@ -49,6 +49,8 @@ Access is granted through Entra groups, each assigned one app role:
 
 An employee in none of the groups cannot sign in: Entra refuses before Keycloak is involved.
 
+`caseworker` includes `brp-raadpleger`, so an employee mapped to it may look up people in the BRP; the `substantieel` these logins carry is enough for that.
+
 ---
 
 ## The Keycloak side

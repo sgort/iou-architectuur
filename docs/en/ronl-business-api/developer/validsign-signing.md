@@ -92,7 +92,7 @@ The ValidSign licence is **production-only — there is no sandbox tenant, and t
 | `GET /v1/validsign/task/:taskId/spec` | main | JWT + tenant |
 | `POST /v1/validsign/task/:taskId/package` | main | JWT + tenant |
 | `GET /v1/validsign/task/:taskId/status` | main | JWT + tenant |
-| `POST /v1/validsign/callback` | **pre-auth** | shared key, in any of five forms |
+| `POST /v1/validsign/callback` | **pre-auth** | shared key, as `Authorization: Basic <key>` |
 | `GET /v1/validsign/stub/ceremony/:packageId` | **pre-auth** | capability URL (stub only; `404` in live mode) |
 | `POST /v1/validsign/stub/ceremony/:packageId/sign` | **pre-auth** | capability URL (stub only; `404` in live mode) |
 | `GET /v1/validsign/ceremony/complete` | **pre-auth** | none |
@@ -111,6 +111,8 @@ Stub package ids were originally **sequential**. On any internet-reachable deplo
     The change landed in v2026.08.36. Earlier commits carry the guessable ids.
 
 The callback and the two stub ceremony routes share a rate limiter — 60 requests per minute — keyed on the **client IP**, not the secret header. The header is attacker-controlled, so keying on it would hand out a fresh budget per request. Keying on IP also means ValidSign's callbacks and a browser's ceremony traffic never land in the same bucket, so ceremony traffic cannot exhaust the budget the callbacks rely on.
+
+The stub ceremony page has no script, so nothing stops a second click on **Onderteken** while the first is still archiving. A repeat of the same outcome does not sign again: it waits for the first request and shows that result. A different outcome is still refused, as the live service would.
 
 ---
 
@@ -131,27 +133,21 @@ ValidSign completes  ─┬─►  POST /callback   ─┐
 
 The route is registered with ValidSign under security type **Bearer token**.
 What ValidSign actually sends is `Authorization: Basic <key>`, with the key raw
-rather than base64-encoded. Both are accepted, along with three further forms,
-all compared in constant time against `VALIDSIGN_CALLBACK_SECRET`:
+rather than base64-encoded, and that is the one form accepted, compared in
+constant time against `VALIDSIGN_CALLBACK_SECRET`. It is logged as
+`credential: basic-raw`.
 
-| Credential | Logged as |
-|---|---|
-| `Authorization: Basic <key>` | `basic-raw` — **what ValidSign sends** |
-| `Authorization: Basic base64(<key>)` | `basic-base64` |
-| `Authorization: Basic base64(name:key)` | `basic-base64-pair` |
-| `Authorization: Bearer <key>` | `bearer` |
-| `x-validsign-secret: <key>` | `x-validsign-secret` |
+The scheme is matched case-insensitively. Everything else is `401`: a
+base64-encoded key, a base64 `name:key` pair, `Authorization: Bearer <key>`, the
+`x-validsign-secret` header, a value that merely *contains* the key, and a wrong
+key.
 
-The scheme is matched case-insensitively. A value that merely *contains* the
-key, a wrong key in any form, and any other scheme such as `Digest` are all
-still `401`.
-
-`"ValidSign callback received"` records **which** form matched, so the check can
-be narrowed to the one ValidSign genuinely uses once that has been observed long
-enough. A rejection logs which credential forms arrived and never their values:
-header names and the `Authorization` scheme only, with a scheme-less value
-logged as `(no scheme)` because it could be the key itself. An accepted callback
-always answers `200`, including for an event it does nothing with.
+A rejection logs which credential forms arrived and never their values: header
+names and the `Authorization` scheme only, with a scheme-less value logged as
+`(no scheme)` because it could be the key itself. Should ValidSign change what
+it sends, that line says so, and the poller still completes the signature. An
+accepted callback always answers `200`, including for an event it does nothing
+with.
 
 !!! note "This was found because a rejection says enough to diagnose it"
     Until v2026.09.8 the route read only `x-validsign-secret`, so **every real
@@ -182,6 +178,8 @@ Three protocol mappers are required on the client:
 | `family_name` | `family_name` |
 
 `scripts/keycloak-add-token-claim-mappers.sh` adds them. It talks only to the Admin REST protocol-mappers endpoint — redirect URIs, web origins and the client secret appear in no request it builds — and is idempotent, so re-running reads state rather than changing it.
+
+**The signer cannot be the sender.** ValidSign files a signer whose address equals the sender's under the package's sender role and creates no signer role, which would leave a failed request and an orphan package. The package route therefore compares the signer's e-mail with `VALIDSIGN_SENDER_EMAIL`, ignoring case, and refuses with `409 SIGNER_IS_SENDER` before anything is created. The panel explains that a colleague has to sign, and offers no retry.
 
 !!! note "Why not a realm import"
     A partial realm import cannot do this safely: `SKIP` policy skips an
@@ -240,9 +238,9 @@ See [Testing](testing/overview.md) for the measured suite figures.
 |---|---|---|
 | `VALIDSIGN_BASE_URL` | `https://my.validsign.eu/api` | Platform endpoint |
 | `VALIDSIGN_API_KEY` | *(empty)* | Account-wide; required in live mode |
-| `VALIDSIGN_SENDER_EMAIL` | *(empty)* | Package sender |
+| `VALIDSIGN_SENDER_EMAIL` | *(empty)* | Package sender; a signer with this address is refused |
 | `VALIDSIGN_STUB_MODE` | `true` | Stub unless explicitly disabled |
-| `VALIDSIGN_CALLBACK_SECRET` | *(empty)* | Verifies the webhook. Must equal the callback key **registered with ValidSign**, and is matched against all five credential forms above |
+| `VALIDSIGN_CALLBACK_SECRET` | *(empty)* | Verifies the webhook. Must equal the callback key **registered with ValidSign**, and is matched against the raw key in `Authorization: Basic` |
 | `VALIDSIGN_LIVE_TIERS` | *(empty)* | Allowlist of tiers permitted to sign for real |
 | `VALIDSIGN_POLL_INTERVAL_MS` | `15000` | Poller sweep interval |
 

@@ -18,7 +18,7 @@ component: RONL Business API
 
 ## Adding New Test Personas
 
-Currently, all test users map to Wessel Kooyman (BSN: 999992235). To add more diverse personas:
+All test citizens with a BSN share Wessel Kooyman (BSN: 999992235). To add more diverse personas:
 
 ### Step 1: Add Test Data to BRP API Mock
 
@@ -31,22 +31,9 @@ If you control the BRP API mock, add new persona data. Otherwise, you'll need to
 - Person with multiple marriages
 - Person with address changes
 
-### Step 2: Update BSN Mapping
+### Step 2: Choose the BSN
 
-**File:** `packages/frontend/src/services/bsn.mapping.ts`
-
-```typescript
-const testUserBSNMapping: Record<string, string> = {
-  // Existing
-  'test-citizen-utrecht': '999992235',        // Wessel Kooyman (married, 3 children)
-  
-  // Add new personas
-  'test-citizen-single': '999991111',         // Single person, no partner/children
-  'test-citizen-divorced': '999992222',       // Divorced, 2 children
-  'test-citizen-remarried': '999993333',      // Multiple marriages
-  'test-citizen-young': '999994444',          // Born 2000, no major events yet
-};
-```
+Pick a number in the reserved `99999xxxx` range that exists in the mock. The BSN is set on the Keycloak user in the next step; there is no table in the frontend.
 
 ### Step 3: Create Keycloak Test Users
 
@@ -61,6 +48,7 @@ const testUserBSNMapping: Record<string, string> = {
 5. **Attributes** tab → Add:
    - `municipality`: `utrecht`
    - `assurance_level`: `hoog`
+   - `bsn`: `999991111`
 6. **Role Mappings** tab → Assign role: `citizen`
 7. Save
 
@@ -854,14 +842,13 @@ const filteredEvents = timelineData.events.filter((e) =>
    ```bash
    curl http://localhost:3002/v1/health
    ```
-3. **Check JWT token** has `preferred_username`:
+3. **Check the JWT** has `bsn`. Copy the access token from the `Authorization` header of a request in the Network tab, and decode it:
    ```javascript
    // In browser console
-   JSON.parse(atob(localStorage.getItem('kc_token').split('.')[1]));
+   JSON.parse(atob('<access token>'.split('.')[1]));
    ```
-4. **Verify BSN mapping**:
+4. **Verify the claim**, in a local session only; do not print it to a shared log:
    ```typescript
-   console.log('User:', user);
    console.log('BSN:', getUserBSN(user));
    ```
 

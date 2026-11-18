@@ -397,8 +397,8 @@ Follow the same steps using `deployment/vm/keycloak/prod/` and hostname `keycloa
 `docker-compose.yml` starts Keycloak with `--import-realm` and mounts `ronl-realm.json` into `/opt/keycloak/data/import/`. Keycloak imports the file only when the realm `ronl` does not exist yet — on a new environment's first start. It configures:
 
 - **Realm `ronl`** with brute-force protection
-- **Client `ronl-business-api`** (public) and the machine-to-machine clients
-- **Protocol mappers** for the tenant (`municipality`, `organisation_type`), the assurance level (`loa`), the realm roles, the employee id and the signer's name and e-mail address
+- **Client `ronl-business-api`** (public, with PKCE and a redirect allow-list) and the machine-to-machine clients
+- **Protocol mappers** for the tenant (`municipality`, `organisation_type`), the assurance level (`loa`), the realm roles, the citizen's `bsn`, the employee id and the signer's name and e-mail address
 - **Realm roles** and **test users** with per-municipality attributes
 - **Token lifespans:** access token 15 minutes, SSO session idle 30 minutes, SSO session max 10 hours
 
@@ -416,6 +416,8 @@ Changes reach those realms through the admin REST API instead, with the idempote
 | The `email`, `given_name` and `family_name` token claims for ValidSign | `keycloak-add-token-claim-mappers.sh` |
 | The Entra ID identity provider for Flevoland, with the token storage eDOCS needs: stored tokens, the `broker` `read-token` role in `default-roles-ronl`, and the `broker-roles` client mapper on `ronl-business-api` | `keycloak-add-entra-idp.sh` |
 | The `lde-author` role and the clients `linked-data-explorer` and `ttl-editor`, with which the Linked Data Explorer and the ttl-editor sign in; optionally the `lde-e2e` client and user, and the `test-author-flevoland` account (see [Keycloak realm](../../reference/keycloak-realm.md#clients-added-by-script-linked-data-explorer-and-ttl-editor)) | `keycloak-add-lde-clients.sh` |
+| The redirect URIs, web origins, post-logout URIs and PKCE requirement of `ronl-business-api` | `keycloak-restrict-rba-client.sh` |
+| The `brp-raadpleger` role, its place in the `caseworker` composite, the `bsn` protocol mapper and the test citizens' `bsn` attribute | `keycloak-add-brp-raadpleger.sh` |
 
 ```bash
 # From a checkout of ronl-business-api, in Git Bash. Creates the five besluit-* roles;
@@ -424,7 +426,9 @@ KEYCLOAK_URL=https://acc.keycloak.open-regels.nl ROLE_PREFIX=besluit- GRANT_USER
   bash scripts/keycloak-add-rip-roles.sh
 ```
 
-Each script prompts for the Keycloak admin password when `ADMIN_PASSWORD` is unset; `keycloak-add-rip-roles.sh`, `keycloak-add-entra-idp.sh` and `keycloak-add-lde-clients.sh` also accept `--dry-run`. `keycloak-add-lde-clients.sh` needs `LDE_ORIGIN` and `TTL_ORIGIN` as well, and refuses its two test-account options, `--with-e2e` and `--with-test-author`, against production. It recognises production by the host name in `KEYCLOAK_URL`, `keycloak.open-regels.nl`, whatever else the URL carries — scheme, credentials, port, path, query, a trailing dot or letter case — and refuses them too when it can read no host, so the guard fails closed; an IP address is not recognised, so never point the script at production by address. `scripts/keycloak-add-lde-clients.test.mjs` tests the guard, in CI's `audit` job. Test users and per-user roles are added in the admin console. See [Entra ID — Rolling out to an environment](entra-id.md#rolling-out-to-an-environment) for the order in which to run them.
+Each script prompts for the Keycloak admin password when `ADMIN_PASSWORD` is unset; `keycloak-add-rip-roles.sh`, `keycloak-add-entra-idp.sh`, `keycloak-add-lde-clients.sh`, `keycloak-restrict-rba-client.sh` and `keycloak-add-brp-raadpleger.sh` also accept `--dry-run`. `keycloak-add-lde-clients.sh` needs `LDE_ORIGIN` and `TTL_ORIGIN` as well, and refuses its two test-account options, `--with-e2e` and `--with-test-author`, against production. It recognises production by the host name in `KEYCLOAK_URL`, `keycloak.open-regels.nl`, whatever else the URL carries — scheme, credentials, port, path, query, a trailing dot or letter case — and refuses them too when it can read no host, so the guard fails closed; an IP address is not recognised, so never point the script at production by address. `scripts/keycloak-add-lde-clients.test.mjs` tests the guard, in CI's `audit` job. Test users and per-user roles are added in the admin console. See [Entra ID — Rolling out to an environment](entra-id.md#rolling-out-to-an-environment) for the order in which to run them.
+
+`keycloak-restrict-rba-client.sh` needs `RBA_ORIGINS`, exact origins without a path or wildcard, and after each change asks the authorization endpoint whether those origins and a foreign one are accepted and whether PKCE is required; `--probe` does only that, without an admin password. Run it with `--enforce-pkce` only once a frontend that sends PKCE is deployed on the tier, because Keycloak then refuses every sign-in without it. Run `keycloak-add-brp-raadpleger.sh` on a tier before a backend that checks the `bsn` claim reaches it.
 
 ---
 
@@ -447,7 +451,7 @@ git commit -m "style: update Keycloak theme styling"
 git push origin <your-branch>   # then open a pull request into acc
 ```
 
-A change under `keycloak-themes/` runs the acceptance frontend workflow, whose suite holds the theme's guard tests (`keycloak-theme.test.ts`, `css-hex.test.ts`). Deploy to the VM once the pull request is merged.
+A change under `keycloak-themes/` runs the acceptance frontend workflow, whose suite holds the theme's guard tests (`keycloak-theme.test.ts`, `css-hex.test.ts`), and on promotion the production frontend workflow, for the same reason. Neither ships the theme: deploy to the VM once the pull request is merged.
 
 ### Step 2 — Deploy to VM
 

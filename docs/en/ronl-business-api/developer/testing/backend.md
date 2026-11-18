@@ -4,27 +4,28 @@ component: RONL Business API
 
 # Backend suite
 
-`packages/backend`, Jest with the `ts-jest` preset. **111 files · 2753 tests ·
-all passing · nothing skipped · `Time: 127.35 s`** under `--runInBand`,
+`packages/backend`, Jest with the `ts-jest` preset. **111 files · 2754 tests ·
+all passing · nothing skipped · `Time: 131.909 s`** under `--runInBand`,
 followed by *"✓ all 138 documented operations were checked against a real
 response"*. Coverage is on by default; see
 [Coverage](coverage.md#backend-by-area) for the per-area figures.
 
-Measured on **14 November 2026** for v2026.11.4 — the release in production,
-`main` at `67bac28` — with `npx jest --coverage --runInBand` followed by
-`node scripts/check-conformance-coverage.cjs`, which is exactly what
-`npm run test:serial --workspace=packages/backend` runs, on `acc` at
-`4579486` (a tree identical to `67bac28`); `.nvmrc` names Node 22.23.4.
-About 173 seconds of wall clock, coverage included. v2026.11.4 added no file
-and 16 tests to the 2737 measured earlier the same day for v2026.11.3
-(102.285 s), which had added two files and 56 tests to the 2681 of
-12 November, which had reproduced 7 November file for file (198.029 s on
-12 November, 137.576 s on 7 November). The package total is the runner's
-own. The
+Measured on **18 November 2026** for v2026.11.5 plus hot fix #473 — `main` at
+`1784a72` — with `npx jest --coverage --runInBand` followed by
+`node scripts/check-conformance-coverage.cjs`, which is what
+`npm run test:serial --workspace=packages/backend` runs, at `be0a1f0` (a tree
+identical to `1784a72`); `.nvmrc` names Node 22.23.4. 195 seconds of wall
+clock, coverage included. v2026.11.5 kept the file count, one file in and one
+out, and added one test to the 2753 measured on 14 November for v2026.11.4
+(127.35 s), which had added no file and 16 tests to the 2737 of v2026.11.3
+earlier that day (102.285 s), which had added two files and 56 tests to the
+2681 of 12 November, which had reproduced 7 November file for file
+(198.029 s on 12 November, 137.576 s on 7 November). The package total is the
+runner's own. The
 per-file and per-area counts are not printed by Jest's default reporter, so
 they were read from Jest's JSON report of the same run (`--json`), which
-lists every test of every file; the 111 files sum to the runner's 2753, as
-they did to 2737 for v2026.11.3 and the 109 to 2681 on 7 and 12 November. Through 9 October every file's count was parsed from its
+lists every test of every file; the 111 files sum to the runner's 2754, as
+they did to 2753 for v2026.11.4, 2737 for v2026.11.3 and the 109 to 2681 on 7 and 12 November. Through 9 October every file's count was parsed from its
 source with the TypeScript compiler, `.each` tables and literal `for … of`
 loops expanded — never a grep for `it(`, which miscounts parameterised and
 multi-line cases. Two tables are not literals and were resolved by hand:
@@ -38,8 +39,8 @@ runner's 2633 exactly at `ebec288`, and 2457 and every per-area figure the
     `&& node scripts/check-conformance-coverage.cjs`. Jest runs the suite as
     before; the script then fails the run unless **every operation in the
     OpenAPI document was compared against a real response** at least once. On
-    14 November it printed *"✓ all 138 documented operations were checked
-    against a real response"*: v2026.11.3 documented
+    18 November, as on 14 November, it printed *"✓ all 138 documented
+    operations were checked against a real response"*: v2026.11.3 documented
     `GET /v1/process/startable` (`getStartableProcesses`), the processes a
     caseworker may start from *Proces starten*. On 7 and 12 November it was
     137: v2026.10.3 documented
@@ -55,21 +56,37 @@ runner's 2633 exactly at `ebec288`, and 2457 and every per-area figure the
     404. On 3 October it was 133 from 30 September plus the two Besluitvorming
     lists and `POST /v1/m2m/process/history`.
 
-    **That figure, and 2753 / 111, are this package's alone.** The repository
-    runs **351 test files and 5434 tests** across five workspaces — see
+    **That figure, and 2754 / 111, are this package's alone.** The repository
+    runs **352 test files and 5442 tests** across five workspaces — see
     [Overview](overview.md). Quoting the backend's count as a repository total
     understates the suite by over two thousand tests.
 
-!!! note "2011 → 2008 → 2028 → 2072 → 2198 → 2202 → 2370 → 2457 → 2633 → 2638 → 2681 → 2737 → 2753, and nothing was lost on the way"
+!!! note "2011 → 2008 → 2028 → 2072 → 2198 → 2202 → 2370 → 2457 → 2633 → 2638 → 2681 → 2737 → 2753 → 2754, and nothing was lost on the way"
     The suite reported **2011** for several releases, of which 2008 ran and
     **three were permanently skipped**. Those three guarded the
     `PHASE_NOT_MODELLED` branch of the RIP phase model. v2026.09.7 made an
     unmodelled phase unrepresentable (issue #85), the branch went, and the
     three skipped cases went with it — a deletion of dead tests rather than a
-    regression. The **2753** measured here is growth on that 2008 base. No
+    regression. The **2754** measured here is growth on that 2008 base. No
     workspace in this repository skips anything.
 
-    **v2026.11.4 added +16 tests and no file** against the measurement of
+    **v2026.11.5 added +1 test, one file in and one out**, against the
+    measurement of v2026.11.4 on 14 November (111 files, 2753). The earlier
+    count of each file is that measurement's, less the change
+    `git diff 67bac28 1784a72` shows in it:
+
+    | File | Tests | What changed |
+    |---|---:|---|
+    | `auth/brp-access.test.ts` | **19** (new) | `brpAccess` (#319): a `brp-raadpleger` may look up anyone at `substantieel` or `hoog` and is refused below it; anyone else only their own BSN at `hoog`, with a list mixing in someone else's, a missing `bsn` claim or a lower level refused |
+    | `pa-monitoring/sources/ep-texts-submitted.client.test.ts` | 24 → **removed** | The European Parliament scrape and its flag are gone, with its client and fixture (#57) |
+    | `routes/brp.routes.test.ts` | 12 → **20** | `POST /v1/brp/personen` access: a citizen at `hoog` on their own record, the refusals with `BRP_SUBJECT_MISMATCH`, a `brp-raadpleger` below and at `substantieel`, and `401` with no user before any check |
+    | `pa-monitoring/curation.service.test.ts` | 61 → **53** | The EP routing cases went; an EU item is labelled by its type alone (#57) |
+    | `auth/tenant-access.test.ts` | 29 → **31** | A process the registry does not know, in the citizen's own tenant: refused as not offered; for staff, allowed as before |
+    | `routes/validsign.routes.test.ts` | 123 → **125** | The callback's credential forms regrouped, the raw key under `Basic`; `409` when the signer is the configured sender; a repeated submit of the same outcome showing the first result |
+    | `routes/process.routes.test.ts` | 134 → **135** | `403 PROCESS_NOT_OFFERED` when a citizen starts a staff process of their own tenant |
+    | `auth/jwt.middleware.test.ts` | 25 → **26** | The `bsn` claim carried onto the user, and absent when the token has none |
+
+    **History: v2026.11.4 added +16 tests and no file** against the measurement of
     v2026.11.3 earlier on 14 November (111 files, 2737), all of it in three
     existing files:
 
@@ -226,32 +243,39 @@ per-file 80% branch floor in `jest.config.js` rides along with it rather than
 needing a coverage job of its own — and so do the OpenAPI coverage gate, an
 ordinary test file, and the conformance-coverage check that `npm test` runs
 after Jest. Since v2026.09.7 `azure-backend-acc.yml` also
-triggers on `pull_request`, so these 2753 tests run *before* a merge rather than
+triggers on `pull_request`, so these 2754 tests run *before* a merge rather than
 only after one — and since **19 September 2026 that run is a required check**,
 so a red backend suite now blocks the merge to `acc` outright. See
 [Overview → What actually gates a merge](overview.md#what-actually-gates-a-merge).
 
 | Area | Files | Tests |
 |---|---:|---:|
-| `src/routes` | 21 | 732 |
+| `src/routes` | 21 | 743 |
 | `src/services` | 30 | 693 |
-| `src/pa-monitoring` | 16 | 583 |
+| `src/pa-monitoring` | 15 | 551 |
 | `src/rip-swimlane` | 2 | 206 |
 | `src/utils` | 19 | 194 |
 | `src/media-aggregator` | 8 | 112 |
-| `src/auth` | 4 | 88 |
+| `src/auth` | 5 | 110 |
 | `src/mcp-servers` | 3 | 63 |
 | `src/openapi` | 4 | 43 |
 | `src/middleware` | 4 | 39 |
 
 !!! success "Both columns are current, and they sum"
-    Re-derived on 14 November 2026: the Files column accounts for all **111**
-    files and the Tests column sums to **2753**, the measured total, every
+    Re-derived on 18 November 2026: the Files column accounts for all **111**
+    files and the Tests column sums to **2754**, the measured total, every
     file's count read from Jest's JSON report of the measured run (see the
     note at the top of this page). Earlier versions of this page carried a
     Files column from one date and a Tests column from another that fell
     274 short, with a warning attached; that gap is closed and has stayed
     closed in every re-derivation since.
+
+    **Three areas moved in v2026.11.5, and the file count held**: `src/routes`
+    732 → **743** (`brp.routes` +8, `validsign.routes` +2, `process.routes`
+    +1), `src/auth` 4 → **5** files and 88 → **110** (`brp-access` new,
+    `tenant-access` +2, `jwt.middleware` +1), and `src/pa-monitoring` 16 →
+    **15** files and 583 → **551** (`ep-texts-submitted.client` gone,
+    `curation.service` −8). The other seven are unchanged to the test.
 
     **Two areas moved in v2026.11.4, and no file was added**:
     `src/services` 685 → **693** (`operaton.service` +8) and `src/utils`
@@ -316,7 +340,7 @@ so a red backend suite now blocks the merge to `acc` outright. See
     counted, which is most of why the old column fell short, and has grown by
     half since.
 
-!!! info "ValidSign is 181 of those tests, across five files"
+!!! info "ValidSign is 183 of those tests, across five files"
     The [signing feature](../validsign-signing.md) arrived in v2026.08.36 and
     was the whole of the backend's growth in file terms for several releases.
     v2026.10.0 made signing state per task and named the archived documents
@@ -325,13 +349,15 @@ so a red backend suite now blocks the merge to `acc` outright. See
 
     | File | Tests | File time, 3 Oct (`--runInBand`) | File time, 9 Oct (`--runInBand`) | File time, 11 Oct (`--runInBand`) |
     |---|---:|---:|---:|---:|
-    | `routes/validsign.routes.test.ts` | 116 → 120 → **123** | 5.5s | 5.7s | under 5s (2.1s) |
+    | `routes/validsign.routes.test.ts` | 116 → 120 → 123 → **125** | 5.5s | 5.7s | under 5s (2.1s) |
     | `services/validsign.service.test.ts` | 32 | under 5s | under 5s | under 5s |
     | `services/validsignCompletion.service.test.ts` | 9 → 13 → **15** | under 5s | under 5s | under 5s |
     | `services/validsignPoller.service.test.ts` | 7 | under 5s | under 5s | under 5s |
     | `utils/config.validsign.test.ts` | 4 | under 5s | under 5s | under 5s |
 
-    v2026.10.2 changed none of the five; they still hold 181 tests. Jest's
+    v2026.10.2 changed none of the five; v2026.11.5 added two to the route file,
+    so they hold 183 tests. The test counts are current; the three time columns
+    are of the dates they name. Jest's
     console prints a file's time only past its five-second slow-test
     threshold; the 2.1s is from the JSON report of the 11 October run.
     All three time columns are in-band runs, one file at a time; on 30 September,
@@ -345,13 +371,16 @@ so a red backend suite now blocks the merge to `acc` outright. See
     116 in v2026.09.12 — the signing endpoints refusing a task belonging to
     another tenant, or to none (#227) — to 120 in v2026.10.0, when a later
     signing task in the same instance began to start afresh instead of
-    opening as declined, and to **123** in v2026.10.1: the signer recorded as
-    `edocsAuthor`, and the task variables read without deserialising them.
+    opening as declined, to 123 in v2026.10.1 — the signer recorded as
+    `edocsAuthor`, and the task variables read without deserialising them —
+    and to **125** in v2026.11.5, with a signer who is the configured sender
+    refused and a repeated submit showing the first result.
 
-    On 11 October, as on 9 October, the route module reports **97.27% statements · 98.38%
-    branches · 100% functions · 97.05% lines**; `validsign.service.ts` and
-    `validsignPoller.service.ts` are at 100 on all four, and
-    `validsignCompletion.service.ts` at **94 / 92.59 / 100 / 95.74**, its
+    On 18 November the route module reports **98.4% statements · 97.54%
+    branches (119/122) · 100% functions · 98.73% lines**. On 11 October, as on
+    9 October, it reported 97.27 / 98.38 / 100 / 97.05, with
+    `validsign.service.ts` and `validsignPoller.service.ts` at 100 on all four,
+    and `validsignCompletion.service.ts` at **94 / 92.59 / 100 / 95.74**, its
     branches up from 91.3 on 3 October with the attribution cases.
 
 !!! warning "A per-file time is not a ranking, and this page used to publish it as one"
@@ -412,7 +441,7 @@ directory.
 | `src/utils` | `config` and its ValidSign and — new in v2026.10.1 — eDOCS counterparts, `env`, `logger`, `operaton-variables`, `slug`, `tls-bootstrap`, `altcha`, `errors`, `client-ip`, `dutch-datetime`, — new in v2026.09.11 — `build-info` and `cors-origin`, and — new in v2026.10.0 — **`problem`**: `sendProblem` writes `application/problem+json` with `type`, `status`, `title`, `detail` and `instance` (the request path, query string stripped) plus the `code` extension, never lets an extension replace an RFC member, and derives the title from the code |
 | `src/mcp-servers` | The standalone stdio MCP servers (`lde`, `triplydb`, `edocs`) — each mocks the MCP SDK to capture and drive its `ListTools`/`CallTool` handlers directly. Since v2026.10.1 the `edocs` server acts as the person whose token arrives in the call's `_meta`, and never retries that person's refusal with its own token |
 | `src/middleware` | `tenant.middleware` and `audit.middleware`; — new in v2026.09.12 — `version.middleware`: every response carries an `API-Version` header with the CalVer release string, error responses and unrouted 404s included; and — new in v2026.10.0 — **`error.middleware`**, the 404, catch-all and rate-limit handlers that used to live untested in `index.ts`: `404 NOT_FOUND`, a malformed JSON body answering `400 MALFORMED_BODY` instead of 500, an oversized one `413 PAYLOAD_TOO_LARGE`, an arbitrary error unable to choose its own status, the message hidden in production, and `429 RATE_LIMIT_EXCEEDED` |
-| `src/auth` | `jwt.middleware` — token validation, role and assurance gates, and since v2026.10.1 a bearer token kept out of anything that serialises or copies `req.auth` — new in v2026.10.1, **`entra-token.service`**, which reads a person's stored Entra ID token from Keycloak so eDOCS can be reached as that person, refusing with `EDOCS_USER_TOKEN_UNAVAILABLE` or `EDOCS_REAUTH_REQUIRED`, and **`citizen-services`**, the services a citizen may start; and, new in v2026.09.12, **`tenant-access`**, the one module that decides tenant questions for process and task access (#218, #219, #229): an exact, case-sensitive tenant match with no match for a missing label; a staff start across tenants refused while a citizen's case is stamped with the deployed tenant and its origin recorded — since v2026.10.1 only for a cross-tenant service such as Zorgtoeslag, and never from an untenanted deployment; a token without a roles claim treated as staff; case reads admitted to the owning tenant or the applicant only; and the single `403 TENANT_MISMATCH` answer |
+| `src/auth` | `jwt.middleware` — token validation, role and assurance gates, since v2026.10.1 a bearer token kept out of anything that serialises or copies `req.auth`, and since v2026.11.5 the `bsn` claim carried onto the user — new in v2026.11.5, **`brp-access`**, who may look up whom in the BRP: a `brp-raadpleger` from `substantieel`, anyone else only their own BSN at `hoog`; new in v2026.10.1, **`entra-token.service`**, which reads a person's stored Entra ID token from Keycloak so eDOCS can be reached as that person, refusing with `EDOCS_USER_TOKEN_UNAVAILABLE` or `EDOCS_REAUTH_REQUIRED`, and **`citizen-services`**, the services a citizen may start; and, new in v2026.09.12, **`tenant-access`**, the one module that decides tenant questions for process and task access (#218, #219, #229): an exact, case-sensitive tenant match with no match for a missing label; a staff start across tenants refused while a citizen's case is stamped with the deployed tenant and its origin recorded — since v2026.10.1 only for a cross-tenant service such as Zorgtoeslag, and never from an untenanted deployment; a token without a roles claim treated as staff; case reads admitted to the owning tenant or the applicant only; and the single `403 TENANT_MISMATCH` answer |
 | `src/rip-swimlane` | `bpmn-swimlane` and `doc-label` — parsing lanes, nodes and rework loops out of deployed BPMN into a swimlane model, against twelve real RIP phase fixtures, since v2026.09.14 seven Awb process fixtures under `__fixtures__/awb/`, and since v2026.10.0 two under `__fixtures__/declared/` — `GedelegeerdBesluitProcess` (six lanes, six phases) and the HR capacity claim (eight phases). The parser serves any laned process, not only RIP: script, business-rule and call-activity nodes as their own kinds, lane groups, and the phase markers the caseworker's phase stepper reads — the built-in Awb set through `ronl:awbPhase`, or, since v2026.10.0, a process's own set declared with `ronl:phases`, `ronl:phaseLabel` and `ronl:phase`. The tests pin that the two schemes never mix, that malformed, duplicate and undeclared entries are ignored, and that none of the twelve RIP fixtures carries a phase set |
 
 `src/utils` was rebuilt over the v2026.08.21 window, going from 5 files and 21

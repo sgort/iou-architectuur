@@ -81,9 +81,9 @@ Successful responses keep their own shapes, described under [Response shapes](#r
 |---|---|---|
 | `400` | A malformed request, a body that does not parse, or a task completion (or machine-to-machine start) that sets a variable fixed at process start | `VALIDATION_ERROR`, `MALFORMED_BODY`, `INVALID_BODY`, `RESERVED_VARIABLE` |
 | `401` | A missing or invalid token, or a person whose eDOCS session can no longer be renewed and must sign in again | `MISSING_TOKEN`, `INVALID_TOKEN`, `UNAUTHORIZED`, `EDOCS_REAUTH_REQUIRED` |
-| `403` | A role, tenant, assurance-level, starter-group or machine-client check that failed, or eDOCS that cannot be reached as the person or refuses them | `FORBIDDEN`, `TENANT_MISMATCH`, `MISSING_TENANT`, `INSUFFICIENT_ASSURANCE`, `NOT_CANDIDATE_STARTER`, `M2M_CLIENT_NOT_ALLOWED`, `EDOCS_CLIENT_NOT_ALLOWED`, `EDOCS_USER_TOKEN_UNAVAILABLE`, `EDOCS_ACCESS_DENIED` |
+| `403` | A role, tenant, assurance-level, starter-group or machine-client check that failed, a process not offered to citizens, a BRP lookup the caller may not make, or eDOCS that cannot be reached as the person or refuses them | `FORBIDDEN`, `TENANT_MISMATCH`, `MISSING_TENANT`, `INSUFFICIENT_ASSURANCE`, `NOT_CANDIDATE_STARTER`, `PROCESS_NOT_OFFERED`, `BSN_CLAIM_MISSING`, `BRP_SUBJECT_MISMATCH`, `M2M_CLIENT_NOT_ALLOWED`, `EDOCS_CLIENT_NOT_ALLOWED`, `EDOCS_USER_TOKEN_UNAVAILABLE`, `EDOCS_ACCESS_DENIED` |
 | `404` | A resource that does not exist or is not visible to the caller | resource-specific `*_NOT_FOUND`, `NOT_FOUND` |
-| `409` | A process start whose key several other organisations deploy | `AMBIGUOUS_DEPLOYMENT` |
+| `409` | A process start whose key several other organisations deploy, or a signature request that conflicts with what exists | `AMBIGUOUS_DEPLOYMENT`, `VALIDSIGN_PACKAGE_EXISTS`, `SIGNER_IS_SENDER` |
 | `413` | A request body over the size limit | `PAYLOAD_TOO_LARGE` |
 | `429` | A rate limit | `RATE_LIMIT_EXCEEDED` |
 | `500` | Anything unexpected | `INTERNAL_ERROR` and operation-specific `*_FAILED` codes |

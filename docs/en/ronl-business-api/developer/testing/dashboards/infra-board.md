@@ -4,8 +4,8 @@ component: RONL Business API
 
 # Infra-board — tests
 
-**Frontend: 19 files · 278 tests**, including the shared signing panel.
-**E2E: 2 specs · 8 tests** — 7 passed and 1 skipped on 14 November 2026, as on 3 and 9 October and 7 November.
+**Frontend: 19 files · 280 tests**, including the shared signing panel.
+**E2E: 2 specs · 8 tests** — 7 passed and 1 skipped on 14 November 2026, as on 3 and 9 October and 7 November; carried forward, not re-run on 18 November.
 
 The infra-board is well covered at the unit level — `src/pages/infra-board` is
 at **100%** statements, functions and lines and 98.74% branches, the
@@ -17,13 +17,20 @@ work that happens inside it.
 
 ## Frontend
 
-Measured on **14 November 2026** on `acc` at `4579486`, a tree identical to
-`main` at `67bac28` (v2026.11.4): the frontend package ran 144 files and
-1782 tests, all passing, every per-file count on this page the same as on
-7 and 12 November and in the v2026.11.3 run earlier that day, and the counts
-below are read from Vitest's JSON report of that run.
+Measured on **18 November 2026** at `be0a1f0`, a tree identical to `main` at
+`1784a72` (v2026.11.5 plus hot fix #473): the frontend package ran 144 files
+and 1787 tests, all passing, and the counts below are read from Vitest's JSON
+report of that run.
 
-**v2026.10.3 added 19 tests to this board and no file.** The project page
+**v2026.11.5 added two tests to this board and no file.**
+`InfraCommandPalette.test.tsx` went 9 → **10**: the palette finds a live
+project waiting between phases and opens it on its instance (#382).
+`signing/SigningPanel.test.tsx` went 16 → **17**: the panel explains a signer
+who is the ValidSign sender, and offers no retry. The other per-file counts are
+as on 14 November. `services/infra.api.test.ts`, 38 → **41** for the shared
+data under its provider (#78), belongs to no board.
+
+**History: v2026.10.3 added 19 tests to this board and no file.** The project page
 now draws its process through the shared ProcessView, with the legend, the
 viewer's lanes and the task marks (`ProjectDetail.test.tsx` 21 → **27**), and
 the portfolio keeps projects waiting between phases, from the finished
@@ -35,9 +42,9 @@ instances of every phase (`infra-board.data.test.ts` 34 → **45**,
 | Area | Files | Tests |
 |---|---:|---:|
 | `pages/infra-board` (data and pure logic) | 6 | 119 |
-| `components/InfraBoardDashboard` | 9 | 115 |
+| `components/InfraBoardDashboard` | 9 | 116 |
 | `pages/InfraBoardDashboard.test.tsx` | 1 | 19 |
-| **`components/signing`** (the signing panel, shared with the caseworker inbox) | 3 | 25 |
+| **`components/signing`** (the signing panel, shared with the caseworker inbox) | 3 | 26 |
 
 !!! note "The signing panel moved to `components/signing/`, and is counted here once"
     Until v2026.10.0 `SigningPanel` and its tests lived in
@@ -51,13 +58,14 @@ instances of every phase (`infra-board.data.test.ts` 34 → **45**,
 
     | File | Tests | Covers |
     |---|---:|---|
-    | `signing/SigningPanel.test.tsx` | 16 | The panel an approval task renders in place of a form; since v2026.10.0 it tells its host once about a decline, so the task list can move on (15 on 30 September, in `InfraBoardDashboard/`) |
+    | `signing/SigningPanel.test.tsx` | 17 | The panel an approval task renders in place of a form; since v2026.10.0 it tells its host once about a decline, so the task list can move on, and since v2026.11.5 it explains a signer who is the ValidSign sender (15 on 30 September, in `InfraBoardDashboard/`; 16 on 14 November) |
     | `signing/useTaskSignature.test.ts` | 5 | **New.** Loading until the signing spec arrives; no fetch without a task; no spec when the fetch fails or answers `success: false`, so the caller falls back to the form; and never the previous task's spec after switching tasks |
     | `signing/resolveSigningUrl.test.ts` | 4 | Resolving the signing ceremony's URL — moved unchanged |
 
-    Coverage on 14 November, unchanged since 3 October: `components/signing`
-    **93.1 / 88.75 / 95.65 / 96.11**, with `SigningPanel.tsx` at 85.93%
-    branches and the other two files at 100 on all four.
+    Coverage on 18 November: `components/signing`
+    **93.22 / 89.15 / 95.65 / 96.19** (93.1 / 88.75 / 95.65 / 96.11 from
+    3 October to 14 November), with `SigningPanel.tsx` at 86.56%
+    branches (85.93% before v2026.11.5) and the other two files at 100 on all four.
 
 !!! note "The phase swimlane's tests moved to `components/process/`"
     `PhaseSwimlane.test.tsx` lived in `components/InfraBoardDashboard/` until
@@ -83,17 +91,18 @@ instances of every phase (`infra-board.data.test.ts` 34 → **45**,
 | `components/InfraBoardDashboard/FaseladderOverview.test.tsx` | 11 | Faseladder overview |
 | `components/InfraBoardDashboard/Portfolio.test.tsx` | 12 | Portfolio view, with waiting projects (11 on 9 October) |
 | `pages/infra-board/rip-phase-counts.test.ts` | 10 | Phase counts |
-| `components/InfraBoardDashboard/InfraCommandPalette.test.tsx` | 9 | Command palette |
+| `components/InfraBoardDashboard/InfraCommandPalette.test.tsx` | 10 | Command palette, since v2026.11.5 with projects waiting between phases (9 on 14 November) |
 | `pages/infra-board/modes.config.test.ts` | 9 | Mode configuration |
 | `components/InfraBoardDashboard/MijnDag.test.tsx` | 6 | The "Mijn Dag" section |
 | `components/InfraBoardDashboard/InfraDock.test.tsx` | 4 | The dock |
 | `components/InfraBoardDashboard/InfraNoAccessPanel.test.tsx` | 1 | The no-access panel |
 
-Coverage on 14 November, as on 7 and 12 November: `pages/infra-board` **100 / 98.74 / 100 / 100**
+Coverage on 18 November: `pages/infra-board` **100 / 98.74 / 100 / 100**
 (98.47 branches on 9 October), and `components/InfraBoardDashboard`
-95.43 / 90.21 / 92.59 / 95.95 (95.34 / 89.91 / 92.59 / 95.85 on 9 October),
-over ten source files. `ProjectDetail.tsx` reads 89.02% branches and 83.33%
-functions; `Portfolio.tsx` 100% branches.
+**95.49 / 90.17 / 92.63 / 96** (95.43 / 90.21 / 92.59 / 95.95 from 7 to
+14 November, 95.34 / 89.91 / 92.59 / 95.85 on 9 October), over ten source
+files. `ProjectDetail.tsx` reads 89.02% branches and 83.33% functions,
+`InfraCommandPalette.tsx` 89.28% branches and `Portfolio.tsx` 100% branches.
 
 The gap between those two rows is the usual one: the pure data and model
 modules are exhaustively covered, while the components carry the
@@ -103,7 +112,7 @@ modules are exhaustively covered, while the components carry the
 
 ## E2E
 
-**Two specs, eight tests.** Measured **14 November 2026** as part of the full
+**Two specs, eight tests.** Last measured **14 November 2026**, and not re-run on 18 November, as part of the full
 frontend run against the developer's already-running local stack: 60 passed,
 7 skipped, 3.9m. Before that, 7 November 2026: 56 passed, 5 skipped, 6.4m;
 9 October 2026: 42 passed, 5 skipped, 2.6m;

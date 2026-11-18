@@ -237,7 +237,7 @@ The shell groups the sections into four modes — `werk | zoeken | simulatie | b
 
 **4. Citizen dashboard (`/dashboard/citizen` — `Dashboard.tsx`)**
 
-The citizen portal, protected by `ProtectedRoute requiredRole="citizen"`: a signed-in caseworker is sent to `/dashboard/caseworker`. It has three tabs — **Diensten**, **Mijn aanvragen** and **Tijdlijn**. **Diensten** shows a card for each service `GET /v1/process/available` returns, with its label, icon and form from `CITIZEN_SERVICE_UI` (`pages/citizen/citizenServiceUi.ts`); see [Adding a citizen service](#adding-a-citizen-service). **Mijn aanvragen** lists the citizen's applications, one per case. **Tijdlijn** shows the BRP timeline.
+The citizen portal, protected by `ProtectedRoute requiredRole="citizen"`: a signed-in caseworker is sent to `/dashboard/caseworker`. It has three tabs — **Diensten**, **Mijn aanvragen** and **Tijdlijn**. **Diensten** shows a card for each service `GET /v1/process/available` returns, with its label, icon and form from `CITIZEN_SERVICE_UI` (`pages/citizen/citizenServiceUi.ts`); see [Adding a citizen service](#adding-a-citizen-service). **Mijn aanvragen** lists the citizen's applications, one per case. **Tijdlijn** shows the BRP timeline of the BSN in the token's `bsn` claim (`services/bsn.mapping.ts`); without the claim there is none.
 
 ---
 
@@ -338,6 +338,8 @@ export default keycloak;
 | External IdP | `'check-sso'` | `keycloak.login({ idpHint })` — `entra-flevoland` or `digid` |
 | Medewerker | `'check-sso'` | `keycloak.login({ loginHint })` — the stored username hint, else the `__medewerker__` sentinel |
 
+`initializeKeycloak()` passes `pkceMethod: 'S256'` as well: `keycloak-js` 23 sends no code challenge unless asked, and the realm refuses a sign-in without one.
+
 After any successful authentication, `sessionStorage.removeItem('selected_idp')` is called before `navigateAfterLogin()` chooses where to go: a stored `post_login_redirect` the caller's roles allow, otherwise the default board — Woo, then Infra-board, then PA-Cockpit, then Caseworker, falling through to `/dashboard/citizen`.
 
 **Token refresh** is done by the frontend, not by the adapter on a timer, and only while the SSO session remains active. Two places call `keycloak.updateToken()`: the API client before every request (see [API client](#api-client)), and `SessionExpiryWarning` on real interaction — typing, clicking, scrolling or moving the mouse, at most once per 30 seconds — once fewer than 180 seconds remain, so filling in a long form without any API call does not let the token run out. Below 120 seconds the warning modal appears; **Sessie verlengen** forces a refresh and falls back to `keycloak.login()` when the session is gone.
@@ -368,7 +370,7 @@ else root.style.removeProperty("--color-background");
 
 All Tailwind utility classes and component styles reference these custom properties, so the entire UI re-themes without a page reload.
 
-`applyTenantTheme` also sets `data-tenant="<id>"` on `<html>` (`TENANT_MARKER_ENABLED` in `services/tenant.ts`; pa-demo's tenant shim keeps its own copy, held equal by a test). The stylesheets use it to switch a whole palette for one tenant: since v2026.11.0, `:root[data-tenant="flevoland"]` points the shared tokens at Flevoland IT's semantic tokens. See [Styling guidelines](#styling-guidelines) and [Municipality themes](../reference/municipality-themes.md).
+`applyTenantTheme` also sets `data-tenant="<id>"` on `<html>` (`TENANT_MARKER_ENABLED` in `services/tenant.ts`; pa-demo's tenant shim keeps its own copy, held equal by a test). The stylesheets use it to switch a whole palette for one tenant: since v2026.11.0, `:root[data-tenant="flevoland"]` points the shared tokens at Flevoland IT's semantic tokens, apart from two values, among them the accent fill; see [Flevoland's palette](../reference/municipality-themes.md#flevolands-palette). See also [Styling guidelines](#styling-guidelines) and [Municipality themes](../reference/municipality-themes.md).
 
 ---
 
@@ -840,7 +842,7 @@ A process whose own start event has a `camunda:formRef` or a `camunda:formKey` o
 |---|---|
 | `css-hex.test.ts` | A stylesheet gains a hex colour outside the per-file list, or a listed one is no longer used — this one runs in CI |
 | `inline-colours.test.ts` | A colour written inline in TS/TSX is not a token and not one of the data colours listed per file (chart series, lanes, categories) |
-| `css-tokens.test.ts` | A stylesheet uses an undefined `--rba-*` token, or a host stops loading the token file |
+| `css-tokens.test.ts` | A stylesheet uses an undefined `--rba-*` token, a `var(--v2-*)` without a fallback that no stylesheet declares, or a host stops loading the token file |
 
 **Tailwind's colour scales follow the tenant.** `tailwind.config.js` points the gray, slate, red, green, blue, amber, orange and yellow scales at `--twc-*` variables (`src/styles/tailwind-palette.css`) whose defaults are Tailwind's own values, so a tenant without a palette renders as before; Flevoland maps each shade onto its palette by role. `tailwind-palette.test.ts` compiles the app's CSS both ways and compares every declaration.
 

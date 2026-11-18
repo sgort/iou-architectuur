@@ -8,19 +8,22 @@ The caseworker portal is the oldest and largest board, and the one whose
 end-to-end journeys exercise the full Operaton stack.
 
 **Frontend: 60 files · 668 tests**, including the shared process view.
-**E2E: 4 specs · 4 tests**, all passing on 14 November 2026. *Proces
-starten*, new in v2026.11.3, has no E2E.
+**E2E: 4 specs · 4 tests**, all passing on 14 November 2026; carried forward,
+not re-run on 18 November. *Proces starten*, new in v2026.11.3, has no E2E.
 
 ---
 
 ## Frontend
 
-Measured on **14 November 2026** on `acc` at `4579486`, a tree identical to
-`main` at `67bac28` (v2026.11.4): the frontend package ran 144 files and
-1782 tests, all passing, and the per-file and per-area counts below are read
-from Vitest's JSON report of that run, which sums to the runner's total.
+Measured on **18 November 2026** at `be0a1f0`, a tree identical to `main` at
+`1784a72` (v2026.11.5 plus hot fix #473): the frontend package ran 144 files
+and 1787 tests, all passing, and the per-file and per-area counts below are
+read from Vitest's JSON report of that run, which sums to the runner's total.
 
-**v2026.11.4 added one test here and no file.**
+**v2026.11.5 added no test here and no file.** Every count on this page is as
+on 14 November.
+
+**History, 14 November: v2026.11.4 added one test here and no file.**
 `CaseworkerDashboardV2/ProcesStartenSection.test.tsx` went 17 → **18**: the
 button now reads *Start proces*, and the new test keeps the visible text in
 the button's accessible name while the process starts, *Bezig…* (WCAG 2.5.3,
@@ -141,16 +144,15 @@ rendering every dashboard uses (ProcessView):
 | `process/status.test.ts` | 3 | **New in v2026.10.3.** The node status vocabulary and its token colours |
 | `process/useViewer.test.ts` | 3 | **New in v2026.10.3.** The viewer read from the Keycloak token |
 
-Coverage on 14 November for v2026.11.3 (statements / branches), from the
-run's coverage map: `components/CaseworkerDashboard` **94.2 / 94.51**,
-`components/CaseworkerDashboardV2` **92.92 / 93.66** (92.69 / 93.36 on
-7 and 12 November), the `regelsimulatie` sub-directory 98.33 / 88.59, and
-`components/process` **99.33 / 92.46**; these area rows were not
-re-derived for v2026.11.4. `ProcesStartenSection.tsx`, new in v2026.11.3,
-read **95.34 / 96.96**, with 90% functions — 32 of 33 branches, which the
-release notes give as 96.97%, rounded rather than truncated — and reads
-**95.45 / 96.96 / 90.00 / 95.12** at v2026.11.4, statements and lines up a
-little on the reworked button.
+Coverage on 18 November (statements / branches), from the run's coverage map:
+`components/CaseworkerDashboard` **94.2 / 94.51**,
+`components/CaseworkerDashboardV2` **92.93 / 93.66** (92.92 / 93.66 for
+v2026.11.3), the `regelsimulatie` sub-directory 98.33 / 88.59, and
+`components/process` **99.33 / 92.46**. `ProcesStartenSection.tsx`, new in
+v2026.11.3, read **95.34 / 96.96**, with 90% functions — 32 of 33 branches,
+which the release notes give as 96.97%, rounded rather than truncated — and
+has read **95.45 / 96.96 / 90.00 / 95.12** since v2026.11.4, statements and
+lines up a little on the reworked button.
 `BesluitOverzichtSection.tsx` is still the lowest file in the frontend by
 branches, at **80.43%** — half a point above the floor — and
 `process/phaseSet.ts`, the phase set a process declares, is at 83.33%; they
@@ -180,7 +182,7 @@ untenanted SVB, SZW and Heusdenpas decisions, and informs the applicant —
 the first journey on this board for an organisation other than Flevoland and
 Dienst Toeslagen.
 
-**All four were measured on 14 November 2026**, as part of the full
+**All four were last measured on 14 November 2026**, and not re-run on 18 November, as part of the full
 frontend run against the developer's already-running local stack (60 passed,
 7 skipped, 3.9m): **one test each, all passing** — `caseworker-journey` in
 9.3s, `heusdenpas-journey` in 11.5s, `thuisbatterij-journey` in 6.5s and

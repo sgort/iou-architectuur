@@ -46,9 +46,12 @@ The `ronl` realm is defined in `config/keycloak/ronl-realm.json`. A Keycloak imp
 | Implicit flow | Disabled |
 | Direct access grants | Enabled |
 | Service accounts | Disabled |
-| PKCE | Not set in the export (no `pkce.code.challenge.method` attribute) |
-| Valid redirect URIs | `*` (restrict in production) |
-| Web origins | `*` (restrict in production) |
+| PKCE | Required, `S256` (`pkce.code.challenge.method`) |
+| Valid redirect URIs | `http://localhost:5173/*` in the export; ACC and PROD hold their own list |
+| Valid post-logout redirect URIs | `+` (the redirect URIs) |
+| Web origins | `+` (the origins of the redirect URIs) |
+
+The client is public, so it has no secret: the redirect list and PKCE are what keep an authorization code from being used elsewhere. `scripts/keycloak-restrict-rba-client.sh` applies the same settings to a live realm. PROD allows its site and the Static Web App's default address, with web origins `+`. ACC allows the same two for its own tier plus a wildcard for pull request previews, and keeps web origins at `*`, because web origins take no pattern and `keycloak-js` exchanges the code from the preview's own origin. That wildcard is an accepted risk on ACC and the script refuses it for production. Both realms require PKCE.
 
 ---
 
@@ -59,6 +62,7 @@ The following protocol mappers are configured on the `ronl-business-api-dedicate
 | Mapper name | Type | Token claim | Source attribute |
 |---|---|---|---|
 | `municipality` | User Attribute | `municipality` | `municipality` |
+| `bsn` | User Attribute | `bsn` | `bsn` |
 | `organisation_type` | User Attribute | `organisation_type` | `organisation_type` |
 | `assurance_level` | User Attribute | `loa` | `assurance_level` |
 | `mandate` | User Attribute | `mandate` | `mandate` |
@@ -115,7 +119,7 @@ The export itself carries two SAML providers, `digid` (DigiD) and `eidas` (eIDAS
 
 ## Realm roles
 
-The realm defines 60 roles.
+The realm defines 61 roles.
 
 ### General
 
@@ -123,7 +127,8 @@ The realm defines 60 roles.
 |---|---|
 | `citizen` | Regular citizen using municipality services |
 | `representative` | Representative acting on behalf of a citizen (with mandate) |
-| `caseworker` | Municipality caseworker processing applications |
+| `caseworker` | Municipality caseworker processing applications. A composite role: it includes `brp-raadpleger` |
+| `brp-raadpleger` | May look up any person in the BRP; held by every caseworker through the `caseworker` composite |
 | `admin` | Municipality administrator |
 | `hr-medewerker` | HR department employee who manages staff onboarding |
 | `infra-projectteam` | Infrastructure project team member — can claim RIP Phase 1 tasks |
@@ -210,7 +215,7 @@ The candidate groups the RIP process models address their tasks to. A task list 
 
 ## Test users
 
-The export defines 29 test users, all with password `test123` and `assurance_level = hoog`. The `ronl-business-api` client allows direct access grants, so a test token can be requested with a username and password.
+The export defines 29 test users, all with password `test123` and `assurance_level = hoog`. The `ronl-business-api` client allows direct access grants, so a test token can be requested with a username and password. The seven test citizens of `utrecht`, `amsterdam`, `heusden`, `bes`, `rotterdam`, `denhaag` and `flevoland` also carry the attribute `bsn = 999992235`; `test-citizen-uwv`, `-toeslagen` and `-unive` have none.
 
 | Username | `municipality` | `organisation_type` | Realm roles |
 |---|---|---|---|
@@ -252,7 +257,7 @@ For Besluitvorming onder gedelegeerde bevoegdheid, `test-indiener-flevoland` pre
 
 `test-pa-flevoland` opens the PA-cockpit and `test-woo-flevoland` the Woo board.
 
-`test-citizen-bes` and `test-caseworker-bes`, for Caribisch Nederland, are the names its landing page at `/bes` pre-fills; the citizen maps to the same test BSN as the other test citizens, `999992235`. They were added to the export in v2026.11.3, and only to the export: that release created neither of them in the ACC or PROD realm, and a local Keycloak whose realm is older than the file does not have them until it is re-imported (see [Changing the realm](#changing-the-realm)).
+`test-citizen-bes` and `test-caseworker-bes`, for Caribisch Nederland, are the names its landing page at `/bes` pre-fills; the citizen carries the same test BSN as the other test citizens, `999992235`. They were added to the export in v2026.11.3, and only to the export: that release created neither of them in the ACC or PROD realm, and a local Keycloak whose realm is older than the file does not have them until it is re-imported (see [Changing the realm](#changing-the-realm)).
 
 ---
 
@@ -264,7 +269,7 @@ Editing `config/keycloak/ronl-realm.json` changes a **local** Keycloak, the next
 npm run docker:down:volumes && npm run docker:up
 ```
 
-This also removes what was added to the local realm by hand or by script; run `scripts/keycloak-add-entra-idp.sh` again afterwards if you use the Entra provider locally.
+This also removes what was added to the local realm by hand or by script; run `scripts/keycloak-add-entra-idp.sh` again afterwards if you use the Entra provider locally. A local realm older than the file also lacks what the sign-in and the BRP route now rely on; re-import it, or run the two scripts below against `http://localhost:8080`.
 
 **ACC and PROD are not re-imported.** An import either skips what already exists or overwrites whole definitions, discarding what those environments configured by hand — redirect URIs, web origins, client secrets, the identity provider, roles granted to employees. Their realms are changed through the admin REST API by idempotent scripts in `scripts/`:
 
@@ -274,6 +279,8 @@ This also removes what was added to the local realm by hand or by script; run `s
 | The ValidSign token claims | `keycloak-add-token-claim-mappers.sh` |
 | The Entra ID identity provider, its token storage, the `read-token` default role and the `broker-roles` client mapper | `keycloak-add-entra-idp.sh` |
 | The `lde-author` role and the clients for the Linked Data Explorer and the ttl-editor | `keycloak-add-lde-clients.sh` — with `LDE_ORIGIN` and `TTL_ORIGIN`; `--with-e2e` and `--with-test-author` add test accounts, refused against production |
+| The redirect URIs, web origins, post-logout URIs and PKCE of `ronl-business-api` | `keycloak-restrict-rba-client.sh` — with `RBA_ORIGINS`; `--enforce-pkce` once a frontend that sends PKCE is deployed on the tier; `RBA_PREVIEW_PREFIX` adds the ACC preview wildcard and is refused on production; `--probe` only checks, `--dry-run` only prints |
+| The `brp-raadpleger` role, its place in `caseworker`, the `bsn` mapper and the test citizens' `bsn` | `keycloak-add-brp-raadpleger.sh` — refuses a `TEST_BSN` outside `99999xxxx`, keeps a `bsn` a user already has, and reads the realm back |
 
 For the besluit roles, for example:
 
