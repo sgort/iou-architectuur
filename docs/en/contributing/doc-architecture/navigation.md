@@ -93,9 +93,9 @@ IOU Architecture Docs
     `mkdocs.yml` and reached from the slide-deck table on the home page.
 
     The Dutch tree mirrors the English one, and falls back to the English page where no
-    Dutch counterpart exists. As of 15 November 2026 that is seven pages: **OpenAPI
+    Dutch counterpart exists. As of 22 November 2026 that is seven pages: **OpenAPI
     Rendering**, the Linked Data Explorer's two **API Specification** pages (v1 and,
     since 6 October 2026, v2) and the RONL Business API's, the CPSV Editor's **Data Model Diagrams**, the **IOU
     Architecture** slide deck, and the Norm Editor's **Changelog & Roadmap**. The tree
-    was reconciled against `mkdocs.yml` again on 15 November 2026 and still matched.
+    was reconciled against `mkdocs.yml` again on 22 November 2026 and still matched.
 

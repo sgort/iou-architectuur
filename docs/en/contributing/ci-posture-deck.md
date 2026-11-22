@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "2d201d5"
-    Linked Data Explorer: "5bccbf2"
-    RONL Business API: "4579486"
+    CPSV Editor: "3ba847f"
+    Linked Data Explorer: "fe841f9"
+    RONL Business API: "be0a1f0"
 ---
 
 # CI Posture Across Repos — Slide Deck
@@ -50,10 +50,11 @@ which is a different question and the one a decision needs answered.
     - **What ships.** Slide 4's clean-up argument predates the move to building on the
       runner; in both applications the tested build is now the shipped build.
     - **The status footnote.** Its commits, `f5bae6a`/`be6bc54` and `f7fe80f`/`daa4816`,
-      are the 12 September heads. The current `acc` heads are `2d201d5` and `5bccbf2`. The
-      Linked Data Explorer's `main`, `e11e4ef`, carries the same tree as its `acc`; the CPSV
-      Editor's, `6910bb8`, is behind it by the Renovate bump of `zizmor-action` to v0.8.0, in
-      `zizmor.yml` and the register, and by lab material under `examples/lab/`.
+      are the 12 September heads. The current `acc` heads are `3ba847f` and `fe841f9`. The
+      Linked Data Explorer's `main`, `4e80c74`, carries the same tree as its `acc`; the CPSV
+      Editor's, `5d6345c`, is behind it by one fix,
+      [ttl-editor#268](https://github.com/sgort/ttl-editor/pull/268) — the vendor logo's scaling,
+      and a publish answer that is not JSON.
     - **How production deploys.** In the Linked Data Explorer a push to `main` now
       starts one ordered *Promote to Production* workflow, which deploys the backend
       before the sites, rather than each deploy workflow firing on its own. See
@@ -197,7 +198,7 @@ release now notices.
 ## Verified against the repositories
 
 The deck's status claims were re-checked on **12 September 2026** rather than taken on
-trust, and re-read against the current `acc` heads on **15 November 2026**:
+trust, and re-read against the current `acc` heads on **22 November 2026**:
 
 - **The rulesets were read from the API**, per branch, with
   `gh api repos/<owner>/<repo>/rules/branches/<branch>`, which reports the effective rules
@@ -230,15 +231,14 @@ trust, and re-read against the current `acc` heads on **15 November 2026**:
   the release SBOM, and v2026.10.1 the quarterly dependency review.
 - **`acc` and `main` carried the same code in both applications the deck covers** on
   12 September, when the deck's footnote named the promotion commits `f5bae6a` and
-  `be6bc54`, on 27 September and on 11 October. On 15 November the Linked Data Explorer's
-  `main`, `e11e4ef`, is the same tree as its `acc` head, `5bccbf2`; the CPSV Editor's `main`,
-  `6910bb8`, is not, by the `zizmor-action` v0.8.0 bump and the lab material merged to `acc`
-  (`2d201d5`) after its release.
+  `be6bc54`, on 27 September and on 11 October. On 22 November the Linked Data Explorer's
+  `main`, `4e80c74`, is the same tree as its `acc` head, `fe841f9`; the CPSV Editor's `main`,
+  `5d6345c`, is not, by one fix merged to `acc` (`3ba847f`) after its v2026.11.2 release.
 - **Production has run in both**: at the deck's export, the CPSV Editor's *Deploy PROD* at
   `f5bae6a` as run 94 and the Linked Data Explorer's *Deploy Frontend to Production* at
-  `be6bc54` as run 44; on 15 November the latest are *Deploy PROD* #114 at `6910bb8`
-  (12 November), and the Linked Data Explorer's *Promote to Production* #11 at `e11e4ef`
-  (12 November) — since v2026.09.7 that workflow is the
+  `be6bc54` as run 44; on 22 November the latest are *Deploy PROD* #116 at `5d6345c`
+  (21 November), and the Linked Data Explorer's *Promote to Production* #12 at `4e80c74`
+  (22 November) — since v2026.09.7 that workflow is the
   one workflow a push to its `main` deploys through. The deck's
   *"confirmed by eye — 9 Sep"* refers to the first builds, `#88` and `#39`.
 

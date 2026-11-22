@@ -41,10 +41,10 @@ rapid prototyping.
       uitgeleverde build; de bouw gebeurt op de runner in plaats van in een
       leverancierscontainer.
     - **De statusvoetnoot.** De genoemde commits zijn de koppen van 12 september. De
-      huidige `acc`-koppen zijn `2d201d5` en `5bccbf2`. De `main` van de Linked Data Explorer (`e11e4ef`)
-      draagt dezelfde boom als zijn `acc`; die van de CPSV Editor (`6910bb8`) loopt achter met de
-      Renovate-update van `zizmor-action` naar v0.8.0 (in `zizmor.yml` en het pinregister) en met
-      labmateriaal onder `examples/lab/`.
+      huidige `acc`-koppen zijn `3ba847f` en `fe841f9`. De `main` van de Linked Data Explorer (`4e80c74`)
+      draagt dezelfde boom als zijn `acc`; die van de CPSV Editor (`5d6345c`) loopt één fix achter
+      ([ttl-editor#268](https://github.com/sgort/ttl-editor/pull/268)): de schaal van het leverancierslogo,
+      en een publicatieantwoord dat geen JSON is.
 
     De gevraagde beslissing verandert hier niet door: de leveringspijplijn onder het
     prototypingspoor bestaat nog steeds niet.

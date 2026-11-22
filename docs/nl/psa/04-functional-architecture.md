@@ -2,11 +2,11 @@
 title: "4. Functionele architectuur"
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "6910bb8"
-    Linked Data Explorer: "e11e4ef"
-    RONL Business API: "67bac28"
+    CPSV Editor: "5d6345c"
+    Linked Data Explorer: "4e80c74"
+    RONL Business API: "1784a72"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -55,7 +55,7 @@ De inlogvoorziening kent een paar vaste rollen, en daarnaast rollen per proces.
 |---|---|---|
 | Inwoner | Eigen aanvragen doen en eigen zaken zien (fase 2) | Kern |
 | Gemachtigde | Namens een ander optreden, binnen de machtiging (fase 2) | Kern |
-| Behandelaar | Zaken van de eigen organisatie behandelen | Kern |
+| Behandelaar | Zaken van de eigen organisatie behandelen; persoonsgegevens opzoeken in de BRP | Kern |
 | Beheerder | Beheer van de eigen organisatie | Kern |
 | Procesrollen | Taken binnen één proces, zoals indiener, jurist of ondertekenaar; in het procesmodel gekoppeld aan taken | Eigen keuze |
 

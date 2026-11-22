@@ -1,21 +1,33 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "2d201d5"
-    Linked Data Explorer: "5bccbf2"
-    RONL Business API: "4579486"
+    CPSV Editor: "3ba847f"
+    Linked Data Explorer: "fe841f9"
+    RONL Business API: "be0a1f0"
 ---
 
 # Supply-Chain Pinning
 
 !!! info "Verification status"
-    All three repositories' claims were re-checked on **15 November 2026**, against
-    `2d201d5`, `5bccbf2` and `4579486`: every `uses:` reference listed and counted,
+    All three repositories' claims were re-checked on **22 November 2026**, against
+    `3ba847f`, `fe841f9` and `be0a1f0`: every `uses:` reference listed and counted,
     rulesets read from the API, `.nvmrc`, `.npmrc` and every `runs-on:` read from the
     workflow files, and `renovate.json` confirmed unchanged since 8 November. The App Service
     runtimes were not re-read; they are as read from Azure on 4 October 2026.
+
+    **The week to 22 November moved one action and how one repository deploys.** Renovate took
+    `zizmor-action` to v0.8.1 in the CPSV Editor on 21 November
+    ([ttl-editor#263](https://github.com/sgort/ttl-editor/pull/263)) and in the Linked Data Explorer
+    on 22 November ([linked-data-explorer#344](https://github.com/sgort/linked-data-explorer/pull/344)),
+    each with its register row on Renovate's branch. The RONL Business API's bump
+    ([ronl-business-api#461](https://github.com/sgort/ronl-business-api/pull/461)) has been open since
+    17 November with `audit` red on that register row, so its `acc` and `main` still pin v0.8.0. Since
+    v0.8.0 the action installs zizmor from a hash-checked wheel rather than a digest-pinned container —
+    see [the gate](#3-githubworkflowszizmoryml-the-gate). The CPSV Editor's two deploy workflows queue
+    per branch since 21 November. No ruleset, hook, `renovate.json`, `.nvmrc` or `.npmrc` setting
+    changed, and every pin count stands.
 
     **The week to 14 November moved versions and added one workflow.** All three moved their
     tooling Node to 24.22.2 on 12 November 2026, and the CPSV Editor and the Linked Data Explorer
@@ -246,11 +258,11 @@ RONL Business API's `acc` had gained both blocks on 12 September 2026, a month a
 the three keeps classic branch protection: the protection endpoint answers 404 for all six,
 so the rulesets are the whole gate.
 
-Ruleset shapes re-verified on 15 November 2026 for all three, with
+Ruleset shapes re-verified on 22 November 2026 for all three, with
 `gh api repos/<owner>/<repo>/rules/branches/<branch>` — which reports the effective rules
 from every ruleset at once, where reading one ruleset, or the classic protection endpoint
 alone, gives the wrong answer. Pin counts were re-derived the same day by listing `uses:`
-references at `2d201d5`, `5bccbf2` and `4579486`.
+references at `3ba847f`, `fe841f9` and `be0a1f0`.
 
 **This documentation repository is a known gap, deliberately deferred.** Its
 `requirements.txt` uses `>=` floors for five of six packages and its workflow
@@ -386,7 +398,7 @@ Three zizmor inputs are deliberate:
 
 | Input | Value | Why |
 |---|---|---|
-| `version` | `'1.29.0'` | The action defaults to `latest`. A supply-chain gate that pulls an unpinned tool on every run would defeat itself. The action resolves this through an internal digest table and runs a genuine container digest pin |
+| `version` | `'1.29.0'` | The action defaults to `latest`. A supply-chain gate that pulls an unpinned tool on every run would defeat itself. Since v0.8.0 — and all three pin v0.8.0 or later — the action installs this version from the lock file it ships for it (`support/locks/zizmor-1.29.0.txt`) with `pip download --require-hashes`, against the `sha256` of every zizmor wheel — a genuine hash pin. Until v0.8.0 it ran a digest-pinned container instead |
 | `advanced-security` | `false` | The default uploads SARIF and requires `security-events: write`; this job is `contents: read` only. It also means fork PRs work, since there is no upload step to fail |
 | `annotations` | `true` | Surfaces findings inline on the diff. Mutually exclusive with `advanced-security` — the action errors if both are true |
 
@@ -430,14 +442,18 @@ by hand.
 
 **The zizmor version is the opposite case**, although this page and all three
 repositories' own records described it the same way until mid-September 2026. It is
-the `version:` input of `zizmorcore/zizmor-action` — `1.29.0` in the Linked Data
-Explorer — and Renovate's github-actions manager maps that input to the Docker image
-`ghcr.io/zizmorcore/zizmor`, so Renovate **does** maintain it. It normally moves in
+the `version:` input of `zizmorcore/zizmor-action` — `1.29.0` in all three — and
+Renovate's github-actions manager maps that input to the Docker image
+`ghcr.io/zizmorcore/zizmor`, so Renovate **does** maintain it. The image is only how
+Renovate notices a release: since v0.8.0 the action does not run it. It normally moves in
 the same *github actions* group pull request as the action bump it depends on, and it
-has to: the action only runs zizmor versions in its own digest table, so zizmor
-1.30.1 needs zizmor-action v0.6.4. The two clear the cooldown separately, though, so
-a group branch can carry the image update alone for a while — and the audit fails
-until the action catches up. That failure is correct, not a flake.
+has to: the action only runs zizmor versions it ships a lock file for, so zizmor
+1.32.0 needs zizmor-action v0.8.1 — before v0.8.0 a digest table played that part, and
+1.30.1 needed v0.6.4. The two clear the cooldown separately, though, so a group branch
+can carry the image update alone for a while — and the audit fails until the action
+catches up. That failure is correct, not a flake. The CPSV Editor's and the Linked Data
+Explorer's registers describe the lock files since 21 and 22 November 2026; the RONL
+Business API's, on v0.8.0, still describes the digest table.
 
 A `Set up Node 24` step precedes both. Renovate declares
 `engines.node ^24.11.0` while the runner defaults to Node 22; npm accepts that
@@ -781,8 +797,8 @@ SBOM read `main` as well as `acc`, which need not share an `.nvmrc`. The RONL Bu
 `upstream-certs.yml` has carried the same literal since it arrived on 13 November, and builds
 nothing either. Renovate's `node` manager maintains all of them.
 
-**What still floats, and what is now decided rather than open.** Checked on 15 November
-2026 at `2d201d5`, `5bccbf2` and `4579486`, except the App Service runtimes, which are as
+**What still floats, and what is now decided rather than open.** Checked on 22 November
+2026 at `3ba847f`, `fe841f9` and `be0a1f0`, except the App Service runtimes, which are as
 read from Azure on 4 October 2026:
 
 - **The App Service runtime can be pinned to a major and no further — decided, not open.**
@@ -796,7 +812,7 @@ read from Azure on 4 October 2026:
   `NODE|24-lts` for its `.nvmrc`, `24.22.2` since 12 November. All four were read from Azure on 4 October
   2026. On 29 October all four already ran the patched Node — v22.23.4 and v24.22.1,
   checked over SSH and recorded in `93c061f` and `bf2467c` — the `-lts` image having moved
-  on its own; that was not re-read on 8 or 15 November, and nobody has yet read which patch
+  on its own; that was not re-read on 8, 15 or 22 November, and nobody has yet read which patch
   the hosts run since the 24.22.2 move. The Linked Data Explorer's backend is the exception to "switch first, then merge": `libxmljs2` builds
   against NAN rather than N-API, so its binary is bound to one major, and between the
   switch and a rebuilt deploy the backend cannot load it. Since 23 September both of its
@@ -839,7 +855,7 @@ Two more were on that list until 19 September 2026 and are now closed:
 - **The runner image**, which ran on `ubuntu-latest` in every job — 6 in the CPSV Editor,
   12 in the Linked Data Explorer, 13 in the RONL Business API — and moved whenever GitHub
   moved it. **Every job in all three now names `ubuntu-24.04`**: 12, 21 and 24 jobs
-  respectively on 15 November 2026, the counts having grown with the `changes` jobs that
+  respectively on 22 November 2026, the counts having grown with the `changes` jobs that
   made the build checks requireable, the daily audit and SBOM jobs, the promotion
   workflows, the `lockfile-review` jobs, the quarterly review and, in the RONL Business
   API, the daily certificate check. (Counted by `runs-on:`.
@@ -908,8 +924,8 @@ which **shipped in September 2026 and now runs in all three repositories** — s
     easy to falsify as a digest**, and neither the audit nor review catches it.
 
     It was reconciled in v2026.08.34 and matches today at **45 `uses:`
-    references across 15 workflows**, digests agreeing — re-counted on 15 November
-    2026 at `4579486`, the count having grown with the Semgrep workflow, `azure/login`
+    references across 15 workflows**, digests agreeing — re-counted on 22 November
+    2026 at `be0a1f0`, the count having grown with the Semgrep workflow, `azure/login`
     for the OIDC backend deploy, and the daily-audit, SBOM, promotion, quarterly
     review and daily certificate-check workflows. That first
     reconciliation was manual and prompted by a docs review rather than by any check
@@ -922,7 +938,7 @@ which **shipped in September 2026 and now runs in all three repositories** — s
     `30 uses: references across 9 workflows` headline. The check reads the first match
     in the file, so it bound on the real headline and stayed green while two numbers in
     one document disagreed. `537fc2f` fixed it in the repository, and the section has kept pace since: it reads
-    `45 uses: references across 15 workflows` (`SECURITY-PIPELINE.md:517` at `4579486`).
+    `45 uses: references across 15 workflows` (`SECURITY-PIPELINE.md:550` at `be0a1f0`).
 
 **A deploy secret can be wrong in a way no check here sees.** Piping a credential from the
 Azure CLI straight into `gh secret set` — `az staticwebapp secrets list … -o tsv | gh secret
@@ -1117,6 +1133,15 @@ there, and merged green. So did the Linked Data Explorer's *github actions* grou
 v7.1.0, `upload-artifact` v7.0.2, `zizmor-action` v0.8.0) and the CPSV Editor's
 `zizmor-action` v0.8.0 ([ttl-editor#247](https://github.com/sgort/ttl-editor/pull/247)): the
 register row sat on Renovate's branch (`a5a16a7`, `7626a4d`) and `audit` passed before the merge.
+The `zizmor-action` v0.8.1 bumps kept it in two of the three: the CPSV Editor's
+([ttl-editor#263](https://github.com/sgort/ttl-editor/pull/263)) and the Linked Data Explorer's
+([linked-data-explorer#344](https://github.com/sgort/linked-data-explorer/pull/344)) carried their
+register rows on Renovate's branch (`69be5ac`, `c0065c8`) and merged on 21 and 22 November with
+`audit` green. The RONL Business API's
+([ronl-business-api#461](https://github.com/sgort/ronl-business-api/pull/461)), open since
+17 November, shows the check doing its job meanwhile: `audit` fails with *"workflow pins
+45d7276c9ca7… (v0.8.1) but SECURITY-PIPELINE.md records only 53290badfa36… (v0.8.0)"*, and
+the pull request waits for its row.
 
 !!! danger "If it proves flaky the answer is `--offline`, never `continue-on-error`"
     The known cost is a network call inside a required job. `--offline` drops the

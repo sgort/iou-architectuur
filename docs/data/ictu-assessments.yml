@@ -905,6 +905,28 @@ assessments:
           them — 15 in the 30 days, weekly since 29 October, and none open on
           the Sunday.
 
+  - date: 2026-11-22
+    kind: measured
+    heads:
+      TTL: 3ba847f
+      LDE: fe841f9
+      RBA: be0a1f0
+    note: >-
+      A week in which no cell moved. The lock-file refreshes Renovate opened
+      on 16 November were still open in all three on the Sunday, green apart
+      from its own pending stability check, so the single catch-up of
+      12 November has not yet become a cadence; the CPSV Editor and the Linked
+      Data Explorer merged a weekly batch of other updates, the RONL Business
+      API none. The RONL Business API fixed eight Dependabot alerts, dismissed
+      two with a reason on the alert, and wrote a reason and a revisit trigger
+      for each of the three it keeps open. `tsx` entered the Linked Data
+      Explorer's backend with no checklist box ticked. Rulesets, Renovate
+      configuration and cooldowns are unchanged.
+    scores:
+      TTL: [3, 4, 3, 4, 2, 4, 5, 5, 4, 4, 4]
+      LDE: [3, 4, 3, 4, 2, 4, 5, 4, 4, 3, 4]
+      RBA: [3, 4, 3, 4, 2, 4, 4, 4, 4, 4, 4]
+
 # The test work of the same period, which the guideline above barely scores.
 # Counted from the tree at each weekly commit: files whose name ends in
 # `.test.*` or `.spec.*`, end-to-end specs under an `e2e/` directory, the
@@ -967,3 +989,7 @@ tests:
     TTL: {files: 77, e2e: 4, ci: 5, workflows: 8, floor: true}
     LDE: {files: 175, e2e: 0, ci: 8, workflows: 12, floor: true}
     RBA: {files: 380, e2e: 20, ci: 12, workflows: 15, floor: true}
+  - date: 2026-11-22
+    TTL: {files: 83, e2e: 4, ci: 5, workflows: 8, floor: true}
+    LDE: {files: 176, e2e: 0, ci: 8, workflows: 12, floor: true}
+    RBA: {files: 383, e2e: 20, ci: 12, workflows: 15, floor: true}

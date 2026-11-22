@@ -2,8 +2,8 @@
   "docs_built": "2026-11-22",
   "last_patch": {
     "date": "2026-11-22",
-    "kind": "Component sync",
-    "summary": "CPSV Editor v2026.11.2 and Linked Data Explorer v2026.11.3, both in production: the editor imports each statement whole and reads a field only from its own property, its publish dialog shows the steps publishing really takes, and a lapsed session asks to sign in again; the Linked Data Explorer accepts only access tokens, says when sign-in cannot be checked, explains a failed publish, and reports a required service described elsewhere as a warning.",
+    "kind": "Component sync and weekly pass",
+    "summary": "CPSV Editor v2026.11.2 and Linked Data Explorer v2026.11.3, both in production: the editor imports each statement whole and reads a field only from its own property, its publish dialog shows the steps publishing really takes, and a lapsed session asks to sign in again; the Linked Data Explorer accepts only access tokens, says when sign-in cannot be checked, explains a failed publish, and reports a required service described elsewhere as a warning; the weekly pass then re-checked the contributing pages and the Project Start Architectuur against all five components, recording that zizmor is now installed from hash-locked wheels and adding a risk for the citizen service number in the browser and the incomplete lookup audit; the ICTU dependency guideline holds at 42, 40 and 40.",
     "previous": {
       "date": "2026-11-18",
       "kind": "Component sync",
@@ -13,6 +13,18 @@
       {
         "label": "linked-data-explorer#358",
         "url": "https://github.com/sgort/linked-data-explorer/issues/358"
+      },
+      {
+        "label": "ronl-business-api#482",
+        "url": "https://github.com/sgort/ronl-business-api/issues/482"
+      },
+      {
+        "label": "ronl-business-api#483",
+        "url": "https://github.com/sgort/ronl-business-api/issues/483"
+      },
+      {
+        "label": "ttl-editor#270",
+        "url": "https://github.com/sgort/ttl-editor/issues/270"
       }
     ]
   },

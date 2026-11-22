@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "2d201d5"
-    Linked Data Explorer: "5bccbf2"
-    RONL Business API: "4579486"
+    CPSV Editor: "3ba847f"
+    Linked Data Explorer: "fe841f9"
+    RONL Business API: "be0a1f0"
 ---
 
 # Design & Handoff
