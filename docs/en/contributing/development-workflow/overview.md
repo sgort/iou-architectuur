@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "2d201d5"
-    Linked Data Explorer: "5bccbf2"
-    RONL Business API: "4579486"
+    CPSV Editor: "3ba847f"
+    Linked Data Explorer: "fe841f9"
+    RONL Business API: "be0a1f0"
 ---
 
 # Development Workflow
@@ -79,12 +79,17 @@ Since v2026.11.4 the RONL Business API's `changes` job counts a change to the ro
 `package.json` or `package-lock.json` against all four targets, not only the backend.
 `/bump-release` always bumps the root `package.json`, so a promotion that carries a
 release now redeploys all four applications, and a lockfile-only promotion no longer
-deploys the backend alone. One pattern still differs from its acceptance filter: the
-frontend's leaves out `keycloak-themes/**`
+deploys the backend alone. Since 17 November 2026 every production pattern matches its
+acceptance filter: the frontend's now includes `keycloak-themes/**` too, so a
+theme-only promotion runs the login theme's guard tests on `main` as they run on `acc`
 ([ronl-business-api#457](https://github.com/sgort/ronl-business-api/issues/457)). The
 production deploy workflows no longer trigger on the push themselves; they are called
 by the promotion. The CPSV Editor has no backend and keeps a single *Deploy PROD*
-workflow that runs on the push to `main`.
+workflow that runs on the push to `main`. Since 21 November 2026 both its deploy
+workflows queue per branch (`concurrency`, `cancel-in-progress: false`): a deploy that
+has started always finishes, and a newer merge replaces only a run still waiting.
+Before that, merges minutes apart deployed in parallel, Azure cancelled the older
+upload, and the run turned red although nothing broke.
 
 ## 5. Documentation
 

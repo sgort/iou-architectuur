@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "2d201d5"
-    Linked Data Explorer: "5bccbf2"
-    RONL Business API: "4579486"
+    CPSV Editor: "3ba847f"
+    Linked Data Explorer: "fe841f9"
+    RONL Business API: "be0a1f0"
 ---
 
 # Contributing to IOU Architecture
@@ -74,6 +74,9 @@ Since 12 September 2026 each of the three checks its mirror at every release, wi
 mirror is pushed at a release rather than after every merge, so between releases it lags.
 The check reports and never pushes — see
 [Supply-Chain Pinning — the GitLab mirror](the-gitlab-mirror.md).
+This site cuts no releases, so its own mirror does not wait for one: since
+15 November 2026 it is fast-forwarded at every housekeeping after a merged pull request,
+`acc` and `main` alike, and on 22 November both its branches matched GitHub's.
 The Norm Editor and the CPRMV API are developed on GitLab, where their pipelines run.
 
 For component-specific development setup, refer to each component's Developer Docs:

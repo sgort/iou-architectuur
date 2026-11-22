@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # Vendor Integration
 
 ---
@@ -50,7 +54,7 @@ For other vendors (currently Blueriq as the reference implementation), the form 
 - **Service notes** — free-text description of the vendor implementation
 - **Certification** — see below
 
-The logo field works the same way as the Organisation tab: upload a JPG or PNG, and an asset path is generated for inclusion in the Turtle output.
+The logo is uploaded as on the Organisation tab, and an asset path, `./assets/{vendor}_vendor_logo.png`, is generated for the Turtle output (`schema:image`). Unlike the organisation's logo, it is not resized: the editor keeps the file exactly as uploaded and sends it at that size when you publish, so a large image makes a large publish. The hint under the button says *PNG, JPG, SVG (max 2MB)*; the editor does not check the size.
 
 ---
 

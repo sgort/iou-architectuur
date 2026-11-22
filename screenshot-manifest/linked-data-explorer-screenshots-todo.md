@@ -1,6 +1,7 @@
 # Linked Data Explorer — screenshots to capture
 
-*A running record across syncs, newest first. Last reviewed for **v2026.11.2** on
+*A running record across syncs, newest first. Last reviewed for **v2026.11.3** on
+22 November 2026 — nothing to capture. Before that, **v2026.11.2** on
 12 November 2026 — two NEW captures for the sign-in are open; the figures are in the pages,
 the files are not yet captured. The two REPLACE rows of v2026.10.1 stay open.*
 
@@ -26,6 +27,10 @@ stale UI.
 **Nothing outstanding.** All three were re-shot on 19 August 2026 and are in
 `docs/assets/screenshots/`; a non-strict `mkdocs build` reports zero
 missing-image warnings.
+
+## Sync v2026.11.2 → v2026.11.3 — nothing to capture
+
+Reviewed on 22 November 2026 for **v2026.11.3**, in production (`origin/main` `4e80c74`). The release hardens sign-in and publishing in the backend and changes how a required service described elsewhere is reported; no captured view shows a changed element. Service links are named by DMN identifier in `linked-data-explorer-dmn-service-links.png`, so the new fragment naming does not appear in it. The optional signed-out re-shoot of v2026.11.2 is unaffected.
 
 ## Sync v2026.11.1 → v2026.11.2 — two NEW, captured 13 November 2026
 

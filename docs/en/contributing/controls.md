@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "2d201d5"
-    Linked Data Explorer: "5bccbf2"
-    RONL Business API: "4579486"
+    CPSV Editor: "3ba847f"
+    Linked Data Explorer: "fe841f9"
+    RONL Business API: "be0a1f0"
 ---
 
 # Controls at a Glance
@@ -45,7 +45,7 @@ run, and **Branch Protection** is what turns the rest from checks into gates.
 | **Linked Data Explorer** | pull request · `audit` · `scan` · `deploy` · `Build and Deploy Frontend` · `Build and Deploy ROPA Site` · `lockfile-review` · no deletion · no force-push | pull request · `audit` · `scan` · no deletion · no force-push |
 | **RONL Business API** | pull request · `audit` · `scan` · `build` · `Build and Deploy ACC Frontend` · `Build and Deploy ACC PA Demo` · `Build and Deploy ACC Public Site` · `lockfile-review` · no deletion · no force-push | pull request · `audit` · `scan` · no deletion · no force-push |
 
-Read from the API on 15 November 2026 with `gh api repos/<owner>/<repo>/rules/branches/<branch>`,
+Read from the API on 22 November 2026 with `gh api repos/<owner>/<repo>/rules/branches/<branch>`,
 which reports the effective rules from every ruleset at once. Three things this table does
 not say, and all three matter:
 
@@ -63,10 +63,10 @@ not say, and all three matter:
   formatting, registry signatures (since 10 October 2026, in all three), pin truth, the
   register and — in the Linked Data Explorer — the check that the RIP phase-model copies
   match their source, and — in the RONL Business API — the swimlane-fixture check, the
-  declarations-only check on `@ronl/shared` and, since 14 November 2026, the tests of its
-  stylelint rules, its Keycloak production guard and its promotion targets all report
-  through it. One red cross can mean
-  any of them.
+  declarations-only check on `@ronl/shared`, since 14 November 2026 the tests of its
+  stylelint rules, its Keycloak production guard and its promotion targets, and since
+  17 November the tests of two scripts that change its live Keycloak realms, all report
+  through it. One red cross can mean any of them.
 - **`lockfile-review` is the newest, since 6 October 2026, in all three.** It runs on every
   pull request and succeeds at once when `package-lock.json` is unchanged, so it can be
   required without ever going missing.
@@ -130,7 +130,7 @@ is addressed, and what the controls do not yet reach:
 | R6 — a cooldown of at least 7 days | [Supply-Chain Pinning](supply-chain.md#the-cooldown-stops-at-the-manifest) | the cooldown now exists at the package-manager level too, but `npm ci` ignores it by design and npm older than 11.10 ignores it silently — which leaves the RONL Business API, whose `.nvmrc` names Node 22.23.4 and so npm 10.9.9, uncovered on its own toolchain |
 | R7, R8 — assess majors; update on a schedule | [Dependency Scanning](dependency-scanning.md#renovate-maintains-dependencies-not-the-tree) | the first-patch rule exists since 25 September 2026 but covers npm alone — action, runner, Node and Docker majors wait on Dependency Dashboard approval, which, on the stricter reading of R7, leaves no written assessment |
 | R9 — reviewed MR, whole pipeline green, no automerge | [Branch Protection](branch-protection.md#what-the-rulesets-still-do-not-require) | met on `acc` since 19 September 2026, and since 6 October 2026 every `acc` also requires `lockfile-review`, which fails on a package resolved outside the registry or without an integrity hash and puts licence changes, new install scripts, downgrades and new direct dependencies in front of the reviewer ([linked-data-explorer#248](https://github.com/sgort/linked-data-explorer/issues/248), closed); no `main` requires a build or a test |
-| R10 — daily audit, including released versions | [Dependency Scanning](dependency-scanning.md#what-nothing-watches-between-merges) | a daily audit of `acc` and `main` and a committed SBOM per release exist in all three since 24 and 26 September 2026, and the audit has caught real advisories in all three — the Linked Data Explorer ([#240](https://github.com/sgort/linked-data-explorer/issues/240)), the RONL Business API ([#303](https://github.com/sgort/ronl-business-api/issues/303), [#323](https://github.com/sgort/ronl-business-api/issues/323)) and the CPSV Editor ([#202](https://github.com/sgort/ttl-editor/issues/202)), and since 11 October 2026 again in the Linked Data Explorer ([#305](https://github.com/sgort/linked-data-explorer/issues/305), [#313](https://github.com/sgort/linked-data-explorer/issues/313)) and the RONL Business API ([#389](https://github.com/sgort/ronl-business-api/issues/389), [#410](https://github.com/sgort/ronl-business-api/issues/410)); #313 closed on 13 November 2026, the day after lock-file maintenance took `follow-redirects` to 1.16.2, so no daily audit is red; still open are the alerts neither fixed nor dismissed with a reason, in all three, the audit passing moderates and development-only advisories, and nothing re-analysing a stored SBOM |
+| R10 — daily audit, including released versions | [Dependency Scanning](dependency-scanning.md#what-nothing-watches-between-merges) | a daily audit of `acc` and `main` and a committed SBOM per release exist in all three since 24 and 26 September 2026, and the audit has caught real advisories in all three — the Linked Data Explorer ([#240](https://github.com/sgort/linked-data-explorer/issues/240)), the RONL Business API ([#303](https://github.com/sgort/ronl-business-api/issues/303), [#323](https://github.com/sgort/ronl-business-api/issues/323)) and the CPSV Editor ([#202](https://github.com/sgort/ttl-editor/issues/202)), and since 11 October 2026 again in the Linked Data Explorer ([#305](https://github.com/sgort/linked-data-explorer/issues/305), [#313](https://github.com/sgort/linked-data-explorer/issues/313)) and the RONL Business API ([#389](https://github.com/sgort/ronl-business-api/issues/389), [#410](https://github.com/sgort/ronl-business-api/issues/410)); #313 closed on 13 November 2026, the day after lock-file maintenance took `follow-redirects` to 1.16.2, so no daily audit is red; the Linked Data Explorer's went red once since, on 18 November, on a `picomatch` high that GitHub withdrew that afternoon ([#345](https://github.com/sgort/linked-data-explorer/issues/345), closed the next day); still open are the alerts neither fixed nor dismissed with a reason, in all three, the audit passing moderates and development-only advisories, and nothing re-analysing a stored SBOM |
 
 The finding the assessment ranked first has since been closed. In the CPSV Editor and the
 Linked Data Explorer's frontend, **the build that passed the tests was not the build that

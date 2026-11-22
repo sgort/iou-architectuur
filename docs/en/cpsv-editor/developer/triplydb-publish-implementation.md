@@ -28,7 +28,7 @@ handlePublish() in App.jsx:
     30%  — Generate TTL (ttlGenerator.js)
            Compute graph IRI (buildGraphIRI); collect logos as data URLs
     60%  — publishToTriplyDB(): one call to the backend
-   100%  — Show result (success, or warning when only the service sync failed)
+   100%  — Show result (success, or a warning naming each part that failed: the service sync, a logo)
         ↓
 publishToTriplyDB() in triplydbHelper.js:
     POST {backendUrl}/v1/triplydb/publish
@@ -123,7 +123,9 @@ file name, non-empty Turtle, and logos with a plain file name and an image data 
 then uploads the Turtle into the graph, uploads each logo as an asset, and syncs the
 dataset's service. A failed logo is reported in `logos` with `ok: false` and does not fail
 the publish; a failed service sync is reported as `serviceUpdated: false` with
-`serviceError`, and the editor shows it as a warning.
+`serviceError`. `handlePublish` turns each into a warning — *Service update failed:
+{serviceError}* and *Logo not uploaded: {fileName}* — and shows them together as *Published
+with warning*.
 
 Errors thrown, for the dialog to show:
 

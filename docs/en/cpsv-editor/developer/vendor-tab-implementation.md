@@ -1,3 +1,7 @@
+---
+component: CPSV Editor
+---
+
 # Vendor Tab Implementation
 
 ---
@@ -138,5 +142,4 @@ useEffect(() => {
 
 - **v1.9.1** — Import support: parse `ronl:VendorService` entities from imported Turtle files, enabling full round-trip for vendor metadata.
 - **v1.10.0** — Additional vendor form components (Oracle Policy Automation, IBM ODM).
-- **v2.0.0** — Logo upload integration in the TriplyDB publish flow; currently logos generate an asset path but are not uploaded.
 - **v2.1.0** — Public certification registry: SPARQL query across all `ronl:VendorService` instances with certified status, displayed as a searchable table.

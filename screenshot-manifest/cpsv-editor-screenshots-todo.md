@@ -1,6 +1,7 @@
 # CPSV Editor — screenshots to capture
 
-*A running record across syncs, newest first. Last reviewed for v2026.11.1 on
+*A running record across syncs, newest first. Last reviewed for v2026.11.2 on
+22 November 2026 — item 11 (the publish dialog, three steps) is open, item 12 optional. Before that, v2026.11.1 on
 12 November 2026 — sign-in and publishing through the backend. All six captures it
 asked for (items 5–10) were made on 13 November 2026. Item 8 records the progress
 indicators as they are, and is re-shot once ttl-editor#249 item 1 is fixed. Item 3, an
@@ -45,6 +46,17 @@ describes. Items 5–10, from v2026.11.1, are below and done.
 - No NL screenshots are needed — the NL CPSV Editor pages are placeholders and
   embed no images. Only `developer/due-diligence.md` is a full translation, and
   it carries no figures.
+
+## Sync v2026.11.1 → v2026.11.2 — one REPLACE, one optional REPLACE
+
+Reviewed on 22 November 2026 for **v2026.11.2**, in production (`origin/main` `5d6345c`). The publish dialog now shows three steps, so item 8 is re-shot as item 11; the required-services picker keeps **Add** disabled until a service is chosen. Fix #268 (vendor logo scaling) is on `acc` only and asks for no capture yet.
+
+| # | Status | File | Embedding page(s) | What it must show | Trigger |
+|---|---|---|---|---|---|
+| 11 | **REPLACE** (closes item 8's re-shoot) | `cpsv-editor-publish-progress.png` | `user-guide/publishing-to-triplydb.md` (§ Publishing) | The dialog while publishing, as an author: header *Publishing to TriplyDB...* with a spinner, the bar at 60%, **three** steps — ✓ Validating form, ✓ Generating TTL, **● Publishing to TriplyDB** in bold blue — and *Publishing...* disabled. The current image shows four steps (✓ Uploading to TriplyDB, ○ Updating service), which no longer exist. Update alt and caption with it (§4.2) | v2026.11.2 (`PublishDialog.jsx:14-18, 176-188`) |
+| 12 | **REPLACE** (optional) | `cpsv-editor-service-required-services.png` | `user-guide/filling-in-the-tabs.md` (Service tab) | Same framing, but either with a published service chosen in the select (Add enabled), or as now with *Choose a published service* and **Add** visibly dimmed. The current image shows Add fully enabled with nothing chosen, which can no longer happen; the caption still holds | v2026.11.2 (`RequiredServicesSection.jsx:151`) |
+
+Item 8 is re-shot as item 11. Considered and not proposed: a *View only* note image and a *Published with warning* image (no page embeds one; the text carries them).
 
 ## Sync v2026.11.0 → v2026.11.1 — two NEW, two REPLACE, two optional, captured 13 November 2026
 

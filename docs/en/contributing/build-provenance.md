@@ -1,21 +1,19 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "2d201d5"
-    Linked Data Explorer: "5bccbf2"
-    RONL Business API: "4579486"
+    CPSV Editor: "3ba847f"
+    Linked Data Explorer: "fe841f9"
+    RONL Business API: "be0a1f0"
 ---
 
 # Build Provenance
 
 !!! info "Verification status"
-    All four implementations were re-checked on **15 November 2026**, against `2d201d5`,
-    `5bccbf2` and `4579486`, by reading every workflow that carries the `env:` block — eight
-    files, unchanged in number — and the RONL Business API's production `/v1/health`. The Linked
-    Data Explorer's production backend did not answer from the pass, so its build id below is
-    read from the promotion run rather than from the app.
+    All four implementations were re-checked on **22 November 2026**, against `3ba847f`,
+    `fe841f9` and `be0a1f0`, by reading every workflow that carries the `env:` block — eight
+    files, unchanged in number — and both production backends' `/v1/health`.
 
     **The two columns that used to be the odd ones out no longer are.** Until
     19 September 2026 the CPSV Editor and the Linked Data Explorer handed their build
@@ -76,18 +74,18 @@ commit share it. The run number is what makes the pair unique per artifact.
 number, and every deploy in one promotion shares it: on 27 September 2026 the Linked
 Data Explorer's production frontend bundle and its backend's `/v1/health` both read
 `build 4148c9a · #2`, and the RONL Business API's public-site bundle and backend both
-read `2443adc` and `3` — Promote to Production runs #2 and #3. On 15 November 2026 the RONL
-Business API's backend read `67bac28` with run `15`, its latest promotion, of 14 November,
-which deployed all four applications. The Linked Data Explorer's latest promotion is #11 at
-`e11e4ef`, of 12 November, which deployed the backend and the frontend and skipped the ROPA
-site. On 11 October the
+read `2443adc` and `3` — Promote to Production runs #2 and #3. On 22 November 2026 the RONL
+Business API's backend read `1784a72` with run `18`, its latest promotion, of 18 November,
+which deployed the backend, the frontend and the PA demo and skipped the public site. The
+Linked Data Explorer's backend read `build 4e80c74 · #12`, its latest promotion, of that
+morning, which deployed the backend and the frontend and skipped the ROPA site. On 11 October the
 Linked Data Explorer's had read `build 03f48bd · #5`, not its latest promotion, #6 at
 `82f461f`, which carried only the SBOM fix, decided that nothing needed deploying, and
 skipped all three deploys. The pair is still unique
 per promotion, which is what it is for; it now names *which promotion* rather than
 *which execution of that deploy workflow*. Acceptance is unchanged — its workflows are
 not called — and so is the CPSV Editor, whose production workflow still triggers itself
-(its latest run, `Deploy PROD` #114, built `6910bb8` on 12 November 2026).
+(its latest run, `Deploy PROD` #116, built `5d6345c` on 21 November 2026).
 
 ---
 

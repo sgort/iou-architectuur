@@ -1,10 +1,10 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    Linked Data Explorer: "5bccbf2"
-    RONL Business API: "4579486"
+    Linked Data Explorer: "fe841f9"
+    RONL Business API: "be0a1f0"
 ---
 
 # OpenAPI Rendering
@@ -150,7 +150,10 @@ state-changing operations, among them `POST /dmns/process/deploy` and
 `DELETE /cache/clear`. There is still no global `security`, so reads stay open, and
 `POST /dmns/deploy` takes the token optionally: without one, and only on a tier that
 allows anonymous test deploys (acceptance among them), it deploys to the `TestOnly`
-tenant for 48 hours, at most ten per address per hour. Its `/v2` document declares no
+tenant for 48 hours, at most ten per address per hour. Since v2026.11.3 a secured
+operation that cannot check a token — Keycloak's signing keys could not be fetched —
+answers `503` with code `AUTH_UNAVAILABLE` rather than `401`, so a Test Request that
+fails that way is not a bad token. Its `/v2` document declares no
 scheme. Test Request against a secured operation therefore needs a token, as it does
 on the RONL Business API. CORS remains a browser policy, not an authorization
 boundary, and a Send button on a public documentation page is still a different
@@ -167,7 +170,7 @@ its acceptance `CORS_ORIGIN` includes `https://acc.iou-architectuur.open-regels.
 so Test Request works from both documentation tiers.
 
 Measured against the Linked Data Explorer's acceptance backend on 16 September 2026
-(and identically again on 27 September, 4 October, 11 October, 8 November and 15 November), varying only the
+(and identically again on 27 September, 4 October, 11 October, 8 November, 15 November and 22 November), varying only the
 `Origin` header on `GET /v1/health`:
 
 | `Origin` sent | Status | `Access-Control-Allow-Origin` |
@@ -177,7 +180,7 @@ Measured against the Linked Data Explorer's acceptance backend on 16 September 2
 | `https://acc.linkeddata.open-regels.nl` | 200 | echoed |
 | `http://localhost:8000` | 200 | absent |
 
-Measured against the RONL Business API's acceptance backend on 15 November 2026 (identical to 4 and 11 October and 8 November):
+Measured against the RONL Business API's acceptance backend on 22 November 2026 (identical to 4 and 11 October, 8 November and 15 November):
 
 | `Origin` sent | Status | `Access-Control-Allow-Origin` |
 |---|---|---|
@@ -207,7 +210,7 @@ made the Linked Data Explorer's table possible: a disallowed origin no longer an
     Azure Static Web Apps reads `staticwebapp.config.json` from the app artifact
     root, and `mkdocs build` never copies the file into `site/`.
 
-    Verified 16 September 2026, and again on 27 September, 11 October, 8 November and 15 November: neither `iou-architectuur.open-regels.nl` nor
+    Verified 16 September 2026, and again on 27 September, 11 October, 8 November, 15 November and 22 November: neither `iou-architectuur.open-regels.nl` nor
     `acc.iou-architectuur.open-regels.nl` returns a `Content-Security-Policy` or
     `X-Frame-Options` header, and both return `Referrer-Policy: same-origin`
     where the file declares `strict-origin-when-cross-origin`.

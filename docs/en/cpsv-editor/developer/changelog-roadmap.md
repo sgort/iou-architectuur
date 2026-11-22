@@ -8,6 +8,30 @@ component: CPSV Editor
 
 ## Changelog
 
+### v2026.11.2 — Import Reads Each Statement Whole, and Publishing Shows Its Real Steps (November 2026)
+
+> Importing: [Import, Export & Live Preview](../features/import-export.md) and [Import & Export TTL](../user-guide/import-export-ttl.md). Signing in and deploying: [Getting Started](../user-guide/getting-started.md#signing-in) and [The DMN Tab](../user-guide/dmn-tab.md#step-4-deploy-to-operaton). Publishing: [Publishing to TriplyDB](../user-guide/publishing-to-triplydb.md) and [TriplyDB Publish Implementation](triplydb-publish-implementation.md). The required-services picker: [Filling In the Tabs](../user-guide/filling-in-the-tabs.md#service-tab). How deploys run: [Deployment](deployment.md). Measured suites and the phase scripts: [Testing](testing.md).
+
+**An import no longer drops an entity because of a semicolon.** The importer used to close a temporal rule, parameter, concept, cost, output or CPRMV rule on the first line that held a `.` and no `;`, wherever they stood. A closing literal containing `;` therefore never closed its block, and the entity was silently lost; a continuation line whose only `.` sat inside an IRI (`<https://x.nl/a> ,`) closed its block too early. A statement now ends where its full stop stands outside string literals and IRIs, ignoring a trailing comment. Parsing every example TTL before and after gives identical results (ttl-editor#258).
+
+**Bare-named fields are read only from their own predicate.** `sector`, `thematicArea`, `isBasedOn`/`extends`, `validFrom`, `validUntil` and `confidenceLevel` were taken from any line containing the name, so a URI path or a description that mentioned "sector" became the sector, and the next export wrote `cv:sector <in>`. They are now matched in the predicate position only, under any prefix; legacy `ronl:` forms and `cprmv:extends`/`cprmv:confidence` are still read (ttl-editor#225).
+
+**Signing in: three follow-ups.** An author whose session has lapsed by the time they click **Deploy to Operaton** is told *Your session has expired. Sign in again to deploy.*, instead of the deploy going out without a token and becoming a test deploy. The **View only** note says that a DMN can still be test-deployed where the backend offers it, naming the tenant and how long it stays, instead of calling deploying locked outright. And a late report from the tab's own sign-in popup no longer starts a second session check (ttl-editor#240).
+
+**Publishing shows the steps it actually takes.** Since publishing became one backend call, the dialog's four indicators no longer followed it. It now lists three — *Validating form*, *Generating TTL* and *Publishing to TriplyDB* — with the running step in bold and the finished ones ticked. A logo the backend could not upload is reported as a warning that names the file, alongside a failed service sync, in one *Published with warning* (ttl-editor#249).
+
+**The required-services picker keeps its states apart.** It no longer shows the previous dataset's services while a new dataset loads, and an edit that does not change the dataset does not reload the list (ttl-editor#227). **Add** is disabled until a service is chosen, a rejection message clears on **Remove** and on typing (ttl-editor#228), and **Refresh list** is disabled when no dataset is configured (ttl-editor#238).
+
+**Deploys queue per branch instead of racing.** Merges that landed minutes apart deployed in parallel, and Azure cancelled the older upload when the newer one started, which the deploy action reports as *Deployment Failed*. Both deploy workflows now set `concurrency` per ref with `cancel-in-progress: false`: a deploy that has started always finishes, and a waiting one is replaced by a newer one, which GitHub shows as cancelled. Each pull request has its own ref, so previews still run side by side (ttl-editor#264).
+
+**Every test file belongs to a phase script, and a test says so.** Eighteen test files ran in `test:ci` but in no scoped script. `test:roundtrip` now also selects the parser and import tests, a new `test:app` runs the `src/App.*` suites, and `test:p2`, `test:p4` and `test:p5` take the rest. `src/testing/phaseScripts.test.js` fails, naming the file, when a test file matches no phase script or a `:watch` script selects other files than its run script. The end-to-end preflight now also checks that Keycloak's realm `ronl` answers, so a missing Keycloak is named before a journey starts.
+
+**Also in this release.** The Legal tab no longer reports a BWB identifier when none was entered (ttl-editor#98), and each reset gets its own default `requires` list instead of a shared one (ttl-editor#229). The Thuisbatterij example subprocess pinned its decisions to tenant 46, which has none; it now resolves the shared, untenanted decisions (ttl-editor#205). `examples/lab/` is new, a home for lab concepts, starting with DMN-bulk: one single-case DMN applied to any number of cases by a sequential multi-instance subprocess, with an `iou/` copy adapted to travel through this editor, the Linked Data Explorer and the RONL Business API, and the results of walking it through all three. `zizmor-action` moves to v0.8.0 and v0.8.1, with zizmor itself still at 1.29.0; since v0.8.0 the action installs zizmor from the lock file it ships for each version, checked by hash, rather than from a digest-pinned container, and `SECURITY-PIPELINE.md` says so. Vite 8.3.6, Vitest and its coverage provider 5.1.0, `lucide-react` 1.70.0, `@babel/parser` 8.1.0 and `globals` 17.14.0.
+
+**The suite grows by 36 tests, to 894 in 74 files.** Four files are new — `parseTTL.predicates.test.js` (8), `parseTTL.statementEnd.test.js` (7), `deployOptions.test.js` (3) and `phaseScripts.test.js` (3) — and the suites around the changed code grew with it: `ServiceTab.test.jsx` from 19 to 24 tests, `SignInMenu.test.jsx` from 8 to 11, `App.publish.test.jsx` from 8 to 10. The eight phase scripts now sum exactly to the full run. Coverage moved by less than a fifth of a point: statements rose to 91.37% and branches to 89.46%, while functions fell to 81.97% and lines to 92.01%, with `App.jsx` at 61.40% functions. The end-to-end journeys were not re-run; no spec changed.
+
+---
+
 ### v2026.11.1 — Signed In: Deploy and Publish as an Author (November 2026)
 
 > Signing in: [Getting Started](../user-guide/getting-started.md#signing-in). Deploying: [The DMN Tab](../user-guide/dmn-tab.md#step-4-deploy-to-operaton) and [DMN Orchestration](../features/dmn-orchestration.md). Publishing: [Publishing to TriplyDB](../user-guide/publishing-to-triplydb.md), [TriplyDB Publishing](../features/triplydb-publishing.md) and [TriplyDB Publish Implementation](triplydb-publish-implementation.md). What it changes for security: [Due Diligence](due-diligence.md). Measured suites: [Testing](testing.md).
@@ -678,6 +702,8 @@ Initial release. React + Tailwind CSS web application. Five-tab interface: Servi
 | [Required services (`dct:requires`)](../user-guide/filling-in-the-tabs.md#service-tab) on the Service tab, picked from the published dataset | v2026.11.0 |
 | [Sign-in](../user-guide/getting-started.md#signing-in) with Keycloak realm `ronl`; deploying and publishing need `lde-author`, with a test deploy where the backend offers one | v2026.11.1 |
 | [Publishing through the backend](triplydb-publish-implementation.md), as the signed-in author: no TriplyDB token in the browser | v2026.11.1 |
+| Deploys queue per branch: a started deploy always finishes, a waiting one is replaced | v2026.11.2 |
+| [Every test file in a phase script](testing.md#running-the-tests), guarded by a test | v2026.11.2 |
 
 ---
 

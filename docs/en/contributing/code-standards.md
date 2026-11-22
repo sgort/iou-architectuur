@@ -1,20 +1,28 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "2d201d5"
-    Linked Data Explorer: "5bccbf2"
-    RONL Business API: "4579486"
+    CPSV Editor: "3ba847f"
+    Linked Data Explorer: "fe841f9"
+    RONL Business API: "be0a1f0"
 ---
 
 # Code Standards
 
 !!! info "Verification status"
-    All three repositories' claims were re-checked on **15 November 2026**, against
-    `2d201d5`, `5bccbf2` and `4579486`: rulesets read from the API per ruleset, workflow
+    All three repositories' claims were re-checked on **22 November 2026**, against
+    `3ba847f`, `fe841f9` and `be0a1f0`: rulesets read from the API per ruleset, workflow
     files enumerated and their steps, triggers and filters read from source, and both
     hook files confirmed unchanged in each repository.
+
+    **What moved by 22 November was small, and mostly in the RONL Business API.** Its required
+    `audit` job runs two more script tests since 17 November, and its promotion now runs the
+    frontend suite on a theme-only change, as its acceptance filter already did. The CPSV
+    Editor's two deploy workflows queue per branch since 21 November, and `zizmor-action` moved to
+    v0.8.1 in the CPSV Editor and the Linked Data Explorer — see
+    [Supply-Chain Pinning](supply-chain.md). Still eight, twelve and fifteen workflows. No hook
+    changed.
 
     **What moved by 14 November was CI in the RONL Business API.** It gained a fifteenth
     workflow, the daily `upstream-certs`; its required `audit` job now also runs the stylelint
@@ -201,7 +209,7 @@ check:
 | Workflow pair | Lint | Type-check | Tests | Notes |
 |---|:---:|:---:|:---:|---|
 | `azure-backend-*` | ✅ | – | ✅ | Builds, uploads the artifact, and since v2026.09.10 deploys it over OIDC (`azure/login` then `az webapp deploy`), then waits until `/v1/health` reports the deployed commit. The four deploy steps are skipped on a pull request. Also lints the OpenAPI document. Since 29 September 2026 ([#269](https://github.com/sgort/ronl-business-api/issues/269)) the backend's `npm test` and `test:serial` end with `scripts/check-conformance-coverage.cjs`, which fails when the OpenAPI document holds an operation no test compared against a real response — so both backend workflows run it |
-| `azure-frontend-*` | ✅ | – | ✅ | Also runs `npm run test:perf`, the wall-clock budget, as a step of its own. Since v2026.11.0 its suite includes `css-hex.test.ts`, which fails on any new hard-coded hex colour in the stylesheets and the Keycloak login theme, and the acceptance filter names `keycloak-themes/**` so a theme-only change runs it. Stylelint (`npm run lint:css`, report-only) is a root script that no hook and no workflow runs; its own rule tests, `npm run test:stylelint`, have run in the required `audit` job since v2026.11.4 ([#433](https://github.com/sgort/ronl-business-api/issues/433)) |
+| `azure-frontend-*` | ✅ | – | ✅ | Also runs `npm run test:perf`, the wall-clock budget, as a step of its own. Since v2026.11.0 its suite includes `css-hex.test.ts`, which fails on any new hard-coded hex colour in the stylesheets and the Keycloak login theme, and the acceptance filter names `keycloak-themes/**` so a theme-only change runs it. Since v2026.11.5 (17 November 2026) the promotion's frontend pattern names `keycloak-themes/` as well (`scripts/promotion-targets.sh:50`, [#457](https://github.com/sgort/ronl-business-api/issues/457), closed), so a theme-only promotion runs that suite on `main` too, although the frontend deploy does not ship the theme. Stylelint (`npm run lint:css`, report-only) is a root script that no hook and no workflow runs; its own rule tests, `npm run test:stylelint`, have run in the required `audit` job since v2026.11.4 ([#433](https://github.com/sgort/ronl-business-api/issues/433)) |
 | `azure-publicsite-*` | ✅ | ✅ | ✅ | Its build additionally gates on a prerender and a bundle-cleanliness check |
 | `azure-pa-demo-*` | ✅ | ✅ | ✅ | The acc workflow also installs Chromium and runs the Playwright E2E suite before the bundle gate; the production one does not. Since v2026.10.1 the Chromium install has a ten-minute `timeout-minutes` of its own |
 
@@ -230,7 +238,11 @@ production patterns (`ffbc109`,
 [#354](https://github.com/sgort/ronl-business-api/issues/354)). Until then it named them for
 the backend only, so a lockfile-only promotion redeployed the backend and none of the three
 sites. The script's table of cases, `scripts/promotion-targets.test.mjs`, runs in the
-required `audit` job.
+required `audit` job. So, since v2026.11.5 (17 November 2026), do the tests of two scripts that
+change the live Keycloak realms, each stopping before any network call:
+`keycloak-restrict-rba-client.test.mjs`, which requires the script to refuse a wildcard or a path
+in the client's origins, and `keycloak-add-brp-raadpleger.test.mjs`, which requires it to refuse a
+test citizen service number outside the reserved `99999xxxx` range (`zizmor.yml:194-206`).
 
 **Linked Data Explorer** — **twelve** workflows in the tree: six deployment workflows,
 the supply-chain `audit` gate added in v2026.08.7, the Semgrep `scan` added in
@@ -331,6 +343,11 @@ production run was indistinguishable from an acceptance one in the Actions list,
 pull request's checks, and in `gh run list` — telling them apart meant opening the run
 and reading which API token it used. Renaming a job renames the check it reports, which
 is why it was done before any deploy check is made required.
+Since 21 November 2026 both also set `concurrency` per ref with `cancel-in-progress: false`
+(`06a4672`). Merges landing minutes apart had deployed in parallel, and Azure cancelled the older
+upload, which the action reports as *Deployment Failed* although nothing broke — four Renovate
+merges in a row that day. Now a deploy that has started always finishes, and only a run still
+waiting is replaced by a newer one, shown as cancelled rather than failed.
 
 Those two workflows also skip documentation-only changes, via `paths-ignore` on
 `docs/**`, `.claude/**` and `**/*.md` — on their `push` trigger. Since 19 September 2026

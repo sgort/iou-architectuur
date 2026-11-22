@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "2d201d5"
-    Linked Data Explorer: "5bccbf2"
-    RONL Business API: "4579486"
+    CPSV Editor: "3ba847f"
+    Linked Data Explorer: "fe841f9"
+    RONL Business API: "be0a1f0"
 ---
 
 # The GitLab Mirror
@@ -78,6 +78,15 @@ API at `4579486` / `67bac28` (`acc` / `main`). The CPSV Editor's `main` is in sy
 `6910bb8`; its GitLab `acc` is at `ab5ff1c`, the v2026.11.1 release, an ancestor twelve
 commits behind GitHub's `2d201d5` — the `zizmor-action` v0.8.0 pull request and the lab
 material merged after the release, which the next release reconciles.
+
+On 22 November 2026, by `git ls-remote` against both remotes, with the check re-read and
+unchanged: the Linked Data Explorer in sync at `fe841f9` / `4e80c74` (`acc` / `main`), its
+v2026.11.3 release of that morning. The CPSV Editor's `main` is in sync at `5d6345c`; its GitLab
+`acc` is at `3ed45c7`, the v2026.11.2 release, an ancestor two commits behind GitHub's `3ba847f`
+— one fix merged after the release. The RONL Business API's GitLab branches hold the v2026.11.5
+release, `e4a467c` / `c80d7d7`, ancestors two and three commits behind GitHub's `be0a1f0` /
+`1784a72` — the accent-colour fix #473 and the promotion that carried it without a release.
+Each repository's next release reconciles its own.
 
 **Two of the three release procedures run a second check straight after this one** — the
 CPSV Editor's since v2026.09.6 and the RONL Business API's since v2026.09.10.

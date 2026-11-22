@@ -263,7 +263,7 @@ When `true`, an amber warning banner is rendered in the deploy modal between the
 
 Run from `packages/backend`:
 ```bash
-npx ts-node --project tsconfig.json src/db/seed-ropa.ts
+npx tsx src/db/seed-ropa.ts
 ```
 
 The script is idempotent — re-running it updates existing rows in place via `ON CONFLICT (bpmn_process_id) DO UPDATE`.

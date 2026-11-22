@@ -17,7 +17,7 @@ The editor can publish service metadata directly to a TriplyDB knowledge graph w
 
 When you publish, the editor generates the complete Turtle output for the current service definition and sends it, with the dataset name and your sign-in token, to the Linked Data Explorer backend's `POST /v1/triplydb/publish`. The backend uploads it to TriplyDB with its own account and token (v2026.11.1). Each service is written to its own deterministic, per-service named graph at `https://regels.overheid.nl/graphs/{org-local}/{service-id}` (v1.9.4), derived by `buildGraphIRI()` from the organisation and service identifiers. Republishing the same service overwrites that graph rather than creating an auto-numbered copy, so each service corresponds to a single, stable graph IRI; different services accumulate side by side in the dataset.
 
-Organisation logos (and vendor logos), when present, travel in the same call, and the backend uploads them as named assets alongside the Turtle data, making them available as linked resources in the knowledge graph.
+Organisation logos (and vendor logos), when present, travel in the same call, and the backend uploads them as named assets alongside the Turtle data, making them available as linked resources in the knowledge graph. A logo the backend cannot upload does not fail the publish: the editor reports it as a warning that names the file.
 
 The published Turtle honours the **CPRMV version selector** (`0.4.1` / `0.3.2`) — the same selection that drives the live preview and **Download TTL** — so you can publish data shaped for a `0.3.x` consumer as well as the default `0.4.1`. See [CPRMV vocabulary version](import-export.md#cprmv-vocabulary-version-041-032) for how the two targets differ (v1.10.5).
 
@@ -40,14 +40,13 @@ If the validation backend is unreachable, the panel shows a distinct amber "resu
 
 ## Progress tracking
 
-The publish dialog lists four steps:
+The publish dialog lists three steps:
 
 1. Validating form
 2. Generating TTL
-3. Uploading to TriplyDB
-4. Updating service
+3. Publishing to TriplyDB
 
-The editor does the first two itself. The last two happen inside the one call to the backend, which uploads the Turtle and the logos and then syncs the dataset's SPARQL service; while it runs the dialog shows **Publishing to TriplyDB...**, and the indicators for those two steps do not follow it. When the upload succeeds but the service sync fails, the result is a warning, not an error: the data is in TriplyDB. On success, the dialog displays a direct link to the published dataset and closes automatically after two seconds. Errors are surfaced inside the dialog with details, and an inline message appears under the page title after the dialog closes.
+The editor does the first two itself. The third is the one call to the backend, which uploads the Turtle and the logos and then syncs the dataset's SPARQL service; the dialog marks the step under way in bold and ticks the finished ones. When the Turtle is in TriplyDB but the service sync or a logo upload fails, the result is a warning that names each, not an error: the data is in TriplyDB. On success the dialog says so and closes automatically after two seconds, and the dataset's URL appears in a message under the page title. Errors are surfaced inside the dialog with details, and an inline message appears under the page title after the dialog closes.
 
 ---
 

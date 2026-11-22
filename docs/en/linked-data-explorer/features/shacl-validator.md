@@ -74,6 +74,8 @@ The SHACL result severity (`sh:Violation`, `sh:Warning`, `sh:Info`) maps directl
 | 🟡 | Warning | A `sh:Warning` — the data conforms but deviates from a recommended practice. Should be reviewed. |
 | 🔵 | Info | A `sh:Info` — a quality suggestion. No conformance impact. |
 
+One exception since v2026.11.3: `dct:requires` to a service the file does not describe is a warning, not an error, because that service's type can only be checked where it is published. See [SHACL-CLASS](../reference/shacl-validation-reference.md#shacl-class).
+
 ---
 
 ## Validation example

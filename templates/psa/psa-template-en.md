@@ -9,7 +9,7 @@
 | Author | […] |
 | Approved by | […] |
 
-Based on the IOU PSA guide, verified on 2026-11-15 against CPSV Editor 6910bb8, Linked Data Explorer e11e4ef, RONL Business API 67bac28, Norm Editor c47096b, CPRMV 8262d3e.
+Based on the IOU PSA guide, verified on 2026-11-22 against CPSV Editor 5d6345c, Linked Data Explorer 4e80c74, RONL Business API 1784a72, Norm Editor c47096b, CPRMV 8262d3e.
 
 ## About this template
 
@@ -257,7 +257,7 @@ The login service has a few fixed roles, and in addition roles per process.
 |---|---|---|
 | Resident | Make their own applications and see their own cases (phase 2) | Core |
 | Representative | Act on behalf of someone else, within the authorisation (phase 2) | Core |
-| Caseworker | Handle cases of their own organisation | Core |
+| Caseworker | Handle cases of their own organisation; look up personal data in the BRP | Core |
 | Administrator | Administer their own organisation | Core |
 | Process roles | Tasks within one process, such as submitter, lawyer or signatory; linked to tasks in the process model | Organisation's own |
 
@@ -633,11 +633,14 @@ Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/08-security
   signature, issuer, audience and validity. IOU chooses
   Keycloak as the issuer; that is replaceable (AB-32).
 - **Authorisation per case, in the backend** (AB-18). A staff member sees only
-  cases of their own organisation, a resident only their own cases. The server sets
+  cases of their own organisation, a resident only their own cases. A resident
+  starts only services meant for residents, and looks up only themselves in the
+  BRP. The server sets
   the organisation label itself; when in doubt, it refuses. The screen is not a
   security boundary.
 - **A level of assurance per action** (AB-19). Having a decision evaluated
-  requires `basis`, starting a process `midden`.
+  requires `basis`, starting a process `midden`, looking up personal data in the
+  BRP `substantieel` for a caseworker and `hoog` for one's own record.
 - **Every write authenticated, authorised and recorded** (AB-20). The RONL
   Business API meets this. The Linked Data Explorer and the CPSV Editor require a
   login with the author role, but do not yet record who did what, and the role is
@@ -662,7 +665,8 @@ Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/08-security
 
 - **Every authenticated request recorded in a separate audit store** (AB-23). No
   retention period is applied yet (risk R-10). Actions that go around the RONL
-  Business API fall outside it (risk R-16).
+  Business API fall outside it (risk R-16). A BRP lookup does not always name
+  every person asked for (risk R-17).
 - **Data at the source** (AB-26): personal data from base registers is fetched
   when needed, not copied.
 - **Record of processing activities per process** (AB-27), public without contact
@@ -953,12 +957,12 @@ Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/11-decision
 | AB-15 | The organisation travels with every deployment and every case. A decision model is deployed once and shared; differences per organisation are in the decision table itself. | Core | realised | |
 | AB-16 | Published artefacts live in a SPARQL 1.1 triple store; IOU chooses TriplyDB. | Replaceable | realised | **Under review**: IOU is considering Apache Jena Fuseki. |
 | AB-17 | Backends accept tokens from one OIDC issuer, which brokers the login services for staff and residents. Which product the issuer is, is AB-32. | Core | partly | The RONL Business API and the Linked Data Explorer yes; the CPSV Editor has no backend of its own and uses the Linked Data Explorer's. The Norm Editor's backend does not check tokens yet (see AB-20). |
-| AB-18 | The backend decides per case who may do what, and refuses when in doubt: only the owning organisation or the applicant themselves. | Core | realised | In the RONL Business API. Who may start a process can be declared in the process model; the backend then refuses anyone else, and also when it cannot check. |
-| AB-19 | Actions require a level of assurance: `basis` to have a decision evaluated, `midden` to start a process. | Core | partly | The check works. DigiD and eIDAS are prepared but switched off; eHerkenning does not exist yet. |
+| AB-18 | The backend decides per case who may do what, and refuses when in doubt: only the owning organisation or the applicant themselves. | Core | realised | In the RONL Business API. Who may start a process can be declared in the process model; the backend then refuses anyone else, and also when it cannot check. A resident starts only services meant for residents, and looks up only themselves in the BRP; a caseworker may look up anyone. |
+| AB-19 | Actions require a level of assurance: `basis` to have a decision evaluated, `midden` to start a process. | Core | partly | The check works. Looking up personal data in the BRP requires `hoog` for one's own record and `substantieel` for a caseworker. DigiD and eIDAS are prepared but switched off; eHerkenning does not exist yet. |
 | AB-20 | Every write in every component is authenticated, authorised and recorded. Publishing happens on behalf of a competent organisation. | Core | partly | The RONL Business API yes. The Linked Data Explorer and the CPSV Editor require a login with the author role for writes, but that role applies to every organisation, and only publishing is noted, in the ordinary log. The Norm Editor not yet. |
 | AB-21 | The design tools are for staff only; residents and businesses reach only the portals and the public site. | Core | partly | The Linked Data Explorer and the CPSV Editor let only staff with the author role write; outside production anyone may test-deploy a decision model. The Norm Editor does not enforce it yet (see AB-20). |
 | AB-22 | Public catalogues are read live from the knowledge graph, through a separate public layer that only reads, without login and with a limit on the number of requests. | Core | realised | |
-| AB-23 | Every authenticated request is recorded in a separate audit store. You set the retention period. | Core | partly | Recording works in the RONL Business API, with one exception (R-16); no retention period is applied anywhere yet. The Linked Data Explorer does not record anything in an audit store yet. |
+| AB-23 | Every authenticated request is recorded in a separate audit store. You set the retention period. | Core | partly | Recording works in the RONL Business API, with two exceptions (R-16, R-17); no retention period is applied anywhere yet. The Linked Data Explorer does not record anything in an audit store yet. |
 | AB-24 | Documents stay in the organisation's document management system; the case holds only a reference. | Organisation's own | realised | |
 | AB-25 | Every component manages its own data; no component reads another's database. | Core | partly | The RONL Business API still reads directly from the Linked Data Explorer's database. |
 | AB-26 | Data stays at the source: base registers are queried, not copied. | Core | partly | The BRP is queried through the Haal Centraal API, but in every environment, production included, still against a test service. Other registers are not connected yet. |
@@ -981,7 +985,7 @@ Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/11-decision
 |---|---|---|---|---|---|---|
 | R-01 | The process engine is still reachable from outside. Changes require a login, but anyone holding the credentials reaches the engine around the Business API's checks, and the backends use accounts with full rights. Failed logins from outside can temporarily cut the backends off from the engine. | AB-08, AB-13 | Place the engine in your own network so that only the backends can reach it. Give each backend its own account with only the rights it needs. | [ronl-business-api#415](https://github.com/sgort/ronl-business-api/issues/415) closed only the part that needed no login; the risk stays open | […] | […] |
 | R-02 | The Norm Editor accepts writes without establishing who makes them. The Linked Data Explorer and the CPSV Editor require a login with the author role, but that role is not per organisation, and what an author does is not recorded in an audit store. Outside production anyone may test-deploy a decision model into a separate test environment. | AB-17, AB-20, AB-21, AB-23 | Make the Norm Editor reachable only inside your network, behind your organisation's login service. Give the author role only to those who may deploy and publish on behalf of your organisation. | [linked-data-explorer#163](https://github.com/sgort/linked-data-explorer/issues/163) and [ttl-editor#234](https://github.com/sgort/ttl-editor/issues/234) closed the part for the Linked Data Explorer and the CPSV Editor; the risk stays open | […] | […] |
-| R-03 | Access for residents and businesses does not really work yet: DigiD and eIDAS are switched off, eHerkenning is missing, the BRP is a test service. | AB-19, AB-26 | Limit adoption to phase 1. Plan the connection to DigiD, eHerkenning and the BRP as a project of its own before phase 2. | — | […] | […] |
+| R-03 | Access for residents and businesses does not really work yet: DigiD and eIDAS are switched off, eHerkenning is missing, the BRP is a test service. Until DigiD is active, the citizen service number in the token is a test value set on test accounts. | AB-19, AB-26 | Limit adoption to phase 1. Plan the connection to DigiD, eHerkenning and the BRP as a project of its own before phase 2. | — | […] | […] |
 | R-04 | What the CPSV Editor writes differs from CPRMV 0.4.2, and CPRMV itself is still a working draft. That is part of how IOU and CPRMV grow together, but it means shared rules can differ between versions. | AB-03, AB-07 | Validate published rules against the CPRMV shapes, follow CPRMV's development, and feed what you find back to IOU. | — | […] | […] |
 | R-05 | SHACL validation is advisory only; an artefact with errors can be published. | AB-11 | Agree that nobody publishes while validation reports errors. | — | […] | […] |
 | R-06 | A published service description keeps no history: republishing overwrites the previous version. This affects the Archiefwet (Public Records Act). | AB-10 | Archive every published version yourself, with its date, in your archive system. | — | […] | […] |
@@ -995,3 +999,4 @@ Explained in the guide: <https://iou-architectuur.open-regels.nl/psa/11-decision
 | R-14 | On test and acceptance the chain breaks: the existing systems IOU connects to (for example document management, signing, identity management, finance) often have only a production environment. Acceptance then tests an imitation, or touches production data. | — | Have administrators and suppliers set up a test and acceptance environment for every connected system (route 3 in [chapter 7](https://iou-architectuur.open-regels.nl/psa/07-integration-architecture/)). Until then: test against stubs, and record that the real connection is first used in production. | — | […] | […] |
 | R-15 | A decision model can pass every check and still never give the right outcome: DMN does not require a model to prove that it works, nor say how it refers to the law. | AB-03 | Test every decision model with test cases before deployment, including the outcomes it must be able to give. Follow the development of [DMN-AP NL](https://github.com/sgort/ttl-editor/blob/main/docs/dmn-ap-nl-proposal.md). | — | […] | […] |
 | R-16 | The token with which the RONL Business API calls a connected service on a staff member's behalf is not yet shielded from that staff member's browser. Actions at that service can therefore bypass the audit store, within the rights the staff member has there. IOU has chosen the fix; it is not built yet. | AB-23 | Have the connected service record who does what itself, and give the connection no more rights than it needs. | Filed with the component; link follows once fixed | […] | […] |
+| R-17 | When personal data is looked up, the RONL Business API falls short in two ways. The portal shows the citizen service number from the token in the browser's developer tools. And the audit store does not always name every person asked for. Today the number is a test value (R-03); with DigiD it becomes real. | AB-23 | Have the BRP connection itself record which persons are looked up. Do not open phase 2 while the portal shows the citizen service number in the browser. | Filed with the component; link follows once fixed | […] | […] |

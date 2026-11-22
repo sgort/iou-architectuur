@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "2d201d5"
-    Linked Data Explorer: "5bccbf2"
-    RONL Business API: "4579486"
+    CPSV Editor: "3ba847f"
+    Linked Data Explorer: "fe841f9"
+    RONL Business API: "be0a1f0"
 ---
 
 # Skills & Boundaries
@@ -69,12 +69,15 @@ precisely the test.
 
 The assistant operates inside a set of recorded boundaries: things it will not do
 unprompted, and approvals it will not infer from an earlier one. `~/.claude/CLAUDE.md`
-is the authority for the full set — **sixteen rules** as of 15 November 2026 — and is
+is the authority for the full set — **sixteen rules** as of 22 November 2026 — and is
 not reproduced here in full, because a copy would drift. The set has grown since the
 2026-08-19 consolidation, most recently on 30 September, when two were added:
 suppressing Semgrep false positives in code rather than in the Semgrep UI, and changing
 an Azure App Service setting. On 10 October one was narrowed rather than added:
-housekeeping now syncs the GitLab mirror only at a release. It will grow again; treat any count on this page as a
+housekeeping now syncs the GitLab mirror only at a release. On 22 November one was
+widened, again without adding to the count: during pull-request triage the assistant
+may now run `npm ci` itself (see below), and a fourth repository joined the
+pull-request-only rule. It will grow again; treat any count on this page as a
 snapshot, and the file as the authority. The boundaries most visible to a day-to-day
 contributor:
 
@@ -94,7 +97,7 @@ contributor:
   branch when asked is fine; integrating that branch into another is a separate
   decision the contributor makes explicitly, every time.
 - **`acc` and `main` change only through a pull request** — in `ronl-business-api`,
-  `linked-data-explorer` and `ttl-editor`. Recorded on 15 September 2026, after a skill
+  `linked-data-explorer`, `ttl-editor` and `lvg`. Recorded on 15 September 2026, after a skill
   finishing a branch offered a local merge into `acc` as one of its options. Here no
   approval given in a session unlocks another route: no merge, rebase, cherry-pick or
   commit onto a local `acc` or `main` to integrate work, no push of new commits to
@@ -102,8 +105,9 @@ contributor:
   offers to merge back locally, that option is left out. What stays allowed is only what
   moves work a merged pull request already put on `origin` — the housekeeping
   fast-forward of the local branches, and the fast-forward-only push of those heads to
-  the GitLab mirror. The rule names three repositories on purpose; this documentation
-  repository is not one of them.
+  the GitLab mirror. The rule names four repositories on purpose — the three
+  applications and `lvg`, a sandbox repository this site does not document; this
+  documentation repository is not one of them.
 - **Housekeeping syncs the GitLab mirror — but only at a release.** Added on
   11 September 2026, this is the one boundary that *grants* something rather than
   withholding it. When housekeeping is part of a release — after the release pull
@@ -113,7 +117,11 @@ contributor:
   merged pull request cost a push, and its pre-push hook, for a mirror that only has to
   be current at a release, so between releases GitLab is expected to lag. It is fenced — fast-forward only, never a
   force, and only in the repositories where the `gitlab` remote is a mirror with no
-  pipeline of its own. A diverged mirror is reported, not forced into line.
+  pipeline of its own. A diverged mirror is reported, not forced into line. This
+  documentation repository is the exception, by the maintainer's decision for it: the
+  site never cuts a release, so waiting for one would mean never syncing. Since
+  15 November 2026 its mirror is fast-forwarded at every housekeeping pass after a
+  merged pull request, `acc` and `main` alike, under the same fences.
 
     **Housekeeping has exactly two triggers**, and is never done in the middle of other
     work: after pull requests are merged (and promoted, where that applies), and when setting up a fresh
@@ -136,6 +144,17 @@ contributor:
     the CPSV Editor and the Linked Data Explorer it still rewrites the marker the check
     compares against, so the check can report in sync over a stale install. Only the
     RONL Business API skips the marker on a lockfile-only install.
+
+    **Since 22 November 2026 there is one exception: pull-request triage.** While
+    triaging open pull requests — Renovate updates and the like — the assistant runs
+    `npm ci` itself whenever the work needs the install to match a lockfile: a stale
+    install after merging dependency pull requests, or a `deps:check` in `pre-push`
+    refusing a push to a pull request's branch. It says that it ran it and why.
+    Everything else stands: outside triage the step is still handed to the contributor,
+    `npm install` never replaces it, and the assistant still never restarts a dev server
+    — one running from that checkout goes down with the install, and the contributor
+    restarts it. The exception was granted during the Linked Data Explorer's Renovate
+    triage, after a push to #344 was refused for a stale install.
 - **Create a branch before implementing.** Integration branches (`acc`, `main`) are
   not worked on directly — direct changes there are hard to isolate and review.
 - **No git worktrees unless asked.** Recorded on 26 September 2026, after a

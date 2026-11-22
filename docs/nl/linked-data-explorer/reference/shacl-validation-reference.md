@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # SHACL Validatiereference
 
 !!! info "Documentatie in ontwikkeling"
@@ -42,6 +46,8 @@
 ### SHACL-MAXCOUNT
 
 ### SHACL-UNIQUELANG
+
+### SHACL-CLASS
 
 ---
 

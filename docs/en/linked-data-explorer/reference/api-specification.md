@@ -56,7 +56,7 @@ purpose.
     address shown at the top of the panel does not list the query string,
     even for a parameter that is ticked and sent.
 
-Operations that change shared state need a Bearer token from the Keycloak realm `ronl` carrying the role `lde-author` — the `bearerAuth` scheme, since v2026.11.2. Without one they answer `401`. See [Backend — Sign-in](../developer/backend.md#sign-in).
+Operations that change shared state need a Bearer token from the Keycloak realm `ronl` carrying the role `lde-author` — the `bearerAuth` scheme, since v2026.11.2. Without one they answer `401`, and `503` (code `AUTH_UNAVAILABLE`) when the realm's signing keys cannot be fetched to check one, which includes the backend's own key-fetch limit being spent ([#358](https://github.com/sgort/linked-data-explorer/issues/358)). See [Backend — Sign-in](../developer/backend.md#sign-in).
 
 This reference renders `/v1/openapi.json`. The `/v2` routes have their own
 document, rendered the same way on [API Specification (v2)](api-specification-v2.md);

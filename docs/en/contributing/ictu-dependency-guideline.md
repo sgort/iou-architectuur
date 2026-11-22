@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "2d201d5"
-    Linked Data Explorer: "5bccbf2"
-    RONL Business API: "4579486"
+    CPSV Editor: "3ba847f"
+    Linked Data Explorer: "fe841f9"
+    RONL Business API: "be0a1f0"
 ---
 
 # ICTU Dependency Guideline
@@ -36,7 +36,7 @@ the page that covers it.
     [#395](https://github.com/sgort/ronl-business-api/issues/395).
 
     Every assessment reads each repository's `acc`, the branch of record. The scores below
-    were read at `2d201d5` (CPSV Editor), `5bccbf2` (Linked Data Explorer) and `4579486`
+    were read at `3ba847f` (CPSV Editor), `fe841f9` (Linked Data Explorer) and `be0a1f0`
     (RONL Business API). Work that has reached `acc` therefore counts before it is promoted
     to `main`.
 
@@ -111,45 +111,52 @@ its provenance half: the registry it asks for is still ICTU's to provide.
 
 ## What moved this week
 
-One Sunday is new since the last pass, 15 November, measured on the day. Three cells moved, all
-up and all in one row, and the totals are 42, 40 and 40, against 41, 39 and 39 on 8 November.
-R8 is back where it stood on 11 October.
+One Sunday is new since the last pass, 22 November, measured on the day. No cell moved, and
+the totals stay 42, 40 and 40.
 
-- **R8: 4 → 5 in the CPSV Editor, 3 → 4 in the other two.** Lock-file maintenance, which
-  refreshes the transitive tree and whose absence had kept the cell down on 1 and 8 November,
-  merged in all three on 12 November, after 38, 31 and 24 days open
-  ([ttl-editor#196](https://github.com/sgort/ttl-editor/pull/196),
-  [linked-data-explorer#301](https://github.com/sgort/linked-data-explorer/pull/301) and
-  [ronl-business-api#387](https://github.com/sgort/ronl-business-api/pull/387)). The Renovate
-  backlog went with it: 16, 10 and 15 Renovate pull requests merged in the 30 days to
-  15 November, weekly since 29 October, and on the Sunday one was open in the CPSV Editor, one
-  in the Linked Data Explorer and none in the RONL Business API. The refreshes merged over
-  Renovate's pending `stability-days` status, which no ruleset requires; every version they
-  changed was at least 14 days old at the merge, so the cooldown held.
-
-Several things happened that moved no cell. The Linked Data Explorer's refresh carried
-`follow-redirects` 1.16.2, and its daily audit, red every day from 31 October to 12 November,
-has passed since; [linked-data-explorer#313](https://github.com/sgort/linked-data-explorer/issues/313)
-closed on 13 November. The sign-in work brought `keycloak-js` into the CPSV Editor
-([ttl-editor#239](https://github.com/sgort/ttl-editor/pull/239)) and the Linked Data Explorer,
-with `jsonwebtoken` and `jwks-rsa` in the latter's backend
-([linked-data-explorer#331](https://github.com/sgort/linked-data-explorer/pull/331)), each
-listed with its checks and merged with none of them ticked. The RONL Business API's VM now pins
-the production Operaton and Caddy by digest, and seven runtime `hono` and `@hono/node-server`
-alerts arrived there on 13 November, none of them high, so its audit stayed green. And Node
-moved again: to 24.22.2 in the CPSV Editor's and the Linked Data Explorer's `.nvmrc`, and in
-every repository's tooling workflows.
+Several things happened that moved no cell. The RONL Business API cleared most of its
+Dependabot alerts by hand: on 17 November
+[#469](https://github.com/sgort/ronl-business-api/pull/469) fixed the seven runtime `hono` and
+`@hono/node-server` alerts and the `fast-xml-parser` low, two development mediums
+(`postcss-selector-parser` and `minimatch`) were dismissed on the alert as a tolerable risk with
+a written reason, and [#470](https://github.com/sgort/ronl-business-api/pull/470) gave its
+`SECURITY-PIPELINE.md` a register, *Semgrep findings we accept, and why*, with a reason and a
+revisit trigger for each of the three alerts it keeps open. Its fourteen open alerts of
+15 November are three. `tsx` entered the Linked Data Explorer's backend, replacing `ts-node`,
+listed by `lockfile-review` with its checks and merged with none of them ticked. The Linked
+Data Explorer's daily audit went red once, on 18 November, on a `picomatch` high whose advisory
+GitHub withdrew that afternoon; the next run closed
+[linked-data-explorer#345](https://github.com/sgort/linked-data-explorer/issues/345) with no
+commit in between. The CPSV Editor and the Linked Data Explorer took `zizmor-action` v0.8.1,
+which installs zizmor from hash-locked wheels; that is inside the action, and Semgrep's
+`pip install` still has no `--require-hashes`, so R4 does not move. The RONL Business API's own
+bump ([ronl-business-api#461](https://github.com/sgort/ronl-business-api/pull/461)) is held by
+the register check until its row is updated — the gate working, evidence for R9 rather than a
+move.
 
 The cells that held, held for a reason:
 
-- **The Linked Data Explorer's R10 stays 3.** Its audit has passed on two scheduled runs, after
-  thirteen red ones with a fix available from 30 October; the fix arrived inside routine
-  lock-file maintenance rather than in answer to the audit, and nothing is accepted in writing.
+- **R8 holds in all three, and is the cell to watch.** Lock-file maintenance opened again on
+  Monday 16 November ([ttl-editor#253](https://github.com/sgort/ttl-editor/pull/253),
+  [linked-data-explorer#343](https://github.com/sgort/linked-data-explorer/pull/343) and
+  [ronl-business-api#458](https://github.com/sgort/ronl-business-api/pull/458)), and all three
+  were still open on the Sunday, six days old: every required check green, only Renovate's own
+  `stability-days` status pending, which no ruleset requires. The CPSV Editor merged a weekly
+  batch of six other Renovate pull requests on 21 November and the Linked Data Explorer four on
+  22 November; the RONL Business API merged none, its last on 12 November. If nothing from
+  Renovate merges there by about 26 November, the precedent of 25 October — more than a
+  fortnight with nothing merged — applies, and its R8 falls to 3.
+- **The RONL Business API's R10 stays 4.** Each alert it had on 15 November is now fixed,
+  dismissed with a reason or accepted in writing, and every scheduled audit from 15 to 21 November passed. But
+  three alerts, one of them high, stay open on purpose, and nothing checks the register against
+  the open alerts: the acceptance is written, not enforced.
+- **The Linked Data Explorer's R10 stays 3.** Its one red run was on an advisory withdrawn the
+  same day, but its three open alerts are neither dismissed nor accepted in writing.
 - **R11 stays 4 in all three.** The quarterly review has not yet run on its own schedule; the
   first slot is 2 January 2027.
-- **R1 stays 3.** The checklist has now been used for six new direct dependencies, in three pull
-  requests, and not followed in any: none of its thirty boxes is ticked — which gives the
-  stricter reading a growing case rather than only an absence.
+- **R1 stays 3.** The checklist has now been used for seven new direct dependencies, in four
+  pull requests, and not followed in any: none of its thirty-five boxes is ticked — which gives
+  the stricter reading a growing case rather than only an absence.
 - **The RONL Business API's R6 stays 4**: its `.nvmrc` still names 22.23.4, which bundles npm
   10.9.9, and npm ignores the cooldown silently below 11.10. The move to 24.22.2 reached its
   tooling workflows only.
@@ -259,8 +266,14 @@ divides cleanly. The Dependabot triage waits mostly on majors already queued —
 Linked Data Explorer; React Router 7, accepted in
 [#395](https://github.com/sgort/ronl-business-api/issues/395) until then, and, for the
 development-only `minimatch` high, typescript-eslint v8 in the RONL Business API — and on
-development-only mediums, and in the RONL Business API on the seven runtime `hono` and
-`@hono/node-server` alerts of 13 November, each with a patched release. The October criticals
+development-only mediums. In the RONL Business API the seven runtime `hono` and
+`@hono/node-server` alerts of 13 November and the `fast-xml-parser` low were fixed on
+17 November ([#469](https://github.com/sgort/ronl-business-api/pull/469)), and two development
+mediums were dismissed that day with a written reason; its `SECURITY-PIPELINE.md` now records
+why each accepted Semgrep finding is accepted. Its row stays open all the same: the three
+alerts it keeps — the two `react-router` mediums and the `minimatch` high — are accepted in
+writing there, each with a revisit trigger, but neither fixed nor dismissed. The Linked Data
+Explorer's `fast-xml-parser` low, with a patched release, is still open. The October criticals
 (`handlebars`, `shell-quote`) and the `source-map-js` high were fixed on 29 October. The Linked
 Data Explorer's runtime `follow-redirects` high, open from 5 November, was fixed on
 12 November. The registry is an ICTU infrastructure question
@@ -291,7 +304,7 @@ From 15 November the RONL Business API counts one more for the same reason:
 `upstream-certs.yml` runs its check script's tests before it checks the certificates.
 
 Three things are visible here that the ICTU scores hide. The CPSV Editor's suite grew more
-than fourfold, from 15 files to 72, and gained its first end-to-end journeys. Every
+than fivefold, from 15 files to 83, and gained its first end-to-end journeys. Every
 repository's CI was running its suites by 23 August — the CPSV Editor's and the Linked Data
 Explorer's for the first time. And the per-file 80%
 branch floor arrived in all three at once, in the releases of 11 September — a gate that
@@ -305,7 +318,7 @@ files hold — are measured per release on each application's testing page, not 
 
 ## What was verified
 
-Re-checked for this page on 15 November 2026, at the three commits in the stamp, rather than
+Re-checked for this page on 22 November 2026, at the three commits in the stamp, rather than
 carried over from the assessment:
 
 - **`runs-on:` in every job of every workflow**: 12 in the CPSV Editor, 21 in the Linked Data
@@ -328,18 +341,24 @@ carried over from the assessment:
   protection. See [Branch Protection](branch-protection.md).
 - **Every `changes` job's pattern**, against `package-lock.json` specifically. The RONL
   Business API's three Static Web App patterns have named it since `6f79e93` (6 October).
-- **Open Dependabot alerts**: 1 in the CPSV Editor (a `minimatch` medium, development); 4 in
+- **Open Dependabot alerts**: 1 in the CPSV Editor (a `minimatch` medium, development); 3 in
   the Linked Data Explorer (at runtime the `@tiptap/core` medium and a `fast-xml-parser` low of
-  12 November; in development dependencies a `minimatch` medium and a `deepmerge` low); 14 in
-  the RONL Business API (at runtime two `react-router` mediums, accepted in
-  [#395](https://github.com/sgort/ronl-business-api/issues/395), seven `hono` and
-  `@hono/node-server` alerts of 13 November — six medium, one low — and a `fast-xml-parser`
-  low; in development dependencies the `minimatch` high, two mediums and a low). None of them
-  is dismissed with a reason.
+  12 November; in development dependencies a `minimatch` medium); 3 in the RONL Business API
+  (at runtime two `react-router` mediums, accepted in
+  [#395](https://github.com/sgort/ronl-business-api/issues/395); in development dependencies
+  the `minimatch` high). Every one has a patched release, and none of them is dismissed with a
+  reason. The RONL Business API's other alerts went on 17 November: eight fixed by
+  [#469](https://github.com/sgort/ronl-business-api/pull/469), and two development mediums
+  dismissed with a written reason and a condition for revisiting them; its
+  `SECURITY-PIPELINE.md` gives the three it keeps open a reason and a revisit trigger each. The
+  development `deepmerge` low in both monorepos left the API when GitHub withdrew its advisory
+  on 16 November.
 - **Renovate pull requests merged in the preceding 30 days**, counted by author
-  (`app/renovate`) and merge date since 16 October: 16, 10 and 15 — none of them between
-  16 and 28 October.
-- **The registry origin of every resolved package**: 556, 1,557 and 1,549 entries, every one
+  (`app/renovate`) and merge date since 23 October: 22, 14 and 15 — the RONL Business API's
+  last on 12 November. On the Sunday two were open in the CPSV Editor, one in the Linked Data
+  Explorer and three in the RONL Business API, among them the three lock-file refreshes of
+  16 November.
+- **The registry origin of every resolved package**: 556, 1,573 and 1,527 entries, every one
   `registry.npmjs.org` (besides 2 and 6 workspace links), none without an `integrity` hash.
   `npm audit signatures` runs in the required `audit` job in all three, through
   `scripts/audit-signatures.sh`. No internal registry and no proxy.
@@ -353,12 +372,15 @@ carried over from the assessment:
   ([linked-data-explorer#305](https://github.com/sgort/linked-data-explorer/issues/305), closed
   29 October) and from 31 October to 12 November
   ([linked-data-explorer#313](https://github.com/sgort/linked-data-explorer/issues/313), closed
-  13 November, `follow-redirects`); it has passed since. The RONL Business API's failed from
+  13 November, `follow-redirects`), and once more on 18 November, on a `picomatch` high whose
+  advisory GitHub withdrew that afternoon
+  ([linked-data-explorer#345](https://github.com/sgort/linked-data-explorer/issues/345), closed
+  by the next run on 19 November). The RONL Business API's failed from
   21 to 29 October ([#389](https://github.com/sgort/ronl-business-api/issues/389), closed
   30 October) and from 31 October to 6 November
   ([#410](https://github.com/sgort/ronl-business-api/issues/410), closed by
   [#417](https://github.com/sgort/ronl-business-api/pull/417)). Every scheduled run from 7 to
-  14 November passed in the CPSV Editor and the RONL Business API.
+  21 November passed in the CPSV Editor and the RONL Business API.
 - **The quarterly dependency review**: `dependency-review.yml`, cron `23 6 2 1,4,7,10 *`, run by
   hand on 10 October in all three
   ([ttl-editor#210](https://github.com/sgort/ttl-editor/issues/210),
@@ -366,18 +388,22 @@ carried over from the assessment:
   [ronl-business-api#362](https://github.com/sgort/ronl-business-api/issues/362)), each closed
   with an outcome for every flagged package. The schedule has not run yet: its first slot is
   2 January 2027.
-- **The release SBOMs** under `docs/sbom/`: seven in the CPSV Editor (2026.09.6, .09.7, .10.0,
-  .10.1, .10.2, .11.0 and .11.1), nine in the Linked Data Explorer (2026.09.7, .09.8, .10.0 to
-  .10.3 and .11.0 to .11.2) and fifteen in the RONL Business API (2026.09.11 to .09.15, .10.0
-  to .10.4 and .11.0 to .11.4). Since 10 October
+- **The release SBOMs** under `docs/sbom/`: eight in the CPSV Editor (2026.09.6, .09.7, .10.0,
+  .10.1, .10.2, .11.0, .11.1 and .11.2), ten in the Linked Data Explorer (2026.09.7, .09.8, .10.0
+  to .10.3 and .11.0 to .11.3) and sixteen in the RONL Business API (2026.09.11 to .09.15,
+  .10.0 to .10.4 and .11.0 to .11.5). Since 10 October
   the production set is read from the lockfile, and the two checks in `sbom.yml` run before
-  the generate step.
+  the generate step. Since 22 November the Linked Data Explorer's strict check compares
+  content only, leaving out the npm that wrote the file
+  ([linked-data-explorer#354](https://github.com/sgort/linked-data-explorer/pull/354)); the
+  other two follow in [ttl-editor#269](https://github.com/sgort/ttl-editor/issues/269) and
+  [ronl-business-api#481](https://github.com/sgort/ronl-business-api/issues/481), both open.
 - **The Renovate major rules**: `allowedVersions` excluding `X.0.0` for npm in all three; the
   `ubuntu` major disabled with a reason in all three, and Node 24 in the RONL Business API.
-  Pending approval on each Dependency Dashboard on 15 November: 2, 3 and 18, of which 2, 3 and
-  13 are majors — Node 26 and `keycloak-js` 26 in the CPSV Editor, Node 26 in the Linked Data
-  Explorer, and `react-router-dom` 7, `eslint` 10 and TypeScript 7 among them in the RONL
-  Business API.
+  Pending approval on each Dependency Dashboard on 22 November: 2, 3 and 19, of which 2, 3 and
+  14 are majors by title — Node 26 and `keycloak-js` 26 in the CPSV Editor, Node 26 and the
+  backend and frontend major groups in the Linked Data Explorer, and React Router 7,
+  `operaton/operaton` v2.2.1 and the Vitest 5 monorepo among them in the RONL Business API.
 - **Container images in the RONL Business API**: six in the root `docker-compose.yml`, each
   with a tag and a digest; of the six compose files under `deployment/vm/`, Skosmos (on
   `:latest`), Postgres, the production Operaton and Caddy (`2.11.9-alpine`, in the VM's file
@@ -388,24 +414,32 @@ carried over from the assessment:
 
 - **The scores themselves.** They are a judgement on a 0–5 scale, and several cells are
   readings rather than facts; a stricter reading would score each one lower, and taking every
-  one of them would give 33, 31 and 29 rather than 42, 40 and 40. Three are new or sharper
-  this week. R8 in all three: lock-file maintenance has merged once, after 38, 31 and 24 days
-  open — the same "a catch-up is not a cadence" argument that held the cell on 1 November — and
-  a stricter reading waits for a refresh to merge within its week. R1 in all three, sharper:
-  six new direct dependencies have now passed the checklist with none of its thirty boxes
-  ticked, and the Linked Data Explorer's listed a transitive `limiter` 1.1.5 with no licence
-  recorded. And the RONL Business API's R10: fourteen open alerts, seven of them new runtime
-  `hono` and `@hono/node-server` alerts, none dismissed, and its acceptance lives in an issue
-  rather than on the alerts. The rest are carried. R10 in the CPSV Editor, where a development
-  `minimatch` medium has been open since 5 November, neither fixed nor dismissed; and in the
-  Linked Data Explorer, where the audit was red on thirteen scheduled runs with a fix
-  available, which a stricter reading scores 2. R5 in all three, where only the provenance half
+  one of them would give 33, 31 and 30 rather than 42, 40 and 40. The RONL Business API's
+  strict total rises from 29 because last week's strict case for its R10 is answered: its
+  fourteen open alerts are three, each accepted in writing with a revisit trigger, two others
+  were dismissed with a reason on the alert, and every audit was green. R8 in all three still
+  waits on its condition: lock-file maintenance merged once, on 12 November, after 38, 31 and
+  24 days open — the same "a catch-up is not a cadence" argument that held the cell on
+  1 November — and a stricter reading waits for a refresh to merge within its week; none has,
+  the refreshes of 16 November
+  ([ttl-editor#253](https://github.com/sgort/ttl-editor/pull/253),
+  [linked-data-explorer#343](https://github.com/sgort/linked-data-explorer/pull/343),
+  [ronl-business-api#458](https://github.com/sgort/ronl-business-api/pull/458)) being open
+  after six days, and the RONL Business API merged no Renovate pull request at all this week.
+  R1 in all three, sharper: seven new direct dependencies have now passed the checklist with
+  none of its thirty-five boxes ticked, `tsx` this week among them, and the Linked Data
+  Explorer's listed a transitive `limiter` 1.1.5 with no licence recorded. The rest are carried.
+  R10 in the CPSV Editor, where a development `minimatch` medium has been open since
+  5 November, neither fixed nor dismissed; and in the Linked Data Explorer, where three open
+  alerts have nothing accepted in writing and the audit went red once this week, though on a
+  withdrawn advisory, which a stricter reading scores 2. R5 in all three, where only the provenance half
   is done and the registry question has not been put to ICTU on the record. R11 in all three,
   where the review ran once, by hand, and the schedule has not yet fired. R9 in all three,
   where no ruleset requires a branch to be up to date or a review to approve it — the
-  refreshes merging over a pending Renovate status is this week's illustration. R7 in all
+  refreshes waiting on a pending Renovate status that no ruleset requires is this week's
+  illustration. R7 in all
   three, where the rule that skips `X.0.0` covers npm only and the approval tick leaves no
-  written assessment — the RONL Business API has thirteen majors waiting on it, the Linked Data
+  written assessment — the RONL Business API has fourteen majors waiting on it, the Linked Data
   Explorer three and the CPSV Editor two, `keycloak-js` 26 among them, for a dependency added
   three majors behind. The RONL Business API's R2: the Skosmos reference still spells
   `:latest`, and the VM's Keycloak tag, `23.0`, names no patch. The Linked Data Explorer's R2,
@@ -418,13 +452,19 @@ carried over from the assessment:
   re-resolves them. And the RONL Business API's R6, whose own npm ignores the cooldown
   silently.
 - **The generous readings not taken.** R9 at 5 in all three, on `lockfile-review` closing
-  the transitive-review gap; R8 at 5 in the Linked Data Explorer and the RONL Business API, on
-  a cleared backlog — 10 and 15 merges in the 30 days, and none open in the RONL Business API
-  on the Sunday; the Linked Data Explorer's R10 at 4, on an audit green since 13 November; and
-  R6 at 5 in the CPSV Editor and the Linked Data Explorer, where the refresh Renovate cannot
-  cool down was shown to respect the 14 days at package level — 68 and 143 versions changed,
-  the youngest 15.5 and 15.7 days old. Taking every generous reading as well would give 44, 44
-  and 42.
+  the transitive-review gap, with the RONL Business API's
+  [#461](https://github.com/sgort/ronl-business-api/pull/461), held by the register check, as
+  further evidence of the gate; R8 at 5 in the Linked Data Explorer, where a weekly batch merged
+  and only the lock-file pull request is open; the Linked Data Explorer's R10 at 4, on an audit
+  green apart from one run on an advisory GitHub withdrew that day, which the audit then closed
+  by itself; the RONL Business API's R10 at 5, where every alert is fixed, dismissed with a
+  reason or accepted in writing with a revisit trigger, and the daily audit was green every
+  day; and R6 at 5 in the CPSV Editor and the Linked Data Explorer, where the refresh Renovate
+  cannot cool down was shown on 15 November to respect the 14 days at package level — 68 and
+  143 versions changed, the youngest 15.5 and 15.7 days old — and was not re-measured, this
+  week's refreshes being unmerged. Taking every generous reading as well would give 44, 44
+  and 42; the RONL Business API's 42 is now made of R9 and R10 rather than R9 and R8, its R8
+  having lost last week's generous case of none open on the Sunday.
 - **Whether a person reads release notes or checks maintenance** before merging or adding a
   dependency. Nothing in the repositories records it either way, so R1, R9 and R11 score only
   what is recorded.

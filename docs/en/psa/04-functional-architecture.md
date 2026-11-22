@@ -2,11 +2,11 @@
 title: "4. Functional architecture"
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "6910bb8"
-    Linked Data Explorer: "e11e4ef"
-    RONL Business API: "67bac28"
+    CPSV Editor: "5d6345c"
+    Linked Data Explorer: "4e80c74"
+    RONL Business API: "1784a72"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -55,7 +55,7 @@ The login service has a few fixed roles, and in addition roles per process.
 |---|---|---|
 | Resident | Make their own applications and see their own cases (phase 2) | Core |
 | Representative | Act on behalf of someone else, within the authorisation (phase 2) | Core |
-| Caseworker | Handle cases of their own organisation | Core |
+| Caseworker | Handle cases of their own organisation; look up personal data in the BRP | Core |
 | Administrator | Administer their own organisation | Core |
 | Process roles | Tasks within one process, such as submitter, lawyer or signatory; linked to tasks in the process model | Organisation's own |
 

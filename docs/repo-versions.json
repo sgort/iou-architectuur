@@ -1,22 +1,30 @@
 {
-  "docs_built": "2026-11-18",
+  "docs_built": "2026-11-22",
   "last_patch": {
-    "date": "2026-11-18",
-    "kind": "Component sync",
-    "summary": "RONL Business API v2026.11.5 in production, with one fix on production ahead of the next release: the sign-in client accepts only its own addresses and requires PKCE, a BRP lookup is open to caseworkers through a role and otherwise only for your own record, citizens start only the processes offered to them, and signing refuses what cannot work; Flevoland's accent fill is pink with white text.",
+    "date": "2026-11-22",
+    "kind": "Component sync and weekly pass",
+    "summary": "CPSV Editor v2026.11.2 and Linked Data Explorer v2026.11.3, both in production: the editor imports each statement whole and reads a field only from its own property, its publish dialog shows the steps publishing really takes, and a lapsed session asks to sign in again; the Linked Data Explorer accepts only access tokens, says when sign-in cannot be checked, explains a failed publish, and reports a required service described elsewhere as a warning; the weekly pass then re-checked the contributing pages and the Project Start Architectuur against all five components, recording that zizmor is now installed from hash-locked wheels and adding a risk for the citizen service number in the browser and the incomplete lookup audit; the ICTU dependency guideline holds at 42, 40 and 40.",
     "previous": {
-      "date": "2026-11-15",
-      "kind": "Weekly pass",
-      "summary": "The contributing pages and the Project Start Architectuur re-checked against all three applications: fifteen workflows in the RONL Business API, lockfile-only promotions that redeploy every application, the VM's Caddy and Postgres pinned, the Linked Data Explorer's API document asking for sign-in, and a new risk for an authentication gap that is chosen to be fixed but not yet built; the ICTU dependency guideline scored 42, 40 and 40, now that lock-file maintenance has merged in all three."
+      "date": "2026-11-18",
+      "kind": "Component sync",
+      "summary": "RONL Business API v2026.11.5 in production, with one fix on production ahead of the next release: the sign-in client accepts only its own addresses and requires PKCE, a BRP lookup is open to caseworkers through a role and otherwise only for your own record, citizens start only the processes offered to them, and signing refuses what cannot work; Flevoland's accent fill is pink with white text."
     },
     "open_findings": [
       {
-        "label": "ronl-business-api#477",
-        "url": "https://github.com/sgort/ronl-business-api/issues/477"
+        "label": "linked-data-explorer#358",
+        "url": "https://github.com/sgort/linked-data-explorer/issues/358"
       },
       {
-        "label": "ronl-business-api#478",
-        "url": "https://github.com/sgort/ronl-business-api/issues/478"
+        "label": "ronl-business-api#482",
+        "url": "https://github.com/sgort/ronl-business-api/issues/482"
+      },
+      {
+        "label": "ronl-business-api#483",
+        "url": "https://github.com/sgort/ronl-business-api/issues/483"
+      },
+      {
+        "label": "ttl-editor#270",
+        "url": "https://github.com/sgort/ttl-editor/issues/270"
       }
     ]
   },
@@ -49,31 +57,31 @@
     {
       "name": "CPSV Editor",
       "icon": "✏️",
-      "version": "v2026.11.1",
+      "version": "v2026.11.2",
       "environment": "prod",
-      "commit": "6910bb8...",
-      "commit_date": "2026-11-12",
+      "commit": "5d6345c...",
+      "commit_date": "2026-11-21",
       "build": {
-        "sha": "6910bb8",
-        "run": 114,
-        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/43278506962"
+        "sha": "5d6345c",
+        "run": 116,
+        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/44922116683"
       },
-      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/6910bb87488cebe43b1ced3645639d02a14f56f6",
+      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/5d6345c6d82cc80eb24f5cf1c381a82ded77edc7",
       "ci_repo": "https://github.com/sgort/ttl-editor"
     },
     {
       "name": "Linked Data Explorer",
       "icon": "🔍",
-      "version": "v2026.11.2",
+      "version": "v2026.11.3",
       "environment": "prod",
-      "commit": "e11e4ef...",
-      "commit_date": "2026-11-12",
+      "commit": "4e80c74...",
+      "commit_date": "2026-11-22",
       "build": {
-        "sha": "e11e4ef",
-        "run": 11,
-        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/43271802879"
+        "sha": "4e80c74",
+        "run": 12,
+        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/45013710334"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/e11e4ef0eb7ea0676a3769230ff1e5edb7d6d8b1",
+      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/4e80c7419d40620fcf3fc190ab2f36eee05686f0",
       "ci_repo": "https://github.com/sgort/linked-data-explorer"
     },
     {

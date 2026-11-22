@@ -1,11 +1,11 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "2d201d5"
-    Linked Data Explorer: "5bccbf2"
-    RONL Business API: "4579486"
+    CPSV Editor: "3ba847f"
+    Linked Data Explorer: "fe841f9"
+    RONL Business API: "be0a1f0"
 ---
 
 # Technology Stack
@@ -127,7 +127,7 @@ mean.
 A contributing page makes claims about repository configuration — workflows,
 `SECURITY-PIPELINE.md`, `renovate.json`, runner configs and their thresholds. **Most
 changes to those produce no new build.** Every frontend deploy workflow is
-path-filtered, as read on 15 November 2026:
+path-filtered, as read on 22 November 2026:
 
 | Repository | The frontend build fires on | Does not fire on |
 |---|---|---|
@@ -136,8 +136,9 @@ path-filtered, as read on 15 November 2026:
 | CPSV Editor | Everything except `docs/**`, `.claude/**` and `**/*.md` | `SECURITY-PIPELINE.md` and every other Markdown record |
 
 Since v2026.11.4 the RONL Business API's production promotion mirrors these filters for the root `package.json` and
-`package-lock.json` as well; the frontend's production pattern still leaves out `keycloak-themes/**`
-([ronl-business-api#457](https://github.com/sgort/ronl-business-api/issues/457)).
+`package-lock.json` as well, and since 17 November 2026 for `keycloak-themes/**` too
+([ronl-business-api#457](https://github.com/sgort/ronl-business-api/issues/457)), so every production pattern now
+matches its acceptance filter.
 
 So a build id is silent about exactly the changes that falsify these pages. The
 commit on the branch of record is not: it moves with every change.
@@ -272,7 +273,7 @@ All three build with MkDocs and publish to Azure Static Web Apps.
 
 The acceptance site, `acc.iou-architectuur.open-regels.nl`, is the Static Web App `ambitious-river-0b5e0d303`, and the root `azure-static-web-apps-pipeline.yml` deploys it whenever `acc` is pushed to the `flevoland` remote. On 14 November 2026 it served a commit two minutes after that commit was pushed there, a commit GitHub's `acc` did not yet have. So a push to `acc` on Azure DevOps deploys acceptance; a push to `acc` on GitHub deploys nothing. `pipeline/azure_ado_pipeline.yml` used to fire on every push to `acc` as well; since 21 August 2026 it carries `trigger: none` and `pr: none` and runs only when someone starts it by hand. Which site it targets is set by a pipeline variable, not in the file.
 
-The GitHub remote is not the only one: this repository is also pushed to Azure DevOps (`flevoland`) and to the open-regels GitLab instance. Only the first two run anything.
+The GitHub remote is not the only one: this repository is also pushed to Azure DevOps (`flevoland`) and to the open-regels GitLab instance. Only the first two run anything. The GitLab mirror is fast-forwarded by hand, and since 15 November 2026 at every housekeeping after a merged pull request, `acc` and `main` alike, rather than at a release, because the site cuts none; on 22 November both its branches matched GitHub's.
 
 A third Azure DevOps pipeline, `pipeline/publish-to-github.yml`, deploys no site. It runs on a tag matching `pub/v*` — a plain `v*` tag triggers nothing — exports a sanitised snapshot of that tag (`pipeline/scripts/sanitize.sh`, with the paths `.gitattributes` marks `export-ignore` left out), and after a manual approval on the ADO environment `GitHub-Public` pushes it to the public repository [ProvincieFlevoland/IOU-architectuur](https://github.com/ProvincieFlevoland/IOU-architectuur), with the `pub/` prefix dropped from the tag. `pipeline/publish-github.md` describes the procedure.
 

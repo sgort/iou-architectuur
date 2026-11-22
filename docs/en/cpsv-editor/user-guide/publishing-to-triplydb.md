@@ -31,26 +31,25 @@ Ensure:
 5. Click **Publish to TriplyDB**.
 
 <figure markdown style="width:100%; margin:0;">
-  ![Screenshot: The publish dialog while publishing: a spinner beside Publishing to TriplyDB..., the progress bar a little over half full, a tick beside Validating form, Generating TTL and Uploading to TriplyDB, an open circle beside Updating service, and the Publishing... button disabled](../../assets/screenshots/cpsv-editor-publish-progress.png)
-  <figcaption>While the backend publishes, Uploading to TriplyDB already has its tick, and Updating service does not get one</figcaption>
+  ![Screenshot: The publish dialog while publishing: a spinner beside Publishing to TriplyDB..., the progress bar a little over half full, ticks beside Validating form and Generating TTL, Publishing to TriplyDB in bold blue with a filled dot, and the Publishing... button disabled](../../assets/screenshots/cpsv-editor-publish-progress.png)
+  <figcaption>While the backend publishes, the first two steps are ticked and Publishing to TriplyDB is the step under way</figcaption>
 </figure>
 
 ---
 
 ## Progress tracking
 
-The dialog lists four steps:
+The dialog lists three steps:
 
 1. Validating form
 2. Generating TTL
-3. Uploading to TriplyDB
-4. Updating service
+3. Publishing to TriplyDB
 
-Since v2026.11.1 the last two happen inside one call to the backend. The editor validates the form and generates the Turtle, then shows **Publishing to TriplyDB...** while the backend uploads the Turtle and any logos and syncs the dataset's service. The indicators for that call do not follow it yet: *Uploading to TriplyDB* shows a tick as soon as the call starts, and *Updating service* never gets one.
+The editor validates the form and generates the Turtle itself. The third step is one call to the backend, which uploads the Turtle and any logos and syncs the dataset's service. The step under way is shown in bold with a filled dot, finished steps get a tick, and steps still to come an open circle.
 
-On success, a direct link to the published dataset appears and the dialog closes automatically after two seconds. A green message with the dataset URL appears under the page title and auto-dismisses after ten seconds.
+On success the dialog says **Published successfully!** and closes after two seconds. A green message under the page title gives the dataset's URL and disappears after ten seconds.
 
-If the Turtle reached TriplyDB but the dataset's service could not be synced, the dialog ends in an orange **Published with warning** with the reason, and closes after three seconds; the message under the page title says the same. The data is in TriplyDB — only the dataset's SPARQL service may lag behind it.
+If the Turtle reached TriplyDB but something around it did not, the dialog ends in an orange **Published with warning** that names each part: *Service update failed:* with the reason when the dataset's service could not be synced, and *Logo not uploaded:* with the file name for each logo the backend could not upload. It closes after three seconds, and the message under the page title says the same. The data is in TriplyDB, so publishing again would not help: only the dataset's SPARQL service may lag behind it, or a logo be missing.
 
 ---
 

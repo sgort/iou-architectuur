@@ -2,11 +2,11 @@
 title: "8. Beveiliging en privacy"
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "6910bb8"
-    Linked Data Explorer: "e11e4ef"
-    RONL Business API: "67bac28"
+    CPSV Editor: "5d6345c"
+    Linked Data Explorer: "4e80c74"
+    RONL Business API: "1784a72"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -30,11 +30,13 @@ vervanging van.
   verzoek het token: handtekening, uitgever, bestemming en geldigheid. IOU kiest
   Keycloak als uitgever; dat is vervangbaar (AB-32).
 - **Autorisatie per zaak, in de backend** (AB-18). Een medewerker ziet alleen zaken
-  van de eigen organisatie, een inwoner alleen de eigen zaken. Het
-  organisatielabel zet de server zelf; bij twijfel weigert hij. Het scherm is geen
+  van de eigen organisatie, een inwoner alleen de eigen zaken. Een inwoner start
+  alleen diensten die voor inwoners bedoeld zijn, en zoekt in de BRP alleen
+  zichzelf op. Het organisatielabel zet de server zelf; bij twijfel weigert hij. Het scherm is geen
   beveiligingsgrens.
 - **Betrouwbaarheidsniveau per handeling** (AB-19). Een beslissing laten berekenen
-  vraagt `basis`, een proces starten `midden`.
+  vraagt `basis`, een proces starten `midden`, persoonsgegevens opzoeken in de
+  BRP `substantieel` voor een behandelaar en `hoog` voor de eigen gegevens.
 - **Elke schrijfactie geauthenticeerd, geautoriseerd en vastgelegd** (AB-20). De
   RONL Business API voldoet hieraan. De Linked Data Explorer en de CPSV Editor
   vragen een login met de rol voor auteurs, maar leggen nog niet vast wie wat deed,
@@ -58,7 +60,8 @@ vervanging van.
 
 - **Elk geauthenticeerd verzoek vastgelegd in een aparte auditopslag** (AB-23).
   Een bewaartermijn wordt nog niet toegepast (risico R-10). Handelingen die buiten
-  de RONL Business API om gaan, vallen daarbuiten (risico R-16).
+  de RONL Business API om gaan, vallen daarbuiten (risico R-16). Een opvraging in
+  de BRP noemt niet altijd elke opgevraagde persoon (risico R-17).
 - **Gegevens bij de bron** (AB-26): persoonsgegevens uit basisregistraties worden
   opgevraagd wanneer nodig, niet gekopieerd.
 - **Verwerkingsregister per proces** (AB-27), openbaar zonder contactgegevens.

@@ -2,11 +2,11 @@
 title: "8. Security and privacy"
 scope: cross-cutting
 verified:
-  date: 2026-11-15
+  date: 2026-11-22
   against:
-    CPSV Editor: "6910bb8"
-    Linked Data Explorer: "e11e4ef"
-    RONL Business API: "67bac28"
+    CPSV Editor: "5d6345c"
+    Linked Data Explorer: "4e80c74"
+    RONL Business API: "1784a72"
     Norm Editor: "c47096b"
     CPRMV: "8262d3e"
 ---
@@ -30,11 +30,14 @@ them.
   signature, issuer, audience and validity. IOU chooses
   Keycloak as the issuer; that is replaceable (AB-32).
 - **Authorisation per case, in the backend** (AB-18). A staff member sees only
-  cases of their own organisation, a resident only their own cases. The server sets
+  cases of their own organisation, a resident only their own cases. A resident
+  starts only services meant for residents, and looks up only themselves in the
+  BRP. The server sets
   the organisation label itself; when in doubt, it refuses. The screen is not a
   security boundary.
 - **A level of assurance per action** (AB-19). Having a decision evaluated
-  requires `basis`, starting a process `midden`.
+  requires `basis`, starting a process `midden`, looking up personal data in the
+  BRP `substantieel` for a caseworker and `hoog` for one's own record.
 - **Every write authenticated, authorised and recorded** (AB-20). The RONL
   Business API meets this. The Linked Data Explorer and the CPSV Editor require a
   login with the author role, but do not yet record who did what, and the role is
@@ -59,7 +62,8 @@ them.
 
 - **Every authenticated request recorded in a separate audit store** (AB-23). No
   retention period is applied yet (risk R-10). Actions that go around the RONL
-  Business API fall outside it (risk R-16).
+  Business API fall outside it (risk R-16). A BRP lookup does not always name
+  every person asked for (risk R-17).
 - **Data at the source** (AB-26): personal data from base registers is fetched
   when needed, not copied.
 - **Record of processing activities per process** (AB-27), public without contact

@@ -84,7 +84,7 @@ What the Deploy button does depends on whether you are signed in, and with which
   <figcaption>Signed out on production, Deploy is locked; acceptance offers a test deploy in its place</figcaption>
 </figure>
 
-A refused deploy shows its reason directly under the button: the backend's own message, or *Too many test deploys from this address; try again later.* A test deployment's ID is stored like any other and appears in a downloaded Turtle file, although the deployment itself is gone after 48 hours.
+A refused deploy shows its reason directly under the button: the backend's own message, or *Too many test deploys from this address; try again later.* If your sign-in has lapsed by the time you click, the reason is *Your session has expired. Sign in again to deploy.*, and nothing is sent: an author's deploy never quietly becomes a test deploy. A test deployment's ID is stored like any other and appears in a downloaded Turtle file, although the deployment itself is gone after 48 hours.
 
 ---
 
