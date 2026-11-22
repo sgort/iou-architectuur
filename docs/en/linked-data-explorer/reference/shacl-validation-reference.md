@@ -1,3 +1,7 @@
+---
+component: Linked Data Explorer
+---
+
 # SHACL Validation Reference
 
 This reference documents the shape layers used by the SHACL Validator, the constraint codes it emits, and the rationale for the RONL-specific shapes. The validator runs on the shared backend at `POST /v1/shacl/validate` (file-local) and `POST /v1/shacl/validate-merged` (merge-simulated), and is used by the Linked Data Explorer's standalone SHACL Validator view.
@@ -132,6 +136,15 @@ Codes are generic — any SHACL Core constraint component can appear, named `SHA
 | **Rationale** | Typically several `cpsv:Rule` blocks were published under one subject URI, so the subject carries multiple same-language titles/descriptions. |
 | **Fix** | Give each rule its own subject URI so each carries at most one title and description per language. |
 
+### SHACL-CLASS
+
+| | |
+|---|---|
+| **Severity** | 🔴 error — 🟡 warning for `dct:requires` to a service the file does not describe (since v2026.11.3) |
+| **Trigger** | A value of a path is not an instance of the class `sh:class` names. CPSV-AP requires the object of `dct:requires` to be a `cpsv:PublicService`. |
+| **Rationale** | The CPSV Editor publishes `dct:requires` to another service without describing it, because that service lives in its own graph. The validator cannot see its type, so it reports that case as a warning that says the type is checked where that service is published. A required service the file does describe, but not as a `cpsv:PublicService`, is an error, as is every other `sh:class` failure. |
+| **Fix** | The warning needs nothing in this file: validate the required service where it is published. For an error, give the value the class the shape requires. |
+
 ---
 
 ## Severity summary by component
@@ -142,6 +155,7 @@ Codes are generic — any SHACL Core constraint component can appear, named `SHA
 | `SHACL-MAXCOUNT` | RONL Custom | error |
 | `SHACL-UNIQUELANG` | RONL Custom, CPSV-AP 3.2.0 | error |
 | `SHACL-DATATYPE` | CPSV-AP 3.2.0 | error |
+| `SHACL-CLASS` | CPSV-AP 3.2.0 | error; warning for `dct:requires` to a service not described in the file |
 
 ---
 

@@ -24,7 +24,7 @@ Expanding a card reveals its full variable list: input variables in blue, output
 
 ### Services a DMN relies on
 
-A public service can declare the services it relies on with `dct:requires`, which the CPSV Editor publishes. When it does, the card of its DMN shows **Requires:** with those services, and the card of a DMN whose service is relied on shows **Required by:**. *Required by* is worked out from the declarations on the endpoint you are viewing. A linked service is named by its DMN identifier when it has a DMN in the list, else by its title, else by the last part of its URI; hovering a name shows the full URI. The same lines appear on the cards in the Chain Composer and on the info card of the BPMN Modeler's **Link to DMN/DRD** panel.
+A public service can declare the services it relies on with `dct:requires`, which the CPSV Editor publishes. When it does, the card of its DMN shows **Requires:** with those services, and the card of a DMN whose service is relied on shows **Required by:**. *Required by* is worked out from the declarations on the endpoint you are viewing. A linked service is named by its DMN identifier when it has a DMN in the list, else by its title (a Dutch title first), else by the fragment of its URI when it has one (`…/def#recht` → `recht`), else by the last part of its URI; hovering a name shows the full URI. The same lines appear on the cards in the Chain Composer and on the info card of the BPMN Modeler's **Link to DMN/DRD** panel.
 
 The links are context only. They do not add a DMN to a chain or decide the order of execution, which stays in the BPMN process.
 

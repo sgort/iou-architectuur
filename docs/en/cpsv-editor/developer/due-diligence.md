@@ -105,7 +105,7 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 | Frontend | React 19, Vite, Tailwind CSS, Lucide icons, `keycloak-js` (sign-in) |
 | State management | React hooks (`useEditorState`, `useArrayHandlers`), no external state library |
 | Build & lint | Vite, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
-| Testing | Vitest 5, `@testing-library/react`, Playwright — 858 tests across 70 files, all passing (measured 12 November 2026), at 91.35% statements, 89.29% branches, 82.15% functions and 92.03% lines; plus 4 end-to-end journeys ([Testing](testing.md)) |
+| Testing | Vitest 5, `@testing-library/react`, Playwright — 894 tests across 74 files, all passing (measured 22 November 2026), at 91.37% statements, 89.46% branches, 81.97% functions and 92.01% lines; plus 4 end-to-end journeys ([Testing](testing.md)) |
 | TTL parsing | Custom hand-written parser (no RDF library dependency) |
 | DMN parsing | Browser DOMParser (XML) |
 | External APIs | Keycloak (OIDC sign-in, realm `ronl`) directly from the browser; TriplyDB, Operaton (Camunda-compatible REST), the RONL SPARQL vocabulary and the DSO APIs only through the shared backend |
@@ -141,10 +141,10 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 
 Since v2026.11.1 the editor has sign-in. A user signs in at Keycloak realm `ronl`, the login the Linked Data Explorer and the RONL Business API share — client `ttl-editor`, the authorization code flow with PKCE — either through Flevoland's Entra or with an employee password. Signing in is optional: editing, import, validation and download work without it. The two actions that change shared state need the realm role `lde-author`:
 
-| Integration point | Auth mechanism at v2026.11.1 |
+| Integration point | Auth mechanism at v2026.11.2 |
 |---|---|
 | TriplyDB publishing | The author's bearer token to the Linked Data Explorer backend's `POST /v1/triplydb/publish`, which requires `lde-author` and publishes with its own TriplyDB account and token. The browser keeps only the dataset name |
-| Operaton deployment & testing | Deploy sends the author's token to `POST /v1/dmns/deploy`. Without a token the backend makes it a test deploy to the tenant `TestOnly`, removed after 48 hours — enabled on acceptance, not on production. Evaluate is open. The backend reaches the engine with its own optional `OPERATON_API_KEY` |
+| Operaton deployment & testing | Deploy sends the author's token to `POST /v1/dmns/deploy`; when an author's session has lapsed the editor refuses to send the deploy and asks them to sign in again, so it never falls back to an anonymous test deploy. Without a token the backend makes it a test deploy to the tenant `TestOnly`, removed after 48 hours — enabled on acceptance, not on production. Evaluate is open. The backend reaches the engine with its own optional `OPERATON_API_KEY` |
 | Shared Express backend (LDE) | Verifies Keycloak tokens. Every route the editor uses to change shared state requires `lde-author` — publish, test-connection, update-service, list-graphs — except deploy, which without a token is a test deploy where one is enabled. The routes the editor reads stay open: the SPARQL proxy, DMN and SHACL validation, evaluate, `publish-target` and `deploy/options` |
 | Azure Static Web Apps | Deployment tokens in GitHub Secrets (CI/CD only, no user auth) |
 

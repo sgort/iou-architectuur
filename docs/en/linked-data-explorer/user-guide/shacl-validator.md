@@ -97,6 +97,8 @@ Errors must be resolved before publishing. Common errors:
 
 Warnings are advisory — the data conforms but deviates from a recommended practice. Review them before publishing.
 
+A common one is **SHACL-CLASS** on `dct:requires`: your service requires another service that this file does not describe. That is expected when the required service is published on its own; its type is checked there.
+
 ---
 
 ## Merge-simulated example

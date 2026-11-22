@@ -159,23 +159,23 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.11.1** · *November 2026*
+-   **✏️ CPSV Editor — v2026.11.2** · *November 2026*
 
     ---
 
-    **Sign in to deploy and publish, and no TriplyDB token in the browser**
+    **An import that reads each statement whole, and publish steps that match the call**
 
-    The editor now offers an optional sign-in through Keycloak ([getting started](cpsv-editor/user-guide/getting-started.md#signing-in)). An author — an account with the `lde-author` role — deploys DMNs and publishes to TriplyDB; anyone else can still build and export, and on acceptance can make a test deploy that is removed after 48 hours ([DMN tab](cpsv-editor/user-guide/dmn-tab.md)). Publishing is one call to the Linked Data Explorer backend, which holds the TriplyDB token and records who published, so the dialog asks only for the dataset ([publishing](cpsv-editor/user-guide/publishing-to-triplydb.md)). Clear All now empties the DMN tab too. The [suites](cpsv-editor/developer/testing.md) stand at 858 tests, all passing.
+    Importing no longer drops a rule, parameter or concept whose last line holds a semicolon, and a field such as the sector is read only from its own property, never from a URI or description that mentions it ([import](cpsv-editor/features/import-export.md)). The publish dialog shows the three steps publishing really takes, and names any logo the backend could not upload ([publishing](cpsv-editor/user-guide/publishing-to-triplydb.md)). An author whose session lapsed is asked to sign in again rather than test-deploying, and the *View only* note says where a test deploy is still possible ([DMN tab](cpsv-editor/user-guide/dmn-tab.md#step-4-deploy-to-operaton)). Deploys now queue instead of racing, and every test file belongs to a phase script. The [suites](cpsv-editor/developer/testing.md) stand at 894 tests in 74 files, all passing.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.11.2** · *November 2026*
+-   **🔍 Linked Data Explorer — v2026.11.3** · *November 2026*
 
     ---
 
-    **Signing in to change shared state**
+    **Sign-in and publishing hardened, and a required service elsewhere is a warning**
 
-    Anything that changes what others see — deploying a DMN, a DRD or a process, saving assets, refreshing the cache, saving or deleting a RoPA record, publishing to TriplyDB — now needs a sign-in with the `lde-author` role ([getting started](linked-data-explorer/user-guide/getting-started.md#signing-in)). Reading and evaluating stay open. Signed out, a deploy on acceptance goes to a test tenant that is cleared after 48 hours, and saved processes, forms and templates stay in your own browser. The backend now publishes to TriplyDB for the CPSV Editor, with its own token, and the eDOCS write routes are gone ([backend](linked-data-explorer/developer/backend.md)). The [suites](linked-data-explorer/developer/testing.md) stand at 3,663 tests; one timed out under load in the full run and passed on its own.
+    The backend now accepts only access tokens. When Keycloak cannot be reached, a change answers that sign-in is unavailable instead of asking you to sign in again ([backend](linked-data-explorer/developer/backend.md#sign-in)). A failed publish to TriplyDB says why in a line the editor can show, and a refused publishing address is named when the backend starts. The SHACL Validator reports `dct:requires` to a service the file does not describe as a warning, because that service is checked where it is published ([SHACL-CLASS](linked-data-explorer/reference/shacl-validation-reference.md#shacl-class)). A linked service without a DMN or title is named by the fragment of its address ([chain building](linked-data-explorer/features/dmn-chain-building.md)). The [suites](linked-data-explorer/developer/testing.md) stand at 3,698 tests in 171 files, all passing.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 

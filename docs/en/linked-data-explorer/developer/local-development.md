@@ -94,7 +94,7 @@ The keys that matter locally:
 | `AUTH_CLIENTS` | `linked-data-explorer,ttl-editor,lde-e2e` | Clients whose tokens are accepted |
 | `TEST_DEPLOY_ENABLED` | `true` | A signed-out DMN deploy goes to tenant `TestOnly` instead of answering `401` |
 | `TRIPLYDB_BASE_URL` / `TRIPLYDB_ACCOUNT` / `TRIPLYDB_API_TOKEN` | commented out | The publishing account. Without account and token, publishing answers `503` and everything else works |
-| `LOG_LEVEL` / `LOG_FORMAT` | `info` / `json` | `json` writes one JSON object per line. Any other value, such as `pretty`, writes coloured, timestamped lines. |
+| `LOG_LEVEL` / `LOG_FORMAT` | `info` / `json` | `json` writes one JSON object per line, each with a `timestamp`. Any other value, such as `pretty`, writes coloured, timestamped lines. |
 | `EDOCS_STUB_MODE` | `true` | eDOCS calls are stubbed. Stub mode is also the default when the key is absent. |
 | `DATABASE_URL` | `postgresql://lde_user:lde_password@localhost:5432/lde_assets` | Asset storage (see [PostgreSQL setup](#postgresql-setup-local)) |
 | `DSO_API_KEY` / `DSO_API_KEY_PROD` | `your-dso-api-key-here` | Replace these with real keys to use the DSO Explorer. The DSO base URLs default to pre-production, and the `_PROD` variants hold the production ones. |
@@ -183,19 +183,21 @@ npm run dev            # terminal 2: frontend
     cd ../ronl-business-api && docker compose up -d postgres operaton
     ```
 
-3. `nodemon` watches `src/**/*.ts` and runs `ts-node src/index.ts`.
+3. `nodemon` watches `src/**/*.ts` and runs `tsx src/index.ts`.
 
 `npm run docker:check` in `packages/backend` runs step 2 on its own.
 
 ### What the backend logs
 
-With the default `LOG_FORMAT=json`, every log line is a JSON object. The start sequence is:
+With the default `LOG_FORMAT=json`, every log line is a JSON object with its own `timestamp`. The start sequence is:
 
 - `[DB] Migrations applied` (or the skip warning when `DATABASE_URL` is empty)
 - `Server started`, with `environment`, `host`, `port`, `corsOrigin`, `triplydbEndpoint` and `operatonBaseUrl`
 - `API available at: http://localhost:3001/v1`
 - `Health check: http://localhost:3001/v1/health`
 - `Legacy API: http://localhost:3001/api (deprecated)`
+
+When `TRIPLYDB_ACCOUNT` and `TRIPLYDB_API_TOKEN` are set but `TRIPLYDB_BASE_URL` is refused, a warning *Publishing is off: TRIPLYDB_BASE_URL is refused* follows, with the reason.
 
 The same logger also writes to `logs/error.log` and `logs/combined.log` under `packages/backend`, and every request is logged as `Incoming request`.
 
@@ -247,7 +249,7 @@ After the database is running and the backend has started once, so that the migr
 
 ```bash
 cd packages/backend
-npx ts-node --project tsconfig.json src/db/seed-ropa.ts
+npx tsx src/db/seed-ropa.ts
 ```
 
 Expected output:
@@ -325,7 +327,7 @@ CORS does not get in the way: `middleware/cors.middleware.ts` answers the public
 | Operaton | `ronl-operaton` container, `http://localhost:8081/engine-rest` | Set in the App Service configuration, see [Deployment](deployment.md#environment-variables-azure-app-service) |
 | PostgreSQL | `ronl-postgres` container, `lde_assets` database | Azure Database for PostgreSQL Flexible Server, see [PostgreSQL deployment](deployment-postgresql.md) |
 | DB migrations | Run on every backend start | Run on every backend start |
-| RoPA seed | Run manually: `npx ts-node … src/db/seed-ropa.ts` | Run manually. No workflow runs it. |
+| RoPA seed | Run manually: `npx tsx src/db/seed-ropa.ts` | Run manually. No workflow runs it. |
 | `ropa-site` API base | `http://localhost:3001`, derived from the hostname | `https://acc.backend.linkeddata.open-regels.nl`, derived from the hostname |
 | `ropa-site` hosting | `npx serve .` | Azure Static Web Apps, deployed by `azure-ropa-site-acc.yml` on a push to `acc` that touches `packages/ropa-site/**` |
 | CORS for public routes | `origin: '*'` for the four public mounts, regardless of `CORS_ORIGIN` | Same |
@@ -374,7 +376,7 @@ The root `package.json` also defines these scripts:
 | `audit:signatures` | `bash scripts/audit-signatures.sh`: runs `npm audit signatures` on the installed tree, verifying each package's registry signature and, where it has one, its provenance attestation. It reads `node_modules`, so it needs `npm ci` first. The required `audit` job runs it on every pull request. |
 | `check-supply-chain` | `node scripts/check-supply-chain.mjs` |
 | `sbom` | `node scripts/write-sbom.mjs`: writes the CycloneDX software bill of materials of the production dependencies, read from the lockfile, to `docs/sbom/<name>-<version>.cdx.json` |
-| `sbom:check` | `node scripts/write-sbom.mjs --check`: exits 1 when the committed SBOM for the current version is missing or no longer matches the lockfile. `sbom.yml` runs the same check on the release pull request. |
+| `sbom:check` | `node scripts/write-sbom.mjs --check`: exits 1 when the committed SBOM for the current version is missing or its components or dependency graph no longer match the lockfile; the serial number, timestamp and the npm that wrote it are not compared. `sbom.yml` runs the same check on the release pull request. |
 | `test:scripts` | Tests `promotion-targets.mjs` and `dso-dossier.mjs`: `node scripts/promotion-targets.test.mjs && node scripts/dso-dossier.test.mjs` |
 | `check-mirror` | `bash scripts/check-mirror.sh`: compares `acc` and `main` on `origin` with the `gitlab` mirror. It prints the push command for any drift and never pushes. |
 | `check-rip-bpmn` | `node scripts/check-rip-bpmn-copies.mjs`: compares the `e2e-fixtures/flevoland/` copies of the twelve RIP phase models byte for byte with their source under `examples/organizations/flevoland/`, and checks the source files against the sha256 fingerprints in `rip-bpmn-fingerprints.json`. The fingerprints also cover two declared-phase models, `GedelegeerdBesluitProcess.bpmn` and `ManagementCapacityClaimProcess.bpmn`. `--write` regenerates the fingerprints and refreshes the `e2e-fixtures` copies. `pre-push` runs it, and so does the required `audit` job in CI. |

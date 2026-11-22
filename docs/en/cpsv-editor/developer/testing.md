@@ -14,33 +14,34 @@ The testing roadmap that ran from P0 to P7 is **complete**: every phase has
 landed, and the per-file 80% branch floor is enforced natively by the runner.
 
 !!! info "Figures on this page are measured, not estimated"
-    Every unit-suite figure below was re-measured against **v2026.11.1** on
-    **12 November 2026** at `e82375e` on `acc`, whose source is the same as
-    `6910bb8` on `main` — `acc` differs only in `zizmor.yml` and
-    `SECURITY-PIPELINE.md`, a Renovate pin of `zizmor-action` — on
-    **Vitest 5.0.5**. The full run with coverage reported **70 files and 858
-    tests, all passing, in 83.43 s** (Vitest's own duration). v2026.11.1 added
-    46 tests. Every phase script, lint, the format check, `check-supply-chain`,
-    `sbom:check` and `audit:signatures` passed on the same checkout, and so did
-    the self-tests of the scripts the supply-chain jobs run:
-    `dependency-review.test.mjs` (24 checks), `lockfile-diff.test.mjs` (77) and
-    `write-sbom.test.mjs` (7).
-    The **end-to-end journeys were not re-run for v2026.11.1**, although three of
-    them changed: they now sign in as `lde-e2e` before deploying, which also
-    needs Keycloak on `:8080` and `LDE_E2E_PASSWORD` in the shell — see
-    [below](#end-to-end-journeys-need-a-live-stack). Their figures are still
-    those of 10 October 2026, against v2026.10.1 on a local stack — the Linked
+    Every unit-suite figure below was re-measured against **v2026.11.2** on
+    **22 November 2026** at `5d6345c` on `main`, on **Vitest 5.1.0**. The full
+    run with coverage reported **74 files and 894 tests, all passing, in
+    61.43 s** (Vitest's own duration, measured while another repository's lint
+    ran on the same machine, so not a clean timing). v2026.11.2 added 36 tests.
+    Every phase script, lint, the format check and `check-supply-chain` passed
+    on the same source, the committed SBOM matches the lockfile — the same
+    components and dependency graph — and the self-tests of the scripts the
+    supply-chain jobs run passed: `dependency-review.test.mjs` (24 checks),
+    `lockfile-diff.test.mjs` (77) and `write-sbom.test.mjs` (7).
+    The **end-to-end journeys were not re-run for v2026.11.2**: no spec changed,
+    only the preflight in `e2e/stack.js`, which now also checks Keycloak. Nor
+    were they re-run for v2026.11.1, when the three stack journeys began to sign
+    in as `lde-e2e` before deploying, which needs Keycloak on `:8080` and
+    `LDE_E2E_PASSWORD` in the shell — see
+    [below](#end-to-end-journeys-need-a-live-stack). Their figures are carried
+    forward from 10 October 2026, against v2026.10.1 on a local stack — the Linked
     Data Explorer backend on `:3001`, Operaton on `:8081`, and this editor's dev
     server started by Playwright's own `webServer` on `:3000`: **4 passed in
     42.4 s**, with Playwright 1.63.0. The lockfile now holds 1.64.1.
     Rerun the commands in [Running the tests](#running-the-tests) to reproduce
     them.
 
-**At a glance:** 70 files · **858 tests** · all passing · 83.43 s for a full run
-with coverage on this measurement, plus **4 end-to-end journeys** run separately
-(last run on 10 October 2026).
+**At a glance:** 74 files · **894 tests** · all passing · 61.43 s for a full run
+with coverage on this measurement (on a busy machine), plus **4 end-to-end
+journeys** run separately (last run on 10 October 2026).
 
-Coverage: **91.35% statements · 89.29% branches · 82.15% functions · 92.03%
+Coverage: **91.37% statements · 89.46% branches · 81.97% functions · 92.01%
 lines**, with every file at or above the 80% branch floor.
 
 !!! danger "Measure after `npm ci`, never after `npm install`"
@@ -61,25 +62,25 @@ from the repository root after `npm ci`.
 
 | Command | Scope | Suites | Tests |
 |---|---|---:|---:|
-| `npm run test:ci` | Everything, once, with coverage | 70 | 858 |
-| `npm test` | Everything, interactive watch mode | 70 | 858 |
+| `npm run test:ci` | Everything, once, with coverage | 74 | 894 |
+| `npm test` | Everything, interactive watch mode | 74 | 894 |
 | `npm run test:generator` | TTL generator regression tests | 9 | 131 |
-| `npm run test:roundtrip` | TTL round-trip tests (P1) | 1 | 14 |
-| `npm run test:p2` | Pure-logic utilities (P2) | 8 | 192 |
-| `npm run test:p3` | State hooks (P3) | 3 | 36 |
-| `npm run test:p4` | Network-touching utilities (P4) | 2 | 36 |
-| `npm run test:p5` | Tab components, PreviewPanel, PublishDialog (P5) | 23 | 190 |
-| `npm run test:p6` | `DMNTab`'s full lifecycle (P6) | 7 | 108 |
+| `npm run test:roundtrip` | TTL round-trip, parser and import tests (P1) | 5 | 61 |
+| `npm run test:app` | The `src/App.*` suites | 6 | 33 |
+| `npm run test:p2` | Pure-logic utilities, and the phase-script guard (P2) | 10 | 200 |
+| `npm run test:p3` | State hooks (P3) | 3 | 37 |
+| `npm run test:p4` | Network-touching utilities and sign-in state (P4) | 7 | 85 |
+| `npm run test:p5` | Tab components, PreviewPanel, PublishDialog, sign-in controls (P5) | 27 | 238 |
+| `npm run test:p6` | `DMNTab`'s full lifecycle (P6) | 7 | 109 |
 | `npm run test:e2e` | Playwright journeys (P7) — **needs a live stack** | 4 | 4 |
 
-Each scoped script has a `:watch` counterpart. The phase scripts overlap
-deliberately — a file can belong to more than one phase — so their counts do
-not sum to 858. Some files belong to no phase script at all:
-`parseTTL.requires.test.js` and `serviceCatalogHelper.test.js` (v2026.11.0), and
-the four sign-in files of v2026.11.1 — `auth.test.js`, `authState.test.js`,
-`SignInMenu.test.jsx` and `LockedAction.test.jsx` — run only in the full suite, like
-`problem.test.js` before them. `DMNTab.signin.test.jsx` is the exception: `test:p6`
-selects it by name.
+Each scoped script has a `:watch` counterpart. Every test file belongs to at
+least one phase script: `src/testing/phaseScripts.test.js` (3 tests, run by
+`test:p2`) reads the scripts from `package.json`, walks `src/` and fails, naming
+the file, when a test file matches no phase script's filter, or when a `:watch`
+script selects other files than its run script. The filters are path substrings
+and may overlap, but on this measurement none does: the eight scripts' counts
+sum exactly to the full run's 74 files and 894 tests.
 
 ### End-to-end journeys need a live stack
 
@@ -105,10 +106,12 @@ LDE_E2E_PASSWORD='<password>' npm run test:e2e
 That makes Keycloak a third service of the stack: `http://localhost:8080`, realm `ronl`,
 with the account that ronl-business-api's `scripts/keycloak-add-lde-clients.sh --with-e2e`
 creates and a `ttl-editor` client registered for `http://localhost:3000`, the port
-Playwright's `webServer` uses. The preflight below does not check Keycloak: when it is
-down, the failure arrives as a 30-second wait for **Sign out** in `e2e/signIn.js`. An
-account without the role fails at sign-in, with that reason. The journeys have not been
-re-run since this change.
+Playwright's `webServer` uses. The preflight below checks Keycloak too: realm `ronl` has
+to answer its OpenID configuration, so a Keycloak that is down, or one without the realm,
+is named before a journey starts instead of surfacing as a 30-second wait for **Sign out**
+in `e2e/signIn.js`. An account without the role fails at sign-in, with that reason. The
+journeys have not been re-run since the sign-in was added, nor since the preflight
+began checking Keycloak.
 
 | Command | What it does |
 |---|---|
@@ -116,13 +119,17 @@ re-run since this change.
 | `npm run test:e2e:headed` | A real browser window, actions slowed to 400 ms |
 | `npm run test:e2e:ui` | Playwright UI mode |
 
-A **preflight fixture checks both services first and names what is missing** —
-once per run, for the three journeys that use them — because
+A **preflight fixture checks all three services first and names what is missing** —
+the backend, Operaton and Keycloak's realm `ronl`, once per run, for the three journeys
+that use them — because
 the failure otherwise arrives disguised: a connection refused surfaced as an
 amber validation banner, or as a deploy that quietly never enabled the Evaluate
 button, with the runner then reporting a timeout on a button several steps from
-the cause. The backend URL is read from `.env.development` rather than
-hardcoded, so the preflight checks the same host the application will call.
+the cause. The backend and Keycloak URLs are read from `.env.development`
+(`VITE_BACKEND_URL`, `VITE_KEYCLOAK_URL`) rather than hardcoded, unless
+`E2E_BACKEND_URL` or `E2E_KEYCLOAK_URL` overrides them, so the preflight checks the
+same hosts the application will call. For Keycloak an answer is not enough: it must
+succeed, because a Keycloak without the realm answers 404.
 
 Since v2026.11.0 the Service tab asks the backend for the dataset's published
 services as soon as it renders. In the stack-free re-import journey nothing
@@ -276,6 +283,8 @@ Test files are colocated with the source they cover (`foo.js` →
 | File | Tests | Style | Covers |
 |---|---:|---|---|
 | `src/parseTTL.requires.test.js` | 8 | Pure unit, inline Turtle | `dct:requires` read back one per line, as a comma list and as an object list continued onto the next lines; a URI containing field names leaks into none of them; bare `a cpsv:PublicService .` stubs before or after the service never become the service; and a round trip keeps the list (v2026.11.0) |
+| `src/parseTTL.predicates.test.js` | 8 | Pure unit, inline Turtle | Bare-named fields read only from their predicate: a sector URI containing "sector" read whole, a description mentioning sector, thematic area, `validFrom` or `validUntil` leaving the field alone, a sector URI inside a required service not leaking into the sector, and the legacy `ronl:` and `cprmv:extends`/`cprmv:confidence` forms still read (v2026.11.2) |
+| `src/parseTTL.statementEnd.test.js` | 7 | Pure unit, inline Turtle | A statement ends at its full stop outside literals and IRIs: a closing literal containing ";" still ends a temporal rule, parameter, concept or CPRMV rule; a "." mid-text or only inside an IRI does not; a full stop on its own line, after a typed literal or before a comment still does (v2026.11.2) |
 | `src/parseTTL.roundtrip.test.js` | 14 | Real fixtures, no mocks | Parses a real reference export, regenerates TTL from the parsed state, then parses again — comparing business fields between the two parses rather than diffing against the original file's formatting |
 | `src/utils/ttlGenerator.sections.test.js` | 29 | Pure unit | The skeleton the others sit in: `generate()` assembles a dozen optional sections, each behind its own condition — service identifier and sector, organisation logo, legal resource, temporal rules |
 | `src/utils/ttlGenerator.uris.test.js` | 26 | Pure unit | The URI and date helpers every emitter shares — legal-resource and ruleset URIs, `cprmvValidFrom`, rules-derived dates, CPRMV rule subject URIs. A wrong one does not throw; it publishes a graph that parses and points at the wrong resources |
@@ -324,7 +333,7 @@ it.
 |---|---:|---|---|
 | `src/hooks/useArrayHandlers.test.js` | 15 | `renderHook` + a `useState` harness | Array CRUD handlers, the four default-item factories, and the pre-configured wrapper hooks. New ids continue from the highest existing id, not the array length |
 | `src/hooks/useDsoImport.test.js` | 9 | `renderHook` + fetch mock + real `window.history` | The DSO → DMN deep-link import: no-op paths, params stripped before the fetch resolves, error branches, and the full success path prefilling three tabs |
-| `src/hooks/useEditorState.test.js` | 12 | `renderHook` + mocked `ronlHelper` | Initial defaults, the mount effects — since v2026.11.1 including the publish target the required-services picker is built from — and `clearAllData`, including its documented exception that TriplyDB config is *not* cleared |
+| `src/hooks/useEditorState.test.js` | 13 | `renderHook` + mocked `ronlHelper` | Initial defaults, the mount effects — since v2026.11.1 including the publish target the required-services picker is built from — and `clearAllData`, including its documented exception that TriplyDB config is *not* cleared, and that each reset gets its own `requires` list rather than the shared default (v2026.11.2) |
 
 ### Network-boundary utilities (P4)
 
@@ -338,26 +347,31 @@ test — a plain `global.fetch` mock — for the published-services list behind 
 tab's required services: the dataset's SPARQL URL, a `null` for each missing config
 field, the query posted through the backend proxy without credentials, one entry per
 service when it has several titles, and an error on a non-ok or unsuccessful response.
-No phase script names it either: `test:p4` still selects only `shaclHelper` and
-`triplydbHelper`.
+`test:p4` selects it, with `problem`, the sign-in modules (`utils/auth`, `authState`)
+and `deployOptions`. `src/utils/deployOptions.test.js` (3 tests, v2026.11.2) covers
+the test-deploy offer: returned when enabled, and `null` when disabled, on an HTTP
+error, a malformed body or a network failure.
 
-`src/utils/problem.test.js` (7 tests, v2026.09.6) belongs with these, though no phase
-script names it: it pins `getProblemDetail`, which reads the backend's RFC 9457 `detail`
+`src/utils/problem.test.js` (7 tests, v2026.09.6) belongs with these, and `test:p4`
+runs it: it pins `getProblemDetail`, which reads the backend's RFC 9457 `detail`
 first and still understands the older `error.message` and bare-string `error` shapes.
 `src/App.lazyTabs.test.jsx` (6 tests) covers the lazy tabs, including the DSO deep link
 that used to leave the DMN tab highlighted over an empty panel, and since v2026.11.1 that
-Clear All remounts the DMN tab empty.
+Clear All remounts the DMN tab empty; `test:app` runs it with the other five `src/App.*`
+suites.
 
-**Sign-in (v2026.11.1).** `src/utils/auth.test.js` (24 tests) is the one suite that
+**Sign-in (v2026.11.1).** `src/utils/auth.test.js` (25 tests) is the one suite that
 unmocks `utils/auth` and drives the real module against a mocked `keycloak-js`: the
 silent check only after an earlier sign-in, the popup and its redirect fallback, the
-popup reporting back or being closed, sign-out, the `lde-author` role, and
+popup reporting back or being closed — since v2026.11.2 including a late report from the
+tab's own popup starting no second check — sign-out, the `lde-author` role, and
 `authHeaders()` refreshing a token or falling back to signed out.
 `src/testing/authState.test.js` (3) pins the test double every other suite runs
 against: `setupTests.js` mocks `utils/auth` with it, so each test starts signed in as an
 author and a test about the signed-out states sets that state itself.
-`src/components/SignInMenu.test.jsx` (8) covers the two routes, the name and **Sign
-out**, and the dismissible *View only* note; `src/components/LockedAction.test.jsx` (4)
+`src/components/SignInMenu.test.jsx` (11) covers the two routes, the name and **Sign
+out**, the dismissible *View only* note, and the note's wording with and without a
+test-deploy offer, which an author never asks for; `src/components/LockedAction.test.jsx` (4)
 the locked button and its two hints.
 
 These use a plain `global.fetch` mock rather than `msw`. Every function here
@@ -376,7 +390,7 @@ tests.
 
 ### Tab components and dialogs (P5)
 
-Twenty-three files, 190 tests. Deliberately thin and even: every component
+Twenty-seven files, 238 tests. Deliberately thin and even: every component
 renders with realistic props, and one representative interaction proves the
 controlled-component contract. No component is left at zero, and `src/components`
 moved from 3.9% to 41% statements in this phase alone.
@@ -397,16 +411,22 @@ section: the published list without the service itself,
 adding from it and from a pasted URI (trimmed, de-duplicated, angle brackets
 stripped), every rejection — the service's own URI, a non-http(s) value, characters
 Turtle does not allow in an IRI — removal by title, pasting after the list failed
-to load, no fetch without a config, and **Refresh list** fetching again.
-`RequiredServicesSection.jsx` has no test file of its own and reaches 96.77% statements,
-95% branches and 100% functions and lines through these.
+to load, no fetch without a config, and **Refresh list** fetching again. v2026.11.2
+added the picker's states, for 24 tests in all: **Refresh list** disabled without a
+dataset, **Add** disabled until a service is chosen, a rejection clearing on **Remove**
+and on typing, the previous dataset's list hidden while a new one loads, and no refetch
+when only the token changes. `RequiredServicesSection.jsx` has no test file of its own
+and reaches 98.48% statements, 95.74% branches and 100% functions and lines through
+these.
 
 ### `DMNTab` lifecycle (P6)
 
-Seven files, 108 tests, covering validate → deploy → evaluate. `DMNTab.signin.test.jsx`
-(9 tests, v2026.11.1) adds the three Deploy states — an author's deploy with a token, the
+Seven files, 109 tests, covering validate → deploy → evaluate. `DMNTab.signin.test.jsx`
+(10 tests, v2026.11.1) adds the three Deploy states — an author's deploy with a token, the
 test deploy to `TestOnly` with evaluations sent to that tenant, and the locked button
-where the backend offers no test deploy — and a refused deploy shown under the button. The suite walks the
+where the backend offers no test deploy — and a refused deploy shown under the button,
+and, since v2026.11.2, an author whose session lapsed at click time asked to sign in
+again rather than test-deployed. The suite walks the
 real lifecycle rather than testing each call in isolation, **because the interface
 enforces that order**: the Evaluate button stays disabled until a deployment has
 succeeded.
@@ -421,8 +441,10 @@ the branch that requires an uploaded file, so the error it raises can never fire
 Four Playwright specs, three of them run against a live stack rather than mocks.
 None of them changed in v2026.10.2 or v2026.11.0. In v2026.11.1 the three stack
 journeys gained a sign-in as `lde-e2e` before deploying (see
-[above](#end-to-end-journeys-need-a-live-stack)), and they were not re-run for it: the
-figures below are still those of 10 October 2026. Last measured on 10 October 2026 against v2026.10.1 on a local stack — the Linked Data
+[above](#end-to-end-journeys-need-a-live-stack)), and they were not re-run for it. No
+spec changed in v2026.11.2; the preflight now also checks Keycloak, and a run today ends
+its preflight line with `, Keycloak http://localhost:8080/realms/ronl (HTTP 200)`. The
+figures below are carried forward from 10 October 2026. Last measured on 10 October 2026 against v2026.10.1 on a local stack — the Linked Data
 Explorer backend on `:3001`, Operaton on `:8081`, and the dev server Playwright's
 `webServer` started on `:3000`. The re-import journey ran first and without the
 preflight; the preflight then confirmed both services once, for the other three:
@@ -457,9 +479,10 @@ finishes — fine at a desk, a hang in anything scripted.
     evaluates *by key* then answers from the test fixture. Only a local stack,
     `.env.development`'s `localhost:8081`, is free of that.
 
-    The app also calls the backend it was **built** against: `E2E_BACKEND_URL`
-    redirects the preflight probe, not the application. Driving a deployed build
-    means driving its stack.
+    The app also calls the backend and the Keycloak it was **built** against:
+    `E2E_BACKEND_URL` and `E2E_KEYCLOAK_URL` redirect the preflight probes, not the
+    application, and without them the preflight still checks the hosts in
+    `.env.development`. Driving a deployed build means driving its stack.
 
     Since v2026.11.1 the stack journeys sign in as `lde-e2e` before they deploy.
     ronl-business-api's `keycloak-add-lde-clients.sh` refuses to create that account
@@ -485,9 +508,9 @@ so the journey is not blocked, and the threshold is documented rather than dodge
 ## Coverage
 
 Measured with Vitest's `--coverage` (`npx vitest run --coverage`, what
-`npm run test:ci` runs) against v2026.11.1 on 12 November 2026, at `e82375e`.
+`npm run test:ci` runs) against v2026.11.2 on 22 November 2026, at `5d6345c`.
 
-**Overall: 91.35% statements · 89.29% branches · 82.15% functions · 92.03%
+**Overall: 91.37% statements · 89.46% branches · 81.97% functions · 92.01%
 lines** — against 54.75% / 40.88% / 38.68% / 55.57% at v2026.09.0. The jump is
 P5, P6 and the branch-floor work landing together; v2026.09.3's two parser guards
 moved `src/utils` a little further. At v2026.10.0 `src/utils` rose again and
@@ -502,16 +525,24 @@ with the parser's new `dct:requires` branches. v2026.11.1 moved every measure up
 68.33% functions, and the sign-in files arrived tested — `LockedAction.jsx`,
 `SignInMenu.jsx` and `useAuth.js` at 100% on every measure, `auth.js` at 98.87%
 statements and 94.11% branches — taking `src/components` to 100% functions.
+v2026.11.2 moved the totals by less than a fifth of a point either way. Branches rose,
+to 89.46%: `PublishDialog.jsx`'s three-step list took `src/components` to 94.55%
+branches, and the parser's two new helpers arrived covered. Functions fell, to 81.97%:
+`App.jsx` stands at 61.40% (35 of 57), from 65.45% — the logo warning's two new
+callbacks are covered, but no test reaches the timers that close the dialog and clear
+the message after a warning, or clear it after a success — which took `src` down on
+every measure. `RequiredServicesSection.jsx`, reworked for its loading states, stands
+at 98.48% statements and 95.74% branches.
 
 | Area | Statements | Branches | Functions | Lines |
 |---|---:|---:|---:|---:|
 | `src/hooks` | 100% | 94.20% | 100% | 100% |
-| `src/utils` | 95.40% | 89.72% | 98.20% | 96.24% |
+| `src/utils` | 95.45% | 89.79% | 98.23% | 96.27% |
 | `src/testing` (the `utils/auth` test double) | 93.75% | 100% | 90.00% | 92.85% |
 | `src/config` | 90.56% | 81.13% | 75.00% | 90.19% |
-| `src/components` | 92.70% | 91.72% | 100% | 95.50% |
-| `src/components/tabs` | 85.43% | **92.36%** | 69.00% | 85.67% |
-| `src` (App, index, parser) | 88.40% | 82.77% | 68.33% | 89.45% |
+| `src/components` | 93.63% | 94.55% | 100% | 96.03% |
+| `src/components/tabs` | 85.60% | **92.56%** | 68.79% | 85.72% |
+| `src` (App, index, parser) | 87.89% | 82.30% | 65.62% | 89.04% |
 
 The rows are the runner's own per-directory figures, so `src/components` counts only the
 files directly in that folder — the dialogs and panels — and the tabs have a row of their
@@ -542,7 +573,7 @@ at 98% branches, from 45.73% at v2026.09.1.
 !!! note "What the branch column does not see"
     A branch floor steps straight over branch-free code. `ConceptsTab.jsx` reads
     80.55% on branches but **71.62% statements and 63.33% functions**;
-    `App.jsx` reads 84.14% / 80.50% / **65.45%**. The uncovered code there is
+    `App.jsx` reads 83.92% / 78.83% / **61.40%**. The uncovered code there is
     largely whole handlers no test calls. That asymmetry is why a functions floor
     is [a separate decision](../../contributing/coverage-floor.md#a-functions-floor-is-a-separate-decision)
     rather than a free companion setting.
@@ -601,7 +632,9 @@ question, deliberately left open.
 - **Add a script pair per phase.** Each new phase gets
   `test:<phase>` and `test:<phase>:watch` in `package.json`, passing Vitest
   the file-name filters of the files it covers, mirroring the existing
-  `test:p2` / `test:p3` / `test:p4` entries.
+  `test:p2` / `test:p3` / `test:p4` entries. A new test file must match a phase
+  script's filter: `src/testing/phaseScripts.test.js` fails, naming it, when it
+  matches none, and when a `:watch` script differs from its run script.
 - **Mock at the network boundary.** There is no local backend to run against —
   the editor depends on the Linked Data Explorer's shared Express backend for
   the SPARQL proxy, TriplyDB publishing, and DMN validation, deploy and
@@ -660,14 +693,15 @@ toolchain instead of twice.
 
 Not phases, but the honest remaining edges:
 
-- **Seven unreachable branches in `DMNTab.jsx`**, all guards the UI cannot
-  reach — `if (!uploadedFile)` under a button that only renders once a file
-  exists, and three of the same shape. Chasing them would mean testing through
-  the component's internals; the file documents them as defensive dead code.
+- **Eight uncovered branches in `DMNTab.jsx`** (446 of 454 covered), all guards
+  and fallbacks the UI does not reach — `if (!uploadedFile)` under a button that
+  only renders once a file exists, three early returns of the same shape, and four
+  `||`/`??` defaults. Chasing them would mean testing through the component's
+  internals; the file documents them as defensive dead code.
 - **Three files one branch above the floor**, with no ratchet left to absorb a
   regression.
 - **A functions floor**, which is a separate decision needing its own
-  measurement — `App.jsx` sits at 65.45% functions against 84.14% branches.
+  measurement — `App.jsx` sits at 61.40% functions against 83.92% branches.
 
 **Deliberately out of scope for now:** swapping in an RDF library (the
 round-trip tests are the data that should decide whether the hand-rolled

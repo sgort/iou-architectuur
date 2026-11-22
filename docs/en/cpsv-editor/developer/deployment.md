@@ -109,6 +109,17 @@ what that hardening deliberately does not cover. The deploy action's container
 image, `staticappsclient:stable`, still floats and cannot be pinned; it now
 only uploads, but still receives the deploy token and the built artifact.
 
+**Deploys queue per branch.** Both deploy workflows set `concurrency` with the
+group `deploy-${{ github.ref }}` and `cancel-in-progress: false`. A deploy that
+has started always finishes; a run still waiting is replaced by a newer one,
+which GitHub shows as cancelled, not failed, so the newest commit is the one
+deployed. Without the group, merges that land minutes apart deploy in
+parallel, and Azure cancels the older upload when the newer one starts, which
+the deploy action reports as *Deployment Failed* although nothing broke. Each
+pull request has a ref of its own, so previews still build side by side.
+`semgrep.yml` sets its own concurrency, cancelling only superseded
+pull-request runs.
+
 ### Dependency audit, review and release SBOM
 
 Three workflows answer questions about dependencies rather than about a commit.

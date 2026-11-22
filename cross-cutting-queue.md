@@ -70,6 +70,42 @@ drained by the pass of 27 September, everything queued from 27 September to 3 Oc
 7. **Hot fix #473 is on production in no release:** Flevoland's accent fill. No rule, workflow or hook changed. It bears on no
    contributing page; `ci-posture-deck.md` and the PSA do not describe tenant colours.
 
+### 22 November 2026 — CPSV Editor v2026.11.1 → v2026.11.2 (production, `5d6345c`) and Linked Data Explorer v2026.11.2 → v2026.11.3 (production, `4e80c74`)
+
+1. **zizmor-action no longer runs zizmor from a container digest.** Since v0.8.0 the action installs zizmor from the lock
+   file it ships per version (`support/locks/zizmor-<version>.txt`) with `pip download --require-hashes`; the Renovate
+   mapping to the `ghcr.io/zizmorcore/zizmor` image is only how Renovate notices a release. The CPSV Editor and the Linked
+   Data Explorer pin v0.8.1 on `main` (ttl-editor `69be5ac`, `.github/workflows/zizmor.yml:75`; LDE `c0065c8`,
+   `SECURITY-PIPELINE.md` §4); zizmor stays 1.29.0. Check the RONL Business API's pin before writing anything for all
+   three. Bears on `supply-chain.md` (the digest-table sentences around :389 and :431-441) and PSA **AB-28** (still pinned,
+   now by wheel hashes).
+2. **The CPSV Editor's `main` no longer lags `acc` by the zizmor bump and the lab.** `main` `5d6345c` carries both and
+   v0.8.1; `acc` is one fix ahead (#268, vendor logo scaling). Bears on the status box in `supply-chain.md:15-35`,
+   `ci-posture-deck.md` (EN :55, :235; NL :45-46) and `the-gitlab-mirror.md:79`.
+3. **The CPSV Editor's deploys queue per branch** (`06a4672`): both Static Web Apps workflows set `concurrency` per ref
+   with `cancel-in-progress: false`; pull requests keep their own group. Bears on `dependency-scanning.md:83-84` if it
+   compares the components' concurrency policies.
+4. **The Linked Data Explorer's SBOM check compares content** (`0244183`, `scripts/write-sbom.mjs`): `--check` ignores
+   `metadata.tools`, so an SBOM written with another npm no longer fails. ttl-editor#269 and ronl-business-api#481 are to
+   follow, so state it per repository. New committed SBOMs: `linked-data-explorer-2026.11.3.cdx.json`,
+   `ttl-editor-2026.11.2.cdx.json`. Bears on `dependency-scanning.md:420-429`.
+5. **Linked Data Explorer tooling:** the backend dev server runs on `tsx` instead of `ts-node` (12 fewer transitive
+   packages), supertest 7, `@types/jszip` removed; `SECURITY-PIPELINE.md` counts twelve workflows (closes
+   linked-data-explorer#342); `npm run test:shacl-smoke` runs four checks and is not yet in CI (#352). Still 12 workflows,
+   rulesets and hooks unchanged. Bears on `code-standards.md` and `dependency-scanning.md`.
+6. **CPSV Editor tooling:** `test:app` is a new phase script, and `src/testing/phaseScripts.test.js` fails when a test
+   file belongs to no phase script; Vitest 5.1.0. Still 8 workflows. Bears on `code-standards.md` and the ICTU test rows.
+7. **PSA, for the re-check on `main`** (generic wording, no routes, hosts or issue links for open gaps):
+   - **AB-17:** the Linked Data Explorer accepts only access tokens, and answers that sign-in is unavailable when the issuer
+     cannot be reached, instead of asking to sign in again (`auth.middleware.ts:88-93, 129-141`). Verify the RONL Business
+     API before writing it as a general statement.
+   - **AB-20, AB-21, R-02:** unchanged. The CPSV Editor no longer lets a lapsed session fall back to a test deploy, but the
+     author role is still not per organisation.
+   - **Possible risk wording**, only if still open on Sunday: an anonymous test feature on the acceptance tier can cause
+     many engine reads per request, and a burst of unknown signing-key references can make sign-in read as unavailable for
+     up to a minute (filed as linked-data-explorer#358; no link in the PSA while open).
+   - Re-pin every PSA page and the template to CPSV Editor `5d6345c` and Linked Data Explorer `4e80c74`.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

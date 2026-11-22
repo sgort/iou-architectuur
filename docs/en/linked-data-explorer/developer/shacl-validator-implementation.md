@@ -174,7 +174,9 @@ Each SHACL result's `sh:resultSeverity` maps to the issue severity, and the code
 | `sh:Warning` | `warning` |
 | `sh:Info` | `info` |
 
-`MaxCountConstraintComponent` → `SHACL-MAXCOUNT`, `UniqueLangConstraintComponent` → `SHACL-UNIQUELANG`, and so on. Offending values are whitespace-normalised and capped at 60 characters.
+One result is downgraded. An `sh:class` failure on `dct:requires`, whose object the validated data does not describe at all, is reported as a `warning`, and its message adds that the required service's type is checked where that service is published. The CPSV Editor publishes `dct:requires <other-service>` without a type, because that service lives in its own graph, so CPSV-AP's `sh:class cpsv:PublicService` could never pass file-locally. A required service that the data does describe, with the wrong type, and every other `sh:class` failure stay errors (`isExternalRequires`, since v2026.11.3).
+
+`MaxCountConstraintComponent` → `SHACL-MAXCOUNT`, `UniqueLangConstraintComponent` → `SHACL-UNIQUELANG`, `ClassConstraintComponent` → `SHACL-CLASS`, and so on. Offending values are whitespace-normalised and reported in full; the frontend wraps long messages.
 
 ### Merge mode
 
@@ -195,7 +197,7 @@ The default (`constructGraph` from `triplydb.service.ts`) issues a real `CONSTRU
 1. Add or edit a `*.ttl` file under `packages/backend/shapes/ronl/` (RONL invariants) — the directory is globbed, so a new file is picked up on restart.
 2. Target the relevant class with `sh:targetClass` and add property shapes (`sh:path`, `sh:minCount`/`sh:maxCount`/`sh:uniqueLang`/…).
 3. Document the shape and the codes it produces in the [SHACL Validation Reference](../reference/shacl-validation-reference.md).
-4. Add or extend a smoke script under `packages/backend/scripts/`, asserting on the `ronl-custom` layer so the test is independent of whether CPSV-AP is vendored.
+4. Add or extend a smoke script under `packages/backend/scripts/`, asserting on the `ronl-custom` layer so the test is independent of whether CPSV-AP is vendored. `npm run test:shacl-smoke -w packages/backend` runs all four smoke scripts; add a new one to that script.
 
 Prefer `sh:uniqueLang true` over `sh:maxCount 1` for human-readable labels (`dct:title`, `dct:description`, `skos:prefLabel`) so bilingual `nl`/`en` records are tolerated while same-language collisions are still caught.
 

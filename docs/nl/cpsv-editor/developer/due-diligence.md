@@ -107,7 +107,7 @@ De `useDsoImport`-hook (`src/hooks/useDsoImport.js`, v1.9.6) verwerkt een deep-l
 | Frontend | React 19, Vite, Tailwind CSS, Lucide-iconen, `keycloak-js` (inloggen) |
 | Statusbeheer | React hooks (`useEditorState`, `useArrayHandlers`), geen externe state-library |
 | Build & lint | Vite, ESLint, Prettier, Husky (pre-commit/pre-push), lint-staged |
-| Testen | Vitest 5, `@testing-library/react`, Playwright — 858 tests in 70 bestanden, alle geslaagd (gemeten op 12 november 2026), met 91,35% statements, 89,29% branches, 82,15% functions en 92,03% lines; plus 4 end-to-end-journeys ([Testing](testing.md)) |
+| Testen | Vitest 5, `@testing-library/react`, Playwright — 894 tests in 74 bestanden, alle geslaagd (gemeten op 22 november 2026), met 91,37% statements, 89,46% branches, 81,97% functions en 92,01% lines; plus 4 end-to-end-journeys ([Testing](testing.md)) |
 | TTL-parsing | Eigen handgeschreven parser (geen RDF-library-afhankelijkheid) |
 | DMN-parsing | Browser DOMParser (XML) |
 | Externe API's | Keycloak (OIDC-inloggen, realm `ronl`) rechtstreeks vanuit de browser; TriplyDB, Operaton (Camunda-compatibele REST), de RONL SPARQL-vocabulaire en de DSO-API's alleen via de gedeelde backend |
@@ -143,10 +143,10 @@ De `useDsoImport`-hook (`src/hooks/useDsoImport.js`, v1.9.6) verwerkt een deep-l
 
 Sinds v2026.11.1 kent de editor inloggen. Een gebruiker logt in bij Keycloak-realm `ronl`, de login die de Linked Data Explorer en de RONL Business API delen — client `ttl-editor`, de authorization-code-flow met PKCE — via Entra van Flevoland of met een medewerkerswachtwoord. Inloggen is optioneel: bewerken, importeren, valideren en downloaden werken zonder. De twee acties die gedeelde gegevens wijzigen vereisen de realmrol `lde-author`:
 
-| Integratiepunt | Authenticatiemechanisme bij v2026.11.1 |
+| Integratiepunt | Authenticatiemechanisme bij v2026.11.2 |
 |---|---|
 | TriplyDB-publicatie | Het bearer-token van de auteur naar `POST /v1/triplydb/publish` van de Linked Data Explorer-backend, die `lde-author` vereist en publiceert met een eigen TriplyDB-account en -token. De browser bewaart alleen de datasetnaam |
-| Operaton-deployment & testen | Deployen stuurt het token van de auteur naar `POST /v1/dmns/deploy`. Zonder token maakt de backend er een testdeploy van naar tenant `TestOnly`, die na 48 uur wordt verwijderd — aan op acceptatie, uit op productie. Evalueren is open. De backend bereikt de engine met een eigen, optionele `OPERATON_API_KEY` |
+| Operaton-deployment & testen | Deployen stuurt het token van de auteur naar `POST /v1/dmns/deploy`; is de sessie van een auteur verlopen, dan verstuurt de editor de deploy niet en vraagt opnieuw in te loggen, zodat die nooit stilzwijgend een anonieme testdeploy wordt. Zonder token maakt de backend er een testdeploy van naar tenant `TestOnly`, die na 48 uur wordt verwijderd — aan op acceptatie, uit op productie. Evalueren is open. De backend bereikt de engine met een eigen, optionele `OPERATON_API_KEY` |
 | Gedeelde Express-backend (LDE) | Controleert Keycloak-tokens. Elke route waarmee de editor gedeelde gegevens wijzigt vereist `lde-author` — publish, test-connection, update-service, list-graphs — behalve deploy, dat zonder token een testdeploy is waar die aan staat. De routes die de editor alleen leest blijven open: de SPARQL-proxy, DMN- en SHACL-validatie, evaluate, `publish-target` en `deploy/options` |
 | Azure Static Web Apps | Deployment-tokens in GitHub Secrets (alleen CI/CD, geen gebruikersauth) |
 

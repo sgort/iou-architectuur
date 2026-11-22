@@ -88,7 +88,8 @@ ttl-editor/
 │   ├── utils/
 │   │   ├── index.js                # Barrel export
 │   │   ├── auth.js                 # Keycloak sign-in (realm ronl), authHeaders()
-│   │   ├── constants.js            # Shared constants, TTL_NAMESPACES, EMPTY_DMN_DATA, CPRMV_RULE_BASE
+│   │   ├── deployOptions.js        # Whether the backend offers test deploys (GET /v1/dmns/deploy/options)
+│   │   ├── constants.js            # Shared constants, createDefaultService, TTL_NAMESPACES, EMPTY_DMN_DATA, CPRMV_RULE_BASE
 │   │   ├── ttlGenerator.js         # TTL generation class
 │   │   ├── ttlHelpers.js           # TTL string/IRI helpers (escapeTTLString, sanitizeIri, …)
 │   │   ├── importHandler.js        # Import logic
@@ -118,7 +119,8 @@ ttl-editor/
 ├── e2e/                            # Playwright journeys, the stack preflight, the lde-e2e sign-in
 ├── e2e-fixtures/                   # Journey fixtures, with a provenance manifest
 ├── examples/                       # Reference TTL/DMN exports; round-trip test fixtures
-│   └── organizations/              # Per-organisation examples and test cases
+│   ├── organizations/              # Per-organisation examples and test cases
+│   └── lab/                        # Lab concepts, starting with DMN-bulk (one DMN over many cases)
 │
 ├── scripts/
 │   ├── check-deps.sh               # npm run deps:check — install vs lockfile; warns on npm < 11.10
@@ -189,7 +191,7 @@ Class-based TTL generation. Each tab section has a corresponding generate method
 
 ### `src/parseTTL.enhanced.js`
 
-Full TTL parser. Handles vocabulary detection, multi-line values, namespace resolution, date parsing, array extraction (keywords, and the services a service `dct:requires`, including object lists continued over several lines), and DMN block capture and preservation. A bare `<uri> a cpsv:PublicService .` stub is skipped, so it can never take over the service section. Returns a data structure matching the editor state shape for direct use in `useEditorState`. A subject typed `cprmv:Rule` becomes a policy rule only when it sits under `CPRMV_RULE_BASE`; any other `cprmv:Rule` — a cell-level grounding resource — is preserved with the DMN block.
+Full TTL parser. Handles vocabulary detection, multi-line values, namespace resolution, date parsing, array extraction (keywords, and the services a service `dct:requires`, including object lists continued over several lines), and DMN block capture and preservation. A block ends where a statement's full stop stands outside string literals and IRIs (`endsStatement`), and fields with a bare name such as `sector` or `validFrom` are matched in the predicate position only, under any prefix (`predicateObject`). A bare `<uri> a cpsv:PublicService .` stub is skipped, so it can never take over the service section. Returns a data structure matching the editor state shape for direct use in `useEditorState`. A subject typed `cprmv:Rule` becomes a policy rule only when it sits under `CPRMV_RULE_BASE`; any other `cprmv:Rule` — a cell-level grounding resource — is preserved with the DMN block.
 
 ### `src/config/vocabularies.config.js`
 

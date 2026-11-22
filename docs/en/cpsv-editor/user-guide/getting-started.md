@@ -33,7 +33,7 @@ The sign-in opens in a popup, so the service you are editing stays where it is. 
   <figcaption>The Sign in menu in the header</figcaption>
 </figure>
 
-Deploying to Operaton and publishing to TriplyDB need the `lde-author` role, the same role the Linked Data Explorer uses. An account without it is shown as **View only**, with a note that can be dismissed; ask an administrator for the role. Signed out or view only, the **Publish** button is locked, and the DMN tab's **Deploy** is either locked or, on acceptance, a test deploy — see [The DMN Tab](dmn-tab.md#step-4-deploy-to-operaton).
+Deploying to Operaton and publishing to TriplyDB need the `lde-author` role, the same role the Linked Data Explorer uses. An account without it is shown as **View only**, with a note that can be dismissed; ask an administrator for the role. Where the backend offers test deploys, the note says that you can still test-deploy a DMN, to the tenant and for the time the backend names (`TestOnly`, removed after 48 hours), while deploying to Operaton and publishing stay locked; elsewhere it says only that they are locked. Signed out or view only, the **Publish** button is locked, and the DMN tab's **Deploy** is either locked or, on acceptance, a test deploy — see [The DMN Tab](dmn-tab.md#step-4-deploy-to-operaton).
 
 ---
 
