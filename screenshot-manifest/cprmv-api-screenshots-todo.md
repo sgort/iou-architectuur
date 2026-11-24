@@ -1,11 +1,17 @@
 # CPRMV API — screenshots to capture
 
-*A running record across syncs, newest first. Last reviewed for v0.4.2 on
-10 October 2026 — **nothing outstanding, and nothing requested**.*
+*A running record across syncs, newest first. Last reviewed for v0.4.3 on
+24 November 2026 — **nothing outstanding, and nothing requested**.*
 
 Real screenshot files live in **`docs/assets/screenshots/`** (language-neutral,
 served at the site root). Docs reference them as
 `../../assets/screenshots/<file>` inside a `<figure markdown>` block.
+
+---
+
+## Sync v0.4.2 → v0.4.3 — no screenshots requested
+
+Reviewed on 24 November 2026 for **v0.4.3**, in production (`main` `d597671`). The CPRMV pages embed no screenshots, and none of the changes needs one: the new endpoints are described by their requests and answers, and the specification's new chapters and class diagrams are linked at `/respec/` rather than copied. An interactive API reference page stays on hold: the API still sends no `Access-Control-*` headers (checked 24 November).
 
 ---
 

@@ -50,7 +50,7 @@ The `Makefile` in `serve_api/` offers the same steps as targets:
 | `make install` | `pip install pip-tools`, `./pip-compile.sh`, `pip install -r requirements-dev.txt` |
 | `make deps` | `./pip-compile.sh` — recompile both requirements files, keeping current pins |
 | `make deps-upgrade` | `./pip-compile.sh --upgrade` — upgrade every pin |
-| `make methods` | Regenerate `data/` from `rdf/0.4.2/` (see [Data files](#data-files)) |
+| `make methods` | Regenerate `data/` from `rdf/0.4.3/` (see [Data files](#data-files)) |
 | `make tests` | `pytest test` |
 
 `pip-compile.sh` also takes `-P <package>` (repeatable) to upgrade a single package. Note that `make install` recompiles the requirements files before installing them.
@@ -107,10 +107,8 @@ Dev extras: `pytest`, `pytest-cov`, `httpx`, `pre-commit`. Tool extras: `bandit`
 | `cvdr2cprmv.xsl` | CVDR XML → CPRMV |
 | `dmn13operaton2cprmv.xsl` | DMN 1.3 → CPRMV |
 | `fmx42cprmv.xsl` | Formex 4 → CPRMV |
+| `sttr2cprmv.xsl` | STTR (DSO) → CPRMV |
 
 The files are committed and copied into the Docker image at build time.
 
-`make methods` regenerates them from the specification: it copies `rdf/0.4.2/cprmv.ttl` and `rdf/0.4.2/cprmvmethods.ttl`, appends every `rdf/0.4.2/methods/*/method.ttl` to `cprmvmethods.ttl`, and copies the methods' `*.xsl` files. Run it after changing a method definition.
-
-!!! warning "The committed `cprmvmethods.ttl` is not what `make methods` produces"
-    At `0.4.2`, `serve_api/data/cprmvmethods.ttl` differs from the generated file: it still contains the removed NRML method, and its value lists use `cprmv:acknowledged`, which is the predicate the code reads. `rdf/0.4.2/cprmvmethods.ttl` writes those lists with `cprmvmethods:acknowledged`, so a regenerated file gives the code no acknowledged methods. The stale file is item 3 of [standards/cprmv#31](https://git.open-regels.nl/standards/cprmv/-/work_items/31).
+`make methods` regenerates them from the specification: it copies `rdf/0.4.3/cprmv.ttl` and `rdf/0.4.3/cprmvmethods.ttl`, appends every `rdf/0.4.3/methods/*/method.ttl` to `cprmvmethods.ttl`, and copies the methods' `*.xsl` files. Run it after changing a method definition. At v0.4.3 the committed files are exactly what `make methods` generates.

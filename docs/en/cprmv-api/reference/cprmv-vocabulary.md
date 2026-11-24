@@ -4,16 +4,15 @@ component: CPRMV
 
 # CPRMV Vocabulary Reference
 
-The CPRMV vocabulary is defined in `rdf/0.4.2/cprmv.ttl`, with SHACL shapes in `rdf/0.4.2/cprmv.shacl.ttl`, and published as the CPRMV specification at [cprmv.open-regels.nl/respec/](https://cprmv.open-regels.nl/respec/). This page provides a compact reference of the classes and properties relevant to the API's output.
+The CPRMV vocabulary is defined in `rdf/0.4.3/cprmv.ttl`, with SHACL shapes in `rdf/0.4.3/cprmv.shacl.ttl`, and published as the CPRMV specification at [cprmv.open-regels.nl/respec/](https://cprmv.open-regels.nl/respec/). This page provides a compact reference of the classes and properties relevant to the API's output.
 
-**Vocabulary namespace:** `https://standaarden.open-regels.nl/standards/cprmv/0.4.2#`  
+**Vocabulary namespace:** `https://standaarden.open-regels.nl/standards/cprmv/0.4.3#`  
 **Prefix:** `cprmv:`  
-**Version:** 0.4.2  
+**Version:** 0.4.3  
 
-Related namespaces used by the API: `cprmvmethods:` = `https://cprmv.open-regels.nl/0.4.2/methods/` (method definitions) and `cprmv-serve:` = `https://cprmv.open-regels.nl/0.4.2/serve-api/` (API configuration properties).
+Related namespaces used by the API: `cprmvmethods:` = `https://cprmv.open-regels.nl/0.4.3/methods/` (method definitions), `cprmv-serve:` = `https://cprmv.open-regels.nl/0.4.3/serve-api/` (API configuration properties) and `core-api:` = `https://cprmv.open-regels.nl/0.4.3/methods/core-api#` (settings of API sources).
 
-!!! note "The copy the API loads"
-    The API loads the vocabulary from `serve_api/data/cprmv.ttl`, which `make methods` copies from `rdf/0.4.2/cprmv.ttl`. The committed copy predates the 0.4.2 additions below: it carries the 0.4.2 namespace but lacks `SerialisationMethod`, the registers, catalogs and echelons, and still declares `cprmv:ReferencenMethod` as a subclass of `cprmv:RuleMethod`. `/methods` serves that copy.
+The API loads the vocabulary from `serve_api/data/cprmv.ttl`, a copy `make methods` takes of `rdf/0.4.3/cprmv.ttl`; `/methods` serves it.
 
 ---
 
@@ -21,13 +20,13 @@ Related namespaces used by the API: `cprmvmethods:` = `https://cprmv.open-regels
 
 | Class                       | Subclass of                      | Description                                          |
 | --------------------------- | -------------------------------- | ---------------------------------------------------- |
-| `cprmv:RuleSet`             | `frbroo:F1_Work`, `cv:Output`    | A versioned set of rules, output of a public service. A RuleSet is a FRBR Work, **not** an `eli:LegalResource` — a formalisation (e.g. business rules) is not in itself a legal resource (`eli:LegalResource` is itself a subclass of FRBR Work). |
+| `cprmv:RuleSet`             | `frbr:Endeavor`, `cv:Output`, `prov:Bundle` | A bundle of rules agreed on as the output of a deliberation in a public service's delivery. As an FRBR Endeavor it can be a Work, an Expression, a Manifestation or an Item. A RuleSet is **not** an `eli:LegalResource` — a formalisation (e.g. business rules) is not in itself a legal resource. |
 | `cprmv:Analysis`            | `cprmv:RuleSet`                  | Rule set produced by an analysis method              |
 | `cprmv:DecisionModel`       | `cprmv:RuleSet`                  | Rule set produced by a formalisation method          |
 | `cprmv:TestSet`             | `cprmv:RuleSet`                  | Rule set of test cases defined following a test method |
 | `cprmv:OrganisationCatalog` | `cprmv:RuleSet`                  | Catalog of officially acknowledged organisations that produce rule sets |
 | `cprmv:ServiceCatalog`      | `cprmv:RuleSet`                  | Catalog of officially acknowledged public services in which rule sets are produced |
-| `cprmv:Rule`                | —                                | An individual rule within a rule set                 |
+| `cprmv:Rule`                | `prov:Entity`                    | A part of a specification agreed on as the output of a deliberation; an individual rule within a rule set |
 | `cprmv:Parameter`           | `cprmv:Rule`                     | A rule representing a parameter value                |
 | `cprmv:AcknowledgedOrganisation` | `cprmv:Rule`                | The official acknowledgement of a `cv:PublicOrganisation` |
 | `cprmv:AcknowledgedService` | `cprmv:Rule`                     | The official acknowledgement of a `cpsv:PublicService` |
@@ -35,7 +34,11 @@ Related namespaces used by the API: `cprmvmethods:` = `https://cprmv.open-regels
 | `cprmv:Decision`            | `cprmv:Rule`                     | A rule defined following an execution method         |
 | `cprmv:Case`                | `cprmv:Rule`                     | A list of decisions defined following an execution method |
 | `cprmv:TestCase`            | `cprmv:Case`                     | A case defined for and following a test method       |
-| `cprmv:RuleMethod`          | —                                | Base class for all method types                      |
+| `cprmv:Instrument`          | —                                | Something used in relation to rules: a method, standard or tool |
+| `cprmv:Standard`            | `cprmv:Instrument`               | A standard used in relation to rules                 |
+| `cprmv:Tool`                | `cprmv:Instrument`               | A tool used in relation to rules                     |
+| `cprmv:Method`              | `cprmv:Instrument`               | A method used in relation to rules                   |
+| `cprmv:RuleMethod`          | `cprmv:Method`                   | Base class for all rule method types                 |
 | `cprmv:AnalysisMethod`      | `cprmv:RuleMethod`               |                                                      |
 | `cprmv:FormalisationMethod` | `cprmv:RuleMethod`               |                                                      |
 | `cprmv:SerialisationMethod` | `cprmv:RuleMethod`               | Meta method: serialising rules as a storable text file (XML, JSON, YAML, Turtle) |
@@ -49,6 +52,8 @@ Related namespaces used by the API: `cprmvmethods:` = `https://cprmv.open-regels
 | `cprmv:ServiceRegister`     | `cprmv:PublicationMethod`        | Method for publishing a service catalog              |
 | `cprmv:Echelon`             | —                                | A category of a rule set in service delivery — see [Echelons](#echelons) |
 
+`cprmv.ttl` declares the `frbr:` prefix as `http://purl.org/vocab/frbr/core`, without the `#` of FRBR Core, so `frbr:Endeavor` and `frbr:relatedEndeavour` expand to IRIs FRBR Core does not define; and `cprmv:Method` carries the label "Tool" ([open-regels/cprmv#2](https://github.com/open-regels/cprmv/issues/2)). This page names the FRBR terms as intended.
+
 ---
 
 ## Properties
@@ -59,7 +64,7 @@ Related namespaces used by the API: `cprmvmethods:` = `https://cprmv.open-regels
 | ----------------- | --------------------------------------------------- | ------------------------------ | --------------------------------------------------------- |
 | `cprmv:id`        | `cprmv:Rule` ∪ `cprmv:RuleSet` ∪ `cprmv:RuleMethod` | literal                        | Unique identifier (lang-tagged, used for path navigation) |
 | `cprmv:hasPart`   | `cprmv:RuleSet` ∪ `cprmv:Rule`                      | RDF list                       | Ordered list of contained rules                           |
-| `cprmv:isBasedOn` | `cprmv:RuleSet` ∪ `cprmv:Rule`                      | `cprmv:RuleSet` ∪ `cprmv:Rule` | Subproperty of `frbroo:R2_is_derivative_of` and `prov:wasDerivedFrom` |
+| `cprmv:isBasedOn` | `cprmv:RuleSet` ∪ `cprmv:Rule`                      | `cprmv:RuleSet` ∪ `cprmv:Rule` | Subproperty of `frbr:relatedEndeavour` and `prov:wasDerivedFrom` |
 | `cprmv:comment`   | `cprmv:Rule` ∪ `cprmv:RuleSet` ∪ `cprmv:RuleMethod` | `xsd:string` or `rdf:langString` (SHACL) |                                                 |
 
 ### On cprmv:RuleSet only
@@ -111,7 +116,7 @@ Related namespaces used by the API: `cprmvmethods:` = `https://cprmv.open-regels
 
 | Echelon                    | Tied to                                                          |
 | -------------------------- | ---------------------------------------------------------------- |
-| `cprmv:AgreementEchelon`   | Contract management: solutions as natural-language descriptions  |
+| `cprmv:NaturalEchelon`     | Contract management: solutions as natural-language descriptions and visualisations |
 | `cprmv:SemanticEchelon`    | Contract management: concepts and norms                          |
 | `cprmv:OntologicEchelon`   | Contract management: information models of concepts and norms    |
 | `cprmv:LogicEchelon`       | Contract management: logically formalised, operable models (decision and process models) |
@@ -122,15 +127,15 @@ Related namespaces used by the API: `cprmvmethods:` = `https://cprmv.open-regels
 
 ## SHACL constraints
 
-`rdf/0.4.2/cprmv.shacl.ttl` constrains the output as follows:
+`rdf/0.4.3/cprmv.shacl.ttl` constrains the output as follows:
 
 - **`cprmv:RuleSetShape`** — `cprmv:id` (at least one), exactly one `cprmv:validFrom` (`xsd:date`), optional `cprmv:validUntil` / `cprmv:publishedOn`, at least one `cprmv:isOutputOf` (`cpsv:PublicService`) and at least one `cprmv:hasMethod` (`cprmv:RuleMethod`). Through the shared property shape `cprmv:hasPartShape` — the sequence path `cprmv:hasPart / rdf:rest* / rdf:first` — a rule set must contain at least one member, and every member must be a `cprmv:Rule`.
 - **`cprmv:RuleShape`** — `cprmv:id` (at least one), at most one `cprmv:definition` and one `cprmv:postDefinition`, `cprmv:hasPart` zero or more.
 - **`cprmv:id`, `cprmv:comment` and `cprmv:sourcequote`** accept `xsd:string` or `rdf:langString`, where constrained.
-- **Method shapes** — every `cprmv:RuleMethod` needs a `cprmv:id`; `refinesTowards` and `refinesFrom` must point to a `cprmv:Echelon`, and each method subclass narrows which echelons it may refine from and towards (for example, an analysis method refines towards the agreement, semantic or ontologic echelon; a formalisation method towards the logic or operable echelon).
+- **Method shapes** — every `cprmv:RuleMethod` needs a `cprmv:id`; `refinesTowards` and `refinesFrom` must point to a `cprmv:Echelon`, and each method subclass narrows which echelons it may refine from and towards (for example, an analysis method refines towards the natural, semantic or ontologic echelon; a formalisation method towards the logic or operable echelon).
 - **Catalogs** — an `OrganisationCatalog` must have an `OrganisationRegister` as method, a `ServiceCatalog` a `ServiceRegister`; `cprmv:acknowledges` is required on `AcknowledgedOrganisation` (`cv:PublicOrganisation`) and `AcknowledgedService` (`cpsv:PublicService`).
 
-`rdf/0.4.2/test.sh` runs pyshacl over the test files and method definitions; it is a manual check.
+`rdf/0.4.3/test.sh` runs pyshacl over the test files and method definitions; it is a manual check.
 
 ---
 
@@ -138,8 +143,8 @@ Related namespaces used by the API: `cprmvmethods:` = `https://cprmv.open-regels
 
 | CPRMV class/property | Aligned standard                                         |
 | -------------------- | -------------------------------------------------------- |
-| `cprmv:RuleSet`      | `frbroo:F1_Work`, `cv:Output`, `dcat:Dataset` member (`cprmv:is_part_of`) |
-| `cprmv:isBasedOn`    | `frbroo:R2_is_derivative_of`, `prov:wasDerivedFrom`     |
+| `cprmv:RuleSet`      | `frbr:Endeavor`, `cv:Output`, `prov:Bundle`, `dcat:Dataset` member (`cprmv:is_part_of`) |
+| `cprmv:isBasedOn`    | `frbr:relatedEndeavour`, `prov:wasDerivedFrom`          |
 | `cprmv:isOutputOf`   | inverse of `schema:serviceOutput`, `prov:wasGeneratedBy` |
 
 The full alignment table and rationale are in the [CPRMV specification](https://cprmv.open-regels.nl/respec/).

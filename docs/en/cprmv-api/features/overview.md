@@ -12,10 +12,10 @@ The CPRMV API delivers the following core capabilities, derived from `serve_api/
 
 Rules are resolved and fetched live from official publication repositories — nothing is pre-loaded or cached between requests. When a request arrives:
 
-1. Each acknowledged publication method in turn tries to parse the rule set identifier against its `cprmv-serve:normalized-id-format`; the first match wins (BWB, CVDR, EU CELLAR, Operaton DMN 1.3).
+1. Each acknowledged publication method in turn tries to parse the rule set identifier against its `cprmv-serve:normalized-id-format`; the first match wins (BWB, CVDR, EU CELLAR, Operaton DMN 1.3, IOU Norms, ROO, DSO).
 2. For a `latest` request on BWB or CVDR, the method looks up the version valid on the requested date through the repository's SRU service.
-3. The publication URL is built from the method's `cprmv-serve:repository-publication-location-format` and the publication is downloaded via HTTPS.
-4. The method's XSLT stylesheet transforms it to CPRMV Turtle.
+3. The publication URL is built from the method's `cprmv-serve:repository-publication-location-format` and the publication is downloaded via HTTPS — for the DSO with the caller's own key, passed on from the `x-api-key` header.
+4. An XSLT stylesheet (XML sources) or the JSON method (`core_json`, for ROO and IOU Norms) transforms it to CPRMV.
 5. rdflib navigates the resulting RDF graph to the requested rule.
 
 This means the API always serves the authoritative source — no synchronisation or stale data.
@@ -24,7 +24,7 @@ This means the API always serves the authoritative source — no synchronisation
 
 ## Multi-repository support
 
-Four publication methods are acknowledged, each a method module with its own XSLT transform and ID format:
+Ten publication methods can be fetched, each with its own ID format and an XSLT transform or the JSON method:
 
 | Repository | Method id | Scope | Identifier prefix |
 |---|---|---|---|
@@ -32,6 +32,9 @@ Four publication methods are acknowledged, each a method module with its own XSL
 | **CVDR** | `repository-overheid-nl-cvdr` | Dutch municipal, provincial and water-board regulations | `CVDR…` |
 | **EU CELLAR** | `eucellar-fmx4` | European Union legislation (Formex v4) | `CFMX4…` |
 | **Operaton DMN 1.3** | `operaton.open-regels.nl` | DMN decision models deployed on operaton.open-regels.nl (experimental) | `DMN1.3_…` |
+| **IOU Norms** | `norms-backend.linkeddata.open-regels.nl` | Norms from the IOU Norms API of the Linked Data Explorer | `IOU-NORMS_…` |
+| **ROO** | `roo`, `roo-uri`, `roo-catalogus` | Public organisations from the Register van Overheidsorganisaties: by key, by TOOI URI, or the whole register | `ROO.…`, `ROOURI…`, `ROO_…` |
+| **DSO** | `dso`, `dso-service-register` | STTR decision models from the Digitaal Stelsel Omgevingswet, and the DSO as a register of their services; needs your DSO key | `DSO_…`, `DSOService_…` |
 
 For BWB and CVDR, "latest version valid on a given date" queries are resolved automatically through SRU search of the repository, so callers do not need to know the exact publication index. See [Publication Repositories](publication-repositories.md).
 
@@ -80,6 +83,12 @@ This enables structured extraction of domain values (e.g. income limits, thresho
 
 ---
 
+## Raw publication download
+
+`/raw/{rule_id_path}` returns the original publication a rule set is read from, untransformed, as a file. The RuleSet itself does not name its source with `prov:wasDerivedFrom`; `/raw` is how to get it. See [API Endpoints](../reference/api-endpoints.md#get-rawrule_id_path).
+
+---
+
 ## Reference resolution
 
 The `/ref` endpoint accepts a single `reference` query parameter, **auto-detects** the reference method, and redirects to the corresponding CPRMV API path or source. The acknowledged reference methods are tried in this order:
@@ -95,13 +104,13 @@ See [Reference Resolution](reference-resolution.md) for details and examples.
 
 ## MCP server
 
-`serve.py` wires the API into a **Model Context Protocol** server with FastMCP (`FastMCP.from_fastapi`), mounted at `/mcp` on a combined application. In the current deployment `/mcp` is **not reachable** — it returns `404` on production and acceptance. The MCP server is built before the API routes are registered, and the container serves the plain FastAPI `app` rather than the combined one. This is reported in [standards/cprmv#31](https://git.open-regels.nl/standards/cprmv/-/work_items/31).
+`serve.py` turns the API's routes into a **Model Context Protocol** server with FastMCP (`FastMCP.from_fastapi`) and mounts it on the API at `/mcp/`. It answers on production and acceptance (checked 24 November 2026). Use the address with the trailing slash: `/mcp` is redirected to an `http://` URL ([open-regels/cprmv#2](https://github.com/open-regels/cprmv/issues/2)).
 
 ---
 
 ## CPRMV Specification hosting
 
-The API serves the CPRMV specification in ReSpec format as static files under `/respec/`, one folder per version (`/respec/0.4.0/`, `/respec/0.4.1/`, `/respec/0.4.2/`). On the live hosts, `/respec/` itself opens the 0.4.2 specification. This makes the canonical specification directly co-located with the API that implements it:
+The API serves the CPRMV specification in ReSpec format as static files under `/respec/`, one folder per version (`/respec/0.4.0/` … `/respec/0.4.3/`). On the live hosts, `/respec/` itself opens the 0.4.3 specification. This makes the canonical specification directly co-located with the API that implements it:
 
 - [cprmv.open-regels.nl/respec/](https://cprmv.open-regels.nl/respec/) — production
 - [acc.cprmv.open-regels.nl/respec/](https://acc.cprmv.open-regels.nl/respec/) — acceptance

@@ -37,6 +37,26 @@ drained by the pass of 27 September, everything queued from 27 September to 3 Oc
    condition per accepted finding (#470, 17 November). The Linked Data Explorer has no such record yet, so
    iou-architectuur#132 stays open. (Was 15 November carry-over 1, and 8 November, 11 October and 4 October before it.)
 
+### 24 November 2026 — CPRMV v0.4.2 → v0.4.3 (production, `d597671`)
+
+1. **PSA, CPRMV 0.4.3 is released** (`rdf/0.4.3/`, `CHANGELOG.md`; production reports 0.4.3 on `/` and in `openapi.json`).
+   `03-architecture-frameworks.md:67` and **AB-03** (`11-decisions-and-risks.md:33`) say "CPRMV 0.4.2": now 0.4.3, still a
+   first public working draft (`html/js/config.js:6`, `specStatus "fpwd"`); "the CPSV Editor still writes CPRMV 0.4.1" stays
+   true. **AB-07**'s note may add that a RuleSet is now an FRBR Endeavor. **AB-01** and `05-application-architecture.md:104`:
+   check whether the function that statement waits for is delivered by 0.4.3. Re-pin every PSA page to CPRMV `d597671`.
+2. **CPRMV's CI no longer builds the ReSpec** (`89f1733`, `d597671`, `.gitlab-ci.yml`): `create-pages` publishes the
+   committed `html/public`; the in-CI build had failed in pipeline #821. A release reaches Docker Hub only through a
+   `serve_api/**` change (hence the `d597671` "trigger pipeline" commit), and the deploy job only prints a pull instruction;
+   the hosts are updated by hand. `controls.md:111-113` (tests on merge requests and `main` when `serve_api/` changes; no
+   built image run) still holds. Bears on `controls.md` and any CI-posture page that describes CPRMV.
+3. **CPRMV development is moving to GitHub** (`open-regels/cprmv`, default branch `acc`; the user, 24 November). New CPRMV
+   issues are filed there (#1, #2); the pages and `repo-versions.json` keep the GitLab links for now. Bears on
+   `contributing/index.md` (repository table, trackers) once the move completes, and on `the-gitlab-mirror.md` if it lists
+   CPRMV's remote.
+4. **Open gaps found in this sync, for the PSA's generic wording only if they bear on a decision:** open-regels/cprmv#1
+   (an API key reflected in a redirect response) and #2 (a method selection that returns everything; an MCP redirect to
+   plain `http`). No link while open.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

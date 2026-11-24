@@ -4,14 +4,14 @@ component: CPRMV
 
 # Data Model
 
-The CPRMV API produces and consumes data conforming to the CPRMV OWL vocabulary (`rdf/0.4.2/cprmv.ttl`), validated by the SHACL shapes in `rdf/0.4.2/cprmv.shacl.ttl`. The `rdf/` folder keeps one subfolder per version (`0.4.0/`, `0.4.1/`, `0.4.2/`).
+The CPRMV API produces and consumes data conforming to the CPRMV OWL vocabulary (`rdf/0.4.3/cprmv.ttl`), validated by the SHACL shapes in `rdf/0.4.3/cprmv.shacl.ttl`. The `rdf/` folder keeps one subfolder per version (`0.4.0/` … `0.4.3/`).
 
 ---
 
 ## Namespace
 
 ```
-https://standaarden.open-regels.nl/standards/cprmv/0.4.2#
+https://standaarden.open-regels.nl/standards/cprmv/0.4.3#
 ```
 
 Prefix: `cprmv:`
@@ -24,7 +24,7 @@ Cardinalities are those of the SHACL shapes.
 
 ### cprmv:RuleSet
 
-A set of rules that is the output of a public service. Subclass of `frbroo:F1_Work` and `cv:Output` — a formalisation is a FRBR Work, not an `eli:LegalResource`. A RuleSet, being a `cv:Output`, is `cprmv:is_part_of` a `dcat:Dataset`.
+A bundle of rules that is the output of a deliberation in a public service's delivery. Subclass of `frbr:Endeavor` — so a Work, Expression, Manifestation or Item —, `cv:Output` and `prov:Bundle`; not an `eli:LegalResource`. A RuleSet, being a `cv:Output`, is `cprmv:is_part_of` a `dcat:Dataset`.
 
 | Property | Type | Cardinality | Notes |
 |---|---|---|---|
@@ -35,14 +35,17 @@ A set of rules that is the output of a public service. Subclass of `frbroo:F1_Wo
 | `cprmv:isOutputOf` | `cpsv:PublicService` | 1..* | Links to the service that produced this rule set |
 | `cprmv:hasMethod` | `cprmv:RuleMethod` | 1..* | |
 | `cprmv:hasPart` | RDF list of `cprmv:Rule` | 1..* items | Checked by `cprmv:hasPartShape` |
-| `cprmv:isBasedOn` | `cprmv:RuleSet` | 0..* | Subproperty of `frbroo:R2_is_derivative_of` and `prov:wasDerivedFrom` |
+| `cprmv:isBasedOn` | `cprmv:RuleSet` | 0..* | Subproperty of `frbr:relatedEndeavour` and `prov:wasDerivedFrom` |
 | `cprmv:comment` | `xsd:string` or `rdf:langString` | 0..* | |
 
 !!! note "Source provenance"
-    When the `/rules` endpoint transforms a publication, the generated `cprmv:RuleSet`
-    carries a `prov:wasDerivedFrom` triple pointing at the source publication URL
-    (the BWB/CVDR repository document, the EU CELLAR item, or the Operaton DMN resource).
-    The XSLT receives that URL as its `puburl` parameter.
+    A RuleSet from `/rules` does not name its source with `prov:wasDerivedFrom`: the
+    original publication is available from `/raw` with the same rule set id, and its
+    source URL follows from the method's configuration. The API no longer hands the
+    stylesheets a `puburl`. Two exceptions: a RuleSet read from JSON (IOU Norms, ROO)
+    points at the publication URL with `cprmv:isBasedOn`, and the STTR stylesheet (DSO)
+    still writes a `prov:wasDerivedFrom`, which, left without a URL, resolves to its
+    base address `https://cprmv.open-regels.nl/0.4.3/methods/dso/`.
 
 ### cprmv:Analysis
 
@@ -58,7 +61,7 @@ Subclass of `cprmv:RuleSet`. A rule set produced by following a formalisation me
 
 ### cprmv:Rule
 
-An individual rule within a rule set.
+An individual rule within a rule set. Subclass of `prov:Entity`.
 
 | Property | Type | Cardinality | Notes |
 |---|---|---|---|
@@ -84,7 +87,7 @@ Subclass of `cprmv:Rule`. A rule that represents a parameter value (e.g. income 
 
 | Class | Subclass of | Description |
 |---|---|---|
-| `cprmv:RuleMethod` | — | Base class |
+| `cprmv:RuleMethod` | `cprmv:Method` | Base class of the rule methods |
 | `cprmv:AnalysisMethod` | `cprmv:RuleMethod` | Methods for analysing legislation (e.g. JAS, FLINT) |
 | `cprmv:FormalisationMethod` | `cprmv:RuleMethod` | Methods for formalising rules (e.g. DMN 1.3) |
 | `cprmv:SerialisationMethod` | `cprmv:RuleMethod` | How a publication is serialised (e.g. BWB XML, Formex 4) |
@@ -97,13 +100,15 @@ Subclass of `cprmv:Rule`. A rule that represents a parameter value (e.g. income 
 | `cprmv:OrganisationRegister` | `cprmv:PublicationMethod` | Register of acknowledged organisations |
 | `cprmv:ServiceRegister` | `cprmv:PublicationMethod` | Register of acknowledged services |
 
-The concrete methods are defined one per folder in `rdf/0.4.2/methods/<method>/method.ttl`, each with an `cprmv:id` equal to its local name. The API loads only those that have a Python module (see [Architecture](architecture.md#method-plugins)).
+`cprmv:Method` is one of three **instruments**: `cprmv:Instrument` — something used in relation to rules — has the subclasses `cprmv:Standard`, `cprmv:Tool` and `cprmv:Method`.
+
+The concrete methods are defined in `rdf/0.4.3/methods/<module>/method.ttl`, grouped into method modules (`cprmvmethods:module`, listing its methods with `cprmvmethods:hasMethods`), each method with a `cprmv:id` equal to its local name. The API loads only those that have a Python module (see [Architecture](architecture.md#method-plugins)).
 
 ---
 
 ## Echelons
 
-`cprmv:Echelon` categorises rule sets in the context of service delivery. It has six subclasses: `cprmv:AgreementEchelon`, `cprmv:SemanticEchelon`, `cprmv:OntologicEchelon`, `cprmv:LogicEchelon`, `cprmv:OperableEchelon` and `cprmv:SupportEchelon`.
+`cprmv:Echelon` categorises rule sets in the context of service delivery. It has six subclasses: `cprmv:NaturalEchelon`, `cprmv:SemanticEchelon`, `cprmv:OntologicEchelon`, `cprmv:LogicEchelon`, `cprmv:OperableEchelon` and `cprmv:SupportEchelon`.
 
 A rule method states which echelons it refines between with `cprmv:refinesFrom` and `cprmv:refinesTowards` (domain `cprmv:RuleMethod`, range `cprmv:Echelon`). The SHACL shapes for each method class limit which echelons are allowed — a `cprmv:TestMethod`, for example, refines from `cprmv:OperableEchelon` towards `cprmv:SupportEchelon`.
 
@@ -128,13 +133,14 @@ A rule method states which echelons it refines between with `cprmv:refinesFrom` 
 
 ## Methods namespace
 
-The methods registry uses three namespaces:
+The methods registry uses four namespaces:
 
 | Prefix | Namespace | Holds |
 |---|---|---|
-| `cprmvmethods:` | `https://cprmv.open-regels.nl/0.4.2/methods/` | Method definitions and the value lists (`rulemethods`, `publicationmethods`, `referencemethods`, …) |
-| `cprmv-serve:` | `https://cprmv.open-regels.nl/0.4.2/serve-api/` | API settings on method nodes, and the `core-*` base methods |
-| `frbr-sru:` | `https://cprmv.open-regels.nl/0.4.2/methods/frbr-sru/` | Settings of the FRBR SRU version lookup |
+| `cprmvmethods:` | `https://cprmv.open-regels.nl/0.4.3/methods/` | Method definitions, modules and the value lists (`rulemethods`, `publicationmethods`, `referencemethods`, …) |
+| `cprmv-serve:` | `https://cprmv.open-regels.nl/0.4.3/serve-api/` | API settings on method nodes, and the `core-*` base methods |
+| `core-api:` | `https://cprmv.open-regels.nl/0.4.3/methods/core-api#` | Settings of API sources: `api-base-url`, `api-headers`, `http-method` |
+| `frbr-sru:` | `https://cprmv.open-regels.nl/0.4.3/methods/frbr-sru/` | Settings of the FRBR SRU version lookup |
 
 Key properties on method nodes:
 
@@ -144,6 +150,7 @@ Key properties on method nodes:
 | `cprmv-serve:normalized-id-format` | Normalised format used for parsing incoming ids |
 | `cprmv-serve:repository-publication-location-format` | URL template for downloading the publication |
 | `cprmv-serve:xslt` | File name of the XSLT in `serve_api/data/` |
+| `cprmv-serve:utilizes` | The service or organisation register a method consults (DSO → DSO service register → ROO) |
 | `cprmv-serve:reference-format` | Pattern a reference method parses references with |
 | `cprmv-serve:reference-mapping` | List of key/label pairs for Juriconnect location strings, including `cprmv-serve:reference-mapping-valid-on` (`g`) and `cprmv-serve:reference-mapping-seen-on` (`z`) |
 | `frbr-sru:url` | SRU search URL for resolving `latest` versions |
@@ -156,6 +163,6 @@ Settings defined on a parent method are copied onto the method that inherits the
 
 ## SHACL shapes
 
-`rdf/0.4.2/cprmv.shacl.ttl` defines node shapes for `cprmv:RuleSet`, `cprmv:DecisionModel`, `cprmv:Rule`, `cprmv:RuleMethod`, the analysis, formalisation, codification, execution, explanation, test and publication method classes (each with its echelon constraints), `cprmv:ReferenceMethod`, the two catalogs, `cprmv:Echelon`, `cprmv:Explanation`, and the test, case and decision classes, plus the property shapes `cprmv:hasPartShape` and the two `cprmv:acknowledges` shapes. They enforce the cardinalities listed above.
+`rdf/0.4.3/cprmv.shacl.ttl` defines node shapes for `cprmv:RuleSet`, `cprmv:DecisionModel`, `cprmv:Rule`, `cprmv:RuleMethod`, the analysis, formalisation, codification, execution, explanation, test and publication method classes (each with its echelon constraints), `cprmv:ReferenceMethod`, the two catalogs, `cprmv:Echelon`, `cprmv:Explanation`, and the test, case and decision classes, plus the property shapes `cprmv:hasPartShape` and the two `cprmv:acknowledges` shapes. They enforce the cardinalities listed above.
 
-`rdf/0.4.2/test.sh` validates the example data, every method definition and sample API output for BWB, CVDR, DMN 1.3 and Formex 4 against them with pyshacl; see [Testing](testing.md#shacl-validation).
+`rdf/0.4.3/test.sh` validates the example data, every method definition and sample API output for BWB, CVDR, DMN 1.3 and Formex 4 against them with pyshacl; see [Testing](testing.md#shacl-validation).

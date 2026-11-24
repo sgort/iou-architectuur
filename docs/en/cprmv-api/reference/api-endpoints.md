@@ -9,7 +9,9 @@ Interactive documentation is available at the live environments:
 - **Production:** [https://cprmv.open-regels.nl/docs](https://cprmv.open-regels.nl/docs) (also [https://cprmv.open-rules.eu/docs](https://cprmv.open-rules.eu/docs))
 - **Acceptance:** [https://acc.cprmv.open-regels.nl/docs](https://acc.cprmv.open-regels.nl/docs)
 
-Responses from `/methods` and `/rules` are plain text (`text/plain; charset=utf-8`) whatever the requested serialisation. Errors are reported in the body with HTTP status `200`, except where noted.
+Responses from `/methods` and `/rules`, and errors from `/raw`, are plain text (`text/plain; charset=utf-8`) whatever the requested serialisation. Errors are reported in the body with HTTP status `200`, except where noted.
+
+`/rules`, `/raw` and `/ref` accept an optional `x-api-key` header. The API passes it on to a source that needs the caller's own key — today the DSO methods (see [Publication Repositories](../features/publication-repositories.md#dso-sttr)); the other sources need none.
 
 ---
 
@@ -20,7 +22,7 @@ Returns the API title and version.
 **Response:**
 
 ```json
-{"CPRMV Rules Serve API": "0.4.2"}
+{"CPRMV Rules Serve API": "0.4.3"}
 ```
 
 ---
@@ -34,10 +36,19 @@ Returns the Methods Knowledge Graph, loaded at start-up from `data/cprmvmethods.
 | Parameter | Type | Default | Values |
 |---|---|---|---|
 | `format` | string | `json-ld` | `json-ld`, `xml`, `turtle`, `ttl`, `n3`, `turtle2` |
+| `method_name` | string | — | A method's local name, e.g. `iou-norms` or `core-api` (names starting with `core` are looked up in `cprmv-serve:`, the others in `cprmvmethods:`) |
 
 **Response:** Plain text in the requested RDF serialisation; `null` for any other `format` value.
 
-The graph lists the acknowledged methods per category (`cprmvmethods:rulemethods`, `publicationmethods`, `referencemethods`, `analysismethods`, `formalisationmethods`, `serialisationmethods`, `executionmethods`, …) and each method's definition. It reflects the committed `data/cprmvmethods.ttl`, which lags behind `rdf/0.4.2/methods/` ([standards/cprmv#31](https://git.open-regels.nl/standards/cprmv/-/work_items/31)).
+The graph lists the acknowledged methods per category (`cprmvmethods:rulemethods`, `publicationmethods`, `referencemethods`, `analysismethods`, `formalisationmethods`, `serialisationmethods`, `executionmethods`, …) and each method's definition. It is the committed `data/cprmvmethods.ttl`, which `make methods` generates from `rdf/0.4.3/`, merged with the vocabulary.
+
+With `method_name`, the response is the description of one node whose type is that method, following blank nodes — for `iou-norms`, the configured instance `norms-backend.linkeddata.open-regels.nl`, not the `iou-norms` method itself. A name that no node is typed by, such as `roo`, `dso` or a misspelling, returns the whole graph with status `200`, not an error ([open-regels/cprmv#2](https://github.com/open-regels/cprmv/issues/2)).
+
+---
+
+## GET /0.4.3/methods/{method_name}
+
+The same as `/methods?method_name=…`, as a path, so that the method URIs in the ReSpec value lists (`https://cprmv.open-regels.nl/0.4.3/methods/…`) lead to the API. Takes `format` like `/methods`, and selects the same way.
 
 ---
 
@@ -70,7 +81,19 @@ Retrieves a rule or rule set from an official publication repository.
 
 when no publication method recognises the Rule Set ID, and the text `No rules found for given path...` when the rule set is found but the path matches no rule.
 
-**Supported Rule Set ID formats:** See [ID Formats](id-formats.md). Besides BWB, CVDR and EU CELLAR, DMN 1.3 decision models deployed on `operaton.open-regels.nl` can be retrieved.
+**Supported Rule Set ID formats:** See [ID Formats](id-formats.md). Besides BWB, CVDR and EU CELLAR: DMN 1.3 decision models on `operaton.open-regels.nl`, norms from the IOU Norms API, organisations from the Register van Overheidsorganisaties, and STTR decision models from the DSO (with `x-api-key`).
+
+---
+
+## GET /raw/{rule_id_path}
+
+Returns the original publication behind a rule set, untransformed, as a download. Only the rule set id counts; any rule path after it is ignored.
+
+**Path and query parameters:** `rule_id_path` and `path_delimiter` as for `/rules`.
+
+**Response:** the file, `application/octet-stream`, with `Content-Disposition: attachment; filename="{RuleSetId}"` (the id as given, no extension) — for BWB the `toestand` XML. If the id is not recognised or the download fails, the body is `{"error retrieving raw Rule Set publication": "…"}` as text, with status `200`.
+
+The source URL is the method's `cprmv-serve:repository-publication-location-format` (see [ID Formats](id-formats.md)).
 
 ---
 
@@ -93,49 +116,18 @@ Resolves an external legal reference to a CPRMV API path and returns an HTTP red
 | ELI → Formex 4 on EU CELLAR | `http://data.europa.eu/eli/reg/2018/1805/oj` | the EU CELLAR item (language `NLD`, format `fmx4`) |
 | ELI for BWB / CVDR (experimental) | `https://wetten.overheid.nl/BWBR0015703/Artikel%2020/onderdeel%20a.` | a `/rules/` path |
 
-**Response:** `307 Temporary Redirect`, or `{"error": "not a valid or supported reference..."}` if no method resolves the reference. A malformed Juriconnect reference currently fails with `500 Internal Server Error` (see [Reference Resolution](../features/reference-resolution.md#juriconnect)).
+**Response:** `307 Temporary Redirect`, or `{"error": "not a valid or supported reference..."}` if no method resolves the reference. The redirect response carries the request's own headers back, the `x-api-key` included ([open-regels/cprmv#1](https://github.com/open-regels/cprmv/issues/1)). A malformed Juriconnect reference currently fails with `500 Internal Server Error` (see [Reference Resolution](../features/reference-resolution.md#juriconnect)).
 
 **Supported reference types:** See [Reference Resolution](../features/reference-resolution.md).
 
 ---
 
-## GET /cellar-by-celex/{celexid}
+## /mcp/
 
-Redirects to the EU CELLAR SPARQL endpoint running a query that finds the manifestation items for a given CELEX id.
-
-**Path / query parameters:**
-
-| Parameter | In | Default | Description |
-|---|---|---|---|
-| `celexid` | path | `32018R1805` | CELEX identifier of the work |
-| `language` | query | `NLD` | Language code |
-| `format` | query | `fmx4` | Manifestation format |
-
-**Response:** `307 Temporary Redirect` to the CELLAR SPARQL results.
-
----
-
-## GET /cellar-by-eli/{elipath}/{language}/{format}
-
-Works like `/cellar-by-celex` but accepts an ELI reference (matched against the EU CELLAR knowledge graph). Only ELI references explicitly linked to CELLAR documents resolve (partial ELIs do not). The language is upper-cased and the format lower-cased before the query is built.
-
-**Example:** `/cellar-by-eli/http://data.europa.eu/eli/reg/2018/1805/oj/NLD/fmx4`
-
-**Response:** `307 Temporary Redirect` to the CELLAR SPARQL results.
-
-!!! note
-    For both `/cellar-by-*` endpoints, a CORS limitation in Swagger UI can make the
-    redirect surface as `TypeError: Load failed`. Open the request URL directly to see
-    the actual CELLAR response.
-
----
-
-## /mcp
-
-`serve.py` builds a **Model Context Protocol** server with FastMCP (`FastMCP.from_fastapi(app=app, name="CPRMV")`) and mounts it at `/mcp` on a combined application (`combined_app`). In the current deployment `/mcp` returns `404`: the MCP server is created before the API routes are registered, so it would expose no tools, and the container runs `fastapi run src/serve.py`, which serves `app` rather than `combined_app`. See [standards/cprmv#31](https://git.open-regels.nl/standards/cprmv/-/work_items/31).
+`serve.py` builds a **Model Context Protocol** server from the API's routes with FastMCP (`FastMCP.from_fastapi(app=app, name="CPRMV")`) after every route is registered, and mounts it on the API at `/mcp`. The endpoint is `/mcp/` (streamable HTTP): a request to `/mcp` is redirected, to an `http://` address ([open-regels/cprmv#2](https://github.com/open-regels/cprmv/issues/2)). On 24 November a `GET /mcp/` answered on all three hosts with the MCP error for a missing session, as the protocol prescribes.
 
 ---
 
 ## Static: /respec/
 
-Serves the CPRMV specification as a static ReSpec HTML site, with one folder per version (`/respec/0.4.0/`, `/respec/0.4.1/`, `/respec/0.4.2/`). Navigate to `/respec/` in a browser.
+Serves the CPRMV specification as a static ReSpec HTML site, with one folder per version (`/respec/0.4.0/` … `/respec/0.4.3/`); `/respec/` itself opens 0.4.3. From 0.4.1 on, each version folder also holds a PDF (`cprmv.pdf`). Navigate to `/respec/` in a browser.

@@ -116,7 +116,7 @@ No SRU / date-based resolution available.
 
 ## DMN 1.3 (Operaton, experimental)
 
-Method: `operaton.open-regels.nl`
+Method: `operaton.open-regels.nl` (type `iou-operaton`)
 
 **Publication ID format:** `DMN1.3_{deploymentid}R{resourceid}_{date}_{index}`
 
@@ -129,3 +129,44 @@ The `{rulesetid}` field encodes `{deploymentid}R{resourceid}`; the `operaton` me
 ```
 https://operaton.open-regels.nl/engine-rest/deployment/{deploymentid}/resources/{resourceid}/data
 ```
+
+---
+
+## IOU Norms
+
+Method: `norms-backend.linkeddata.open-regels.nl` (type `iou-norms`)
+
+**Publication ID format:** `IOU-NORMS_{rulesetid}_{date}`
+
+**Normalised ID format (parsed):** `IOU-NORMS_{rulesetid}_{date}_{index}`
+
+The date and index must be given but do not select a version (see [Publication Repositories](../features/publication-repositories.md#iou-norms-open-regelsnl)).
+
+**Publication URL template:**
+
+```
+https://acc.backend.linkeddata.open-regels.nl/v2/norms/?rulesetid={rulesetid}&valid-on={date}
+```
+
+---
+
+## ROO (Register van Overheidsorganisaties)
+
+| Method | Publication ID format = normalised ID format | Publication URL template |
+|---|---|---|
+| `roo` | `ROO.{key}={rulesetid}_{date}_{index}` | `https://api-organisaties.overheid.nl/v1/overheidsorganisaties/identificatie-uitgebreid?{key}={rulesetid}` |
+| `roo-uri` | `ROOURI{uri}_{date}_{index}` | `https://api-organisaties.overheid.nl/v1/overheidsorganisaties/{uri}` |
+| `roo-catalogus` | `ROO_{date}_{index}` | `https://api-organisaties.overheid.nl/v1/overheidsorganisaties` |
+
+`{key}` is an identification field such as `organisatiecode` or `oin`; `{uri}` is a URL-encoded TOOI URI. The date and index must be given but are not used.
+
+---
+
+## DSO (STTR)
+
+| Method | Publication ID format = normalised ID format | Publication URL template |
+|---|---|---|
+| `dso` | `DSO_{rulesetid}_{date}_{index}` | `https://service.omgevingswet.overheid.nl/publiek/toepasbare-regels/api/toepasbareregelsuitvoerengegevens/v1/toepasbareRegels/{rulesetid}/sttrBestand` |
+| `dso-service-register` | `DSOService_{rulesetid}_{date}_{index}` | `https://service.omgevingswet.overheid.nl/publiek/toepasbare-regels/api/toepasbareregelsuitvoerengegevens/v1/toepasbareRegels/{rulesetid}` |
+
+Both need the caller's DSO API key in the `x-api-key` header (see [Publication Repositories](../features/publication-repositories.md#dso-sttr)).

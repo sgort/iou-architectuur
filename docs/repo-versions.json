@@ -1,30 +1,30 @@
 {
-  "docs_built": "2026-11-22",
+  "docs_built": "2026-11-24",
   "last_patch": {
-    "date": "2026-11-22",
-    "kind": "Component sync and weekly pass",
-    "summary": "CPSV Editor v2026.11.2 and Linked Data Explorer v2026.11.3, both in production: the editor imports each statement whole and reads a field only from its own property, its publish dialog shows the steps publishing really takes, and a lapsed session asks to sign in again; the Linked Data Explorer accepts only access tokens, says when sign-in cannot be checked, explains a failed publish, and reports a required service described elsewhere as a warning; the weekly pass then re-checked the contributing pages and the Project Start Architectuur against all five components, recording that zizmor is now installed from hash-locked wheels and adding a risk for the citizen service number in the browser and the incomplete lookup audit; the ICTU dependency guideline holds at 42, 40 and 40.",
+    "date": "2026-11-24",
+    "kind": "Component sync",
+    "summary": "CPRMV v0.4.3, in production: a RuleSet is now an FRBR Endeavor and methods come in modules; the API reads organisations, norms and DSO decision models as sources, returns the original publication through /raw, narrows /methods to one method, drops the EU CELLAR helpers and serves its MCP server at /mcp/; the specification gains new introductory chapters, a diagram per class and a PDF.",
     "previous": {
-      "date": "2026-11-18",
-      "kind": "Component sync",
-      "summary": "RONL Business API v2026.11.5 in production, with one fix on production ahead of the next release: the sign-in client accepts only its own addresses and requires PKCE, a BRP lookup is open to caseworkers through a role and otherwise only for your own record, citizens start only the processes offered to them, and signing refuses what cannot work; Flevoland's accent fill is pink with white text."
+      "date": "2026-11-22",
+      "kind": "Component sync and weekly pass",
+      "summary": "CPSV Editor v2026.11.2 and Linked Data Explorer v2026.11.3, both in production: the editor imports each statement whole and reads a field only from its own property, its publish dialog shows the steps publishing really takes, and a lapsed session asks to sign in again; the Linked Data Explorer accepts only access tokens, says when sign-in cannot be checked, explains a failed publish, and reports a required service described elsewhere as a warning; the weekly pass then re-checked the contributing pages and the Project Start Architectuur against all five components, recording that zizmor is now installed from hash-locked wheels and adding a risk for the citizen service number in the browser and the incomplete lookup audit; the ICTU dependency guideline holds at 42, 40 and 40."
     },
     "open_findings": [
       {
-        "label": "linked-data-explorer#358",
-        "url": "https://github.com/sgort/linked-data-explorer/issues/358"
+        "label": "open-regels/cprmv#1",
+        "url": "https://github.com/open-regels/cprmv/issues/1"
       },
       {
-        "label": "ronl-business-api#482",
-        "url": "https://github.com/sgort/ronl-business-api/issues/482"
+        "label": "open-regels/cprmv#2",
+        "url": "https://github.com/open-regels/cprmv/issues/2"
       },
       {
-        "label": "ronl-business-api#483",
-        "url": "https://github.com/sgort/ronl-business-api/issues/483"
+        "label": "ttl-editor#274",
+        "url": "https://github.com/sgort/ttl-editor/issues/274"
       },
       {
-        "label": "ttl-editor#270",
-        "url": "https://github.com/sgort/ttl-editor/issues/270"
+        "label": "ronl-business-api#489",
+        "url": "https://github.com/sgort/ronl-business-api/issues/489"
       }
     ]
   },
@@ -87,11 +87,11 @@
     {
       "name": "CPRMV",
       "icon": "📜",
-      "version": "v0.4.2",
+      "version": "v0.4.3",
       "environment": "prod",
-      "commit": "ace9dfa...",
-      "commit_date": "2026-10-02",
-      "repo_url": "https://git.open-regels.nl/standards/cprmv/-/commit/ace9dfa9157c7be5fbd00d39994cd6d3837fb72a",
+      "commit": "d597671...",
+      "commit_date": "2026-11-23",
+      "repo_url": "https://git.open-regels.nl/standards/cprmv/-/commit/d597671421d119469ce3e4585849be32fea7c778",
       "ci_repo": "https://git.open-regels.nl/standards/cprmv"
     }
   ]

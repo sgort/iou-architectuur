@@ -14,14 +14,11 @@ The CPRMV API runs as a Docker container. GitLab CI builds the image and pushes 
 
 - Installs and sets the `nl_NL.UTF-8` locale (`LANG`, `LANGUAGE`, `LC_ALL`).
 - Installs `requirements.txt`.
-- Copies `src/`, `data/`, `respec/` and `certs/` into `/app`. `certs/` holds the certSIGN Web CA intermediate that `serve.py` adds to its SSL context, because `repository.officiele-overheidspublicaties.nl` omits it from its TLS handshake.
+- Copies `src/`, `data/`, `respec/`, `methods/` and `certs/` into `/app`. `certs/` holds the certSIGN Web CA intermediate that `serve.py` adds to its SSL context, because `repository.officiele-overheidspublicaties.nl` omits it from its TLS handshake.
 - Creates a non-root `appuser` and runs as that user.
 - Exposes port `8000`.
 - Health check via `urllib.request.urlopen('http://localhost:8000/', timeout=5)`.
-- Command: `fastapi run src/serve.py --port 8000 --host 0.0.0.0`.
-
-!!! warning "The Dockerfile on `main` does not copy `methods/`"
-    The method modules in `serve_api/methods/` are not copied into the image. `serve.py` then finds no methods at startup, so an image built from `main`'s Dockerfile cannot load any method: `/` answers, but `/rules` and `/ref` cannot resolve any publication or reference. The fix, which adds `COPY methods/ ./methods/`, is [standards/cprmv!20](https://git.open-regels.nl/standards/cprmv/-/merge_requests/20) and is not yet merged. The hosts currently run an image built with that fix.
+- Command: `fastapi run src/serve.py --port 8000 --host 0.0.0.0`, which serves `app`, the API with the MCP server mounted at `/mcp`.
 
 ---
 
@@ -29,11 +26,11 @@ The CPRMV API runs as a Docker container. GitLab CI builds the image and pushes 
 
 | Host | Version on `/` |
 |---|---|
-| `https://cprmv.open-regels.nl/` | 0.4.2 |
-| `https://cprmv.open-rules.eu/` | 0.4.2 |
-| `https://acc.cprmv.open-regels.nl/` | 0.4.2 |
+| `https://cprmv.open-regels.nl/` | 0.4.3 |
+| `https://cprmv.open-rules.eu/` | 0.4.3 |
+| `https://acc.cprmv.open-regels.nl/` | 0.4.3 |
 
-All three answer `{"CPRMV Rules Serve API":"0.4.2"}` on `/` (checked 10 October 2026). `/mcp` answers 404 on all three: MCP is not reachable in the current deployment ([standards/cprmv#31](https://git.open-regels.nl/standards/cprmv/-/work_items/31)).
+All three answer `{"CPRMV Rules Serve API":"0.4.3"}` on `/` (checked 24 November 2026), and `/mcp/` answers as an MCP endpoint; `/mcp` without the slash redirects to an `http://` address ([open-regels/cprmv#2](https://github.com/open-regels/cprmv/issues/2)).
 
 ---
 
@@ -108,13 +105,13 @@ docker compose pull
 docker compose up -d
 ```
 
-The `IMAGE_TAG` environment variable pins a specific commit SHA from the CI build output.
+The `IMAGE_TAG` environment variable pins a specific commit SHA from the CI build output. On 23 November CI pushed `latest` and `d5976714` as the same image.
 
 ---
 
 ## Health check
 
-The container's built-in health check polls `http://localhost:8000/` every 30 seconds with a 30-second timeout, 3 retries, and a 5-second start period. The `/` endpoint returns `{"CPRMV Rules Serve API": "0.4.2"}`. The compose file defines its own health check on the same URL (10-second timeout, 40-second start period).
+The container's built-in health check polls `http://localhost:8000/` every 30 seconds with a 30-second timeout, 3 retries, and a 5-second start period. The `/` endpoint returns `{"CPRMV Rules Serve API": "0.4.3"}`. The compose file defines its own health check on the same URL (10-second timeout, 40-second start period).
 
 The health check only proves the application started: an image without `methods/` passes it. To check that methods load, request a rule, for example:
 

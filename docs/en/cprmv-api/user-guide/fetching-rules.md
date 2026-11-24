@@ -4,7 +4,7 @@ component: CPRMV
 
 # Fetching Rules
 
-All rule retrieval goes through the `/rules/{rule_id_path}` endpoint. This page covers the full range of retrieval patterns.
+All rule retrieval goes through the `/rules/{rule_id_path}` endpoint; `/raw` returns the original publication instead. This page covers the full range of retrieval patterns.
 
 ---
 
@@ -75,6 +75,37 @@ GET /rules/CVDR712517_2025-07-02_latest      ← valid on date
 ```
 GET /rules/CFMX483e4752e-f2e5-11e8-9982-01aa75ed71a1.0017.02_DOC_2%2C%20Artikel%201
 ```
+
+---
+
+## Norms, organisations and DSO decision models
+
+Norms from the IOU Norms API and an organisation from the Register van Overheidsorganisaties:
+
+```
+GET /rules/IOU-NORMS_BWBR0015703_2026-01-01_1?format=turtle
+GET /rules/ROO.organisatiecode=gm1926_2026-01-01_1?format=turtle
+```
+
+An STTR decision model from the DSO needs your own DSO API key in the `x-api-key` header:
+
+```
+curl -H "x-api-key: <your DSO key>" "https://cprmv.open-regels.nl/rules/DSO_14_2026-01-01_1"
+```
+
+Without the key the answer is `{"error": "'x-api-key'"}`. See [Publication Repositories](../features/publication-repositories.md) for what each source returns.
+
+---
+
+## Downloading the original publication
+
+`/raw` takes the rule set id and returns the publication as published, as a file — for BWB the `toestand` XML:
+
+```
+GET /raw/BWBR0015703_2025-07-01_0
+```
+
+A rule path after the id is ignored. See [API Endpoints](../reference/api-endpoints.md#get-rawrule_id_path).
 
 ---
 

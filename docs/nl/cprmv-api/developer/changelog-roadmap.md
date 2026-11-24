@@ -1,3 +1,7 @@
+---
+component: CPRMV
+---
+
 # CI/CD & Changelog
 
 !!! info "Documentatie in ontwikkeling"
@@ -16,6 +20,8 @@
 ---
 
 ## Changelog
+
+### v0.4.3 (November 2026)
 
 ### v0.4.1 (June 2026)
 

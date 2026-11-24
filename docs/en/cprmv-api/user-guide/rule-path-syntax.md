@@ -58,6 +58,17 @@ DMN1.3_{deploymentid}R{resourceid}_{date}_{index}
 
 Example: `DMN1.3_e62cb254-0e74-11f1-a5e9-f68ed60940f5Re62cb255-0e74-11f1-a5e9-f68ed60940f5_2026-01-01_1, LiteralExpression_2021`.
 
+### IOU Norms, ROO and DSO
+
+```
+IOU-NORMS_BWBR0015703_2026-01-01_1          ← norms from the IOU Norms API
+ROO.organisatiecode=gm1926_2026-01-01_1     ← an organisation by a known key
+ROO_2026-01-01_1                            ← the whole register (slow)
+DSO_14_2026-01-01_1                         ← an STTR decision model; needs x-api-key
+```
+
+The date and index must be present but select nothing for these sources. ROO also takes a URL-encoded TOOI URI after `ROOURI`. See [ID Formats](../reference/id-formats.md).
+
 ---
 
 ## Rule ID matching rules

@@ -4,7 +4,7 @@ component: CPRMV
 
 # Getting Started
 
-The CPRMV API is available as a live service. No account or API key is required.
+The CPRMV API is available as a live service. No account is required, and most sources need no key. The DSO decision models need your own DSO API key, sent as the `x-api-key` header.
 
 ---
 
@@ -15,7 +15,7 @@ The CPRMV API is available as a live service. No account or API key is required.
 | **Production** | [https://cprmv.open-regels.nl/docs](https://cprmv.open-regels.nl/docs) (also [https://cprmv.open-rules.eu/docs](https://cprmv.open-rules.eu/docs)) |
 | **Acceptance** | [https://acc.cprmv.open-regels.nl/docs](https://acc.cprmv.open-regels.nl/docs) |
 
-Every environment exposes FastAPI's interactive Swagger UI at `/docs`, where every endpoint can be called directly in the browser. `GET /` returns the running version, for example `{"CPRMV Rules Serve API": "0.4.2"}`.
+Every environment exposes FastAPI's interactive Swagger UI at `/docs`, where every endpoint can be called directly in the browser. `GET /` returns the running version, for example `{"CPRMV Rules Serve API": "0.4.3"}`.
 
 ---
 
@@ -57,6 +57,18 @@ The `cprmv:id` of the returned rule set shows which publication was found (for e
 
 ---
 
+## Downloading the original publication
+
+`/raw` takes the same rule set id as `/rules` and returns the publication itself, untransformed, as a file:
+
+```
+GET https://acc.cprmv.open-regels.nl/raw/BWBR0015703_2025-07-01_0
+```
+
+For BWB this is the `toestand` XML. See [API Endpoints](../reference/api-endpoints.md#get-rawrule_id_path).
+
+---
+
 ## Checking the CPRMV specification
 
 The CPRMV specification in ReSpec format is served at:
@@ -75,4 +87,4 @@ This describes the full vocabulary — classes, properties, and cardinality cons
 GET https://acc.cprmv.open-regels.nl/methods?format=turtle
 ```
 
-Returns the Methods Knowledge Graph in Turtle format: the acknowledged method lists (`cprmvmethods:rulemethods`, `publicationmethods`, `referencemethods`, `analysismethods`, …) and the definition of each method with its configuration properties. The graph is loaded from `serve_api/data/cprmvmethods.ttl`, which currently lags behind the method definitions in `rdf/0.4.2/methods/` ([standards/cprmv#31](https://git.open-regels.nl/standards/cprmv/-/work_items/31)).
+Returns the Methods Knowledge Graph in Turtle format: the acknowledged method lists (`cprmvmethods:rulemethods`, `publicationmethods`, `referencemethods`, `analysismethods`, …) and the definition of each method with its configuration properties. The graph is loaded from `serve_api/data/cprmvmethods.ttl`, which `make methods` generates from `rdf/0.4.3/`. `/methods?method_name=iou-norms` narrows it to the configured IOU Norms source (see [API Endpoints](../reference/api-endpoints.md#get-methods) for how a name is matched).

@@ -42,4 +42,4 @@ Prints the `docker pull` commands for the new image tags and a reminder to updat
 
 ### ReSpec publication
 
-A separate job (`create-pages`, `node:lts-alpine`) runs on the default branch only. It installs Chromium, runs `npm ci` and `npm run build` in `html/`, and publishes `html/public` to GitLab Pages.
+A separate job (`create-pages`, `node:lts-alpine`) runs on the default branch only and publishes the committed `html/public` to GitLab Pages, `https://standaarden.open-regels.nl/standards/cprmv/<version>/`. It builds nothing: the ReSpec is built locally with `npm run build` in `html/` (ReSpec, PlantUML class diagrams, a pandoc PDF) and committed, both to `html/public/<version>/` and to `serve_api/respec/`. `html/public/` has no index of its own, so the Pages root answers 404 and the versioned paths serve.
