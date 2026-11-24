@@ -58,8 +58,6 @@ redirects to `http://publications.europa.eu/resource/cellar/83e4752e-f2e5-11e8-9
 
 Because this method queries CELLAR for any reference that reaches it, every reference not handled by `cprmvapi` or `juriconnect` costs a CELLAR round trip before `elinl` is tried.
 
-See also the [`/cellar-by-eli`](../reference/api-endpoints.md) endpoint for explicit language/format control.
-
 ---
 
 ## ELI for BWB and CVDR (experimental)
@@ -95,6 +93,6 @@ The supported reference methods are acknowledged in the `cprmvmethods:referencem
     - `cprmv-serve:reference-mapping-valid-on` — the locatie-string key that carries the valid-on date (`g`).
     - `cprmv-serve:reference-mapping-seen-on` — the locatie-string key for the sighting date (`z`).
 
-`cprmv-serve:` is the namespace `https://cprmv.open-regels.nl/0.4.2/serve-api/`.
+`cprmv-serve:` is the namespace `https://cprmv.open-regels.nl/0.4.3/serve-api/`.
 
 If no method matches, the endpoint returns `{"error": "not a valid or supported reference..."}`.

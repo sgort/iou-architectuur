@@ -10,17 +10,19 @@ The **CPRMV API** is a Python/FastAPI service that makes individual rules from D
 
 ## What it does
 
-The API accepts a Rule Set identifier (a BWB, CVDR, EU CELLAR or Operaton DMN ID) and an optional path of rule identifiers, then:
+The API accepts a Rule Set identifier (a BWB, CVDR, EU CELLAR, Operaton DMN, IOU Norms, ROO or DSO ID) and an optional path of rule identifiers, then:
 
 1. Finds the publication method whose identifier format matches the Rule Set ID.
 2. Downloads the publication on-the-fly from its repository.
-3. Transforms it to CPRMV using the XSLT stylesheet of the method.
+3. Transforms it to CPRMV — with the method's XSLT stylesheet for XML, or field by field for JSON.
 4. Navigates the resulting rule tree to the requested rule.
 5. Returns the rule in the requested format — `cprmv-json`, Turtle, JSON-LD, or other RDF serialisations.
 
 No pre-loading or batch conversion is required. For BWB and CVDR, the API resolves "latest version valid on a given date" queries via SRU search of the publication repository.
 
 Each publication and reference method is a Python module in `serve_api/methods/`, configured by its RDF method definition. See [Publication Repositories](features/publication-repositories.md).
+
+`/raw` returns the publication untransformed.
 
 ---
 
@@ -34,11 +36,14 @@ graph LR
     CVDR["CVDR Repository<br/>officiele-overheidspublicaties.nl"] -->|XML download| API
     CELLAR["EU CELLAR<br/>publications.europa.eu"] -->|XML download| API
     OPERATON["Operaton<br/>operaton.open-regels.nl"] -->|DMN download| API
+    NORMS["IOU Norms API<br/>Linked Data Explorer"] -->|JSON| API
+    ROO["Register van Overheidsorganisaties<br/>api-organisaties.overheid.nl"] -->|JSON| API
+    DSO["DSO, with the caller's key<br/>service.omgevingswet.overheid.nl"] -->|STTR download| API
 
     subgraph "CPRMV API"
         API["serve.py<br/>FastAPI"]
         METHODS["Method modules<br/>serve_api/methods/"]
-        XSLT["XSLT Transforms<br/>bwb2cprmv.xsl<br/>cvdr2cprmv.xsl<br/>fmx42cprmv.xsl<br/>dmn13operaton2cprmv.xsl"]
+        XSLT["XSLT Transforms<br/>bwb2cprmv.xsl<br/>cvdr2cprmv.xsl<br/>fmx42cprmv.xsl<br/>dmn13operaton2cprmv.xsl<br/>sttr2cprmv.xsl"]
         KG["Methods KG<br/>cprmvmethods.ttl<br/>cprmv.ttl"]
         API --- METHODS
         METHODS --- XSLT
@@ -81,7 +86,7 @@ Versions are those locked in `serve_api/requirements.txt`; `pyproject.toml` list
 | Image registry | Docker Hub (`datafluisteraar/cprmv-api`) | — |
 | CI/CD | GitLab CI | — |
 
-The MCP integration is wired up in `serve.py`, but `/mcp` is not reachable in the current deployment — see [MCP server](features/overview.md#mcp-server).
+The MCP server is mounted on the API at `/mcp/` — see [MCP server](features/overview.md#mcp-server).
 
 ---
 
@@ -95,16 +100,18 @@ cprmv/
 │   │   └── utils/
 │   │       └── constants.py       # RDF namespaces, Path/Query parameter definitions
 │   ├── methods/                   # Method modules: RuleMethod, PublicationMethod, ReferenceMethod,
-│   │                              # SerialisationMethod base classes; core_web, core_xml, frbr_sru;
-│   │                              # bwb, cvdr, fmx4, dmn13, repository_overheid_nl, eucellar,
-│   │                              # operaton, open_regels_nl, cprmvapi, juriconnect, eli
+│   │                              # SerialisationMethod, OrganisationRegister, ServiceRegister base classes;
+│   │                              # core_web, core_api, core_xml, core_json, frbr_sru;
+│   │                              # bwb, cvdr, fmx4, dmn13, sttr, repository_overheid_nl, eucellar,
+│   │                              # operaton, iou, open_regels_nl, roo, dso, cprmvapi, juriconnect, eli
 │   ├── data/                      # Written by `make methods`
 │   │   ├── cprmv.ttl              # CPRMV vocabulary (loaded into the Methods KG)
 │   │   ├── cprmvmethods.ttl       # Method registry + all method definitions (loaded into the Methods KG)
 │   │   ├── bwb2cprmv.xsl          # XSLT: BWB XML → CPRMV Turtle
 │   │   ├── cvdr2cprmv.xsl         # XSLT: CVDR XML → CPRMV Turtle
 │   │   ├── fmx42cprmv.xsl         # XSLT: Formex v4 → CPRMV Turtle
-│   │   └── dmn13operaton2cprmv.xsl# XSLT: DMN 1.3 (Operaton) → CPRMV Turtle
+│   │   ├── dmn13operaton2cprmv.xsl# XSLT: DMN 1.3 (Operaton) → CPRMV Turtle
+│   │   └── sttr2cprmv.xsl         # XSLT: STTR (DSO) → CPRMV Turtle
 │   ├── certs/                     # certSIGN Web CA intermediate for repository.officiele-overheidspublicaties.nl
 │   ├── respec/                    # Static CPRMV specification per version (served at /respec/)
 │   ├── test/                      # pytest suite
@@ -115,11 +122,11 @@ cprmv/
 │   ├── requirements.txt / requirements-dev.txt
 │   └── pyproject.toml
 ├── rdf/
-│   └── 0.4.0/ 0.4.1/ 0.4.2/       # One folder per CPRMV version
+│   └── 0.4.0/ … 0.4.3/            # One folder per CPRMV version
 │       ├── cprmv.ttl              # CPRMV OWL vocabulary
 │       ├── cprmvmethods.ttl       # Method registry (acknowledged method lists)
 │       ├── cprmv.shacl.ttl        # SHACL shapes for validation
-│       └── methods/<method>/      # 0.4.2: one folder per method — method.ttl, README.md, XSLT
+│       └── methods/<module>/      # 0.4.2 and later: one folder per method module — method.ttl, README.md, XSLT
 ├── html/                          # ReSpec source for the CPRMV specification (shaclgen.py generates chapters)
 ├── METHODS.md                     # How methods are defined in RDF and implemented in Python
 ├── ROADMAP.md

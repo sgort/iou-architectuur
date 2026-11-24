@@ -1,3 +1,7 @@
+---
+component: CPRMV
+---
+
 # API Endpoints
 
 !!! info "Documentatie in ontwikkeling"
@@ -19,7 +23,15 @@
 
 ---
 
+## GET /0.4.3/methods/{method_name}
+
+---
+
 ## GET /rules/{rule_id_path}
+
+---
+
+## GET /raw/{rule_id_path}
 
 ---
 
@@ -27,15 +39,7 @@
 
 ---
 
-## GET /cellar-by-celex/{celexid}
-
----
-
-## GET /cellar-by-eli/{elipath}/{language}/{format}
-
----
-
-## /mcp
+## /mcp/
 
 ---
 

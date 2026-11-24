@@ -28,9 +28,9 @@ Applied to `BWBR0015703_2025-07-01_0, Artikel 20, lid 1, onderdeel a.`, whose de
 
 ```json
 {
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": "https://standaarden.open-regels.nl/standards/cprmv/0.4.2#Rule",
-    "https://standaarden.open-regels.nl/standards/cprmv/0.4.2#id": "onderdeel a.",
-    "https://standaarden.open-regels.nl/standards/cprmv/0.4.2#definition": "een alleenstaande van 18, 19 of 20 jaar: € 337,98;",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": "https://standaarden.open-regels.nl/standards/cprmv/0.4.3#Rule",
+    "https://standaarden.open-regels.nl/standards/cprmv/0.4.3#id": "onderdeel a.",
+    "https://standaarden.open-regels.nl/standards/cprmv/0.4.3#definition": "een alleenstaande van 18, 19 of 20 jaar: € 337,98;",
     "http://cprmv.open-regels.nl/situatie": "een alleenstaande van 18, 19 of 20 jaar",
     "http://cprmv.open-regels.nl/norm": "337,98;",
     "http://cprmv.open-regels.nl/rulesetid": "BWBR0015703_2025-07-01_0",

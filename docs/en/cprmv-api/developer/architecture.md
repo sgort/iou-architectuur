@@ -49,9 +49,11 @@ When `serve.py` is imported it:
 
 1. Builds an SSL context that adds the bundled certSIGN Web CA intermediate (`certs/certsign-webca.crt`) to the default trust store, and stores it as `app.SSL_CONTEXT`. `repository.officiele-overheidspublicaties.nl` leaves this intermediate out of its TLS handshake, so without it every download from that repository fails certificate verification.
 2. Sets the Dutch locale (see [Locale](#locale)).
-3. Creates the FastAPI `app` (version `0.4.2`) and the MCP wiring (see [MCP](#mcp)).
+3. Creates the FastAPI `app` (version `0.4.3`), whose lifespan also starts the MCP app once it exists (see [MCP](#mcp)).
 4. Calls `set_CPRMVMETHODSKG` twice: `./data/cprmvmethods.ttl` into a new graph, then `./data/cprmv.ttl` merged into the same graph. The result is `app.cprmvsettings["CPRMVMETHODS_KG"]`, the methods knowledge graph used at request time.
-5. Calls `load_methods()` and stores the instances in `app.cprmvmethods`.
+5. Registers a middleware that keeps each request's headers in a context variable (`app.current_request_headers`), so a method can pass the caller's `x-api-key` on to its source.
+6. Calls `load_methods()` and stores the instances in `app.cprmvmethods`.
+7. Builds the MCP server and mounts it at `/mcp` — last, after every route (see [MCP](#mcp)).
 
 ---
 
@@ -72,22 +74,29 @@ The Python classes mirror the RDF method hierarchy:
 | Module | Class | Inherits from | Role |
 |---|---|---|---|
 | `RuleMethod.py` | `RuleMethod` | — | Holds `app` and the method's `config` node |
-| `PublicationMethod.py` | `PublicationMethod` | `RuleMethod` | Id normalisation, `interpret_publication_id`, `find_publication_version_valid_on_date`, `get_raw_publication` |
+| `PublicationMethod.py` | `PublicationMethod` | `RuleMethod` | Id normalisation, `interpret_publication_id`, `find_publication_version_valid_on_date`, `get_raw_publication`; reads `cprmv-serve:utilizes` to find the service or organisation register it consults |
+| `OrganisationRegister.py`, `ServiceRegister.py` | `OrganisationRegister`, `ServiceRegister` | — | Base classes for registers of organisations and of services |
 | `ReferenceMethod.py` | `ReferenceMethod` | `RuleMethod` | `parse_reference` (against `cprmv-serve:reference-format`), `transform_reference` |
 | `SerialisationMethod.py` | `SerialisationMethod` | `RuleMethod` | `get_cprmv_rule_set_from_raw_publication` |
-| `core_web.py` | `core_web` | `PublicationMethod` | Downloads the publication from `cprmv-serve:repository-publication-location-format` |
+| `core_web.py` | `core_web` | `PublicationMethod` | Downloads the publication from `cprmv-serve:repository-publication-location-format`; the HTTP method and headers can be overridden |
+| `core_api.py` | `core_api` | `core_web` | HTTP method and headers from the `core-api:` settings; passes the caller's `x-api-key` on where configured |
 | `core_xml.py` | `core_xml` | `SerialisationMethod` | Runs the XSLT named in `cprmv-serve:xslt` from `./data/`, with file and network access disabled |
+| `core_json.py` | `core_json` | `SerialisationMethod` | Turns JSON into a RuleSet, one `cprmv:Rule` per key |
 | `frbr_sru.py` | `frbr_sru` | `core_web` | Finds the version in force on a date through an SRU service (`frbr-sru:` settings) |
 | `bwb.py`, `cvdr.py`, `fmx4.py`, `dmn13.py` | `bwb`, `cvdr`, `fmx4`, `dmn13` | `core_xml` | One XSLT each |
+| `sttr.py` | `sttr` | `dmn13` | STTR (DSO), with `sttr2cprmv.xsl` |
 | `repository_overheid_nl.py` | `repository_overheid_nl_bwb`, `repository_overheid_nl_cvdr` | `frbr_sru` + `bwb` / `cvdr` | BWB and CVDR on repository.overheid.nl |
 | `eucellar.py` | `eucellar_fmx4` | `core_web` + `fmx4` | Formex 4 from EU CELLAR |
 | `operaton.py` | `operaton` | `core_web` + `dmn13` | Splits the rule set id on `R` into deployment and resource id |
-| `open_regels_nl.py` | `operaton_open_regels_nl` | `operaton` | Operaton at operaton.open-regels.nl |
+| `iou.py` | `iou_operaton`, `iou_norms` | `operaton`; `core_web` + `core_json` | Operaton and the Norms API in an IOU environment |
+| `open_regels_nl.py` | `operaton_open_regels_nl`, `norms_backend_linkeddata_open_regels_nl` | `iou_operaton`, `iou_norms` | The IOU showcase at open-regels.nl |
+| `roo.py` | `roo`, `roo_uri`, `roo_catalogus` | `OrganisationRegister` + `core_api` + `core_json` | Register van Overheidsorganisaties |
+| `dso.py` | `dso`; `dso_service_register` | `core_api` + `sttr`; `ServiceRegister` + `core_api` + `core_json` | DSO decision models, and the DSO as a service register |
 | `cprmvapi.py` | `cprmvapi` | `ReferenceMethod` | The API's own `/rules` URLs |
 | `juriconnect.py` | `juriconnect` | `ReferenceMethod` | Juriconnect 1.3 and 1.31 |
 | `eli.py` | `elifmx4`, `elinl` | `ReferenceMethod` | ELI to Formex 4 on EU CELLAR; ELI on Dutch publications |
 
-`METHODS.md` in the repository describes how to add a method: an RDF definition in `rdf/0.4.2/methods/<method>/method.ttl`, a Python module in `serve_api/methods/`, and `make methods` to regenerate `serve_api/data/` (see [Local Development](local-development.md#data-files)).
+`METHODS.md` in the repository describes how to add a method: an RDF definition in `rdf/0.4.3/methods/<module>/method.ttl`, a Python module in `serve_api/methods/`, and `make methods` to regenerate `serve_api/data/` (see [Local Development](local-development.md#data-files)).
 
 ---
 
@@ -101,6 +110,8 @@ The Python classes mirror the RDF method hierarchy:
 4. **Hook.** `interpret_publication` lets a method add id parts — `operaton` adds `deploymentid` and `resourceid`.
 
 The first method that returns a publication wins. `load_rule_set` then calls the method's `get_cprmv_rule_set_from_publication`, which fetches the raw publication into a temporary file, transforms it into the graph and deletes the file. Parse errors mentioning an unbound prefix are logged and ignored. The rule set id in the path is replaced by the resolved official id before traversal.
+
+`/raw` follows the same detection, then returns the file from the method's `get_raw_publication` instead of transforming it.
 
 ---
 
@@ -125,21 +136,19 @@ The first method that returns a publication wins. `load_rule_set` then calls the
 
 When the rule found is not the root, the root's `cprmv:hasPart` is replaced by a one-item list holding that rule, so the response is always the rule set with only the matched branch.
 
-For `cprmv-json`, `get_rule(g, rule)` recursively collects all predicate-object pairs for a rule node; for `cprmv:hasPart` it walks the RDF list and builds a nested dict keyed by `cprmv:id`. For RDF formats, the response is the concise bounded description of the root, to which the API adds `rdf:type cprmv:RuleMethod` and the method's type and `cprmv:id` triples from the methods knowledge graph, so the output satisfies the RuleSet and RuleMethod SHACL shapes.
+For `cprmv-json`, `get_rule(g, rule)` recursively collects all predicate-object pairs for a rule node; for `cprmv:hasPart` it walks the RDF list and builds a nested dict keyed by `cprmv:id`. For other values the API recursively collects the object's own triples too (`cbd_cprmv_json`), so an object such as `cprmv:isOutputOf` arrives as a nested service object. For RDF formats, the response is the root's triples, following blank nodes (`iterative_cbd`), to which the API adds `rdf:type cprmv:RuleMethod` and the method's type and `cprmv:id` triples from the methods knowledge graph, so the output satisfies the RuleSet and RuleMethod SHACL shapes.
 
 ---
 
 ## MCP
 
-`serve.py` wires an MCP server through FastMCP: `FastMCP.from_fastapi(app=app, name="CPRMV")`, served by `mcp.http_app(path='/mcp')`, whose routes are merged with the API's into a second application, `combined_app`. The MCP server is created before any route is registered on `app`, and the image serves `app` (`fastapi run src/serve.py`), not `combined_app`.
-
-`/mcp` is not reachable in the current deployment: it answers 404 on all three hosts. This is tracked in [standards/cprmv#31](https://git.open-regels.nl/standards/cprmv/-/work_items/31).
+`serve.py` builds the MCP server last, at the end of the module: `FastMCP.from_fastapi(app=app, name="CPRMV")` after every route, served by `mcp.http_app(path="/")` and mounted on `app` at `/mcp`. `app`'s lifespan enters the MCP app's lifespan. The image serves `app` (`fastapi run src/serve.py`), so the MCP endpoint is `/mcp/` on every host; it answered on all three on 24 November 2026. A request to `/mcp` is redirected to `/mcp/`, with an `http://` scheme ([open-regels/cprmv#2](https://github.com/open-regels/cprmv/issues/2)).
 
 ---
 
 ## Static files
 
-The `/respec` path is served as a static file directory mounted from `serve_api/respec/`, which holds the ReSpec HTML of the current version and versioned folders (`0.4.0/`, `0.4.1/`, `0.4.2/`). The Docker image includes the folder at build time.
+The `/respec` path is served as a static file directory mounted from `serve_api/respec/`, which holds the ReSpec HTML of the current version and versioned folders (`0.4.0/` … `0.4.3/`), from `0.4.1/` on each with a PDF (`cprmv.pdf`). The Docker image includes the folder at build time.
 
 ---
 

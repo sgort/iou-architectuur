@@ -4,20 +4,20 @@ component: CPRMV
 
 # Testing
 
-The CPRMV API has one test file, `serve_api/test/test_serve.py`, run with pytest. Three tests are active; ten more are commented out since the method modules were introduced in 0.4.2. The SHACL shapes are validated separately with a shell script that is not part of CI.
+The CPRMV API has one test file, `serve_api/test/test_serve.py`, run with pytest. Three tests are active; ten more are commented out since the method modules were introduced in 0.4.2, and v0.4.3 changed only the version the active ones expect. The SHACL shapes are validated separately with a shell script that is not part of CI.
 
 ---
 
 ## At a glance
 
-Measured on 10 October 2026 at `ace9dfa` (v0.4.2), on Windows with Python 3.14.3, after installing `requirements-dev.txt` without `uvloop` (which does not build on Windows):
+Measured on 24 November 2026 at `d597671` (v0.4.3), from a scratch export, on Windows with Python 3.14.3, after installing the pinned `requirements-dev.txt` without `uvloop` (it does not build on Windows; uvicorn uses it only when serving), plus `pywin32` and `colorama`, which pip-compile's Linux pin set omits. CI on Linux (`python:3.14-bookworm`, pipeline #824 at `d597671`) ran the same suite and passed.
 
 | Check | Command (from `serve_api/`) | Result |
 |---|---|---|
-| Syntax check | `python -m py_compile src/serve.py` | OK |
-| Import check | `python -c "from src.serve import app"` | OK — 12 methods loaded from `methods/` |
-| Unit tests | `pytest` | 3 collected, 3 passed in 2.29 s |
-| SHACL validation | `sh test.sh` (from `rdf/0.4.2/`) | Not measured |
+| Syntax check | `python -m py_compile src/serve.py` | Not run locally; passed in CI |
+| Import check | `python -c "from src.serve import app"` | Not run separately (the tests import `app`); passed in CI |
+| Unit tests | `pytest` | 3 collected in `test/test_serve.py`, 3 passed in 6.68 s; passed in CI |
+| SHACL validation | `sh test.sh` (from `rdf/0.4.3/`) | Not measured |
 
 ---
 
@@ -54,7 +54,7 @@ Pushes to `develop` build and push an image (`datafluisteraar/cprmv-api:{branch-
 
 | Test | What it checks | Notes |
 |---|---|---|
-| `test_get_root` | `GET /` returns 200 and `{"CPRMV Rules Serve API": "0.4.2"}` | Uses FastAPI's `TestClient` |
+| `test_get_root` | `GET /` returns 200 and `{"CPRMV Rules Serve API": "0.4.3"}` | Uses FastAPI's `TestClient` |
 | `test_detect_cprmv_serve_reference_method_and_transform` | An empty reference resolves to `None`; a Juriconnect 1.31 reference with `z` and `g` and a 1.3 reference with `g` resolve to the expected `/rules/…` paths | Needs network: the `elifmx4` reference method queries the EU CELLAR SPARQL endpoint |
 | `test_detect_cprmv_serve_unknown_method` | `get_rules("UNKNOWN")` returns the "No supported publication repository…" error | |
 
@@ -85,13 +85,13 @@ They call functions that 0.4.2 removed or moved into method modules (`detect_cpr
 
 ## SHACL validation
 
-`rdf/0.4.2/test.sh` validates against `cprmv.shacl.ttl`, with `cprmv.ttl` as ontology and inference set to `both`:
+`rdf/0.4.3/test.sh` validates against `cprmv.shacl.ttl`, with `cprmv.ttl` as ontology and inference set to `both`:
 
 1. `test.ttl` — the basic example data.
 2. Every `methods/*/method.ttl` — all method definitions.
 3. `testbwb.ttl`, `testcvdr.ttl`, `testdmn.ttl`, `testfmx4.ttl` — saved API output for the four implemented serialisations.
 
-Run it from `rdf/0.4.2/`. It requires pyshacl (`pip install pyshacl`), which is not in `requirements-dev.txt`. The script is manual: CI does not run it. It was not run for the figures above.
+Run it from `rdf/0.4.3/`. It requires pyshacl (`pip install pyshacl`), which is not in `requirements-dev.txt`. The script is manual: CI does not run it. It was not run for the figures above.
 
 ---
 
@@ -99,8 +99,9 @@ Run it from `rdf/0.4.2/`. It requires pyshacl (`pip install pyshacl`), which is 
 
 - **`/rules`.** No active test fetches a rule set or follows a rule path; `test_get_rules` is commented out.
 - **The method modules.** No test calls a publication, serialisation or reference method directly, and no test checks which methods `load_methods()` loads. `test_detect_cprmv_serve_unknown_method` passes even when no method is loaded.
-- **`/ref`, `/methods`, `/cellar-by-eli`, `/cellar-by-celex` and `/respec`** have no endpoint test.
-- **MCP.** Nothing tests `/mcp`, which answers 404 on the hosts ([standards/cprmv#31](https://git.open-regels.nl/standards/cprmv/-/work_items/31)).
-- **The Docker image.** CI builds and pushes the image but never starts it or requests an endpoint from it. That is how an image without `methods/` reached production: the tests run against the source tree, where `methods/` exists, and the image's health check only requests `/` (see [Deployment](deployment.md#docker-image)).
-- **The data files.** The CI check only warns when a file is missing, and nothing compares the committed `serve_api/data/cprmvmethods.ttl` with what `make methods` generates (see [Local Development](local-development.md#data-files)).
+- **`/ref`, `/methods`, `/0.4.3/methods`, `/raw` and `/respec`** have no endpoint test.
+- **The new sources.** Nothing tests IOU Norms, ROO, DSO or the `x-api-key` pass-through.
+- **MCP.** Nothing tests `/mcp/`. It answers on the hosts, but no test lists its tools.
+- **The Docker image.** CI builds and pushes the image but never starts it or requests an endpoint from it. An image without `methods/` would pass: the tests run against the source tree, where `methods/` exists, and the image's health check only requests `/` (see [Deployment](deployment.md#docker-image)). The Dockerfile copies `methods/`, but nothing checks that it does.
+- **The data files.** The CI check only warns when a file is missing, and nothing compares the committed `serve_api/data/cprmvmethods.ttl` with what `make methods` generates — at v0.4.3 they are the same (see [Local Development](local-development.md#data-files)).
 - **SHACL.** The shapes and the API's output are validated only when someone runs `test.sh` by hand.

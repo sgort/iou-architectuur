@@ -1,3 +1,7 @@
+---
+component: CPRMV
+---
+
 # Functies Overzicht
 
 !!! info "Documentatie in ontwikkeling"
@@ -28,6 +32,10 @@
 ---
 
 ## Definition extraction with unformat
+
+---
+
+## Raw publication download
 
 ---
 
