@@ -57,6 +57,67 @@ drained by the pass of 27 September, everything queued from 27 September to 3 Oc
    (an API key reflected in a redirect response) and #2 (a method selection that returns everything; an MCP redirect to
    plain `http`). No link while open.
 
+### 26 November 2026 — `~/.claude/CLAUDE.md` and the skill, for the CPRMV move (no component page yet)
+
+1. **`~/.claude/CLAUDE.md` (user's request, 26 November):** `cprmv` joins `ronl-business-api`, `linked-data-explorer`,
+   `ttl-editor` and `lvg` in both pull-request-only lists ("never merge or force-push" and "`acc` and `main` change only
+   through a pull request"); the GitLab-mirror bullet says CPRMV moved to GitHub `open-regels/cprmv` on 26 November with
+   rulesets on `acc` and `main`, and that its `gitlab` remote, the old home, publishes the ReSpec on a push to `main`
+   (ask first). Still sixteen `##` rules. Bears on `development-workflow/skills-and-boundaries.md` (the list of
+   pull-request-only repositories, the mirror rule) and `the-gitlab-mirror.md`.
+2. **The skill:** `stamp-staleness.py` resolves each component's CI remote from `ci_repo` instead of fixed names or URLs;
+   `SKILL.md` gains a CPRMV row, a CPRMV `build` field, owner-agnostic `gh` calls and the Git Bash leading-slash trap.
+   Bears on `development-workflow/skills-and-boundaries.md` and `overview.md` where they describe the skill.
+3. **The CPRMV pages themselves wait** for fixes the CPRMV session is making (26 November); the queue entries for the move
+   (contributing pages, PSA AB-28/AB-29 and three PSA statements, the ICTU question) are added with that sync.
+
+### 26 November 2026 — CPRMV moves to GitHub (no new version; production `8f01b2b`)
+
+Supersedes items 2 and 3 of the 24 November CPRMV entry: GitLab CI and Docker Hub are gone, and the move is complete.
+CPRMV is developed on GitHub `open-regels/cprmv` (default branch `acc`); the GitLab project keeps only the ReSpec Pages
+job. Evidence: `README.md`, `SECURITY-PIPELINE.md`, `.github/workflows/{ci,zizmor,semgrep,dependency-audit}.yml`,
+`.github/rulesets/{acc,main}.json`, `deployment/vm/**` at `8f01b2b`; live `/health` (stable `8f01b2b` run 13, acceptance
+`ebff352` run 11).
+
+1. **`contributing/index.md`:** the repository table's CPRMV row (GitLab CI, GitLab issues) → GitHub `open-regels/cprmv`,
+   GitHub Actions, issues on GitHub, GitLab only for Pages; the sentences saying the Norm Editor and CPRMV are developed on
+   GitLab and take issues there.
+2. **`the-gitlab-mirror.md`:** CPRMV's GitLab copy is pushed by hand at a release like the applications' mirrors, but a
+   push to `main` still runs its Pages job (its rule is now `$CI_COMMIT_BRANCH == "main"`); no `check-mirror` script.
+   GitLab `main` was left at `189cadc` on 26 November by the user's decision.
+3. **`branch-protection.md` and `controls.md`:** rulesets "acc supply-chain gate" and "main promotion gate" both require
+   `audit`, `scan`, `test` and `build`, pull request with no approvals, merge commits only, no bypass; no
+   `lockfile-review`. Unlike the three applications, `main` requires `test` and `build` (contrast `controls.md:78`).
+   `controls.md:107-114`'s CPRMV sentence (GitLab pipeline, untested image from `develop`, no built image run) is false.
+4. **`supply-chain.md` and `dependency-scanning.md`:** CPRMV's own `SECURITY-PIPELINE.md` (ported from `lvg`'s light
+   pipeline, npm → Python); actions hash-pinned (zizmor), base image and Caddy pinned by digest, requirements locked with
+   hashes; Renovate with a 14-day cooldown and lock-file maintenance; Semgrep required; a daily pip-audit with a tracking
+   issue; no accepted findings recorded.
+5. **`build-provenance.md`:** `/health` reports `environment`, `build.sha`, `build.run` and `image.digest`, checked by
+   CI's smoke and wait-for-deploy steps; `actions/attest-build-provenance` on every pushed digest. `repo-versions.json`
+   now carries a CPRMV `build`.
+6. **`code-standards.md` and `coverage-floor.md`:** CPRMV is Python with no hooks and no formatter (SECURITY-PIPELINE
+   lists them as follow-ups); no coverage floor; draft PR #29 proposes an 80% per-file branch floor (planned only).
+7. **`ictu-dependency-guideline.md`:** CPRMV is not scored. It now carries most of what the guideline asks (cooldown,
+   majors on approval with an explicit recommendation-7 rule, hashes, digests, daily audit, Semgrep): decide whether to
+   score it as a fourth column from the next weekly pass.
+8. **The VM pipeline is the model for ronl-business-api#196** (the user, 26 November): pull, not push; a design recorded
+   first; idempotent apply; status readable without SSH (`/deploy-status.json`, `/health`); digest pins reported as
+   running; no credentials in CI. Not yet answered for the RBA: one shared VM for several services and both tiers,
+   Keycloak and Postgres rollback, and the `docker`-group risk the design says to revisit before a shared VM. Bears on
+   the RBA's next sync and on `supply-chain.md` (#196 boundary).
+9. **PSA (generic wording, no issue links for open gaps):** re-pin every page to CPRMV `8f01b2b`.
+   **AB-28** "CPRMV not yet" (`11-decisions-and-risks.md:58`, `08-security-and-privacy.md:77-80`): CPRMV now pins
+   everything a build fetches and waits 14 days, but has no SBOM: propose *deels* for CPRMV. **AB-29** (changes only
+   through a pull request): CPRMV now meets it. **AB-30**: still the rapid-prototyping track, unchanged.
+   `09-technical-infrastructure.md:42` (CPRMV "container on its own servers") and
+   `10-management-and-continuity.md:56-59` ("built on GitLab under a lighter regime") are false. **R-07**: CPRMV has
+   its own acceptance tier now; the risk still holds through AB-05 and AB-28. Possible generic chapter-8 wording: the VM
+   trusts an image by its tag (provenance attested, not yet checked before deploying), and the deployment user's Docker
+   rights amount to root on that VM.
+10. **Organisation move:** every IOU component is to move to the `open-regels` GitHub organisation (the user,
+    26 November); CPRMV is the first. Record as intent on `contributing/index.md`, not as fact for the others.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

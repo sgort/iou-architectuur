@@ -83,6 +83,7 @@ adapt the paths — the same staging applies.
 | **Norm Editor** | sibling repo **`../editor`** (confirmed on the Windows workstation at `C:\Users\gorts01\Development\editor`; also seen at `/home/steven/Development/editor` on Linux) | `gui/public/changelog.json`, schema **`{versions: {<service>: <semver>, ...}, releases: [{version, date, changes: {<conventional-commit-type>: [commit, ...]}, commits: [...]}]}`** — git-log-derived, not curated. `version-gap.py` auto-detects this shape (a `releases` array) vs. the curated `versions` array and normalizes both to the same `sections`/`items` shape; it also drops the synthetic `"Unreleased"` pseudo-version. Pass `--changelog <path> --component "Norm Editor"` explicitly. | No `developer/changelog-roadmap.md` existed before the 2026.07.0 sync (create it + add the mkdocs.yml nav entry — don't assume the page is there). Docs currently have **zero** screenshots — don't force a manifest entry for that reason alone. `docs/nl/index.md` is a placeholder with no "What's New" section to mirror at all — check before assuming both `docs/en/index.md` and `docs/nl/index.md` need the card edit. Because the first tag can land long after the code it covers, don't backfill version numbers onto pre-existing features you can't date — only claim what genuinely changed inside the tagged commit range. |
 | **Linked Data Explorer** | sibling repo `../linked-data-explorer` | `packages/frontend/src/changelog.json` — a dict with a **`versions`** array, same curated `format: "commits"` shape as the CPSV Editor, plus a per-entry `scope` field (`frontend` / `backend` / `both`, absent on most). **`version-gap.py` works against it unmodified** — pass `--changelog ../linked-data-explorer/packages/frontend/src/changelog.json --component "Linked Data Explorer"`. | Versions switched from SemVer to CalVer mid-history (…, 1.9.12, 1.9.13, 2026.07.0, …), so an ordered gap can span both schemes — the same transition the CPSV Editor made. `repo-versions.json` and the roadmap headings carry a `v` prefix; the changelog does not. **i18n differs from the CPSV Editor**: nearly every EN page has an NL counterpart (64 and 63 on 24 September 2026 — count rather than trust the number, it moves every sync), and **two are real translations** — `developer/backend.md` and `reference/api-stability.md` — so check each NL page before assuming it is a placeholder. `user-guide/multilingualism.md` was listed here as a third until 3 October 2026: it had been a **0-byte file** since April, which renders a blank Dutch page instead of falling back to English. It is now a standard placeholder. An empty file is a fourth kind of NL page, and `wc -l` reporting 0 is how to spot it. A screenshot manifest already exists at `screenshot-manifest/linked-data-explorer-screenshots-todo.md`. `developer/testing.md` **exists** (507 lines as of v2026.09.5) — refresh it, never create a second one; note `developer/test-cases.md` is a *feature* doc, not the test-suite page. The repository has **no Playwright suite at all**, so the Stage 2d end-to-end sweep legitimately returns nothing here. |
 | **RONL Business API** | sibling repo `../ronl-business-api` | `packages/frontend/src/pages/changelog-data.ts` — a **TypeScript file**, not JSON: unquoted object keys, mixed single/double-quoted strings, trailing commas, and a `ChangelogItem = string \| FeedbackItem` union mixed into `items` arrays. `version-gap.py`'s `json.loads()` cannot parse it directly, and no safe regex conversion exists (a colon inside changelog prose would get mangled by a naive `key:` → `"key":` transform). **Use the shim, not `version-gap.py`:** `node .claude/skills/iou-document-patch/scripts/ts-changelog.js <file.ts>`, with `--latest`, `--gap <version>` or `--json`. It slices off everything before the `export const changelog` assignment and evaluates the remaining object literal as a JavaScript expression in a throwaway `vm` context, so nothing regexes the content. Feed it a file read from a **ref**, not the working tree. If it reports that it cannot evaluate the literal, the data has grown a real TypeScript construct — say so rather than working around it. | Version strings carry a `v` prefix in `repo-versions.json` and `changelog-roadmap.md` headings (`v3.9.1`) but not in `changelog-data.ts` itself (`'3.9.1'`) — normalize before comparing. **Documentation convention for User Guides**: pages are **ACC-brief / PROD-full** — a page's depth follows the release maturity of what it documents, not a fixed template. The current set is Getting Started, four board pages (Caseworker, PA-Cockpit, Infra-board, Woo-dashboard), and Public Site. `user-guide/test-guides/` holds live Dutch test scripts that are **maintained, not archived** — never give them the archive banner or treat them as frozen. Promoting a board from ACC to PROD is the trigger to expand its brief page into a full guide. |
+| **CPRMV** (vocabulary and the CPRMV Rules Serve API) | sibling repo `../cprmv`. **GitHub `open-regels/cprmv` since 26 November 2026** (the clone's `origin`, default branch `acc`); the old GitLab project `standards/cprmv` is the remote `gitlab` and hosts only the ReSpec Pages job. `acc` and `main` change by pull request, and two rulesets require `audit`, `scan`, `test` and `build` | `CHANGELOG.md` at the repo root — **Markdown, hand-written, per version** (`**v0.4.3**`, `**v0.4.3 CPRMV API**`); no parser fits it, so read it from the ref. The served version is `serve_api/src/serve.py` (`version=`) and `serve_api/pyproject.toml`; a commit range can carry no version bump at all (the 26 November 2026 move did not), and is then recorded the way the RONL Business API records #473: a note *on production, in no release yet* above the latest entry | **Branch of record: `main`** for production (`acc` serves the ACC VM). Two VMs, one per tier, each pulling its image on a systemd timer: CI tests, builds, publishes per tier and waits until the VM's `/health` reports the commit. `https://cprmv.open-regels.nl/health` (and `cprmv.open-rules.eu`) answers `environment: stable`, `https://acc.cprmv.open-regels.nl/health` `acceptance`, each with `build.sha`, `build.run` and the image digest — the cheapest proof of what runs where. Tests: `pytest` in `serve_api/` (needs Linux packages: on Windows install `requirements-dev.txt` minus `uvloop` with `--no-deps --require-hashes` into a scratch venv over a `git archive` export, then add `pywin32`, `pywin32-ctypes` and `colorama`), plus **bats** suites for the deploy scripts that run only in CI — take their counts from the CI run's log (`gh run view <id> --log`) and say so. The user calls the VM pipeline the framework for ronl-business-api#196: document it in full on `developer/vm-deployment.md` |
 
 ### i18n rule (do not violate)
 
@@ -197,9 +198,9 @@ successive syncs the header spreads only as far as pages actually get revised.
 A cross-cutting page may also say which commit of each component its claims were
 last re-checked against. The header renders it as *"verified 2026-09-09 against
 ✏️ bbda389 · 🔍 007b350 · ⚙️ 04e38c8"*, each SHA linking to the commit in the
-component's `ci_repo` — **GitHub** for the three applications, where the deploy
-runs it triggered are listed; not the GitLab mirror, which has the same SHAs but
-lags and shows no runs.
+component's `ci_repo` — **GitHub** for the three applications and, since
+26 November 2026, for CPRMV, where the deploy runs it triggered are listed; not
+the GitLab mirror, which has the same SHAs but lags and shows no runs.
 On a stamped page it replaces the site-wide *docs built* date, which only says a
 sync happened somewhere:
 
@@ -269,7 +270,11 @@ It is the **frontend build that was serving the recorded environment when the
 recorded commit was current** — a different fact from `version`, because a new
 build can reach ACC or PROD without a release bump, and the reader can compare
 this string with the build line the running application prints. See Stage 2c for
-how to derive it. Omit it for components with no build id (Norm Editor, CPRMV).
+how to derive it. Omit it for components with no build id (the Norm Editor).
+CPRMV has one since 26 November 2026: its `CI` workflow builds, publishes and
+deploys per tier, and the API's `/health` reports the build it serves
+(`build.sha`, `build.run`), so the recorded run can be checked against the live
+answer.
 
 Supporting infrastructure (already in place — do not rebuild it):
 
@@ -535,12 +540,15 @@ and the exact commit that was deployed.
     promotion, or to document it as `acc` and re-stamp after.
 
 **Also derive the `build` field** for components that have a build id (CPSV
-Editor, Linked Data Explorer, RONL Business API). It is the latest successful
+Editor, Linked Data Explorer, RONL Business API, CPRMV). It is the latest successful
 *frontend deploy* push run on the environment's branch whose commit is the
-recorded commit **or an ancestor of it**:
+recorded commit **or an ancestor of it** — for CPRMV, the `CI` run whose `deploy`
+job served that tier; confirm it against the live `/health` (`build.sha`,
+`build.run`). Take `<owner>/<repo>` from the component's `ci_repo` in
+`repo-versions.json`, never from memory: owners are moving (see the Guardrails).
 
 ```bash
-gh api "repos/sgort/<repo>/actions/runs?branch=<main|acc>&event=push&per_page=40" \
+gh api "repos/<owner>/<repo>/actions/runs?branch=<main|acc>&event=push&per_page=40" \
   --jq '.workflow_runs[] | select(.name|test("Frontend|PROD|static";"i"))
         | select(.conclusion=="success")
         | "\(.name) | #\(.run_number) | \(.head_sha[0:7]) | \(.html_url)"'
@@ -1090,7 +1098,7 @@ produced a false "CPSV Editor is two releases behind".
 | Linked Data Explorer | `git -C ../linked-data-explorer show origin/acc:packages/frontend/src/changelog.json` → first `versions[]` |
 | RONL Business API | `git -C ../ronl-business-api show origin/acc:packages/frontend/src/pages/changelog-data.ts` → first `version:` — TypeScript, so use the shim in `scripts/ts-changelog.js` rather than `json.loads` |
 | Norm Editor | `git -C ../editor show origin/main:gui/public/changelog.json` → first non-`Unreleased` `releases[]`. **Its releases live on `main`, not `acc`**, though `repo-versions.json` records the environment as `acc` — check both and say which you read |
-| CPRMV | Its remote-tracking ref for `main`, against the recorded `commit`. **Read the remote's name first** (`git -C ../cprmv remote`) — it has been `gitlab` in one clone and `origin` in another, and the wrong name makes `rev-parse` fail or, worse, answer from a months-old leftover ref |
+| CPRMV | `origin/main` (GitHub `open-regels/cprmv` since 26 November 2026), against the recorded `commit`, and the version in `serve_api/src/serve.py` — the live `/health` of `cprmv.open-regels.nl` names the build it serves. **Check the remotes first** (`git -C ../cprmv remote -v`): the clone also keeps `gitlab`, the old home, which still receives `main` but no longer runs CI, and in earlier clones the names were the other way round |
 
 Read from a **ref**, never the working tree — a sibling repo is very often
 parked on a feature branch, and its working tree will answer confidently and
@@ -1149,7 +1157,8 @@ owned by this pass too, but it is read differently from the contributing pages:
   IOU has released, not what is on `acc`. Pin the five `main` heads alongside the
   three `acc` heads of 6a: `origin/main` for the CPSV Editor, the Linked Data
   Explorer, the RONL Business API and the Norm Editor (whose `origin` is GitLab),
-  and `origin/main` for CPRMV (its clone's only remote, also GitLab).
+  and `origin/main` for CPRMV (GitHub `open-regels/cprmv` since 26 November 2026;
+  its `gitlab` remote is the old home).
 - **Dutch first.** The Dutch pages are the original; edit `docs/nl/psa/`, then
   carry the same change into `docs/en/psa/`.
 
@@ -1374,3 +1383,24 @@ and which remain, and the three heads everything was read at.
   this site. They change without any component repository changing, so nothing
   else in this skill will surface the drift. Re-derive them from `~/.claude/`
   every run — never from the pages themselves, and never from memory.
+- **Repositories are moving to the `open-regels` GitHub organisation; never
+  hardcode an owner.** CPRMV moved from GitLab to `open-regels/cprmv` on
+  26 November 2026, and every IOU component is to follow. `ci_repo` in
+  `repo-versions.json` is the single place that says where a component's CI runs:
+  take `<owner>/<repo>` for every `gh` call from it, and `stamp-staleness.py`
+  finds each clone's CI remote by matching `ci_repo` against the remote URLs. When
+  a component moves, the sync that documents the move updates `ci_repo` and
+  `repo_url` (the user confirms both), the pages' repository links, and the
+  memory note; a clone whose remote still names the old owner is then reported by
+  the script rather than read, and needs `git remote set-url` from the user.
+  GitHub redirects the old URLs for a while, which hides a missed update — check
+  `gh repo view <owner>/<repo>` answers under the new name before recording it.
+- **In Git Bash, a leading `/` in an argument is rewritten into a Windows path**
+  unless `MSYS_NO_PATHCONV=1` is set — not only in `git show ref:path` but in
+  **`gh issue create --title "/ref …"`**, where it published
+  `C:/Users/<user>/AppData/Local/Programs/Git/ref …` as an issue title on
+  open-regels/cprmv#1 (24 November 2026, corrected two days later; the rename
+  event keeps the old title in the timeline). Prefix every `gh` call whose
+  title, body or argument can start with `/` with `MSYS_NO_PATHCONV=1`, pass
+  bodies with `--body-file`, and read the title back after creating an issue.
+  The same setting breaks `git -C /c/...`: with it, use `C:/...` paths.

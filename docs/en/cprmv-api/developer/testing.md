@@ -4,26 +4,27 @@ component: CPRMV
 
 # Testing
 
-The CPRMV API has one test file, `serve_api/test/test_serve.py`, run with pytest. Three tests are active; ten more are commented out since the method modules were introduced in 0.4.2, and v0.4.3 changed only the version the active ones expect. The SHACL shapes are validated separately with a shell script that is not part of CI.
+The CPRMV API has one test file, `serve_api/test/test_serve.py`, run with pytest. Six tests are active, three of them on `/health`; ten more are commented out since the method modules were introduced in 0.4.2. The shell scripts of the pipeline and the VMs have 54 bats tests. The SHACL shapes are validated separately with a shell script that is not part of CI.
 
 ---
 
 ## At a glance
 
-Measured on 24 November 2026 at `d597671` (v0.4.3), from a scratch export, on Windows with Python 3.14.3, after installing the pinned `requirements-dev.txt` without `uvloop` (it does not build on Windows; uvicorn uses it only when serving), plus `pywin32` and `colorama`, which pip-compile's Linux pin set omits. CI on Linux (`python:3.14-bookworm`, pipeline #824 at `d597671`) ran the same suite and passed.
+Measured on 26 November 2026 at `189cadc`, whose code and tests equal `8f01b2b`, the commit on `main`, from a scratch export, on Windows with Python 3.14. The hash-locked `requirements-dev.txt` was installed with `--require-hashes` without `uvloop`, which does not build on Windows, and `pywin32`, `pywin32-ctypes` and `colorama` were added, which the Linux-compiled files omit. CI on Linux ran the same suite and the shell tests in the `test` job of [run 13](https://github.com/open-regels/cprmv/actions/runs/45892291396) at `8f01b2b`, and passed.
 
-| Check | Command (from `serve_api/`) | Result |
+| Check | Command | Result |
 |---|---|---|
-| Syntax check | `python -m py_compile src/serve.py` | Not run locally; passed in CI |
-| Import check | `python -c "from src.serve import app"` | Not run separately (the tests import `app`); passed in CI |
-| Unit tests | `pytest` | 3 collected in `test/test_serve.py`, 3 passed in 6.68 s; passed in CI |
+| Syntax check | `python -m py_compile src/serve.py` (from `serve_api/`) | Not run locally; passed in CI |
+| Import check | `python -c "from src.serve import app"` (from `serve_api/`) | Not run separately (the tests import `app`); passed in CI |
+| Unit tests | `pytest` (from `serve_api/`) | 6 collected in `test/test_serve.py`, 6 passed in 9.63 s; 6 passed in CI in 1.83 s |
+| Shell tests | `bats scripts/test deployment/vm/reconciler/test` (from the repository root) | Not run locally (bats not installed); 54 passed in CI, as read from the run's log |
 | SHACL validation | `sh test.sh` (from `rdf/0.4.3/`) | Not measured |
 
 ---
 
 ## Running the tests
 
-Install the dependencies as described in [Local Development](local-development.md#setup), then run from `serve_api/` — the API loads `./data/` and `./respec/` relative to the working directory:
+Install the dependencies as described in [Local Development](local-development.md#setup) (on Linux or WSL; on Windows, see the container command below), then run from `serve_api/`. The API loads `./data/` and `./respec/` relative to the working directory:
 
 ```bash
 python -m py_compile src/serve.py
@@ -33,18 +34,25 @@ pytest
 
 `make tests` runs `pytest test`. One active test needs network access (see [Test inventory](#test-inventory)).
 
+In a container, from the repository root in Git Bash, as the repository's README gives it:
+
+```bash
+MSYS_NO_PATHCONV=1 docker run --rm -e PIP_ROOT_USER_ACTION=ignore -e PIP_DISABLE_PIP_VERSION_CHECK=1 -v "$PWD/serve_api:/s" -w /s python:3.14-bookworm sh -c "pip install -q --require-hashes -r requirements-dev.txt && pytest"
+```
+
 ---
 
 ## What CI runs
 
-The `test-cprmv-api` job (`python:3.14-bookworm`) runs on merge request pipelines and on pushes to `main`, in both cases only when files under `serve_api/` change. It installs `libxml2-dev`, `libxslt-dev` and `requirements-dev.txt`, then runs:
+The `test` job of the CI workflow runs on every pull request into `acc` or `main` and on every push to them, whatever the files changed. On `ubuntu-24.04` with Python 3.14 it installs `requirements-dev.txt` with `--require-hashes`, then runs:
 
 1. `python -m py_compile src/serve.py`
-2. `python -c "from src.serve import app; ..."`
-3. `test -f ./data/cprmvmethods.ttl || echo "Warning ..."` and the same for `./data/cprmv.ttl` — these only print a warning; a missing file does not fail the job
-4. `pytest`
+2. `python -c "from src.serve import app"`
+3. `pytest`, from `serve_api/`
+4. shellcheck over every tracked `*.sh` outside `rdf/` and over the reconciler's test stubs
+5. the bats suites in `scripts/test` and `deployment/vm/reconciler/test`
 
-Pushes to `develop` build and push an image (`datafluisteraar/cprmv-api:{branch-slug}`) without any test job. Changes outside `serve_api/` — including `rdf/` — do not trigger the test job. See [CI/CD](ci-cd.md).
+The rulesets require `test` on `acc` and `main`. The `build` job then starts the built image and requires its `/health` to report the commit; `publish` repeats that on the pushed image. See [CI/CD](ci-cd.md).
 
 ---
 
@@ -55,6 +63,9 @@ Pushes to `develop` build and push an image (`datafluisteraar/cprmv-api:{branch-
 | Test | What it checks | Notes |
 |---|---|---|
 | `test_get_root` | `GET /` returns 200 and `{"CPRMV Rules Serve API": "0.4.3"}` | Uses FastAPI's `TestClient` |
+| `test_health_reports_build_and_digest` | With `BUILD_SHA`, `BUILD_RUN`, `CPRMV_IMAGE_DIGEST` and `CPRMV_ENVIRONMENT` set, `GET /health` returns them, with the keys in the order `status`, `version`, `environment`, `build`, `image` | |
+| `test_health_reports_null_when_unset` | Unset, each of them is `null` | |
+| `test_health_treats_empty_as_null` | An empty value is `null` too | |
 | `test_detect_cprmv_serve_reference_method_and_transform` | An empty reference resolves to `None`; a Juriconnect 1.31 reference with `z` and `g` and a 1.3 reference with `g` resolve to the expected `/rules/…` paths | Needs network: the `elifmx4` reference method queries the EU CELLAR SPARQL endpoint |
 | `test_detect_cprmv_serve_unknown_method` | `get_rules("UNKNOWN")` returns the "No supported publication repository…" error | |
 
@@ -83,6 +94,12 @@ They call functions that 0.4.2 removed or moved into method modules (`detect_cpr
 
 ---
 
+## Shell tests
+
+The pipeline's and the VMs' shell scripts have 54 bats tests in five files, run by CI's `test` job on a runner with git, jq, curl, `flock` and pip-audit; the reconciler's tests run against stubbed `docker` and `curl`. On Linux or WSL with those tools, run `bats scripts/test deployment/vm/reconciler/test` from the repository root. The `bats/bats:1.14.0` image lacks git, jq and curl, so in Docker only the tests that need none of them run, such as `scripts/test/ci-tier.bats`. What each file covers is on [VM Deployment](vm-deployment.md#what-the-tests-verify).
+
+---
+
 ## SHACL validation
 
 `rdf/0.4.3/test.sh` validates against `cprmv.shacl.ttl`, with `cprmv.ttl` as ontology and inference set to `both`:
@@ -102,6 +119,9 @@ Run it from `rdf/0.4.3/`. It requires pyshacl (`pip install pyshacl`), which is 
 - **`/ref`, `/methods`, `/0.4.3/methods`, `/raw` and `/respec`** have no endpoint test.
 - **The new sources.** Nothing tests IOU Norms, ROO, DSO or the `x-api-key` pass-through.
 - **MCP.** Nothing tests `/mcp/`. It answers on the hosts, but no test lists its tools.
-- **The Docker image.** CI builds and pushes the image but never starts it or requests an endpoint from it. An image without `methods/` would pass: the tests run against the source tree, where `methods/` exists, and the image's health check only requests `/` (see [Deployment](deployment.md#docker-image)). The Dockerfile copies `methods/`, but nothing checks that it does.
-- **The data files.** The CI check only warns when a file is missing, and nothing compares the committed `serve_api/data/cprmvmethods.ttl` with what `make methods` generates — at v0.4.3 they are the same (see [Local Development](local-development.md#data-files)).
+- **The image's methods.** CI starts the built image and the pushed one and checks `/health`, but `/health` loads no method: an image without `methods/` would still pass, because the tests run against the source tree, where `methods/` exists (see [Deployment](deployment.md#docker-image)). The Dockerfile copies `methods/`, and nothing checks that it does.
+- **The data files.** Nothing checks that `serve_api/data/` holds the files the API loads, or compares the committed `cprmvmethods.ttl` with what `make methods` generates — at v0.4.3 they are the same (see [Local Development](local-development.md#data-files)).
 - **SHACL.** The shapes and the API's output are validated only when someone runs `test.sh` by hand.
+- **Coverage.** No coverage is measured or required.
+
+A design for a fuller test foundation — tests on recorded source responses, a per-file branch-coverage floor and end-to-end runs — is in review as a draft pull request ([open-regels/cprmv#29](https://github.com/open-regels/cprmv/pull/29)); none of it is in place.

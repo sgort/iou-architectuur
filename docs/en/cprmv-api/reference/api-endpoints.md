@@ -27,6 +27,31 @@ Returns the API title and version.
 
 ---
 
+## GET /health
+
+Reports liveness and what the host runs. Every field is read when the request arrives; one that is not set, or is empty, is `null`.
+
+**Response** (from `cprmv.open-regels.nl` on 26 November 2026):
+
+```json
+{"status": "ok", "version": "0.4.3", "environment": "stable",
+ "build": {"sha": "8f01b2b16302e3289f360ca440796a977d446e05", "run": "13"},
+ "image": {"digest": "sha256:299276c7ac9193fcbfd5c256bec6ea83be6687b974c09d983a0835e213af9b21"}}
+```
+
+| Field | Source |
+|---|---|
+| `version` | the API version, as on `/` |
+| `environment` | `CPRMV_ENVIRONMENT`, set by the tier's Compose file: `acceptance` or `stable` |
+| `build.sha`, `build.run` | the commit and CI run number the image was built from (`BUILD_SHA`, `BUILD_RUN`); `run` is a string |
+| `image.digest` | the registry digest the VM runs (`CPRMV_IMAGE_DIGEST`) |
+
+CI and the VMs compare `build.sha` with the commit they deploy ([VM Deployment](../developer/vm-deployment.md#what-health-proves)). Only `GET` is served: `HEAD /health` answers `405`.
+
+The hosts also serve `/deploy-status.json`. That file comes from the VM, not from the API: see [VM Deployment](../developer/vm-deployment.md#reading-deploy-statusjson).
+
+---
+
 ## GET /methods
 
 Returns the Methods Knowledge Graph, loaded at start-up from `data/cprmvmethods.ttl` and `data/cprmv.ttl`.

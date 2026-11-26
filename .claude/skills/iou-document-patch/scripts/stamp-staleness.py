@@ -68,21 +68,22 @@ try:
 except ImportError:  # pragma: no cover
     sys.exit("PyYAML is required: run with the docs venv (venv/bin/python)")
 
-# Component name (as in repo-versions.json) ->
-#   (sibling clone, branch of record, remote that hosts its CI)
+# Component name (as in repo-versions.json) -> (sibling clone, branch of record).
+#
+# The remote that hosts a component's CI is not named here: it is the remote
+# whose URL matches the component's `ci_repo` in docs/repo-versions.json (see
+# ci_remote). Remote names have not been stable: CPRMV's was `gitlab` in one
+# clone and `origin` in another, and on 26 November 2026 CPRMV moved to GitHub
+# (`origin`), keeping GitLab as `gitlab` for its ReSpec only. A fixed name reads
+# a months-old ref without complaint. Every component is due to move to the
+# `open-regels` GitHub organisation; after a move only `ci_repo` changes, and a
+# clone still pointing at the old owner is reported instead of read.
 COMPONENTS = {
-    "CPSV Editor": ("ttl-editor", "acc", "origin"),
-    "Linked Data Explorer": ("linked-data-explorer", "acc", "origin"),
-    "RONL Business API": ("ronl-business-api", "acc", "origin"),
-    "Norm Editor": ("editor", "main", "origin"),  # origin is GitLab; no acc branch
-    "CPRMV": ("cprmv", "main", None),  # remote resolved by URL: see REMOTE_URLS
-}
-
-# Components whose clone has named its GitLab remote differently over time
-# (`gitlab` in one clone, `origin` in another). A fixed name then reads a
-# months-old ref without complaint, so these resolve the remote by its URL.
-REMOTE_URLS = {
-    "CPRMV": "git.open-regels.nl/standards/cprmv",
+    "CPSV Editor": ("ttl-editor", "acc"),
+    "Linked Data Explorer": ("linked-data-explorer", "acc"),
+    "RONL Business API": ("ronl-business-api", "acc"),
+    "Norm Editor": ("editor", "main"),  # no acc branch
+    "CPRMV": ("cprmv", "main"),
 }
 
 # What a contributing page makes claims about: CI, hooks, the supply-chain
@@ -152,9 +153,17 @@ def resolve_remote(repo, url_fragment):
     proc = subprocess.run(["git", "-C", repo, "remote", "-v"], capture_output=True, text=True)
     for line in proc.stdout.splitlines():
         parts = line.split()
-        if len(parts) >= 2 and url_fragment in parts[1]:
+        if len(parts) >= 2 and url_fragment.lower() in parts[1].lower():
             return parts[0]
     return None
+
+
+def ci_url_fragment(record):
+    """host/owner/repo of a record's ci_repo, without scheme, credentials or .git."""
+    url = (record or {}).get("ci_repo") or ""
+    url = re.sub(r"^[a-z+]+://", "", url.strip())
+    url = url.split("@", 1)[-1].rstrip("/")
+    return url[:-4] if url.endswith(".git") else url
 
 # Workflow names that deploy something. Supply-chain audits and backend builds
 # run on the same push but ship nothing a reader can see.
@@ -241,19 +250,24 @@ def check_stamp(component, value, siblings_root, records, offline, branch=None, 
         finding["problems"].append("no clone mapping in stamp-staleness.py")
         return finding
 
-    clone, default_branch, remote = COMPONENTS[component]
+    clone, default_branch = COMPONENTS[component]
     branch = branch or default_branch
     repo = os.path.join(siblings_root, clone)
-    finding.update(clone=clone, branch=branch, remote=remote)
+    finding.update(clone=clone, branch=branch)
     if not os.path.isdir(repo):
         finding["problems"].append(f"clone not found at {repo}")
         return finding
+    fragment = ci_url_fragment(records[component])
+    if not fragment:
+        finding["problems"].append("no ci_repo for this component in docs/repo-versions.json")
+        return finding
+    remote = resolve_remote(repo, fragment)
     if remote is None:
-        remote = resolve_remote(repo, REMOTE_URLS[component])
-        if remote is None:
-            finding["problems"].append(f"no remote of {clone} points at {REMOTE_URLS[component]}")
-            return finding
-        finding["remote"] = remote
+        finding["problems"].append(
+            f"no remote of {clone} points at {fragment} (its ci_repo): add or re-point it"
+        )
+        return finding
+    finding["remote"] = remote
 
     code, full = git(repo, "rev-parse", "--verify", "--quiet", f"{value}^{{commit}}")
     if code != 0:
@@ -341,7 +355,7 @@ def main():
         records = {r["name"]: r for r in json.load(handle).get("repositories", [])}
 
     if args.fetch:
-        for clone, _branch, _remote in COMPONENTS.values():
+        for clone, _branch in COMPONENTS.values():
             repo = os.path.join(args.siblings, clone)
             if os.path.isdir(repo):
                 git(repo, "fetch", "--quiet", "--all", "--prune")
