@@ -66,6 +66,10 @@ graph LR
 | **Production (alias)** | [cprmv.open-rules.eu/docs](https://cprmv.open-rules.eu/docs) | [cprmv.open-rules.eu/respec/](https://cprmv.open-rules.eu/respec/) |
 | **Acceptance** | [acc.cprmv.open-regels.nl/docs](https://acc.cprmv.open-regels.nl/docs) | [acc.cprmv.open-regels.nl/respec/](https://acc.cprmv.open-regels.nl/respec/) |
 
+Production is the stable tier and runs `main`, on its own VM that also answers as `cprmv.open-rules.eu`; acceptance runs `acc` on another. Each reports its tier, commit and image at `/health` ([Deployment](developer/deployment.md#hosts), [VM Deployment](developer/vm-deployment.md)).
+
+Source, issues and pull requests are at [open-regels/cprmv](https://github.com/open-regels/cprmv) on GitHub, default branch `acc`. The published specification is at `https://standaarden.open-regels.nl/standards/cprmv/<version>/`, which GitLab Pages serves.
+
 ---
 
 ## Technology stack
@@ -76,15 +80,16 @@ Versions are those locked in `serve_api/requirements.txt`; `pyproject.toml` list
 |---|---|---|
 | API framework | FastAPI | 0.142.2 |
 | ASGI toolkit / server | Starlette / Uvicorn | 1.7.0 / 0.54.0 |
-| MCP integration | FastMCP (MCP SDK 2.2.0) | 4.0.10 |
+| MCP integration | FastMCP (MCP SDK 2.3.0) | 4.1.8 |
 | RDF library | rdflib | 7.6.0 |
 | XML/XSLT processing | lxml | 6.1.3 |
 | Pattern matching | parse | 1.22.2 |
 | Date parsing | ciso8601 | 2.3.3 |
 | Runtime | Python | 3.14 |
-| Container | Docker (`python:3.14-bookworm`) | — |
-| Image registry | Docker Hub (`datafluisteraar/cprmv-api`) | — |
-| CI/CD | GitLab CI | — |
+| Container | Docker (`python:3.14-bookworm`, pinned by digest) | — |
+| Image registry | GitHub Container Registry (`ghcr.io/open-regels/cprmv-api`) | — |
+| CI/CD | GitHub Actions; GitLab Pages for the specification | — |
+| Deployment | An Azure VM per tier: Docker Compose, Caddy, and a reconciler on a systemd timer | — |
 
 The MCP server is mounted on the API at `/mcp/` — see [MCP server](features/overview.md#mcp-server).
 
@@ -116,8 +121,7 @@ cprmv/
 │   ├── respec/                    # Static CPRMV specification per version (served at /respec/)
 │   ├── test/                      # pytest suite
 │   ├── Dockerfile
-│   ├── docker-compose.yml
-│   ├── Makefile                   # install, methods, deps, deps-upgrade, tests
+│   ├── Makefile                   # install, methods, deps / deps-linux, deps-upgrade, tests
 │   ├── pip-compile.sh
 │   ├── requirements.txt / requirements-dev.txt
 │   └── pyproject.toml
@@ -128,6 +132,14 @@ cprmv/
 │       ├── cprmv.shacl.ttl        # SHACL shapes for validation
 │       └── methods/<module>/      # 0.4.2 and later: one folder per method module — method.ttl, README.md, XSLT
 ├── html/                          # ReSpec source for the CPRMV specification (shaclgen.py generates chapters)
+├── deployment/vm/                 # The two VMs: Compose stacks and Caddyfiles per tier, reconciler, provisioning
+├── scripts/                       # CI helper scripts and their bats tests
+├── .github/                       # Workflows, zizmor configuration, rulesets as JSON
+├── docs/                          # Design specs and implementation plans
+├── .gitlab-ci.yml                 # ReSpec publication only
+├── README.md
+├── SECURITY-PIPELINE.md           # Register of every pin, the checks and the rulesets
+├── renovate.json
 ├── METHODS.md                     # How methods are defined in RDF and implemented in Python
 ├── ROADMAP.md
 └── CHANGELOG.md

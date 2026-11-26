@@ -19,6 +19,10 @@ component: CPRMV
 
 ---
 
+## GET /health
+
+---
+
 ## GET /methods
 
 ---

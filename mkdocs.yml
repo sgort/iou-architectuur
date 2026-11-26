@@ -388,6 +388,7 @@ nav:
       - Local Development: cprmv-api/developer/local-development.md
       - Data Model: cprmv-api/developer/data-model.md
       - Deployment: cprmv-api/developer/deployment.md
+      - VM Deployment: cprmv-api/developer/vm-deployment.md
       - CI/CD: cprmv-api/developer/ci-cd.md
       - Testing: cprmv-api/developer/testing.md
       - Changelog & Roadmap: cprmv-api/developer/changelog-roadmap.md

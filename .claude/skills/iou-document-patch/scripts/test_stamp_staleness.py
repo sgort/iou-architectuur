@@ -30,11 +30,25 @@ class ProfileTest(unittest.TestCase):
         self.assertIn(":(glob)**/src/auth/**", settings["paths"])
         self.assertLessEqual(set(stamp_staleness.CI_PATHS), set(settings["paths"]))
 
-    def test_cprmv_remote_resolved_by_url_not_by_name(self):
-        # The cprmv clone's remote has been called `gitlab` in one clone and
-        # `origin` in another; a fixed name silently reads a stale ref.
-        self.assertIsNone(stamp_staleness.COMPONENTS["CPRMV"][2])
-        self.assertIn("CPRMV", stamp_staleness.REMOTE_URLS)
+    def test_no_remote_names_are_hardcoded(self):
+        # Remote names have not been stable (CPRMV: `gitlab`, then `origin`, and
+        # on 26 November 2026 a move to GitHub); the CI remote comes from ci_repo.
+        for clone_and_branch in stamp_staleness.COMPONENTS.values():
+            self.assertEqual(len(clone_and_branch), 2)
+        self.assertFalse(hasattr(stamp_staleness, "REMOTE_URLS"))
+
+
+class CiUrlFragmentTest(unittest.TestCase):
+    def test_github(self):
+        self.assertEqual(stamp_staleness.ci_url_fragment({"ci_repo": "https://github.com/open-regels/cprmv"}),
+                         "github.com/open-regels/cprmv")
+
+    def test_trailing_slash_git_suffix_and_credentials(self):
+        self.assertEqual(stamp_staleness.ci_url_fragment({"ci_repo": "https://user@git.open-regels.nl/standards/cprmv.git/"}),
+                         "git.open-regels.nl/standards/cprmv")
+
+    def test_missing(self):
+        self.assertEqual(stamp_staleness.ci_url_fragment({}), "")
 
 
 class ResolveRemoteTest(unittest.TestCase):
@@ -58,6 +72,19 @@ class ResolveRemoteTest(unittest.TestCase):
     def test_no_matching_remote(self):
         repo = self._clone({"origin": "https://github.com/someone/cprmv.git"})
         self.assertIsNone(stamp_staleness.resolve_remote(repo, "git.open-regels.nl/standards/cprmv"))
+
+    def test_github_origin_beside_gitlab_after_the_move(self):
+        repo = self._clone({"gitlab": "https://git.open-regels.nl/standards/cprmv.git",
+                            "origin": "https://github.com/open-regels/cprmv.git"})
+        self.assertEqual(stamp_staleness.resolve_remote(repo, "github.com/open-regels/cprmv"), "origin")
+
+    def test_old_owner_is_not_matched_after_an_org_move(self):
+        repo = self._clone({"origin": "https://github.com/sgort/ttl-editor.git"})
+        self.assertIsNone(stamp_staleness.resolve_remote(repo, "github.com/open-regels/ttl-editor"))
+
+    def test_match_ignores_case(self):
+        repo = self._clone({"origin": "https://github.com/Open-Regels/CPRMV.git"})
+        self.assertEqual(stamp_staleness.resolve_remote(repo, "github.com/open-regels/cprmv"), "origin")
 
 
 if __name__ == "__main__":

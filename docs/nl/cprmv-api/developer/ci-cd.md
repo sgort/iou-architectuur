@@ -1,3 +1,7 @@
+---
+component: CPRMV
+---
+
 # CI/CD
 
 !!! info "Documentatie in ontwikkeling"
@@ -11,8 +15,32 @@
 
 ---
 
-## CI/CD pipeline
+## Branches and tiers
 
-### Stages
+---
 
-### ReSpec publication
+## The workflows
+
+### CI (`ci.yml`)
+
+### Supply-chain audit (`zizmor.yml`)
+
+### Semgrep (`semgrep.yml`)
+
+### Dependency audit (`dependency-audit.yml`)
+
+---
+
+## Required checks
+
+---
+
+## Pinning and Renovate
+
+---
+
+## ReSpec publication
+
+---
+
+## Releasing

@@ -1,11 +1,17 @@
 # CPRMV API — screenshots to capture
 
-*A running record across syncs, newest first. Last reviewed for v0.4.3 on
-24 November 2026 — **nothing outstanding, and nothing requested**.*
+*A running record across syncs, newest first. Last reviewed for v0.4.3 at `8f01b2b` on
+26 November 2026 — **nothing outstanding, and nothing requested**.*
 
 Real screenshot files live in **`docs/assets/screenshots/`** (language-neutral,
 served at the site root). Docs reference them as
 `../../assets/screenshots/<file>` inside a `<figure markdown>` block.
+
+---
+
+## Sync v0.4.3 at `d597671` → `8f01b2b` (the move to GitHub) — no screenshots requested
+
+Reviewed on 26 November 2026 for the move to GitHub `open-regels/cprmv` and the VM deployment, in production at `8f01b2b` with no new version. Nothing on screen changed; the new VM deployment page describes the pipeline in tables and text, and `/health` is shown as its JSON answer.
 
 ---
 

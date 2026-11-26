@@ -1,13 +1,13 @@
 {
-  "docs_built": "2026-11-24",
+  "docs_built": "2026-11-26",
   "last_patch": {
-    "date": "2026-11-24",
+    "date": "2026-11-26",
     "kind": "Component sync",
-    "summary": "CPRMV v0.4.3, in production: a RuleSet is now an FRBR Endeavor and methods come in modules; the API reads organisations, norms and DSO decision models as sources, returns the original publication through /raw, narrows /methods to one method, drops the EU CELLAR helpers and serves its MCP server at /mcp/; the specification gains new introductory chapters, a diagram per class and a PDF.",
+    "summary": "CPRMV moves to GitHub without a new version: production runs 8f01b2b and still reports 0.4.3, built and deployed by GitHub Actions to one VM per tier, each pulling the head of its branch, rolling back a release that fails its check and reporting what runs on /health; acc and main change only through pull requests that pass audit, scan, test and build.",
     "previous": {
-      "date": "2026-11-22",
-      "kind": "Component sync and weekly pass",
-      "summary": "CPSV Editor v2026.11.2 and Linked Data Explorer v2026.11.3, both in production: the editor imports each statement whole and reads a field only from its own property, its publish dialog shows the steps publishing really takes, and a lapsed session asks to sign in again; the Linked Data Explorer accepts only access tokens, says when sign-in cannot be checked, explains a failed publish, and reports a required service described elsewhere as a warning; the weekly pass then re-checked the contributing pages and the Project Start Architectuur against all five components, recording that zizmor is now installed from hash-locked wheels and adding a risk for the citizen service number in the browser and the incomplete lookup audit; the ICTU dependency guideline holds at 42, 40 and 40."
+      "date": "2026-11-24",
+      "kind": "Component sync",
+      "summary": "CPRMV v0.4.3, in production: a RuleSet is now an FRBR Endeavor and methods come in modules; the API reads organisations, norms and DSO decision models as sources, returns the original publication through /raw, narrows /methods to one method, drops the EU CELLAR helpers and serves its MCP server at /mcp/; the specification gains new introductory chapters, a diagram per class and a PDF."
     },
     "open_findings": [
       {
@@ -17,14 +17,6 @@
       {
         "label": "open-regels/cprmv#2",
         "url": "https://github.com/open-regels/cprmv/issues/2"
-      },
-      {
-        "label": "ttl-editor#274",
-        "url": "https://github.com/sgort/ttl-editor/issues/274"
-      },
-      {
-        "label": "ronl-business-api#489",
-        "url": "https://github.com/sgort/ronl-business-api/issues/489"
       }
     ]
   },
@@ -89,10 +81,15 @@
       "icon": "📜",
       "version": "v0.4.3",
       "environment": "prod",
-      "commit": "d597671...",
-      "commit_date": "2026-11-23",
-      "repo_url": "https://git.open-regels.nl/standards/cprmv/-/commit/d597671421d119469ce3e4585849be32fea7c778",
-      "ci_repo": "https://git.open-regels.nl/standards/cprmv"
+      "commit": "8f01b2b...",
+      "commit_date": "2026-11-26",
+      "build": {
+        "sha": "8f01b2b",
+        "run": 13,
+        "run_url": "https://github.com/open-regels/cprmv/actions/runs/45892291396"
+      },
+      "repo_url": "https://github.com/open-regels/cprmv/commit/8f01b2b16302e3289f360ca440796a977d446e05",
+      "ci_repo": "https://github.com/open-regels/cprmv"
     }
   ]
 }

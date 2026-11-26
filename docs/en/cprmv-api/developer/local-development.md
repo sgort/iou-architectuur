@@ -8,7 +8,7 @@ component: CPRMV
 
 ## Prerequisites
 
-- Python 3.14 — the Docker image and the CI test job both use `python:3.14-bookworm`
+- Python 3.14 — the Docker image builds from `python:3.14-bookworm`, pinned by digest, and CI's `test` job uses Python 3.14
 - `libxml2` and `libxslt` system libraries (required by lxml)
 
 On Debian/Ubuntu:
@@ -24,7 +24,14 @@ brew install libxml2 libxslt
 ```
 
 !!! warning "Windows"
-    `requirements.txt` and `requirements-dev.txt` pin `uvloop` (pulled in by `uvicorn[standard]`), which does not build on Windows. Install the requirements without that line.
+    Both requirements files are compiled **for Linux** and carry hashes, so they do not install on Windows as they are: `uvloop` does not build there, platform-only packages such as `colorama` are missing, and pip refuses anything without a hash. On Windows, run the API and its tests in Docker, or use WSL. From Git Bash at the repository root:
+
+    ```bash
+    docker build -t cprmv-api:local serve_api
+    docker run --rm -p 8000:8000 cprmv-api:local
+    ```
+
+    The container command for the tests is under [Testing](testing.md#running-the-tests).
 
 ---
 
@@ -38,7 +45,7 @@ python -m venv venv
 source venv/bin/activate   # Windows: venv\Scripts\activate
 
 # Install runtime, dev and tool dependencies (what CI installs)
-pip install -r requirements-dev.txt
+pip install --require-hashes -r requirements-dev.txt
 ```
 
 `requirements-dev.txt` is compiled from `pyproject.toml` with the `dev` and `tools` extras, so it includes the runtime dependencies. `requirements.txt` holds the runtime dependencies only; it is what the Docker image installs.
@@ -47,13 +54,13 @@ The `Makefile` in `serve_api/` offers the same steps as targets:
 
 | Target | Runs |
 |---|---|
-| `make install` | `pip install pip-tools`, `./pip-compile.sh`, `pip install -r requirements-dev.txt` |
-| `make deps` | `./pip-compile.sh` — recompile both requirements files, keeping current pins |
-| `make deps-upgrade` | `./pip-compile.sh --upgrade` — upgrade every pin |
+| `make install` | `pip install pip-tools==7.6.2`, then `pip install -r requirements-dev.txt` |
+| `make deps` / `make deps-linux` | Recompile both requirements files, with hashes, in a `python:3.14-bookworm` container pinned by digest, as CI checks them; `ARGS=--upgrade` upgrades every pin |
+| `make deps-upgrade` | `make deps-linux ARGS=--upgrade` |
 | `make methods` | Regenerate `data/` from `rdf/0.4.3/` (see [Data files](#data-files)) |
 | `make tests` | `pytest test` |
 
-`pip-compile.sh` also takes `-P <package>` (repeatable) to upgrade a single package. Note that `make install` recompiles the requirements files before installing them.
+`pip-compile.sh` also takes `-P <package>` (repeatable) to upgrade a single package. `make install` does not recompile. CI's `audit` check recompiles both files on Linux and fails on any difference, so a file compiled on Windows is rejected. Windows has no `make`; `SECURITY-PIPELINE.md` in the repository gives the equivalent `docker run`.
 
 ---
 
@@ -80,7 +87,7 @@ See [Testing](testing.md) for the commands, what they cover and what CI runs.
 
 ## Project dependencies
 
-`pyproject.toml` declares the dependencies without versions; `pip-compile.sh` locks them into `requirements.txt` and `requirements-dev.txt`.
+`pyproject.toml` declares the dependencies without versions; `pip-compile.sh` locks them, with hashes, into `requirements.txt` and `requirements-dev.txt` (`--generate-hashes --allow-unsafe --strip-extras`).
 
 | Package | Locked version | Purpose |
 |---|---|---|
@@ -89,7 +96,7 @@ See [Testing](testing.md) for the commands, what they cover and what CI runs.
 | `parse` | 1.22.2 | Pattern matching for ids, references and `unformat` |
 | `lxml` | 6.1.3 | XSLT transform of publication XML |
 | `ciso8601` | 2.3.3 | ISO 8601 date parsing |
-| `fastmcp` | 4.0.10 | MCP server wiring (see [Architecture](architecture.md#mcp)) |
+| `fastmcp` | 4.1.8 | MCP server wiring (see [Architecture](architecture.md#mcp)) |
 
 Dev extras: `pytest`, `pytest-cov`, `httpx`, `pre-commit`. Tool extras: `bandit`, `black`, `mypy`, `ruff`, `safety`, `vulture`.
 

@@ -23,16 +23,8 @@ component: CPRMV
 
 ---
 
-## Running with Docker Compose
-
----
-
-## Synology NAS deployment
-
----
-
-## Updating to a new image version
-
----
-
 ## Health check
+
+---
+
+## Running the image yourself
