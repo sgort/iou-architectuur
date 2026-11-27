@@ -66,9 +66,9 @@ graph LR
 | **Production (alias)** | [cprmv.open-rules.eu/docs](https://cprmv.open-rules.eu/docs) | [cprmv.open-rules.eu/respec/](https://cprmv.open-rules.eu/respec/) |
 | **Acceptance** | [acc.cprmv.open-regels.nl/docs](https://acc.cprmv.open-regels.nl/docs) | [acc.cprmv.open-regels.nl/respec/](https://acc.cprmv.open-regels.nl/respec/) |
 
-Production is the stable tier and runs `main`, on its own VM that also answers as `cprmv.open-rules.eu`; acceptance runs `acc` on another. Each reports its tier, commit and image at `/health` ([Deployment](developer/deployment.md#hosts), [VM Deployment](developer/vm-deployment.md)).
+Production is the stable tier and runs `main`, on its own VM that also answers as `cprmv.open-rules.eu`; acceptance runs `acc` on another. Each reports its tier, release, commit and image at `/health` ([Deployment](developer/deployment.md#hosts), [VM Deployment](developer/vm-deployment.md)).
 
-Source, issues and pull requests are at [open-regels/cprmv](https://github.com/open-regels/cprmv) on GitHub, default branch `acc`. The published specification is at `https://standaarden.open-regels.nl/standards/cprmv/<version>/`, which GitLab Pages serves.
+Source, issues and pull requests are at [open-regels/cprmv](https://github.com/open-regels/cprmv) on GitHub, default branch `acc`. The published specification is at `https://standaarden.open-regels.nl/standards/cprmv/<version>/`, which GitLab Pages serves; each release pushes it there ([Releasing](developer/ci-cd.md#releasing)).
 
 ---
 
@@ -122,6 +122,7 @@ cprmv/
 │   ├── test/                      # pytest suite
 │   ├── Dockerfile
 │   ├── Makefile                   # install, methods, deps / deps-linux, deps-upgrade, tests
+│   ├── RELEASE                    # The release number, vYYYY.MM.N; written only by a release
 │   ├── pip-compile.sh
 │   ├── requirements.txt / requirements-dev.txt
 │   └── pyproject.toml
@@ -133,9 +134,10 @@ cprmv/
 │       └── methods/<module>/      # 0.4.2 and later: one folder per method module — method.ttl, README.md, XSLT
 ├── html/                          # ReSpec source for the CPRMV specification (shaclgen.py generates chapters)
 ├── deployment/vm/                 # The two VMs: Compose stacks and Caddyfiles per tier, reconciler, provisioning
-├── scripts/                       # CI helper scripts and their bats tests
+├── scripts/                       # CI and release scripts (write-sbom.py) and their tests
 ├── .github/                       # Workflows, zizmor configuration, rulesets as JSON
-├── docs/                          # Design specs and implementation plans
+├── .claude/commands/              # bump-release.md: cuts a release
+├── docs/                          # Design specs, implementation plans, and the release SBOMs in docs/sbom/
 ├── .gitlab-ci.yml                 # ReSpec publication only
 ├── README.md
 ├── SECURITY-PIPELINE.md           # Register of every pin, the checks and the rulesets

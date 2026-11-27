@@ -29,6 +29,8 @@ component: CPRMV
 
 ### Dependency audit (`dependency-audit.yml`)
 
+### Release SBOM (`sbom.yml`)
+
 ---
 
 ## Required checks
@@ -44,3 +46,9 @@ component: CPRMV
 ---
 
 ## Releasing
+
+### Two version numbers
+
+### Cutting a release
+
+### The release SBOM

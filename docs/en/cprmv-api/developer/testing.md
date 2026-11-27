@@ -4,20 +4,21 @@ component: CPRMV
 
 # Testing
 
-The CPRMV API has one test file, `serve_api/test/test_serve.py`, run with pytest. Six tests are active, three of them on `/health`; ten more are commented out since the method modules were introduced in 0.4.2. The shell scripts of the pipeline and the VMs have 54 bats tests. The SHACL shapes are validated separately with a shell script that is not part of CI.
+The CPRMV API has one test file, `serve_api/test/test_serve.py`, run with pytest. Seven tests are active, four of them on `/health`; ten more are commented out since the method modules were introduced in 0.4.2. The shell scripts of the pipeline and the VMs have 69 bats tests. The release SBOM script has its own pytest suite, `scripts/test/test_write_sbom.py`, which the Release SBOM workflow runs. The SHACL shapes are validated separately with a shell script that is not part of CI.
 
 ---
 
 ## At a glance
 
-Measured on 26 November 2026 at `189cadc`, whose code and tests equal `8f01b2b`, the commit on `main`, from a scratch export, on Windows with Python 3.14. The hash-locked `requirements-dev.txt` was installed with `--require-hashes` without `uvloop`, which does not build on Windows, and `pywin32`, `pywin32-ctypes` and `colorama` were added, which the Linux-compiled files omit. CI on Linux ran the same suite and the shell tests in the `test` job of [run 13](https://github.com/open-regels/cprmv/actions/runs/45892291396) at `8f01b2b`, and passed.
+Measured on 27 November 2026 at `502a351`, the commit on `main` (release v2026.11.0), from a scratch export, on Windows with Python 3.14. The hash-locked `requirements-dev.txt` was installed with `--require-hashes` without `uvloop`, which does not build on Windows, and `pywin32`, `pywin32-ctypes` and `colorama` were added, which the Linux-compiled files omit. CI on Linux ran the same suite and the shell tests in the `test` job of [run 21](https://github.com/open-regels/cprmv/actions/runs/45969250973) at `502a351`, and passed; the Release SBOM workflow's [run 5](https://github.com/open-regels/cprmv/actions/runs/45969251022) on the same commit passed the SBOM script's tests.
 
 | Check | Command | Result |
 |---|---|---|
 | Syntax check | `python -m py_compile src/serve.py` (from `serve_api/`) | Not run locally; passed in CI |
 | Import check | `python -c "from src.serve import app"` (from `serve_api/`) | Not run separately (the tests import `app`); passed in CI |
-| Unit tests | `pytest` (from `serve_api/`) | 6 collected in `test/test_serve.py`, 6 passed in 9.63 s; 6 passed in CI in 1.83 s |
-| Shell tests | `bats scripts/test deployment/vm/reconciler/test` (from the repository root) | Not run locally (bats not installed); 54 passed in CI, as read from the run's log |
+| Unit tests | `pytest` (from `serve_api/`) | 7 collected in `test/test_serve.py`, 7 passed in 5.31 s; 7 passed in CI in 1.46 s |
+| Shell tests | `bats scripts/test deployment/vm/reconciler/test` (from the repository root) | Not run locally (bats not installed); 69 passed in CI, as read from the run's log |
+| SBOM script tests | `python -m pytest scripts/test/test_write_sbom.py` (from the repository root) | 75 collected, 74 passed and 1 skipped in 1.21 s: the skipped test runs the real `cyclonedx-py`, which was not installed; 75 passed in the Release SBOM run, which installs `cyclonedx-bom` 8.0.1 |
 | SHACL validation | `sh test.sh` (from `rdf/0.4.3/`) | Not measured |
 
 ---
@@ -52,6 +53,8 @@ The `test` job of the CI workflow runs on every pull request into `acc` or `main
 4. shellcheck over every tracked `*.sh` outside `rdf/` and over the reconciler's test stubs
 5. the bats suites in `scripts/test` and `deployment/vm/reconciler/test`
 
+`scripts/test/test_write_sbom.py` is not in this job: the Release SBOM workflow runs it, on pushes to `main`, by hand, and on pull requests that change the SBOM script or its inputs, so it does not run on a push to `acc` ([CI/CD](ci-cd.md#release-sbom-sbomyml)).
+
 The rulesets require `test` on `acc` and `main`. The `build` job then starts the built image and requires its `/health` to report the commit; `publish` repeats that on the pushed image. See [CI/CD](ci-cd.md).
 
 ---
@@ -63,9 +66,10 @@ The rulesets require `test` on `acc` and `main`. The `build` job then starts the
 | Test | What it checks | Notes |
 |---|---|---|
 | `test_get_root` | `GET /` returns 200 and `{"CPRMV Rules Serve API": "0.4.3"}` | Uses FastAPI's `TestClient` |
-| `test_health_reports_build_and_digest` | With `BUILD_SHA`, `BUILD_RUN`, `CPRMV_IMAGE_DIGEST` and `CPRMV_ENVIRONMENT` set, `GET /health` returns them, with the keys in the order `status`, `version`, `environment`, `build`, `image` | |
+| `test_health_reports_build_and_digest` | With `BUILD_SHA`, `BUILD_RUN`, `BUILD_RELEASE`, `CPRMV_IMAGE_DIGEST` and `CPRMV_ENVIRONMENT` set, `GET /health` returns them, with the keys in the order `status`, `version`, `environment`, `release`, `build`, `image` | |
 | `test_health_reports_null_when_unset` | Unset, each of them is `null` | |
 | `test_health_treats_empty_as_null` | An empty value is `null` too | |
+| `test_health_reads_the_release_per_request` | Changing `BUILD_RELEASE` between two requests changes `release`: it is read per request | |
 | `test_detect_cprmv_serve_reference_method_and_transform` | An empty reference resolves to `None`; a Juriconnect 1.31 reference with `z` and `g` and a 1.3 reference with `g` resolve to the expected `/rules/…` paths | Needs network: the `elifmx4` reference method queries the EU CELLAR SPARQL endpoint |
 | `test_detect_cprmv_serve_unknown_method` | `get_rules("UNKNOWN")` returns the "No supported publication repository…" error | |
 
@@ -96,7 +100,19 @@ They call functions that 0.4.2 removed or moved into method modules (`detect_cpr
 
 ## Shell tests
 
-The pipeline's and the VMs' shell scripts have 54 bats tests in five files, run by CI's `test` job on a runner with git, jq, curl, `flock` and pip-audit; the reconciler's tests run against stubbed `docker` and `curl`. On Linux or WSL with those tools, run `bats scripts/test deployment/vm/reconciler/test` from the repository root. The `bats/bats:1.14.0` image lacks git, jq and curl, so in Docker only the tests that need none of them run, such as `scripts/test/ci-tier.bats`. What each file covers is on [VM Deployment](vm-deployment.md#what-the-tests-verify).
+The pipeline's and the VMs' shell scripts have 69 bats tests in six files, run by CI's `test` job on a runner with git, jq, curl, `flock` and pip-audit; the reconciler's tests run against stubbed `docker` and `curl`. On Linux or WSL with those tools, run `bats scripts/test deployment/vm/reconciler/test` from the repository root. The `bats/bats:1.14.0` image lacks git, jq and curl, so in Docker only the tests that need none of them run, such as `scripts/test/ci-tier.bats`. What each file covers is on [VM Deployment](vm-deployment.md#what-the-tests-verify).
+
+---
+
+## SBOM script tests
+
+`scripts/test/test_write_sbom.py` tests `scripts/write-sbom.py`, which writes the [release SBOM](ci-cd.md#release-sbom-sbomyml). Its 17 test functions make 75 cases, most of them from parametrising every mode of the script over eleven malformed release files. They run without network, in a temporary project, with the CycloneDX tool's output as a fixture. They check that:
+
+- the file is named after the release, not the vocabulary version; a release file without a trailing newline is read; and the script validates the release with the same expression as `scripts/read-release.sh`;
+- every mode fails, writing nothing, when `serve_api/RELEASE` is missing or malformed (no `v`, month 13, an unpadded month, a CRLF ending, two lines, a path, an empty file, two trailing newlines, a NUL byte, a leading space), and `--verify-release` then says that `main` has not been released with a release number;
+- the output is normalised: volatile fields removed, components sorted whatever the input order or line numbers, a duplicate package rejected, and stable JSON with a trailing newline;
+- `--check` passes on a fresh file, fails on a missing or stale one, and ignores the tool's version and timestamp; `--verify-release` fails only on a missing file; `--print-path` runs no tool;
+- one test runs the real `cyclonedx-py` on a hashed requirements file. It is skipped where the tool is not installed; the Release SBOM workflow installs it.
 
 ---
 

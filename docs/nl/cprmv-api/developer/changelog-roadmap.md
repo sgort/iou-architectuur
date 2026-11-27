@@ -2,7 +2,7 @@
 component: CPRMV
 ---
 
-# CI/CD & Changelog
+# Changelog & Roadmap
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
@@ -15,13 +15,17 @@ component: CPRMV
 
 ---
 
-## CI/CD pipeline
+## Releases
+
+### v2026.11.0 — Release Numbers, a Bill of Materials per Release, and CPRMV on GitHub (November 2026)
 
 ---
 
-## Changelog
+## Vocabulary and API versions
 
 ### v0.4.3 (November 2026)
+
+### v0.4.2 (October 2026)
 
 ### v0.4.1 (June 2026)
 
@@ -34,6 +38,3 @@ component: CPRMV
 ### Completed
 
 ### Planned
-
-### v0.4.x — Features & documentation
-

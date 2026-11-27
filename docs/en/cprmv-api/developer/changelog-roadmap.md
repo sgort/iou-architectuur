@@ -6,14 +6,34 @@ component: CPRMV
 
 ---
 
-## Changelog
+CPRMV has two version numbers ([why](ci-cd.md#two-version-numbers)). A **release** (`vYYYY.MM.N`) is what runs on production: `/health` reports it as `release`, it tags the image and it names the release's bill of materials. The **vocabulary and API version** (`0.4.3`) is the version of the CPRMV vocabulary, its specification and the API's routes and namespaces; it changes only when they do, and several releases can share it.
+
+---
+
+## Releases
+
+Releases are numbered since 27 November 2026 and have no changelog of their own in the repository; each entry below is written from the release's pull requests.
+
+### v2026.11.0 — Release Numbers, a Bill of Materials per Release, and CPRMV on GitHub (November 2026)
+
+> How a release is cut: [CI/CD](ci-cd.md#releasing). What `/health` reports: [GET /health](../reference/api-endpoints.md#get-health). How each tier deploys itself: [VM Deployment](vm-deployment.md). The tests: [Testing](testing.md).
+
+Vocabulary and API version **0.4.3**, unchanged. Production runs `502a351` since 27 November 2026, promoted by [#35](https://github.com/open-regels/cprmv/pull/35).
+
+- **A release number beside the version.** A release is numbered `vYYYY.MM.N`: `.0` is the month's first release, and the count restarts each month. The number is kept in `serve_api/RELEASE`, which only a release writes; CI checks it, fails the build on anything but one line `vYYYY.MM.N`, and builds it into the image, and `/health` reports it as `release`, between `environment` and `build`. On production the image is also tagged `v2026.11.0`. Acceptance reports the last release its code is at or after, and `build.sha` says exactly what runs. No git tags, no GitHub Releases.
+- **`/bump-release`.** A Claude Code command in the repository cuts a release: it reconciles the open pull requests, computes the next number, asks whether the vocabulary version changes too (it does not raise it itself), opens the release pull request into `acc` and then `acc` into `main`, checks that both production hosts report the release, and pushes `main` to GitLab, which publishes the specification. It never merges a pull request and never pushes to `acc` or `main`; a maintainer merges both.
+- **A bill of materials per release.** Each release commits a CycloneDX 1.6 SBOM of the shipped Python dependencies, `docs/sbom/cprmv-api-v2026.11.0.cdx.json` (98 components), generated deterministically from the hash-locked `serve_api/requirements.txt`. A new workflow, *Release SBOM*, fails a release pull request whose SBOM does not match the requirements, and a push to `main` without a release number or its SBOM; it keeps a copy as a 90-day artifact and is not a required check. The release is in the file's name only: inside, the root component is `cprmv@0.4.3`, the vocabulary version. `cprmv-api-0.4.3.cdx.json` records what production ran before release numbers, and is byte for byte the same file, because the release changed no dependency. The image carries its own SBOM attestation in GHCR, which covers the Debian packages.
+- **Developed on GitHub.** Since 26 November 2026 ([#26](https://github.com/open-regels/cprmv/pull/26), [#28](https://github.com/open-regels/cprmv/pull/28), [#31](https://github.com/open-regels/cprmv/pull/31), production at `8f01b2b`) development, issues and CI are at [open-regels/cprmv](https://github.com/open-regels/cprmv), default branch `acc`; GitLab keeps only the job that publishes the specification. Rulesets on `acc` and `main` require `audit`, `scan`, `test` and `build` before a pull request merges. Actions are pinned to commit hashes, the Python and Caddy images by digest, and both requirements files carry hashes; Renovate moves them after 14 days, and a daily `pip-audit` fails on any advisory in a shipped package. Six shipped packages with advisories were upgraded on the way, among them `fastmcp` to 4.1.8. The image moved from Docker Hub to `ghcr.io/open-regels/cprmv-api`, with a provenance attestation, and the Docker Hub Compose file is gone.
+- **Each tier deploys itself.** Each tier runs on its own Azure VM, which deploys the head of its branch within minutes of the merge, checks it, and restores the previous deployment if the check fails; `cprmv.open-rules.eu` is served by the stable VM. `/health` reports the environment, the release, the commit and run the image was built from, and its digest. For this release, CI [run 21](https://github.com/open-regels/cprmv/actions/runs/45969250973) published `502a351`, the stable VM reported it running at 08:58 UTC, and `deploy` passed.
+- **Tests.** pytest collects seven tests, all passing, measured on 27 November from a scratch export; the new one checks that `/health` reads the release on every request. CI run 21 passed them and 69 bats tests, 15 of them new for `scripts/read-release.sh`. The SBOM script has 75 tests of its own, which the [Release SBOM run](https://github.com/open-regels/cprmv/actions/runs/45969251022) passed; locally 74 passed and the one that runs the real CycloneDX tool was skipped, because the tool was not installed.
+
+---
+
+## Vocabulary and API versions
 
 This changelog is maintained starting from CPRMV / CPRMV API v0.4.0.
 Usage of earlier versions is deprecated and at own risk.
 Note that CPRMV / CPRMV API still is highly subject to change.
-
-!!! note "On production, in no release yet"
-    **CPRMV moved to GitHub, and each tier deploys itself.** Since 26 November 2026 production runs `8f01b2b`, promoted from `acc` by [#26](https://github.com/open-regels/cprmv/pull/26), [#28](https://github.com/open-regels/cprmv/pull/28) and [#31](https://github.com/open-regels/cprmv/pull/31) without a version change, so it still reports `0.4.3`; the repository's changelog has no entry for it yet. Development, issues and CI moved from GitLab to [open-regels/cprmv](https://github.com/open-regels/cprmv), default branch `acc`; GitLab keeps only the job that publishes the ReSpec. Four workflows run on GitHub Actions, and rulesets on `acc` and `main` require `audit`, `scan`, `test` and `build` before a pull request merges. Actions are pinned to commit hashes, the Python and Caddy images by digest, and both requirements files carry hashes; Renovate moves them after 14 days, and a daily `pip-audit` fails on any advisory in a shipped package. Six shipped packages with advisories were upgraded on the way, among them `fastmcp` to 4.1.8. The image moved from Docker Hub to `ghcr.io/open-regels/cprmv-api`, with a provenance attestation, and the Docker Hub Compose file is gone. Each tier runs on its own Azure VM, which deploys the head of its branch within minutes of the merge, checks it, and restores the previous release if the check fails; `cprmv.open-rules.eu` is served by the stable VM. `/health` reports the environment, the commit and run the image was built from, and its digest. pytest collects six tests, all passing, measured on 26 November from a scratch export; CI run 13 passed them and 54 bats tests. See [CI/CD](ci-cd.md), [VM Deployment](vm-deployment.md) and [GET /health](../reference/api-endpoints.md#get-health).
 
 ### v0.4.3 (November 2026)
 
@@ -125,6 +145,7 @@ Note that CPRMV / CPRMV API still is highly subject to change.
 
 | Feature | Version |
 | ------- | ------- |
+| Release numbers, a release SBOM, `/bump-release` | v2026.11.0 |
 | CPRMV / CPRMV API | v0.4.3  |
 | CPRMV / CPRMV API | v0.4.2  |
 | CPRMV / CPRMV API | v0.4.1  |

@@ -35,6 +35,10 @@ component: CPRMV
 
 ---
 
+## SBOM script tests
+
+---
+
 ## SHACL validation
 
 ---

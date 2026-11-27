@@ -1,13 +1,13 @@
 {
-  "docs_built": "2026-11-26",
+  "docs_built": "2026-11-27",
   "last_patch": {
-    "date": "2026-11-26",
+    "date": "2026-11-27",
     "kind": "Component sync",
-    "summary": "CPRMV moves to GitHub without a new version: production runs 8f01b2b and still reports 0.4.3, built and deployed by GitHub Actions to one VM per tier, each pulling the head of its branch, rolling back a release that fails its check and reporting what runs on /health; acc and main change only through pull requests that pass audit, scan, test and build.",
+    "summary": "CPRMV v2026.11.0, the first release with a release number: production runs 502a351 and reports release v2026.11.0 beside vocabulary version 0.4.3 on /health, the image is also tagged v2026.11.0, every release commits a CycloneDX bill of materials named after it, and /bump-release cuts a release through acc and main and pushes the specification to GitLab.",
     "previous": {
-      "date": "2026-11-24",
+      "date": "2026-11-26",
       "kind": "Component sync",
-      "summary": "CPRMV v0.4.3, in production: a RuleSet is now an FRBR Endeavor and methods come in modules; the API reads organisations, norms and DSO decision models as sources, returns the original publication through /raw, narrows /methods to one method, drops the EU CELLAR helpers and serves its MCP server at /mcp/; the specification gains new introductory chapters, a diagram per class and a PDF."
+      "summary": "CPRMV moves to GitHub without a new version: production runs 8f01b2b and still reports 0.4.3, built and deployed by GitHub Actions to one VM per tier, each pulling the head of its branch, rolling back a release that fails its check and reporting what runs on /health; acc and main change only through pull requests that pass audit, scan, test and build."
     },
     "open_findings": [
       {
@@ -79,16 +79,17 @@
     {
       "name": "CPRMV",
       "icon": "📜",
-      "version": "v0.4.3",
+      "version": "v2026.11.0",
+      "vocabulary": "0.4.3",
       "environment": "prod",
-      "commit": "8f01b2b...",
-      "commit_date": "2026-11-26",
+      "commit": "502a351...",
+      "commit_date": "2026-11-27",
       "build": {
-        "sha": "8f01b2b",
-        "run": 13,
-        "run_url": "https://github.com/open-regels/cprmv/actions/runs/45892291396"
+        "sha": "502a351",
+        "run": 21,
+        "run_url": "https://github.com/open-regels/cprmv/actions/runs/45969250973"
       },
-      "repo_url": "https://github.com/open-regels/cprmv/commit/8f01b2b16302e3289f360ca440796a977d446e05",
+      "repo_url": "https://github.com/open-regels/cprmv/commit/502a3517f0c1d1f56aa4f57a42a37a42daf28657",
       "ci_repo": "https://github.com/open-regels/cprmv"
     }
   ]

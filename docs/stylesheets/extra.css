@@ -442,8 +442,18 @@ button:focus {
    the version or scope fact beside them, so they keep the lighter default
    colour and normal weight. */
 .doc-meta__build code,
+.doc-meta__vocabulary code,
 .doc-meta__verified code {
   font-size: 0.9em;
+  white-space: nowrap;
+}
+
+/* Second line of the status table's Version cell (repo-versions.json `vocabulary`),
+   e.g. CPRMV's vocabulary version beside its release number. */
+.doc-status-admonition .doc-status-vocabulary {
+  display: block;
+  font-size: 0.85em;
+  color: var(--md-default-fg-color--light);
   white-space: nowrap;
 }
 
