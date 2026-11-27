@@ -53,6 +53,8 @@ component: RONL Business API
 
 ### Other attributes the view reads
 
+### Linked documents (werkwijze B and B+)
+
 ---
 
 ## Related pages

@@ -3,7 +3,7 @@
   "last_patch": {
     "date": "2026-11-27",
     "kind": "Component sync",
-    "summary": "CPRMV v2026.11.0, the first release with a release number: production runs 502a351 and reports release v2026.11.0 beside vocabulary version 0.4.3 on /health, the image is also tagged v2026.11.0, every release commits a CycloneDX bill of materials named after it, and /bump-release cuts a release through acc and main and pushes the specification to GitLab.",
+    "summary": "CPRMV v2026.11.0, the first release with a release number: production runs 502a351 and reports release v2026.11.0 beside vocabulary version 0.4.3 on /health, every release commits a CycloneDX bill of materials, and /bump-release cuts a release through acc and main. RONL Business API v2026.11.6 (7416c65): Infra-board tasks can ask for their B and B+ documents from the eDOCS projectmap and refuse completion without them, once the models that declare them are deployed; the Woo-dashboard signs in with the Flevoland account; the backend deploys only from CI.",
     "previous": {
       "date": "2026-11-26",
       "kind": "Component sync",
@@ -17,6 +17,10 @@
       {
         "label": "open-regels/cprmv#2",
         "url": "https://github.com/open-regels/cprmv/issues/2"
+      },
+      {
+        "label": "ronl-business-api#498",
+        "url": "https://github.com/sgort/ronl-business-api/issues/498"
       }
     ]
   },
@@ -24,16 +28,16 @@
     {
       "name": "RONL Business API",
       "icon": "⚙️",
-      "version": "v2026.11.5",
+      "version": "v2026.11.6",
       "environment": "prod",
-      "commit": "1784a72...",
-      "commit_date": "2026-11-18",
+      "commit": "7416c65...",
+      "commit_date": "2026-11-27",
       "build": {
-        "sha": "1784a72",
-        "run": 18,
-        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/44256987035"
+        "sha": "7416c65",
+        "run": 19,
+        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/46007617879"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/1784a723e03a57319c6c818bd9e71644f46af1c4",
+      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/7416c658f4df3a952ff53ae941c377abbb9637d1",
       "ci_repo": "https://github.com/sgort/ronl-business-api"
     },
     {

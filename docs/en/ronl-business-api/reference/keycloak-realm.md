@@ -111,7 +111,7 @@ Each of the two public clients carries its own `realm_roles`, `username` and `fu
 
 ## Identity provider: `entra-flevoland`
 
-An OIDC provider for Provincie Flevoland's Entra ID, configured by `scripts/keycloak-add-entra-idp.sh` rather than by the realm export, because it carries a client secret. Its mappers set `municipality = flevoland`, `organisation_type = province` and `assurance_level = substantieel`, and map the Entra app roles `IOU_ADMIN`, `IOU_USERS`, `IOU_PA` and `IOU_INFRA` to `admin`, `caseworker`, `public-affairs` and `infra-projectteam`, on every login. The provider is hidden on the Keycloak login form (`hideOnLogin`); Flevoland employees reach it through the landing page. It stores the Entra tokens it receives (`storeToken`, with `offline_access` in its default scope), so the backend can act in eDOCS as the person; the same script adds the `broker` client's `read-token` role to `default-roles-ronl` and the `broker-roles` client mapper to `ronl-business-api`. None of this is in the realm export. See [Entra ID](../developer/deployment/entra-id.md).
+An OIDC provider for Provincie Flevoland's Entra ID, configured by `scripts/keycloak-add-entra-idp.sh` rather than by the realm export, because it carries a client secret. Its mappers set `municipality = flevoland`, `organisation_type = province` and `assurance_level = substantieel`, and map the Entra app roles `IOU_ADMIN`, `IOU_USERS`, `IOU_PA`, `IOU_INFRA` and `IOU_WOO` to `admin`, `caseworker`, `public-affairs`, `infra-projectteam` and `woo-coordinatie`, on every login. The provider is hidden on the Keycloak login form (`hideOnLogin`); Flevoland employees reach it through the landing page. It stores the Entra tokens it receives (`storeToken`, with `offline_access` in its default scope), so the backend can act in eDOCS as the person; the same script adds the `broker` client's `read-token` role to `default-roles-ronl` and the `broker-roles` client mapper to `ronl-business-api`. None of this is in the realm export. See [Entra ID](../developer/deployment/entra-id.md).
 
 The export itself carries two SAML providers, `digid` (DigiD) and `eidas` (eIDAS), both disabled.
 
@@ -215,7 +215,7 @@ The candidate groups the RIP process models address their tasks to. A task list 
 
 ## Test users
 
-The export defines 29 test users, all with password `test123` and `assurance_level = hoog`. The `ronl-business-api` client allows direct access grants, so a test token can be requested with a username and password. The seven test citizens of `utrecht`, `amsterdam`, `heusden`, `bes`, `rotterdam`, `denhaag` and `flevoland` also carry the attribute `bsn = 999992235`; `test-citizen-uwv`, `-toeslagen` and `-unive` have none.
+The export defines 33 test users, all with password `test123` and `assurance_level = hoog`. The `ronl-business-api` client allows direct access grants, so a test token can be requested with a username and password. The seven test citizens of `utrecht`, `amsterdam`, `heusden`, `bes`, `rotterdam`, `denhaag` and `flevoland` also carry the attribute `bsn = 999992235`; `test-citizen-uwv`, `-toeslagen` and `-unive` have none.
 
 | Username | `municipality` | `organisation_type` | Realm roles |
 |---|---|---|---|
@@ -240,6 +240,10 @@ The export defines 29 test users, all with password `test123` and `assurance_lev
 | `test-indiener-flevoland` | `flevoland` | `province` | `caseworker`, `besluit-indiener` |
 | `test-besluit-flevoland` | `flevoland` | `province` | `caseworker`, `besluit-jurist`, `besluit-bestuursautoriteit`, `besluit-ondertekenaar`, `besluit-registratie` |
 | `test-infra-flevoland` | `flevoland` | `province` | `caseworker`, `infra-projectteam`, `infra-medewerker`, and all 34 `rip-*` roles |
+| `test-infra-pl-flevoland` | `flevoland` | `province` | `caseworker`, `infra-medewerker`, `infra-projectteam`, `rip-projectleider` |
+| `test-infra-po-flevoland` | `flevoland` | `province` | `caseworker`, `infra-medewerker`, `infra-projectteam`, `rip-projectondersteuner` |
+| `test-infra-ao-flevoland` | `flevoland` | `province` | `caseworker`, `infra-medewerker`, `infra-projectteam`, `rip-ao` |
+| `test-infra-aandrager-flevoland` | `flevoland` | `province` | `caseworker`, `infra-medewerker`, `infra-projectteam`, `rip-aandrager` |
 | `test-pa-flevoland` | `flevoland` | `province` | `public-affairs`, `pa-author`, `pa-editor`, `pa-admin` |
 | `test-woo-flevoland` | `flevoland` | `province` | `woo-coordinatie` |
 | `test-citizen-uwv` | `uwv` | `national` | `citizen` |
@@ -251,7 +255,7 @@ The export defines 29 test users, all with password `test123` and `assurance_lev
 
 `test-hr-denhaag` is the primary HR test account — it holds the `hr-medewerker` realm role and can start onboarding processes and view the Afgeronde onboardingen archive. `test-onboarded-denhaag` simulates an employee who has already been onboarded; logging in with this account triggers an auto-fetch of the completed onboarding record for `emp-test-01`.
 
-`test-hr-flevoland` is the Flevoland HR account for onboarding infrastructure employees, and also holds every role of the management capacity claim except `manager`; `test-mngr-flevoland` is the manager who starts a claim. `test-infra-flevoland` is a pre-configured infrastructure team member (`employeeId: EMP-FLV-001`) who can start and work through the RIP processes.
+`test-hr-flevoland` is the Flevoland HR account for onboarding infrastructure employees, and also holds every role of the management capacity claim except `manager`; `test-mngr-flevoland` is the manager who starts a claim. `test-infra-flevoland` is a pre-configured infrastructure team member (`employeeId: EMP-FLV-001`) who can start and work through the RIP processes. `test-infra-pl-flevoland`, `test-infra-po-flevoland`, `test-infra-ao-flevoland` and `test-infra-aandrager-flevoland` (`EMP-FLV-011` to `EMP-FLV-014`) each hold one RIP role — projectleider, projectondersteuner, AO and aandrager — for the document flow in the Infra-board's tasks. They were added to the export in v2026.11.6, and only to the export.
 
 For Besluitvorming onder gedelegeerde bevoegdheid, `test-indiener-flevoland` prepares a besluit and `test-besluit-flevoland` holds the four other lanes. `test-caseworker-flevoland`, the everyday Flevoland caseworker, can prepare a besluit too. Both besluit accounts have an e-mail address, which signing with ValidSign needs.
 

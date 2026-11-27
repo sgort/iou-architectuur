@@ -26,11 +26,13 @@ shapes, see [API Specification](../../reference/api-specification.md), under **D
 | --- | :---: | --- |
 | `GET /v1/edocs/status` | ✓ | Works — `reachable` and `authenticated` both confirmed |
 | `GET /v1/edocs/workspaces` | ✓ | Works — `200`, list returned |
-| `POST /v1/edocs/workspaces/ensure` — search branch | ✓ | Works — finds an existing workspace by `DOCNAME` filter |
+| `POST /v1/edocs/workspaces/ensure` — search branch | ✓ | Works since v2026.11.6 — the server ignores the `DOCNAME` filter, so the client pages through the list and matches the project number itself, see [Workspace search](#workspace-search-ignores-the-filter) |
 | `POST /v1/edocs/workspaces/ensure` — create branch | ✓ | **Broken** — server-side `500`, see [Workspace create fails](#workspace-create-fails) |
 | `POST /v1/edocs/documents` — standalone (no `workspaceId`) | ✓ | Works — see [Document upload fix](#document-upload-fix) |
 | `POST /v1/edocs/documents` — workspace-ref (`workspaceId` set) | ✓ | **Broken** — two different errors tried, neither works, see [Workspace-ref upload](#workspace-ref-upload-still-broken) |
-| `GET /v1/edocs/workspaces/:id/documents` | ✓ | Works (empty-list case) — see [Workspace-documents endpoint](#workspace-documents-endpoint-didnt-exist) — non-empty case not yet verified |
+| `GET /v1/edocs/workspaces/:id/documents` | ✓ | Works (empty-list case) — see [Workspace-documents endpoint](#workspace-documents-endpoint-didnt-exist); non-empty workspace content has since been observed through the Infra-board's routes, not through this one |
+| `POST /documents/{id}/references` (DM server, via the RIP upload) | ✓ | Works — files a standalone upload into a workspace (24 Nov 2026); the way the Infra-board gets an upload into the projectmap |
+| `GET /folders/{id}` (DM server, via `/v1/rip/instances/:id/workspace?folderId=`) | ✓ | Works — a folder's content as flat items, like a workspace's (23 Nov 2026) |
 | `GET /v1/edocs/documents/:id/profile` | ✓ | Works — `200` |
 | `GET /v1/edocs/documents/:id/versions` | ✓ | Works — see [Versions list parsing](#versions-list-parsing-was-wrong) |
 | `GET /v1/edocs/documents/:id/versions/:version` | ✓ | Works — only with the literal value `0`, see [Download](#download-wrong-shape-and-wrong-version-id) |
@@ -267,7 +269,19 @@ resolved, but does not currently work. The BPMN worker
 path — it's blocked until this is fixed. In practice the preceding
 `rip-edocs-workspace` task already fails first for any project needing a
 genuinely new workspace, since it hits the same `500` above — the process
-never reaches the document task in that case.
+never reaches the document task in that case. Since v2026.11.6 the R2.1
+model's *Aanmaken projectmap eDOCS* task uses the new `rip-edocs-projectmap`
+topic instead, which catches that failure, records it on the instance as
+`edocsWorkspaceError` and completes, so a project is not held in R2.1 by
+eDOCS — once that model, one of those that declare linked documents, is
+deployed.
+
+The Infra-board's linked-document upload, new in v2026.11.6, does not use
+the workspace-ref path: with `EDOCS_WORKSPACE_UPLOAD_ENABLED=false`, its
+default, it uploads standalone and then files the document into the
+workspace as a reference (`POST /documents/{id}/references`), which works.
+That upload applies once the RIP models that declare linked documents are
+deployed; they are not yet on ACC or production.
 
 ### Workspace-documents endpoint didn't exist
 
@@ -277,10 +291,13 @@ such sub-resource in the API — workspace content is retrieved from the
 workspace resource itself, `GET /workspaces/{id}`. Fixed, along with the same
 flat-list-item parsing fix as the workspace-search bug above.
 
-Only the empty-list case has been confirmed live (no document has
-successfully landed *inside* a workspace, since the ref-upload path above
-doesn't work) — the non-empty shape is inferred from the same confirmed flat
-pattern used elsewhere, not yet directly observed.
+Only the empty-list case has been confirmed live through this route. A
+non-empty workspace has since been read on the test library through the
+Infra-board's routes (23 November 2026), which use a separate
+`listContents` — folders as `type: "folders"`, documents as
+`type: "documents"` with `VS.VERSION_LABEL`, `LAST_EDIT_DATE` and the
+author — while this route still calls `getWorkspaceDocuments`; its own
+non-empty shape is inferred, not directly observed.
 
 ### Versions list parsing was wrong
 
@@ -328,17 +345,22 @@ the backend the refusal surfaces as `502 EDOCS_ERROR`.
 same account — so the restriction is specific to document delete, not a
 blanket delete restriction.
 
-### Possible workspace-search filter issue (unconfirmed)
+### Workspace search ignores the filter
 
-In one run, `PROJECT_NUMBER` was left at its default (a fresh
-`SMOKE-<timestamp>`, not any workspace used before), yet
-`ensureWorkspace()`'s search still returned `created: false` for an unrelated,
-differently-named workspace. A `DOCNAME like 'SMOKE-<timestamp>%'` filter
-should not match a `DOCNAME` that doesn't start with that prefix. Not yet
-root-caused — could be the DM server not honoring/parsing the `filter` query
-param, or something in how the client builds/encodes it. Worth checking
-before relying on `ensureWorkspace()`'s "found existing" result for anything
-that matters.
+Confirmed on the test library on 24 November 2026: the DM server ignores the
+`filter` parameter on `GET /workspaces`. Every filter, also one matching
+nothing, returned all four workspaces, and the response echoed an empty
+filter. The search sent `DOCNAME like 'P-1%'` with `max 1`, so it returned the
+first workspace for every project — the unrelated match seen earlier, when a
+fresh `SMOKE-<timestamp>` project number still found an existing workspace,
+was this.
+
+Since v2026.11.6 the client pages through the list (200 per page, at most
+50 pages) and matches itself: a workspace whose name is the project number
+wins, otherwise the first whose name starts with it followed by a space or a
+dash, so `P-1` never matches `P-10`. Reading the whole list on each lookup is
+the cost, tracked in
+[#487](https://github.com/sgort/ronl-business-api/issues/487).
 
 ---
 

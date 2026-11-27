@@ -73,18 +73,20 @@ Every error is [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem detail
 |---|---|
 | `POST /v1/process/{key}/start` failing with `PROCESS_START_FAILED` | `details` (the engine's own message) and `engine` (the Operaton base URL the start was sent to) |
 | A task completion, or a machine-to-machine start, refused with `RESERVED_VARIABLE` | `reserved` (the variable names refused) |
+| A task completion refused with `LINKED_DOCUMENT_MISSING` | `missing` (each item still needed, as `{ slug, what, label }`) |
 | `GET /v1/health` and `GET /v1/health/ready` answering `503` | `data` (the full health or readiness report) |
 
 Successful responses keep their own shapes, described under [Response shapes](#response-shapes). The HTTP status matches the failure:
 
 | Status | Meaning | Codes include |
 |---|---|---|
-| `400` | A malformed request, a body that does not parse, or a task completion (or machine-to-machine start) that sets a variable fixed at process start | `VALIDATION_ERROR`, `MALFORMED_BODY`, `INVALID_BODY`, `RESERVED_VARIABLE` |
+| `400` | A malformed request, a body that does not parse, or a task completion (or machine-to-machine start) that sets a variable fixed at process start | `VALIDATION_ERROR`, `MALFORMED_BODY`, `INVALID_BODY`, `RESERVED_VARIABLE`, `INVALID_REQUEST`, `EMPTY_FILE` |
 | `401` | A missing or invalid token, or a person whose eDOCS session can no longer be renewed and must sign in again | `MISSING_TOKEN`, `INVALID_TOKEN`, `UNAUTHORIZED`, `EDOCS_REAUTH_REQUIRED` |
-| `403` | A role, tenant, assurance-level, starter-group or machine-client check that failed, a process not offered to citizens, a BRP lookup the caller may not make, or eDOCS that cannot be reached as the person or refuses them | `FORBIDDEN`, `TENANT_MISMATCH`, `MISSING_TENANT`, `INSUFFICIENT_ASSURANCE`, `NOT_CANDIDATE_STARTER`, `PROCESS_NOT_OFFERED`, `BSN_CLAIM_MISSING`, `BRP_SUBJECT_MISMATCH`, `M2M_CLIENT_NOT_ALLOWED`, `EDOCS_CLIENT_NOT_ALLOWED`, `EDOCS_USER_TOKEN_UNAVAILABLE`, `EDOCS_ACCESS_DENIED` |
-| `404` | A resource that does not exist or is not visible to the caller | resource-specific `*_NOT_FOUND`, `NOT_FOUND` |
-| `409` | A process start whose key several other organisations deploy, or a signature request that conflicts with what exists | `AMBIGUOUS_DEPLOYMENT`, `VALIDSIGN_PACKAGE_EXISTS`, `SIGNER_IS_SENDER` |
-| `413` | A request body over the size limit | `PAYLOAD_TOO_LARGE` |
+| `403` | A role, tenant, assurance-level, starter-group or machine-client check that failed, a process not offered to citizens, a BRP lookup the caller may not make, eDOCS that cannot be reached as the person or refuses them, or a document link by someone not among the task's candidates | `FORBIDDEN`, `TENANT_MISMATCH`, `MISSING_TENANT`, `INSUFFICIENT_ASSURANCE`, `NOT_CANDIDATE_STARTER`, `PROCESS_NOT_OFFERED`, `BSN_CLAIM_MISSING`, `BRP_SUBJECT_MISMATCH`, `M2M_CLIENT_NOT_ALLOWED`, `EDOCS_CLIENT_NOT_ALLOWED`, `EDOCS_USER_TOKEN_UNAVAILABLE`, `EDOCS_ACCESS_DENIED`, `NOT_CANDIDATE` |
+| `404` | A resource that does not exist or is not visible to the caller | resource-specific `*_NOT_FOUND`, `NOT_FOUND`, `UNKNOWN_DOCUMENT` |
+| `409` | A process start whose key several other organisations deploy, a signature request that conflicts with what exists, or a document link the case is not ready for | `AMBIGUOUS_DEPLOYMENT`, `VALIDSIGN_PACKAGE_EXISTS`, `SIGNER_IS_SENDER`, `NO_PROJECT_WORKSPACE`, `DOCUMENT_TASK_NOT_OPEN`, `MAP_UPLOAD_UNSUPPORTED` |
+| `413` | A request body, or an uploaded file, over the size limit | `PAYLOAD_TOO_LARGE`, `FILE_TOO_LARGE` |
+| `422` | A well-formed request the case cannot accept: a task completion missing its linked documents, a document that is not in the case's workspace or of the wrong kind, or a signer without an e-mail address | `LINKED_DOCUMENT_MISSING`, `DOCUMENT_NOT_IN_WORKSPACE`, `MAP_EXPECTED`, `DOCUMENT_EXPECTED`, `MISSING_SIGNER_EMAIL` |
 | `429` | A rate limit | `RATE_LIMIT_EXCEEDED` |
 | `500` | Anything unexpected | `INTERNAL_ERROR` and operation-specific `*_FAILED` codes |
 | `502` | A fault in an upstream system, such as eDOCS or Doccle, or an upstream that could not be reached at all | `EDOCS_ERROR`, `DOCCLE_ERROR`, `BRP_UPSTREAM_UNREACHABLE` |

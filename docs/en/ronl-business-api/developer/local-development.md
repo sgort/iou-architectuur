@@ -192,7 +192,7 @@ the digests current (`docker:pinDigests` in `renovate.json`).
 |---|---|---|---|---|
 | `keycloak` | `ronl-keycloak` | `quay.io/keycloak/keycloak:23.0` | 8080 | Its database is the `keycloak` DB in Postgres |
 | `postgres` | `ronl-postgres` | `postgres:16-alpine` | 5432 | Volume `postgres-data` |
-| `operaton-init` | `ronl-operaton-init` | `alpine:3.24.3` | — | Runs once and exits |
+| `operaton-init` | `ronl-operaton-init` | `alpine:3.24.4` | — | Runs once and exits |
 | `operaton` | `ronl-operaton` | `operaton/operaton:2.1.5` | 8081 → 8080 | Volume `operaton-data` |
 | `operaton-accounts` | `ronl-operaton-accounts` | `curlimages/curl:8.23.0` | — | Runs once on every up and exits |
 | `redis` | `ronl-redis` | `redis:7.2-alpine` | 6379 | Volume `redis-data`, append-only file on |
@@ -361,7 +361,7 @@ To run a single server, use its root script: `npm run dev:backend`,
 
 ## Test users
 
-`config/keycloak/ronl-realm.json` defines **29 users**, all with password
+`config/keycloak/ronl-realm.json` defines **33 users**, all with password
 **`test123`** and assurance level `hoog`. The `municipality` attribute is the
 user's tenant.
 
@@ -388,6 +388,10 @@ user's tenant.
 | flevoland | `test-hr-flevoland` | caseworker, hr-medewerker, board-secretary, board-director, hrm-unit, procurement-unit, planning-control-officer, financial-controller, hr-business-partner, personnel-controller |
 | flevoland | `test-mngr-flevoland` | caseworker, manager |
 | flevoland | `test-infra-flevoland` | caseworker, infra-projectteam, infra-medewerker, and the RIP project roles (`rip-*`) |
+| flevoland | `test-infra-pl-flevoland` | caseworker, infra-medewerker, infra-projectteam, rip-projectleider |
+| flevoland | `test-infra-po-flevoland` | caseworker, infra-medewerker, infra-projectteam, rip-projectondersteuner |
+| flevoland | `test-infra-ao-flevoland` | caseworker, infra-medewerker, infra-projectteam, rip-ao |
+| flevoland | `test-infra-aandrager-flevoland` | caseworker, infra-medewerker, infra-projectteam, rip-aandrager |
 | flevoland | `test-pa-flevoland` | public-affairs, pa-author, pa-editor, pa-admin |
 | flevoland | `test-woo-flevoland` | woo-coordinatie |
 | uwv | `test-citizen-uwv` | citizen |
@@ -408,6 +412,15 @@ stack](#the-docker-stack)). To sign in as them, reset the volumes
 (`npm run docker:down:volumes && npm run docker:up`, which also clears the audit
 database and the Operaton deployments) or add the two users in the admin
 console.
+
+The four `test-infra-*-flevoland` accounts with one RIP role each (`EMP-FLV-011` to `EMP-FLV-014`) were
+added in v2026.11.6 for the Infra-board's document flow, so a task can be worked as the role its lane
+names rather than as `test-infra-flevoland`, who holds all of them. Their roles cover only some of the
+document tasks: R2.1's PSU step and R2.4's ILS and V&G collection are the projectleider's, and R2.2's
+*Bespreken concept VO* is open to the aandrager; the other R2.2 and R2.3 document tasks need roles such as
+`rip-ontwerper`, `rip-team`, `rip-kostenadviseur` and `rip-kosten-contractdeskundige`, which of the test
+accounts only `test-infra-flevoland` holds. They are in the export only;
+the same applies — reset the volumes or add them by hand.
 
 The Keycloak admin console is at `http://localhost:8080` with `admin`/`admin`.
 

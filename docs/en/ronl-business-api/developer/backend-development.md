@@ -53,10 +53,12 @@ packages/backend/
     │   └── tenant-access.ts      # Every tenant decision for process and task access
     ├── pa-monitoring/            # Policy analysis: /v1/pa routers, sources, curation
     ├── media-aggregator/         # /v1/media-aggregator
-    ├── rip-swimlane/             # BPMN swimlane parsing: Infra-board phases and any laned process
+    ├── rip-swimlane/             # BPMN swimlane parsing: Infra-board phases and any laned process;
+    │                             #   linked-docs.ts and document-spec.ts read the B/B+ document attributes
     │   └── __fixtures__/         # RIP processes; awb/ (Awb-phase processes); declared/ (processes that declare their own phases)
     ├── mcp-servers/              # eDOCS, LDE and TriplyDB MCP servers
-    ├── services/                 # Operaton, audit, eDOCS, ValidSign, Doccle, brp-upstream, … plus llm/, mcp/, document/
+    ├── services/                 # Operaton, audit, eDOCS, ValidSign, Doccle, brp-upstream, … plus llm/, mcp/, document/,
+    │                             #   rip-documents/ (Infra-board linked documents: listing, link, upload, the completion check)
     ├── types/                    # audit.types.ts, auth.types.ts
     └── utils/                    # config, cors-origin, client-ip, logger, errors, problem (sendProblem),
                                   #   operaton-variables, starter-groups, …
@@ -73,7 +75,7 @@ Middleware is registered in this order in `src/index.ts`:
 1. `helmet()` — security headers (CSP, HSTS), only when `config.security.helmetEnabled`
 2. `cors()` — `origin` is `corsOriginCallback(...)`; see [CORS](#cors)
 3. `rateLimit()` — one global limiter, skipped for the ValidSign callback path, which has its own; its 429 is `rateLimitHandler` from `error.middleware.ts`
-4. `express.json({ limit: '1mb' })` — wrapped so the ValidSign callback path skips it and parses its own body
+4. `express.json({ limit: '1mb' })` — wrapped so the ValidSign callback path and the RIP linked-document upload (`/v1/rip/instances/:id/documents/:slug/upload`, `isLinkedUploadPath()`) skip it and parse their own body; the upload's limit follows `EDOCS_LINKED_UPLOAD_MAX_MB`
 5. `express.urlencoded({ limit: '1mb' })`
 6. Request logging — method, path, query, IP, user agent
 7. `API-Version` header — set by an inline handler and again by `versionMiddleware`; both write `package.json`'s version, so the duplicate is harmless
@@ -159,18 +161,24 @@ Either connect yields the `X-DM-DST` session token (and `X-DM-CSRF-TOKEN`) from 
 
 ```typescript
 ensureWorkspace(projectNumber: string, projectName: string): Promise<EdocsWorkspaceResult>
-uploadDocument(workspaceId: string, filename: string, contentBase64: string, metadata: EdocsDocumentMetadata): Promise<EdocsDocumentResult>
+uploadDocument(workspaceId: string | null, filename: string, contentBase64: string, metadata: EdocsDocumentMetadata): Promise<EdocsDocumentResult>
 getWorkspaceDocuments(workspaceId: string): Promise<...>
+findWorkspace(projectNumber: string): Promise<{ workspaceId: string; workspaceName: string } | null>
+listContents(kind: 'workspace' | 'folder', id: string): Promise<EdocsContainerItem[]>
+addReference(documentId: string, workspaceId: string, workspaceName: string): Promise<void>
 healthCheck(): Promise<{ status: 'up' | 'down' | 'stub'; reachable: boolean; authenticated: boolean; latency?: number; error?: string }>
 ```
 
+The workspace search behind `findWorkspace` and `ensureWorkspace` pages through `GET /workspaces` (200 per page, at most 50 pages) and matches the project number itself — an exact name first, otherwise the first name that starts with it followed by a space or a dash — because the DM server ignores `filter` ([#487](https://github.com/sgort/ronl-business-api/issues/487) tracks the cost of reading the whole list). `addReference` files an existing document into a workspace (`POST /documents/{id}/references`); the Infra-board's linked-document upload uses it after a standalone upload, since uploading straight into a workspace is still refused.
+
 When `EDOCS_STUB_MODE=true` (the default), all methods return realistic fake data and log what they would have done. The stub is transparent — callers cannot distinguish it from a live server.
 
-`externalTaskWorker.service.ts` polls Operaton's external task API (`POST /external-task/fetchAndLock`) using long-polling (`asyncResponseTimeout: 20 000 ms`). Every call — fetch-and-lock, complete and failure — carries `OPERATON_USERNAME` / `OPERATON_PASSWORD` as basic auth (`operatonBasicAuth()` in `utils/operaton-auth.ts`), because the engine requires a login since v2026.11.1. It handles three topics:
+`externalTaskWorker.service.ts` polls Operaton's external task API (`POST /external-task/fetchAndLock`) using long-polling (`asyncResponseTimeout: 20 000 ms`). Every call — fetch-and-lock, complete and failure — carries `OPERATON_USERNAME` / `OPERATON_PASSWORD` as basic auth (`operatonBasicAuth()` in `utils/operaton-auth.ts`), because the engine requires a login since v2026.11.1. It handles four topics:
 
 | Topic | Reads | Writes |
 |---|---|---|
 | `rip-edocs-workspace` | `projectNumber`, `projectName` | `edocsWorkspaceId`, `edocsWorkspaceName`, `edocsWorkspaceCreated` |
+| `rip-edocs-projectmap` (R2.1 *Aanmaken projectmap eDOCS*) | `projectNumber`, `projectName` | `edocsWorkspaceId` (`''` when there is none), `edocsWorkspaceName`, `edocsWorkspaceCreated`, and `edocsWorkspaceError` on failure — it never fails the task |
 | `rip-relatics-workspace` (simulated — no Relatics integration yet) | `projectNumber`, `projectName` | `relaticsWorkspaceId`, `relaticsWorkspaceName`, `relaticsWorkspaceCreated`, `relaticsWorkspaceSimulated` |
 | `rip-edocs-document` | `edocsWorkspaceId`, `edocsAuthor`, `edocsAuthorName`, `documentTemplateId`, `edocsDocumentVariableName`, + template variables | `<edocsDocumentVariableName>` (e.g. `edocsIntakeReportId`) and `<edocsDocumentVariableName>_docId` |
 

@@ -715,7 +715,7 @@ wrong:
   on both App Services — measured on the resources rather than assumed
   (`basicPublishingCredentialsPolicies/scm` `allow=false`) — so a
   publish-profile deploy would be rejected outright. The workflow does what the
-  hand-run scripts already did, `az webapp deploy` over an ARM token, with a
+  hand-run scripts did (retired in v2026.11.6), `az webapp deploy` over an ARM token, with a
   machine identity instead of a human session. That removes the failure that
   once stopped a release reaching acceptance: an expired `az login`, discovered
   after the merge. The acceptance and production identities are separate and
@@ -903,10 +903,9 @@ unrelated pull request.
 
 !!! note "A `package.json`-only change still triggers the backend build"
     `packages/backend/**` matches `package.json`, so adding a script or bumping
-    `engines` fires a full backend build even though no source changed. Since the
-    habit is to run the deploy script whenever that workflow fires, this invites
-    a deploy of byte-identical code. The question to ask is not *did the workflow
-    run* but:
+    `engines` fires a full backend build even though no source changed, and on a
+    push to `acc` or `main` that build deploys byte-identical code. The question to
+    ask is not *did the workflow run* but:
 
     ```bash
     git diff --name-only <last-deployed-sha>..HEAD -- packages/backend/src packages/shared/src
@@ -1197,11 +1196,11 @@ four `changes` jobs that look up a pull request's changed files, and
 **Backend** — `workflow_dispatch` `azure-backend-prod.yml` from the Actions tab
 against the previous commit; it deploys the backend alone. Or use the Azure
 Portal: App Service → Deployment Center → select a previous deployment →
-*Redeploy*. The hand-run `deploy-backend-to-{acc,prod}.sh` scripts still exist
-as a break-glass path, but they resolve dependencies on a developer machine
-against semver ranges with no lockfile — which is why the
-[supply-chain register](../../contributing/supply-chain.md) keeps them as a
-named exception rather than treating the workflow as having closed it.
+*Redeploy*. There is no hand-run path any more: the break-glass
+`deploy-backend-to-{acc,prod}.sh` scripts, which resolved dependencies on a
+developer machine against semver ranges with no lockfile, were retired in
+v2026.11.6, closing the exception the repository's supply-chain register had
+kept open for them.
 
 **Static sites** — Azure Static Web Apps keeps deployment history. Azure Portal:
 Static Web App → Environments → select a previous deployment → *Promote*.

@@ -15,11 +15,13 @@ reassurance.
 
 ## Frontend
 
-Measured on **18 November 2026** at `be0a1f0`, a tree identical to `main` at
-`1784a72` (v2026.11.5 plus hot fix #473): the frontend package ran 144 files
-and 1787 tests, all passing, every per-file count on this page the same as on
-7, 12 and 14 November, and the counts
-below are read from Vitest's JSON report of that run. Every count is the same as on 30 September and 3 and 9 October. The
+Measured on **27 November 2026** at `aa68931`, a tree identical to `main` at
+`7416c65` (v2026.11.6): the frontend package ran 147 files and 1862 tests, all
+passing, every per-file count on this page the same as on 7, 12, 14 and
+18 November, and the counts below are read from Vitest's JSON report of that
+run. v2026.11.6 edited one test file here without changing its count:
+`WooNoAccessPanel.test.tsx` gained an assertion for the `IOU_WOO` role, the
+Entra role the Woo board now has, and still holds one test. Every count is the same as on 30 September and 3 and 9 October. The
 releases since touched this board's source only to move its colours onto the
 shared tokens (`charts.tsx`, `WooNoAccessPanel.tsx`, `dashboard-woo.css`); no
 test changed.
@@ -51,7 +53,7 @@ test changed.
 `woo.data.test.ts` (+4) and `WooDashboard.test.tsx` (+3) grew in v2026.09.15's
 branch-margin work; the other counts are as they were on 28 September.
 
-Coverage on 9 October, as on 30 September and 3 October: `components/WooDashboard`
+Coverage on 27 November, as on 30 September and 3 and 9 October: `components/WooDashboard`
 **98.26 / 94.78 / 98.52 / 98.57** and `pages/woo` **99.13 / 100 / 100 / 99** —
 the latter up from 96.55 / 84.12 / 94.44 / 98.01.
 

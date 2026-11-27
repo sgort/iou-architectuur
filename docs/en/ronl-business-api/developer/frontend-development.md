@@ -75,6 +75,9 @@ packages/frontend/src/
 │   │                              #   Profiel, Rollen, …) and TaskFormViewer.tsx
 │   ├── InfraBoardDashboard/       # Infra-board sections: Portfolio, ProjectDetail, PhaseDetail,
 │   │                              #   MijnDag, FaseladderOverview, router, dock
+│   ├── rip-documents/             # Infra-board linked documents, shared by the Infra-board and the
+│   │                              #   Taken inbox: TaskCompletion, TaskDocuments, DocumentsPanel,
+│   │                              #   model, rip-documents.css
 │   ├── signing/                   # ValidSign signing, shared by every task view: SigningPanel,
 │   │                              #   useTaskSignature, resolveSigningUrl, signing-panel.css
 │   ├── WooDashboard/              # Woo sections: Overzicht, Verzoeken, Proces, Publicatie,
@@ -149,7 +152,7 @@ The single-board tenants today are Gemeente Amsterdam, Gemeente Heusden, Caribis
 | **Inwoner? Log in met DigiD** (`citizen-link`) | `startIdpLogin('digid', 'test-citizen-flevoland')` | Hints DigiD, with a test-user login hint |
 | Top-bar **Inloggen** (`login-link`) | `startMedewerkerLogin(undefined, 'test-caseworker-flevoland')` | Keycloak's own form with the test user pre-filled; no board target |
 | A board card's **Openen** | `startMedewerkerLogin(route, testUser)` | As above with the board's test user, plus a stored redirect to that board |
-| A board card's **Flevoland-account** (Caseworker, PA-Cockpit, Infra-board — every board with an `entraRole` in `boards.config.ts`; not Woo) | `startEntraBoardLogin(route)` | Entra ID, plus a stored redirect to that board |
+| A board card's **Flevoland-account** (every board with an `entraRole` in `boards.config.ts` — all four since v2026.11.6) | `startEntraBoardLogin(route)` | Entra ID, plus a stored redirect to that board |
 
 All four cards show before sign-in; the grid does not filter by role. `FLEVOLAND_IDP` is `'entra-flevoland'`, exported from `services/identity-providers.ts` so the landing page can name the provider without importing `keycloak-js`. The alias must match the provider `scripts/keycloak-add-entra-idp.sh` creates and the redirect URI registered in Flevoland's Entra app registration — renaming it means changing all three. **Bekijk de borden** beside the hero button is a secondary anchor to `#boards`; it starts no login.
 
@@ -177,9 +180,9 @@ function startIdpLogin(idp: LandingIdp, usernameHint?: string) {
 
 The selected value is stored in `sessionStorage` under the key `selected_idp` and read by `AuthCallback.tsx`. `'eherkenning'` and `'eidas'` remain in the `LandingIdp` union but no control emits them today: the realm export defines `digid` and `eidas` as disabled SAML providers and no eHerkenning provider at all.
 
-**A board chosen on a landing page** is remembered twice: `post_login_redirect` says where to go, and `login_board_request` (`services/board-request.ts`) records that the person picked that board on this landing page. When the login grants the board's role, `navigateAfterLogin()` opens the board. When it does not, a redirect stored by a dashboard just falls back to the role's own dashboard, but a board picked on a landing page sends the person back to that page with an `AccessDeniedState` in router state, and `AccessDeniedDialog` explains the refusal: **Geen toegang tot &lt;bord&gt;**, the signed-in name, the missing role, for boards with an Entra role the app role to ask for (`IOU_USERS`, `IOU_PA`, `IOU_INFRA`), and the buttons **Naar mijn dashboard** (only when the account has a staff dashboard) and **Uitloggen**. Closing it drops the router state, so a refresh or Back does not bring it back.
+**A board chosen on a landing page** is remembered twice: `post_login_redirect` says where to go, and `login_board_request` (`services/board-request.ts`) records that the person picked that board on this landing page. When the login grants the board's role, `navigateAfterLogin()` opens the board. When it does not, a redirect stored by a dashboard just falls back to the role's own dashboard, but a board picked on a landing page sends the person back to that page with an `AccessDeniedState` in router state, and `AccessDeniedDialog` explains the refusal: **Geen toegang tot &lt;bord&gt;**, the signed-in name, the missing role, for boards with an Entra role the app role to ask for (`IOU_USERS`, `IOU_PA`, `IOU_INFRA`, `IOU_WOO`), and the buttons **Naar mijn dashboard** (only when the account has a staff dashboard) and **Uitloggen**. Closing it drops the router state, so a refresh or Back does not bring it back.
 
-**Logging out** of the Caseworker and citizen dashboards, or from the session-expiry warning, returns to the person's own landing page: they pass `landingUrl(user.municipality)` from `services/landing.ts` as Keycloak's `redirectUri`, so an Amsterdam caseworker lands on `/amsterdam`. A tenant without a page of its own, such as Flevoland, is sent on to `/`. The PA-Cockpit, Infra-board and Woo boards log out to `/`; **Uitloggen** in the no-access dialog returns to the landing page it was shown on.
+**Logging out** of the Caseworker and citizen dashboards, or from the session-expiry warning, returns to the person's own landing page: they pass `landingUrl(user.municipality)` from `services/landing.ts` as Keycloak's `redirectUri`, so an Amsterdam caseworker lands on `/amsterdam`. A tenant without a page of its own, such as Flevoland, is sent on to `/`. The PA-Cockpit, Infra-board and Woo boards log out to `/`; **Uitloggen** in the no-access dialog returns to the landing page it was shown on. It calls `logoutTo(redirectUri)` (`services/keycloak.ts`), and closes the dialog first so the round trip cannot land on it again. The dialog lives in router state, which survives a reload while the landing page never initialises `keycloak-js`, and `keycloak.logout()` throws without that adapter; so when `keycloak-js` holds no session, `logoutTo()` sends the browser to Keycloak's end-session endpoint itself, with `client_id` and `post_logout_redirect_uri`. Without an ID token, Keycloak asks the person to confirm the logout.
 
 **2. Authentication Callback (`/auth` — `AuthCallback.tsx`)**
 
@@ -607,10 +610,16 @@ Renders the form for a claimed task in the caseworker dashboard.
 | `variables` | `Record<string, unknown> \| null` | Process variables for pre-population |
 | `onCompleted` | `() => void` | Called after successful task completion |
 | `onError` | `() => void` | Called on API or form error |
+| `extraVariables` | `Record<string, unknown>` | Optional. Sent with the completion on top of the form's own data — linked-document figures, the kredietcheck |
+| `blockedText` | `string \| null` | Optional. What is still needed before the task may close; submitting is refused while it is set |
+| `onFormData` | `(data: Record<string, unknown>) => void` | Optional. The form's current values, on load and on every change |
+| `onMissing` | `(missing: MissingItem[]) => void` | Optional. Called with the list when the server refuses with `422 LINKED_DOCUMENT_MISSING` |
 
 On mount: calls `businessApi.task.formSchema(taskId)` to fetch the task's form and imports it with `variables` as its data. On submit: calls `businessApi.task.complete(taskId, data)`, then `onCompleted` or `onError`. When the task has no form — an unsuccessful answer, or a 404 or 415 from the API — it sets `status = 'no-form'` and renders a plain **Taak voltooien** button that completes the task with no variables. On unmount, calls `form.destroy()` to release the `@bpmn-io/form-js` instance.
 
-A task view asks `useTaskSignature(taskId)` (`components/signing/`) first, and renders `TaskFormViewer` only when the task needs no signature. While the answer is out it shows *Ondertekening controleren…* rather than either, because the form would let a signature task be approved without signing; a task whose BPMN carries `ronl:signatureRef` gets `SigningPanel` instead, and a failed lookup falls back to the form. The Taken inbox and the Infra-board's `ProjectDetail` both work this way — see [ValidSign signing](validsign-signing.md).
+The Taken inbox and the Infra-board's `ProjectDetail` no longer render it directly: they render `TaskCompletion` (`components/rip-documents/`), which puts *Documenten bij deze taak* above the form, passes what is still missing as `blockedText` and the figures and kredietcheck as `extraVariables`, and shows the server's `422 LINKED_DOCUMENT_MISSING` list through `onMissing`. It does so for every task: the inbox asks `GET /v1/rip/instances/{id}/documents` for any claimed task, and the block stays empty for a task whose model declares no linked documents.
+
+A task view asks `useTaskSignature(taskId)` (`components/signing/`) first, and renders `TaskCompletion` only when the task needs no signature. While the answer is out it shows *Ondertekening controleren…* rather than either, because the form would let a signature task be approved without signing; a task whose BPMN carries `ronl:signatureRef` gets `SigningPanel` instead, and a failed lookup falls back to the form. The Taken inbox and the Infra-board's `ProjectDetail` both work this way — see [ValidSign signing](validsign-signing.md).
 
 ### `DecisionViewer`
 
@@ -836,7 +845,7 @@ A process whose own start event has a `camunda:formRef` or a `camunda:formKey` o
 
 ## Styling guidelines
 
-**Colours come from the shared tokens.** `packages/shared/styles/tokens.css` holds one `:root` block of `--rba-*` tokens — Flevoland's fixed brand colours, the themed brand chained to the tenant's `--color-primary`, neutrals, and status colours by role (`--rba-ok-*`, `--rba-warn-*`, `--rba-bad-*`) — and the caseworker app, PA-Cockpit and pa-demo load it. Flevoland IT's own token file sits in `packages/shared/styles/flevoland/`. Since v2026.11.0 the stylesheets and inline styles hold no neutral, brand or status hex value: the 22 left in the stylesheets are data and category colours, each listed with its reason, and three tests guard it:
+**Colours come from the shared tokens.** `packages/shared/styles/tokens.css` holds one `:root` block of `--rba-*` tokens — Flevoland's fixed brand colours, the themed brand chained to the tenant's `--color-primary`, neutrals, status colours by role (`--rba-ok-*`, `--rba-warn-*`, `--rba-bad-*`), and the Infra-board's document chips by werkwijze (`--rba-doc-a`, `--rba-doc-b`, `--rba-doc-bp`, each with a `-bg` tint) — and the caseworker app, PA-Cockpit and pa-demo load it. Flevoland IT's own token file sits in `packages/shared/styles/flevoland/`. Since v2026.11.0 the stylesheets and inline styles hold no neutral, brand or status hex value: the 22 left in the stylesheets are data and category colours, each listed with its reason, and three tests guard it:
 
 | Test | Fails when |
 |---|---|

@@ -221,8 +221,50 @@ A process that does not follow the Awb declares its phases on `<bpmn:process>` a
 | `callActivity` with `calledElement` | A subprocess step; the view can open the called process |
 | `camunda:formRef` | The form a step uses, per node |
 | `ronl:documentRef` | The documents a step produces; a comma-separated list for several |
+| `ronl:linkedDocumentRef` | Documents a step links rather than generates; carried as `linkedDocs` on the node, not drawn as badges (see below) |
 
 Only the first `<bpmn:process>` in a file is read, and only these flow-node types become nodes: start, end and intermediate events, user, manual, receive, script, business-rule, service and send tasks, call activities, subprocesses, and exclusive, inclusive, event-based and parallel gateways.
+
+### Linked documents (werkwijze B and B+)
+
+`ronl:documentRef` names documents the platform **generates** from a template (werkwijze A). A user task
+can also name documents it does **not** generate but must have before it completes — kept in eDOCS and
+linked (B), with key figures (B+), or a folder that must hold given documents. Four attributes, all on
+the `<bpmn:userTask>`:
+
+| Attribute | Grammar | Meaning |
+|---|---|---|
+| `ronl:linkedDocumentRef` | `<slug>:<format>[:optional][:map]`, comma-separated | A document to link. `<format>` is the eDOCS format (template) number; `optional` makes it required only under a condition; `map` makes the link a folder |
+| `ronl:documentFigures` | `<slug>=<fig>,<fig>`, `;` between slugs | Key figures to enter for a linked document; stored as `Long` in `<base>_<fig>` |
+| `ronl:documentChecklist` | `<slug>=<item>\|<item>`, `;` between slugs | Documents a linked folder must contain, matched by name |
+| `ronl:kredietCheck` | `<variable>:<slug>` | The gateway variable the task answers, *binnen* or *buiten* the projectkrediet, suggested from that document's `totaal` |
+
+For example, R2.4's *Opstellen Projectraming DO*:
+
+```xml
+<bpmn:userTask id="…" name="Opstellen Projectraming DO"
+  camunda:candidateGroups="rip-kosten-contractdeskundige"
+  ronl:linkedDocumentRef="rip-projectraming-do:2591295"
+  ronl:documentFigures="rip-projectraming-do=totaal,onvoorzien,prijspeil"
+  ronl:kredietCheck="ramingBinnenKrediet:rip-projectraming-do">
+```
+
+The Infra-board's R2.1–R2.4 models
+([linked-data-explorer#362](https://github.com/sgort/linked-data-explorer/pull/362)) are the first to
+carry these attributes; they are not yet deployed on the ACC or the production process engines.
+
+- **A malformed entry is dropped without a warning**, like an unknown phase marker: a slug must match
+  `[a-z0-9][a-z0-9-]*`, a figure list needs `=`, and a `kredietCheck` variable must be a valid identifier.
+- **The completion is checked against these.** `POST /v1/task/{id}/complete` refuses with
+  `422 LINKED_DOCUMENT_MISSING` while a non-optional document, a figure, a checklist item, or the credit
+  check's answer (or its reason, when it deviates from the suggestion) is missing. See
+  [Tasks — Completing](../features/tasks.md#completing).
+- **Who may link** is the task's `camunda:candidateGroups`: only a caller holding one of them, while the
+  task is open. A task with no candidate groups cannot have its documents linked by anyone.
+- The link is stored as `linkedDoc_<slug>` (JSON) and `linkedDocNumber_<slug>` (the eDOCS number, for
+  templates to bind); a completion cannot set either.
+- **Not drawn on the node.** The swimlane model carries these as `linkedDocs` beside `docs`, but the view
+  draws badges for `docs` only.
 
 ---
 

@@ -14,7 +14,7 @@ The landing page's primary button, **Inloggen met uw Flevoland-account**, sends 
 
 After sign-in the employee lands on the dashboard for their role.
 
-The Caseworker, PA-Cockpit and Infra-board cards on the landing page each carry a **Flevoland-account** button beside **Openen**, which signs in through Entra ID and keeps that board as the target; the Woo card has none, because no Entra app role exists for it. When the signed-in role does not open the chosen board, the employee returns to the landing page with a dialog, **Geen toegang tot <bord>**, that names their account, the missing role and the Entra app role to ask their functional administrator for (`IOU_USERS`, `IOU_PA` or `IOU_INFRA`), with **Naar mijn dashboard** and **Uitloggen**.
+Every board card on the landing page — Caseworker, PA-Cockpit, Infra-board and Woo-dashboard — carries a **Flevoland-account** button beside **Openen**, which signs in through Entra ID and keeps that board as the target; the Woo card has had one since v2026.11.6. When the signed-in role does not open the chosen board, the employee returns to the landing page with a dialog, **Geen toegang tot <bord>**, that names their account, the missing role and the Entra app role to ask their functional administrator for (`IOU_USERS`, `IOU_PA`, `IOU_INFRA` or `IOU_WOO`), with **Naar mijn dashboard** and **Uitloggen**.
 
 ---
 
@@ -46,6 +46,7 @@ Access is granted through Entra groups, each assigned one app role:
 | `flv-role-iou-poc-user` | `IOU_USERS` | `caseworker` |
 | `Flv-role-IOU-publicAffairs-contributors` | `IOU_PA` | `public-affairs` |
 | `Flv-role-IOU-infra-contributors` | `IOU_INFRA` | `infra-projectteam` |
+| `Flv-role-IOU-WOO-contributors` | `IOU_WOO` | `woo-coordinatie` |
 
 An employee in none of the groups cannot sign in: Entra refuses before Keycloak is involved.
 
@@ -64,11 +65,11 @@ Its mappers run on every login (sync mode `FORCE`):
 | `municipality` | `municipality = flevoland` |
 | `organisation-type` | `organisation_type = province` |
 | `assurance-level` | `assurance_level = substantieel` |
-| `role-iou-admin`, `role-iou-user`, `role-iou-pa`, `role-iou-infra` | Add the realm role while the Entra app role is present; remove it once it is gone |
+| `role-iou-admin`, `role-iou-user`, `role-iou-pa`, `role-iou-infra`, `role-iou-woo` | Add the realm role while the Entra app role is present; remove it once it is gone |
 
 Roles assigned by hand in Keycloak — `pa-author`, `pa-editor`, `pa-admin`, the `rip-*` and `besluit-*` roles — are not touched by the mappers. Assign them to the brokered user after their first login.
 
-The four mapped roles are the exception. A hand-assigned `admin`, `caseworker`, `public-affairs` or `infra-projectteam` is removed at the next login whenever the Entra token lacks the matching app role. Grant those through the Entra groups only.
+The five mapped roles are the exception. A hand-assigned `admin`, `caseworker`, `public-affairs`, `infra-projectteam` or `woo-coordinatie` is removed at the next login whenever the Entra token lacks the matching app role. Grant those through the Entra groups only. Since v2026.11.6 that includes `woo-coordinatie`: a Flevoland colleague who was given it by hand loses it at their next Entra login unless they are in `Flv-role-IOU-WOO-contributors`.
 
 ### Stored tokens for eDOCS
 
@@ -116,7 +117,7 @@ ENTRA_CLIENT_ID=ef967eb0-3902-408f-8161-4e294c826473 \
 
 It prompts for the Keycloak admin password and the Entra client secret. The secret is never printed or written to disk. `--dry-run` shows what would be sent, with the secret redacted, without contacting Keycloak.
 
-Before creating anything the script checks that the four mapped realm roles exist, and stops with their names if one is missing.
+Before creating anything the script checks that the five mapped realm roles exist, and stops with their names if one is missing.
 
 It also normalises what you paste. Both GUIDs are trimmed of surrounding whitespace and of the carriage return a copied value can carry — the Flevoland client id arrived with a leading space — and both are then **lower-cased**. That last step matters: Entra issues tokens with the tenant id in lower case and Keycloak compares the token's `iss` to the configured issuer as an exact string, so an upper-case paste passes the GUID check and then fails every login.
 
@@ -160,7 +161,7 @@ printf '%s' "$ENTRA_CLIENT_SECRET" | curl -s -X POST \
    bash scripts/keycloak-add-entra-idp.sh
 ```
 
-Expected: `SECRET OK`, `all mapped roles present in realm ronl`, `created provider entra-flevoland`, seven `created mapper` lines and `verified: provider entra-flevoland with 7 mappers in realm ronl`, followed by the redirect URI to register in Entra, `added broker read-token to default-roles-ronl`, `created client mapper broker-roles on ronl-business-api`, and a reminder that users who signed in before the run must sign in once more for Keycloak to store their tokens. On a re-run the lines read `updated` instead of `created` (`present` for the default role), and a mapper no longer in the file shows as `removed mapper`. If the script reports that the realm lacks a mapped role, create that role in the realm first; do not remove the mapper.
+Expected: `SECRET OK`, `all mapped roles present in realm ronl`, `created provider entra-flevoland`, eight `created mapper` lines and `verified: provider entra-flevoland with 8 mappers in realm ronl`, followed by the redirect URI to register in Entra, `added broker read-token to default-roles-ronl`, `created client mapper broker-roles on ronl-business-api`, and a reminder that users who signed in before the run must sign in once more for Keycloak to store their tokens. On a re-run the lines read `updated` instead of `created` (`present` for the default role), and a mapper no longer in the file shows as `removed mapper`. If the script reports that the realm lacks a mapped role, create that role in the realm first; do not remove the mapper.
 
 **2. First login.** Each employee signs in once through **Inloggen met uw Flevoland-account**. This creates their Keycloak user, with the tenant attributes and the roles of their Entra groups. Until step 3 an Infra-board user sees the board without tasks.
 
@@ -182,7 +183,7 @@ KEYCLOAK_URL=$KEYCLOAK_URL ROLE_PREFIX=besluit- GRANT_USER= \
 
 With `GRANT_USER` empty the script only creates the roles — which is also its default for any prefix other than `rip-`, so `GRANT_USER=` can be left out here. `GRANT_USER=<username>` would grant all five to that one user, which suits a demonstration account that plays every lane but not a colleague who holds one. Assign each colleague the role of their lane in the admin console instead — see [Caseworker — Besluitvorming](../../user-guide/caseworker.md#besluitvorming) for which lane does what.
 
-Then, in the admin console (Users → the employee → Role mapping), assign `infra-medewerker` to Infra-board users, and where needed `woo-coordinatie` (Woo board), `pa-author`, `pa-editor` or `pa-admin` (Dossierbeheer) and a `besluit-*` role (Besluitvorming). Never assign `admin`, `caseworker`, `public-affairs` or `infra-projectteam` here; see [The Keycloak side](#the-keycloak-side).
+Then, in the admin console (Users → the employee → Role mapping), assign `infra-medewerker` to Infra-board users, and where needed `pa-author`, `pa-editor` or `pa-admin` (Dossierbeheer) and a `besluit-*` role (Besluitvorming). Never assign `admin`, `caseworker`, `public-affairs`, `infra-projectteam` or `woo-coordinatie` here; see [The Keycloak side](#the-keycloak-side).
 
 **4. Sign out and in again, and check.** A new token carries the new roles. In the admin console the employee's **Attributes** show `municipality=flevoland`, `organisation_type=province` and `assurance_level=substantieel`, and **Role mapping** shows the Entra-mapped roles plus those from step 3. The Flevoland button lands on the highest-priority board the roles allow (Woo, then Infra-board, then PA-Cockpit, then Caseworker). The other boards open through their cards on the landing page.
 
@@ -192,11 +193,11 @@ Then, in the admin console (Users → the employee → Role mapping), assign `in
 
 ## Adding and removing an employee
 
-Flevoland IT grants access by adding a colleague to one or more of the four Entra groups. Some of the result is automatic; the rest is a manual step in Keycloak that is easy to forget. Everything below applies **per environment**: ACC and PROD each create their own Keycloak user.
+Flevoland IT grants access by adding a colleague to one or more of the five Entra groups. Some of the result is automatic; the rest is a manual step in Keycloak that is easy to forget. Everything below applies **per environment**: ACC and PROD each create their own Keycloak user.
 
 ### When a colleague is added to a group
 
-**Nothing can be done before their first login.** The Keycloak user does not exist until the colleague has signed in once through **Inloggen met uw Flevoland-account**. That first login creates it with `municipality=flevoland`, `organisation_type=province`, `assurance_level=substantieel` and the roles of their groups (`IOU_ADMIN` → `admin`, `IOU_USERS` → `caseworker`, `IOU_PA` → `public-affairs`, `IOU_INFRA` → `infra-projectteam`).
+**Nothing can be done before their first login.** The Keycloak user does not exist until the colleague has signed in once through **Inloggen met uw Flevoland-account**. That first login creates it with `municipality=flevoland`, `organisation_type=province`, `assurance_level=substantieel` and the roles of their groups (`IOU_ADMIN` → `admin`, `IOU_USERS` → `caseworker`, `IOU_PA` → `public-affairs`, `IOU_INFRA` → `infra-projectteam`, `IOU_WOO` → `woo-coordinatie`).
 
 **After that first login**, depending on what they need:
 
@@ -205,17 +206,17 @@ Flevoland IT grants access by adding a colleague to one or more of the four Entr
 | `flv-role-iou-poc-admin` or `flv-role-iou-poc-user` only | None | Everything comes from Entra |
 | `Flv-role-IOU-infra-contributors` (Infra-board) | `GRANT_USER=<email> bash scripts/keycloak-add-rip-roles.sh`, then assign `infra-medewerker` | Without the `rip-*` roles the board shows no tasks; see [Infra-board users](#infra-board-users) |
 | The infra group, but **not** `flv-role-iou-poc-user` | None possible — ask Flevoland IT to add them to the user group too | Without `caseworker` the Infra-board assistant answers `403` ([ronl-business-api#251](https://github.com/sgort/ronl-business-api/issues/251)) |
-| Woo board | Assign `woo-coordinatie` | No Entra app role exists for it |
+| `Flv-role-IOU-WOO-contributors` (Woo board) | None | `woo-coordinatie` comes from `IOU_WOO` since v2026.11.6 |
 | PA-Cockpit authoring (Dossierbeheer) | Assign `pa-author`, `pa-editor` or `pa-admin` as needed | These are finer than `IOU_PA` |
 | Besluitvorming (Caseworker) | Assign the `besluit-*` role of their lane: `besluit-indiener`, `besluit-jurist`, `besluit-bestuursautoriteit`, `besluit-ondertekenaar` or `besluit-registratie` | No Entra app role exists for them; they also need `caseworker`, from `flv-role-iou-poc-user` |
 
-Assign roles in the admin console: Users → the colleague (their username is their e-mail address) → Role mapping → Assign role. **Never assign `admin`, `caseworker`, `public-affairs` or `infra-projectteam` there**; the next login removes them again.
+Assign roles in the admin console: Users → the colleague (their username is their e-mail address) → Role mapping → Assign role. **Never assign `admin`, `caseworker`, `public-affairs`, `infra-projectteam` or `woo-coordinatie` there**; the next login removes them again.
 
 The colleague signs out and in once more to receive a token with the new roles.
 
 ### When a colleague is removed from a group, or leaves
 
-- **Removed from a group:** the mapped role disappears at their next login. Roles assigned by hand — `rip-*`, `besluit-*`, `infra-medewerker`, `woo-coordinatie`, `pa-*` — **remain** until removed by hand in each environment.
+- **Removed from a group:** the mapped role disappears at their next login. Roles assigned by hand — `rip-*`, `besluit-*`, `infra-medewerker`, `pa-*` — **remain** until removed by hand in each environment.
 - **Leaves the organisation:** once Flevoland IT disables the Entra account, the colleague can no longer sign in. The Keycloak user and its hand-assigned roles remain. Disable or delete the user in each environment.
 - **An active session** keeps its roles until the access token expires, at most 15 minutes.
 
@@ -224,7 +225,7 @@ The colleague signs out and in once more to receive a token with the new roles.
 For a discussion of proper user and application management, these are the steps nothing automates yet:
 
 - **Per environment, per colleague:** the first login has to happen before any role can be granted, and every hand-assigned role is granted separately on ACC and on PROD.
-- **Roles without an Entra source:** `rip-*`, `besluit-*`, `infra-medewerker`, `woo-coordinatie`, `pa-author`, `pa-editor`, `pa-admin`. The script grants all 34 `rip-*` roles at once; nothing models which RIP role a colleague actually holds.
+- **Roles without an Entra source:** `rip-*`, `besluit-*`, `infra-medewerker`, `pa-author`, `pa-editor`, `pa-admin`. The script grants all 34 `rip-*` roles at once; nothing models which RIP role a colleague actually holds.
 - **No deprovisioning:** removing someone from a group, or disabling their account, leaves their hand-assigned roles and their Keycloak user in place.
 - **No overview:** which colleague holds which hand-assigned role is only visible per user, per environment, in the admin console.
 - **Group composition:** an infra colleague needs two groups ([ronl-business-api#251](https://github.com/sgort/ronl-business-api/issues/251)); nothing checks that.
@@ -242,7 +243,7 @@ Flevoland IT issues a new secret before the current one expires. Run step 1 of [
 | Symptom | Cause |
 |---|---|
 | Microsoft shows `AADSTS50011` (redirect URI mismatch) | The environment's redirect URI is not registered on the app registration. The script prints the exact URI |
-| Microsoft shows `AADSTS50105` (not assigned) | The employee is in none of the four groups |
+| Microsoft shows `AADSTS50105` (not assigned) | The employee is in none of the five groups |
 | Microsoft shows `AADSTS700016` (application not found in the directory) | The client ID is wrong — typically the secret's ID was used. Re-run the script with the app registration's *Application (client) ID* |
 | Keycloak: "Unexpected error when authenticating with identity provider" (HTTP 502 on `/broker/entra-flevoland/endpoint`) | Keycloak could not exchange the code at Entra. The Keycloak container log (`docker compose logs keycloak` locally) names the Entra error |
 | Keycloak log: `AADSTS7000215` (invalid client secret) | The secret in Keycloak is not the secret's **value** — often the secret ID, or a mis-pasted value. Re-run the script with the value from the *Value* column; it is shown only when the secret is created |

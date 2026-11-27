@@ -7,6 +7,22 @@
     **7 November 2026** without its captures: rows 21–26 are stale views the pages still embed, and
     rows 27–34 are optional. Rows 11–20 still hold, apart from the colours rows 27–34 name. The sync
     to v2026.11.2 (12 November 2026) added none. The sync to v2026.11.5 and #473 (18 November 2026) requests none.
+    The sync to v2026.11.6 (27 November 2026) requests three, rows 38–40, for the following week; rows 39 and 40
+    wait until the RIP models that declare linked documents are deployed.
+
+## Sync v2026.11.5 → v2026.11.6 — one REPLACE, two NEW (for the week of 30 November)
+
+Reviewed on 27 November 2026 for **v2026.11.6**, in production (`origin/main` `7416c65`). The Woo-dashboard's card now offers the Flevoland account, so the landing page changes. The Infra-board's tasks and project page gain document blocks, but only for a process model that declares linked documents, and those models (linked-data-explorer#362) are **not yet deployed on ACC or production**: rows 39 and 40 can be captured only once they are, on whichever tier has them first; say which in the row when it is done. The user chose to capture all three the following week.
+
+| # | Status | File | Embedding page | What it must show | Trigger |
+|---|---|---|---|---|---|
+| 38 | **REPLACE** (supersedes optional row 27) | `ronl-business-api-landing-page.png` | `user-guide/getting-started.md` (§ Werkomgeving) | The Flevoland landing grid, signed out, with **Flevoland-account** beside **Openen** on **all four** cards, the Woo-dashboard included, in Flevoland's palette | v2026.11.6 — `entraRole: 'IOU_WOO'` (cfbcfec, #490) |
+| 39 | **NEW** — after the models are deployed | `ronl-business-api-infra-board-taak-documenten.png` | `user-guide/infra-board.md` (§ Documents at a task) | A claimed R2.3 or R2.4 task (best *Opstellen Projectraming DO*, as `test-infra-flevoland`) showing **Documenten bij deze taak**: the projectmap list with one document linked (its eDOCS name), the figure inputs prefilled from R2.3, the **Kredietcheck** with its *voorstel*, the line *Nog nodig: …*, and **Taak voltooien** disabled below | v2026.11.6 — a0ba345, facee22 (#488) |
+| 40 | **NEW** — after the models are deployed | `ronl-business-api-infra-board-documenten-panel.png` | `user-guide/infra-board.md` (§ The Documenten panel) | A project page's **Documenten R2.3** (or R2.4) panel: the A / B / B+ chips, rows in several states (**Gekoppeld** with number, version and date; **Ontbreekt — taak wacht** with **Taak openen**; **Nog niet aan de beurt**), a B+ row with its figures, and the kredietcheck row | v2026.11.6 — a0ba345 (#488) |
+
+**Row 21** (`ronl-business-api-rip-phase-swimlane.png`, still REPLACE-pending): the project page now has a **Documenten** panel between the diagram and *Open taken*. If row 21 is shot after the models are deployed, frame it so the panel is either clearly out of frame or included.
+
+**Considered and not captured:** the Woo no-access panel's `IOU_WOO` sentence (quoted on the page); the no-access dialog's **Uitloggen** fix (a behaviour; a still looks the same); the V&G folder checklist (part of row 39 if the task is R2.4 *Samenstellen Verzamelmap V&G*); the phase page's eDOCS column (one column in an existing table); the retired deploy scripts, the eDOCS settings, the test accounts and the dependency updates (no surface); Flevoland pink (#473, reviewed 18 November: every Flevoland capture already shows it).
 
 ## Sync v2026.11.4 → v2026.11.5 — nothing to capture, one figure retired
 
