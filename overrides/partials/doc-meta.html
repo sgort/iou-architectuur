@@ -40,6 +40,12 @@
       build can reach an environment with no release bump, and a reader can
       compare this string with the one the running application prints.
 
+    vocabulary (component mode) — a component whose release number is not the
+      version of what it publishes may record that second version as well:
+      CPRMV releases as "v2026.11.0" and serves vocabulary "0.4.3", which is
+      what its / and /health print as "version". Printed as recorded, with
+      the word "vocabulary" before it, so it can be compared with /health.
+
     verified (cross-cutting mode) — a page may declare which commit of each
       component its claims were last re-checked against:
 
@@ -104,6 +110,15 @@
         </span>
       {%- endif %}
     </span>
+    {%- if repo.vocabulary %}
+      <span class="doc-meta__fact doc-meta__vocabulary"
+            title="The vocabulary version this release serves: what / and /health report as version">
+        <span class="md-icon">
+          {% include ".icons/material/book-alphabet.svg" %}
+        </span>
+        vocabulary <code>{{ repo.vocabulary }}</code>
+      </span>
+    {%- endif %}
     {%- if repo.build and repo.build.sha %}
       <span class="doc-meta__fact doc-meta__build"
             title="Frontend build serving {{ (repo.environment or '') | upper }} at the recorded commit — compare with the build line in the application's changelog">

@@ -40,6 +40,10 @@ Two derived or optional fields ride along:
   environment is often older than the branch head, and a new build can reach
   an environment without a release bump. See
   docs/en/contributing/build-provenance.md.
+- `vocabulary` — optional string: a second version some components publish
+  beside their release number (CPRMV: release `v2026.11.0`, vocabulary
+  `0.4.3`, which is what its `/` and `/health` call `version`). Rendered by
+  doc-meta.html and doc-status.js when present; nothing else reads it.
 
 Failing to read or parse the file is deliberately non-fatal: the header
 degrades to showing only the git dates rather than breaking the build.

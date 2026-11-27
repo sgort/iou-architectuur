@@ -1,11 +1,17 @@
 # CPRMV API — screenshots to capture
 
-*A running record across syncs, newest first. Last reviewed for v0.4.3 at `8f01b2b` on
-26 November 2026 — **nothing outstanding, and nothing requested**.*
+*A running record across syncs, newest first. Last reviewed for release v2026.11.0 (vocabulary 0.4.3) at
+`502a351` on 27 November 2026 — **nothing outstanding, and nothing requested**.*
 
 Real screenshot files live in **`docs/assets/screenshots/`** (language-neutral,
 served at the site root). Docs reference them as
 `../../assets/screenshots/<file>` inside a `<figure markdown>` block.
+
+---
+
+## Sync `8f01b2b` → release v2026.11.0 (`502a351`) — no screenshots requested
+
+Reviewed on 27 November 2026 for the first CalVer release, v2026.11.0, with the vocabulary still at 0.4.3. Nothing on screen changed: the release number shows in `/health`, which the pages give as its JSON answer, and the bill of materials is a file.
 
 ---
 

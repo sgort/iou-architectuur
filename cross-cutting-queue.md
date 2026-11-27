@@ -118,6 +118,29 @@ job. Evidence: `README.md`, `SECURITY-PIPELINE.md`, `.github/workflows/{ci,zizmo
 10. **Organisation move:** every IOU component is to move to the `open-regels` GitHub organisation (the user,
     26 November); CPRMV is the first. Record as intent on `contributing/index.md`, not as fact for the others.
 
+### 27 November 2026 — CPRMV release v2026.11.0 (production, `502a351`; vocabulary still 0.4.3)
+
+Evidence: `serve_api/RELEASE`, `.github/workflows/sbom.yml`, `scripts/write-sbom.py`, `.claude/commands/bump-release.md`,
+`docs/superpowers/specs/2026-11-27-release-versioning-design.md` and `…-sbom-design.md`, `SECURITY-PIPELINE.md` at `502a351`;
+live `/health` (stable: `release` `v2026.11.0`, `version` `0.4.3`, `502a351` run 21).
+
+1. **PSA AB-28** (`11-decisions-and-risks.md:58`, `08-security-and-privacy.md:77-80`): the 26 November entry (item 9)
+   proposed *deels* for CPRMV because it had no SBOM. CPRMV now commits a CycloneDX SBOM per release and attaches an
+   image SBOM attestation, besides pinning and the 14-day wait, so it meets AB-28's build criteria; whether "measured
+   weekly" holds depends on scoring CPRMV (26 November item 7). Revise item 9 with this; R-07 follows.
+2. **The release process on `contributing/**`:** CPRMV has `/bump-release` too, with `vYYYY.MM.N` (a `v` prefix, unlike
+   the applications' `YYYY.MM.N`), no changelog and no git tags, and a release number beside a vocabulary version.
+3. **`the-gitlab-mirror.md`** (extends 26 November item 2): pushing `main` to GitLab is a fixed step of every CPRMV
+   release, done by `/bump-release` (fast-forward only, checked before and confirmed after; stops on divergence), which
+   publishes the ReSpec. GitLab `main` was `502a351` on 27 November; GitLab `acc` is not kept current.
+4. **`supply-chain.md` and the SBOM pages** (extends 26 November item 4): `sbom.yml` (`release-sbom`, not a required
+   check), `scripts/write-sbom.py` (Python, `cyclonedx-bom` 8.0.1, CycloneDX 1.6), one file per release number, and an
+   image SBOM attestation. Compare with the applications' SBOM practice.
+5. **`build-provenance.md`** (extends 26 November item 5): `/health` also reports `release`; `repo-versions.json` gains an
+   optional `vocabulary` field, rendered in the page header and the home page's status table.
+6. **`ictu-dependency-guideline.md`** (26 November item 7): CPRMV now also keeps an SBOM per release, one more input for
+   deciding whether to score it.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

@@ -62,7 +62,14 @@
           "</td>" +
           "<td><code>" +
           repo.version +
-          "</code></td>" +
+          "</code>" +
+          // Optional second version, e.g. CPRMV's vocabulary beside its release.
+          (repo.vocabulary
+            ? '<span class="doc-status-vocabulary">vocabulary ' +
+              escapeHtml(repo.vocabulary) +
+              "</span>"
+            : "") +
+          "</td>" +
           "<td>" +
           envBadge(repo.environment) +
           "</td>" +

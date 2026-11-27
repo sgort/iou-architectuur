@@ -35,7 +35,9 @@ Both services restart unless stopped and keep at most three 10 MB log files. The
 3. Within two minutes of the image appearing, the tier's VM sees the new head, pulls `sha-<commit>` and brings the release up.
 4. CI's `deploy` job waits until `deploy-status.json` reports the commit running and `/health` reports the same `build.sha`.
 
-Release pull request [#31](https://github.com/open-regels/cprmv/pull/31) merged into `main` at 20:36 UTC on 26 November 2026. CI run 13 had published `8f01b2b` by 20:40, the stable VM reported it running at 20:40:29, and `deploy` passed at 20:40:40, 29 seconds after that job started.
+On this page, as in the reconciler, a *release* is what the reconciler deploys: one commit's deployment directory. The release *number* (`v2026.11.0`) that `/health` reports is a different thing; see [Two version numbers](ci-cd.md#two-version-numbers).
+
+Release pull request [#35](https://github.com/open-regels/cprmv/pull/35), release v2026.11.0, merged into `main` at 08:53 UTC on 27 November 2026. CI [run 21](https://github.com/open-regels/cprmv/actions/runs/45969250973) had published `502a351` by 08:57, the stable VM reported it running at 08:58:33, and `deploy` passed at 08:59:02, 93 seconds after that job started.
 
 ---
 
@@ -105,7 +107,7 @@ If the new release does not come up healthy within the time limit, or `/health` 
 | `failed` | The target did not come up; the previous release was restored, or nothing ran before. | Read `last_attempt.error`, fix, merge a new commit. |
 | `broken` | The target failed and the restore failed. | SSH in, read the reconciler's journal and `state.json`, and bring a release up by hand. |
 
-On 26 November 2026 both stable host names reported `running` `8f01b2b`, and acceptance `running` `ebff352`, each with `matches_repo: true` and no warning.
+On 27 November 2026 both stable host names reported `running` `502a351`, and acceptance `running` `2341daa`, each with `matches_repo: true` and no warning.
 
 ### Changing the reconciler
 
@@ -115,7 +117,7 @@ The reconciler never updates itself, so that a bad merge cannot replace what wou
 
 ## What `/health` proves
 
-`GET /health` answers `status`, `version`, `environment`, `build.sha`, `build.run` and `image.digest` ([API Endpoints](../reference/api-endpoints.md#get-health)). The commit and run are baked into the image by CI as build arguments; the digest and the environment are set by the tier's Compose file. Four checks compare `build.sha` with the commit they expect:
+`GET /health` answers `status`, `version`, `environment`, `release`, `build.sha`, `build.run` and `image.digest` ([API Endpoints](../reference/api-endpoints.md#get-health)). The release number, the commit and the run are baked into the image by CI as build arguments; the digest and the environment are set by the tier's Compose file. Only `build.sha` is checked; `release` says which release the code belongs to, and on acceptance it is the last release the code is at or after. Four checks compare `build.sha` with the commit they expect:
 
 | Where | Against |
 |---|---|
@@ -126,7 +128,7 @@ The reconciler never updates itself, so that a bad merge cannot replace what wou
 
 A host that reports a commit therefore runs an image built from that commit, and `deploy-status.json` names the registry digest the VM pinned. `/health` does not load a method; it proves which build runs, not that every source answers.
 
-On 26 November 2026 `cprmv.open-regels.nl` and `cprmv.open-rules.eu` reported `stable`, `8f01b2b` (run 13), and `acc.cprmv.open-regels.nl` reported `acceptance`, `ebff352` (run 11). `acc` and `main` held the same tree; the two builds differ only in the commit they were built from.
+On 27 November 2026 `cprmv.open-regels.nl` and `cprmv.open-rules.eu` reported `stable`, release `v2026.11.0`, `502a351` (run 21), and `acc.cprmv.open-regels.nl` reported `acceptance`, release `v2026.11.0`, `2341daa` (run 35). Acceptance runs six pull requests more, merged into `acc` after the release: five Renovate dependency updates and the removal of `safety` from the `tools` extra.
 
 ---
 
@@ -150,13 +152,14 @@ Outbound HTTPS is open, as on an Azure VM by default. The VM needs GitHub, GHCR 
 
 ## What the tests verify
 
-The scripts are shellchecked and tested with bats in CI's `test` job: 54 tests in five files, all passing in CI run 13 on 26 November 2026.
+The scripts are shellchecked and tested with bats in CI's `test` job: 69 tests in six files, all passing in CI run 21 on 27 November 2026.
 
 | File | Tests | What they pin down |
 |---|---|---|
 | `deployment/vm/reconciler/test/reconcile.bats` | 24 | a first deploy; a second run changes nothing; waiting, then stalled; a failed deploy restores the previous release; a wrong `build.sha` counts as failure; a failed commit is not retried, a newer one is; a failing restore is `broken`; a first deploy that fails has nothing to restore; an unhealthy release is re-applied, and a failed re-apply restores the previous one; a failed fetch or an unreachable Docker daemon changes nothing; a failed or waiting target keeps the running release healthy; a pull failure waits; a missing digest or tier directory fails and restores; pruning keeps the running and previous releases; `matches_repo`; a held lock skips the run; an existing clone is reused; the stable tier follows `CPRMV_BRANCH` |
 | `scripts/test/wait-for-deploy.bats` | 11 | passes only when the status and `/health` agree; fails on `broken`, even when the commit matches, and on this commit failed, but not on an older failed commit; superseded; an unreachable status polls until the time-out; a status value cannot start a workflow command; usage |
 | `scripts/test/smoke-health.bats` | 5 | matching, mismatching and null `build.sha`; no answer within the deadline; usage |
+| `scripts/test/read-release.bats` | 15 | the release number CI builds into the image: a valid release is printed, with or without a trailing newline; an absent file gives an empty release; the default path; a missing `v`, month 13, month 00 or an unpadded month, more than one line, trailing text, a CRLF ending, an empty file, a NUL byte, two trailing newlines and a leading space all fail without printing a release; usage |
 | `scripts/test/ci-tier.bats` | 5 | `acc` and `main` map to their tiers; other branches, tags and no argument fail |
 | `scripts/test/audit-requirements.bats` | 9 | the [dependency audit](ci-cd.md#dependency-audit-dependency-audityml): shipped findings fail, development-only findings do not, accepted ids are ignored, a clean file is clean, tool errors and skipped shipped packages are failures |
 
@@ -181,4 +184,4 @@ Lifting the reconciler into a form other repositories can share is a follow-up f
 - **The `cprmv` user is in the `docker` group**, which is root-equivalent. It is a system account without a login shell, on a VM that runs nothing else.
 - **Caddy restarts on every deploy**, because each release has its own directory and so its own Caddyfile mount: a brief connection drop per deploy.
 - **A changed reconciler or unit is installed by hand**, over SSH or by reprovisioning; `matches_repo` shows only the former.
-- **No image scan and no SBOM** yet; both are follow-ups in the design.
+- **No image scan** yet; it is a follow-up in the design. Each release has an SBOM, and each pushed image an SBOM attestation ([Release SBOM](ci-cd.md#release-sbom-sbomyml)).

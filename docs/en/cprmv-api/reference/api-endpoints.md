@@ -17,7 +17,7 @@ Responses from `/methods` and `/rules`, and errors from `/raw`, are plain text (
 
 ## GET /
 
-Returns the API title and version.
+Returns the API title and the vocabulary and API version.
 
 **Response:**
 
@@ -31,18 +31,19 @@ Returns the API title and version.
 
 Reports liveness and what the host runs. Every field is read when the request arrives; one that is not set, or is empty, is `null`.
 
-**Response** (from `cprmv.open-regels.nl` on 26 November 2026):
+**Response** (from `cprmv.open-regels.nl` on 27 November 2026):
 
 ```json
-{"status": "ok", "version": "0.4.3", "environment": "stable",
- "build": {"sha": "8f01b2b16302e3289f360ca440796a977d446e05", "run": "13"},
- "image": {"digest": "sha256:299276c7ac9193fcbfd5c256bec6ea83be6687b974c09d983a0835e213af9b21"}}
+{"status": "ok", "version": "0.4.3", "environment": "stable", "release": "v2026.11.0",
+ "build": {"sha": "502a3517f0c1d1f56aa4f57a42a37a42daf28657", "run": "21"},
+ "image": {"digest": "sha256:047d4d416d50a3fe9147d2e63d81d06ab07ec8b7f44c1aa83ffedceb7091b8fc"}}
 ```
 
 | Field | Source |
 |---|---|
-| `version` | the API version, as on `/` |
+| `version` | the vocabulary and API version, as on `/` ([two version numbers](../developer/ci-cd.md#two-version-numbers)) |
 | `environment` | `CPRMV_ENVIRONMENT`, set by the tier's Compose file: `acceptance` or `stable` |
+| `release` | the release number the image was built at, `vYYYY.MM.N` (`BUILD_RELEASE`, from `serve_api/RELEASE`); on acceptance, the last release its code is at or after; `null` before the first release and in local builds |
 | `build.sha`, `build.run` | the commit and CI run number the image was built from (`BUILD_SHA`, `BUILD_RUN`); `run` is a string |
 | `image.digest` | the registry digest the VM runs (`CPRMV_IMAGE_DIGEST`) |
 
