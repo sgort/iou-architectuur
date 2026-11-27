@@ -126,7 +126,7 @@ uses — but **SCM basic auth is disabled on both App Services**
 (`basicPublishingCredentialsPolicies/scm` `allow=false`, measured on the
 resources rather than assumed), so a publish-profile deploy would be rejected.
 
-OIDC is not a new mechanism here: the hand-run scripts already deploy with `az
+OIDC was not a new mechanism here: the hand-run scripts, since retired, deployed with `az
 webapp deploy` over an ARM token from `az login`. The workflow makes that same
 call with a machine identity instead of a human session, which removes the
 failure that once stopped a release reaching acceptance — an expired login,
@@ -336,24 +336,13 @@ deployment → *Redeploy*.
 
 ## Manual deployment
 
-`deploy-backend-to-acc.sh` and `deploy-backend-to-prod.sh` still exist at the
-repository root. They are the **break-glass path** for when CI cannot deploy —
-not the normal route, and not a shortcut.
+There is none. `deploy-backend-to-acc.sh` and `deploy-backend-to-prod.sh`, the hand-run break-glass
+path, were **deleted on 27 November 2026** (v2026.11.6). They installed without the lockfile, against
+semver ranges, with no package-manager cooldown and no CI record of what was installed — the pattern
+the workflow had been changed to stop — and the repository's supply-chain register kept them as a named
+exception that would close *"when the scripts are retired, not when the workflow lands"*. It is now
+closed.
 
-!!! danger "The scripts resolve dependencies on a developer machine"
-    They install without the lockfile, against semver ranges, with no
-    package-manager cooldown and no CI record of what was installed. That is the
-    exact pattern the workflow was changed to stop doing, and the repository's
-    supply-chain register keeps it as a **named exception** rather than treating
-    it as closed: *the exception closes when the scripts are retired, not when
-    the workflow lands.*
-
-    Use `workflow_dispatch` on `azure-backend-prod.yml` or
-    `azure-backend-acc.yml` instead wherever that is possible — it deploys one
-    tier's backend alone, from the lockfile, with the verification above.
-
-Both scripts carry real safety rails: they refuse to run off `acc`, refuse a
-dirty working tree, and resolve an archiver before building anything. The
-portable path falls back to the bsdtar bundled at `System32\tar.exe`, because
-Info-ZIP's `zip` cannot be installed on a managed Windows laptop. They also fail
-fast on a dead Azure session rather than part-way through.
+To deploy one tier's backend alone, dispatch `azure-backend-acc.yml` or `azure-backend-prod.yml`
+(`workflow_dispatch`): it installs from the lockfile and runs the verification above. `.gitignore` still
+keeps any local `deploy-backend-*.sh` variant out of the repository.

@@ -16,7 +16,7 @@ Since September 2026 the **Faseladder reads twelve of twelve deelprocessen inzet
 
 - **Finishing a phase readies the project for the next one.** A completed instance moves its project into the following phase's *Starten* list automatically, so you no longer start each phase from a standing position.
 - **Every phase has a real diagram.** Opening a project shows the process drawn from the model actually deployed on the engine, not a hand-maintained sketch — including its rework loops, and coloured by what genuinely ran when you select a finished rung. It looks the same as the Caseworker's process overview: a legend that lists only what the diagram shows, the lanes you work in marked **jouw rol**, your own task marked **jouw taak** and a colleague's claimed task **geclaimd**, and a dashed outline on every task that is not yours. A decision is a diamond with a question mark and its question above it; a parallel split or join is a bar captioned *tegelijk* or *alles klaar*.
-- **A task shows every document it carries.** Where a process step produces more than one deliverable, the diagram gives it one badge per document rather than naming only the first. R2.2's *Opstellen concept VO* is the clearest case: it yields both an **Ontwerptoelichting** and an **Objectenboom**, and both are named on the node.
+- **A task shows every document it carries.** Where a process step produces more than one deliverable, the diagram gives it one badge per document rather than naming only the first. R2.2's *Opstellen concept VO* is the clearest case: it yields both an **Ontwerptoelichting** and an **Objectenboom**, and both are named on the node. A document that a task links from eDOCS rather than generates is not drawn on the node — it is in the task's **Documenten bij deze taak** and the phase's **Documenten** panel (see [Documents at a task](#documents-at-a-task)) — so once R2.2's model declares the Ontwerptoelichting as linked, that node will name only the Objectenboom.
 
 <figure markdown style="width:100%; margin:0;">
   ![Screenshot: a RIP phase swimlane diagram derived from the deployed BPMN, showing lanes, task states and a rework loop](../../assets/screenshots/ronl-business-api-rip-phase-swimlane.png)
@@ -63,6 +63,99 @@ on the Faseladder refresh with them.
 ## Working on a task
 
 In a task's panel the process variables, **Procesgegevens**, start folded: **Gegevens tonen** opens them. Claiming a task refreshes the project's open tasks at once, so the diagram's marks follow straight away.
+
+---
+
+## Documents at a task
+
+Some documents of R2.1 to R2.4 are not made by the board but kept in eDOCS: a PSU-presentatie, an
+Ontwerptoelichting, a Projectraming. The board calls them **B** documents, and **B+** when they also
+carry key figures; a document the board makes itself is an **A** document. When a phase's model
+declares that a task links such a document, the task shows **Documenten bij deze taak** above its
+form, and you cannot complete the task until the block is complete.
+
+!!! note "Not on the process engines yet"
+    The R2.1–R2.4 models that declare these linked documents
+    ([linked-data-explorer#362](https://github.com/sgort/linked-data-explorer/pull/362)) are not yet
+    deployed on the ACC or the production process engines. Until they are, no task shows this block
+    and the Documenten panel below has no B or B+ rows; both appear once those models are deployed.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: the Documenten bij deze taak block of an Infra-board task, with a document linked from the eDOCS projectmap, its key figures, the kredietcheck with its voorstel, and Taak voltooien disabled](../../assets/screenshots/ronl-business-api-infra-board-taak-documenten.png)
+  <figcaption>A task's documents: linked from the eDOCS projectmap, with its key figures and the kredietcheck</figcaption>
+</figure>
+
+In those models, these tasks link a document:
+
+| Phase | Task | Document | Kind |
+|---|---|---|---|
+| R2.1 | Uitvoeren PSU en aanvullen Projectplan 3. PSU-verslag | PSU-presentatie | B |
+| R2.2 | Opstellen concept VO | Ontwerptoelichting | B |
+| R2.2 | Bespreken concept VO | Bevindingenformulier | B |
+| R2.2 | Opstellen definitief VO | Hoeveelheidsbepaling | B |
+| R2.3 | (Laten) opstellen VO-raming | Projectraming VO | B+ |
+| R2.3 | Opstellen SSK-raming | SSK-rekenmodel Provincie Flevoland UAV | B+ |
+| R2.3 | Controleren Projectraming VO | — the kredietcheck | |
+| R2.3 | Bepalen inkoopstrategie | Inkoopplan, only when one is written | B |
+| R2.4 | Opstellen Projectraming DO | Projectraming DO, and the kredietcheck | B+ |
+| R2.4 | Invullen ILS | ILS Flevoland | B |
+| R2.4 | Samenstellen Verzamelmap V&G | Verzamelmap documenten V&G (a folder) | B |
+
+**Link a document.** Under *Kiezen uit de projectmap in eDOCS* the block lists the project's eDOCS
+projectmap, with each item's number, version, date and author; choose the document. For the V&G
+collection you choose a folder instead (*Map kiezen*), and the block then lists the three documents that
+folder must hold — *V&G-plan ontwerpfase*, *Risico-inventarisatie V&G*, *Aanstelling V&G-coördinator
+ontwerpfase* — each **Aanwezig** or **Ontbreekt in de map**; put a missing one in the folder in eDOCS.
+A linked document shows its eDOCS name.
+
+**Or upload it.** **Bestand uploaden naar projectmap…** sends a file of at most 20 MB to eDOCS, files it
+into the projectmap under the project number and links it. When the project has no projectmap yet, the
+button reads **Bestand uploaden naar eDOCS…** and the file lands in eDOCS outside the projectmap.
+A folder cannot be uploaded: make it in eDOCS and link it.
+
+**When the projectmap is empty** the block says so and what to do — upload a file, or put it in the
+projectmap in eDOCS — and **Opnieuw laden** reads it again.
+
+**Key figures (B+).** Under the document, enter the figures from the spreadsheet: for a projectraming
+the total excluding VAT, the part for the unforeseen, and the price level; for the SSK model the building
+costs and the total. The board does not recalculate them; the spreadsheet stays the source. In R2.4 the
+Projectraming DO opens with the figures of R2.3's Projectraming VO, to confirm or change.
+
+**The kredietcheck.** Enter the *Beschikbaar projectkrediet* (R2.4 brings it from R2.3). The block shows
+the estimate, the credit and the difference, and marks **Binnen** or **Buiten projectkrediet** as its
+*voorstel*. You decide; when you choose against the suggestion, give a reason under *Reden voor afwijken
+van het voorstel*. The answer is what the process branches on.
+
+**Taak voltooien** stays disabled while anything is missing, and the block's last line says what: *Nog
+nodig: …*, or *Alles compleet.* The platform checks the same when you complete, so a task cannot close
+without its documents by any route through the board.
+
+You link and upload as yourself, with your Flevoland account: eDOCS records your name and applies your
+rights. Signed in with another account, the block says *eDOCS is alleen beschikbaar als u bent
+ingelogd met uw Flevoland-account.* Only someone who may do the task — who holds one of its roles — can
+link its documents, and only while the task is open.
+
+Reading a task's documents also needs the caseworker role — for a Flevoland account, the Entra ID app
+role `IOU_USERS`. Without it, a task panel shows *De documenten van deze taak konden niet worden
+geladen.* above its form.
+
+### The Documenten panel
+
+A project page shows, under the phase diagram, a **Documenten** panel for the selected phase: every
+document the phase's model declares, A, B or B+, with the task and role that produce it, its eDOCS
+number, version and date, and its status — **Gekoppeld**, **Opgemaakt**, **Wordt opgemaakt bij
+akkoord**, **Ontbreekt — taak wacht**, **Nog niet aan de beurt** or **Niet nodig — criteria voldaan**.
+A B+ row shows its figures, and a phase with a kredietcheck has a *Beslispunt* under the table with the
+estimate, the credit and the answer. **Taak openen** selects the task that has to produce a missing
+document. The panel reads again after each task you complete.
+
+<figure markdown style="width:100%; margin:0;">
+  ![Screenshot: the Documenten panel of a RIP phase on a project page, listing A, B and B+ documents with their eDOCS number and status, and the kredietcheck Beslispunt](../../assets/screenshots/ronl-business-api-infra-board-documenten-panel.png)
+  <figcaption>The Documenten panel of a phase: every document, its werkwijze and status</figcaption>
+</figure>
+
+On a phase page, the WIP table gains an **eDOCS** column — *2/3 gekoppeld*, or *1 ontbreekt* — and the
+blockade names what a project is waiting for, such as *Wacht op koppeling Projectraming VO*.
 
 ---
 

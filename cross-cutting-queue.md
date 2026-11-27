@@ -141,6 +141,31 @@ live `/health` (stable: `release` `v2026.11.0`, `version` `0.4.3`, `502a351` run
 6. **`ictu-dependency-guideline.md`** (26 November item 7): CPRMV now also keeps an SBOM per release, one more input for
    deciding whether to score it.
 
+### 27 November 2026 — RONL Business API v2026.11.5 → v2026.11.6 (production, `7416c65`)
+
+Evidence: `SECURITY-PIPELINE.md`, `.npmrc`, `.github/workflows/azure-backend-{acc,prod}.yml` at `7416c65` (the scripts
+`deploy-backend-to-{acc,prod}.sh` are deleted, b0a12de, #491); `changelog-data.ts` 2026.11.6; findings filed as
+ronl-business-api#498.
+
+1. **The break-glass deploy scripts are retired**, and `SECURITY-PIPELINE.md` closes the exception "The backend is deployed
+   outside CI, and its dependencies are unpinned" (27 November). The backend now reaches ACC and production only through
+   `azure-backend-{acc,prod}.yml`, installed with `npm ci` from the root lockfile. Pages still saying the scripts remain:
+   `supply-chain.md:176` and `:874–890` (now only the VM images stay open, #196); `ictu-dependency-guideline.md:217–222`
+   and `:447`; `controls.md:128`; `code-standards.md:277`; and the RBA R3/R4 rationale in `docs/data/ictu-assessments.yml`
+   (around 494–502). **Score effect is the pass's call:** it removes one of two reasons holding R3/R4 back; the VM images
+   without digests (#196) remain.
+2. **`supply-chain.md`, what the gate does not protect:** drop the scripts exception, keep the VM-images one, as the RBA's
+   register now does.
+3. **PSA:** no PSA text names the scripts, so no status changes from item 1; AB-28's RBA evidence can cite the retirement.
+   AB-17 / AB-32: the Woo-dashboard now signs in through the Entra broker too (all four boards), an evidence update only.
+   AB-20 / AB-23: the new link and upload routes and the 422 refusal are audit-logged. AB-18: the M2M task completion
+   skips the linked-document check (filed in #498), for the pass to judge, worded generically and without a link while
+   open. Re-pin RBA on the PSA pages from `1784a72` to `7416c65`.
+4. **eDOCS archiving:** the open question which eDOCS document type the secretariat and the archive expect (comment beside
+   `EDOCS_LINKED_UPLOAD_FORM` in `config.ts` and `.env.example`) may belong with a PSA archiving risk, if one exists.
+5. **The unit-test figures:** 359 test files and 5,695 tests at `7416c65` (backend 115 · 2,932; frontend 147 · 1,862;
+   pa-cockpit 43 · 516; pa-demo 19 · 109; public site 35 · 276), for the weekly `tests:` rows.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

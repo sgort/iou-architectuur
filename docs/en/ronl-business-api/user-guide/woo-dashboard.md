@@ -15,6 +15,11 @@ On opening the board you see traffic-light indicators for compliance and lead ti
   <figcaption>Woo-dashboard — steering on the Wet open overheid</figcaption>
 </figure>
 
+**Opening it.** Sign in with your Flevoland account — the card's **Flevoland-account** button, or the
+landing page's primary button — and the board opens if your account holds the Entra ID app role
+`IOU_WOO`. Without it, the landing page's dialog — or the board itself, if you reach it another way —
+says **Geen toegang** and names that role, so you know what to ask your functioneel beheerder for.
+
 ---
 
 !!! note "Brief for now"

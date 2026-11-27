@@ -4,11 +4,11 @@ component: RONL Business API
 
 # Infra-board — tests
 
-**Frontend: 19 files · 280 tests**, including the shared signing panel.
-**E2E: 2 specs · 8 tests** — 7 passed and 1 skipped on 14 November 2026, as on 3 and 9 October and 7 November; carried forward, not re-run on 18 November.
+**Frontend: 22 files · 342 tests**, including the shared signing panel and the shared linked-documents components.
+**E2E: 2 specs · 8 tests** — 7 passed and 1 skipped on 14 November 2026, as on 3 and 9 October and 7 November; carried forward, not re-run on 18 or 27 November: no spec changed.
 
 The infra-board is well covered at the unit level — `src/pages/infra-board` is
-at **100%** statements, functions and lines and 98.74% branches, the
+at **100%** statements, functions and lines and 98.75% branches, the
 best-covered substantial area in the frontend — and its **two Playwright
 specs** divide the board between them: one driving the shell, one driving the
 work that happens inside it.
@@ -17,12 +17,22 @@ work that happens inside it.
 
 ## Frontend
 
-Measured on **18 November 2026** at `be0a1f0`, a tree identical to `main` at
-`1784a72` (v2026.11.5 plus hot fix #473): the frontend package ran 144 files
-and 1787 tests, all passing, and the counts below are read from Vitest's JSON
-report of that run.
+Measured on **27 November 2026** at `aa68931`, a tree identical to `main` at
+`7416c65` (v2026.11.6): the frontend package ran 147 files and 1862 tests, all
+passing, and the counts below are read from Vitest's JSON report of that run
+— see [Overview](../overview.md) for how the frontend was measured.
 
-**v2026.11.5 added two tests to this board and no file.**
+**v2026.11.6 added 62 tests to this board and three files**, for the linked
+eDOCS documents a RIP task needs before it may close. The three files are
+new in the shared `components/rip-documents/` (see the note below):
+`TaskCompletion.test.tsx` (**23**), `model.test.ts` (**23**) and
+`DocumentsPanel.test.tsx` (**10**). `PhaseDetail.test.tsx` went 31 → **35**
+— the eDOCS column, the blockade on a task whose document is missing, and
+the selection by instance — and `ProjectDetail.test.tsx` 27 → **29**: the
+*Documenten* panel, *Taak openen*, and a refresh after a task completes.
+`pages/infra-board/rip-model.test.ts` was edited and kept its **26**.
+
+**History: v2026.11.5 added two tests to this board and no file.**
 `InfraCommandPalette.test.tsx` went 9 → **10**: the palette finds a live
 project waiting between phases and opens it on its instance (#382).
 `signing/SigningPanel.test.tsx` went 16 → **17**: the panel explains a signer
@@ -42,9 +52,32 @@ instances of every phase (`infra-board.data.test.ts` 34 → **45**,
 | Area | Files | Tests |
 |---|---:|---:|
 | `pages/infra-board` (data and pure logic) | 6 | 119 |
-| `components/InfraBoardDashboard` | 9 | 116 |
+| `components/InfraBoardDashboard` | 9 | 122 |
 | `pages/InfraBoardDashboard.test.tsx` | 1 | 19 |
 | **`components/signing`** (the signing panel, shared with the caseworker inbox) | 3 | 26 |
+| **`components/rip-documents`** (the linked documents, shared with the caseworker inbox) | 3 | 56 |
+
+!!! note "The linked documents live in `components/rip-documents/`, and are counted here once"
+    v2026.11.6 put the linked-documents components in a shared
+    `components/rip-documents/`: the Infra-board's project page and phase
+    detail use them, and so does the caseworker's *Taken* inbox, which renders
+    `TaskCompletion` for a RIP task (`TakenInbox.tsx:523`). As with the
+    signing panel, the directory's tests are counted **once, on this page**,
+    and not on the [Caseworker](caseworker.md) page as well:
+
+    | File | Tests | Covers |
+    |---|---:|---|
+    | `rip-documents/TaskCompletion.test.tsx` | 23 | **New.** Completing a task with a B document, with B+ figures and the kredietcheck, with optional and map documents, and a task without linked documents |
+    | `rip-documents/model.test.ts` | 23 | **New.** Amounts and figures, a task's linked documents and its completion state, the kredietcheck, the work-in-progress summary, dates, and the error texts |
+    | `rip-documents/DocumentsPanel.test.tsx` | 10 | **New.** The project's *Documenten* panel and the *Beslispunt* |
+
+    Coverage on 27 November: `components/rip-documents`
+    **97.37 / 93.44 / 98.75 / 98.66** over four source files —
+    `TaskCompletion.tsx` at 100 on all four, `model.ts` at 100 / 96.77 / 100 /
+    100, `DocumentsPanel.tsx` at 100 / 91.25 / 100 / 100 and
+    `TaskDocuments.tsx` at **94.96 / 92.69 / 97.87 / 97.43**, the lowest of
+    the four: it has no test file of its own and is covered through
+    `TaskCompletion.test.tsx`.
 
 !!! note "The signing panel moved to `components/signing/`, and is counted here once"
     Until v2026.10.0 `SigningPanel` and its tests lived in
@@ -81,9 +114,9 @@ instances of every phase (`infra-board.data.test.ts` 34 → **45**,
 | File | Tests | Covers |
 |---|---:|---|
 | `pages/infra-board/infra-board.data.test.ts` | 45 | The board's data module — since v2026.10.3 the waiting rows built from finished phases (34 on 9 October) |
-| `components/InfraBoardDashboard/PhaseDetail.test.tsx` | 31 | Phase detail view |
+| `components/InfraBoardDashboard/PhaseDetail.test.tsx` | 35 | Phase detail view; since v2026.11.6 the eDOCS column, the blockade on a task whose document is missing, and the selection by instance (31 on 18 November) |
+| `components/InfraBoardDashboard/ProjectDetail.test.tsx` | 29 | Project detail, since v2026.10.3 drawn through ProcessView with the viewer's marks, a waiting project's finished phase, a refresh of the open tasks after a claim, and the shared signing panel through `useTaskSignature`; since v2026.11.6 the *Documenten* panel, *Taak openen* and a refresh after completion (21 on 9 October, 27 on 18 November) |
 | `pages/infra-board/rip-model.test.ts` | 26 | The RIP phase model |
-| `components/InfraBoardDashboard/ProjectDetail.test.tsx` | 27 | Project detail, since v2026.10.3 drawn through ProcessView with the viewer's marks, a waiting project's finished phase, a refresh of the open tasks after a claim, and the shared signing panel through `useTaskSignature` (21 on 9 October) |
 | `pages/InfraBoardDashboard.test.tsx` | 19 | The page container (18 on 9 October) |
 | `pages/infra-board/rail-stats.test.ts` | 15 | Rail statistics |
 | `components/InfraBoardDashboard/InfraSectionRouter.test.tsx` | 14 | Section routing |
@@ -97,12 +130,15 @@ instances of every phase (`infra-board.data.test.ts` 34 → **45**,
 | `components/InfraBoardDashboard/InfraDock.test.tsx` | 4 | The dock |
 | `components/InfraBoardDashboard/InfraNoAccessPanel.test.tsx` | 1 | The no-access panel |
 
-Coverage on 18 November: `pages/infra-board` **100 / 98.74 / 100 / 100**
-(98.47 branches on 9 October), and `components/InfraBoardDashboard`
-**95.49 / 90.17 / 92.63 / 96** (95.43 / 90.21 / 92.59 / 95.95 from 7 to
-14 November, 95.34 / 89.91 / 92.59 / 95.85 on 9 October), over ten source
-files. `ProjectDetail.tsx` reads 89.02% branches and 83.33% functions,
-`InfraCommandPalette.tsx` 89.28% branches and `Portfolio.tsx` 100% branches.
+Coverage on 27 November: `pages/infra-board` **100 / 98.75 / 100 / 100**
+(98.74 branches on 18 November, 98.47 on 9 October), and
+`components/InfraBoardDashboard` **95.49 / 90.26 / 93.02 / 96.16**
+(95.49 / 90.17 / 92.63 / 96 on 18 November, 95.43 / 90.21 / 92.59 / 95.95
+from 7 to 14 November, 95.34 / 89.91 / 92.59 / 95.85 on 9 October), over ten
+source files. `ProjectDetail.tsx` reads 89.08% branches and 85.71% functions
+(89.02 and 83.33 on 18 November), `PhaseDetail.tsx` 86.78% branches — the
+lowest in the directory — `InfraCommandPalette.tsx` 89.28% branches and
+`Portfolio.tsx` 100% branches.
 
 The gap between those two rows is the usual one: the pure data and model
 modules are exhaustively covered, while the components carry the
@@ -112,7 +148,7 @@ modules are exhaustively covered, while the components carry the
 
 ## E2E
 
-**Two specs, eight tests.** Last measured **14 November 2026**, and not re-run on 18 November, as part of the full
+**Two specs, eight tests.** Last measured **14 November 2026**, and not re-run on 18 November or on 27 November, when no spec had changed, as part of the full
 frontend run against the developer's already-running local stack: 60 passed,
 7 skipped, 3.9m. Before that, 7 November 2026: 56 passed, 5 skipped, 6.4m;
 9 October 2026: 42 passed, 5 skipped, 2.6m;
@@ -170,6 +206,17 @@ real signing cannot complete the journey's approval task without a binding
 signature, and the spec refuses before it sends a package. So the R2.1 work
 has not been driven end to end by these pages since 30 August; that needs a
 run against a target in stub mode.
+
+!!! warning "A risk for when the linked-document models are deployed: R2.1 now needs a document"
+    Since v2026.11.6, R2.1's *Uitvoeren PSU en aanvullen Projectplan* task
+    declares a linked document (`ronl:linkedDocumentRef="rip-psu-presentatie:…"`),
+    and the backend refuses to complete a task whose linked document is
+    missing with `422 LINKED_DOCUMENT_MISSING`. `rip-r21-journey.spec.ts`
+    drives R2.1 to completion and links no document, so against a target
+    where that R2.1 model is deployed it can be expected to stop at that task.
+    The models that declare linked documents are not yet deployed on ACC or
+    production, so this is a risk for when they are — not a measured failure:
+    the spec was not run on 27 November.
 
 !!! warning "This page said *none* for six days"
     Both specs landed on **24 August 2026**. This page, its at-a-glance line and

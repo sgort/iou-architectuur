@@ -139,13 +139,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.11.5** · *November 2026*
+-   **⚙️ RONL Business API — v2026.11.6** · *November 2026*
 
     ---
 
-    **Sign-in only from its own addresses, and the BRP asks who is looking**
+    **The Infra-board's tasks ask for their eDOCS documents, and the backend deploys only from CI**
 
-    The sign-in client now accepts only its listed addresses and requires PKCE, on ACC and production ([Keycloak realm](ronl-business-api/reference/keycloak-realm.md#client-ronl-business-api)). A BRP lookup is open to caseworkers through a new role, and otherwise only for your own record, at assurance level `hoog` and by the `bsn` claim in your token ([BRP API](ronl-business-api/reference/brp-api-endpoints.md#authentication)). Citizens start only the processes offered to them, a signer who is the ValidSign sender is told so before anything is created, and the signing callback accepts the one form ValidSign sends ([ValidSign signing](ronl-business-api/developer/validsign-signing.md#what-the-callback-accepts)). On production since 18 November, ahead of the next release: Flevoland's accent fill is pink with white text ([themes](ronl-business-api/reference/municipality-themes.md#flevolands-palette)).
+    A task in R2.1 to R2.4 that produces a document kept in eDOCS can ask for it before it completes: pick it from the project's eDOCS projectmap or upload it, enter its key figures and answer the kredietcheck, and the platform refuses the completion while anything is missing. It shows once the process models that declare those documents are deployed, which they are not yet on ACC or production ([Infra-board](ronl-business-api/user-guide/infra-board.md#documents-at-a-task)). The Woo-dashboard opens with the Flevoland account, through the new Entra ID app role `IOU_WOO`, and **Uitloggen** in the no-access dialog works in one click ([Entra ID](ronl-business-api/developer/deployment/entra-id.md)). The hand-run backend deploy scripts are retired, so the backend reaches acceptance and production only through CI, installed from the lockfile ([Backend deployment](ronl-business-api/developer/deployment/backend.md#manual-deployment)). Flevoland's pink accent fill, on production since 18 November, is now part of a release ([themes](ronl-business-api/reference/municipality-themes.md#flevolands-palette)).
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 

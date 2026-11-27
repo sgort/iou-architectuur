@@ -7,21 +7,32 @@ component: RONL Business API
 The caseworker portal is the oldest and largest board, and the one whose
 end-to-end journeys exercise the full Operaton stack.
 
-**Frontend: 60 files · 668 tests**, including the shared process view.
+**Frontend: 60 files · 677 tests**, including the shared process view.
 **E2E: 4 specs · 4 tests**, all passing on 14 November 2026; carried forward,
-not re-run on 18 November. *Proces starten*, new in v2026.11.3, has no E2E.
+not re-run on 18 or 27 November: no spec changed. *Proces starten*, new in v2026.11.3, has no E2E.
 
 ---
 
 ## Frontend
 
-Measured on **18 November 2026** at `be0a1f0`, a tree identical to `main` at
-`1784a72` (v2026.11.5 plus hot fix #473): the frontend package ran 144 files
-and 1787 tests, all passing, and the per-file and per-area counts below are
-read from Vitest's JSON report of that run, which sums to the runner's total.
+Measured on **27 November 2026** at `aa68931`, a tree identical to `main` at
+`7416c65` (v2026.11.6): the frontend package ran 147 files and 1862 tests, all
+passing, and the per-file and per-area counts below are read from Vitest's
+JSON report of that run, which sums to the runner's total — see
+[Overview](../overview.md) for how the frontend was measured.
 
-**v2026.11.5 added no test here and no file.** Every count on this page is as
-on 14 November.
+**v2026.11.6 added nine tests here and no file**, for the Infra-board's linked
+documents, which the *Taken* inbox shows for a RIP task.
+`CaseworkerDashboardV2/TakenInbox.test.tsx` went 32 → **34**: the inbox
+renders `TaskCompletion`, with the linked-document block for a RIP task.
+`CaseworkerDashboard/TaskFormViewer.test.tsx` went 14 → **21**: the form's
+new `extraVariables` and `blockedText`, and a `422` shown through
+`onMissing`. The linked-documents components themselves, in the shared
+`components/rip-documents/`, are counted on the
+[Infra-board](infra-board.md#frontend) page.
+
+**History, 18 November: v2026.11.5 added no test here and no file.** Every
+count on this page was as on 14 November.
 
 **History, 14 November: v2026.11.4 added one test here and no file.**
 `CaseworkerDashboardV2/ProcesStartenSection.test.tsx` went 17 → **18**: the
@@ -71,7 +82,7 @@ the citizen services — belong to no board; see
 
 The `CaseworkerDashboard/` directory is not only this board's: it is the
 **shared section-component library**, reused across three of the four V2
-dashboards. Changes there ripple, which is why it carries 232 tests across 26
+dashboards. Changes there ripple, which is why it carries 239 tests across 26
 files on its own. `components/process/` is shared the same way: the
 caseworker's process view is built from it, and the Infra-board's project
 detail draws its phase stepper and swimlane with the same components.
@@ -82,14 +93,19 @@ detail draws its phase stepper and swimlane with the same components.
     `SigningPanel` and `useTaskSignature` moved to the shared
     `components/signing/`, and `TakenInbox` asks `useTaskSignature` whether a
     claimed task signs through ValidSign before it renders a form. That
-    directory's **3 files and 25 tests** are counted once, on
+    directory's **3 files and 26 tests** are counted once, on
     [Infra-board](infra-board.md#frontend), where the panel started — not
     here as well. What this board adds is in `TakenInbox.test.tsx`, below.
 
+    The same holds since v2026.11.6 for **`components/rip-documents/`**,
+    whose `TaskCompletion` the inbox renders for a RIP task
+    (`TakenInbox.tsx:523`): its **3 files and 56 tests** are counted on the
+    Infra-board page, not here.
+
 | Area | Files | Tests |
 |---|---:|---:|
-| `components/CaseworkerDashboard` (shared section library) | 26 | 232 |
-| `components/CaseworkerDashboardV2` (including `regelsimulatie/`) | 17 | 212 |
+| `components/CaseworkerDashboard` (shared section library) | 26 | 239 |
+| `components/CaseworkerDashboardV2` (including `regelsimulatie/`) | 17 | 214 |
 | **`components/process`** (the process view, shared with the Infra-board) | 14 | 182 |
 | `pages/caseworker-v2` (`modes.config`) | 1 | 27 |
 | `pages/CaseworkerDashboardV2.test.tsx` | 1 | 15 |
@@ -110,10 +126,11 @@ Largest files outside `components/process/`:
 
 | File | Tests | Covers |
 |---|---:|---|
-| `CaseworkerDashboardV2/TakenInbox.test.tsx` | 32 | The task list — filters, the phase hint, the *Procesgegevens* bar, the process view a selected task opens, and since v2026.10.0 the signing panel in place of the form for a task that must be signed, nothing while the signing spec is still loading, the fallback form when it cannot be fetched, and a refreshed list after a decline (28 on 30 September) |
+| `CaseworkerDashboardV2/TakenInbox.test.tsx` | 34 | The task list — filters, the phase hint, the *Procesgegevens* bar, the process view a selected task opens, and since v2026.10.0 the signing panel in place of the form for a task that must be signed, nothing while the signing spec is still loading, the fallback form when it cannot be fetched, and a refreshed list after a decline; since v2026.11.6 `TaskCompletion` and the linked-document block for a RIP task (28 on 30 September, 32 on 18 November) |
 | `CaseworkerDashboardV2/SectionRouter.test.tsx` | 32 | Section routing and the shell's state machine; since v2026.11.3 `proces-starten` too |
 | `pages/caseworker-v2/modes.config.test.ts` | 27 | Mode configuration, a pure data module, read against the real `tenants.json`; since v2026.11.3 where *Proces starten* sits and which tenant shows it |
 | `CaseworkerDashboardV2/regelsimulatie/simEngine.test.ts` | 22 | The deterministic budget-exhaustion simulator |
+| `CaseworkerDashboard/TaskFormViewer.test.tsx` | 21 | Rendering and submitting an Operaton task form; since v2026.11.6 `extraVariables`, `blockedText`, and a `422` shown through `onMissing` (14 on 18 November) |
 | `CaseworkerDashboard/McpChatSection.test.tsx` | 20 | The MCP chat surface |
 | **`CaseworkerDashboardV2/ProcesStartenSection.test.tsx`** | **18** | **New in v2026.11.3**, with 17. *Proces starten*: a row per process with a *Start proces* button (since v2026.11.4; its accessible name starts with the visible text, *Bezig…* included), nothing to start, a process without a start form started at once and confirmed with a pointer to *Taken*, one with a form opened first, failures and their fallbacks, and an error when the list cannot be loaded |
 | `CaseworkerDashboard/IouGebruiksscenarioSection.test.tsx` | 17 | Usage-scenario section |
@@ -121,7 +138,6 @@ Largest files outside `components/process/`:
 | `CaseworkerDashboardV2/RegelSimulatie.test.tsx` | 16 | The rule-simulation section |
 | `CaseworkerDashboard/GereedschapSection.test.tsx` | 15 | Tools section |
 | `CaseworkerDashboardV2/regelsimulatie/SimTweak.test.tsx` | 15 | Adjusting the simulation's parameters |
-| `CaseworkerDashboard/TaskFormViewer.test.tsx` | 14 | Rendering and submitting an Operaton task form |
 | `pages/CaseworkerDashboardV2.test.tsx` | 15 | The page container — since v2026.10.1 logging out to the user's own tenant landing page |
 
 **The process view** — new in v2026.09.14, and since v2026.10.3 the one
@@ -144,11 +160,13 @@ rendering every dashboard uses (ProcessView):
 | `process/status.test.ts` | 3 | **New in v2026.10.3.** The node status vocabulary and its token colours |
 | `process/useViewer.test.ts` | 3 | **New in v2026.10.3.** The viewer read from the Keycloak token |
 
-Coverage on 18 November (statements / branches), from the run's coverage map:
-`components/CaseworkerDashboard` **94.2 / 94.51**,
-`components/CaseworkerDashboardV2` **92.93 / 93.66** (92.92 / 93.66 for
-v2026.11.3), the `regelsimulatie` sub-directory 98.33 / 88.59, and
-`components/process` **99.33 / 92.46**. `ProcesStartenSection.tsx`, new in
+Coverage on 27 November (statements / branches), from the run's coverage map:
+`components/CaseworkerDashboard` **94.37 / 94.61** (94.2 / 94.51 on
+18 November), `components/CaseworkerDashboardV2` **92.93 / 93.66** (92.92 /
+93.66 for v2026.11.3), the `regelsimulatie` sub-directory 98.33 / 88.59, and
+`components/process` **99.33 / 92.46**. The two files v2026.11.6 changed read
+`TakenInbox.tsx` **94.77 / 93.87** and `TaskFormViewer.tsx` **97.33 / 92.85**,
+with 100% functions and lines. `ProcesStartenSection.tsx`, new in
 v2026.11.3, read **95.34 / 96.96**, with 90% functions — 32 of 33 branches,
 which the release notes give as 96.97%, rounded rather than truncated — and
 has read **95.45 / 96.96 / 90.00 / 95.12** since v2026.11.4, statements and
@@ -156,7 +174,8 @@ lines up a little on the reworked button.
 `BesluitOverzichtSection.tsx` is still the lowest file in the frontend by
 branches, at **80.43%** — half a point above the floor — and
 `process/phaseSet.ts`, the phase set a process declares, is at 83.33%; they
-are still the only two files below 85 in the repository; see
+are still the only two frontend files below 85, joined in the repository
+since v2026.11.6 by the backend's `rip-swimlane/document-spec.ts` (84.21%); see
 [Coverage](../coverage.md#frontend-by-area).
 
 !!! note "The simulator carries a real performance budget"
@@ -182,7 +201,7 @@ untenanted SVB, SZW and Heusdenpas decisions, and informs the applicant —
 the first journey on this board for an organisation other than Flevoland and
 Dienst Toeslagen.
 
-**All four were last measured on 14 November 2026**, and not re-run on 18 November, as part of the full
+**All four were last measured on 14 November 2026**, and not re-run on 18 or 27 November, as part of the full
 frontend run against the developer's already-running local stack (60 passed,
 7 skipped, 3.9m): **one test each, all passing** — `caseworker-journey` in
 9.3s, `heusdenpas-journey` in 11.5s, `thuisbatterij-journey` in 6.5s and

@@ -13,9 +13,9 @@ jsdom. All five run with coverage by default.
 
 !!! info "Figures on this page are measured, not estimated"
     Every unit-test count and percentage below was produced on
-    **18 November 2026** against **v2026.11.5 plus hot fix #473**: `main` is
-    at `1784a72`. The runs were made at `be0a1f0`, whose tree is identical to
-    `1784a72`. Each workspace was run on its own, one after another, serially:
+    **27 November 2026** against **v2026.11.6**: `main` is at `7416c65`. The
+    runs were made at `aa68931`, whose tree is identical to `7416c65`, on
+    Node 24.22.2. Each workspace was run on its own, one after another, serially:
     the backend as `npx jest --coverage --runInBand` followed by
     `node scripts/check-conformance-coverage.cjs` — exactly what its
     `test:serial` script runs — and each Vitest workspace with coverage and
@@ -23,13 +23,32 @@ jsdom. All five run with coverage by default.
     All five collect coverage, as their `npm test` counterparts do. Rerun the
     commands in [Running the tests](#running-the-tests) to reproduce them.
 
-    **v2026.11.5 and its hot fix added one test file net and 8 tests: 352
-    files and 5442 tests, from 351 and 5434.** The backend gained a file and
-    lost one, for +1 test; the frontend gained 5 tests, pa-cockpit 1, and the
-    public site one file with 1 test; pa-demo did not change — set out below
-    the table. v2026.11.4 had added no file and 17 tests to the 351 and 5417
-    of v2026.11.3, which had added 3 files and 99 tests to 12 November's 348
-    and 5318.
+    **v2026.11.6 added 7 test files and 253 tests: 359 files and 5695 tests,
+    from 352 and 5442.** The backend gained 4 files and 178 tests and the
+    frontend 3 files and 75, nearly all of it the Infra-board's linked eDOCS
+    documents; pa-cockpit, pa-demo and the public site did not change — set
+    out below the table. v2026.11.5 and its hot fix had added one test file
+    net and 8 tests to the 351 and 5434 of v2026.11.4, which had added no
+    file and 17 tests to the 351 and 5417 of v2026.11.3.
+
+    **The frontend's figures come from its parallel run, and the serial run
+    is not a finding.** The serial `npm run test:serial` run (707.29s)
+    collected 146 files and 1847 tests, all passing, and then failed the
+    per-file branch floor for `src/pages/ChangelogPanelContent.tsx` (77.63%
+    against 80%) — because Vitest could not start a worker for
+    `src/pages/ChangelogPanel.test.tsx` (*"Failed to start forks worker …
+    Timeout waiting for worker to respond"*), so that file's 15 tests never
+    ran and the component lost their coverage. A default parallel
+    `npm test --workspace=@ronl/frontend` run (211.92s) collected all
+    **147 files and 1862 tests**, with one timing failure in that same file
+    (*"Unable to find role="dialog""*); run on its own, the file passed
+    15 of 15. CI's frontend job at the same tree,
+    [Deploy Frontend to ACC #1081](https://github.com/sgort/ronl-business-api/actions/runs/46003889371),
+    ran the 147 files green with the floor. A parallel-run failure is not a
+    finding until it fails in isolation, and this one did not: the frontend
+    is 147 files and 1862 tests, all passing, with no defect, and the floor
+    holds when every file runs. Its row below and its coverage on
+    [Coverage](coverage.md) are the parallel run's.
 
     **The method is that of the passes since 3 October.** The counts do not
     depend on it. The durations do, heavily — see the footnote under the
@@ -38,14 +57,18 @@ jsdom. All five run with coverage by default.
     against an earlier release it names the date that figure was taken,
     because not every figure here has been re-measured on every pass.
 
-    **The runtime:** `.nvmrc` names Node 22.23.4 at `1784a72`, as at
-    `67bac28`. The SBOM check below was run with npm 11.19.1.
+    **The runtime:** the runs used Node 24.22.2; `.nvmrc` still names Node
+    22.23.4 at `7416c65`, as at `1784a72` and `67bac28`. The SBOM check below
+    was run on 18 November with npm 11.19.1.
 
-    **The Playwright suites were not re-run on 18 November.** Their figures
+    **The Playwright suites were not re-run on 18 or 27 November.** Their figures
     are **carried forward from the run of 14 November** for v2026.11.3, and
-    say nothing about v2026.11.5: no spec, helper or Playwright configuration
-    changed between `67bac28` and `1784a72`, but the application under them
-    did, and no E2E run has been made against it. That 14 November run was
+    say nothing about v2026.11.5 or v2026.11.6: no spec, helper or Playwright
+    configuration changed between `67bac28` and `7416c65`, but the application
+    under them did, and no E2E run has been made against it. One risk is
+    known: R2.1 now declares a linked document, which `rip-r21-journey.spec.ts`
+    does not link — see
+    [Infra-board](dashboards/infra-board.md#e2e). That 14 November run was
     against the full local stack the developer had running — the frontend on
     `:5173`, the backend on `:3002`, Keycloak on `:8080` and the Linked Data
     Explorer backend on `:3001`, with the `bes` test users present; nothing
@@ -57,13 +80,14 @@ jsdom. All five run with coverage by default.
     `public-site/e2e/publiek`. The live-smoke shell scripts remain described
     from their configuration only.
 
-    **`npm run test:perf` was re-run: 1 file · 1 test · passing, 1.28s.**
+    **`npm run test:perf` was not re-run on 27 November; on 18 November it
+    was 1 file · 1 test · passing, 1.28s.**
     Because `vite.config.ts` excludes `src/**/*.perf.test.ts`, that one test is
-    **not** part of the 144 frontend files or the repository-wide 352 / 5442
+    **not** part of the 147 frontend files or the repository-wide 359 / 5695
     below. Wherever this page states a repository-wide file count, that count
     excludes the performance spec — and the self-contained script tests under
     `scripts/`, which no workspace runner collects. **All ten ran on
-    18 November and passed**: `dependency-review.test.mjs` (24 tests),
+    18 November and passed**, and none changed in v2026.11.6: `dependency-review.test.mjs` (24 tests),
     `lockfile-diff.test.mjs` (77), `write-sbom.test.mjs` (7),
     `check-upstream-certs.test.mjs` (22), the two stylelint rule tests under
     `scripts/stylelint/` through `npm run test:stylelint` —
@@ -73,7 +97,8 @@ jsdom. All five run with coverage by default.
     `keycloak-restrict-rba-client.test.mjs` (22) and
     `keycloak-add-brp-raadpleger.test.mjs` (12); see [CI](#ci).
 
-    **The root gates were re-run on 18 November, and all exited 0.**
+    **The root gates were last run on 18 November, for v2026.11.5, and all
+    exited 0; they were not re-run on 27 November.**
     `type-check`, `lint`, `check-format`, `check-shared` (13 files),
     `check-supply-chain` (45 pinned references), `check-swimlane-fixtures`
     (14 fixtures match) and `audit:signatures` (1452 registry signatures and
@@ -92,45 +117,84 @@ jsdom. All five run with coverage by default.
 
 | Package | Runner | Files | Tests | Result | Duration¹ | Statements | Branches | Functions | Lines |
 |---|---|---:|---:|---|---:|---:|---:|---:|---:|
-| `packages/backend` | Jest + ts-jest | 111 | 2754² | all passing | 131.91s | 98.78% | 94.88% | 97.64% | 99.16% |
-| `packages/frontend` | Vitest + RTL | 144 | 1787 | all passing³ | 460.60s | 95.65% | 93.44% | 91.96% | 96.07% |
-| `packages/pa-cockpit` | Vitest + RTL | 43 | 516 | all passing | 127.69s | 92.61% | 93.89% | 89.57% | 93.13% |
-| `packages/pa-demo` | Vitest + jsdom | 19 | 109 | all passing | 41.30s | 93.75% | 96.15% | 85.00% | 93.10% |
-| `packages/public-site` | Vitest + jsdom | 35 | 276 | all passing | 46.66s | 96.68% | 97.41% | 95.09% | 97.23% |
+| `packages/backend` | Jest + ts-jest | 115 | 2932² | all passing | 306.30s | 98.81% | 94.86% | 97.80% | 99.22% |
+| `packages/frontend` | Vitest + RTL | 147 | 1862 | all passing³ | 211.92s³ | 95.69% | 93.39% | 92.24% | 96.14% |
+| `packages/pa-cockpit` | Vitest + RTL | 43 | 516 | all passing | 117.40s | 92.61% | 93.89% | 89.57% | 93.13% |
+| `packages/pa-demo` | Vitest + jsdom | 19 | 109 | all passing | 93.32s | 93.75% | 96.15% | 85.00% | 93.10% |
+| `packages/public-site` | Vitest + jsdom | 35 | 276 | all passing | 112.53s | 96.68% | 97.41% | 95.09% | 97.23% |
 
-**352 files · 5442 tests**, all passing, **nothing skipped**. The pass took
-about **13 minutes 28 seconds** of runner-reported time across the five serial
-runs (808.16s: 131.91s, 460.60s, 127.69s, 41.30s and 46.66s) and **15 minutes
-0 seconds** of wall clock per command — 195s, 479s, 132s, 45s and 49s. The
-v2026.11.4 pass on 14 November took 628.66s of runner-reported time and
-11 minutes 41 seconds of wall clock, and the v2026.11.3 pass that morning
-804.8s and 15 minutes 23 seconds: the spread is the machine, not the suite.
-One performance spec runs separately and is excluded from both the 144 and
-the 352 — 5443 in total. See [Coverage](coverage.md) for what those
+**359 files · 5695 tests**, all passing, **nothing skipped**. The serial runs
+took 306.30s, 117.40s, 93.32s and 112.53s of runner-reported time for the
+backend, pa-cockpit, pa-demo and the public site; the frontend took 707.29s
+serially, on the 146 files that run collected, and 211.92s in the parallel
+run its row reports (see ³). Wall clock per command was not recorded on
+27 November. The v2026.11.5 pass on 18 November took 808.16s of
+runner-reported time and 15 minutes 0 seconds of wall clock, the v2026.11.4
+pass on 14 November 628.66s and 11 minutes 41 seconds, and the v2026.11.3
+pass that morning 804.8s and 15 minutes 23 seconds: the spread is the
+machine, not the suite.
+One performance spec runs separately and is excluded from both the 147 and
+the 359 — 5696 in total. See [Coverage](coverage.md) for what those
 percentages mean and where the remaining gaps are.
 
-**Against v2026.11.4, measured on 14 November: +1 file and +8 tests** — the
-backend +1 test on an unchanged 111 files (one file added, one removed), the
-frontend +5, pa-cockpit +1, the public site +1 file and +1 test, pa-demo
-unchanged. **Against 12 November (v2026.11.2): +4 files and +124 tests.**
-12 November had reproduced 7 November (v2026.11.1) file for file. Against the
-11 October measurement of v2026.10.2 — eight releases ago — that is **+21
-files and +368 tests**. Written out:
+**Against v2026.11.5 plus hot fix #473, measured on 18 November: +7 files
+and +253 tests** — the backend +4 files and +178 tests, the frontend +3 files
+and +75, pa-cockpit, pa-demo and the public site unchanged. **Against
+v2026.11.4 (14 November): +8 files and +261 tests.** Against the 11 October
+measurement of v2026.10.2 — nine releases ago — that is **+28 files and
++621 tests**. Written out:
 
-| | 30 Sep · v2026.09.15 | 3 Oct · v2026.10.0 | 9 Oct · v2026.10.1 | 11 Oct · v2026.10.2 | 7 Nov · v2026.11.1 and 12 Nov · v2026.11.2 | 14 Nov · v2026.11.3 | 14 Nov · v2026.11.4 | 18 Nov · v2026.11.5 + #473 | Δ since v2026.11.4 |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| `packages/backend` | 97 files · 2370 | 100 · 2457 | 105 · 2633 | 105 · 2638 | 109 · 2681 | 111 · 2737 | 111 · 2753 | **111 · 2754** | +0 · +1 |
-| `packages/frontend` | 120 files · 1318 | 124 · 1378 | 130 · 1540 | 130 · 1540 | 143 · 1738 | 144 · 1781 | 144 · 1782 | **144 · 1787** | +0 · +5 |
-| `packages/pa-cockpit` | 43 files · 515 | 43 · 515 | 43 · 515 | 43 · 515 | 43 · 515 | 43 · 515 | 43 · 515 | **43 · 516** | +0 · +1 |
-| `packages/pa-demo` | 19 files · 106 | 19 · 106 | 19 · 106 | 19 · 106 | 19 · 109 | 19 · 109 | 19 · 109 | **19 · 109** | — |
-| `packages/public-site` | 33 files · 265 | 34 · 275 | 34 · 275 | 34 · 275 | 34 · 275 | 34 · 275 | 34 · 275 | **35 · 276** | +1 · +1 |
-| **Total** | **312 · 4574** | **320 · 4731** | **331 · 5069** | **331 · 5074** | **348 · 5318** | **351 · 5417** | **351 · 5434** | **352 · 5442** | **+1 · +8** |
+| | 30 Sep · v2026.09.15 | 3 Oct · v2026.10.0 | 9 Oct · v2026.10.1 | 11 Oct · v2026.10.2 | 7 Nov · v2026.11.1 and 12 Nov · v2026.11.2 | 14 Nov · v2026.11.3 | 14 Nov · v2026.11.4 | 18 Nov · v2026.11.5 + #473 | 27 Nov · v2026.11.6 | Δ since v2026.11.5 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `packages/backend` | 97 files · 2370 | 100 · 2457 | 105 · 2633 | 105 · 2638 | 109 · 2681 | 111 · 2737 | 111 · 2753 | 111 · 2754 | **115 · 2932** | +4 · +178 |
+| `packages/frontend` | 120 files · 1318 | 124 · 1378 | 130 · 1540 | 130 · 1540 | 143 · 1738 | 144 · 1781 | 144 · 1782 | 144 · 1787 | **147 · 1862** | +3 · +75 |
+| `packages/pa-cockpit` | 43 files · 515 | 43 · 515 | 43 · 515 | 43 · 515 | 43 · 515 | 43 · 515 | 43 · 515 | 43 · 516 | **43 · 516** | — |
+| `packages/pa-demo` | 19 files · 106 | 19 · 106 | 19 · 106 | 19 · 106 | 19 · 109 | 19 · 109 | 19 · 109 | 19 · 109 | **19 · 109** | — |
+| `packages/public-site` | 33 files · 265 | 34 · 275 | 34 · 275 | 34 · 275 | 34 · 275 | 34 · 275 | 34 · 275 | 35 · 276 | **35 · 276** | — |
+| **Total** | **312 · 4574** | **320 · 4731** | **331 · 5069** | **331 · 5074** | **348 · 5318** | **351 · 5417** | **351 · 5434** | **352 · 5442** | **359 · 5695** | **+7 · +253** |
 
-What v2026.11.5 and hot fix #473 changed, by workspace — per-file counts from
-the runners' own JSON reports of the measured runs (Jest's `--json`, Vitest's
-`json` reporter), which sum to each runner's total; the earlier count of each
-file is the 14 November figure, less the change `git diff 67bac28 1784a72`
-shows in it:
+What v2026.11.6 changed, by workspace — per-file counts from the runners' own
+JSON reports of the measured runs (Jest's `--json`, Vitest's `json`
+reporter), which sum to each runner's total; the earlier count of each file
+is the 18 November figure:
+
+- **Backend, four new files and +75 in existing ones.**
+  `services/rip-documents/rip-documents.service.test.ts` (45) and
+  `services/rip-documents/logic.test.ts` (35), the documents of a RIP
+  instance, linking and uploading one, and the completion check;
+  `rip-swimlane/linked-docs.test.ts` (16) and
+  `rip-swimlane/document-spec.test.ts` (7), reading the linked documents a
+  model declares. In existing files: `routes/rip.routes.test.ts` 47 →
+  **77**, `services/edocs.service.test.ts` 81 → **96**,
+  `services/operaton.service.test.ts` 218 → **227**,
+  `services/externalTaskWorker.service.test.ts` 36 → **42**,
+  `routes/edocs.access.test.ts` 17 → **23**, `routes/task.routes.test.ts`
+  58 → **63** (`422 LINKED_DOCUMENT_MISSING`), `rip-swimlane/bpmn-swimlane.test.ts`
+  201 → **204** and `rip-swimlane/doc-label.test.ts` 5 → **6**;
+  `utils/config.test.ts` changed and kept its 42. See
+  [Backend suite](backend.md).
+- **Frontend, three new files and +19 in existing ones.** In the new shared
+  `components/rip-documents/`: `TaskCompletion.test.tsx` (23),
+  `model.test.ts` (23) and `DocumentsPanel.test.tsx` (10). In existing files:
+  `CaseworkerDashboard/TaskFormViewer.test.tsx` 14 → **21**,
+  `InfraBoardDashboard/PhaseDetail.test.tsx` 31 → **35**,
+  `CaseworkerDashboardV2/TakenInbox.test.tsx` 32 → **34**,
+  `InfraBoardDashboard/ProjectDetail.test.tsx` 27 → **29**,
+  `services/keycloak.test.ts` 8 → **10** (`logoutTo`),
+  `LoginChoice/AccessDeniedDialog.test.tsx` 11 → **12** and
+  `pages/login-choice/boards.config.test.ts` 9 → **10**, its boards with an
+  Entra role now four, Woo included. Five more were edited and kept their
+  count: `pages/LoginChoice.test.tsx` (28), `pages/infra-board/rip-model.test.ts`
+  (26), `css-colour.test.ts` (33), `css-tokens.test.ts` (25) and
+  `WooDashboard/WooNoAccessPanel.test.tsx` (1). See
+  [Infra-board](dashboards/infra-board.md) and
+  [Caseworker](dashboards/caseworker.md).
+- **pa-cockpit, pa-demo and the public site: no test change.** pa-cockpit's
+  `package.json` moved `vite` from ^6.4.5 to ^6.4.6.
+
+**History, 18 November: what v2026.11.5 and hot fix #473 changed**, by
+workspace — the earlier count of each file is the 14 November figure, less
+the change `git diff 67bac28 1784a72` shows in it:
 
 - **Backend, one file in, one out, +1 test.** New:
   `auth/brp-access.test.ts` (19), who may look up whom in the BRP (#319).
@@ -303,7 +367,8 @@ loop whose table is a literal in the file. Six tables are not literals, and
 were resolved by hand: in the backend, `SHELLS.slice(1)` in
 `bpmn-swimlane.test.ts` (2 cases, not 1) and the router's route layers in
 `public.routes.security.test.ts` (16, not 1); in the frontend,
-`boards.config.test.ts`'s boards with an Entra role (3) and the five
+`boards.config.test.ts`'s boards with an Entra role (3 then; 4 since
+v2026.11.6, which gave the Woo board one) and the five
 `tenants.json`-driven tables in `tenants-landing.test.ts` (25 cases, not 5).
 With those, the parse gives **2633, 1540, 515, 106 and 275** — each runner's
 total exactly — and, at `0625d48`, 2457 and 1378, the 3 October totals.
@@ -372,11 +437,14 @@ branch-margin commits (see [Coverage](coverage.md)): `391b1a8` added four to
 
 ² The backend reported **2011** for several releases, of which 2008 ran and
 three were permanently skipped; those three went with the unreachable
-`PHASE_NOT_MODELLED` branch they guarded (issue #85). The 2754 measured here is
+`PHASE_NOT_MODELLED` branch they guarded (issue #85). The 2932 measured here is
 growth on top of that 2008 — **2011 → 2008 → 2028 → 2072 → 2198 → 2202 →
-2370 → 2457 → 2633 → 2638 → 2681 → 2737 → 2753 → 2754** — and **no workspace
-skips anything**. The 18 November run ended with *"✓ all 138 documented
-operations were checked against a real response"*, as on 14 November.
+2370 → 2457 → 2633 → 2638 → 2681 → 2737 → 2753 → 2754 → 2932** — and **no workspace
+skips anything**. The 27 November run ended with *"✓ all 141 documented
+operations were checked against a real response"*: three more than on
+18 November, for `GET /v1/rip/instances/{instanceId}/workspace` and the
+link and upload of a RIP document, which v2026.11.6 added and documented.
+The 18 November run ended with 138, as on 14 November.
 v2026.11.4 documented no new operation; it reworded one description in
 `openapi.yaml`. The v2026.11.3 run ended with *"✓ all 138 documented operations were
 checked against a real response"*, the conformance-coverage step `npm test`
@@ -390,8 +458,13 @@ it was the same number for two opposite reasons: v2026.10.1 documented
 `GET /v1/process/available` and removed the deprecated `GET` spelling of
 `/v1/m2m/process/history`. See [Backend suite](backend.md).
 
-³ The frontend is **1787/1787 green in its serial run**, the one the table
-reports. No default parallel run was made on 7, 12, 14 or 18 November; the last one, on
+³ The frontend's row is its **default parallel run** of 27 November, 211.92s:
+the 147 files and 1862 tests, with one timing failure in
+`pages/ChangelogPanel.test.tsx` that passed 15 of 15 run on its own, and CI
+green on the same tree. Its serial run that day (707.29s) could not start a
+worker for that file and so collected 146 files and 1847 tests, all passing —
+see the measured box at the top. On 18 November the frontend was
+**1787/1787 green in its serial run**. No default parallel run was made on 7, 12, 14 or 18 November; the one before 27 November, on
 11 October, was 1540/1540 green in 116.45s, with pa-cockpit, pa-demo and the
 public site green beside it — the first parallel frontend run measured since
 30 September, when it was 1318/1318 green. The file that failed under
@@ -409,31 +482,37 @@ was fixed at its own boundary in `afc2001`, which closed
     decimal in the others.
 
     Branches moved furthest, which is the point of a *branch* floor, and the
-    18 November figures hold the gain: public-site **70.39% → 97.41%**,
-    pa-cockpit **75.55% → 93.89%**, frontend **80.33% → 93.44%**, backend
-    **90.01% → 94.88%**, pa-demo **86.95% → 96.15%**.
+    27 November figures hold the gain: public-site **70.39% → 97.41%**,
+    pa-cockpit **75.55% → 93.89%**, frontend **80.33% → 93.39%**, backend
+    **90.01% → 94.86%**, pa-demo **86.95% → 96.15%**.
 
     **The floor is a gate, and it is per file.** v2026.09.6 configured it in
     all five runner configs — a glob key `'./src/**/*.ts': { branches: 80 }` in
     `packages/backend/jest.config.js`, and
     `thresholds: { branches: 80, perFile: true }` in the four Vitest configs —
     so one file dropping below 80% branches exits the run non-zero and names
-    that file. **The five thresholds are unchanged at `1784a72`, and no run
-    named a file**; reading every file entry in the five workspaces'
-    coverage reports independently finds **zero of 349 files below 80%
-    branches** in any workspace.
+    that file. **The five thresholds are unchanged at `7416c65`.** On
+    27 November the frontend's serial run named one file,
+    `pages/ChangelogPanelContent.tsx` at 77.63%, because the test file that
+    covers it never started (see the measured box at the top); the parallel
+    run and CI, in which every file ran, named none. Reading every file entry
+    in the five workspaces' coverage reports — the frontend's from its
+    parallel run — finds **zero of 358 files below 80% branches** in any
+    workspace.
 
     **The floor is still 80, and the 85 margin still fails in the same two
     places.** On 30 September every file cleared 85, after `391b1a8` (#256)
     and `73a6764` had lifted the files at or near the line. v2026.10.0 brought
     two new frontend files in below it, and no release since has moved
-    either. Restated from the 18 November coverage reports, every file below
-    85% branches in the repository:
+    either; v2026.11.6 brought a third, in the backend. Restated from the
+    27 November coverage reports, every file below 85% branches in the
+    repository:
 
     | Workspace | File | Branches |
     |---|---|---:|
     | frontend | `components/CaseworkerDashboard/BesluitOverzichtSection.tsx` | **80.43** (37/46) |
     | frontend | `components/process/phaseSet.ts` | 83.33 (10/12) |
+    | backend | `rip-swimlane/document-spec.ts` | 84.21 (16/19) — new in v2026.11.6 |
 
     No other file in any workspace is below 85. The lowest file per
     workspace on 11 October — the same five files as on 3 and 9 October, at
@@ -458,11 +537,16 @@ was fixed at its own boundary in `afc2001`, which closed
     `utils/starter-groups.ts` and `services/api.ts` in the frontend, each at
     91.66%; v2026.11.4 took `starter-groups.ts` to 92.85%. The one source file under coverage
     that v2026.10.2 changed, `services/operaton.service.ts`, reads 92.78%.
+    Of the files v2026.11.6 added, besides `document-spec.ts`, the nearest are
+    the frontend's `rip-documents/DocumentsPanel.tsx` at 91.25% and
+    `TaskDocuments.tsx` at 92.69%; of those it changed,
+    `InfraBoardDashboard/PhaseDetail.tsx` at 86.78% and `routes/rip.routes.ts`
+    at 90.66%.
     It is a margin, not a floor; the configs say 80.
 
     The floor is **branches only**, deliberately: measured the same way, a
     functions floor at 80 would now fail **23 files** (frontend 8, pa-cockpit 7,
-    pa-demo 5, public-site 3, backend 0) — as on 9 October, and one fewer than
+    pa-demo 5, public-site 3, backend 0) — as on 9 October and 27 November, and one fewer than
     on 3 October, because `DvtpTakenSection.tsx` was deleted with the DVTP
     sections. The configs' own comments were corrected from 31 to 26 in
     `391b1a8`, dated 28 September, and are three high today. See
@@ -479,15 +563,16 @@ on 1378 tests on 3 October, **418.01s** on 1540 on 9 October, **413.76s**
 on the same 1540 on 11 October, against **116.45s** for that morning's
 parallel run of the same tree, about 3.6 times faster, **424.71s** on
 1738 on 7 November, **745.75s** on the same 1738 on 12 November, and
-**453.73s** on 1781 on 14 November for v2026.11.3, **362.97s** on 1782 that evening for v2026.11.4, and **460.60s** on 1787 on 18 November. That the larger suite
+**453.73s** on 1781 on 14 November for v2026.11.3, **362.97s** on 1782 that evening for v2026.11.4, **460.60s** on 1787 on 18 November, and **707.29s** on the 1847 its serial run collected on 27 November. That the larger suite
 took less time on 9 October than the smaller one on 3 October says how much
 of the figure is the machine. Treat them as an order of magnitude rather
 than a figure to match, and compare like with like. The backend's 110.81s
 on 11 October against 228.05s on 9 October, on five more tests, is the same
 lesson; on 7 November it took 137.58s, on 12 November 198.03s on the
 same 2681 tests, on 14 November 102.29s on 2737 for v2026.11.3 and
-127.35s on 2753 for v2026.11.4, and on 18 November 131.91s on 2754. All five
-durations in the table are the 18 November runs'.
+127.35s on 2753 for v2026.11.4, on 18 November 131.91s on 2754, and on
+27 November 306.30s on 2932. All five durations in the table are the
+27 November runs': four serial, and the frontend's parallel (see ³).
 
 They are machine-dependent to a degree worth keeping in mind even within one
 mode: the same parallel backend suite was measured at **118.06s** (24 Sep),
@@ -522,7 +607,7 @@ is why nothing on this page is compared on time alone.
 | Page | Covers |
 |---|---|
 | [Coverage](coverage.md) | Headline and per-area coverage for all five packages, and why the last two decimals are noise |
-| [Backend suite](backend.md) | The 111 files and 2754 tests in `packages/backend`, by area |
+| [Backend suite](backend.md) | The 115 files and 2932 tests in `packages/backend`, by area |
 | [Public site suite](public-site.md) | The 35 files and 276 tests in `packages/public-site`, plus its own Playwright suite |
 | [PA-demo suite](pa-demo.md) | The 19 files and 109 tests in `packages/pa-demo`, and the one Playwright suite that runs in CI |
 | [Caseworker](dashboards/caseworker.md) · [PA cockpit](dashboards/pa-cockpit.md) · [Infra-board](dashboards/infra-board.md) · [Woo-dashboard](dashboards/woo-dashboard.md) | The frontend and cockpit suites, split the way the product is — one page per board |
@@ -530,16 +615,23 @@ is why nothing on this page is compared on time alone.
 | [Writing tests](writing-tests.md) | Conventions for adding tests here, and the traps that have already cost time |
 
 !!! note "The four board pages do not add up to the frontend total, by design"
-    Re-derived on **18 November 2026** from Vitest's JSON report of the
-    measured run, they account for **1025 of the 1787** frontend tests:
-    Caseworker 486, the shared process view in `components/process/` 182
-    (listed on the Caseworker page), Infra-board 254, the shared signing panel
-    in `components/signing/` 26 (listed on the Infra-board page) and
+    Re-derived on **27 November 2026** from Vitest's JSON report of the
+    measured run, they account for **1096 of the 1862** frontend tests:
+    Caseworker 495, the shared process view in `components/process/` 182
+    (listed on the Caseworker page), Infra-board 260, the shared signing panel
+    in `components/signing/` 26 and the shared linked documents in
+    `components/rip-documents/` 56 (both listed on the Infra-board page) and
     Woo-dashboard 77. The PA cockpit's 516 live in their own package and are
-    not part of the 1787. The other **762** are not board-specific — among
+    not part of the 1862. The other **766** are not board-specific — among
     them v2026.11.0's colour guards at the package root (`css-colour`,
     `css-move`, `css-tokens`, `tailwind-palette`, `inline-colours`,
     `keycloak-theme`, `css-hex`: 108 tests) and the tenant and API services.
+
+    v2026.11.6 moved four and added one: Caseworker 486 → **495**
+    (`TaskFormViewer` +7, `TakenInbox` +2), Infra-board 254 → **260**
+    (`PhaseDetail` +4, `ProjectDetail` +2), `components/rip-documents/` new
+    at **56**, and the rest 762 → **766** (`keycloak` +2, `AccessDeniedDialog`
+    +1, `boards.config` +1).
 
     v2026.11.5 moved three: Infra-board 253 → **254** (`InfraCommandPalette`
     +1), signing 25 → **26** (`SigningPanel` +1) and the rest 759 → **762**
@@ -587,13 +679,14 @@ is why nothing on this page is compared on time alone.
 
     Note also that `components/CaseworkerDashboard/` is counted under
     [Caseworker](dashboards/caseworker.md) but is the **shared section-component
-    library**, reused across three of the four V2 dashboards. Its 232 tests
+    library**, reused across three of the four V2 dashboards. Its 239 tests
     protect more than that one board — and `components/process/` is shared the
     same way, since the Infra-board's `ProjectDetail` draws its phase stepper
     and swimlane with the same `PhaseStepper` and `PhaseSwimlane` the
     caseworker's process overview uses. Since v2026.10.0 so is
     `components/signing/`: the caseworker inbox and the Infra-board both render
-    the same `SigningPanel` through `useTaskSignature`.
+    the same `SigningPanel` through `useTaskSignature` — and since v2026.11.6
+    `components/rip-documents/`, whose `TaskCompletion` both render.
 
 ---
 
@@ -604,13 +697,13 @@ be installed in every workspace).
 
 | Command | Scope | Files | Tests |
 |---|---|---:|---:|
-| `npm test` | Every workspace with a `test` script (see below) | 352 | 5442 |
-| `npm run test:serial` | The same, without file parallelism — what the 18 November figures were measured with, one workspace at a time | 352 | 5442 |
-| `npm test --workspace=@ronl/backend` | Backend only (Jest, coverage on by default), then the conformance-coverage check | 111 | 2754 |
-| `npm run test:contract --workspace=@ronl/backend` | `src/openapi` and `src/routes` — the OpenAPI gates plus every route suite, coverage off | 25 | 786 |
+| `npm test` | Every workspace with a `test` script (see below) | 359 | 5695 |
+| `npm run test:serial` | The same, without file parallelism — what the 27 November figures were measured with, one workspace at a time, the frontend's excepted (see ³ above) | 359 | 5695 |
+| `npm test --workspace=@ronl/backend` | Backend only (Jest, coverage on by default), then the conformance-coverage check | 115 | 2932 |
+| `npm run test:contract --workspace=@ronl/backend` | `src/openapi` and `src/routes` — the OpenAPI gates plus every route suite, coverage off | 25 | 827 |
 | `npm run test:openapi-coverage --workspace=@ronl/backend` | `src/openapi` only — the coverage gate, the conformance helper and their helpers, coverage off | 4 | 43 |
 | `npm run lint:openapi --workspace=@ronl/backend` | Builds `openapi/openapi.json` and lints it with Spectral against the NL API Design Rules 2.2.1 ruleset, failing on `error` | — | — |
-| `npm test --workspace=@ronl/frontend` | Frontend only (Vitest, coverage on by default) | 144 | 1787 |
+| `npm test --workspace=@ronl/frontend` | Frontend only (Vitest, coverage on by default) | 147 | 1862 |
 | `npm test --workspace=@ronl/pa-cockpit` | The cockpit package | 43 | 516 |
 | `npm test --workspace=@ronl/pa-demo` | The public demo | 19 | 109 |
 | `npm test --workspace=@ronl/public-site` | Public site only (Vitest, coverage on by default) | 35 | 276 |
@@ -665,8 +758,8 @@ with a severity of 'error' found!"*; it was not re-run on 11 October, after a
 release that changed two operations' descriptions and nothing else in the
 document. The two contract test scripts were not run on their own on either
 date:
-their counts in the table are the 18 November full run's `src/routes`
-(21 files, 743 tests) and `src/openapi` (4 and 43), which is exactly what
+their counts in the table are the 27 November full run's `src/routes`
+(21 files, 784 tests) and `src/openapi` (4 and 43), which is exactly what
 they select; neither script was run on its own that day either.
 When they were last run on their own, on 30 September, they reported
 **23 suites · 668 tests** and **4 suites · 43 tests**, reconciling with that
@@ -942,8 +1035,8 @@ So the budget moved rather than moved up:
   11 October: 1.98s; 9 October: 5.80s, 4.02s of it setup;
   3 October: 1.18s in all; 12 September: 1.04s). Because `vite.config.ts`
   excludes `src/**/*.perf.test.ts`, the
-  frontend's 144 files and 1787 tests above do **not** include it, and
-  neither does the repository-wide **352 files / 5442 tests** — it is the one
+  frontend's 147 files and 1862 tests above do **not** include it, and
+  neither does the repository-wide **359 files / 5695 tests** — it is the one
   frontend test that has to be counted separately.
 
 `ChangelogPanel.test.tsx` was the other casualty of the same contention: its
@@ -1216,7 +1309,7 @@ suites:
 
 That makes **ten self-contained script tests** since v2026.11.5 outside
 the five workspaces' runners — no test runner, a pass count, exit 1 on any
-failure — none of them part of the 352 files. All ten run in a workflow:
+failure — none of them part of the 359 files. All ten run in a workflow:
 four in the workflow that uses their script, and six in `zizmor.yml`'s
 required `audit` job — the two stylelint ones, new in v2026.10.3 and run by
 nothing but `npm run test:stylelint` by hand until v2026.11.4, the two added

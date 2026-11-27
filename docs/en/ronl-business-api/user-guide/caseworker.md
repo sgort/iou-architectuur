@@ -144,6 +144,11 @@ The overview can also be opened with the command palette: with a task selected, 
 
 Under **Acties**, an open task offers **Taak claimen**. Once claimed, the confirmation **Taak geclaimd.** appears and the task's form opens in its place. Fill it in and choose **Taak voltooien**; **Taak voltooid.** confirms it and the task leaves your list. If saving fails, **Opslaan mislukt.** says so and the form stays open.
 
+A task of an Infra-board process whose model declares a document kept in eDOCS shows **Documenten bij deze
+taak** above its form, as on the Infra-board, and **Taak voltooien** waits until it is complete — see
+[Infra-board — Documents at a task](infra-board.md#documents-at-a-task). The models that declare such
+documents are not yet deployed on the ACC or the production process engines, so no task shows the block yet.
+
 ### Ondertekenen
 
 Some tasks are completed by signing a document with ValidSign rather than by filling in a form — in [Besluitvorming](#besluitvorming), **Onderteken het besluit**. The process model says which tasks these are. Once you have claimed such a task, **Acties** shows a signing panel instead of the form.

@@ -4,18 +4,20 @@ component: RONL Business API
 
 # Backend suite
 
-`packages/backend`, Jest with the `ts-jest` preset. **111 files · 2754 tests ·
-all passing · nothing skipped · `Time: 131.909 s`** under `--runInBand`,
-followed by *"✓ all 138 documented operations were checked against a real
+`packages/backend`, Jest with the `ts-jest` preset. **115 files · 2932 tests ·
+all passing · nothing skipped · `Time: 306.3 s`** under `--runInBand`,
+followed by *"✓ all 141 documented operations were checked against a real
 response"*. Coverage is on by default; see
 [Coverage](coverage.md#backend-by-area) for the per-area figures.
 
-Measured on **18 November 2026** for v2026.11.5 plus hot fix #473 — `main` at
-`1784a72` — with `npx jest --coverage --runInBand` followed by
+Measured on **27 November 2026** for v2026.11.6 — `main` at `7416c65` — with
+`npx jest --coverage --runInBand` followed by
 `node scripts/check-conformance-coverage.cjs`, which is what
-`npm run test:serial --workspace=packages/backend` runs, at `be0a1f0` (a tree
-identical to `1784a72`); `.nvmrc` names Node 22.23.4. 195 seconds of wall
-clock, coverage included. v2026.11.5 kept the file count, one file in and one
+`npm run test:serial --workspace=packages/backend` runs, at `aa68931` (a tree
+identical to `7416c65`), on Node 24.22.2; `.nvmrc` still names Node 22.23.4.
+v2026.11.6 added four files and 178 tests to the 2754 measured on
+18 November for v2026.11.5 plus hot fix #473 (131.909 s, 195 seconds of wall
+clock), which had kept the file count, one file in and one
 out, and added one test to the 2753 measured on 14 November for v2026.11.4
 (127.35 s), which had added no file and 16 tests to the 2737 of v2026.11.3
 earlier that day (102.285 s), which had added two files and 56 tests to the
@@ -24,8 +26,8 @@ earlier that day (102.285 s), which had added two files and 56 tests to the
 runner's own. The
 per-file and per-area counts are not printed by Jest's default reporter, so
 they were read from Jest's JSON report of the same run (`--json`), which
-lists every test of every file; the 111 files sum to the runner's 2754, as
-they did to 2753 for v2026.11.4, 2737 for v2026.11.3 and the 109 to 2681 on 7 and 12 November. Through 9 October every file's count was parsed from its
+lists every test of every file; the 115 files sum to the runner's 2932, as
+the 111 did to 2754 for v2026.11.5 and to 2753 for v2026.11.4, 2737 for v2026.11.3 and the 109 to 2681 on 7 and 12 November. Through 9 October every file's count was parsed from its
 source with the TypeScript compiler, `.each` tables and literal `for … of`
 loops expanded — never a grep for `it(`, which miscounts parameterised and
 multi-line cases. Two tables are not literals and were resolved by hand:
@@ -39,8 +41,13 @@ runner's 2633 exactly at `ebec288`, and 2457 and every per-area figure the
     `&& node scripts/check-conformance-coverage.cjs`. Jest runs the suite as
     before; the script then fails the run unless **every operation in the
     OpenAPI document was compared against a real response** at least once. On
-    18 November, as on 14 November, it printed *"✓ all 138 documented
-    operations were checked against a real response"*: v2026.11.3 documented
+    27 November it printed *"✓ all 141 documented operations were checked
+    against a real response"*: v2026.11.6 documented three operations, the
+    Infra-board's linked documents — `GET /v1/rip/instances/{instanceId}/workspace`
+    (`getRipInstanceWorkspace`), `POST …/documents/{slug}/link`
+    (`linkRipDocument`) and `POST …/documents/{slug}/upload`
+    (`uploadRipDocument`). On 18 November, as on 14 November, it was 138:
+    v2026.11.3 documented
     `GET /v1/process/startable` (`getStartableProcesses`), the processes a
     caseworker may start from *Proces starten*. On 7 and 12 November it was
     137: v2026.10.3 documented
@@ -56,21 +63,43 @@ runner's 2633 exactly at `ebec288`, and 2457 and every per-area figure the
     404. On 3 October it was 133 from 30 September plus the two Besluitvorming
     lists and `POST /v1/m2m/process/history`.
 
-    **That figure, and 2754 / 111, are this package's alone.** The repository
-    runs **352 test files and 5442 tests** across five workspaces — see
+    **That figure, and 2932 / 115, are this package's alone.** The repository
+    runs **359 test files and 5695 tests** across five workspaces — see
     [Overview](overview.md). Quoting the backend's count as a repository total
     understates the suite by over two thousand tests.
 
-!!! note "2011 → 2008 → 2028 → 2072 → 2198 → 2202 → 2370 → 2457 → 2633 → 2638 → 2681 → 2737 → 2753 → 2754, and nothing was lost on the way"
+!!! note "2011 → 2008 → 2028 → 2072 → 2198 → 2202 → 2370 → 2457 → 2633 → 2638 → 2681 → 2737 → 2753 → 2754 → 2932, and nothing was lost on the way"
     The suite reported **2011** for several releases, of which 2008 ran and
     **three were permanently skipped**. Those three guarded the
     `PHASE_NOT_MODELLED` branch of the RIP phase model. v2026.09.7 made an
     unmodelled phase unrepresentable (issue #85), the branch went, and the
     three skipped cases went with it — a deletion of dead tests rather than a
-    regression. The **2754** measured here is growth on that 2008 base. No
+    regression. The **2932** measured here is growth on that 2008 base. No
     workspace in this repository skips anything.
 
-    **v2026.11.5 added +1 test, one file in and one out**, against the
+    **v2026.11.6 added +178 tests and four files**, against the measurement
+    of v2026.11.5 plus hot fix #473 on 18 November (111 files, 2754) — 103 in
+    the new files and 75 in existing ones, nearly all of it the Infra-board's
+    linked eDOCS documents. The earlier count of each file is the 18 November
+    run's; with the files no test change touched, they sum to its 2754:
+
+    | File | Tests | What changed |
+    |---|---:|---|
+    | `services/rip-documents/rip-documents.service.test.ts` | **45** (new) | The documents of a RIP instance, its eDOCS workspace, linking a document and uploading one, and the completion check — including the projectmap resolved across phases, filing an upload into it by reference, a prefill from an earlier phase, and the failure paths |
+    | `services/rip-documents/logic.test.ts` | **35** (new) | The pure rules under that service: the link record and its variables, a task's state, the instance's document list, the B+ figures and the kredietcheck, and `checkCompletion` |
+    | `rip-swimlane/linked-docs.test.ts` | **16** (new) | Reading `ronl:linkedDocumentRef`, the figures and the checklist a document declares, and the kredietcheck out of the BPMN |
+    | `rip-swimlane/document-spec.test.ts` | **7** (new) | `readDocumentSpecs` against the real R2.x models and on synthetic input |
+    | `routes/rip.routes.test.ts` | 47 → **77** | The instance's documents and workspace, and linking and uploading a document |
+    | `services/edocs.service.test.ts` | 81 → **96** | `findWorkspace` across pages, `listContents` and `addReference` |
+    | `services/operaton.service.test.ts` | 218 → **227** | `getRipDocumentContext` and `getProjectVariables` |
+    | `services/externalTaskWorker.service.test.ts` | 36 → **42** | The `rip-edocs-projectmap` topic |
+    | `routes/edocs.access.test.ts` | 17 → **23** | `applyServiceFallback`, for routes that read eDOCS when they can |
+    | `routes/task.routes.test.ts` | 58 → **63** | `422 LINKED_DOCUMENT_MISSING` before a task with an incomplete linked document closes, `linkedDoc_*` variables sent with a completion dropped, and the figures sent as `Long` |
+    | `rip-swimlane/bpmn-swimlane.test.ts` | 201 → **204** | `linkedDocs` on the swimlane's tasks, and an R2.2 fixture |
+    | `rip-swimlane/doc-label.test.ts` | 5 → **6** | The curated document labels |
+    | `utils/config.test.ts` | **42**, unchanged | The three new eDOCS settings asserted in the existing default and override cases |
+
+    **History: v2026.11.5 added +1 test, one file in and one out**, against the
     measurement of v2026.11.4 on 14 November (111 files, 2753). The earlier
     count of each file is that measurement's, less the change
     `git diff 67bac28 1784a72` shows in it:
@@ -243,17 +272,17 @@ per-file 80% branch floor in `jest.config.js` rides along with it rather than
 needing a coverage job of its own — and so do the OpenAPI coverage gate, an
 ordinary test file, and the conformance-coverage check that `npm test` runs
 after Jest. Since v2026.09.7 `azure-backend-acc.yml` also
-triggers on `pull_request`, so these 2754 tests run *before* a merge rather than
+triggers on `pull_request`, so these 2932 tests run *before* a merge rather than
 only after one — and since **19 September 2026 that run is a required check**,
 so a red backend suite now blocks the merge to `acc` outright. See
 [Overview → What actually gates a merge](overview.md#what-actually-gates-a-merge).
 
 | Area | Files | Tests |
 |---|---:|---:|
-| `src/routes` | 21 | 743 |
-| `src/services` | 30 | 693 |
+| `src/services` (with `rip-documents/`) | 32 | 803 |
+| `src/routes` | 21 | 784 |
 | `src/pa-monitoring` | 15 | 551 |
-| `src/rip-swimlane` | 2 | 206 |
+| `src/rip-swimlane` | 4 | 233 |
 | `src/utils` | 19 | 194 |
 | `src/media-aggregator` | 8 | 112 |
 | `src/auth` | 5 | 110 |
@@ -262,15 +291,27 @@ so a red backend suite now blocks the merge to `acc` outright. See
 | `src/middleware` | 4 | 39 |
 
 !!! success "Both columns are current, and they sum"
-    Re-derived on 18 November 2026: the Files column accounts for all **111**
-    files and the Tests column sums to **2754**, the measured total, every
+    Re-derived on 27 November 2026: the Files column accounts for all **115**
+    files and the Tests column sums to **2932**, the measured total, every
     file's count read from Jest's JSON report of the measured run (see the
     note at the top of this page). Earlier versions of this page carried a
     Files column from one date and a Tests column from another that fell
     274 short, with a warning attached; that gap is closed and has stayed
     closed in every re-derivation since.
 
-    **Three areas moved in v2026.11.5, and the file count held**: `src/routes`
+    **Three areas moved in v2026.11.6, and four files were added**:
+    `src/services` 30 → **32** files and 693 → **803**
+    (`rip-documents.service` and `logic` new in `services/rip-documents/`,
+    which this table counts with `src/services`; `edocs.service` +15,
+    `operaton.service` +9, `externalTaskWorker.service` +6), `src/routes`
+    743 → **784** (`rip.routes` +30, `edocs.access` +6, `task.routes` +5) and
+    `src/rip-swimlane` 2 → **4** files and 206 → **233** (`linked-docs` and
+    `document-spec` new, `bpmn-swimlane` +3, `doc-label` +1). `src/utils` kept
+    its 194: `config.test.ts` changed without a test added. The other six are
+    unchanged to the test. `src/services` has passed `src/routes` as the
+    largest area.
+
+    **History: three areas moved in v2026.11.5, and the file count held**: `src/routes`
     732 → **743** (`brp.routes` +8, `validsign.routes` +2, `process.routes`
     +1), `src/auth` 4 → **5** files and 88 → **110** (`brp-access` new,
     `tenant-access` +2, `jwt.middleware` +1), and `src/pa-monitoring` 16 →
@@ -434,7 +475,7 @@ directory.
 | Area | Covers |
 |---|---|
 | `src/pa-monitoring` | Public Affairs monitoring — the largest area in the repository. `pa.routes` and `pa-dossiers.routes` for dossier authoring, `curation.service`, `rules` (pure scoring), the TK/OB/EU/agenda/media source clients, `pa-cache`, `query-match`, `rss`, `notifications.service` |
-| `src/services` | Every service — `operaton`, `edocs` and, new in v2026.10.1, **`edocs-author`** (the member of staff who acted, stamped as `edocsAuthor` and `edocsAuthorName`), `doccle`, `audit`, `berichten`, `nieuws`, `search`, `regelcatalogus`, `productenDiensten`, `mcpChat`, `externalTaskWorker`, `lde`, the `llm/` providers (Anthropic, OpenAI), the `mcp/` provider wrappers (Cprmv, Lde, Operaton, TriplyDb), and the three [ValidSign](../validsign-signing.md) services |
+| `src/services` | Every service — new in v2026.11.6, **`rip-documents/`**: the documents a RIP instance needs, linking an eDOCS document to it and uploading one into its workspace, and the check that refuses to complete a task while one is missing — and `operaton`, `edocs` and, new in v2026.10.1, **`edocs-author`** (the member of staff who acted, stamped as `edocsAuthor` and `edocsAuthorName`), `doccle`, `audit`, `berichten`, `nieuws`, `search`, `regelcatalogus`, `productenDiensten`, `mcpChat`, `externalTaskWorker`, `lde`, the `llm/` providers (Anthropic, OpenAI), the `mcp/` provider wrappers (Cprmv, Lde, Operaton, TriplyDb), and the three [ValidSign](../validsign-signing.md) services |
 | `src/routes` | Every route module, mounted with the service layer and auth mocked and supertest driving requests — `m2m`, `process`, `public.routes` and its security counterpart, `edocs`, `task`, `rip`, plus `doccle`, `mcp`, `health`, `hr`, `capacity`, `decision`, `brp`, `admin`, `validsign`, `root` (new in v2026.09.11, and now built from the registry's advertised endpoints), and, new in v2026.10.1, **`edocs.access`**: a machine client on `EDOCS_ALLOWED_CLIENTS` acts as the service account, a caseworker or admin as themselves, and each refusal has its own code — `EDOCS_CLIENT_NOT_ALLOWED`, `FORBIDDEN`, `EDOCS_USER_TOKEN_UNAVAILABLE`, `EDOCS_REAUTH_REQUIRED`, `EDOCS_ACCESS_DENIED`. In v2026.10.1 `process.routes` gained `GET /available`, the citizen's services, and `m2m` lost the deprecated `GET` history spelling, which a test now asserts no longer answers. Since v2026.10.0 every refusal and failure these suites assert is an RFC 9457 problem — `code` and `detail` where they used to read `error.code` and `error.message` (#216) — and two suites are new or reshaped by the release: **`besluitvorming.routes`**, the tenant-scoped running and completed besluit lists, and **`m2m`**, which now asserts `400 RESERVED_VARIABLE` before any engine call on start and on completion (#261) and the filtered `POST /process/history` (#263). New in v2026.09.12: **`openapi.routes`** — `GET /v1/openapi.json` serves the document with any origin allowed, reads it once when the router is built rather than per request (so a zip deploy cannot serve a document from an artifact the process is not running), and answers a 500 problem rather than crashing at load when the file is missing; and **`registry`** — every mount is under `/v1`, the ValidSign callback router precedes the authenticated one on the same mount, only `/v1/validsign` and `/v1/pa` carry two routers, and every path the root banner advertises is actually mounted, the drift that let it promise `/v1/docs` from the initial commit (#67) |
 | `src/openapi` | New in v2026.09.12 (#200), and completed in v2026.09.14 (#214, #269). **`coverage`** is the contract gate, three rules: both sides actually loaded, since two empty lists agree perfectly; every served operation is documented in `openapi/openapi.yaml`; and every documented operation is still served. The pending list that used to sit beside it — `openapi/pending.json`, with a ceiling of 18 that could only move down — is **gone**: #214 described the last undocumented operations, the rules that read the list became trivially true, and they were deleted with the file, so a route added without a description now fails here rather than being let in with the number bumped. **`testing/conformance`** tests `expectToMatchOperation`, which the route suites call on real supertest responses: the operation is documented, the status is documented for it (falling back to `default`), a 2xx carries `API-Version` (ADR API-57), and the content type is documented and the body validates against its schema with Ajv's JSON Schema 2020-12 validator, formats included and strict schema checking on. It also records every operation it is asked about, even one whose check then fails, so that `scripts/check-conformance-coverage.cjs` can fail `npm test` if any documented operation was never checked. **`document`** reads the real built `openapi.json` and rejects anything that is not an OpenAPI document with paths, without masking a missing file. **`testing/routeOperations`** turns the registry and the document into comparable operation lists, and throws rather than skips on a nested router, a non-string path or an unsupported method, since skipping would hide an operation from the gate |
 | `src/media-aggregator` | `net-guard` (the SSRF guard: IPv4/IPv6 rules, every DNS path), `ingest`, `search`, `store`, `sanitize`, `stable-id`, plus the aggregator's own route module |
@@ -442,7 +483,7 @@ directory.
 | `src/mcp-servers` | The standalone stdio MCP servers (`lde`, `triplydb`, `edocs`) — each mocks the MCP SDK to capture and drive its `ListTools`/`CallTool` handlers directly. Since v2026.10.1 the `edocs` server acts as the person whose token arrives in the call's `_meta`, and never retries that person's refusal with its own token |
 | `src/middleware` | `tenant.middleware` and `audit.middleware`; — new in v2026.09.12 — `version.middleware`: every response carries an `API-Version` header with the CalVer release string, error responses and unrouted 404s included; and — new in v2026.10.0 — **`error.middleware`**, the 404, catch-all and rate-limit handlers that used to live untested in `index.ts`: `404 NOT_FOUND`, a malformed JSON body answering `400 MALFORMED_BODY` instead of 500, an oversized one `413 PAYLOAD_TOO_LARGE`, an arbitrary error unable to choose its own status, the message hidden in production, and `429 RATE_LIMIT_EXCEEDED` |
 | `src/auth` | `jwt.middleware` — token validation, role and assurance gates, since v2026.10.1 a bearer token kept out of anything that serialises or copies `req.auth`, and since v2026.11.5 the `bsn` claim carried onto the user — new in v2026.11.5, **`brp-access`**, who may look up whom in the BRP: a `brp-raadpleger` from `substantieel`, anyone else only their own BSN at `hoog`; new in v2026.10.1, **`entra-token.service`**, which reads a person's stored Entra ID token from Keycloak so eDOCS can be reached as that person, refusing with `EDOCS_USER_TOKEN_UNAVAILABLE` or `EDOCS_REAUTH_REQUIRED`, and **`citizen-services`**, the services a citizen may start; and, new in v2026.09.12, **`tenant-access`**, the one module that decides tenant questions for process and task access (#218, #219, #229): an exact, case-sensitive tenant match with no match for a missing label; a staff start across tenants refused while a citizen's case is stamped with the deployed tenant and its origin recorded — since v2026.10.1 only for a cross-tenant service such as Zorgtoeslag, and never from an untenanted deployment; a token without a roles claim treated as staff; case reads admitted to the owning tenant or the applicant only; and the single `403 TENANT_MISMATCH` answer |
-| `src/rip-swimlane` | `bpmn-swimlane` and `doc-label` — parsing lanes, nodes and rework loops out of deployed BPMN into a swimlane model, against twelve real RIP phase fixtures, since v2026.09.14 seven Awb process fixtures under `__fixtures__/awb/`, and since v2026.10.0 two under `__fixtures__/declared/` — `GedelegeerdBesluitProcess` (six lanes, six phases) and the HR capacity claim (eight phases). The parser serves any laned process, not only RIP: script, business-rule and call-activity nodes as their own kinds, lane groups, and the phase markers the caseworker's phase stepper reads — the built-in Awb set through `ronl:awbPhase`, or, since v2026.10.0, a process's own set declared with `ronl:phases`, `ronl:phaseLabel` and `ronl:phase`. The tests pin that the two schemes never mix, that malformed, duplicate and undeclared entries are ignored, and that none of the twelve RIP fixtures carries a phase set |
+| `src/rip-swimlane` | `bpmn-swimlane` and `doc-label`, and — new in v2026.11.6 — **`linked-docs`**, which reads a task's `ronl:linkedDocumentRef` with the figures, checklist and kredietcheck its document declares, and **`document-spec`**, which collects those specs from the R2.x models — parsing lanes, nodes and rework loops out of deployed BPMN into a swimlane model, against twelve real RIP phase fixtures, since v2026.09.14 seven Awb process fixtures under `__fixtures__/awb/`, and since v2026.10.0 two under `__fixtures__/declared/` — `GedelegeerdBesluitProcess` (six lanes, six phases) and the HR capacity claim (eight phases). The parser serves any laned process, not only RIP: script, business-rule and call-activity nodes as their own kinds, lane groups, and the phase markers the caseworker's phase stepper reads — the built-in Awb set through `ronl:awbPhase`, or, since v2026.10.0, a process's own set declared with `ronl:phases`, `ronl:phaseLabel` and `ronl:phase`. The tests pin that the two schemes never mix, that malformed, duplicate and undeclared entries are ignored, and that none of the twelve RIP fixtures carries a phase set |
 
 `src/utils` was rebuilt over the v2026.08.21 window, going from 5 files and 21
 tests to 8 and 73 — `config.test.ts` the largest single addition, with

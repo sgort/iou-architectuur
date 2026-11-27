@@ -29,6 +29,20 @@ Every data response says which one acted (`actingAs: "user"` or `"service"`). A 
 
 Background archiving runs as the service account, which can only record itself as the author. The employee who caused the write is therefore recorded at the end of the document's title, as **"<title> — namens <naam> (<e-mail>)"**.
 
+### Documents a task must link
+
+A process can also name documents it does not generate but must know about: a document kept in the
+document-management system and linked to the case, possibly with key figures taken from it, or a folder
+that must hold a given set of documents. The task that produces such a document lists the case's
+workspace, lets a person link an item from it or upload a file into it, and cannot be completed until
+everything it needs is linked. A link is written by the platform only after it has checked the case's
+organisation, that the task is open and that the person may perform it, and each link is audited. The
+person lists, links and uploads as themselves, as above; only the check made when the task is completed,
+of whether a linked folder holds its required documents, reads that folder as the service account. See
+[Tasks — Completing](tasks.md#completing) and, for the Infra-board, where the first models to declare
+such documents are not yet deployed on the ACC or production engines,
+[Documents at a task](../user-guide/infra-board.md#documents-at-a-task).
+
 ---
 
 ## Delivering a document to a recipient

@@ -48,6 +48,19 @@ Only the task's own lineage and history are required; a calling process the user
 
 A completion cannot set the variables that decide access, nor the ones that decide whose name eDOCS archiving records. `municipality`, `originTenantId` and `applicantId` are written once, when the process starts; Operaton stores completion variables on the process instance, so a completion carrying `municipality` would hand the case to another organisation. `edocsAuthor` and `edocsAuthorName` are set by the backend alone, from the token of the member of staff who acts — a completion stamps the one who completed it — so that background archiving records the document "namens" the right employee; a completion carrying them would archive in someone else's name. A completion that includes any of the five is refused with `400 RESERVED_VARIABLE`, after the tenant check and before anything reaches the engine; the problem's `reserved` member names the variables refused. A completion through the machine-to-machine route, `POST /v1/m2m/task/{id}/complete`, is refused the same way.
 
+A completion can also wait for documents. When the task's model declares documents it must link from a
+document-management system (`ronl:linkedDocumentRef`), key figures for them, a checklist for a linked
+folder, or a credit check (`ronl:kredietCheck`), the completion is refused with
+`422 LINKED_DOCUMENT_MISSING` until each is present; the problem's `missing` member lists what is
+absent, each as `{ slug, what, label }` with `what` one of `document`, `figure`, `checklist`, `answer`
+or `reason`. Nothing is completed. The links themselves are written only by the routes that link or
+upload a document, which check the document and the caller, so link variables sent with a completion
+(`linkedDoc_*`, `linkedDocNumber_*`) are dropped rather than stored; figures are stored as whole numbers,
+and the credit check's suggestion is recomputed by the platform rather than taken from the request. This
+check is made on `POST /v1/task/{id}/complete`; the machine-to-machine completion does not make it.
+The Infra-board's R2.1–R2.4 models are the first to declare such documents; they are not yet deployed on
+the ACC or the production process engines.
+
 A completed task leaves a record: it can be retrieved afterwards as part of the tenant's history of finished work — filtered on the same `municipality` variable — separate from the list of currently open tasks.
 
 ---
