@@ -25,10 +25,11 @@ ttl-editor/
 ├── postcss.config.js
 ├── package.json
 ├── package-lock.json
-├── lockfile-review.json            # Licence allow-list for the lockfile review
+├── lockfile-review.json            # Licence allow-list and the 14-day minReleaseAgeDays
+├── dependency-register.json        # One assessment per direct dependency, read by the dependency gate
 ├── renovate.json                   # Dependency update policy
 ├── SECURITY-PIPELINE.md            # Pins, required checks, accepted risks
-├── .nvmrc                          # Exact Node version (24.22.2); CI reads it
+├── .nvmrc                          # Exact Node version (24.22.3); CI reads it
 ├── .npmrc                          # min-release-age=14 — npm's 14-day cooldown
 ├── .env.development                # Local: backend :3001, Operaton :8081, Keycloak :8080
 ├── .env.production                 # Loaded by every `vite build`
@@ -101,6 +102,7 @@ ttl-editor/
 │   │   ├── ronlHelper.js           # RONL vocabulary SPARQL queries
 │   │   ├── serviceCatalogHelper.js # Published services in the dataset, for dct:requires
 │   │   ├── iknowParser.js          # iKnow XML parser
+│   │   ├── logoImage.js            # Scales a vendor logo to fit 512 px, as PNG
 │   │   ├── problem.js              # Reads the backend's RFC 9457 error detail
 │   │   └── buildInfo.js            # Build SHA and run number, injected at build time
 │   │
@@ -129,7 +131,8 @@ ttl-editor/
 │   ├── audit-tree.mjs              # Daily dependency audit, grouped by advisory
 │   ├── audit-signatures.sh         # npm run audit:signatures — registry signatures and provenance
 │   ├── lockfile-diff.mjs           # Lockfile review of a pull request's package-lock.json change
-│   ├── dependency-review.mjs       # Quarterly dependency review evidence
+│   ├── dependency-gate.mjs         # Register and 14-day cooldown gate, in the lockfile-review job
+│   ├── dependency-review.mjs       # Quarterly dependency review evidence, and the register's open items
 │   ├── write-sbom.mjs              # npm run sbom — CycloneDX SBOM into docs/sbom/
 │   ├── check-mirror.sh             # npm run check-mirror — GitLab mirror vs GitHub (never pushes)
 │   └── check-previews.sh           # npm run check-previews — orphaned preview environments (never deletes)

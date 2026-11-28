@@ -189,7 +189,7 @@ Voegt gedeployde DMN's samen tot één DRD en deployt die naar Operaton. Vereist
 GET  /v1/edocs/status
 ```
 
-Meldt of het OpenText eDOCS-documentmanagementsysteem bereikbaar is. Het RIP Fase 1-proces dossiert zijn documenten via de [external task worker](#external-task-worker), die de eDOCS-service rechtstreeks aanroept. De drie schrijfroutes die er ook waren — `POST /workspaces/ensure`, `POST /documents` en `GET /workspaces/:workspaceId/documents` — hadden geen client, en v2026.11.2 heeft ze verwijderd. In stub-modus (`EDOCS_STUB_MODE=true`, default) retourneren alle methoden realistische nepresponses zodat het proces end-to-end draait voordat een live eDOCS-server beschikbaar is.
+Meldt of het OpenText eDOCS-documentmanagementsysteem bereikbaar is. Het RIP Fase 1-proces dossierde zijn documenten via de [external task worker](#external-task-worker), die de eDOCS-service rechtstreeks aanroept; geen model in de repository gebruikt zijn twee topics nog, en de eDOCS-stap van R2.1 (`rip-edocs-projectmap`, sinds v2026.11.4) wordt afgehandeld door de worker van de RONL Business API. De drie schrijfroutes die er ook waren — `POST /workspaces/ensure`, `POST /documents` en `GET /workspaces/:workspaceId/documents` — hadden geen client, en v2026.11.2 heeft ze verwijderd. In stub-modus (`EDOCS_STUB_MODE=true`, default) retourneren alle methoden realistische nepresponses zodat het proces end-to-end draait voordat een live eDOCS-server beschikbaar is.
 
 Zie [eDOCS-integratie](edocs-integration.md), en de [API Specification](../reference/api-specification.md) voor request- en responsedetails.
 

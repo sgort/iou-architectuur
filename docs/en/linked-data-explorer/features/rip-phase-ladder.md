@@ -17,6 +17,17 @@ Two phases have their own deep pages, written when they were the only ones model
 [R2.1](rip-phase1-bundle.md) and [R2.2](rip-r22-bundle.md). This page covers the ladder
 as a whole.
 
+!!! info "Linked documents in R2.1 to R2.4, since v2026.11.4"
+    The R2.1 to R2.4 models also name the documents a task links from eDOCS rather
+    than generates: `ronl:linkedDocumentRef`, with key figures
+    (`ronl:documentFigures`), a checklist (`ronl:documentChecklist`) and a
+    kredietcheck (`ronl:kredietCheck`). The RONL Business API asks for them when the
+    task is completed —
+    [Documents at a task](../../ronl-business-api/user-guide/infra-board.md#documents-at-a-task).
+    That is what the models declare. The release puts them in this repository and
+    deploys nothing to Operaton, and on 28 November 2026 the changed models are not yet
+    deployed on ACC or production.
+
 ---
 
 ## What is modelled
@@ -39,10 +50,10 @@ R2.2 preceded it, and R5.3 closed the ladder in v2026.09.2.
 
 | Phase | Subject | Nodes | Flows | Lanes | Forms | Docs |
 |---|---|--:|--:|--:|--:|--:|
-| [R2.1](rip-phase1-bundle.md) | Projectdefinitie en voorbereiding VO | 19 | 21 | 9 | 12 | 3 |
-| [R2.2](rip-r22-bundle.md) | Voorlopig ontwerp | 17 | 21 | 4 | 9 | 5 |
-| R2.3 | VO-raming | 22 | 23 | 9 | 12 | 6 |
-| R2.4 | DO en -raming | 29 | 33 | 6 | 18 | 9 |
+| [R2.1](rip-phase1-bundle.md) | Projectdefinitie en voorbereiding VO | 20 | 22 | 9 | 12 | 3 |
+| [R2.2](rip-r22-bundle.md) | Voorlopig ontwerp | 17 | 21 | 4 | 9 | 2 |
+| R2.3 | VO-raming | 23 | 24 | 9 | 12 | 5 |
+| R2.4 | DO en -raming | 30 | 34 | 6 | 18 | 7 |
 | R3.1 | Opstellen bestek en tekeningen | 25 | 31 | 4 | 12 | 6 |
 | R3.2 | Afronding bestek en tekeningen | 27 | 30 | 7 | 18 | 7 |
 | R4.1 | Aanbestedingsproces | 25 | 27 | 7 | 17 | 7 |
@@ -57,12 +68,20 @@ R2.2 preceded it, and R5.3 closed the ladder in v2026.09.2.
     the v2026.10.0 release commit — flow nodes (tasks, events and gateways),
     `sequenceFlow` elements, `lane` elements, distinct `camunda:formRef`/`formKey`
     values, and distinct `ronl:documentRef`/`ronl:signatureRef` ids, a
-    comma-separated `ronl:documentRef` counting each of its ids.
+    comma-separated `ronl:documentRef` counting each of its ids. The R2.1 to R2.4
+    rows were counted again at v2026.11.4, the release that changed those four models.
 
-    They agree with the release notes everywhere the notes state a figure, with one
-    exception: **R2.3 has 22 flow nodes, where the notes say 21.** The file is the
-    authority — 12 user tasks, 1 start event, 4 end events, 4 exclusive gateways and
-    1 parallel gateway.
+    They agreed with the release notes everywhere the notes stated a figure, with one
+    exception: **R2.3 had 22 flow nodes, where the notes said 21.** The file is the
+    authority. At v2026.10.0 it had 12 user tasks, 1 start event, 4 end events,
+    4 exclusive gateways and 1 parallel gateway. v2026.11.4 added a 13th user task.
+
+    **Docs counts templates only.** Since v2026.11.4, a document kept in eDOCS is linked
+    with `ronl:linkedDocumentRef` rather than generated, and is not counted. R2.1 links
+    one, and R2.2, R2.3 and R2.4 link three each. That is why R2.2 fell from 5 to 2, R2.3
+    from 6 to 5 and R2.4 from 9 to 7. R2.1 gained a service task, *Aanmaken projectmap
+    eDOCS*. The new user tasks *Opstellen SSK-raming* (R2.3) and *Samenstellen
+    Verzamelmap V&G* (R2.4) have no form, so Forms did not change.
 
 ---
 

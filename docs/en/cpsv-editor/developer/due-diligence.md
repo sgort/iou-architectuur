@@ -111,7 +111,7 @@ The `useDsoImport` hook (`src/hooks/useDsoImport.js`) consumes a deep-link hando
 | External APIs | Keycloak (OIDC sign-in, realm `ronl`) directly from the browser; TriplyDB, Operaton (Camunda-compatible REST), the RONL SPARQL vocabulary and the DSO APIs only through the shared backend |
 | Backend dependency | Shared Express server (Linked Data Explorer repo) for CORS-proxied SPARQL queries (the RONL vocabulary and the published-services list), TriplyDB publishing as the signed-in author, DMN syntactic validation (libxmljs2), DMN deploy and evaluate, pre-publish SHACL validation and the DSO import |
 | Hosting | Azure Static Web Apps (acc branch → acceptance, main → production) |
-| CI/CD | GitHub Actions: lint, tests and the production build on the runner (Node 24.22.2 from `.nvmrc`), uploaded to Azure Static Web Apps with `skip_app_build`; on every pull request a required lockfile review and verification of registry signatures and provenance attestations; a daily dependency audit, a quarterly dependency review, and an SBOM per release of every production package ([Deployment](deployment.md)) |
+| CI/CD | GitHub Actions: lint, tests and the production build on the runner (Node 24.22.3 from `.nvmrc`), uploaded to Azure Static Web Apps with `skip_app_build`; on every pull request a required lockfile review, which blocks a new direct dependency without a recorded assessment and any lockfile version younger than 14 days, and verification of registry signatures and provenance attestations; a daily dependency audit, a quarterly dependency review, and an SBOM per release of every production package ([Deployment](deployment.md)) |
 
 ---
 

@@ -1,7 +1,7 @@
 # Linked Data Explorer — screenshots to capture
 
-*A running record across syncs, newest first. Last reviewed for **v2026.11.3** on
-22 November 2026 — nothing to capture. Before that, **v2026.11.2** on
+*A running record across syncs, newest first. Last reviewed for **v2026.11.4** on
+28 November 2026 — nothing to capture. Before that, **v2026.11.3** on 22 November 2026 — nothing to capture. Before that, **v2026.11.2** on
 12 November 2026 — two NEW captures for the sign-in are open; the figures are in the pages,
 the files are not yet captured. The two REPLACE rows of v2026.10.1 stay open.*
 
@@ -27,6 +27,10 @@ stale UI.
 **Nothing outstanding.** All three were re-shot on 19 August 2026 and are in
 `docs/assets/screenshots/`; a non-strict `mkdocs build` reports zero
 missing-image warnings.
+
+## Sync v2026.11.3 → v2026.11.4 — nothing to capture
+
+Reviewed on 28 November 2026 for **v2026.11.4**, in production (`origin/main` `7925e61`). The release adds the dependency register gate to the required `lockfile-review` check and changes the RIP R2.1–R2.4 models (linked eDOCS documents, a projectmap step in R2.1); no frontend code changed, so no captured view shows a changed element. `linked-data-explorer-bpmn-document-template-selector.png` still shows R2.2 *Opstellen concept VO* with two templates, a configuration the bundle no longer ships; the Modeler behaviour it illustrates is unchanged, so it stays. `ronl-lde-bpmn-rip-phase1-canvas.png` predates the new *Aanmaken projectmap eDOCS* service task; its caption claims only part of the process, so it stays too.
 
 ## Sync v2026.11.2 → v2026.11.3 — nothing to capture
 

@@ -52,7 +52,7 @@ vendorService: {
     email: string,
     phone: string,
     website: string,
-    logo: string | null,          // Base64 encoded image
+    logo: string,                 // PNG data URL, scaled to fit 512 px (utils/logoImage.js); '' when none
   },
   technical: {
     serviceUrl: string,

@@ -10,6 +10,10 @@
     The sync to v2026.11.6 (27 November 2026) requests three, rows 38–40, for the following week; rows 39 and 40
     wait until the RIP models that declare linked documents are deployed.
 
+## Sync v2026.11.6 → v2026.11.7 — nothing to capture
+
+Reviewed on 28 November 2026 for **v2026.11.7**, in production (`origin/main` `9e8d9ec`). No application code changed: the release moves to Node 24 and adds the dependency register gate and a daily cooldown proof. Rows 38–40 below stay as they are; rows 39 and 40 still wait for the RIP models on ACC or production.
+
 ## Sync v2026.11.5 → v2026.11.6 — one REPLACE, two NEW (for the week of 30 November)
 
 Reviewed on 27 November 2026 for **v2026.11.6**, in production (`origin/main` `7416c65`). The Woo-dashboard's card now offers the Flevoland account, so the landing page changes. The Infra-board's tasks and project page gain document blocks, but only for a process model that declares linked documents, and those models (linked-data-explorer#362) are **not yet deployed on ACC or production**: rows 39 and 40 can be captured only once they are, on whichever tier has them first; say which in the row when it is done. The user chose to capture all three the following week.

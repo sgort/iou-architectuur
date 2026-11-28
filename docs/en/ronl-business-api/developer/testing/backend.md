@@ -14,7 +14,12 @@ Measured on **27 November 2026** for v2026.11.6 — `main` at `7416c65` — with
 `npx jest --coverage --runInBand` followed by
 `node scripts/check-conformance-coverage.cjs`, which is what
 `npm run test:serial --workspace=packages/backend` runs, at `aa68931` (a tree
-identical to `7416c65`), on Node 24.22.2; `.nvmrc` still names Node 22.23.4.
+identical to `7416c65`), on Node 24.22.2; `.nvmrc` then named Node 22.23.4, and
+names 24.22.3 since v2026.11.7. **Re-run on 28 November 2026** for v2026.11.7
+(`main` at `9e8d9ec`), at `f267d7a` (a tree identical to `9e8d9ec`), the same
+way and on the same Node: the same 115 files and 2932 tests, all passing, the
+same all-files coverage and the same 141 operations checked, in
+`Time: 220.168 s`; no backend test file changed in that release.
 v2026.11.6 added four files and 178 tests to the 2754 measured on
 18 November for v2026.11.5 plus hot fix #473 (131.909 s, 195 seconds of wall
 clock), which had kept the file count, one file in and one

@@ -85,8 +85,8 @@ realm's keys from it to verify a token. Without it the editor still works, signe
 
 | Tool | Version | Why |
 |---|---|---|
-| Node.js | 24.22.2 | `.nvmrc`. CI installs exactly this version (`node-version-file: .nvmrc`). The LDE repository pins its own version in its own `.nvmrc`, currently the same version. |
-| npm | 11.10 or newer | `.npmrc` sets a 14-day cooldown (`min-release-age=14`) that older npm ignores without a warning. Node 24.22.2 bundles npm 11.19. npm 10 also crashes on anything that re-resolves the tree (`npm install <package>`, `npm update`) — see below. |
+| Node.js | 24.22.3 | `.nvmrc`. CI installs exactly this version (`node-version-file: .nvmrc`). The LDE repository pins its own version in its own `.nvmrc`, currently the same version. |
+| npm | 11.10 or newer | `.npmrc` sets a 14-day cooldown (`min-release-age=14`) that older npm ignores without a warning. Node 24.22.3 bundles npm 11.19. npm 10 also crashes on anything that re-resolves the tree (`npm install <package>`, `npm update`) — see below. |
 | bash | on `PATH` | `npm start` runs `npm run deps:check`, which is `bash scripts/check-deps.sh`; the pre-push hook runs it too. On Windows, npm runs scripts through `cmd.exe`, so `bash` must be found on `PATH` — Git for Windows provides one. |
 | Git | — | |
 | Docker | — | Only to run the LDE backend: its `dev` script refuses to start without the `ronl-postgres` and `ronl-operaton` containers. |
@@ -153,6 +153,11 @@ what catches a stale install after a pull.
     and ignores the `.npmrc` cooldown by design — the lockfile is the source of truth. Use
     `npm install <package>` only to add or upgrade one package. `npm ci` deletes
     `node_modules` first, so stop the dev server before running it.
+    A new **direct** dependency also needs its entry in `dependency-register.json`
+    in the same pull request, or `lockfile-review` fails (v2026.11.3, see
+    [Deployment](deployment.md#supply-chain-guards-around-the-install));
+    `node scripts/dependency-gate.mjs --check-register` checks the file's shape
+    locally, without the network.
 
 The port is fixed: `vite.config.mjs` sets `server: { port: 3000, strictPort: true }`. The
 LDE backend allowlists browser origins for CORS by port, and `strictPort` stops Vite from

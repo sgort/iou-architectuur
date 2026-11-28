@@ -113,7 +113,7 @@ De `useDsoImport`-hook (`src/hooks/useDsoImport.js`, v1.9.6) verwerkt een deep-l
 | Externe API's | Keycloak (OIDC-inloggen, realm `ronl`) rechtstreeks vanuit de browser; TriplyDB, Operaton (Camunda-compatibele REST), de RONL SPARQL-vocabulaire en de DSO-API's alleen via de gedeelde backend |
 | Backend-afhankelijkheid | Gedeelde Express-server (Linked Data Explorer-repo) voor CORS-geproxyde SPARQL-queries (de RONL-vocabulaire en de lijst gepubliceerde diensten), TriplyDB-publicatie als de ingelogde auteur, DMN-syntactische validatie (libxmljs2), het deployen en evalueren van DMN's, de SHACL-validatie vóór publicatie en de DSO-import |
 | Hosting | Azure Static Web Apps (acc-branch → acceptatie, main → productie) |
-| CI/CD | GitHub Actions: lint, tests en de productiebuild op de runner (Node 24.22.2 uit `.nvmrc`), geüpload naar Azure Static Web Apps met `skip_app_build`; bij elke pull request een verplichte lockfile-review en controle van registry-handtekeningen en provenance-attestaties; een dagelijkse dependency-audit, een driemaandelijkse dependency-review en een SBOM per release van elk productiepakket ([Deployment](deployment.md)) |
+| CI/CD | GitHub Actions: lint, tests en de productiebuild op de runner (Node 24.22.3 uit `.nvmrc`), geüpload naar Azure Static Web Apps met `skip_app_build`; bij elke pull request een verplichte lockfile-review, die een nieuwe directe afhankelijkheid zonder vastgelegde beoordeling en elke lockfile-versie jonger dan 14 dagen tegenhoudt, en controle van registry-handtekeningen en provenance-attestaties; een dagelijkse dependency-audit, een driemaandelijkse dependency-review en een SBOM per release van elk productiepakket ([Deployment](deployment.md)) |
 
 ---
 

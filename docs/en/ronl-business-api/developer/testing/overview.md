@@ -12,16 +12,28 @@ cockpit (`packages/pa-cockpit`), the public cockpit demo
 jsdom. All five run with coverage by default.
 
 !!! info "Figures on this page are measured, not estimated"
-    Every unit-test count and percentage below was produced on
-    **27 November 2026** against **v2026.11.6**: `main` is at `7416c65`. The
-    runs were made at `aa68931`, whose tree is identical to `7416c65`, on
-    Node 24.22.2. Each workspace was run on its own, one after another, serially:
+    Every unit-test count and percentage below was measured. For
+    **v2026.11.7** (`main` at `9e8d9ec`) the backend was re-run on
+    **28 November 2026**, at `f267d7a`, whose tree is identical to `9e8d9ec`:
+    115 files and 2932 tests, all passing, the same all-files coverage to the
+    second decimal, in `Time: 220.168 s`. The other four workspaces were not
+    re-run on 28 November, because no test file changed between `7416c65` and
+    `9e8d9ec`; their figures are those of **27 November 2026**, against
+    **v2026.11.6** (`main` at `7416c65`), measured at `aa68931`, whose tree is
+    identical to `7416c65`. Both days used Node 24.22.2. Each workspace was run
+    on its own, one after another, serially:
     the backend as `npx jest --coverage --runInBand` followed by
     `node scripts/check-conformance-coverage.cjs` — exactly what its
     `test:serial` script runs — and each Vitest workspace with coverage and
     `--no-file-parallelism`, which is what its **`npm run test:serial`** runs.
     All five collect coverage, as their `npm test` counterparts do. Rerun the
     commands in [Running the tests](#running-the-tests) to reproduce them.
+
+    **v2026.11.7 added no test file and no test: 359 files and 5695 tests,
+    as for v2026.11.6.** No `*.test.ts(x)`, e2e spec, helper or Playwright
+    configuration changed between `7416c65` and `9e8d9ec`: the release moved
+    the toolchain to Node 24 and refreshed the lockfile. The backend duration
+    in the table is 27 November's.
 
     **v2026.11.6 added 7 test files and 253 tests: 359 files and 5695 tests,
     from 352 and 5442.** The backend gained 4 files and 178 tests and the
@@ -48,7 +60,11 @@ jsdom. All five run with coverage by default.
     finding until it fails in isolation, and this one did not: the frontend
     is 147 files and 1862 tests, all passing, with no defect, and the floor
     holds when every file runs. Its row below and its coverage on
-    [Coverage](coverage.md) are the parallel run's.
+    [Coverage](coverage.md) are the parallel run's. The same file is now
+    [#504](https://github.com/sgort/ronl-business-api/issues/504): in the
+    developer's full parallel run on 28 November it timed out at 60 s, and run
+    alone it passed 15 of 15 in 19.9 s. It renders every release in
+    `changelog-data.ts`, which grows with each one.
 
     **The method is that of the passes since 3 October.** The counts do not
     depend on it. The durations do, heavily — see the footnote under the
@@ -57,17 +73,24 @@ jsdom. All five run with coverage by default.
     against an earlier release it names the date that figure was taken,
     because not every figure here has been re-measured on every pass.
 
-    **The runtime:** the runs used Node 24.22.2; `.nvmrc` still names Node
-    22.23.4 at `7416c65`, as at `1784a72` and `67bac28`. The SBOM check below
-    was run on 18 November with npm 11.19.1.
+    **The runtime:** the runs used Node 24.22.2; `.nvmrc` names Node 24.22.3
+    since v2026.11.7 (22.23.4 until then), so the measuring Node is one patch
+    behind the pinned one, on the same major and the same npm 11.19.1. The
+    SBOM check below was run on 18 November with npm 11.19.1.
 
-    **The Playwright suites were not re-run on 18 or 27 November.** Their figures
-    are **carried forward from the run of 14 November** for v2026.11.3, and
-    say nothing about v2026.11.5 or v2026.11.6: no spec, helper or Playwright
-    configuration changed between `67bac28` and `7416c65`, but the application
-    under them did, and no E2E run has been made against it. One risk is
-    known: R2.1 now declares a linked document, which `rip-r21-journey.spec.ts`
-    does not link — see
+    **The Playwright suites were not re-run for this page on 18, 27 or
+    28 November.** Their figures are **carried forward from the run of
+    14 November** for v2026.11.3: no spec, helper or Playwright configuration
+    changed between `67bac28` and `9e8d9ec`, but the application under them
+    did, and Playwright itself moved to 1.65.1 in v2026.11.7. For v2026.11.7,
+    promotion [#510](https://github.com/sgort/ronl-business-api/pull/510)
+    reports the developer's own runs, not repeated here: against localhost
+    with the new RIP models, 65 of 67 passed, with one known failure and
+    [#508](https://github.com/sgort/ronl-business-api/issues/508); against ACC
+    at `f267d7a`, all passed except the known accessibility failures on the
+    Keycloak login pages (#497). The R2.1 journey stalling is what v2026.11.6
+    named as a risk: R2.1 now declares a linked document, which
+    `rip-r21-journey.spec.ts` does not link — see
     [Infra-board](dashboards/infra-board.md#e2e). That 14 November run was
     against the full local stack the developer had running — the frontend on
     `:5173`, the backend on `:3002`, Keycloak on `:8080` and the Linked Data
@@ -86,19 +109,22 @@ jsdom. All five run with coverage by default.
     **not** part of the 147 frontend files or the repository-wide 359 / 5695
     below. Wherever this page states a repository-wide file count, that count
     excludes the performance spec — and the self-contained script tests under
-    `scripts/`, which no workspace runner collects. **All ten ran on
-    18 November and passed**, and none changed in v2026.11.6: `dependency-review.test.mjs` (24 tests),
-    `lockfile-diff.test.mjs` (77), `write-sbom.test.mjs` (7),
-    `check-upstream-certs.test.mjs` (22), the two stylelint rule tests under
-    `scripts/stylelint/` through `npm run test:stylelint` —
-    `selector-root-class.test.mjs` (18) and `summary.test.mjs` (12) —
-    `keycloak-add-lde-clients.test.mjs` (24), `promotion-targets.test.mjs`
-    (8, one more than on 14 November) and, both new in v2026.11.5,
-    `keycloak-restrict-rba-client.test.mjs` (22) and
-    `keycloak-add-brp-raadpleger.test.mjs` (12); see [CI](#ci).
+    `scripts/`, which no workspace runner collects. **All twelve ran on
+    28 November and passed.** v2026.11.7 added two and extended two:
+    `cooldown-proof.test.mjs` (25 checks) and `dependency-gate.test.mjs`
+    (130) are new, `dependency-review.test.mjs` went from 24 to 49 and
+    `lockfile-diff.test.mjs` from 77 to 84. The other eight are unchanged:
+    `write-sbom.test.mjs` (7), `check-upstream-certs.test.mjs` (22), the two
+    stylelint rule tests under `scripts/stylelint/` through
+    `npm run test:stylelint` — `selector-root-class.test.mjs` (18) and
+    `summary.test.mjs` (12) — `keycloak-add-lde-clients.test.mjs` (24),
+    `promotion-targets.test.mjs` (8), `keycloak-restrict-rba-client.test.mjs`
+    (22) and `keycloak-add-brp-raadpleger.test.mjs` (12); see [CI](#ci).
+    `cooldown-proof.mjs` itself, which installs from the npm registry, is not
+    a unit test and was not run for this page.
 
     **The root gates were last run on 18 November, for v2026.11.5, and all
-    exited 0; they were not re-run on 27 November.**
+    exited 0; they were not re-run on 27 or 28 November.**
     `type-check`, `lint`, `check-format`, `check-shared` (13 files),
     `check-supply-chain` (45 pinned references), `check-swimlane-fixtures`
     (14 fixtures match) and `audit:signatures` (1452 registry signatures and
@@ -137,8 +163,9 @@ One performance spec runs separately and is excluded from both the 147 and
 the 359 — 5696 in total. See [Coverage](coverage.md) for what those
 percentages mean and where the remaining gaps are.
 
-**Against v2026.11.5 plus hot fix #473, measured on 18 November: +7 files
-and +253 tests** — the backend +4 files and +178 tests, the frontend +3 files
+**v2026.11.7 changed no count:** the backend's 28 November run matched
+27 November's, and no other workspace's tests changed. **Against v2026.11.5
+plus hot fix #473, measured on 18 November: +7 files and +253 tests** — the backend +4 files and +178 tests, the frontend +3 files
 and +75, pa-cockpit, pa-demo and the public site unchanged. **Against
 v2026.11.4 (14 November): +8 files and +261 tests.** Against the 11 October
 measurement of v2026.10.2 — nine releases ago — that is **+28 files and
@@ -153,7 +180,7 @@ measurement of v2026.10.2 — nine releases ago — that is **+28 files and
 | `packages/public-site` | 33 files · 265 | 34 · 275 | 34 · 275 | 34 · 275 | 34 · 275 | 34 · 275 | 34 · 275 | 35 · 276 | **35 · 276** | — |
 | **Total** | **312 · 4574** | **320 · 4731** | **331 · 5069** | **331 · 5074** | **348 · 5318** | **351 · 5417** | **351 · 5434** | **352 · 5442** | **359 · 5695** | **+7 · +253** |
 
-What v2026.11.6 changed, by workspace — per-file counts from the runners' own
+**History, 27 November: what v2026.11.6 changed**, by workspace — per-file counts from the runners' own
 JSON reports of the measured runs (Jest's `--json`, Vitest's `json`
 reporter), which sum to each runner's total; the earlier count of each file
 is the 18 November figure:
@@ -1219,7 +1246,30 @@ of the check.
 
 ### CI
 
-**Fifteen** workflows under `.github/workflows/`. **v2026.11.5 added none
+**Fifteen** workflows under `.github/workflows/`. **v2026.11.7 added none
+and edited seven** — `git diff --name-status 7416c65 9e8d9ec -- .github/`
+lists only modifications — and changed no unit-test step of the five
+workspaces. What changed around the suites:
+
+- `dependency-audit.yml` gained the *Cooldown proof* step, `node
+  scripts/cooldown-proof.test.mjs && node scripts/cooldown-proof.mjs`,
+  before the audit, and its pull-request paths gained both files; see
+  [CI/CD](../cicd.md#dependency-audit-daily-on-acc-and-main).
+- `zizmor.yml`'s required `lockfile-review` gained *Test the dependency
+  gate* — `node scripts/dependency-gate.test.mjs`, then
+  `node scripts/dependency-gate.mjs --check-register` — before the
+  comparison, and the job gained `issues: read` and `pull-requests: read`
+  for the gate; see
+  [CI/CD](../cicd.md#lockfile-review-what-a-lockfile-change-contains).
+- `dependency-review.yml`'s pull-request paths gained
+  `scripts/dependency-gate.mjs` and `dependency-register.json`.
+- The tooling Node literal went from 24.22.2 to **24.22.3** in
+  `dependency-audit.yml`, `dependency-review.yml`, `sbom.yml`,
+  `upstream-certs.yml` and both `zizmor.yml` jobs, and
+  `zizmorcore/zizmor-action` to v0.8.1. The two `azure-backend-*` edits
+  are comments only.
+
+**History, 18 November: v2026.11.5 added none
 and edited one**, `zizmor.yml` — `git diff --stat 67bac28 1784a72 --
 .github/` lists that one file — and changed no unit-test step of the five
 workspaces. Its required `audit` job gained two steps beside the other
@@ -1307,19 +1357,23 @@ suites:
   generating the file, so they compare the committed SBOM and can fail; see
   the warning under the gates table above.
 
-That makes **ten self-contained script tests** since v2026.11.5 outside
+That makes **twelve self-contained script tests** since v2026.11.7 outside
 the five workspaces' runners — no test runner, a pass count, exit 1 on any
-failure — none of them part of the 359 files. All ten run in a workflow:
-four in the workflow that uses their script, and six in `zizmor.yml`'s
+failure — none of them part of the 359 files. All twelve run in a workflow:
+six in the workflow that uses their script (`lockfile-diff` and
+`dependency-gate` in `lockfile-review`, `dependency-review`, `write-sbom`,
+`check-upstream-certs` and `cooldown-proof`), and six in `zizmor.yml`'s
 required `audit` job — the two stylelint ones, new in v2026.10.3 and run by
 nothing but `npm run test:stylelint` by hand until v2026.11.4, the two added
-in v2026.11.4 and the two added in v2026.11.5. All ten ran and passed on
-18 November:
+in v2026.11.4 and the two added in v2026.11.5. All twelve ran and passed on
+28 November:
 
-| Script test | Result, 18 Nov | Runs in |
+| Script test | Result, 28 Nov | Runs in |
 |---|---|---|
-| `scripts/lockfile-diff.test.mjs` | *PASS: 77 checks* | `zizmor.yml`, job `lockfile-review`, before it compares `package-lock.json` with the base (since v2026.10.1) |
-| `scripts/dependency-review.test.mjs` | *PASS: 24 checks* | `dependency-review.yml`, before the review (new in v2026.10.2) |
+| `scripts/lockfile-diff.test.mjs` | *PASS: 84 checks* (77 on 18 Nov) | `zizmor.yml`, job `lockfile-review`, before it compares `package-lock.json` with the base (since v2026.10.1) |
+| `scripts/dependency-gate.test.mjs` | *PASS: 130 checks* | `zizmor.yml`, job `lockfile-review`, before `--check-register` and the comparison (new in v2026.11.7) |
+| `scripts/dependency-review.test.mjs` | *PASS: 49 checks* (24 on 18 Nov) | `dependency-review.yml`, before the review (new in v2026.10.2) |
+| `scripts/cooldown-proof.test.mjs` | *PASS: 25 checks* | `dependency-audit.yml`, the *Cooldown proof* step, before `cooldown-proof.mjs` (new in v2026.11.7) |
 | `scripts/write-sbom.test.mjs` | *PASS: 7 checks* | `sbom.yml`, before the two checks (new in v2026.10.2) |
 | `scripts/check-upstream-certs.test.mjs` | *PASS 22* | `upstream-certs.yml`, before the certificate check (new in v2026.11.3) |
 | `scripts/stylelint/selector-root-class.test.mjs` | *18 PASS, 0 FAIL* | `zizmor.yml`, job `audit`, through `npm run test:stylelint` since v2026.11.4 (new in v2026.10.3; no workflow or hook ran it before) |
@@ -1370,9 +1424,9 @@ v2026.11.3:
 | `azure-pa-demo-acc.yml` / `-prod.yml` | ✅ | ✅ | **✅** | **✅ (acc only)** | – | ✅ | Yes |
 | `azure-publicsite-acc.yml` / `-prod.yml` | ✅ | ✅ | **✅** | – | – | ✅ | Yes |
 | `promote-to-production.yml` | – | – | – | – | – | – | Orchestrates the four `-prod` workflows in order |
-| `zizmor.yml` | – | – | – | – | – | – | No — the required `audit` gate, which since v2026.09.12 also checks that the lockfile matches `package.json` and since v2026.10.2 verifies registry signatures, and which runs the stylelint and promotion-targets script tests and the three Keycloak script tests (`keycloak-add-lde-clients`, `keycloak-restrict-rba-client`, `keycloak-add-brp-raadpleger`); and `lockfile-review`, required on `acc`, which runs `lockfile-diff.test.mjs` first |
+| `zizmor.yml` | – | – | – | – | – | – | No — the required `audit` gate, which since v2026.09.12 also checks that the lockfile matches `package.json` and since v2026.10.2 verifies registry signatures, and which runs the stylelint and promotion-targets script tests and the three Keycloak script tests (`keycloak-add-lde-clients`, `keycloak-restrict-rba-client`, `keycloak-add-brp-raadpleger`); and `lockfile-review`, required on `acc`, which runs `lockfile-diff.test.mjs`, `dependency-gate.test.mjs` and the register check first |
 | `semgrep.yml` | – | – | – | – | – | – | No — `scan`, required on `acc` and, since the end of September, on `main` |
-| `dependency-audit.yml` | – | – | – | – | – | – | No — a daily scheduled audit of the dependency tree; with `dependency-review` and `upstream-certs`, one of the three checks here that run on a clock rather than a commit |
+| `dependency-audit.yml` | – | – | – | – | – | – | No — a daily scheduled audit of the dependency tree; with `dependency-review` and `upstream-certs`, one of the three checks here that run on a clock rather than a commit; runs `cooldown-proof.test.mjs` and the npm cooldown proof first (since v2026.11.7) |
 | `dependency-review.yml` | – | – | – | – | – | – | No — the quarterly maintenance review of every direct dependency, which opens an issue; runs `dependency-review.test.mjs` first. New in v2026.10.2 |
 | `sbom.yml` | – | – | – | – | – | – | No — tests the generator (`write-sbom.test.mjs`), checks the **committed** release SBOM, then generates and uploads it on a push to `main` |
 | `upstream-certs.yml` | – | – | – | – | – | – | No — the daily check of each upstream's TLS certificate, which opens, updates or closes a tracking issue; runs `check-upstream-certs.test.mjs` first. New in v2026.11.3 |

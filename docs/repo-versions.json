@@ -1,26 +1,26 @@
 {
-  "docs_built": "2026-11-27",
+  "docs_built": "2026-11-28",
   "last_patch": {
-    "date": "2026-11-27",
+    "date": "2026-11-28",
     "kind": "Component sync",
-    "summary": "CPRMV v2026.11.0, the first release with a release number: production runs 502a351 and reports release v2026.11.0 beside vocabulary version 0.4.3 on /health, every release commits a CycloneDX bill of materials, and /bump-release cuts a release through acc and main. RONL Business API v2026.11.6 (7416c65): Infra-board tasks can ask for their B and B+ documents from the eDOCS projectmap and refuse completion without them, once the models that declare them are deployed; the Woo-dashboard signs in with the Flevoland account; the backend deploys only from CI.",
+    "summary": "CPSV Editor v2026.11.3, Linked Data Explorer v2026.11.4 and RONL Business API v2026.11.7, all in production: a new direct dependency now waits for an assessment in a dependency register and no package version younger than fourteen days enters a lockfile, in all three; the RONL Business API moves to Node 24 and npm 11.19 on both tiers; the CPSV Editor scales vendor logos; the RIP R2.1–R2.4 models link their eDOCS documents.",
     "previous": {
-      "date": "2026-11-26",
+      "date": "2026-11-27",
       "kind": "Component sync",
-      "summary": "CPRMV moves to GitHub without a new version: production runs 8f01b2b and still reports 0.4.3, built and deployed by GitHub Actions to one VM per tier, each pulling the head of its branch, rolling back a release that fails its check and reporting what runs on /health; acc and main change only through pull requests that pass audit, scan, test and build."
+      "summary": "CPRMV v2026.11.0, the first release with a release number: production runs 502a351 and reports release v2026.11.0 beside vocabulary version 0.4.3 on /health, every release commits a CycloneDX bill of materials, and /bump-release cuts a release through acc and main. RONL Business API v2026.11.6 (7416c65): Infra-board tasks can ask for their B and B+ documents from the eDOCS projectmap and refuse completion without them, once the models that declare them are deployed; the Woo-dashboard signs in with the Flevoland account; the backend deploys only from CI."
     },
     "open_findings": [
       {
-        "label": "open-regels/cprmv#1",
-        "url": "https://github.com/open-regels/cprmv/issues/1"
+        "label": "ttl-editor#282",
+        "url": "https://github.com/sgort/ttl-editor/issues/282"
       },
       {
-        "label": "open-regels/cprmv#2",
-        "url": "https://github.com/open-regels/cprmv/issues/2"
+        "label": "linked-data-explorer#372",
+        "url": "https://github.com/sgort/linked-data-explorer/issues/372"
       },
       {
-        "label": "ronl-business-api#498",
-        "url": "https://github.com/sgort/ronl-business-api/issues/498"
+        "label": "ronl-business-api#511",
+        "url": "https://github.com/sgort/ronl-business-api/issues/511"
       }
     ]
   },
@@ -28,16 +28,16 @@
     {
       "name": "RONL Business API",
       "icon": "⚙️",
-      "version": "v2026.11.6",
+      "version": "v2026.11.7",
       "environment": "prod",
-      "commit": "7416c65...",
-      "commit_date": "2026-11-27",
+      "commit": "9e8d9ec...",
+      "commit_date": "2026-11-28",
       "build": {
-        "sha": "7416c65",
-        "run": 19,
-        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/46007617879"
+        "sha": "9e8d9ec",
+        "run": 20,
+        "run_url": "https://github.com/sgort/ronl-business-api/actions/runs/46140679285"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/7416c658f4df3a952ff53ae941c377abbb9637d1",
+      "repo_url": "https://git.open-regels.nl/hosting/ronl-business-api/-/commit/9e8d9ecabc6ca7ba36d25b08f5180c0496cb3527",
       "ci_repo": "https://github.com/sgort/ronl-business-api"
     },
     {
@@ -53,31 +53,31 @@
     {
       "name": "CPSV Editor",
       "icon": "✏️",
-      "version": "v2026.11.2",
+      "version": "v2026.11.3",
       "environment": "prod",
-      "commit": "5d6345c...",
-      "commit_date": "2026-11-21",
+      "commit": "c3105f0...",
+      "commit_date": "2026-11-28",
       "build": {
-        "sha": "5d6345c",
-        "run": 116,
-        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/44922116683"
+        "sha": "c3105f0",
+        "run": 118,
+        "run_url": "https://github.com/sgort/ttl-editor/actions/runs/46126349228"
       },
-      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/5d6345c6d82cc80eb24f5cf1c381a82ded77edc7",
+      "repo_url": "https://git.open-regels.nl/showcases/ttl-editor/-/commit/c3105f07b3ac464855bfe8b7a64b81e13519aec5",
       "ci_repo": "https://github.com/sgort/ttl-editor"
     },
     {
       "name": "Linked Data Explorer",
       "icon": "🔍",
-      "version": "v2026.11.3",
+      "version": "v2026.11.4",
       "environment": "prod",
-      "commit": "4e80c74...",
-      "commit_date": "2026-11-22",
+      "commit": "7925e61...",
+      "commit_date": "2026-11-28",
       "build": {
-        "sha": "4e80c74",
-        "run": 12,
-        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/45013710334"
+        "sha": "7925e61",
+        "run": 13,
+        "run_url": "https://github.com/sgort/linked-data-explorer/actions/runs/46130976178"
       },
-      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/4e80c7419d40620fcf3fc190ab2f36eee05686f0",
+      "repo_url": "https://git.open-regels.nl/hosting/linked-data-explorer/-/commit/7925e618a0e3e1f062dc7d12f4631df234d75700",
       "ci_repo": "https://github.com/sgort/linked-data-explorer"
     },
     {

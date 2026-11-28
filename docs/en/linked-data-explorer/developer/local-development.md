@@ -12,7 +12,7 @@ This guide sets up the Linked Data Explorer on a workstation: the frontend, the 
 
 | Requirement | Why |
 |---|---|
-| **Node.js 24.22.2** | The version `.nvmrc` names, and the one CI builds and tests on. `package.json` requires `>=24.22.1`, at the root and in `packages/backend`. |
+| **Node.js 24.22.3** | The version `.nvmrc` names, and the one CI builds and tests on. `package.json` requires `>=24.22.1`, at the root and in `packages/backend`. |
 | **npm 11.10 or newer** (recommended) | `.npmrc` sets `min-release-age=14`, a 14-day cooldown on newly published versions. Older npm ignores the setting without a warning, so `scripts/check-deps.sh` warns at every dev-server start and push when npm is older than 11.10. |
 | **bash on `PATH`** | The root scripts run `bash scripts/check-deps.sh`, and the backend's `dev` script runs `bash scripts/check-docker.sh`. |
 | **Docker** | The backend's Docker check calls `docker info` and `docker inspect` from that bash. |
@@ -346,12 +346,12 @@ npm run lint           # ESLint in every workspace
 npm run lint:fix
 npm run format         # Prettier, writing
 npm run check-format   # Prettier, checking only
-npm run test:scripts   # two of the five test harnesses in scripts/
+npm run test:scripts   # two of the six test harnesses in scripts/
 ```
 
 [Testing](testing.md) has the suites, their current counts, the contract subset and the CI gate.
 
-`npm run test:scripts` runs on Windows as well as Linux: both harnesses print `PASS: 24 checks` (measured on Windows, 10 October 2026). The other three harnesses have no npm script, and CI runs each in the workflow that uses the script it tests: `node scripts/lockfile-diff.test.mjs` in the `lockfile-review` job, `node scripts/write-sbom.test.mjs` in `sbom.yml`, and `node scripts/dependency-review.test.mjs` in `dependency-review.yml`.
+`npm run test:scripts` runs on Windows as well as Linux: both harnesses print `PASS: 24 checks` (measured on Windows, 10 October 2026). The other four harnesses have no npm script, and CI runs each in the workflow that uses the script it tests: `node scripts/lockfile-diff.test.mjs` and, since v2026.11.4, `node scripts/dependency-gate.test.mjs` in the `lockfile-review` job, `node scripts/write-sbom.test.mjs` in `sbom.yml`, and `node scripts/dependency-review.test.mjs` in `dependency-review.yml`.
 
 ### Git hooks
 
@@ -391,7 +391,7 @@ In `packages/backend`, `docker:check`, `build:openapi`, `lint:openapi`, `test:co
 
 ## Getting a change to ACC
 
-`acc` accepts changes only through a pull request. The `acc supply-chain gate` ruleset blocks direct pushes, force-pushes and deletion. It requires a pull request, merged with a merge commit, and these status checks: `audit`, `scan`, `deploy`, `Build and Deploy Frontend`, `Build and Deploy ROPA Site` and `lockfile-review`. `lockfile-review` reports what a pull request changes in `package-lock.json`. It succeeds at once when the lockfile is unchanged, and fails on a package from a non-npmjs origin or without an integrity hash.
+`acc` accepts changes only through a pull request. The `acc supply-chain gate` ruleset blocks direct pushes, force-pushes and deletion. It requires a pull request, merged with a merge commit, and these status checks: `audit`, `scan`, `deploy`, `Build and Deploy Frontend`, `Build and Deploy ROPA Site` and `lockfile-review`. `lockfile-review` reports what a pull request changes in `package-lock.json`. It succeeds at once when the lockfile is unchanged and the dependency register parses. It fails on a package from a non-npmjs origin or without an integrity hash. Since v2026.11.4 it also fails on a direct dependency new to a manifest that has no valid entry in `dependency-register.json`, and on a package version younger than 14 days. See [Deployment → Supporting workflows](deployment.md#supporting-workflows) for the rules and the exceptions.
 
 1. Create a branch from `acc` and push it.
 2. Open a pull request into `acc`. The backend workflow's `deploy` job runs lint, the OpenAPI lint, typecheck, the full test suite and the build on the pull request, and skips its deploy steps. It does so only when the pull request touches `packages/backend/`, the root `package.json` or `package-lock.json`, `.nvmrc`, the workflow itself, or `e2e-fixtures/`, `examples/` or `packages/frontend/public/examples/`, which the backend's fixture and bundle tests read. The frontend and RoPA site workflows build from the pull request.

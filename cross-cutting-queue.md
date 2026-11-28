@@ -166,6 +166,54 @@ ronl-business-api#498.
 5. **The unit-test figures:** 359 test files and 5,695 tests at `7416c65` (backend 115 · 2,932; frontend 147 · 1,862;
    pa-cockpit 43 · 516; pa-demo 19 · 109; public site 35 · 276), for the weekly `tests:` rows.
 
+### 28 November 2026 — CPSV Editor v2026.11.3 (`c3105f0`), Linked Data Explorer v2026.11.4 (`7925e61`), RONL Business API v2026.11.7 (`9e8d9ec`)
+
+All three in production. Evidence at those commits: `scripts/dependency-gate.mjs`, `dependency-register.json`,
+`lockfile-review.json`, `scripts/lockfile-diff.mjs`, `scripts/dependency-review.mjs`, `.github/workflows/zizmor.yml`
+(`lockfile-review`), `SECURITY-PIPELINE.md`; the LDE gate is #368 (67bd0ae), copied into ttl-editor #276 (ffd4bce) and
+ronl-business-api #503, each marked "Copied from linked-data-explorer 67bd0ae". A peer session briefed the proposed
+ICTU moves (R1 3 → 4 and R6 → 5 in all three); verify them here, at the pass's own `acc` heads, and let the user decide.
+
+1. **The new-dependency checklist is gone; a blocking register gate replaces it, in all three** (ICTU R1). Inside the
+   already-required `lockfile-review`: a new direct dependency, counted per manifest and including `peerDependencies`,
+   fails the check until `dependency-register.json` assesses it against evidence the gate fetches from the npm registry
+   and GitHub (`MIN_WHY = 40` characters per unmet criterion; outcome keep or replace, replace needs a follow-up).
+   Pages still describing the checklist: `dependency-scanning.md:492-494`, `controls.md:127`, `supply-chain.md` (the
+   lockfile-review Finding/Effect table, ~505-519, gains two blocking rows), `ictu-dependency-guideline.md:126`,
+   `:157-159` and `:429-430`. Register entries: TTL keycloak-js (keep, #275); LDE keycloak-js (keep, #366), jsonwebtoken
+   and jwks-rsa (replace, #365), @types/jsonwebtoken and tsx (keep), #367 open (limiter licence); RBA stylelint (#376,
+   #499) and @axe-core/playwright in two manifests (#362). Demo: LDE throwaway #369, blocked.
+2. **The 14-day cooldown is enforced in CI on the lockfile itself, whatever wrote it** (ICTU R6):
+   `lockfile-review.json` `minReleaseAgeDays: 14`; exceptions only through a committed override with an open issue or a
+   Renovate security pull request whose `security` label renovate[bot] added (checked through the GitHub API), both
+   logged; first use LDE #364 (fast-xml-parser 5.12.1). Closes in CI the gap `supply-chain.md#the-cooldown-stops-at-the-manifest`
+   and `controls.md:130` describe. Remaining gap: hosted Renovate installs its own npm (12.2.3) outside the cooldown.
+3. **RBA moves to Node 24.22.3 and npm 11.19.1** (#501, #502): `engines` `node >=24.22.1`, `npm >=11.10.0`;
+   `check-deps.sh` fails below npm 11.10; `scripts/cooldown-proof.mjs` runs daily in `dependency-audit.yml`; ACC and PROD
+   App Services on `NODE|24-lts`; Renovate's Node-24 hold removed. Bears on `supply-chain.md:613`, `:737`, `:752`, `:810`,
+   `controls.md:130`, `ictu-dependency-guideline.md:160`, `:452` (RBA R6 "stays 4: `.nvmrc` still names 22.23.4"), and
+   R2 (runtime aligned on both tiers; an exact pin is still impossible).
+4. **Node 24.22.3 in the CPSV Editor and the LDE too** (TTL #272, LDE #361/#363). Stale 24.22.2 on contributing pages:
+   `code-standards.md:31`, `supply-chain.md:33`, `:614`, `:735-736`, `ictu-dependency-guideline.md:203-204`, `:365-366`.
+5. **Quarterly review** (ICTU R11): `dependency-review.mjs` now lists the register's open overrides and replacements and
+   the previous quarter's Renovate security exceptions; first scheduled run 2 January 2027.
+6. **`.npmrc` corrections in the RBA**: Renovate passes no `--before` when `min-release-age` is set (no "stricter of the
+   two", no ETARGET retry); grep the contributing pages for those claims, and check whether the TTL and LDE `.npmrc`
+   carry them too. stylelint arrived in RBA #376, not #374; the sign-in pull requests were RBA #376 and LDE #331.
+7. **Workflows and rulesets:** `lockfile-review` gains `issues: read` and `pull-requests: read`, runs the gate's
+   self-test and `--check-register` on every pull request (it no longer "succeeds at once" when the lockfile is
+   unchanged), and `pull_request` keeps its default types deliberately (a `labeled` trigger cancelled a run the ruleset
+   then read as failed, LDE #368). Workflow counts unchanged. Rulesets unchanged in all three (`lockfile-review`
+   required on `acc` only).
+8. **Known limits recorded in source** (`SECURITY-PIPELINE.md` § New dependencies): the job runs the pull request's own
+   copy of the gate and rulesets require no approvals; a hand-set `"inBundle": true` skips the origin, integrity and
+   cooldown checks; a pull request editing only the register gets the structural check, not the evidence check (RBA
+   #511). Bears on `supply-chain.md` "what this does not protect", R9, and PSA chapter 8 (generic wording).
+9. **PSA:** AB-28 evidence (the wait is enforced in CI in all three), no status change implied; re-pin the CPSV Editor to
+   `c3105f0`, the LDE to `7925e61` and the RBA to `9e8d9ec` on the PSA pages.
+10. **Not scored yet:** the same gate is to be ported to LVG and CPRMV (peer briefing, 28 November); work not started.
+11. **Findings filed:** ttl-editor#282, linked-data-explorer#372, ronl-business-api#511.
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

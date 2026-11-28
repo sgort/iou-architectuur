@@ -145,7 +145,7 @@ When a `UserTask` is selected, the properties panel shows a **Link decision temp
 - **Attached templates** appear as chips, each showing the template's name and id, with a **✕** button that removes it. A template id this browser does not know is shown as its bare id rather than hidden.
 - **The select below the chips adds a template.** It lists only the templates saved in the Document Composer that are not yet attached, under **-- Add a template --**, and reads **-- All templates attached --** once none are left.
 
-The Modeler writes the attached ids to `ronl:documentRef` as a comma-separated list — `ronl:documentRef="rip-ontwerptoelichting,rip-objectenboom"` — and removes the attribute when the last chip is removed. A BPMN with a single id is a list of one, so existing processes need no change.
+The Modeler writes the attached ids to `ronl:documentRef` as a comma-separated list — for example `ronl:documentRef="rip-ontwerptoelichting,rip-objectenboom"`, which R2.2's *Opstellen concept VO* carried until v2026.11.4 — and removes the attribute when the last chip is removed. A BPMN with a single id is a list of one, so existing processes need no change.
 
 A **purple badge** (📄) appears beneath the element on the canvas, below the green form badge. With one template it shows the template id; with several it reads **N documents**, and hovering it lists every id. Each badge colour stands for one kind of link:
 
@@ -166,6 +166,19 @@ Document template linking is only available for `UserTask` elements (not `StartE
     of the task's plain form. The deploy modal bundles that template like any
     other. See [ValidSign signing](../../ronl-business-api/developer/validsign-signing.md)
     and [RIP R2.1 Bundle](rip-phase1-bundle.md#the-phase-exit-approval-is-signed).
+
+### Linked documents
+
+Since v2026.11.4 four more attributes appear on user tasks in the RIP R2.1 to R2.4 models. They describe a document the task does **not** generate: one kept in eDOCS, which the task links.
+
+| Attribute | Holds |
+|---|---|
+| `ronl:linkedDocumentRef` | `<slug>:<eDOCS format>[:optional][:map]`, comma-separated — e.g. `rip-projectraming:2591295` |
+| `ronl:documentFigures` | the key figures to enter for a linked document — e.g. `rip-projectraming=totaal,onvoorzien,prijspeil` |
+| `ronl:documentChecklist` | what a linked folder must contain — for `rip-verzamelmap-vg`, three V&G documents, separated by a vertical bar |
+| `ronl:kredietCheck` | `<variable>:<slug>` — the gateway variable the task answers, *binnen* or *buiten* the projectkrediet |
+
+Like `ronl:signatureRef`, they are written by hand. Unlike it, they are not registered, so the Modeler shows no badge and offers no control for them. It keeps them through a save, because an unregistered attribute round-trips in `$attrs`. A linked document is not a bundle resource, so the Deploy modal neither looks it up nor sends it. The RONL Business API reads the attributes from a deployed model and asks for the document when the task is completed. The syntax is defined in its [BPMN design criteria](../../ronl-business-api/reference/bpmn-design-criteria.md), and what a caseworker sees in [Infra-board → Documents at a task](../../ronl-business-api/user-guide/infra-board.md#documents-at-a-task). The models that carry them are in the repository; on 28 November 2026 they are not yet deployed on ACC or production.
 
 See [Document Composer](document-composer.md) for how to create and manage document templates.
 

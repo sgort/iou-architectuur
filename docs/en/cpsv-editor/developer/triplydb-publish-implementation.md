@@ -113,7 +113,7 @@ const result = await publishToTriplyDB({
   service: service.identifier,
   logos, // [{ fileName: 'Org_logo.png', dataUrl: 'data:image/png;base64,…' }]
 });
-// → { url, graph, serviceUpdated, serviceError?, logos: [{ fileName, ok }] }
+// → { url?, graph, serviceUpdated, serviceError?, logos: [{ fileName, ok }], answerUnreadable? }
 ```
 
 It sends `POST {backendUrl}/v1/triplydb/publish` with the author's bearer token from
@@ -123,9 +123,13 @@ file name, non-empty Turtle, and logos with a plain file name and an image data 
 then uploads the Turtle into the graph, uploads each logo as an asset, and syncs the
 dataset's service. A failed logo is reported in `logos` with `ok: false` and does not fail
 the publish; a failed service sync is reported as `serviceUpdated: false` with
-`serviceError`. `handlePublish` turns each into a warning — *Service update failed:
-{serviceError}* and *Logo not uploaded: {fileName}* — and shows them together as *Published
-with warning*.
+`serviceError`. A 200 whose body is not JSON — a proxy's empty or HTML answer — is not an
+error either (v2026.11.3): the graph went up but the details are unknown, so
+`publishToTriplyDB` returns `{ graph, serviceUpdated: true, logos: [], answerUnreadable: true }`
+without a `url`. `handlePublish` turns each into a warning — *Service update failed:
+{serviceError}*, *Logo not uploaded: {fileName}* and, for an unreadable answer, *The
+backend's answer could not be read, so the service sync and logos are unconfirmed; check the
+dataset in TriplyDB* — and shows them together as *Published with warning*.
 
 Errors thrown, for the dialog to show:
 

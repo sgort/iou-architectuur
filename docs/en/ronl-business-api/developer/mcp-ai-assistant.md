@@ -321,7 +321,7 @@ for await (const event of businessApi.mcp.chatStream(message, history, sources, 
 | `CPRMV_URL`              | CPRMV MCP endpoint; defaults to `https://acc.cprmv.open-regels.nl/mcp`         |
 | `LDE_MCP_ENABLED`        | Set to `true` to register `LdeMcpProvider`; defaults to `false`                |
 | `LDE_DATABASE_URL`       | PostgreSQL connection string for the LDE `lde_assets` database                 |
-| Node.js 22 LTS           | Required by `operaton-mcp`; Azure App Service must use `NODE|22-lts`           |
+| Node.js 22 or newer      | `operaton-mcp` declares `engines.node >=22.0.0`; the repository runs Node 24, and both App Services `NODE|24-lts` |
 | `caseworker` role        | JWT claim required to access `POST /v1/mcp/chat`                               |
 
 `operaton-mcp` is a regular `package.json` dependency of `packages/backend`. On Linux (Azure App Service) it is resolved from `node_modules` at startup via `require.resolve`. On Windows/macOS it falls back to `npx -y operaton-mcp`. No global install is needed.
@@ -394,11 +394,11 @@ az webapp config appsettings set \
     LDE_MCP_ENABLED=true \
     LDE_DATABASE_URL="postgresql://...lde_assets?sslmode=verify-full"
 
-# Ensure Node 22 LTS runtime
+# Ensure the Node 24 LTS runtime (the major .nvmrc names)
 az webapp config set \
   --name ronl-business-api-acc \
   --resource-group rg-ronl-acc \
-  --linux-fx-version "NODE|22-lts"
+  --linux-fx-version "NODE|24-lts"
 ```
 
 After deployment, verify all providers in the application logs:
@@ -416,7 +416,7 @@ az webapp log tail --name ronl-business-api-acc --resource-group rg-ronl-acc
 
 ## Troubleshooting
 
-**`503 MCP_NOT_CONNECTED`** — All providers selected for the request are unavailable. Individual provider failures are non-fatal — the backend continues without them. Check `GET /v1/mcp/sources` to see which providers are connected. For the Process Engine specifically: verify `MCP_ENABLED=true`, `OPERATON_BASE_URL`, `OPERATON_USERNAME`, and `OPERATON_PASSWORD` are correct, and that the App Service runtime is `NODE|22-lts` (the child process will silently fail on Node 20). For `LdeMcpProvider`: verify `LDE_DATABASE_URL` is reachable and uses `sslmode=verify-full` (not `sslmode=require`) to avoid a pg-connection-string SSL warning.
+**`503 MCP_NOT_CONNECTED`** — All providers selected for the request are unavailable. Individual provider failures are non-fatal — the backend continues without them. Check `GET /v1/mcp/sources` to see which providers are connected. For the Process Engine specifically: verify `MCP_ENABLED=true`, `OPERATON_BASE_URL`, `OPERATON_USERNAME`, and `OPERATON_PASSWORD` are correct, and that the App Service runtime is `NODE|24-lts`, the major `.nvmrc` names (the child process fails silently on Node 20, below `operaton-mcp`'s `>=22.0.0`). For `LdeMcpProvider`: verify `LDE_DATABASE_URL` is reachable and uses `sslmode=verify-full` (not `sslmode=require`) to avoid a pg-connection-string SSL warning.
 
 **A source shows *(offline)*** — its provider failed to connect at startup. Since v2026.10.4 every provider closes and clears a half-open client when its connect fails, then rethrows so the registry logs the error; before that, a failed connect could leave the source reported as connected and every chat failing with *"Not connected"*. A source whose tool listing throws during a chat is left out of that chat with a warning instead of failing it. Check the backend's startup log for the provider's error.
 

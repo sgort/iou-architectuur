@@ -43,7 +43,7 @@ rebuilds the image about weekly, and a hosted runner cannot pin it by digest.
 | `zizmor.yml` | PR, push to `acc`/`main` | — | No — the `audit` gate, and `lockfile-review` on pull requests |
 | `semgrep.yml` | PR, push to `acc`/`main` | — | No — the `scan` job |
 | `dependency-audit.yml` | schedule (05:17 UTC daily), `workflow_dispatch`, PR touching its own files | — | No — the `dependency-audit` job |
-| `dependency-review.yml` | schedule (06:23 UTC on day 2 of each quarter), `workflow_dispatch`, PR touching the workflow, `dependency-review.mjs` or `lockfile-diff.mjs` | — | No — the `dependency-review` job |
+| `dependency-review.yml` | schedule (06:23 UTC on day 2 of each quarter), `workflow_dispatch`, PR touching the workflow, `dependency-review.mjs`, `lockfile-diff.mjs`, `dependency-gate.mjs` or `dependency-register.json` | — | No — the `dependency-review` job |
 | `sbom.yml` | push to `main`, `workflow_dispatch`, PR touching the SBOM tooling | — | No — the `release-sbom` job |
 | `upstream-certs.yml` | schedule (05:41 UTC daily), `workflow_dispatch`, PR touching the workflow, `check-upstream-certs.mjs` or its test | — | No — the `upstream-certs` job |
 | `promote-to-production.yml` | push to `main` (**no paths filter**), `workflow_dispatch` | — | No — it *calls* the four below |
@@ -173,7 +173,7 @@ run on a pull request only when it touches their own tooling.
 | # | Step | What it does |
 |---|---|---|
 | 1 | Checkout | `persist-credentials: false` |
-| 2 | Set up Node `24.22.2` | For the config validator only — see [Node runtime](#node-runtime) |
+| 2 | Set up Node `24.22.3` | For the config validator only — see [Node runtime](#node-runtime) |
 | 3 | Run zizmor | Workflow static analysis, with zizmor itself pinned to `1.29.0` — maintained by Renovate, which maps the action to the image `ghcr.io/zizmorcore/zizmor`, not bumped by hand |
 | 4 | Validate `renovate.json` | `renovate-config-validator --strict` |
 | 5 | Lockfile matches `package.json` | `npm ci --dry-run --ignore-scripts` — resolves and validates without writing `node_modules` |
@@ -246,42 +246,86 @@ A dependency pull request shows its reviewer the direct change
 reads that diff. `zizmor.yml` therefore carries two more jobs, which run on
 pull requests only:
 
-- **`lockfile-review`** runs code from the head ref — `scripts/lockfile-diff.mjs`
-  and the lockfile — with a **read-only** token. It first runs the script's own
-  tests (`scripts/lockfile-diff.test.mjs`), then compares `package-lock.json`
-  with the base commit's as data; it never runs npm and never installs. When the
-  lockfile is unchanged it succeeds at once. The report goes to the job summary.
+- **`lockfile-review`** runs code from the head ref — `scripts/lockfile-diff.mjs`,
+  `scripts/dependency-gate.mjs`, the register and the lockfile — with a
+  **read-only** token: `contents: read`, plus `issues: read` and
+  `pull-requests: read` for the gate's questions to the GitHub API. It first
+  runs the two scripts' own tests (`lockfile-diff.test.mjs`,
+  `dependency-gate.test.mjs`) and `dependency-gate.mjs --check-register`, so a
+  malformed register fails the check even when the lockfile is unchanged. It
+  then compares `package-lock.json` with the base commit's as data; it never
+  runs npm and never installs. When the lockfile is unchanged it succeeds after
+  those checks. The report, with the gate's section right under the verdict,
+  goes to the job summary.
 - **`lockfile-review-comment`** holds the `pull-requests: write` token and runs
   no repository code at all: it posts the report as one sticky comment on the
   pull request, updating it on every push. It runs only for branches in this
   repository — a fork's token is read-only — and not for a run a newer push
   superseded.
 
-Two findings **fail** the check, over the whole head lockfile however an entry
-arrived: a package not resolved from `https://registry.npmjs.org/`, and a
+Two findings of `lockfile-diff.mjs` **fail** the check, over the whole head
+lockfile however an entry arrived: a package not resolved from `https://registry.npmjs.org/`, and a
 package without an integrity hash (bundled dependencies excepted, since their
-parent's tarball carries the integrity). Everything else is a **review prompt**
-in the comment, never a failure: a licence change, a new package whose licence
+parent's tarball carries the integrity). Everything else it finds is a **review
+prompt** in the comment, never a failure: a licence change, a new package whose licence
 is not on the allow-list in `lockfile-review.json` at the repository root, a new
 install script, and a downgrade. A lockfile or configuration the script cannot
 use exits 2, which never reads as clean.
 
-A **new direct dependency** gets a section of its own in the comment: the
-package, the manifest and field that declare it, and a checklist of the
-[dependency criteria](https://github.com/sgort/linked-data-explorer/blob/acc/docs/dependency-criteria.md) — maintained,
-maintainers, licence, release policy and footprint, needed — to tick before
-merging (ICTU recommendation 1). Anything that does not hold needs a sentence in
-the pull request saying why the package is still the right choice. "New" means
-direct in the head lockfile and absent from every manifest in the base: a
-package already direct elsewhere in the repository was vetted when it arrived,
-and moving one between fields — `dependencies` to `devDependencies` — is not
-adding it. The lockfile carries its own copy of every workspace manifest, so
-the job reads them without reading a single `package.json`. Like the other
-prompts, the checklist never fails the check.
+**A new direct dependency needs a register entry, and the gate blocks without
+one** (since v2026.11.7, [#503](https://github.com/sgort/ronl-business-api/pull/503),
+ported from linked-data-explorer's #368). "New" means new to *that manifest*,
+under any field, `peerDependencies` included. A package already direct in
+another workspace still counts when it spreads to a new one; under the old rule,
+which skipped it, `@axe-core/playwright` reached `packages/frontend` in #413
+without a checklist. Moving a package between fields of one manifest —
+`dependencies` to `devDependencies` — is not adding it. The lockfile carries its
+own copy of every workspace manifest, so the job reads them without reading a
+single `package.json`.
+
+Each such dependency needs an entry in `dependency-register.json` at the
+repository root: a verdict and a reason for each of the
+[dependency criteria](https://github.com/sgort/linked-data-explorer/blob/acc/docs/dependency-criteria.md)
+— maintained, maintainers, licence, release policy, footprint, needed — the
+version assessed, and an outcome. `scripts/dependency-gate.mjs` fails the check
+when an entry is missing or malformed, or when it contradicts the evidence the
+gate gathers itself from the npm registry, the GitHub API and the lockfile: an
+entry may not claim a criterion holds that the evidence says does not, every
+unmet criterion and `needed` need a sentence, the assessed major must be the
+locked one, and a cited issue must be open (ICTU recommendation 1). The
+comment's tick-box checklist is gone.
+
+The same step **fails any package version the lockfile adds or changes that is
+younger than 14 days** (`minReleaseAgeDays` in `lockfile-review.json`), however
+the lockfile was written. That is the pull-request-time cover for the
+[cooldown](#the-package-manager-cooldown), which `npm ci` ignores. There is no
+label a person can set, and no bypass. A person's urgent fix needs a committed
+override that cites an open issue: `"status": "override"` for a dependency
+still to assess, or a `cooldownOverrides` entry for a version too young. A
+Renovate security pull request passes when its author is `renovate[bot]` and the
+GitHub API's history of the pull request shows `renovate[bot]` adding the
+`security` label. The gate waits up to 60 seconds for that label, because
+Renovate adds it a second or so after opening the pull request. The workflow
+deliberately does not run on `labeled`: a pull request opened with labels would
+start two runs on one commit, and in linked-data-explorer the cancelled first
+run of the required check blocked the merge. Each exception is logged under
+*Cooldown exceptions* in the comment and the job summary. Exit 0 means nothing
+blocking, 1 a blocking finding, and 2 that an input, the register, the registry
+or the API could not be used, which is never clean.
+
+The register started on 28 November 2026 with three entries assessed after the
+fact: `stylelint` at the root (added in #376; footprint unmet, and its
+`svg-tags` has no licence recorded, #499) and `@axe-core/playwright` in
+`packages/public-site` and `packages/frontend` (MPL-2.0, test-only, kept as
+quarterly review #362 decided). Two limits are known: the job runs the pull
+request's own copy of the gate, and the rulesets require no approvals, so a pull
+request can weaken the gate by editing it; and a lockfile entry hand-marked
+`"inBundle": true` skips the origin, integrity and cooldown checks. Both show in
+the diff.
 
 `lockfile-review` is a **required status check on `acc`**. It can be: this
 workflow has no paths filter, so the check reports on every pull request, and an
-unchanged lockfile passes at once. `main` does not require it — see [Required
+unchanged lockfile passes once the script tests and the register check have. `main` does not require it — see [Required
 checks and branch rules](#required-checks-and-branch-rules).
 
 ### `scan` — Semgrep, required on `acc` and `main`
@@ -318,8 +362,8 @@ Every other gate runs on a commit, so a new advisory against unchanged code was
 seen by nothing, and Dependabot watches `acc`, not the `main` production deploys
 from. `dependency-audit.yml` runs at 05:17 UTC daily — off the hour, because
 GitHub queues scheduled runs and the top of the hour is busiest — and on
-`workflow_dispatch`. It also runs on a pull request that touches the workflow or
-`scripts/audit-tree.mjs`, so a change to the audit is exercised before it merges;
+`workflow_dispatch`. It also runs on a pull request that touches the workflow,
+`scripts/audit-tree.mjs`, `scripts/cooldown-proof.mjs` or its test, so a change to the audit is exercised before it merges;
 the issue step is skipped there.
 
 - **Both branches, from their lockfiles.** The job fetches `acc` and `main`,
@@ -340,7 +384,8 @@ the issue step is skipped there.
   dozens of findings; `audit-tree.mjs` collapses them.
 - **One tracking issue.** A scheduled failure that only fails a job reports to an
   Actions page nobody opens, so the job opens, updates and closes a single issue
-  titled *Daily dependency audit: production high or critical advisory*.
+  titled *Daily dependency audit: production high or critical advisory*. It
+  also fails, and the issue says so, when the cooldown proof fails.
 - **"Could not run" is never "clean".** The script exits 0 clean, 1 on a finding,
   2 when the audit could not run; anything higher is clamped to 2, and 2 is
   handled with the weight of a finding.
@@ -348,7 +393,20 @@ the issue step is skipped there.
   the working tree, including a script that exists on the branch under review
   before it exists on `acc` or `main`; the first run lost it at the first
   checkout and read the missing module as a finding.
-- **Node is an exact literal**, `'24.22.2'`, not `.nvmrc`: the job reads both
+- **It first proves the npm cooldown holds** (since v2026.11.7). The
+  *Cooldown proof* step runs `scripts/cooldown-proof.test.mjs`, then
+  `scripts/cooldown-proof.mjs`. The proof picks a version of a frequently
+  published package (`@types/node`, then `typescript`, `@playwright/test`,
+  `vite`) younger than the `.npmrc` cooldown and asks npm to install it in a
+  temporary directory with a copy of `.npmrc`. It passes only if npm refuses
+  and the same command with `--min-release-age=0` succeeds, so a network
+  failure cannot pass as a refusal. Its exit codes match the audit's — 0
+  refused, 1 not refused or a failing test, 2 could not run — and the job and
+  the tracking issue take the worse of the two; a proof failure gets its own
+  section in the issue. It runs before the audit step, which checks out other
+  branches and replaces the tree. Measured on 27 November 2026: npm 10.9.9 did
+  not refuse, npm 11.19.1 and 12.2.2 did.
+- **Node is an exact literal**, `'24.22.3'`, not `.nvmrc`: the job reads both
   branches, which need not share an `.nvmrc`, and the tool reading a lockfile
   should not change with the tree it reads. Renovate maintains it.
 
@@ -365,9 +423,10 @@ daily audit stays silent, and it opens no Renovate pull request. So
 `dependency-review.yml` runs on a clock — at 06:23 UTC on the second day of each
 quarter (`23 6 2 1,4,7,10 *`), off the hour like the daily audit — and on
 `workflow_dispatch`. It also runs on a pull request that touches the workflow,
-`scripts/dependency-review.mjs` or `scripts/lockfile-diff.mjs`, whose lockfile
-reading it shares, so a change to the review is exercised before it merges. Its
-one job, `dependency-review`, runs on Node `'24.22.2'`:
+`scripts/dependency-review.mjs`, `scripts/lockfile-diff.mjs` (whose lockfile
+reading it shares), `scripts/dependency-gate.mjs` or `dependency-register.json`,
+so a change to the review is exercised before it merges. Its one job,
+`dependency-review`, runs on Node `'24.22.3'`:
 
 1. **Test the review script** — `node scripts/dependency-review.test.mjs`.
 2. **Gather the evidence.** `scripts/dependency-review.mjs` takes every direct
@@ -378,13 +437,21 @@ one job, `dependency-review`, runs on Node `'24.22.2'`:
    A deprecated package or an archived repository fails; no release in twelve
    months, a single maintainer or a licence off the allow-list is flagged for a
    judgement. It installs nothing, and writes the report to the job summary. It exits 0 whatever it found — a
-   finding is for a person, not a red run — and 2 when the lockfile or
-   configuration cannot be used.
+   finding is for a person, not a red run — and 2 when the lockfile, the
+   configuration or the register cannot be used. A 429 or 5xx from the
+   registry or GitHub is retried after 2 s and 5 s, or after the server's
+   `Retry-After` (since v2026.11.7).
 3. **Open the quarter's review issue**, titled after the quarter — *Quarterly
    dependency review — 2026-Q4* — and labelled `dependencies`; this step is
    what the job's `issues: write` is for. A re-run in the same quarter leaves an existing issue's body
    alone, because the outcomes are recorded there, and adds the fresh evidence
    as a comment. The step is skipped on a pull request.
+
+Since v2026.11.7 the report, and so the quarter's issue, also lists what the
+[dependency register](#lockfile-review-what-a-lockfile-change-contains) still
+holds open — overrides, replacements with a follow-up issue, cooldown
+overrides — and the previous quarter's Renovate security exceptions, which the
+job's `issues: write` also lets it search for.
 
 The script flags what fails a criterion or needs a judgement; a person ticks
 *keep*, *replace* or *accept* for each package and gives the reason, and a
@@ -394,7 +461,7 @@ replacement gets an issue of its own. The criteria are the ones in
 maintained, maintainers, licence (the allow-list in `lockfile-review.json`),
 release policy, footprint, and needed — shared by `linked-data-explorer`,
 `ttl-editor` and this repository: ICTU recommendation 1 applies them before a
-package is added (see [`lockfile-review`](#lockfile-review-what-a-lockfile-change-contains)),
+package is added, where the register gate blocks without an entry (see [`lockfile-review`](#lockfile-review-what-a-lockfile-change-contains)),
 recommendation 11 again every quarter (sgort/linked-data-explorer#250).
 
 The first review, for 2026-Q4, is issue 362: of 85 direct dependencies, 3 failed
@@ -414,7 +481,7 @@ It runs at 05:41 UTC daily — off the hour, like the daily audit — and on
 `workflow_dispatch`, and on a pull request that touches the workflow,
 `scripts/check-upstream-certs.mjs` or its test. Like every scheduled workflow it
 runs from the default branch, `acc`. It is not a required check on either branch.
-Its one job, `upstream-certs`, runs on Node `'24.22.2'`:
+Its one job, `upstream-certs`, runs on Node `'24.22.3'`:
 
 1. **Test the check script** — `node scripts/check-upstream-certs.test.mjs`.
 2. **Check the certificates.** `check-upstream-certs.mjs` opens a TLS connection
@@ -457,13 +524,13 @@ drift only warns; and `--print-path`. Both comparisons ignore `serialNumber` and
 the npm version recorded in `metadata.tools` included. `npm run sbom:check` runs
 the strict check locally.
 
-`sbom.yml` runs one job, `release-sbom`, on Node `'24.22.2'` — the same literal
+`sbom.yml` runs one job, `release-sbom`, on Node `'24.22.3'` — the same literal
 as the daily audit, for the same reason:
 
 | # | Step | When |
 |---|---|---|
 | 1 | Checkout | Always |
-| 2 | Set up Node `24.22.2` | Always |
+| 2 | Set up Node `24.22.3` | Always |
 | 3 | Test the SBOM generator — `node scripts/write-sbom.test.mjs` | Always |
 | 4 | `--verify-release` | A push to `main` |
 | 5 | `--check`, when the pull request changes the version's SBOM file (a release bump); skipped otherwise | A pull request touching the SBOM tooling — the workflow, `write-sbom.mjs`, its test, or `docs/sbom/**` |
@@ -487,14 +554,14 @@ on a promotion, what is deployed.
     lockfile filter above replaced it (#368).
 
 !!! warning "An SBOM is comparable only with one generated by the same npm"
-    The committed `ronl-business-api-2026.11.3.cdx.json` lists 493 components and
-    records npm 11.19.1 in its `metadata.tools`, the npm Node 24.22.2 bundles.
-    Because `--check` compares that field too, and because npm 10 resolves the
-    tree differently, a local `npm run sbom:check` under Node 22.23.4's bundled
-    npm 10.9.9 exits 1 against it (measured on 7 November 2026 against the
-    v2026.11.1 SBOM: 505 components generated, 487 committed). Generated with
-    npm 11.19.1 from the same lockfile, the document is identical to the
-    committed one. Run the strict check with the npm CI uses; since v2026.10.4
+    The committed SBOM records the npm that wrote it in `metadata.tools`, and
+    `--check` compares that field too. `ronl-business-api-2026.11.7.cdx.json`
+    lists 470 components and records npm 11.19.1 — the npm Node 24.22.3
+    bundles, the Node `sbom.yml` pins and, since v2026.11.7, the one `.nvmrc`
+    names. npm 10 also resolves the tree differently: under Node 22.23.4's
+    npm 10.9.9, a local `npm run sbom:check` exited 1 against the v2026.11.1
+    SBOM (measured on 7 November 2026: 505 components generated, 487
+    committed). Run the strict check with the npm CI uses. Since v2026.10.4,
     `/bump-release` generates the release SBOM under the Node `sbom.yml` pins,
     and so with its npm.
 
@@ -502,57 +569,67 @@ on a promotion, what is deployed.
 
 ## Node runtime
 
-One source of truth. Both App Service plans run `NODE|22-lts`, and until
-v2026.09.7 eight workflows asked for `node-version: '20'` — building the
-deployed artifact on a major the host does not run.
+One source of truth. Both App Service plans run `NODE|24-lts` — since
+v2026.11.7; `NODE|22-lts` before — and until v2026.09.7 eight workflows asked
+for `node-version: '20'`, building the deployed artifact on a major the host did
+not run.
 
 - The **eight deploy workflows** read `node-version-file: .nvmrc`.
-- `.nvmrc` carries an exact `22.23.4`, which bundles npm 10.9.9 — the release that fixes CVE-2026-111497, a Brotli decoder out-of-bounds write; both App Services already ran it.
-- The root `engines.node` is `>=22`, and `engines.npm` is `>=10.0.0`.
+- `.nvmrc` carries an exact `24.22.3`, which bundles npm 11.19.1. Node 24 came
+  in v2026.11.7 ([#501](https://github.com/sgort/ronl-business-api/pull/501),
+  then 24.22.3 in #502) so that npm enforces the `.npmrc` cooldown; Node
+  22.23.4's npm 10.9.9 ignored it (see
+  [The package-manager cooldown](#the-package-manager-cooldown)).
+- The root `engines` is `"node": ">=24.22.1"`, `"npm": ">=11.10.0"`, and so is
+  `packages/backend`'s. The npm floor is the cooldown's: 11.10.0 is the first
+  npm that enforces `min-release-age`, and the hosted Renovate app installs its
+  npm from `engines.npm`.
 - `dependency-audit.yml`, `dependency-review.yml` and `sbom.yml` name an exact
-  `'24.22.2'`: they read lockfiles — both branches', in the audit's case — and
+  `'24.22.3'`: they read lockfiles — both branches', in the audit's case — and
   should not change Node with the tree they read. `upstream-certs.yml` names the
   same literal, so Renovate moves all of them together.
-- `zizmor.yml` names the same exact `'24.22.2'`, deliberately on a different
-  major from `.nvmrc`:
-  its `renovate-config-validator` step needs Node 24, because `renovate`
-  declares `engines.node ^24.11.0`. npm accepts that mismatch with an
-  `EBADENGINE` warning rather than refusing, which is how the validator once
-  ran unsupported and green. Pointing it at `.nvmrc` instead would run it on
-  Node 22, which `renovate` does not support. Renovate maintains this pin behind
-  the same fourteen-day cooldown as everything else — when v24.21.0 was adopted
-  in v2026.09.11 it had been released sixteen days before, checked against the
-  Node release index rather than taken from the `stability-days` status, which
-  reads *not met* on lock-file maintenance branches that are in fact compliant.
+- `zizmor.yml` names the same exact `'24.22.3'` in both of its jobs. Its
+  `renovate-config-validator` step needs Node 24, because `renovate` declares
+  `engines.node ^24.11.0`, and npm accepts a mismatch with an `EBADENGINE`
+  warning rather than refusing, which is how the validator once ran unsupported
+  and green. Until v2026.11.7 this literal was deliberately on a different
+  major from `.nvmrc`; now both are on 24, and today on the same version.
+  Renovate maintains this pin behind the same fourteen-day cooldown as
+  everything else — when v24.21.0 was adopted in v2026.09.11 it had been
+  released sixteen days before, checked against the Node release index rather
+  than taken from the `stability-days` status, which reads *not met* on
+  lock-file maintenance branches that are in fact compliant.
 
 !!! note "`engines` is a floor, not the runtime — and Renovate no longer raises it"
     Renovate's `rangeStrategy bump` applies to `engines` as well as to
-    dependencies, and under `bump` it raises `engines.node` and `engines.npm`
-    to the newest versions it sees — once to an npm floor that no Node 22
-    release then bundled. Nothing enforces `engines` here, so a
-    raised floor produces `EBADENGINE` warnings on a slightly older toolchain
-    and drifts the root away from `packages/backend` and App Service's
-    `NODE|22-lts`. `engines` now uses `rangeStrategy widen`, which leaves a
-    range untouched when the new version already satisfies it: `>=22` stays
-    `>=22`, and the exact runtime stays where it belongs, in `.nvmrc`.
+    dependencies, and under `bump` it raised `engines.node` and `engines.npm`
+    to the newest versions it saw — once to an npm floor that no Node 22
+    release then bundled. `engines` now uses `rangeStrategy widen`, which
+    leaves a range untouched when the new version already satisfies it, so
+    the exact runtime stays where it belongs, in `.nvmrc`. The floors were
+    raised by hand in v2026.11.7, to `>=24.22.1` and `>=11.10.0`, and the npm
+    one is deliberate: a `packageManager` field or `constraints.npm` below it
+    would turn the cooldown off for Renovate without a word.
 
 `.nvmrc` is also in every deploy workflow's **path filter**, which it was not
 until v2026.09.9 — see [Path filters](#path-filters).
 
 ### Majors that are deferred, and majors that wait
 
-Two majors are held by a Renovate rule that sets `enabled: false` and carries,
+One major is held by a Renovate rule that sets `enabled: false` and carries,
 in its `description`, the reason and the condition that ends it:
 
-- **Node 24.** Both App Services run `NODE|22-lts` against an `.nvmrc` of
-  `22.23.4`, so the tree is consistent today; taking 24 in `.nvmrc` alone would
-  build the backend on a major the host does not run. The rule ends by
-  **switching both App Services to `NODE|24-lts` first**, then removing the rule
-  in the same change as the `.nvmrc` bump. App Service offers the runtime at the
-  major only — see [Backend deployment](deployment/backend.md#azure-app-service-configuration).
 - **Ubuntu 26.04.** The runner pins exist to stop drift, not to be newest, and
   `ubuntu-latest` still resolves to 24.04. The rule ends when `ubuntu-latest`
   moves; then every workflow moves in one pull request, the way 24.04 arrived.
+
+Until v2026.11.7 a second such rule held Node 24, while both App Services ran
+`NODE|22-lts`. It
+ended in v2026.11.7 as it said it would: the App Services moved first, and the
+rule went in the change that bumped `.nvmrc`
+([#501](https://github.com/sgort/ronl-business-api/pull/501)). App Service
+offers the runtime at the major only — see
+[Backend deployment](deployment/backend.md#azure-app-service-configuration).
 
 Every other major waits as a Dependency Dashboard checkbox rather than being
 disabled, so a person still sees it. When one is approved, a second rule decides
@@ -562,6 +639,11 @@ to npm because the same pattern against Docker tags or the runner datasource
 would mean something else; the recorded cost is that a package publishing `X.0.0`
 and never a patch is never offered that major, which takes a per-package
 exception with its reason.
+
+A Node major (26, say) is one of these, and its checkbox must not be ticked
+until each App Service runs that major: ACC switched before the change merges
+into `acc`, PROD before the promotion (`SECURITY-PIPELINE.md`, "The App Service
+runtime"; the rule's `description` in `renovate.json`).
 
 The local development stack in `docker-compose.yml` pins all six images by tag
 **and** digest, maintained by Renovate through `docker:pinDigests` in
@@ -585,20 +667,36 @@ min-release-age=14
 ```
 
 npm itself will then not resolve a version published less than fourteen days
-ago. Four properties of it were measured rather than assumed, and each one
-matters:
+ago, from npm 11.10.0 on. Where it reaches, since the move to Node 24 in
+v2026.11.7:
 
 | Context | Behaviour |
 |---|---|
-| npm **11.10 or newer** | Honours it on `install` and `update` |
-| `npm ci` | **Ignores it on purpose** — so CI, which only ever runs `npm ci`, cannot fail on it |
-| npm **10.9.9** (bundled with Node 22.23.4) | Ignores it *without a warning* — which is why `scripts/check-deps.sh` warns when npm is older than 11.10 |
-| The backend deploy | Not covered: it installs in its own `deploy/` folder, and npm reads a project `.npmrc` only from the project root |
+| `npm install` / `npm update` on a workstation, npm **11.19.1** (Node 24.22.3, `.nvmrc`) | Honours it. `scripts/check-deps.sh` **fails** below npm 11.10, at every dev-server start and push, and names `nvm use` |
+| npm **10.9.9** (Node 22.23.4, `.nvmrc` until v2026.11.7) | Ignored it *without a warning*: until v2026.11.7 the setting did nothing on a workstation that followed `.nvmrc` |
+| Renovate's update pull requests and lock-file maintenance | Renovate passes no `--before` when `.npmrc` sets `min-release-age`, and leaves the cutoff to npm. The hosted app installs its npm from `engines.npm` (`>=11.10.0`), so that floor is the cooldown's |
+| Renovate's security pull requests | Pass no minimum release age, by Renovate's design |
+| `npm ci` | **Ignores it on purpose** and installs the lockfile as it is (npm/cli#9281). Covered at pull-request time instead: the [register gate](#lockfile-review-what-a-lockfile-change-contains) fails any lockfile version younger than 14 days |
+| The backend deploy | `npm ci --omit=dev --workspace=@ronl/backend` from the root lockfile, in CI only since v2026.11.6, so the `npm ci` row applies |
+
+Until v2026.11.7 this page said the backend deploy was not covered because it
+installed in its own `deploy/` folder, and that Renovate's security pull
+requests retry without the cutoff when npm answers `ETARGET`. The first stopped
+being true in v2026.11.6, when the deploy scripts that installed there were
+retired and the backend came to deploy only from CI; the second never happened
+here, as `.npmrc` and `SECURITY-PIPELINE.md` now say.
+
+**The proof.** `scripts/cooldown-proof.mjs` checks every day, in
+[`dependency-audit`](#dependency-audit-daily-on-acc-and-main), that npm on this
+toolchain really refuses a version younger than the cooldown. Run it locally
+with `node scripts/cooldown-proof.mjs`; pass
+`--npm "npx -y -p npm@12.2.2 npm"` to test another npm.
 
 An urgent security fix may skip the cooldown, as the guideline allows — set the
 flag to zero on that one command line, never in the file, and say why in the
-pull request. Renovate's security pull requests already do this themselves,
-retrying without the cutoff when npm answers `ETARGET`.
+pull request. The lockfile it writes then needs a `cooldownOverrides` entry,
+citing an open issue, to pass the gate, unless it is a Renovate security pull
+request.
 
 ---
 
