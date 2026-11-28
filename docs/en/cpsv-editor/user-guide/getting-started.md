@@ -12,7 +12,7 @@ component: CPSV Editor
 
 **To run the editor locally:**
 
-- Node.js 24.22.2, the version pinned in the repository's `.nvmrc`
+- Node.js 24.22.3, the version pinned in the repository's `.nvmrc`
 - npm
 
 ---

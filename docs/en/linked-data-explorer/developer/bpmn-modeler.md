@@ -506,6 +506,8 @@ The descriptor declares seven type entries:
 
 `ronl:signatureRef` is registered, but the Modeler offers no control for it: it is written by hand in the BPMN. `ronlModdleDescriptor.test.ts` reads `documentRef` and `signatureRef` on a user task as typed properties, because an unregistered attribute still round-trips, parked in `$attrs`, and a missing registration would otherwise fail silently.
 
+The four linked-document attributes that the RIP R2.1 to R2.4 models carry since v2026.11.4 — `ronl:linkedDocumentRef`, `ronl:documentFigures`, `ronl:documentChecklist` and `ronl:kredietCheck` — are **not** registered in `ronlModdleDescriptor.json`. They live in `$attrs`. No LDE code reads them, no test pins their round-trip, and only the RONL Business API interprets them ([Linked documents](../features/bpmn-modeler.md#linked-documents)).
+
 The phase attributes are registered so the phase editors can write them with `modeling.updateModdleProperties`; the test also reads them as typed properties and round-trips them through a save.
 
 Each entry has the same shape, e.g. for `LanguageMixin`:

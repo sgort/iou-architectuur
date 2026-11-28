@@ -303,7 +303,7 @@ git push origin acc
 The workflow automatically:
 
 1. Checks out code
-2. Sets up Node.js from `.nvmrc` (22.23.4)
+2. Sets up Node.js from `.nvmrc` (24.22.3)
 3. Installs dependencies with `npm ci` and builds `@ronl/shared`
 4. Lints, then runs the PA cockpit tests, the frontend tests and the
    performance budget

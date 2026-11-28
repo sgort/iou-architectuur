@@ -8,6 +8,15 @@ The LDE backend integrates with **OpenText eDOCS** — the document management s
 
 The integration uses the **external task pattern**: the LDE backend's worker polls Operaton with `fetchAndLock` for tasks on its topics, and completes or fails each one itself, rather than Operaton calling the backend. Every one of those calls logs in with the engine credentials (`OPERATON_USERNAME` and `OPERATON_PASSWORD`, since v2026.11.1). This keeps the coupling loose and makes the integration resilient to temporary eDOCS unavailability.
 
+!!! warning "The R2.1 model's eDOCS step is not this worker's"
+    The topics below date from the RIP Phase 1 model this integration was built for. No BPMN in the
+    repository uses `rip-edocs-workspace` or `rip-edocs-document` any more. `RipR21Process`, its successor,
+    has had an eDOCS step since v2026.11.4: *Aanmaken projectmap eDOCS*, with topic `rip-edocs-projectmap`.
+    That topic, and the model's `rip-relatics-workspace`, are handled by the **RONL Business API's** external
+    task worker, not this one ([RIP R2.1 Bundle](../features/rip-phase1-bundle.md#bpmn)). The RONL Business
+    API's worker also subscribes to `rip-edocs-workspace` and `rip-edocs-document`, so with both backends
+    polling one engine, whichever locked a task on those topics first would handle it.
+
 ---
 
 ## Architecture

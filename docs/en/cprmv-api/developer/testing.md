@@ -4,21 +4,21 @@ component: CPRMV
 
 # Testing
 
-The CPRMV API has one test file, `serve_api/test/test_serve.py`, run with pytest. Seven tests are active, four of them on `/health`; ten more are commented out since the method modules were introduced in 0.4.2. The shell scripts of the pipeline and the VMs have 69 bats tests. The release SBOM script has its own pytest suite, `scripts/test/test_write_sbom.py`, which the Release SBOM workflow runs. The SHACL shapes are validated separately with a shell script that is not part of CI.
+The CPRMV API has two test files in `serve_api/test/`, run with pytest: `test_serve.py` has seven active tests, four of them on `/health`, and ten more commented out since the method modules were introduced in 0.4.2; `test_ref.py` has 19 tests of `/ref`. The shell scripts of the pipeline and the VMs have 69 bats tests. The release SBOM script has its own pytest suite, `scripts/test/test_write_sbom.py`, which the Release SBOM workflow runs. The SHACL shapes are validated separately with a shell script that is not part of CI.
 
 ---
 
 ## At a glance
 
-Measured on 27 November 2026 at `502a351`, the commit on `main` (release v2026.11.0), from a scratch export, on Windows with Python 3.14. The hash-locked `requirements-dev.txt` was installed with `--require-hashes` without `uvloop`, which does not build on Windows, and `pywin32`, `pywin32-ctypes` and `colorama` were added, which the Linux-compiled files omit. CI on Linux ran the same suite and the shell tests in the `test` job of [run 21](https://github.com/open-regels/cprmv/actions/runs/45969250973) at `502a351`, and passed; the Release SBOM workflow's [run 5](https://github.com/open-regels/cprmv/actions/runs/45969251022) on the same commit passed the SBOM script's tests.
+Measured on 28 November 2026 at `0c4d236`, the commit on `main` (release v2026.11.1), from a scratch export, on Windows with Python 3.14. The hash-locked `requirements-dev.txt` was installed with `--require-hashes` without `uvloop`, which does not build on Windows, and `pywin32`, `pywin32-ctypes` and `colorama` were added, which the Linux-compiled files omit. CI on Linux ran the same suite and the shell tests in the `test` job of [run 50](https://github.com/open-regels/cprmv/actions/runs/46040683051) at `0c4d236`, and passed; the Release SBOM workflow's [run 13](https://github.com/open-regels/cprmv/actions/runs/46040682565) on the same commit passed the SBOM script's tests.
 
 | Check | Command | Result |
 |---|---|---|
 | Syntax check | `python -m py_compile src/serve.py` (from `serve_api/`) | Not run locally; passed in CI |
 | Import check | `python -c "from src.serve import app"` (from `serve_api/`) | Not run separately (the tests import `app`); passed in CI |
-| Unit tests | `pytest` (from `serve_api/`) | 7 collected in `test/test_serve.py`, 7 passed in 5.31 s; 7 passed in CI in 1.46 s |
+| Unit tests | `pytest` (from `serve_api/`) | 26 collected, 19 in `test/test_ref.py` and 7 in `test/test_serve.py`; 26 passed in 6.99 s; 26 passed in CI in 1.45 s |
 | Shell tests | `bats scripts/test deployment/vm/reconciler/test` (from the repository root) | Not run locally (bats not installed); 69 passed in CI, as read from the run's log |
-| SBOM script tests | `python -m pytest scripts/test/test_write_sbom.py` (from the repository root) | 75 collected, 74 passed and 1 skipped in 1.21 s: the skipped test runs the real `cyclonedx-py`, which was not installed; 75 passed in the Release SBOM run, which installs `cyclonedx-bom` 8.0.1 |
+| SBOM script tests | `python -m pytest scripts/test/test_write_sbom.py` (from the repository root) | 75 collected, 74 passed and 1 skipped in 1.62 s: the skipped test runs the real `cyclonedx-py`, which was not installed; 75 passed in the Release SBOM run, which installs `cyclonedx-bom` 8.0.1 |
 | SHACL validation | `sh test.sh` (from `rdf/0.4.3/`) | Not measured |
 
 ---
@@ -33,7 +33,7 @@ python -c "from src.serve import app; print('FastAPI app imported successfully')
 pytest
 ```
 
-`make tests` runs `pytest test`. One active test needs network access (see [Test inventory](#test-inventory)).
+`make tests` runs `pytest test`. No active test needs network access: `test_ref.py` replaces CELLAR, and the references `test_serve.py` resolves never reach it (see [Test inventory](#test-inventory)).
 
 In a container, from the repository root in Git Bash, as the repository's README gives it:
 
@@ -63,6 +63,8 @@ The rulesets require `test` on `acc` and `main`. The `build` job then starts the
 
 ### Active
 
+In `test_serve.py`:
+
 | Test | What it checks | Notes |
 |---|---|---|
 | `test_get_root` | `GET /` returns 200 and `{"CPRMV Rules Serve API": "0.4.3"}` | Uses FastAPI's `TestClient` |
@@ -70,8 +72,19 @@ The rulesets require `test` on `acc` and `main`. The `build` job then starts the
 | `test_health_reports_null_when_unset` | Unset, each of them is `null` | |
 | `test_health_treats_empty_as_null` | An empty value is `null` too | |
 | `test_health_reads_the_release_per_request` | Changing `BUILD_RELEASE` between two requests changes `release`: it is read per request | |
-| `test_detect_cprmv_serve_reference_method_and_transform` | An empty reference resolves to `None`; a Juriconnect 1.31 reference with `z` and `g` and a 1.3 reference with `g` resolve to the expected `/rules/…` paths | Needs network: the `elifmx4` reference method queries the EU CELLAR SPARQL endpoint |
+| `test_detect_cprmv_serve_reference_method_and_transform` | An empty reference resolves to `None`; a Juriconnect 1.31 reference with `z` and `g` and a 1.3 reference with `g` resolve to the expected `/rules/…` paths | Offline: none of these references reaches CELLAR, since `elifmx4` no longer queries it for a reference that is not an ELI |
 | `test_detect_cprmv_serve_unknown_method` | `get_rules("UNKNOWN")` returns the "No supported publication repository…" error | |
+
+In `test_ref.py`, 19 cases from six test functions, offline: every test that could reach CELLAR replaces the ELI method's `urlopen`, either with a fake CELLAR answer or with one that fails the test when called.
+
+| Test | Cases | What it checks |
+|---|---|---|
+| `test_ref_redirect_does_not_echo_request_headers` | 1 | A Juriconnect reference sent with `x-api-key` and a custom header gets a `307` to `/rules/BWBR0015703_…` that carries neither header nor the key's value |
+| `test_unrecognised_references_never_reach_cellar` | 8 | An empty string, plain text, an ELI on another host, and ELIs with a quote, a SPARQL injection, a closing `" . }`, angle brackets or a trailing newline resolve to `None` without a CELLAR query |
+| `test_valid_eli_reference_queries_cellar` | 1 | A valid ELI queries CELLAR once, at `https://publications.europa.eu/webapi/rdf/sparql?`, and resolves to the item |
+| `test_ref_redirects_to_a_cellar_item` | 1 | `/ref` redirects a valid ELI to the CELLAR item |
+| `test_ref_refuses_to_redirect_elsewhere` | 7 | A target on another host, `//host`, `/\host`, with user info, on a look-alike host, `javascript:` or `ftp:` gets `200` with the *not a valid or supported reference* error and no `location` |
+| `test_ref_refuses_a_cellar_answer_pointing_elsewhere` | 1 | A CELLAR answer that points to another host is refused the same way |
 
 ### Commented out
 
@@ -132,7 +145,7 @@ Run it from `rdf/0.4.3/`. It requires pyshacl (`pip install pyshacl`), which is 
 
 - **`/rules`.** No active test fetches a rule set or follows a rule path; `test_get_rules` is commented out.
 - **The method modules.** No test calls a publication, serialisation or reference method directly, and no test checks which methods `load_methods()` loads. `test_detect_cprmv_serve_unknown_method` passes even when no method is loaded.
-- **`/ref`, `/methods`, `/0.4.3/methods`, `/raw` and `/respec`** have no endpoint test.
+- **`/methods`, `/0.4.3/methods`, `/raw` and `/respec`** have no endpoint test. `/ref` is tested for its headers and its redirect targets, with Juriconnect and ELI references; no test resolves a `cprmvapi` or `elinl` reference.
 - **The new sources.** Nothing tests IOU Norms, ROO, DSO or the `x-api-key` pass-through.
 - **MCP.** Nothing tests `/mcp/`. It answers on the hosts, but no test lists its tools.
 - **The image's methods.** CI starts the built image and the pushed one and checks `/health`, but `/health` loads no method: an image without `methods/` would still pass, because the tests run against the source tree, where `methods/` exists (see [Deployment](deployment.md#docker-image)). The Dockerfile copies `methods/`, and nothing checks that it does.

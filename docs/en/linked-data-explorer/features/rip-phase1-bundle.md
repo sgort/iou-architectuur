@@ -26,7 +26,7 @@ It lives at `examples/organizations/flevoland/rip-phase-21/` and deploys to Oper
 
 ## Process flow
 
-`RipR21Process` has **thirteen user tasks**, one service task and three approval gateways, laid out in swimlanes. Task names are in Dutch, matching the source specification and what a caseworker sees in the task list.
+`RipR21Process` has **thirteen user tasks**, two service tasks and three approval gateways, laid out in swimlanes. Task names are in Dutch, matching the source specification and what a caseworker sees in the task list.
 
 | # | Type | Name |
 |---|---|---|
@@ -35,20 +35,21 @@ It lives at `examples/organizations/flevoland/rip-phase-21/` and deploys to Oper
 | 3 | ExclusiveGateway | Projectplan 1. Intake-formulier akkoord? |
 | 4 | UserTask | Verbeteren kwaliteit 1. Intake-formulier ↺ |
 | 5 | ServiceTask | Laten aanmaken workspace Relatics |
-| 6 | UserTask | Organiseren intake-overleg |
-| 7 | UserTask | Uitvoeren intake-overleg |
-| 8 | UserTask | Aanvullen Projectplan 2. Intake-verslag |
-| 9 | UserTask | Accorderen Projectplan 2. Intake-verslag |
-| 10 | ExclusiveGateway | Akkoord? |
-| 11 | UserTask | Opstellen risicodossier en versturen aan PL |
-| 12 | UserTask | Opstellen planning en informeren PL en ondersteuner |
-| 13 | UserTask | Initiëren / organiseren PSU |
-| 14 | UserTask | Uitvoeren PSU en aanvullen Projectplan 3. PSU-verslag |
-| 15 | UserTask | Houden overleg uitgangspunten VO-fase |
-| 16 | UserTask | Aanvullen Projectplan 4. Uitgangspunten VO-fase |
-| 17 | UserTask | Accorderen Projectplan 4. Uitgangspunten VO-fase |
-| 18 | ExclusiveGateway | Akkoord? |
-| 19 | EndEvent | Fase 1 voltooid → R2.2 |
+| 6 | ServiceTask | Aanmaken projectmap eDOCS |
+| 7 | UserTask | Organiseren intake-overleg |
+| 8 | UserTask | Uitvoeren intake-overleg |
+| 9 | UserTask | Aanvullen Projectplan 2. Intake-verslag |
+| 10 | UserTask | Accorderen Projectplan 2. Intake-verslag |
+| 11 | ExclusiveGateway | Akkoord? |
+| 12 | UserTask | Opstellen risicodossier en versturen aan PL |
+| 13 | UserTask | Opstellen planning en informeren PL en ondersteuner |
+| 14 | UserTask | Initiëren / organiseren PSU |
+| 15 | UserTask | Uitvoeren PSU en aanvullen Projectplan 3. PSU-verslag |
+| 16 | UserTask | Houden overleg uitgangspunten VO-fase |
+| 17 | UserTask | Aanvullen Projectplan 4. Uitgangspunten VO-fase |
+| 18 | UserTask | Accorderen Projectplan 4. Uitgangspunten VO-fase |
+| 19 | ExclusiveGateway | Akkoord? |
+| 20 | EndEvent | Fase 1 voltooid → R2.2 |
 
 ### The phase-exit approval is signed
 
@@ -64,7 +65,7 @@ Sixteen files deploy together: one BPMN, twelve forms and three document templat
 
 ### BPMN
 
-`RipR21Process.bpmn` — the executable process. Its one ServiceTask uses `camunda:type="external"` with topic **`rip-relatics-workspace`**, polled by the LDE backend external task worker.
+`RipR21Process.bpmn` — the executable process. Its two ServiceTasks use `camunda:type="external"`. *Laten aanmaken workspace Relatics* has topic **`rip-relatics-workspace`**. *Aanmaken projectmap eDOCS*, added in v2026.11.4 between it and *Opstellen risicodossier*, has topic **`rip-edocs-projectmap`**. Both topics are the RONL Business API's: its external task worker subscribes to them, simulates the Relatics workspace (there is no Relatics integration yet), and for the projectmap looks up the project's eDOCS workspace and records it for the later phases, without ever failing the task. The LDE backend's own worker subscribes to neither topic (see [eDOCS Integration](../developer/edocs-integration.md)).
 
 ### Forms
 
@@ -92,6 +93,8 @@ Three templates, each bound to the task that produces it with `ronl:documentRef`
 | `rip-intake-report.document` | Aanvullen Projectplan 2. Intake-verslag | `projectNumber`, `projectName`, `confirmedScope`, `confirmedBudget`, `confirmedTimeline`, `intakeDecisions`, `intakeAgreements` |
 | `rip-psu-report.document` | Uitvoeren PSU | `psDate`, `psLocation`, `psOutcomes`, `psActionPoints`, `projectManager`, `projectSupporter` |
 | `rip-pdp.document` | Aanvullen Projectplan 4. | `confirmedScope`, `confirmedBudget`, `confirmedTimeline`, `riskFileReference`, `pdpNotes` |
+
+*Uitvoeren PSU* also **links** a document it does not generate: the PSU-presentatie, which is kept in eDOCS (`ronl:linkedDocumentRef="rip-psu-presentatie:3325975"`, eDOCS format 3325975). Since v2026.11.4 that task goes to the candidate group `rip-projectleider`, though it is still drawn in the *Deelnemers PSU* lane. A linked document is not a bundle file, so the sixteen files above are unchanged. The model declares the link, and the RONL Business API asks for the document when the task is completed, once the model is deployed. This release puts the models in the repository and deploys nothing to Operaton; on 28 November 2026 the changed models are not yet deployed on ACC or production. See [Infra-board → Documents at a task](../../ronl-business-api/user-guide/infra-board.md#documents-at-a-task) and [BPMN Modeler → Linked documents](bpmn-modeler.md#linked-documents).
 
 !!! warning "Their signature blocks did not render until v2026.08.4"
     All three templates used `signoff` and `contactInfo` where `DocumentZones`

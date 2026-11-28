@@ -35,9 +35,9 @@ Both services restart unless stopped and keep at most three 10 MB log files. The
 3. Within two minutes of the image appearing, the tier's VM sees the new head, pulls `sha-<commit>` and brings the release up.
 4. CI's `deploy` job waits until `deploy-status.json` reports the commit running and `/health` reports the same `build.sha`.
 
-On this page, as in the reconciler, a *release* is what the reconciler deploys: one commit's deployment directory. The release *number* (`v2026.11.0`) that `/health` reports is a different thing; see [Two version numbers](ci-cd.md#two-version-numbers).
+On this page, as in the reconciler, a *release* is what the reconciler deploys: one commit's deployment directory. The release *number* (`v2026.11.1`) that `/health` reports is a different thing; see [Two version numbers](ci-cd.md#two-version-numbers).
 
-Release pull request [#35](https://github.com/open-regels/cprmv/pull/35), release v2026.11.0, merged into `main` at 08:53 UTC on 27 November 2026. CI [run 21](https://github.com/open-regels/cprmv/actions/runs/45969250973) had published `502a351` by 08:57, the stable VM reported it running at 08:58:33, and `deploy` passed at 08:59:02, 93 seconds after that job started.
+Release pull request [#45](https://github.com/open-regels/cprmv/pull/45), release v2026.11.1, merged into `main` at 17:17 UTC on 27 November 2026. CI [run 50](https://github.com/open-regels/cprmv/actions/runs/46040683051) had published `0c4d236` by 17:21, the stable VM reported it running at 17:22:38, and `deploy` passed at 17:23:08, 88 seconds after that job started.
 
 ---
 
@@ -107,7 +107,7 @@ If the new release does not come up healthy within the time limit, or `/health` 
 | `failed` | The target did not come up; the previous release was restored, or nothing ran before. | Read `last_attempt.error`, fix, merge a new commit. |
 | `broken` | The target failed and the restore failed. | SSH in, read the reconciler's journal and `state.json`, and bring a release up by hand. |
 
-On 27 November 2026 both stable host names reported `running` `502a351`, and acceptance `running` `2341daa`, each with `matches_repo: true` and no warning.
+On 28 November 2026 both stable host names reported `running` `0c4d236`, and acceptance `running` `ebf7def`, each with `matches_repo: true` and no warning.
 
 ### Changing the reconciler
 
@@ -128,7 +128,7 @@ The reconciler never updates itself, so that a bad merge cannot replace what wou
 
 A host that reports a commit therefore runs an image built from that commit, and `deploy-status.json` names the registry digest the VM pinned. `/health` does not load a method; it proves which build runs, not that every source answers.
 
-On 27 November 2026 `cprmv.open-regels.nl` and `cprmv.open-rules.eu` reported `stable`, release `v2026.11.0`, `502a351` (run 21), and `acc.cprmv.open-regels.nl` reported `acceptance`, release `v2026.11.0`, `2341daa` (run 35). Acceptance runs six pull requests more, merged into `acc` after the release: five Renovate dependency updates and the removal of `safety` from the `tools` extra.
+On 28 November 2026 `cprmv.open-regels.nl` and `cprmv.open-rules.eu` reported `stable`, release `v2026.11.1`, `0c4d236` (run 50), and `acc.cprmv.open-regels.nl` reported `acceptance`, release `v2026.11.1`, `ebf7def` (run 56). Acceptance runs two pull requests more, merged into `acc` after the release: the development requirements compiled against the shipped ones ([#46](https://github.com/open-regels/cprmv/pull/46)) and a Renovate update of `fastapi-cli` to 0.0.34 ([#43](https://github.com/open-regels/cprmv/pull/43)).
 
 ---
 
@@ -152,7 +152,7 @@ Outbound HTTPS is open, as on an Azure VM by default. The VM needs GitHub, GHCR 
 
 ## What the tests verify
 
-The scripts are shellchecked and tested with bats in CI's `test` job: 69 tests in six files, all passing in CI run 21 on 27 November 2026.
+The scripts are shellchecked and tested with bats in CI's `test` job: 69 tests in six files, all passing in CI run 50 on 27 November 2026.
 
 | File | Tests | What they pin down |
 |---|---|---|

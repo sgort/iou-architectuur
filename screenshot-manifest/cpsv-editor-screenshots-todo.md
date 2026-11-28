@@ -1,7 +1,7 @@
 # CPSV Editor — screenshots to capture
 
-*A running record across syncs, newest first. Last reviewed for v2026.11.2 on
-22 November 2026 — item 11 (the publish dialog, three steps) is open, item 12 optional. Before that, v2026.11.1 on
+*A running record across syncs, newest first. Last reviewed for v2026.11.3 on
+28 November 2026 — nothing new to capture. Before that, v2026.11.2 on 22 November 2026 — item 11 (the publish dialog, three steps) is open, item 12 optional. Before that, v2026.11.1 on
 12 November 2026 — sign-in and publishing through the backend. All six captures it
 asked for (items 5–10) were made on 13 November 2026. Item 8 records the progress
 indicators as they are, and is re-shot once ttl-editor#249 item 1 is fixed. Item 3, an
@@ -46,6 +46,10 @@ describes. Items 5–10, from v2026.11.1, are below and done.
 - No NL screenshots are needed — the NL CPSV Editor pages are placeholders and
   embed no images. Only `developer/due-diligence.md` is a full translation, and
   it carries no figures.
+
+## Sync v2026.11.2 → v2026.11.3 — none
+
+Reviewed on 28 November 2026 for **v2026.11.3**, in production (`origin/main` `c3105f0`). No capture is requested: the vendor logo is now scaled to fit 512 px before it is stored (#268), which changes the stored image, not the Vendor tab's layout; the unreadable-answer warning reuses *Published with warning*, which no page shows as an image; and the dependency gate is CI. Items 11 and 12 from v2026.11.2 are carried as they stand.
 
 ## Sync v2026.11.1 → v2026.11.2 — one REPLACE, one optional REPLACE
 

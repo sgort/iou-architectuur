@@ -51,7 +51,7 @@ When `serve.py` is imported it:
 2. Sets the Dutch locale (see [Locale](#locale)).
 3. Creates the FastAPI `app` (version `0.4.3`), whose lifespan also starts the MCP app once it exists (see [MCP](#mcp)).
 4. Calls `set_CPRMVMETHODSKG` twice: `./data/cprmvmethods.ttl` into a new graph, then `./data/cprmv.ttl` merged into the same graph. The result is `app.cprmvsettings["CPRMVMETHODS_KG"]`, the methods knowledge graph used at request time.
-5. Registers a middleware that keeps each request's headers in a context variable (`app.current_request_headers`), so a method can pass the caller's `x-api-key` on to its source.
+5. Registers a middleware that keeps each request's headers in a context variable (`app.current_request_headers`). `/rules` and `/raw` add the caller's `x-api-key` to it, so a method can pass the key on to its source; `/ref` does not use it.
 6. Calls `load_methods()` and stores the instances in `app.cprmvmethods`.
 7. Builds the MCP server and mounts it at `/mcp` — last, after every route (see [MCP](#mcp)).
 
@@ -117,11 +117,13 @@ The first method that returns a publication wins. `load_rule_set` then calls the
 
 ## Reference resolution
 
-`/ref` calls `detect_cprmv_serve_reference_method_and_transform(reference)`, which walks the methods acknowledged under `cprmvmethods:referencemethods` and returns the first non-empty `transform_reference` result as a redirect:
+`/ref` calls `detect_cprmv_serve_reference_method_and_transform(reference)`, which walks the methods acknowledged under `cprmvmethods:referencemethods` and takes the first non-empty `transform_reference` result:
 
 - **`cprmvapi`** uses the default: parse against `{baseuri}/rules/{path}` and return `/rules/` plus the path with `/` replaced by `, `.
 - **`juriconnect`** parses `jci1.{subversion}:c:BWB{bwbid}&{locatie-string}`, accepts subversion `3` or `31` and an 8-character id after `BWB`. Each `key=value` pair in the location string is mapped through `cprmv-serve:reference-mapping`: the valid-on key (`g`) sets the date, the seen-on key (`z`) sets the version index, and the remaining keys become path segments. The rule set id is formatted with the `normalized-id-format` of `repository-overheid-nl-bwb`; the date defaults to today and the index to `latest`. So `…&z=2025-07-01&g=2025-07-01` yields `BWBR0015703_2025-07-01_2025-07-01`.
-- **`elifmx4`** queries the EU CELLAR SPARQL endpoint for the ELI and returns the first item URL.
+- **`elifmx4`** returns `None` without a query unless the reference matches `ELI_REFERENCE` (`http://data.europa.eu/eli/[A-Za-z0-9._/-]+`) in full and its reference format: the reference goes into the SPARQL query as a literal, and the query is percent-encoded once, so escaping would not help. For a match it queries the EU CELLAR SPARQL endpoint and returns the first item URL.
+
+`/ref` redirects to that result only when `is_safe_redirect` allows it: a path on this API (not `//host`) or an `http` or `https` URL on a host in `SAFE_REDIRECT_HOSTS` (`publications.europa.eu`) without user info, with no backslash or control character. Otherwise, as for an unrecognised reference, it answers *not a valid or supported reference*. The redirect carries no request headers.
 
 ---
 

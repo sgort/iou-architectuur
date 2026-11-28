@@ -54,7 +54,7 @@ For other vendors (currently Blueriq as the reference implementation), the form 
 - **Service notes** — free-text description of the vendor implementation
 - **Certification** — see below
 
-The logo is uploaded as on the Organisation tab, and an asset path, `./assets/{vendor}_vendor_logo.png`, is generated for the Turtle output (`schema:image`). Unlike the organisation's logo, it is not resized: the editor keeps the file exactly as uploaded and sends it at that size when you publish, so a large image makes a large publish. The hint under the button says *PNG, JPG, SVG (max 2MB)*; the editor does not check the size.
+The logo is uploaded as on the Organisation tab, and an asset path, `./assets/{vendor}_vendor_logo.png`, is generated for the Turtle output (`schema:image`). Since v2026.11.3 the editor scales it to fit 512 px on its longer side, keeping its proportions, and stores it as PNG — a file that already fits keeps its size but is still converted. Unlike the organisation's logo, it is not cropped to a square, because vendor logos are often wide wordmarks. A file the browser cannot read as an image is refused with *Could not use this logo:* and the reason. The hint under the button still says *PNG, JPG, SVG (max 2MB)*; the editor checks no size, and since the logo is scaled before it is stored, a large file no longer makes a large publish.
 
 ---
 

@@ -139,13 +139,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
 <div class="grid cards whats-new-cards" markdown>
 
--   **⚙️ RONL Business API — v2026.11.6** · *November 2026*
+-   **⚙️ RONL Business API — v2026.11.7** · *November 2026*
 
     ---
 
-    **The Infra-board's tasks ask for their eDOCS documents, and the backend deploys only from CI**
+    **Node 24, so npm keeps the fourteen-day cooldown, and no new dependency merges unassessed**
 
-    A task in R2.1 to R2.4 that produces a document kept in eDOCS can ask for it before it completes: pick it from the project's eDOCS projectmap or upload it, enter its key figures and answer the kredietcheck, and the platform refuses the completion while anything is missing. It shows once the process models that declare those documents are deployed, which they are not yet on ACC or production ([Infra-board](ronl-business-api/user-guide/infra-board.md#documents-at-a-task)). The Woo-dashboard opens with the Flevoland account, through the new Entra ID app role `IOU_WOO`, and **Uitloggen** in the no-access dialog works in one click ([Entra ID](ronl-business-api/developer/deployment/entra-id.md)). The hand-run backend deploy scripts are retired, so the backend reaches acceptance and production only through CI, installed from the lockfile ([Backend deployment](ronl-business-api/developer/deployment/backend.md#manual-deployment)). Flevoland's pink accent fill, on production since 18 November, is now part of a release ([themes](ronl-business-api/reference/municipality-themes.md#flevolands-palette)).
+    The repository moves to Node 24 and npm 11.19, and both App Services to `NODE|24-lts`. Until now, an `npm install` on a workstation ignored the fourteen-day wait on new package versions without a word. Now npm enforces it, the dev-server start and push checks refuse an older npm, and a daily check proves that npm still refuses a version that is too young ([CI/CD](ronl-business-api/developer/cicd.md#the-package-manager-cooldown)). A new direct dependency cannot merge without an assessment in the new dependency register, checked against what the npm registry and GitHub say, and no package version younger than fourteen days enters the lockfile ([CI/CD](ronl-business-api/developer/cicd.md#lockfile-review-what-a-lockfile-change-contains)). Nothing changes on screen.
 
     [:octicons-arrow-right-24: Full changelog](ronl-business-api/developer/changelog-roadmap.md)
 
@@ -159,33 +159,33 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](norm-editor/developer/changelog-roadmap.md)
     
--   **✏️ CPSV Editor — v2026.11.2** · *November 2026*
+-   **✏️ CPSV Editor — v2026.11.3** · *November 2026*
 
     ---
 
-    **An import that reads each statement whole, and publish steps that match the call**
+    **A new dependency waits for its assessment, and large vendor logos publish**
 
-    Importing no longer drops a rule, parameter or concept whose last line holds a semicolon, and a field such as the sector is read only from its own property, never from a URI or description that mentions it ([import](cpsv-editor/features/import-export.md)). The publish dialog shows the three steps publishing really takes, and names any logo the backend could not upload ([publishing](cpsv-editor/user-guide/publishing-to-triplydb.md)). An author whose session lapsed is asked to sign in again rather than test-deploying, and the *View only* note says where a test deploy is still possible ([DMN tab](cpsv-editor/user-guide/dmn-tab.md#step-4-deploy-to-operaton)). Deploys now queue instead of racing, and every test file belongs to a phase script. The [suites](cpsv-editor/developer/testing.md) stand at 894 tests in 74 files, all passing.
+    The required lockfile review now blocks a pull request that adds a direct dependency without an assessment in the new dependency register, checked against what the npm registry and GitHub say, and any package version younger than 14 days, whatever wrote the lockfile; `keycloak-js` is the first entry, kept until the Keycloak 26 migration ([deployment](cpsv-editor/developer/deployment.md#supply-chain-guards-around-the-install)). The Vendor tab scales a logo to fit 512 px, so a large one no longer fails the whole publish ([vendor integration](cpsv-editor/user-guide/vendor-integration.md#vendor-metadata-form)), and a publish whose answer cannot be read ends in a warning instead of an error ([publishing](cpsv-editor/user-guide/publishing-to-triplydb.md)). Node 24.22.3. The [suites](cpsv-editor/developer/testing.md) stand at 903 tests in 76 files, all passing.
 
     [:octicons-arrow-right-24: Full changelog](cpsv-editor/developer/changelog-roadmap.md)
 
--   **🔍 Linked Data Explorer — v2026.11.3** · *November 2026*
+-   **🔍 Linked Data Explorer — v2026.11.4** · *November 2026*
 
     ---
 
-    **Sign-in and publishing hardened, and a required service elsewhere is a warning**
+    **A new dependency waits for its assessment, and the RIP models link their eDOCS documents**
 
-    The backend now accepts only access tokens. When Keycloak cannot be reached, a change answers that sign-in is unavailable instead of asking you to sign in again ([backend](linked-data-explorer/developer/backend.md#sign-in)). A failed publish to TriplyDB says why in a line the editor can show, and a refused publishing address is named when the backend starts. The SHACL Validator reports `dct:requires` to a service the file does not describe as a warning, because that service is checked where it is published ([SHACL-CLASS](linked-data-explorer/reference/shacl-validation-reference.md#shacl-class)). A linked service without a DMN or title is named by the fragment of its address ([chain building](linked-data-explorer/features/dmn-chain-building.md)). The [suites](linked-data-explorer/developer/testing.md) stand at 3,698 tests in 171 files, all passing.
+    A pull request that adds a direct dependency now fails its required `lockfile-review` check until `dependency-register.json` records an assessment of it, checked against the npm registry and GitHub, with a reason wherever a criterion is not met. Any package version younger than 14 days is held back too, unless a Renovate security update or a committed override with an open issue lets it through, and the report logs each exception ([Deployment](linked-data-explorer/developer/deployment.md#supporting-workflows)). In the RIP R2.1 to R2.4 models, a document kept in eDOCS is now linked by its task rather than generated from a template, and R2.1 gains a step that finds the project's eDOCS projectmap; the models are in the repository, not yet on the process engines ([RIP Phase Ladder](linked-data-explorer/features/rip-phase-ladder.md)). Node moves to 24.22.3. The [suites](linked-data-explorer/developer/testing.md) stand at 3,698 tests in 171 files, all passing.
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
--   **📜 CPRMV API — v2026.11.0** · *vocabulary 0.4.3* · *November 2026*
+-   **📜 CPRMV API — v2026.11.1** · *vocabulary 0.4.3* · *November 2026*
 
     ---
 
     **Organisations, norms and the DSO as sources, and the original publication on request**
 
-    A RuleSet is now an FRBR Endeavor, so it can be a Work, an Expression, a Manifestation or an Item, and methods come in modules ([vocabulary](cprmv-api/reference/cprmv-vocabulary.md)). The API reads organisations from the Register van Overheidsorganisaties, norms from the IOU Norms API and STTR decision models from the DSO, which takes your own key ([sources](cprmv-api/features/publication-repositories.md)). `/raw` returns the original publication, `/methods` narrows to one method, and the EU CELLAR helpers are gone ([endpoints](cprmv-api/reference/api-endpoints.md)). The MCP server now answers at `/mcp/`, and the specification has new introductory chapters, a diagram per class and a PDF that builds again. Its seven [tests](cprmv-api/developer/testing.md) pass. Since 27 November production runs release v2026.11.0, the first with a release number beside vocabulary version 0.4.3: CPRMV is developed on GitHub, each tier runs on its own VM that deploys the head of its branch, rolls back when a deploy fails its check and reports the release it runs, and every release keeps a bill of materials ([releases](cprmv-api/developer/changelog-roadmap.md#releases), [VM deployment](cprmv-api/developer/vm-deployment.md)).
+    A RuleSet is now an FRBR Endeavor, so it can be a Work, an Expression, a Manifestation or an Item, and methods come in modules ([vocabulary](cprmv-api/reference/cprmv-vocabulary.md)). The API reads organisations from the Register van Overheidsorganisaties, norms from the IOU Norms API and STTR decision models from the DSO, which takes your own key ([sources](cprmv-api/features/publication-repositories.md)). `/raw` returns the original publication, `/methods` narrows to one method, and the EU CELLAR helpers are gone ([endpoints](cprmv-api/reference/api-endpoints.md)). The MCP server now answers at `/mcp/`, and the specification has new introductory chapters, a diagram per class and a PDF that builds again. Since 27 November production runs release v2026.11.1: `/ref` no longer sends your request headers back or redirects anywhere but this API and EU CELLAR, and its 26 [tests](cprmv-api/developer/testing.md) pass. Release v2026.11.0 was the first with a release number beside vocabulary version 0.4.3: CPRMV is developed on GitHub, each tier runs on its own VM that deploys the head of its branch, rolls back when a deploy fails its check and reports the release it runs, and every release keeps a bill of materials ([releases](cprmv-api/developer/changelog-roadmap.md#releases), [VM deployment](cprmv-api/developer/vm-deployment.md)).
 
     [:octicons-arrow-right-24: Full changelog](cprmv-api/developer/changelog-roadmap.md)
 

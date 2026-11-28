@@ -25,22 +25,37 @@ on `:3001`, with the `bes` test users present; nothing was started or stopped
 for the run. The public site's six count as passed from its serial run; its
 default parallel run had two timeouts — see below.
 
-!!! warning "Not re-run for v2026.11.5 or v2026.11.6: every figure on this page is carried forward from 14 November"
-    The suites were not run on 18 November, when the unit tests were measured
-    for v2026.11.5 plus hot fix #473 (`main` at `1784a72`), nor on
-    27 November, for v2026.11.6 (`main` at `7416c65`). No spec, helper or
-    Playwright configuration changed between `67bac28` and `7416c65`, and the
-    inventory is still 20 spec files, so the counts stand. The results do not
+!!! warning "Not re-run for v2026.11.5, v2026.11.6 or v2026.11.7: every figure on this page is carried forward from 14 November"
+    The suites were not run for this page on 18 November, when the unit tests
+    were measured for v2026.11.5 plus hot fix #473 (`main` at `1784a72`), on
+    27 November, for v2026.11.6 (`main` at `7416c65`), or on 28 November, for
+    v2026.11.7 (`main` at `9e8d9ec`). No spec, helper or Playwright
+    configuration changed between `67bac28` and `9e8d9ec`, and the inventory
+    is still 20 spec files, so the counts stand; Playwright itself moved from
+    1.64.1 to 1.65.1 in v2026.11.7's lock-file maintenance. The results do not
     extend to the new releases: the application under the specs changed, and
-    **nothing on this page says E2E passed against v2026.11.5 or v2026.11.6**.
+    **nothing measured on this page says E2E passed against v2026.11.5,
+    v2026.11.6 or v2026.11.7**.
 
-    One risk is known. Since v2026.11.6, R2.1's *Uitvoeren PSU* task declares
-    a linked document (`rip-psu-presentatie`), and the backend refuses to
-    complete it without one, `422 LINKED_DOCUMENT_MISSING`;
-    `rip-r21-journey.spec.ts` drives R2.1 to completion and links no
-    document. The models that declare linked documents are not yet deployed
-    on ACC or production, so this is a risk for when they are, not a measured
-    failure — see [Infra-board](dashboards/infra-board.md#e2e).
+    For v2026.11.7, promotion [#510](https://github.com/sgort/ronl-business-api/pull/510)
+    reports the developer's own runs, not repeated here: against localhost
+    with the new RIP models (linked-data-explorer `c318d27` and `4f04bc5`),
+    65 of 67 passed, with one known failure and [#508](https://github.com/sgort/ronl-business-api/issues/508);
+    against ACC at `f267d7a`, all passed except the known accessibility
+    failures on the Keycloak login pages (#497).
+
+    **Observed: [#508](https://github.com/sgort/ronl-business-api/issues/508).** Since
+    v2026.11.6, R2.1's *Uitvoeren PSU* task declares a linked document
+    (`rip-psu-presentatie`), **Taak voltooien** stays disabled until it is
+    linked, and the backend refuses the completion without it,
+    `422 LINKED_DOCUMENT_MISSING`. `rip-r21-journey.spec.ts` drives R2.1 to
+    completion and links no document. Against localhost with the new models
+    it now stalls: it clicks submit and waits 30 s for a
+    `POST …/task/{id}/complete` that never comes
+    (`rip-r21-journey.spec.ts:720`). #510 calls it a spec gap, not a
+    regression. The models that declare linked documents are not yet deployed
+    on ACC or production, so on ACC the journey still meets the old R2.1
+    model — see [Infra-board](dashboards/infra-board.md#e2e).
 
 !!! success "Re-run on 14 November — six more tests, and the first run on axe-core 4.14.0 and Playwright 1.64.1"
     v2026.11.3 added no spec and changed one:

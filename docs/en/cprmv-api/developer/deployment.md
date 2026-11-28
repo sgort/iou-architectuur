@@ -29,17 +29,17 @@ The CPRMV API runs as a Docker container. CI builds the image on every push to `
 | `<version>`, the vocabulary version, e.g. `0.4.3` | every push to `main` | the latest stable build of that version |
 | `vYYYY.MM.N`, the release, e.g. `v2026.11.0` | every push to `main` once there is a release | the latest stable build of that release |
 
-The VMs never run a tag: they resolve `sha-<commit>` to its registry digest and run the digest. Each pushed digest carries a build provenance attestation and a BuildKit SBOM attestation. On 27 November 2026 `v2026.11.0`, `0.4.3` and `stable` named the same digest.
+The VMs never run a tag: they resolve `sha-<commit>` to its registry digest and run the digest. Each pushed digest carries a build provenance attestation and a BuildKit SBOM attestation. On 28 November 2026 `v2026.11.1`, `0.4.3` and `stable` named the same digest.
 
 ---
 
 ## Hosts
 
-| Host | Tier | Branch | `/health` on 27 November 2026 |
+| Host | Tier | Branch | `/health` on 28 November 2026 |
 |---|---|---|---|
-| `https://cprmv.open-regels.nl/` | stable | `main` | `stable`, `v2026.11.0`, `502a351`, run 21 |
-| `https://cprmv.open-rules.eu/` | stable (alias, same VM) | `main` | `stable`, `v2026.11.0`, `502a351`, run 21 |
-| `https://acc.cprmv.open-regels.nl/` | acceptance | `acc` | `acceptance`, `v2026.11.0`, `2341daa`, run 35 |
+| `https://cprmv.open-regels.nl/` | stable | `main` | `stable`, `v2026.11.1`, `0c4d236`, run 50 |
+| `https://cprmv.open-rules.eu/` | stable (alias, same VM) | `main` | `stable`, `v2026.11.1`, `0c4d236`, run 50 |
+| `https://acc.cprmv.open-regels.nl/` | acceptance | `acc` | `acceptance`, `v2026.11.1`, `ebf7def`, run 56 |
 
 All three answer `{"CPRMV Rules Serve API":"0.4.3"}` on `/`, and `/mcp/` answers as an MCP endpoint; `/mcp` without the slash redirects to an `http://` address ([open-regels/cprmv#2](https://github.com/open-regels/cprmv/issues/2)). Each also serves `/deploy-status.json`, its VM's deployment status ([VM Deployment](vm-deployment.md#reading-deploy-statusjson)).
 

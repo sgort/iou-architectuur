@@ -207,16 +207,27 @@ signature, and the spec refuses before it sends a package. So the R2.1 work
 has not been driven end to end by these pages since 30 August; that needs a
 run against a target in stub mode.
 
-!!! warning "A risk for when the linked-document models are deployed: R2.1 now needs a document"
+!!! warning "Observed (#508): R2.1 now needs a document, and the journey stalls there"
     Since v2026.11.6, R2.1's *Uitvoeren PSU en aanvullen Projectplan* task
     declares a linked document (`ronl:linkedDocumentRef="rip-psu-presentatie:…"`),
     and the backend refuses to complete a task whose linked document is
     missing with `422 LINKED_DOCUMENT_MISSING`. `rip-r21-journey.spec.ts`
-    drives R2.1 to completion and links no document, so against a target
-    where that R2.1 model is deployed it can be expected to stop at that task.
-    The models that declare linked documents are not yet deployed on ACC or
-    production, so this is a risk for when they are — not a measured failure:
-    the spec was not run on 27 November.
+    drives R2.1 to completion and links no document. What v2026.11.6 named as
+    a risk is now observed, in the developer's run for v2026.11.7 against
+    localhost with the new RIP models (linked-data-explorer `c318d27` and
+    `4f04bc5`): the spec clicks submit and waits 30 s for a
+    `POST …/task/{id}/complete` that never comes
+    (`rip-r21-journey.spec.ts:720`), recorded as
+    [#508](https://github.com/sgort/ronl-business-api/issues/508). Promotion
+    [#510](https://github.com/sgort/ronl-business-api/pull/510) attributes it to
+    the completion gate keeping submit disabled until the PSU-presentatie is
+    linked, a spec gap rather than a regression; #508 itself does not yet name
+    the task, and also lists as leads a recipe that no longer matches the new
+    form and the task's new candidate group, `rip-projectleider`. The models
+    that declare linked documents are not yet deployed on ACC or production;
+    the developer's ACC run for v2026.11.7 passed apart from the known
+    Keycloak accessibility failures (#497). The spec was not run for these
+    pages.
 
 !!! warning "This page said *none* for six days"
     Both specs landed on **24 August 2026**. This page, its at-a-glance line and

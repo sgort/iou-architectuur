@@ -4,7 +4,7 @@ component: RONL Business API
 
 # Backend Deployment (Azure App Service)
 
-The backend deploys to **Azure App Service** (Node.js 22) from GitHub Actions.
+The backend deploys to **Azure App Service** (Node.js 24) from GitHub Actions.
 There are two deployment targets, ACC and PROD, and since v2026.09.10 **both are
 deployed by CI** — until then the workflows ended at an uploaded artifact and a
 person ran a script afterwards.
@@ -80,7 +80,7 @@ Both backend workflows follow the same process:
 
 ```yaml
  1. Checkout code
- 2. Setup Node.js from .nvmrc (22.23.4)
+ 2. Setup Node.js from .nvmrc (24.22.3)
  3. npm ci                          (install all workspace dependencies)
  4. Build shared package            (npm run build --workspace=@ronl/shared)
  5. Lint backend                    (npm run lint in packages/backend)
@@ -199,18 +199,23 @@ running, which is the failure this exists to detect.
 ## Azure App Service configuration
 
 **App name:** `ronl-business-api-acc` / `ronl-business-api-prod`  
-**Runtime:** `NODE|22-lts`  
+**Runtime:** `NODE|24-lts` on both, since v2026.11.7 (ACC switched before #501 merged into `acc`, PROD just before promotion #510)  
 **Startup command:** `node dist/index.js`
 
 App Service pins the Node runtime at the major only: `az webapp list-runtimes
 --os linux` offers `NODE|22-lts`, `NODE|24-lts` and `NODE|26`, with no exact
 version and no digest. What can be kept is the major in step with `.nvmrc`,
-which is `22.23.4`. A Node major bump therefore changes two places in a fixed
-order — **switch both App Services to the new `NODE|<major>-lts` first, then
-merge the `.nvmrc` bump** — because the other order builds the artifact on one
-major and runs it on another. No pull-request check runs against an App Service,
-so nothing enforces this; `SECURITY-PIPELINE.md` records it as the rule, and a
-disabled Renovate rule holds Node 24 until it is followed (see
+which is `24.22.3`. A Node major bump therefore follows a fixed order **on each
+tier: switch that tier's App Service to the new `NODE|<major>-lts` first, then
+merge what deploys the `.nvmrc` bump to it** — the pull request into `acc` for
+ACC, the promotion for PROD — because the other order builds the artifact on
+one major and runs it on another. Node 24 arrived that way in v2026.11.7. For
+the short window between each switch and its merge, code built on 22 ran on a
+host running 24, which is accepted because the production tree has no native
+addon. No pull-request check runs against an App Service, so nothing enforces
+the order; `SECURITY-PIPELINE.md` ("The App Service runtime") records it as the
+rule, and a `renovate.json` comment says not to tick a Node major on the
+Dependency Dashboard before each App Service runs it (see
 [CI/CD → Node runtime](../cicd.md#node-runtime)).
 
 Azure App Settings (environment variables) are configured via CLI or the Azure Portal. Set the production values from `docs/deployment/environment-variables.md`:

@@ -14,18 +14,24 @@ The testing roadmap that ran from P0 to P7 is **complete**: every phase has
 landed, and the per-file 80% branch floor is enforced natively by the runner.
 
 !!! info "Figures on this page are measured, not estimated"
-    Every unit-suite figure below was re-measured against **v2026.11.2** on
-    **22 November 2026** at `5d6345c` on `main`, on **Vitest 5.1.0**. The full
-    run with coverage reported **74 files and 894 tests, all passing, in
-    61.43 s** (Vitest's own duration, measured while another repository's lint
-    ran on the same machine, so not a clean timing). v2026.11.2 added 36 tests.
-    Every phase script, lint, the format check and `check-supply-chain` passed
-    on the same source, the committed SBOM matches the lockfile — the same
-    components and dependency graph — and the self-tests of the scripts the
-    supply-chain jobs run passed: `dependency-review.test.mjs` (24 checks),
-    `lockfile-diff.test.mjs` (77) and `write-sbom.test.mjs` (7).
-    The **end-to-end journeys were not re-run for v2026.11.2**: no spec changed,
-    only the preflight in `e2e/stack.js`, which now also checks Keycloak. Nor
+    Every unit-suite figure below was re-measured against **v2026.11.3** on
+    **28 November 2026** at `c3105f0` on `main` (run at `4ec37df`, whose tree is
+    identical), on **Vitest 5.1.0** and Node v24.22.2 — `.nvmrc` now names
+    24.22.3. A first run, made while the machine was short of memory, lost
+    files to workers that failed to start and was discarded; each suite was
+    then run on its own. The full run with coverage reported **76 files and
+    903 tests, all passing, in 124.00 s** (Vitest's own duration; 208 s wall
+    clock). v2026.11.3 added 9 tests. `test:p2` and `test:p5`, whose files
+    changed, were also run alone and agree; `test:app` and `test:p4`, each one
+    test up in one file, are counted from the full run's per-file figures, and
+    the other scripts select no changed file. The self-tests of the scripts the
+    supply-chain jobs run passed: `dependency-gate.test.mjs` (130 checks, new
+    in v2026.11.3), `dependency-review.test.mjs` (49), `lockfile-diff.test.mjs`
+    (84) and `write-sbom.test.mjs` (7). The release's SBOM is committed as
+    `docs/sbom/ttl-editor-2026.11.3.cdx.json`.
+    The **end-to-end journeys were not re-run for v2026.11.3**: no spec,
+    fixture or Playwright config changed. Nor for v2026.11.2, when only the
+    preflight in `e2e/stack.js` changed, to check Keycloak too. Nor
     were they re-run for v2026.11.1, when the three stack journeys began to sign
     in as `lde-e2e` before deploying, which needs Keycloak on `:8080` and
     `LDE_E2E_PASSWORD` in the shell — see
@@ -33,15 +39,15 @@ landed, and the per-file 80% branch floor is enforced natively by the runner.
     forward from 10 October 2026, against v2026.10.1 on a local stack — the Linked
     Data Explorer backend on `:3001`, Operaton on `:8081`, and this editor's dev
     server started by Playwright's own `webServer` on `:3000`: **4 passed in
-    42.4 s**, with Playwright 1.63.0. The lockfile now holds 1.64.1.
+    42.4 s**, with Playwright 1.63.0. The lockfile now holds 1.65.1.
     Rerun the commands in [Running the tests](#running-the-tests) to reproduce
     them.
 
-**At a glance:** 74 files · **894 tests** · all passing · 61.43 s for a full run
-with coverage on this measurement (on a busy machine), plus **4 end-to-end
+**At a glance:** 76 files · **903 tests** · all passing · 124.00 s for a full run
+with coverage on this measurement, plus **4 end-to-end
 journeys** run separately (last run on 10 October 2026).
 
-Coverage: **91.37% statements · 89.46% branches · 81.97% functions · 92.01%
+Coverage: **91.54% statements · 89.53% branches · 82.43% functions · 92.28%
 lines**, with every file at or above the 80% branch floor.
 
 !!! danger "Measure after `npm ci`, never after `npm install`"
@@ -62,15 +68,15 @@ from the repository root after `npm ci`.
 
 | Command | Scope | Suites | Tests |
 |---|---|---:|---:|
-| `npm run test:ci` | Everything, once, with coverage | 74 | 894 |
-| `npm test` | Everything, interactive watch mode | 74 | 894 |
+| `npm run test:ci` | Everything, once, with coverage | 76 | 903 |
+| `npm test` | Everything, interactive watch mode | 76 | 903 |
 | `npm run test:generator` | TTL generator regression tests | 9 | 131 |
 | `npm run test:roundtrip` | TTL round-trip, parser and import tests (P1) | 5 | 61 |
-| `npm run test:app` | The `src/App.*` suites | 6 | 33 |
-| `npm run test:p2` | Pure-logic utilities, and the phase-script guard (P2) | 10 | 200 |
+| `npm run test:app` | The `src/App.*` suites | 6 | 34 |
+| `npm run test:p2` | Pure-logic utilities, the vendor-logo scaler, and the phase-script guard (P2) | 11 | 205 |
 | `npm run test:p3` | State hooks (P3) | 3 | 37 |
-| `npm run test:p4` | Network-touching utilities and sign-in state (P4) | 7 | 85 |
-| `npm run test:p5` | Tab components, PreviewPanel, PublishDialog, sign-in controls (P5) | 27 | 238 |
+| `npm run test:p4` | Network-touching utilities and sign-in state (P4) | 7 | 86 |
+| `npm run test:p5` | Tab components, PreviewPanel, PublishDialog, sign-in controls (P5) | 28 | 240 |
 | `npm run test:p6` | `DMNTab`'s full lifecycle (P6) | 7 | 109 |
 | `npm run test:e2e` | Playwright journeys (P7) — **needs a live stack** | 4 | 4 |
 
@@ -80,7 +86,7 @@ least one phase script: `src/testing/phaseScripts.test.js` (3 tests, run by
 the file, when a test file matches no phase script's filter, or when a `:watch`
 script selects other files than its run script. The filters are path substrings
 and may overlap, but on this measurement none does: the eight scripts' counts
-sum exactly to the full run's 74 files and 894 tests.
+sum exactly to the full run's 76 files and 903 tests.
 
 ### End-to-end journeys need a live stack
 
@@ -213,13 +219,13 @@ Eight workflows run in this repository. Every job runs on `ubuntu-24.04`.
 |---|---|---|
 | **Deploy ACC (orange-beach)** | `changes`, then `Build and deploy ACC` | `changes` decides whether a pull request touches anything outside `docs/**`, `.claude/**` and `**/*.md`; then Node from `.nvmrc` → `npm ci` → `npm run lint` → `npm run test:ci` → `npm run build` → upload `dist/` to acceptance |
 | **Deploy PROD (white-sky)** | `Build and deploy PROD` | The same sequence without `changes`, deploying production |
-| **Supply-chain audit** (`zizmor.yml`) | `audit` | On Node 24.22.2: zizmor 1.29.0, `renovate-config-validator --strict`, *Lockfile matches package.json* (`npm ci --dry-run --ignore-scripts`), `npm run check-format`, `npm run check-supply-chain`, and *Verify registry signatures* (`npm run audit:signatures`) |
-| **Supply-chain audit** (`zizmor.yml`) | `lockfile-review`, `lockfile-review-comment` | On every pull request, succeeding at once when `package-lock.json` is unchanged: a read-only job tests and runs the lockfile diff, and a separate job holding the write token posts the review comment — no tests |
+| **Supply-chain audit** (`zizmor.yml`) | `audit` | On Node 24.22.3: zizmor 1.29.0, `renovate-config-validator --strict`, *Lockfile matches package.json* (`npm ci --dry-run --ignore-scripts`), `npm run check-format`, `npm run check-supply-chain`, and *Verify registry signatures* (`npm run audit:signatures`) |
+| **Supply-chain audit** (`zizmor.yml`) | `lockfile-review`, `lockfile-review-comment` | On every pull request: a read-only job runs the self-tests of the lockfile diff and the dependency gate and checks `dependency-register.json`, so a malformed register fails even with the lockfile unchanged; when `package-lock.json` changed it then runs the lockfile diff and the dependency gate (v2026.11.3), and a separate job holding the write token posts the one review comment — no unit suites |
 | **Semgrep** (`semgrep.yml`) | `scan` | Semgrep Code and Supply Chain — see [Dependency Scanning](../../contributing/dependency-scanning.md) |
 | **Close preview environments** | `Close ACC staging environment`, `Close PROD staging environment` | Deletes a pull request's Static Web Apps preview when it closes — no tests, but see below |
 | **Dependency audit** (`dependency-audit.yml`) | `dependency-audit` | Daily at 05:17 UTC: `npm audit --package-lock-only` on both `acc` and `main`, failing on a high or critical production advisory — no tests |
 | **Release SBOM** (`sbom.yml`) | `release-sbom` | Checks the committed CycloneDX SBOM before regenerating it — strictly on the release pull request, existence only on a push to `main` — no tests |
-| **Dependency review** (`dependency-review.yml`) | `dependency-review` | Quarterly, on the second day of January, April, July and October: opens the quarter's review issue for every direct dependency — no tests |
+| **Dependency review** (`dependency-review.yml`) | `dependency-review` | Quarterly, on the second day of January, April, July and October: opens the quarter's review issue for every direct dependency, and since v2026.11.3 lists the register's open overrides and the previous quarter's Renovate security exceptions — no tests |
 
 **Preview environments close from a workflow with no path filter** (v2026.09.6). The
 close jobs used to live in the deploy workflows, whose `paths-ignore` applies to the
@@ -325,6 +331,7 @@ it.
 | `src/utils/validators.test.js` | 29 | Pure unit | All eight exports: the six per-section validators, the `validateForm` aggregation across every section including array fields, and the `isValidDate` helper |
 | `src/utils/iknowParser.test.js` | 31 | Real DOM parsing | Both iKnow XML export formats, format auto-detection, the field-map helper, the dot-path value extractor, and `applyMapping` including filters and transforms — plus the two guards: prototype path segments are neither read nor written, and a nested-quantifier or over-long transform pattern throws |
 | `src/utils/cprmvImport.test.js` | 13 | Pure unit | `flattenCprmvRules` — sub-clause folding, namespace variants (0.4.1 slash, 0.3.0 `contains`, legacy flat arrays), multi-entry input, malformed input tolerance, id uniqueness |
+| `src/utils/logoImage.test.js` | 5 | Pure unit | `fitWithin`, the size a vendor logo is scaled to (v2026.11.3): an image that fits is left alone, a wide or a tall one is scaled to 512 px on its longer side with its proportions kept, no side is rounded down to 0, and the maximum is 512. `readScaledImage`, which reads and draws the file, is tested through the Vendor tab (P5) |
 | `src/utils/ronlHelper.test.js` | 5 | `global.fetch` mock | The two SPARQL functions that query the RONL vocabulary through the shared backend proxy |
 
 ### State hooks (P3)
@@ -339,7 +346,7 @@ it.
 
 | File | Tests | Style | Covers |
 |---|---:|---|---|
-| `src/utils/triplydbHelper.test.js` | 32 | `global.fetch` mock + the `utils/auth` test double | All seven exports since v2026.11.1: graph-IRI construction, the dataset-name check, the one publish call to the backend with the author's token (its warning, 401/403, problem-detail, bare-status and network-failure branches), the dataset check through the backend, the publish target, and the `localStorage` config that keeps only the dataset and removes an older version's token |
+| `src/utils/triplydbHelper.test.js` | 33 | `global.fetch` mock + the `utils/auth` test double | All seven exports since v2026.11.1: graph-IRI construction, the dataset-name check, the one publish call to the backend with the author's token (its warning, 401/403, problem-detail, bare-status and network-failure branches, and since v2026.11.3 a 200 whose body is not JSON, which counts as published), the dataset check through the backend, the publish target, and the `localStorage` config that keeps only the dataset and removes an older version's token |
 | `src/utils/shaclHelper.test.js` | 4 | `global.fetch` mock | `validateTtl` — success, a parsed-but-invalid backend response, and the distinct `unavailable` shape on network failure. SHACL validation is advisory and must never block publishing |
 
 `src/utils/serviceCatalogHelper.test.js` (11 tests, v2026.11.0) is the same kind of
@@ -390,7 +397,7 @@ tests.
 
 ### Tab components and dialogs (P5)
 
-Twenty-seven files, 238 tests. Deliberately thin and even: every component
+Twenty-eight files, 240 tests. Deliberately thin and even: every component
 renders with realistic props, and one representative interaction proves the
 controlled-component contract. No component is left at zero, and `src/components`
 moved from 3.9% to 41% statements in this phase alone.
@@ -405,6 +412,11 @@ vendor URI rather than a capability flag**, so iKnow gets integration tooling,
 Blueriq gets the contact form, and every other vendor gets an "under development"
 placeholder. Adding a vendor to the concept list gives it a dropdown entry and
 nothing else.
+
+`VendorTab.logo.test.jsx` (2 tests, v2026.11.3) uploads a logo through the Vendor tab,
+with the browser's image decoding and canvas stubbed because jsdom has neither: a
+2048 × 1024 logo is drawn at 512 × 256 and stored as the PNG the canvas returns, and a
+300 × 120 logo keeps its size. No test yet feeds it a file that cannot be decoded.
 
 `ServiceTab.test.jsx` gained eleven tests in v2026.11.0, for the *Required services*
 section: the published list without the service itself,
@@ -442,7 +454,7 @@ Four Playwright specs, three of them run against a live stack rather than mocks.
 None of them changed in v2026.10.2 or v2026.11.0. In v2026.11.1 the three stack
 journeys gained a sign-in as `lde-e2e` before deploying (see
 [above](#end-to-end-journeys-need-a-live-stack)), and they were not re-run for it. No
-spec changed in v2026.11.2; the preflight now also checks Keycloak, and a run today ends
+spec changed in v2026.11.2 or v2026.11.3; in v2026.11.2 the preflight now also checks Keycloak, and a run today ends
 its preflight line with `, Keycloak http://localhost:8080/realms/ronl (HTTP 200)`. The
 figures below are carried forward from 10 October 2026. Last measured on 10 October 2026 against v2026.10.1 on a local stack — the Linked Data
 Explorer backend on `:3001`, Operaton on `:8081`, and the dev server Playwright's
@@ -508,9 +520,9 @@ so the journey is not blocked, and the threshold is documented rather than dodge
 ## Coverage
 
 Measured with Vitest's `--coverage` (`npx vitest run --coverage`, what
-`npm run test:ci` runs) against v2026.11.2 on 22 November 2026, at `5d6345c`.
+`npm run test:ci` runs) against v2026.11.3 on 28 November 2026, at `c3105f0`.
 
-**Overall: 91.37% statements · 89.46% branches · 81.97% functions · 92.01%
+**Overall: 91.54% statements · 89.53% branches · 82.43% functions · 92.28%
 lines** — against 54.75% / 40.88% / 38.68% / 55.57% at v2026.09.0. The jump is
 P5, P6 and the branch-floor work landing together; v2026.09.3's two parser guards
 moved `src/utils` a little further. At v2026.10.0 `src/utils` rose again and
@@ -533,16 +545,23 @@ callbacks are covered, but no test reaches the timers that close the dialog and 
 the message after a warning, or clear it after a success — which took `src` down on
 every measure. `RequiredServicesSection.jsx`, reworked for its loading states, stands
 at 98.48% statements and 95.74% branches.
+v2026.11.3 moved every total up, functions the most, to 82.43%. `App.jsx` rose to
+80.49% statements, 84.70% branches and 64.91% functions with the unreadable-answer
+test, lifting `src` on every measure, and the Vendor tab's logo tests lifted
+`src/components/tabs`. The new `logoImage.js` arrives at 84.61% statements, 85.71%
+branches and 71.42% functions: no test reaches its two error callbacks, for a file
+that cannot be read or decoded, or the branch for a browser without a canvas, so
+`src/utils` fell slightly on every measure, most on functions.
 
 | Area | Statements | Branches | Functions | Lines |
 |---|---:|---:|---:|---:|
 | `src/hooks` | 100% | 94.20% | 100% | 100% |
-| `src/utils` | 95.45% | 89.79% | 98.23% | 96.27% |
+| `src/utils` | 95.28% | 89.78% | 97.43% | 96.20% |
 | `src/testing` (the `utils/auth` test double) | 93.75% | 100% | 90.00% | 92.85% |
 | `src/config` | 90.56% | 81.13% | 75.00% | 90.19% |
 | `src/components` | 93.63% | 94.55% | 100% | 96.03% |
-| `src/components/tabs` | 85.60% | **92.56%** | 68.79% | 85.72% |
-| `src` (App, index, parser) | 87.89% | 82.30% | 65.62% | 89.04% |
+| `src/components/tabs` | 85.98% | **92.66%** | 69.36% | 86.22% |
+| `src` (App, index, parser) | 88.57% | 82.53% | 68.75% | 89.75% |
 
 The rows are the runner's own per-directory figures, so `src/components` counts only the
 files directly in that folder — the dialogs and panels — and the tabs have a row of their
@@ -573,7 +592,7 @@ at 98% branches, from 45.73% at v2026.09.1.
 !!! note "What the branch column does not see"
     A branch floor steps straight over branch-free code. `ConceptsTab.jsx` reads
     80.55% on branches but **71.62% statements and 63.33% functions**;
-    `App.jsx` reads 83.92% / 78.83% / **61.40%**. The uncovered code there is
+    `App.jsx` reads 84.70% / 80.49% / **64.91%**. The uncovered code there is
     largely whole handlers no test calls. That asymmetry is why a functions floor
     is [a separate decision](../../contributing/coverage-floor.md#a-functions-floor-is-a-separate-decision)
     rather than a free companion setting.
@@ -701,7 +720,7 @@ Not phases, but the honest remaining edges:
 - **Three files one branch above the floor**, with no ratchet left to absorb a
   regression.
 - **A functions floor**, which is a separate decision needing its own
-  measurement — `App.jsx` sits at 61.40% functions against 83.92% branches.
+  measurement — `App.jsx` sits at 64.91% functions against 84.70% branches.
 
 **Deliberately out of scope for now:** swapping in an RDF library (the
 round-trip tests are the data that should decide whether the hand-rolled

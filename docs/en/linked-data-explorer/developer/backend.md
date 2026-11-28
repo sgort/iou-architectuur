@@ -199,7 +199,7 @@ Assembles deployed DMNs into a single DRD and deploys it to Operaton. Requires `
 GET  /v1/edocs/status
 ```
 
-Reports whether the OpenText eDOCS document management system is reachable. The RIP Phase 1 process files its documents through the [external task worker](#external-task-worker), which calls the eDOCS service directly. The three write routes that also existed — `POST /workspaces/ensure`, `POST /documents` and `GET /workspaces/:workspaceId/documents` — had no client, and v2026.11.2 removed them. In stub mode (`EDOCS_STUB_MODE=true`, default) all methods return realistic fake responses so the process runs end-to-end before a live eDOCS server is available.
+Reports whether the OpenText eDOCS document management system is reachable. The RIP Phase 1 process filed its documents through the [external task worker](#external-task-worker), which calls the eDOCS service directly; no model in the repository uses its two topics any more, and R2.1's eDOCS step (`rip-edocs-projectmap`, since v2026.11.4) is handled by the RONL Business API's worker. The three write routes that also existed — `POST /workspaces/ensure`, `POST /documents` and `GET /workspaces/:workspaceId/documents` — had no client, and v2026.11.2 removed them. In stub mode (`EDOCS_STUB_MODE=true`, default) all methods return realistic fake responses so the process runs end-to-end before a live eDOCS server is available.
 
 See [eDOCS Integration](edocs-integration.md), and the [API Specification](../reference/api-specification.md) for request and response details.
 

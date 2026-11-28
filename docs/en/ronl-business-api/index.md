@@ -76,7 +76,7 @@ The Province of Flevoland deployment runs in production. Each release is tried o
 | Layer | Technology |
 |---|---|
 | Frontend | React 18, TypeScript, Vite, CSS Custom Properties |
-| Backend | Node.js 22, Express 4, TypeScript |
+| Backend | Node.js 24, Express 4, TypeScript |
 | Authentication | Keycloak 23, OIDC Authorization Code Flow |
 | Business rules | Operaton BPMN/DMN engine |
 | Database | Azure PostgreSQL Flexible Server (audit logs) |

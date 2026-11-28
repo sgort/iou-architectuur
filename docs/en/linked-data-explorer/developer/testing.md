@@ -11,39 +11,58 @@ before that the repository had no test files at all and `npm test` exited 1 with
 *"No tests found"*.
 
 !!! info "Figures on this page are measured, not estimated"
-    The headline counts, package coverage, per-area tables, per-file coverage
-    and command results below were produced by running the suites against
-    **v2026.11.3** on **22 November 2026**, at `4e80c74` on `main` — the same tree
-    as `fe841f9` on `acc`, so ACC and production both run what was measured.
-    The runs used the working checkout, whose tree equals `origin/main`, on
-    **Node 24.22.2** (npm 11.19.1), the version `.nvmrc` pins.
+    The headline counts, the backend's coverage, the runner times and the script
+    harness counts below were produced by running the suites against
+    **v2026.11.4** on **28 November 2026**: `7925e61` on `main`, run at the
+    checkout `6ce7df8` on `acc`, whose tree is identical, so ACC and production
+    both run what was measured. The run used **Node v24.22.2**, while `.nvmrc`
+    names 24.22.3 since this release; CI builds and tests on 24.22.3.
 
-    Both packages ran **serially**: the backend with
-    `npx jest --coverage --runInBand`, the frontend with
-    `npx vitest run --coverage --no-file-parallelism`. Counts and coverage do not
-    depend on that choice; the runner times do, and are not comparable with the
-    parallel figures earlier releases quoted. Rerun the commands in
-    [Running the tests](#running-the-tests) to reproduce them.
+    Both packages ran as `npm test` runs them, with coverage and the runners'
+    **default parallelism**. A first attempt, made while other work was loading
+    the machine, ran short of memory and was discarded. In the run that counts,
+    one frontend test timed out under parallel load, and its file then passed 88
+    of 88 on its own: see
+    [When the frontend suite fails only in parallel](#when-the-frontend-suite-fails-only-in-parallel).
+    Rerun the commands in [Running the tests](#running-the-tests) to reproduce them.
+
+    No test file in either package changed in v2026.11.4. The frontend's coverage,
+    the per-area tables and the per-file coverage are still those of the
+    **v2026.11.3** measurement on 22 November 2026, at `4e80c74`, when both
+    packages ran serially. The frontend's coverage was not measured again: Vitest
+    writes no coverage report for a run in which a test failed.
 
 **At a glance:** 171 test files · **3698 tests**, all passing · backend 98.38%
-statements, frontend 95.72%.
+statements, frontend 95.72% (22 November).
 
 | Package | Runner | Files | Tests | Runner time | Statements | Branches | Functions | Lines |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| `packages/backend` | Jest + ts-jest | 79 | 2130 | 101.0 s (serial) | 98.38% | 91.99% | 97.67% | 99.07% |
-| `packages/frontend` | Vitest + RTL | 92 | 1568 | 282.2 s (serial) | 95.72% | 92.94% | 94.18% | 96.76% |
+| `packages/backend` | Jest + ts-jest | 79 | 2130 | 98.6 s (parallel) | 98.38% | 91.99% | 97.67% | 99.07% |
+| `packages/frontend` | Vitest + RTL | 92 | 1568 | 149.7 s (parallel) | 95.72% | 92.94% | 94.18% | 96.76% |
 
-The backend's 2130 tests and the frontend's 1568 all passed. Because the
-frontend ran one file at a time, this measurement says nothing about the
-timeout described in
+The backend's 2130 tests all passed. Of the frontend's 1568, 1567 passed in the
+parallel run and one timed out at 5000 ms under load: *Authority option labels
+carry no level prefix…* in `DsoExplorer.test.tsx`, the test that timed out at
+v2026.09.6 and v2026.11.2 too. Run on its own, that file passed 88 of 88, so all
+1568 pass and the timeout is not a defect — see
 [When the frontend suite fails only in parallel](#when-the-frontend-suite-fails-only-in-parallel).
+The frontend's coverage columns are the 22 November figures.
 
 `packages/ropa-site` has no `package.json` and is not an npm workspace member, so
-`npm test` never reaches it. Five further test files live outside both packages
+`npm test` never reaches it. Six further test files live outside both packages
 and outside the total above — see
 [Script harnesses outside `npm test`](#script-harnesses-outside-npm-test).
 
-**Against v2026.11.2 that is +1 file and +35 tests**, all from v2026.11.3: sign-in
+**Against v2026.11.3 that is no change: the same 171 files and 3698 tests.**
+v2026.11.4 changed no test file in either package. It adds the dependency
+register gate, whose harness lives in `scripts/` and is not counted here
+([Script harnesses outside `npm test`](#script-harnesses-outside-npm-test)), and
+it changes the RIP R2.1 to R2.4 models and their `e2e-fixtures/` copies, which
+the fixture and parity tests read; the totals did not move. The backend's
+coverage held at **98.38%** statements, **91.99%** branches, **97.67%**
+functions and **99.07%** lines. The frontend's was not measured again.
+
+**v2026.11.3 added 1 file and 35 tests**: sign-in
 and publishing hardened ([#332](https://github.com/sgort/linked-data-explorer/issues/332),
 [#336](https://github.com/sgort/linked-data-explorer/issues/336)) and the
 `dct:requires` follow-ups.
@@ -332,34 +351,38 @@ both workspaces with `--workspaces --if-present`.
 
 | Command | Scope | Files | Tests | Time |
 |---|---|---:|---:|---:|
-| `npm test` | Both packages | 171 | 3698 | — |
-| `npm test -w packages/backend` | Backend only (Jest, with coverage) | 79 | 2130 | 101.0 s, measured serially with `--runInBand` |
-| `npm test -w packages/frontend` | Frontend only (Vitest, with coverage) | 92 | 1568 | 282.2 s, measured serially with `--no-file-parallelism` |
+| `npm test` | Both packages | 171 | 3698 | 320 s for the whole command, both runners in parallel |
+| `npm test -w packages/backend` | Backend only (Jest, with coverage) | 79 | 2130 | 98.6 s, in the parallel `npm test` run |
+| `npm test -w packages/frontend` | Frontend only (Vitest, with coverage) | 92 | 1568 | 149.7 s, in the same run |
 | `npm run test:contract -w packages/backend` | `src/openapi` and `src/routes`, without coverage | 31 | 865 | 19.4 s |
 | `npm run test:shacl-smoke -w packages/backend` | The four SHACL smoke scripts against the real shapes — **not** part of `npm test` | 4 | 4 checks | — |
-| `npm run test:scripts` | Two of the five script harnesses in `scripts/` — **not** part of `npm test` | 2 | 24 + 24 checks | — |
+| `npm run test:scripts` | Two of the six script harnesses in `scripts/` — **not** part of `npm test` | 2 | 24 + 24 checks | — |
 | `node scripts/promotion-targets.test.mjs` | The promotion decision script alone | 1 | 24 checks | — |
 | `node scripts/dso-dossier.test.mjs` | The dossier renderer alone | 1 | 24 checks | — |
-| `node scripts/lockfile-diff.test.mjs` | The lockfile review script — in no npm script; CI runs it | 1 | 77 checks (counted, not run locally) | — |
-| `node scripts/write-sbom.test.mjs` | The SBOM generator's production filter and `--check` comparison — in no npm script; CI runs it | 1 | 12 checks (counted, not run locally) | — |
-| `node scripts/dependency-review.test.mjs` | The quarterly dependency review script — in no npm script; CI runs it | 1 | 24 checks (counted, not run locally) | — |
+| `node scripts/lockfile-diff.test.mjs` | The lockfile review script — in no npm script; CI runs it | 1 | 84 checks | — |
+| `node scripts/dependency-gate.test.mjs` | The dependency register gate — in no npm script; CI runs it | 1 | 130 checks | — |
+| `node scripts/write-sbom.test.mjs` | The SBOM generator's production filter and `--check` comparison — in no npm script; CI runs it | 1 | 12 checks | — |
+| `node scripts/dependency-review.test.mjs` | The quarterly dependency review script — in no npm script; CI runs it | 1 | 49 checks | — |
 
-Times are the runner's own figures from the 22 November 2026 measurement. They
+Times are the runners' own figures from the 28 November 2026 `npm test` run:
+Jest reported 98.6 s and Vitest 149.66 s, and the whole command took 320 s. They
 depend on the machine's load and are not comparable across measurements: the
-12 November backend run took 214.5 s and the frontend run, in parallel,
-176.2 s. The backend row was measured with `npx jest --coverage --runInBand`
-and the frontend row with `npx vitest run --coverage --no-file-parallelism`,
-both one file at a time; `npm test` runs both runners with their default
-parallelism, so its time will differ. The contract subset ran on its own, with
-`npm run test:contract`, and its count matches the full backend run's report.
-`npm run test:shacl-smoke` printed a `PASS` line for each of its four scripts.
-`npm run test:scripts` passes on Windows as well as Linux:
-both harnesses printed `PASS: 24 checks` on Windows in the same measurement.
-The three CI-only harnesses were not run locally. Their figures are counts of
-the `check` and `throws` calls in each file, each adding one to the `PASS`
-figure it prints — all at top level, except one `check` in
-`dependency-review.test.mjs` that runs once for each of four repository URLs,
-and counts four.
+22 November runs, one file at a time (`npx jest --coverage --runInBand` and
+`npx vitest run --coverage --no-file-parallelism`), took 101.0 s and 282.2 s.
+The contract subset and `npm run test:shacl-smoke` were not run again on
+28 November, since no file they run changed. Their figures are from 22 November,
+when the subset ran on its own, with `npm run test:contract`, and its count
+matched the full backend run's report, and `test:shacl-smoke` printed a `PASS`
+line for each of its four scripts.
+
+All six script harnesses were run on Windows on 28 November, and each figure is
+the `PASS: <n> checks` line it printed; both `test:scripts` harnesses printed
+`PASS: 24 checks`. Until v2026.11.3 the three CI-only harnesses were not run
+locally, and their figures — 77, 12 and 24 — were counts of the `check` and
+`throws` calls in their source. `write-sbom.test.mjs` printed the 12 it was
+counted at. For `lockfile-diff.test.mjs` (84) and `dependency-review.test.mjs`
+(49), both of which v2026.11.4 extended, this measurement does not separate the
+checks the release added from the change from counting to running.
 
 `npm run sbom:check` (`node scripts/write-sbom.mjs --check`), new in
 v2026.10.1, is not a test: it exits 1 when the committed SBOM for the current
@@ -368,6 +391,9 @@ v2026.11.3 it ignores which npm wrote the document, as it already ignored the
 serial number and the timestamp ([#299](https://github.com/sgort/linked-data-explorer/issues/299)). `sbom.yml` runs the same `--check` on
 the release pull request. In the 22 November measurement, run with npm 11.19.1,
 it reported `docs\sbom\linked-data-explorer-2026.11.3.cdx.json matches the lockfile`.
+It was not run on 28 November. Release pull request
+[#370](https://github.com/sgort/linked-data-explorer/pull/370) reports it passing
+for `linked-data-explorer-2026.11.4.cdx.json`, written with npm 11.19.1.
 
 Both packages' `test` scripts include coverage by default, so a plain run always
 produces a report. Watch modes are `test:watch` in either package; the backend
@@ -387,11 +413,12 @@ npm run test:contract -w packages/backend
 # Watch mode while working on the backend
 npm run test:watch -w packages/backend
 
-# Two of the five script harnesses, which npm test does not run
+# Two of the six script harnesses, which npm test does not run
 npm run test:scripts
 
-# The three harnesses CI runs, which no npm script runs
+# The four harnesses CI runs, which no npm script runs
 node scripts/lockfile-diff.test.mjs
+node scripts/dependency-gate.test.mjs
 node scripts/write-sbom.test.mjs
 node scripts/dependency-review.test.mjs
 
@@ -418,12 +445,13 @@ need to know to add a test to it — put the file under one of those two
 directories and it is included; put a contract assertion anywhere else and it
 will never run in the fast loop.
 
-At v2026.11.3 that is **31 files and 865 tests**, all passing: **818 tests from
-`src/routes`** and **47 from `src/openapi`**. That is one file and 7 tests more
-than at v2026.11.2: `triplydb.publish.transport.test.ts` (2) is new, and
+At v2026.11.4 that is still **31 files and 865 tests**: **818 tests from
+`src/routes`** and **47 from `src/openapi`**, as at v2026.11.3, since no file
+under either directory changed. v2026.11.3 had added one file and 7 tests to
+v2026.11.2's: `triplydb.publish.transport.test.ts` (2) is new, and
 `triplydb.routes.test.ts` and `write-auth.test.ts` grew by 2 each and
-`dmn.testdeploy.routes.test.ts` by 1. The subset ran on its own on 22 November
-2026, and Jest reported 19.4 seconds. It is the
+`dmn.testdeploy.routes.test.ts` by 1. The subset last ran on its own on
+22 November 2026, all passing, and Jest reported 19.4 seconds. It is the
 loop to use while editing `openapi.yaml`, `openapi.v2.yaml` or a route.
 
 **There is no frontend contract subset.** `packages/frontend` defines no
@@ -434,35 +462,37 @@ number belongs to the backend row.
 
 ### Script harnesses outside `npm test`
 
-Five test files live in `scripts/`, outside both workspaces, and `npm test` runs
+Six test files live in `scripts/`, outside both workspaces, and `npm test` runs
 none of them. The root script `npm run test:scripts` runs two, in order:
 `node scripts/promotion-targets.test.mjs && node scripts/dso-dossier.test.mjs`.
-The other three have no npm script; each runs in CI, in the workflow that uses
-the script it tests: `lockfile-diff.test.mjs`, new in v2026.10.1, and
-`write-sbom.test.mjs` and `dependency-review.test.mjs`, new in v2026.10.2.
+The other four have no npm script; each runs in CI, in the workflow that uses
+the script it tests: `lockfile-diff.test.mjs`, new in v2026.10.1,
+`write-sbom.test.mjs` and `dependency-review.test.mjs`, new in v2026.10.2, and
+`dependency-gate.test.mjs`, new in v2026.11.4.
 
 | Harness | Covers | Runs in CI | Checks |
 |---|---|---|---:|
 | `promotion-targets.test.mjs` | `scripts/promotion-targets.mjs`, which decides which production deploys a promotion needs — including a drift guard that the two production site workflows' `pull_request` paths agree with its patterns | **Yes** — `promote-to-production.yml` runs it in its `changes` job, before the script it tests makes the decision | 24 |
 | `dso-dossier.test.mjs` | The DSO activity dossier renderer | **No** — no workflow and neither git hook invokes it | 24 |
-| `lockfile-diff.test.mjs` | `scripts/lockfile-diff.mjs`, the lockfile review of a pull request: parsing, the diff by package name, downgrades, the blocking rules (a non-npmjs origin, a missing integrity hash), licence changes against the allow-list in `lockfile-review.json`, install scripts, new direct dependencies and the checklist the report gives each, the report and its truncation, and the command line's exit codes | **Yes** — `zizmor.yml` runs it in its `lockfile-review` job, before the script it tests compares the lockfile | 77 |
+| `lockfile-diff.test.mjs` | `scripts/lockfile-diff.mjs`, the lockfile review of a pull request: parsing, the diff by package name, downgrades, the blocking rules (a non-npmjs origin, a missing integrity hash), licence changes against the allow-list in `lockfile-review.json`, install scripts, new direct dependencies, read from every manifest and since v2026.11.4 including `peerDependencies` (the report now points each to the register instead of giving it a checklist), the `minReleaseAgeDays` setting in `lockfile-review.json`, the report and its truncation, and the command line's exit codes | **Yes** — `zizmor.yml` runs it in its `lockfile-review` job, before the script it tests compares the lockfile | 84 |
+| `dependency-gate.test.mjs` | `scripts/dependency-gate.mjs`, the dependency register gate: parsing the register, the signals the registry and GitHub evidence give, an entry that claims a criterion the evidence contradicts, reasons under 40 characters or repeated, the deprecated and archived signals against a replace outcome, the 14-day cooldown and its exceptions, recognising a Renovate security pull request from the API, gathering the evidence with a fake registry and GitHub, the combined report, and the command line | **Yes** — `zizmor.yml` runs it in its `lockfile-review` job, then `--check-register`, before the comparison, on every pull request | 130 |
 | `write-sbom.test.mjs` | `scripts/write-sbom.mjs`'s production filter: the production set read from the lockfile — every package it does not mark `dev`, `devOptional` included, plus the workspace packages — the dependency graph pruned to match, a production package npm did not list reported rather than left out, and the version in the output path; and, since v2026.11.3, that `--check` compares content: another npm, serial number or timestamp compares equal, and a different component list or dependency graph does not | **Yes** — `sbom.yml` runs it in its `release-sbom` job, before the SBOM checks and the generation | 12 |
-| `dependency-review.test.mjs` | `scripts/dependency-review.mjs`, the evidence for the quarterly review of every direct dependency: the quarter, the direct dependencies read from the lockfile, the registry and GitHub evidence, the assessment and the report — with the registry's and GitHub's answers as fixtures | **Yes** — `dependency-review.yml` runs it before gathering the evidence | 24 |
+| `dependency-review.test.mjs` | `scripts/dependency-review.mjs`, the evidence for the quarterly review of every direct dependency: the quarter, the direct dependencies read from the lockfile, the registry and GitHub evidence, the assessment and the report — with the registry's and GitHub's answers as fixtures; since v2026.11.4 also what the dependency register holds open, the previous quarter's Renovate security exceptions, and the retry of a 429 or 5xx answer | **Yes** — `dependency-review.yml` runs it before gathering the evidence | 49 |
 
-So the promotion and lockfile harnesses are gates: a promotion whose decision
-script fails its own test deploys nothing, and a pull request whose lockfile
-review script fails its test fails `lockfile-review`, a required check on `acc`.
+So the promotion, lockfile and dependency-gate harnesses are gates: a promotion
+whose decision script fails its own test deploys nothing, and a pull request
+whose lockfile review or gate script fails its test, or whose register does not
+parse, fails `lockfile-review`, a required check on `acc`.
 The SBOM and dependency-review harnesses stop their own run — a failing SBOM
 test means no SBOM is checked, generated or uploaded, and a failing review test
 means no evidence is gathered and no issue opened — but neither workflow is a
 required check. The dossier harness still protects its renderer only when
 someone runs it — by hand, or through `test:scripts`.
 
-None is a runner. All five are hand-rolled ESM harnesses — not `node:test` —
+None is a runner. All six are hand-rolled ESM harnesses — not `node:test` —
 that count passing checks, print `PASS: <n> checks`, and call
-`process.exit(1)` naming any check that failed. The three CI-only harnesses'
-figures were counted from their source, not from a run: they execute only in
-CI, and were not run for this measurement.
+`process.exit(1)` naming any check that failed. All six were run for the
+28 November measurement, the four CI-only ones included.
 
 The two in `test:scripts` both run on Windows since v2026.10.0. Until then the
 promotion harness located its script with `new URL(...).pathname`, which on Windows yields `/C:/…`, a
@@ -476,8 +506,8 @@ command-line failures.
 comparable to a Jest or Vitest test: they have no per-case isolation, no setup or
 teardown, no reporter and no coverage instrumentation. Folding them into the
 headline would inflate it with a different unit of measurement. Counted as files
-rather than tests, the repository has **176** executable test files — 79 in the
-backend, 92 in the frontend and 5 in `scripts/` — of which `npm test` runs 171.
+rather than tests, the repository has **177** executable test files — 79 in the
+backend, 92 in the frontend and 6 in `scripts/` — of which `npm test` runs 171.
 
 ### Linting and formatting
 
@@ -499,7 +529,8 @@ exited 0 in the same pass — the first reporting 35 pinned references across 6
 actions in agreement, the second *12 RIP phase models and 2
 declared-phase models fingerprinted, 2 e2e-fixtures copies identical to
 source* — and `sbom:check` found the committed SBOM in step with the lockfile.
-`audit:signatures` and `deps:check` were not part of this pass.
+`audit:signatures` and `deps:check` were not part of this pass. None of these
+was run again for v2026.11.4.
 
 Both root commands fan out over both packages. The backend checks
 `src/**/*.ts`; the frontend checks the whole package.
@@ -592,9 +623,9 @@ their own triggers:
 | Workflow · job | Runs | Required on `acc` |
 |---|---|:---:|
 | `zizmor.yml` · `audit` | Among its steps, `npm run audit:signatures` (since v2026.10.2) — the registry signature of every installed package, and the provenance attestation of those that have one — and `npm run check-rip-bpmn` (since v2026.10.1) | ✅ |
-| `zizmor.yml` · `lockfile-review` | `node scripts/lockfile-diff.test.mjs`, then the lockfile review itself — it blocks only on a package from a non-npmjs origin or without an integrity hash, or on a lockfile it cannot read, and succeeds at once when the lockfile is unchanged | ✅ |
+| `zizmor.yml` · `lockfile-review` | `node scripts/lockfile-diff.test.mjs`, then `node scripts/dependency-gate.test.mjs` and `dependency-gate.mjs --check-register` (since v2026.11.4), then the lockfile review and the dependency gate — it blocks on a package from a non-npmjs origin or without an integrity hash, a lockfile it cannot read, a new direct dependency without a valid register entry, or a version younger than 14 days without a logged exception, and succeeds at once when the lockfile is unchanged and the register parses | ✅ |
 | `sbom.yml` · `release-sbom` | `node scripts/write-sbom.test.mjs` (since v2026.10.2), before the SBOM checks and the generation — on a push to `main`, by hand, and on a pull request touching the SBOM tooling or `docs/sbom/` | – |
-| `dependency-review.yml` · `dependency-review` | `node scripts/dependency-review.test.mjs` (since v2026.10.2), before the review gathers its evidence — once a quarter, by hand, and on a pull request touching the workflow, `dependency-review.mjs` or `lockfile-diff.mjs` | – |
+| `dependency-review.yml` · `dependency-review` | `node scripts/dependency-review.test.mjs` (since v2026.10.2), before the review gathers its evidence — once a quarter, by hand, and on a pull request touching the workflow, `dependency-review.mjs`, `lockfile-diff.mjs`, `dependency-gate.mjs` or `dependency-register.json` | – |
 
 The `acc supply-chain gate` ruleset requires `audit`, `scan`, `deploy`,
 `Build and Deploy Frontend`, `Build and Deploy ROPA Site` and `lockfile-review`;
@@ -976,6 +1007,15 @@ proposed above has not been added.
 `--no-file-parallelism`, and all 1568 tests passed, so it neither confirms nor
 rules out a recurrence under parallel load.
 
+**It recurred at v2026.11.4.** The 28 November `npm test` run reported
+`Test Files 1 failed | 91 passed (92)` and `Tests 1 failed | 1567 passed (1568)`.
+The failure was again *Authority option labels carry no level prefix…*, timed
+out at 5000 ms in `DsoExplorer.test.tsx`, and the run's `environment` figure was
+**920.94 s**. Run alone, the file passed 88 of 88, so the v2026.11.4 figures at
+the top of this page are 1568 tests, all passing, and the timeout is not a defect.
+No test file changed in this release. The per-file `testTimeout` proposed above
+has still not been added.
+
 ---
 
 ## Defects the tests found
@@ -1136,12 +1176,12 @@ labour cost once.
 
 Three gaps, named so that nobody reads a figure here as covering them:
 
-**Either package under parallel workers.** Both packages were measured
-serially, the backend with `--runInBand` and the frontend with
-`--no-file-parallelism`, so their 101.0 s and 282.2 s say nothing about how long
-`npm test` or the CI step takes with the runners' default parallelism, and
-cannot be set against the parallel times earlier releases quoted. The counts and coverage are unaffected.
-The measurement ran on Node 24.22.2, the version `.nvmrc` pins.
+**Runner times that carry across.** The 28 November run used the runners'
+default parallelism on a workstation, so its 98.6 s and 149.7 s say nothing
+about how long the CI step takes, and cannot be set against the serial 101.0 s
+and 282.2 s of 22 November. The counts and coverage are unaffected.
+The measurement ran on Node v24.22.2, while `.nvmrc` names 24.22.3 since
+v2026.11.4.
 
 **Per-test-file coverage attribution on the frontend.** Vitest's v8 coverage is
 whole-run: it reports what the suite as a whole covered, not what each test file
@@ -1150,7 +1190,9 @@ test file with a coverage figure, it is pairing a file with *its obvious
 subject*, which is an editorial judgement, not a measurement. Two test files
 touching the same module cannot be told apart by these numbers.
 
-**Deltas before v2026.10.1.** The v2026.11.3 delta at the top compares the
+**Deltas before v2026.10.1.** The v2026.11.4 delta at the top compares the
+28 November totals with the 22 November ones; no test file changed in between,
+so there is nothing to compare file by file. The v2026.11.3 delta compares the
 22 November runner reports with the per-file counts this page gave at
 v2026.11.2, completing them from the diff where the page gave none. The
 v2026.11.2 delta compared two runner reports test file by test file, the
@@ -1162,9 +1204,10 @@ were arithmetic against the **previously published** figures of the release
 before, not a fresh measurement of the older commit. If those figures were
 wrong, the deltas inherit the error.
 
-The three CI-only harnesses' checks — 77, 12 and 24 — are the figures on this
-page that no run produced: they execute only in CI and were counted from their
-source.
+Until v2026.11.3, the three CI-only harnesses' checks — 77, 12 and 24 — were
+the figures on this page that no run produced: they were counted from their
+source. Since the 28 November measurement every harness figure here is a `PASS`
+count a run printed.
 
 ---
 
@@ -1196,12 +1239,12 @@ branches, which is a deliberate hold rather than a gap, and `BpmnCanvas.tsx`,
 which v2026.10.2 took to 84.03% of a larger branch count and which reads 84.27% at v2026.11.3: see
 [The per-file branch floor](#the-per-file-branch-floor).
 
-**Put the dossier harness in CI.** The root has a script for two of the five
-harnesses, `npm run test:scripts`; the promotion, lockfile, SBOM and
-dependency-review harnesses run in CI, and since v2026.10.0 `test:scripts` runs
+**Put the dossier harness in CI.** The root has a script for two of the six
+harnesses, `npm run test:scripts`; the promotion, lockfile, dependency-gate, SBOM
+and dependency-review harnesses run in CI, and since v2026.10.0 `test:scripts` runs
 on Windows too. One thing remains: `scripts/dso-dossier.test.mjs` still runs in
 no workflow and no hook, so its 24 checks protect the dossier renderer only as
-long as someone remembers. None of the five harnesses has been ported to
+long as someone remembers. None of the six harnesses has been ported to
 `node:test`. See
 [Script harnesses outside `npm test`](#script-harnesses-outside-npm-test).
 

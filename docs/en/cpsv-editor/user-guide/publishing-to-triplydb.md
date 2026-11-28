@@ -49,7 +49,7 @@ The editor validates the form and generates the Turtle itself. The third step is
 
 On success the dialog says **Published successfully!** and closes after two seconds. A green message under the page title gives the dataset's URL and disappears after ten seconds.
 
-If the Turtle reached TriplyDB but something around it did not, the dialog ends in an orange **Published with warning** that names each part: *Service update failed:* with the reason when the dataset's service could not be synced, and *Logo not uploaded:* with the file name for each logo the backend could not upload. It closes after three seconds, and the message under the page title says the same. The data is in TriplyDB, so publishing again would not help: only the dataset's SPARQL service may lag behind it, or a logo be missing.
+If the Turtle reached TriplyDB but something around it did not, the dialog ends in an orange **Published with warning** that names each part: *Service update failed:* with the reason when the dataset's service could not be synced, and *Logo not uploaded:* with the file name for each logo the backend could not upload. If the backend answered but its answer could not be read — a proxy's empty or HTML reply instead of JSON — the warning says *The backend's answer could not be read, so the service sync and logos are unconfirmed; check the dataset in TriplyDB*, and the message under the page title ends in *View at: TriplyDB* instead of the dataset's URL (v2026.11.3). It closes after three seconds, and the message under the page title says the same. The data is in TriplyDB, so publishing again would not help: only the dataset's SPARQL service may lag behind it, or a logo be missing.
 
 ---
 

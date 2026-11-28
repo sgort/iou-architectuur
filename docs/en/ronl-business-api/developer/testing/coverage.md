@@ -6,7 +6,10 @@ component: RONL Business API
 
 Measured on **27 November 2026** against **v2026.11.6** (`main` at
 `7416c65`), at `aa68931` — a tree identical to `7416c65` — on **Node
-24.22.2**; `.nvmrc` still names Node 22.23.4. Each package was measured one
+24.22.2**; `.nvmrc` then named Node 22.23.4, and names 24.22.3 since
+v2026.11.7. The backend was re-run on 28 November for v2026.11.7 (`main` at
+`9e8d9ec`) with the same all-files figures; no test file changed in that
+release, so the other packages were not re-run. Each package was measured one
 workspace at a time: the backend by `npx jest --coverage --runInBand`, the
 Jest command its `test:serial` runs, and pa-cockpit, pa-demo and the public
 site with coverage and `--no-file-parallelism`, as their

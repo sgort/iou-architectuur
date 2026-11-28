@@ -14,8 +14,8 @@ The release it describes is the one in the header above.
 
 | Tool | Version | Why |
 |---|---|---|
-| Node.js | **22.23.4** (`.nvmrc`); `engines` asks for `>=22` | Backend and front-end runtimes. The Azure App Services run `NODE|22-lts` |
-| npm | `engines` asks for `>=10`; **11.10 or newer** recommended | Node 22.23.4 bundles npm 10.9.9, which silently ignores the 14-day `min-release-age` cooldown in the root `.npmrc`. `deps:check` warns and suggests `npm install -g npm@11` |
+| Node.js | **24.22.3** (`.nvmrc`); `engines` asks for `>=24.22.1` | Backend and front-end runtimes. The Azure App Services run `NODE|24-lts` |
+| npm | **11.19.1**, bundled with Node 24.22.3; `engines` asks for `>=11.10.0` | 11.10 is the first npm that enforces the 14-day `min-release-age` cooldown in the root `.npmrc`; older npm ignores it without a warning. `deps:check` fails below 11.10 and names `nvm use` |
 | Docker with Compose v2 | `docker compose …` | The six local services |
 | Git | — | Includes Git for Windows' **bash**, see below |
 | **bash** | Any recent bash | The install, the dev start and the checks are bash scripts |
@@ -325,8 +325,9 @@ npm run dev
    does not trip it and line endings do not matter. When a third-party
    dependency has changed, it stops and tells you to run **`npm ci`**, with a
    reminder that `npm ci` deletes `node_modules` first and so takes down any dev
-   server running from it. It never installs anything itself. It also warns,
-   without failing, when npm is older than 11.10.
+   server running from it. It never installs anything itself. It also **fails** when npm is older than
+   11.10, which ignores the `.npmrc` cooldown, and tells you to run `nvm use`
+   (since v2026.11.7; it used to warn). On the Node `.nvmrc` names, it passes.
 2. **`docker:check`** (`scripts/check-docker.sh`) checks that Docker is running
    and that four containers are running and healthy: `ronl-keycloak`,
    `ronl-postgres`, `ronl-redis` and `ronl-operaton`. When one is missing or not
@@ -626,6 +627,12 @@ For running the test suites, see [Testing](testing/overview.md).
 
 **`deps:check` says the install is stale**
 : Stop the dev servers and run `npm ci`.
+
+**`deps:check` says npm ignores the `min-release-age` cooldown**
+: Another Node is active. Select the one `.nvmrc` names — `nvm use`, or on
+  nvm-windows `nvm use (Get-Content .nvmrc)`; see
+  [Selecting the Node version with nvm](#prerequisites) — then check that
+  `npm -v` prints 11.10 or newer.
 
 **`docker:check` lists a container as not running or not yet healthy**
 : Run `npm run docker:up` and wait for `docker compose ps` to show all four as

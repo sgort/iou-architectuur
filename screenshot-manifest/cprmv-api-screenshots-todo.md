@@ -1,11 +1,17 @@
 # CPRMV API — screenshots to capture
 
-*A running record across syncs, newest first. Last reviewed for release v2026.11.0 (vocabulary 0.4.3) at
-`502a351` on 27 November 2026 — **nothing outstanding, and nothing requested**.*
+*A running record across syncs, newest first. Last reviewed for release v2026.11.1 (vocabulary 0.4.3) at
+`0c4d236` on 28 November 2026 — **nothing outstanding, and nothing requested**.*
 
 Real screenshot files live in **`docs/assets/screenshots/`** (language-neutral,
 served at the site root). Docs reference them as
 `../../assets/screenshots/<file>` inside a `<figure markdown>` block.
+
+---
+
+## Sync `502a351` → release v2026.11.1 (`0c4d236`) — no screenshots requested
+
+Reviewed on 28 November 2026. The release changes how `/ref` redirects and what it sends back, adds the first Semgrep triage and updates dependencies; none of it has a screen, and the pages give `/ref` as requests and answers.
 
 ---
 

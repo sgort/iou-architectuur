@@ -50,7 +50,7 @@ Those two hand-offs are modelled as `textAnnotation`s instead. A `callActivity` 
 
 ## Bundle contents
 
-Fifteen files deploy together: one BPMN, nine forms and five document templates.
+Twelve files deploy together: one BPMN, nine forms and two document templates. Until v2026.11.4 there were fifteen. Three of the specification's documents are kept in eDOCS, and the tasks now link them rather than generate them: see [Linked documents](#linked-documents).
 
 ### Forms
 
@@ -75,31 +75,42 @@ Two modelling decisions are worth knowing:
 
 ### Document templates
 
-One per green *"Format …"* box in the specification. A Format there and a `.document` here are the same thing: a template with bindings. The blue outputs drawn beside them are instances of these templates rather than artifacts of their own.
+A green *"Format …"* box in the specification is either a template the platform fills, or a document kept in eDOCS that a task links. Two are templates: a `.document` here with bindings, and the blue outputs drawn beside it are instances of it.
 
 | Template | Attached to |
 |---|---|
 | `rip-kes.document` | `Task_VerzamelenKlanteisen` |
-| `rip-ontwerptoelichting.document` | `Task_OpstellenConceptVO` |
-| `rip-bevindingenformulier.document` | `Task_BesprekenConceptVO` |
-| `rip-hoeveelheidsbepaling.document` | `Task_OpstellenDefinitiefVO` |
 | `rip-objectenboom.document` | `Task_OpstellenConceptVO` |
 
 Zone keys are `signOff` and `contactInformation`, camelCase, from the start — unlike R2.1's templates, which shipped with `signoff` and `contactInfo`, keys `DocumentZones` never declares, leaving their signature blocks silently unrendered until v2026.08.4 repaired them.
 
-!!! note "One task, two templates"
-    `Task_OpstellenConceptVO` produces both the Ontwerptoelichting and the
-    Objectenboom, and carries both:
-    `ronl:documentRef="rip-ontwerptoelichting,rip-objectenboom"`. The attribute
-    holds a comma-separated list, so the Modeler badge on that task reads
-    **2 documents**, and the Deploy modal includes both templates in the
-    bundle. See [BPMN Modeler → Document template linking](bpmn-modeler.md#document-template-linking).
+### Linked documents
+
+The other three are kept in eDOCS. Since v2026.11.4 the task that produces each one links it with `ronl:linkedDocumentRef`, as `<slug>:<eDOCS format number>`. Until then each was a template of its own. A linked document is not part of the bundle. The model declares the link, and the RONL Business API asks for the document when the task is completed, once the model is deployed ([Infra-board → Documents at a task](../../ronl-business-api/user-guide/infra-board.md#documents-at-a-task)). This release puts the models in the repository and deploys nothing to Operaton; on 28 November 2026 the changed models are not yet deployed on ACC or production.
+
+| Linked document | eDOCS format | Task |
+|---|--:|---|
+| Ontwerptoelichting | 3226401 | `Task_OpstellenConceptVO` |
+| Bevindingenformulier | 2690351 | `Task_BesprekenConceptVO` |
+| Hoeveelheidsbepaling | 3103686 | `Task_OpstellenDefinitiefVO` |
+
+The forms of the last two tasks no longer ask for a reference to the document: `bevindingenformulierReferentie` and `hoeveelheidsbepalingReferentie` are gone, because the link records it.
+
+!!! note "One task, a template and a linked document"
+    `Task_OpstellenConceptVO` produces both the Objectenboom and the
+    Ontwerptoelichting. From v2026.10.0 to v2026.11.3 it carried both as
+    templates: `ronl:documentRef="rip-ontwerptoelichting,rip-objectenboom"`,
+    with the badge **2 documents**. It now carries
+    `ronl:documentRef="rip-objectenboom"` and
+    `ronl:linkedDocumentRef="rip-ontwerptoelichting:3226401"`. The Modeler
+    badge names the one template, and the Deploy modal bundles only that
+    template. See [BPMN Modeler → Document template linking](bpmn-modeler.md#document-template-linking).
 
 ---
 
 ## Deploying the bundle
 
-Deployment is identical to any other bundle — see [Deploying the bundle](rip-phase1-bundle.md#deploying-the-bundle) on the R2.1 page. Open `RipR22Process.bpmn` in the BPMN Modeler and click **Deploy**; all fifteen resources go through the LDE backend to Operaton as one deployment.
+Deployment is identical to any other bundle — see [Deploying the bundle](rip-phase1-bundle.md#deploying-the-bundle) on the R2.1 page. Open `RipR22Process.bpmn` in the BPMN Modeler and click **Deploy**; all twelve resources go through the LDE backend to Operaton as one deployment.
 
 ---
 

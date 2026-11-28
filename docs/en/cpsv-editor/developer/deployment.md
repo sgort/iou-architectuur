@@ -28,7 +28,7 @@ clean up after a pull request.
 | **Deploy ACC (orange-beach)** | `azure-static-web-apps-orange-beach-0574c2a03.yml` | `changes`, `Build and deploy ACC` | pushes to `acc`; pull requests into `acc` | Lint, test, build and deploy acceptance |
 | **Deploy PROD (white-sky)** | `azure-static-web-apps-white-sky-02b674303.yml` | `Build and deploy PROD` | pushes to `main`; pull requests into `main` | Lint, test, build and deploy production |
 | **Supply-chain audit** | `zizmor.yml` | `audit` | every pull request; pushes to `acc`/`main` | Workflow analysis, Renovate config, lockfile sync, formatting, registry signatures, pin truth |
-| | | `lockfile-review`, `lockfile-review-comment` | every pull request | What the pull request's `package-lock.json` change contains, reported in the run summary and a pull request comment |
+| | | `lockfile-review`, `lockfile-review-comment` | every pull request | What the pull request's `package-lock.json` change contains, and the dependency gate: a new direct dependency without a register entry, or a version younger than 14 days, fails it. Reported in the run summary and a pull request comment |
 | **Semgrep** | `semgrep.yml` | `scan` | every pull request; pushes to `acc`/`main` | Semgrep Code and Supply Chain over the source and the npm tree |
 | **Close preview environments** | `close-preview-environments.yml` | `Close ACC staging environment`, `Close PROD staging environment` | every pull request closed into `acc` or `main` | Deletes the pull request's Static Web Apps preview |
 | **Dependency audit** | `dependency-audit.yml` | `dependency-audit` | daily at 05:17 UTC; on demand; pull requests touching the audit itself | `npm audit` of both `acc` and `main` |
@@ -77,7 +77,7 @@ Pull requests are filtered differently in each deploy workflow:
 ```
 checkout (persist-credentials: false)
        ↓
-setup-node (node-version-file: .nvmrc → 24.22.2)  →  npm ci
+setup-node (node-version-file: .nvmrc → 24.22.3)  →  npm ci
        ↓
 npm run lint  →  npm run test:ci        ← a failure here blocks the deploy
        ↓
@@ -99,7 +99,7 @@ check exists because the deploy action, given an empty or wrong directory,
 uploads it and reports success. Before v2026.09.7 the action built the bundle
 itself, with Oryx inside its own container, on a Node the repository never
 chose (Node 22.22.0); production now runs on the `.nvmrc`-pinned Node, currently
-24.22.2. Renovate's `nvm` manager maintains `.nvmrc`.
+24.22.3. Renovate's `nvm` manager maintains `.nvmrc`.
 
 Every `uses:` reference is pinned to a commit digest rather than a tag, each
 job declares least-privilege `permissions:`, and the checkout step does not
@@ -146,7 +146,10 @@ linked-data-explorer's `docs/dependency-criteria.md` sets for adding a
 dependency. The run never fails on a finding — a finding is for a person — and
 reports in its summary and in **one issue per quarter**, which records the
 outcomes; a re-run in the same quarter adds the fresh evidence as a comment
-and leaves the issue body alone.
+and leaves the issue body alone. Since v2026.11.3 the review also lists what the
+dependency register still holds open — overrides, replacements and cooldown
+overrides — and the previous quarter's Renovate security pull requests that
+passed the cooldown, until each is dealt with.
 
 **Release SBOM** covers the fact that a promotion to `main` *is* a release here
 — there are no tags. `scripts/write-sbom.mjs` writes
@@ -192,18 +195,47 @@ copy is the durable one.
   `package-lock.json` with the base's, reading the lockfiles only, and reports
   new and removed packages, downgrades, licence changes, new install scripts
   and new packages whose licence `lockfile-review.json` does not allow. Those
-  are review prompts. It fails only on a package resolved from somewhere other
-  than `https://registry.npmjs.org/`, or one with no integrity hash, and
-  succeeds at once when the lockfile is unchanged. Each new **direct**
-  dependency is listed with a checklist of the dependency criteria. The job
-  runs with a read-only token; a separate `lockfile-review-comment` job, which
-  checks out no code, holds the `pull-requests: write` token and posts or
-  updates the comment, for same-repository branches only.
+  are review prompts. The diff itself fails only on a package resolved from
+  somewhere other than `https://registry.npmjs.org/`, or one with no integrity
+  hash. After the self-tests and the register check below, the job succeeds
+  at once when the lockfile is unchanged. Each new **direct** dependency is
+  listed, and the dependency gate below decides whether it may merge. The job
+  runs with a read-only token (`contents`, `issues` and `pull-requests: read`);
+  a separate `lockfile-review-comment` job, which checks out no code, holds the
+  `pull-requests: write` token and posts or updates the comment, for
+  same-repository branches only.
+- **Dependency gate** (v2026.11.3). The same job runs
+  `scripts/dependency-gate.mjs`, the same file as in the Linked Data Explorer
+  and the RONL Business API, and fails the pull request on either of two
+  findings. A direct dependency new to a manifest, in any dependency field,
+  needs an entry in `dependency-register.json` in the same pull request: a
+  verdict for each of the six criteria, the version assessed and an outcome
+  (*keep* or *replace*). The gate gathers the evidence itself from the npm
+  registry, the GitHub API and the lockfile, and fails an entry that claims a
+  criterion holds which the evidence contradicts, an unmet criterion or
+  *needed* without a written reason, an assessed major that is not the locked
+  one, or a cited issue that is closed. And every package version the
+  lockfile adds or changes must have been published at least
+  `minReleaseAgeDays` (14, in `lockfile-review.json`) before the run. The
+  ways through are committed and logged: an override citing an open issue
+  (`"status": "override"`, or a `cooldownOverrides` entry), or, for a young
+  version, a Renovate security pull request whose `security` label the
+  GitHub API shows renovate[bot] adding; the gate waits up to 60 seconds for
+  that label rather than starting a second run on `labeled`. The gate's
+  self-test and `--check-register` run before the comparison, so a malformed
+  register fails even when the lockfile is unchanged. An unreachable registry
+  or API exits `2` and fails the check, never reads as clean. Two limits are
+  recorded in `SECURITY-PIPELINE.md`: the job runs the pull request's own copy
+  of the gate, and the rulesets require no approvals, so a pull request can
+  weaken it; and a lockfile entry hand-marked `"inBundle": true` skips the
+  origin, integrity and cooldown checks. Both show in the diff.
 - **Cooldown.** The root `.npmrc` sets `min-release-age=14`, so npm will not
   resolve a version published less than 14 days ago — covering lock-file
   maintenance and workstation installs, which Renovate's own 14-day cooldown
-  cannot reach. npm 11.10 or newer honours it (Node 24.22.2 bundles 11.19);
+  cannot reach. npm 11.10 or newer honours it (Node 24.22.3 bundles 11.19);
   `npm ci` ignores it by design, so CI is neither blocked nor protected by it.
+  The dependency gate checks the same 14 days on the lockfile a pull request
+  brings, and that is where CI is protected.
 - **Majors.** Renovate never offers an npm package's `X.0.0`, so the earliest a
   major can arrive is its first patch, and majors wait for Dependency Dashboard
   approval. The Ubuntu 26.04 runner major is deferred by a Renovate rule that
