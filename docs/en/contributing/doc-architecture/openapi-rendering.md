@@ -1,256 +1,121 @@
 ---
 scope: cross-cutting
-verified:
-  date: 2026-11-22
-  against:
-    Linked Data Explorer: "fe841f9"
-    RONL Business API: "be0a1f0"
 ---
 
 # OpenAPI Rendering
 
-How the API Specification pages — the Linked Data Explorer's two
-([v1](../../linked-data-explorer/reference/api-specification.md) and, since
-6 October 2026, [v2](../../linked-data-explorer/reference/api-specification-v2.md))
-and, since 26 September 2026, the
-[RONL Business API's](../../ronl-business-api/reference/api-specification.md) — turn
-a component's OpenAPI document into a browsable reference, what they depend on at
-run time, and which of those dependencies are load-bearing. The three pages are built
-the same way; where they differ, this page says so.
+Three pages turn a component's OpenAPI document into a browsable reference: the Linked Data Explorer's
+[API Specification (v1)](../../linked-data-explorer/reference/api-specification.md) and
+[API Specification (v2)](../../linked-data-explorer/reference/api-specification-v2.md), and the
+[RONL Business API's API Specification](../../ronl-business-api/reference/api-specification.md). Each renders the
+document in the browser with Scalar, fetched live from the component's acceptance backend; nothing is stored in this
+repository. This page explains how they are wired and what they depend on at run time.
 
-This page exists so the specification page itself can stay what a reader came
-for — the reference — rather than opening with four boxes of operational
-detail.
+## How it works
 
----
-
-## The arrangement
-
-Each page declares an empty banner element and three script tags: the provenance
-script described below, then Scalar (`@scalar/api-reference`, pinned at 1.68.0 on
-all three pages) loaded from `cdn.jsdelivr.net`, and a configuration element that tells it
-which document to fetch:
-
-```html
-<script
-  id="api-reference"
-  data-url="https://acc.backend.linkeddata.open-regels.nl/v1/openapi.json"
-  data-configuration='{"layout":"classic", …,"servers":[{"url":"…/v1","description":"Acceptance"}]}'>
-</script>
+```mermaid
+sequenceDiagram
+    participant B as Browser
+    participant S as Site (Static Web Apps)
+    participant C as cdn.jsdelivr.net
+    participant API as Acceptance backend
+    B->>S: GET the API Specification page
+    B->>API: GET /v1/health (provenance banner)
+    API-->>B: version, environment, build
+    B->>C: GET @scalar/api-reference@1.68.0
+    B->>API: GET /v1/openapi.json (or /v2/openapi.json)
+    API-->>B: the OpenAPI document
+    B->>API: Test Request (when a reader sends one)
 ```
 
-Everything below is a consequence of the last two.
+Each page contains, in order:
 
-### Live, not stored
+1. **A banner element** — `#lde-spec-provenance` on the two Linked Data Explorer pages, `#rba-spec-provenance` with
+   class `.spec-provenance` on the RONL Business API page — hidden until filled.
+2. **An inline script** that fetches the backend's `/v1/health` and writes
+   `Rendered from <environment> · version <x> · build <sha> · #<run> · read <time> UTC` into the banner. If the
+   fetch fails the banner stays hidden; the reference still renders.
+3. **A configuration element** `<script id="api-reference" data-url="…" data-configuration='…'>` naming the document
+   to fetch.
+4. **Scalar** itself, `https://cdn.jsdelivr.net/npm/@scalar/api-reference@1.68.0/dist/browser/standalone.js`.
 
-The document is fetched from the backend **on every page load**. There is no
-committed copy.
+The document's `info.version` is the release version, set from the backend's `package.json` at build time. The
+banner adds what the document cannot say: which environment and which build served it.
 
-That was chosen on 16 September 2026, while
-[linked-data-explorer#129](https://github.com/sgort/linked-data-explorer/issues/129)
-was describing the API route group by route group: the document went from 24 paths
-to 63 in three days, so a snapshot would have been stale within days, and every
-backend deploy would have owed the documentation site a fetch, a commit, a build and
-a promotion. #129 closed on 17 September, and every `/v1` route is now described —
-as is every `/v2` route since 6 October — and the backend's tests fail when one is not.
+## Per page
 
-The cost is **reproducibility**. The page cannot be replayed as it looked last
-week, and it shows nothing at all if the backend is unreachable. When the
-specification stops changing from one release to the next, a stored copy under
-`docs/assets/openapi/` becomes the better arrangement — reviewable in a diff, and
-immune to a backend deploy. #129 closing is a sign of that, not proof of it; the
-page stays live until releases stop moving the document. The switch back is a
-one-line change to `data-url` plus the file.
+| Page | Document | Banner reads | `/v1/health` shape | Security schemes in the document |
+|---|---|---|---|---|
+| LDE v1 | `https://acc.backend.linkeddata.open-regels.nl/v1/openapi.json` | LDE `/v1/health` | flat, with a preformatted `build.label` | `bearerAuth`, on the state-changing operations; no global `security` |
+| LDE v2 | `https://acc.backend.linkeddata.open-regels.nl/v2/openapi.json` | LDE `/v1/health` (same process) | as above | none |
+| RONL Business API | `https://acc.api.open-regels.nl/v1/openapi.json` | RBA `/v1/health` | wrapped in `{ success, data }`; the script formats `data.build.sha` and `run` | `bearerAuth` (global), `mediaAggregatorKey`, `m2mOAuth` |
 
-### Provenance comes from a second endpoint
+All three use the same Scalar configuration:
 
-All three documents carry their own release version: `info.version` is injected from
-`package.json` at build time, never written in the source, so the document and the
-running service cannot disagree about it. What the document cannot say is **which
-build** is serving it, or in which environment — so the banner reads `/v1/health`,
-which reports the version, the environment and the build (commit and workflow run)
-of the very service that just served the document. The Linked Data Explorer's v2
-page reads `/v1/health` too, because the same running process serves both of its
-documents:
+- `"layout": "classic"` — Scalar's default `modern` layout fixes its sidebar and search to the viewport, which
+  escapes Material's content column. `classic` keeps the sidebar inline.
+- `"servers"` overridden to the acceptance base URL only (`…/v1` or `…/v2`). The documents list Production first;
+  the override keeps **Test Request** off production.
+- `"withDefaultFonts": false`, `"showSidebar": true`, `"hideDownloadButton": false`.
 
-```
-Rendered from acceptance · version 2026.10.0 · build 9e0d18e · #342 · read … UTC
-```
-
-The two services shape `/v1/health` differently, and each page's script reads its
-own. The Linked Data Explorer's is flat and carries a preformatted `build.label`. The
-RONL Business API's is wrapped in its `{ success, data }` envelope, with
-`data.build = { sha, run, runId }` and no label, so its script formats the short SHA
-and run number itself.
-
-If that fetch fails the banner stays hidden and the reference still renders. It
-degrades to nothing, never to an error.
-
-All three banners are styled by `docs/stylesheets/spec-provenance.css`, listed in
-`extra_css`. The Linked Data Explorer's two pages share an element targeted by its id,
-`#lde-spec-provenance`; any later page uses the shared `.spec-provenance` class, as
-the RONL Business API's does.
-
-### Two configuration choices that look wrong and are not
-
-- **`layout: "classic"`.** Scalar's default `modern` layout puts its sidebar and
-  search box at `position: fixed`. Scalar assumes it owns the viewport, so
-  inside a Material content column its chrome escapes that column and floats
-  over the page — two application shells competing for one screen. `classic`
-  places the sidebar inline.
-- **`servers` is overridden** rather than the servers array being reordered in
-  the document. Which environment a reader is pointed at is a presentation
-  choice and belongs in the page, not in a copy of someone else's contract. The
-  Linked Data Explorer's v2 document lists Production first; its page points at the
-  acceptance `/v2` base.
-
----
+The banners are styled by `docs/stylesheets/spec-provenance.css`.
 
 ## What it depends on at run time
 
-Three separate mechanisms, commonly confused with one another.
-
-| Mechanism | Governs | Load-bearing for |
+| Mechanism | Governs | Needed for |
 |---|---|---|
-| Wildcard CORS on `/v1/openapi.json` (and the Linked Data Explorer's `/v2/openapi.json`) | the document fetch | **the render** |
-| `CORS_ORIGIN` allowlist | every other route | **Test Request**, and the provenance banner |
-| `connect-src` in the site CSP | all outbound fetches | both — if the CSP is ever enforced |
+| `Access-Control-Allow-Origin: *` on `/v1/openapi.json` and `/v2/openapi.json` | the document fetch | the render, from any origin |
+| The backend's `CORS_ORIGIN` allowlist | every other route | the banner and **Test Request** |
+| `cdn.jsdelivr.net` reachable | the Scalar script | the render |
 
-The mechanisms are the same for both components; what differs is who is on the
-allowlist.
+Measured with an `Origin` header, on `GET /v1/health`:
 
-### The CORS asymmetry
+| `Origin` sent | LDE acceptance | RBA acceptance | LDE and RBA production |
+|---|---|---|---|
+| `https://iou-architectuur.open-regels.nl` | echoed | echoed | absent |
+| `https://acc.iou-architectuur.open-regels.nl` | echoed | echoed | — |
+| `http://localhost:8000` | absent | absent | — |
 
-`/v1/openapi.json` — and the Linked Data Explorer's `/v2/openapi.json` — is a
-**public mount** served with `Access-Control-Allow-Origin: *`, entirely separate from the `CORS_ORIGIN`
-allowlist that governs every other route. So the render works from any origin
-and does not depend on either documentation tier being allowlisted — a third
-party could render the same document.
+So the banner and Test Request work on both deployed documentation tiers, and not under `mkdocs serve`. No
+documentation page can call a production backend from the browser. Test Request against a secured operation needs
+a token: a Keycloak access token for `bearerAuth`.
 
-`/v1/health` does **not** get that treatment. It goes through the allowlist, and
-both acceptance backends now allowlist both deployed documentation tiers —
-`https://iou-architectuur.open-regels.nl` and
-`https://acc.iou-architectuur.open-regels.nl`. Neither allowlists `localhost`. So
-both banners show on both deployed tiers; under `mkdocs serve`, neither shows. The
-RONL Business API's allowlist named only the production tier until its acceptance
-App Service's `CORS_ORIGIN` gained the acceptance documentation origin on
-30 September 2026.
+### The Content-Security-Policy is not applied
 
-### Test Request targets acceptance, deliberately
+`staticwebapp.config.json` at the repository root declares a Content-Security-Policy, `X-Frame-Options: DENY` and
+other headers. It is not deployed: both pipelines publish `app_location: site`, and `mkdocs build` copies only
+`docs/staticwebapp.config.json` (`trailingSlash: auto`) into `site/`. Neither deployed tier sends a
+`Content-Security-Policy` or `X-Frame-Options` header. Tracked in
+[iou-architectuur#98](https://github.com/sgort/iou-architectuur/issues/98).
 
-Scalar's **Test Request** control issues a real request. It is pinned to the
-acceptance API. The production backend allows only its own two frontends — the
-Linked Data Explorer's and the CPSV Editor's — so no documentation page can reach it
-from a browser.
+The render and Test Request therefore work because no policy is enforced. If the root file's policy were applied
+as written:
 
-That split is a decision, not an accident. Since v2026.11.2 the Linked Data Explorer's
-`/v1` document declares one security scheme, `bearerAuth` — a Keycloak access token
-from realm `ronl` carrying the role `lde-author` — and requires it on its
-state-changing operations, among them `POST /dmns/process/deploy` and
-`DELETE /cache/clear`. There is still no global `security`, so reads stay open, and
-`POST /dmns/deploy` takes the token optionally: without one, and only on a tier that
-allows anonymous test deploys (acceptance among them), it deploys to the `TestOnly`
-tenant for 48 hours, at most ten per address per hour. Since v2026.11.3 a secured
-operation that cannot check a token — Keycloak's signing keys could not be fetched —
-answers `503` with code `AUTH_UNAVAILABLE` rather than `401`, so a Test Request that
-fails that way is not a bad token. Its `/v2` document declares no
-scheme. Test Request against a secured operation therefore needs a token, as it does
-on the RONL Business API. CORS remains a browser policy, not an authorization
-boundary, and a Send button on a public documentation page is still a different
-proposition from an endpoint someone has to write a request to reach, so production
-stays locked to its own frontend. On `/v2`, `GET /v2/norms` echoes the acceptance
-documentation origin, so Test Request works there too.
+- `connect-src` already names both acceptance backends, so the document fetch, the banner and Test Request would
+  keep working; removing a backend from it would blank its page.
+- `script-src` admits `cdn.jsdelivr.net`, so Scalar would load. It does not admit `unpkg.com`, where Material loads
+  Mermaid from, so diagrams across the site would stop rendering.
+- `style-src` admits `'self'`, `'unsafe-inline'` and `https://fonts.googleapis.com` only, so a renderer that loads
+  its own stylesheet from a CDN would need it vendored.
+- `X-Frame-Options: DENY` would block iframe-based renderers such as `mkdocs-swagger-ui-tag` and `mkdocs-redoc-tag`.
 
-The RONL Business API's document goes further. It declares three security schemes —
-`bearerAuth`, a Keycloak-issued JWT, `mediaAggregatorKey`, and since 28 September 2026
-`m2mOAuth`, an OAuth2 client-credentials scheme for the machine-to-machine surface —
-and, unlike the Linked Data Explorer's, applies `bearerAuth` globally, so Test
-Request against it needs a token for most operations. And since 30 September 2026
-its acceptance `CORS_ORIGIN` includes `https://acc.iou-architectuur.open-regels.nl`,
-so Test Request works from both documentation tiers.
+## What it does not cover
 
-Measured against the Linked Data Explorer's acceptance backend on 16 September 2026
-(and identically again on 27 September, 4 October, 11 October, 8 November, 15 November and 22 November), varying only the
-`Origin` header on `GET /v1/health`:
+- **Site search.** Scalar renders in the browser, so operations and schemas are not in the MkDocs search index;
+  only each page's own prose is.
+- **Reproducibility.** The page shows what the acceptance backend serves now. It cannot show an earlier version,
+  and renders nothing when the backend is unreachable.
+- **Production.** Every page points at acceptance; the production documents are not rendered here.
+- **Other components.** No OpenAPI document of CPRMV, the CPSV Editor or the Norm Editor is rendered on this site.
 
-| `Origin` sent | Status | `Access-Control-Allow-Origin` |
-|---|---|---|
-| `https://iou-architectuur.open-regels.nl` | 200 | echoed |
-| `https://acc.iou-architectuur.open-regels.nl` | 200 | echoed |
-| `https://acc.linkeddata.open-regels.nl` | 200 | echoed |
-| `http://localhost:8000` | 200 | absent |
+## Where it lives
 
-Measured against the RONL Business API's acceptance backend on 22 November 2026 (identical to 4 and 11 October, 8 November and 15 November):
-
-| `Origin` sent | Status | `Access-Control-Allow-Origin` |
-|---|---|---|
-| `https://iou-architectuur.open-regels.nl` | 200 | echoed |
-| `https://acc.iou-architectuur.open-regels.nl` | 200 | echoed (preflight 204, echoed) |
-| `http://localhost:8000` | 200 | absent |
-
-On 27 September 2026 the acceptance documentation origin's row read *absent
-(preflight too)*; it changed with the `CORS_ORIGIN` update of 30 September.
-
-Both halves of
-[linked-data-explorer#145](https://github.com/sgort/linked-data-explorer/issues/145)
-made the Linked Data Explorer's table possible: a disallowed origin no longer answers
-`500`, and both documentation tiers are allowlisted on the acceptance App Service.
-
----
-
-## The Content-Security-Policy is not enforced
-
-!!! warning "A security header file that looks active and is not"
-
-    `staticwebapp.config.json` at the repository root declares a CSP, and
-    `connect-src` there names both acceptance backends —
-    `https://acc.backend.linkeddata.open-regels.nl` and `https://acc.api.open-regels.nl`.
-    **That file is not applied
-    to either deployment.** All three deployment definitions publish with `app_location: "site"`,
-    Azure Static Web Apps reads `staticwebapp.config.json` from the app artifact
-    root, and `mkdocs build` never copies the file into `site/`.
-
-    Verified 16 September 2026, and again on 27 September, 11 October, 8 November, 15 November and 22 November: neither `iou-architectuur.open-regels.nl` nor
-    `acc.iou-architectuur.open-regels.nl` returns a `Content-Security-Policy` or
-    `X-Frame-Options` header, and both return `Referrer-Policy: same-origin`
-    where the file declares `strict-origin-when-cross-origin`.
-
-    Tracked as
-    [iou-architectuur#98](https://github.com/sgort/iou-architectuur/issues/98).
-
-So the render and Test Request reach the backend **because no policy is
-enforced**, not because one permits them. The policy already names both
-hosts, so the page should keep working unchanged when the file is finally
-applied — but that entry stops being cosmetic at that moment. Removing the
-backend from `connect-src` under an enforced policy would blank the page, not
-merely disable a button.
-
----
-
-## Renderers considered
-
-Four were trialled against the same document before Scalar was chosen. The
-comparison is worth recording, because the trade it revealed is not obvious.
-
-| Renderer | Search records contributed | Indexed text |
-|---|---|---|
-| neoteroi-mkdocs (build-time HTML) | 62 | 105,298 chars |
-| Redoc / Swagger UI / Scalar | 1 each | ~1 KB each |
-
-Build-time rendering wins decisively on search: it emits real HTML that MkDocs
-indexes, so a schema name like `ErrorEnvelope` (at the time; the Linked Data
-Explorer's errors are now RFC 9457 `Problem` objects) becomes findable through site
-search. The client-side renderers contribute nothing but the page's own prose.
-Scalar was chosen knowing that cost, for a presentation that reads as an API
-console and for a Test Request control that build-time HTML cannot offer at all.
-
-Two constraints found during that trial are worth keeping in mind for any future
-renderer:
-
-- **A renderer shipping its own stylesheet needs it vendored** if the CSP is
-  ever enforced, since `style-src` admits `'self'`, `'unsafe-inline'` and
-  `https://fonts.googleapis.com` only — no CDN such as jsDelivr.
-- **The iframe-based MkDocs plugins** (`mkdocs-swagger-ui-tag`,
-  `mkdocs-redoc-tag`) are a trap: they work on localhost and would be blocked in
-  production by `X-Frame-Options: DENY` — again, once the header is actually
-  sent.
+| What | Path |
+|---|---|
+| The three pages | `docs/en/linked-data-explorer/reference/api-specification.md`, `api-specification-v2.md`, `docs/en/ronl-business-api/reference/api-specification.md` |
+| Banner styles | `docs/stylesheets/spec-provenance.css` (in `extra_css`) |
+| Scalar version | the `<script src>` at the end of each page |
+| Document URL and servers override | the `data-url` and `data-configuration` attributes on `#api-reference` |
+| Header file that is not deployed | `staticwebapp.config.json` (repository root) |
+| Header file that is deployed | `docs/staticwebapp.config.json` |
+| CORS allowlists | each backend's `CORS_ORIGIN` App Service setting |

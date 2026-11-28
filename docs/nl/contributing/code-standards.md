@@ -2,7 +2,7 @@
 scope: cross-cutting
 ---
 
-# Code Standaarden
+# Codestandaarden en hooks
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
@@ -15,12 +15,14 @@ scope: cross-cutting
 
 ---
 
-## Linting and formatting
+## How it works
 
-## Git hooks
+## Per repository
 
-## CI
+## The Norm Editor is shaped differently
 
-## Commit messages
+## CPRMV
 
-## Testing
+## What it does not cover
+
+## Where it lives

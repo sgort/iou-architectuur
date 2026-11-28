@@ -2,7 +2,7 @@
 scope: cross-cutting
 ---
 
-# De dekkingsdrempel
+# Tests en dekkingsdrempels
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
@@ -15,18 +15,16 @@ scope: cross-cutting
 
 ---
 
-## Why per file, and why branches
+## How it works
 
-## A functions floor is a separate decision
+## Per repository
 
-## Why one repository needed a script first
+## Coverage floors
 
-## Reaching the floor has a load cost, and it lands somewhere else
+## Raising coverage without writing hollow tests
 
-## Runner mechanics
+## Running the suites locally
 
-## Margins differ sharply, and "clean" means different things
+## What it does not cover
 
-## A floor only gates where the tests run before the merge
-
-## Adopting this in a fourth application
+## Where it lives

@@ -2,7 +2,7 @@
 scope: cross-cutting
 ---
 
-# Overzicht
+# Documentatiearchitectuur
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
@@ -10,13 +10,21 @@ scope: cross-cutting
 
 ---
 
-**Status:** Concept
+**Status:** Concept  
 **Engelstalige bron:** `contributing/doc-architecture/overview.md`
 
 ---
 
-## Sitestructuur
+## How a build works
 
----
+## Stack
 
-## Inhoudsbronnen
+## Structure and navigation
+
+## The page metadata header
+
+## Build and deploy
+
+## How content stays current
+
+## Where it lives

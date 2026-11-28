@@ -2,7 +2,7 @@
 scope: cross-cutting
 ---
 
-# Ontwikkelworkflow
+# Ontwikkelwerkwijze
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
@@ -15,14 +15,16 @@ scope: cross-cutting
 
 ---
 
-## 1. Design
+## How it works
 
-## 2. Handoff
+## Specs and plans
 
-## 3. Implementation
+## The handoff package
 
-## 4. Release
+## Who decides what
 
-## 5. Documentation
+## This documentation site
 
-## Where to go next
+## What it does not cover
+
+## Where it lives

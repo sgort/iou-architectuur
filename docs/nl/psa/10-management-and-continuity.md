@@ -83,5 +83,5 @@ heeft nog geen testdekking of controlepoorten.
 - [Overzicht van de controles](../contributing/controls.md)
 - [De ontwikkelwerkwijze](../contributing/development-workflow/overview.md)
 - [Bouwherkomst: welke build draait er](../contributing/build-provenance.md)
-- [Twee sporen voor levering](../contributing/ci-posture-deck.md)
+- [Twee sporen voor levering](../ci-posture-deck.md)
 - [De spiegel op GitLab](../contributing/the-gitlab-mirror.md)

@@ -1,175 +1,93 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-22
+  date: 2026-11-28
   against:
-    CPSV Editor: "3ba847f"
-    Linked Data Explorer: "fe841f9"
-    RONL Business API: "be0a1f0"
+    CPSV Editor: "4ec37df"
+    Linked Data Explorer: "6ce7df8"
+    RONL Business API: "f267d7a"
+    CPRMV: "ebf7def"
+    Norm Editor: "fed2de3"
 ---
 
 # The GitLab Mirror
 
-*The one control that cannot run in CI*
+Development, pull requests and CI for the three applications, CPRMV and this documentation site live on GitHub. Each
+also has a copy on `git.open-regels.nl` (GitLab), and nothing pushes that copy automatically: a person pushes it, by
+hand, with a fast-forward from the GitHub branch. This page says which repositories have a mirror, which branches go
+there and when.
 
-Every CI gate in this documentation — [pinning](supply-chain.md),
-[scanning](dependency-scanning.md), the [coverage floor](coverage-floor.md) and the
-[rulesets](branch-protection.md) that require them — runs on GitHub Actions. The
-applications are also mirrored by hand to the open-regels.nl GitLab instance, and
-**the mirror is outside all of them**. It stays outside: each merge leaves it behind
-until someone pushes — and since 10 October 2026 that push happens **only while a release
-is cut**: the release procedure runs `check-mirror` (below) and the mirror is reconciled
-there. Between releases GitLab is expected to lag.
+## How it works
 
-What changed on 12 September 2026 is that something now *notices*. A release-time check,
-`scripts/check-mirror.sh`, runs in all three repositories from `/bump-release`, in the
-step that lands the release through a pull request — step 6 in the CPSV Editor, 7 in the
-Linked Data Explorer, 8 in the RONL Business API — and compares each remote-tracking ref
-with the mirror's. **It closes the observation half
-of the problem, not the drift.** It cannot run in CI, and that is a property of the mirror
-rather than a shortcoming of the check: the `gitlab` remote lives in `.git/config`, not
-in any tracked file, so a runner has no such remote, no credential for it and no route to
-it. It also
-never pushes — it prints the exact command and stops, because writing to a shared remote
-is a decision for a person.
-
-Its output separates the two cases that a commit count cannot, and it prints the
-remote-tracking form rather than the local branch, which drifts. All four of its paths —
-match, behind, diverged, missing — were exercised against a scratch bare repository rather
-than assumed.
-
-On 12 September 2026, by `git ls-remote` against both remotes:
-
-| Repository | `acc` | `main` |
-|---|---|---|
-| CPSV Editor | ✅ `f7fe80f` on both | ✅ `f5bae6a` on both |
-| Linked Data Explorer | ✅ `1babd54` on both | ✅ `be6bc54` on both |
-| RONL Business API | ✅ `28e1a9e` on both | ✅ `311d732` on both |
-
-Two were checked again on 19 September 2026, after their promotions that day, and both
-were in sync: the Linked Data Explorer with `acc` at `379cbab` and `main` at `ec4792f`,
-the CPSV Editor with `acc` at `a37bace` and `main` at `2723db1`.
-
-**The check itself was re-read from all three repositories on 4 October 2026** and is
-unchanged since it landed. On the same day, by `git ls-remote` against both remotes, all
-three mirrors were in sync after that week's promotions: the CPSV Editor at `4cba989` /
-`719683b`, the Linked Data Explorer at `9e0d18e` / `71a8236`, the RONL Business API at
-`5c6e716` / `0625d48` (`acc` / `main`). On 27 September 2026 they had been in sync at
-`a7fe76f` / `7d154ba`, `0143ea2` / `4148c9a` and `3c44b9e` / `2443adc`. A tick is still
-*synced at the last check*.
-
-On 11 October 2026, by `git ls-remote` against both remotes, with the check re-read and
-unchanged: the CPSV Editor in sync at `2cf6a90` / `98458fa` and the RONL Business API at
-`c51ec0a` / `7117914` (`acc` / `main`). The Linked Data Explorer's `main` is in sync at
-`82f461f`; its GitLab `acc` is at `b7ccd6f`, an ancestor two commits behind GitHub's
-`a87f64b` — the SBOM fix promoted to `main` without a release, so the mirror's `acc` waits
-for the next one.
-
-On 8 November 2026, by `git ls-remote` against both remotes, with the check re-read and
-unchanged: the Linked Data Explorer in sync at `4300700` / `189435e` and the RONL Business
-API at `c6cf3ac` / `35fb3a8` (`acc` / `main`). The CPSV Editor's `main` is in sync at
-`84886c9`; its GitLab `acc` is at `8b57ef2`, an ancestor seven commits behind GitHub's
-`34a51b4` — two Renovate action-pin pull requests merged after the v2026.11.0 release, which
-the next release reconciles.
-
-On 15 November 2026, by `git ls-remote` against both remotes, with the check re-read and
-unchanged: the Linked Data Explorer in sync at `5bccbf2` / `e11e4ef` and the RONL Business
-API at `4579486` / `67bac28` (`acc` / `main`). The CPSV Editor's `main` is in sync at
-`6910bb8`; its GitLab `acc` is at `ab5ff1c`, the v2026.11.1 release, an ancestor twelve
-commits behind GitHub's `2d201d5` — the `zizmor-action` v0.8.0 pull request and the lab
-material merged after the release, which the next release reconciles.
-
-On 22 November 2026, by `git ls-remote` against both remotes, with the check re-read and
-unchanged: the Linked Data Explorer in sync at `fe841f9` / `4e80c74` (`acc` / `main`), its
-v2026.11.3 release of that morning. The CPSV Editor's `main` is in sync at `5d6345c`; its GitLab
-`acc` is at `3ed45c7`, the v2026.11.2 release, an ancestor two commits behind GitHub's `3ba847f`
-— one fix merged after the release. The RONL Business API's GitLab branches hold the v2026.11.5
-release, `e4a467c` / `c80d7d7`, ancestors two and three commits behind GitHub's `be0a1f0` /
-`1784a72` — the accent-colour fix #473 and the promotion that carried it without a release.
-Each repository's next release reconciles its own.
-
-**Two of the three release procedures run a second check straight after this one** — the
-CPSV Editor's since v2026.09.6 and the RONL Business API's since v2026.09.10.
-`npm run check-previews` lists the Static Web Apps preview environments Azure actually has
-against the pull requests GitHub has open, and prints the exact
-`az staticwebapp environment delete` command for each orphan. It exists for the same
-reason as the mirror check: GitHub starts no workflow for a pull request with a merge
-conflict, so no close job ever runs for it, and in the CPSV Editor eight previews on
-acceptance and production had outlived their pull requests unnoticed. Like `check-mirror`
-it runs on a workstation and never deletes anything itself. It hardcodes no app: the CPSV
-Editor's derives each from its deploy workflow's file name, and the RONL Business API's —
-whose workflow names carry no hostname, and whose apps span two subscriptions — finds
-them by `repositoryUrl` across every subscription the login can read. The Linked Data
-Explorer has no such check.
-
-**The RONL Business API's check strips the carriage returns `az` writes on Windows.** The
-Azure CLI on Windows ends every `-o tsv` line with `\r\n`, and the check feeds those
-values back into later calls, so each subscription id and resource group carried a
-trailing `\r` and every call built from them failed. On 26 September 2026 that reported
-three items NOT CHECKED straight after a fresh `az login`, and the script exited 1 on a
-login that was fine. Since `80e34a2` an `az()` wrapper in `scripts/check-previews.sh`
-strips them and keeps the exit status; it shipped in v2026.09.13 and has been on `main`
-since the v2026.09.14 promotion. The CPSV Editor's `check-previews.sh` has no such guard, though it too reads
-`-o tsv` output back into later calls.
-
-A tick is *synced at the last check*, not *kept in sync*. The RONL Business API's mirror
-had never been audited before 12 September, and both branches turned out to be strict
-ancestors — `acc` eight commits behind and `main` one hundred and eighty-four — so two
-fast-forwards reconciled it. It then drifted three more times the same day, as each
-promotion pull request merged, which is the behaviour the check exists to surface.
-
-## Behind is not the same as diverged
-
-One command separates the two cases before anything is pushed:
-
-```bash
-git merge-base --is-ancestor gitlab/<branch> origin/<branch>
+```mermaid
+flowchart LR
+    GH["GitHub origin/acc, origin/main"] --> CHK["npm run check-mirror"]
+    CHK -->|"MATCH"| DONE["nothing to push"]
+    CHK -->|"BEHIND or MISSING"| PUSH["git push gitlab origin/BRANCH:refs/heads/BRANCH"]
+    CHK -->|"DIVERGED"| STOP["stop: do not force"]
+    PUSH --> LS["git ls-remote gitlab"]
+    PUSH -.->|"CPRMV main only"| PAGES["GitLab Pages publishes the ReSpec"]
 ```
 
-An ancestor means a fast-forward, and reconciliation is one push. Anything else means the
-mirror holds commits GitHub has never seen. Commit counts alone do not tell the two
-apart — *"253 behind"* and *"18 ahead and 306 behind"* both read as *stale*. And push the
-**remote-tracking** ref, not the local branch, which drifts:
+1. **A release, or a merged pull request here.** The three applications and CPRMV reconcile their mirror at a release,
+   as the last steps of `/bump-release`. This documentation site has no releases; its mirror is pushed after each
+   merged pull request, during housekeeping.
+2. **Compare.** `npm run check-mirror` (`scripts/check-mirror.sh`) fetches `origin` and `gitlab` and reports each of
+   `acc` and `main` as `MATCH`, `BEHIND by N`, `MISSING` or `DIVERGED`. For a branch that is behind or missing it prints
+   the push command and exits non-zero. It never pushes.
+3. **Push.** A person runs the printed command. It names the remote-tracking branch (`origin/acc`), so what goes to
+   GitLab is what GitHub holds, not whatever the local branch happens to be.
+4. **Diverged means stop.** If GitLab holds commits GitHub does not, the branch is not fast-forwardable. It is archived
+   on GitLab under another name, never forced into line.
+5. **Confirm** with `git ls-remote gitlab` that both heads match GitHub.
 
-```bash
-git push gitlab origin/acc:refs/heads/acc
-git push gitlab origin/main:refs/heads/main
-```
+The `gitlab` remote exists only in each clone's `.git/config`; no tracked file names it. A CI runner has no such
+remote and no credentials for it, so the check runs on the workstation that pushes. On a clone without a `gitlab`
+remote, `check-mirror` says so and exits 0.
 
-## What the CPSV Editor's divergence turned out to be
+## Per repository
 
-The CPSV Editor's GitLab `main` had not moved since **4 March 2026** while GitHub moved on,
-and it carried **18 commits GitHub had never seen**. By the repository's own record,
-seventeen were cross-remote merges with no content of their own. The trees disagreed by
-more than that: files existed on GitLab and on no GitHub branch at all — most of them
-Create React App leftovers the Vite migration had removed on purpose, and **two example
-TTLs that existed nowhere on GitHub**, neither on `main` nor on `acc`. They had been
-committed with a CI-skip marker, which is how they came to be on one remote and not the
-other without anything noticing.
+| Repository | GitLab project | Branches mirrored | Pushed when | How | Pipeline on GitLab |
+|---|---|---|---|---|---|
+| CPSV Editor | `showcases/ttl-editor` | `acc`, `main` | at a release | `/bump-release` ends with `npm run check-mirror` | none (no `.gitlab-ci.yml`) |
+| Linked Data Explorer | `hosting/linked-data-explorer` | `acc`, `main` | at a release | `/bump-release` ends with `npm run check-mirror` | none |
+| RONL Business API | `hosting/ronl-business-api` | `acc`, `main` | at a release | `/bump-release` ends with `npm run check-mirror` | none |
+| CPRMV | `standards/cprmv` | `main` only; GitLab's `acc` is not kept current | every release | step 6 of `/bump-release` pushes `main` (fast-forward checked with `git merge-base --is-ancestor`) | `create-pages`: publishes the ReSpec |
+| Norm Editor | `regels/editor` | — | — | GitLab is its only remote (`origin`); there is no mirror | `.gitlab-ci.yml` (tests, image builds) |
+| This site (`iou-architectuur`) | `showcases/iou-architectuur` | `acc`, `main` | after each merged pull request | housekeeping: fast-forward push of `acc` and `main`, then `git ls-remote gitlab` | none |
 
-**Compare trees, not commit counts.** Eighteen commits ahead was almost entirely noise;
-filtering `git diff --name-status origin/main gitlab/main` to additions is what found the
-two files that mattered. Check each result against *every* branch on the other remote,
-not just the matching one.
+Between releases the application mirrors lag GitHub; that is expected. At the verified heads every mirrored branch
+matched GitHub.
 
-The reconciliation, in the order that keeps content safe on both remotes:
+`scripts/check-mirror.sh` is the same file in all three applications.
 
-1. **Land the missing content on GitHub** — v2026.09.3 recovered the two files by
-   cherry-picking the commit that restores them, not by merging a branch based on the
-   stale remote.
-2. **Push `acc` to the mirror first**, so the files exist on GitLab outside the branch
-   about to be overwritten.
-3. **Archive the ref being replaced** — `archive/gitlab-main-2026-09-09` still holds
-   `15a7d17` on the mirror, so the operation is reversible.
-4. **Reset with `--force-with-lease=main:<old-sha>`**, naming the SHA, so the push refuses
-   if anything moved underneath. Before it, confirm every file about to disappear has a
-   successor.
+### CPRMV: the mirror that publishes
 
-!!! warning "A skip marker in a commit message switches every gate off"
-    GitHub Actions honours `[skip ci]`, `[ci skip]`, `[no ci]`, `[skip actions]` and
-    `[actions skip]` **anywhere in a commit message**, including in prose that only
-    discusses them. That is how the two files bypassed every check, and it is a signal
-    that something skipped review rather than a convenience for documentation — use
-    `paths-ignore` to express *"this change does not need a deploy"* without switching
-    the gates off. See [Code Standards](code-standards.md#ci) for why the symptom is
-    silence rather than red.
+CPRMV's GitLab project is where its ReSpec is served from. `.gitlab-ci.yml` holds one job, `create-pages`, which runs
+only when `main` is pushed and publishes the prebuilt `html/public` directory to
+`https://standaarden.open-regels.nl/standards/cprmv/`. Nothing else runs on GitLab. Pushing `main` there is therefore
+a publication, and it is a fixed step of every CPRMV release: running `/bump-release` is the go-ahead for that push.
+The command checks before pushing (`equal`, `behind`, or `DIVERGED`, which stops it), pushes
+`origin/main:refs/heads/main`, confirms with `git ls-remote gitlab refs/heads/main`, and then asks for the Pages
+pipeline of that commit to be confirmed in the GitLab UI. Outside a release, a push of CPRMV's `main` to GitLab still
+publishes, so it is asked for first.
+
+## What it does not cover
+
+- **No gate runs on GitLab.** Rulesets, required checks and every CI control on these pages run on GitHub Actions. A
+  mirror carries the same commits, not the same guarantees.
+- **No automatic sync.** Nothing pushes the mirror and nothing alerts when it lags; `check-mirror` runs only when a
+  person runs it.
+- **The application mirrors are not current between releases**, and CPRMV's GitLab `acc` is not current at all.
+- **The commit links on this site point at GitHub**, where the deploy runs are, not at the mirror
+  ([Build Provenance](build-provenance.md)).
+
+## Where it lives
+
+| What | Where |
+|---|---|
+| The check | `scripts/check-mirror.sh`, run as `npm run check-mirror` (CPSV Editor, Linked Data Explorer, RONL Business API) |
+| When it runs | the GitLab-mirror step near the end of `.claude/commands/bump-release.md` in each of those repositories |
+| CPRMV push | step 6, "Push `main` to GitLab", in `cprmv/.claude/commands/bump-release.md` |
+| CPRMV Pages job | `cprmv/.gitlab-ci.yml` |
+| The remote | `git remote -v` in each clone (local configuration, not in the repository) |

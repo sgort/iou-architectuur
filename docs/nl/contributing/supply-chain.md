@@ -2,7 +2,7 @@
 scope: cross-cutting
 ---
 
-# Supply-Chain Pinning
+# Vastpinnen
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
@@ -15,21 +15,12 @@ scope: cross-cutting
 
 ---
 
-## Why in-repo rather than org-level
+## How it works
 
-## Adoption status
+## What is pinned, per repository
 
-## The concrete risk
+## Renovate, per repository
 
-## The four files
+## What this does not protect
 
-## What this means day to day
-
-## What this does **not** protect
-
-## Evidence it works — and a cautionary tale
-
-## Replicating this in the next repository
-
-## `check-supply-chain` — the preflight zizmor cannot be
-
+## Where it lives

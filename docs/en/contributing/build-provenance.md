@@ -1,389 +1,146 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-22
+  date: 2026-11-28
   against:
-    CPSV Editor: "3ba847f"
-    Linked Data Explorer: "fe841f9"
-    RONL Business API: "be0a1f0"
+    CPSV Editor: "4ec37df"
+    Linked Data Explorer: "6ce7df8"
+    RONL Business API: "f267d7a"
+    CPRMV: "ebf7def"
+    Norm Editor: "fed2de3"
 ---
 
 # Build Provenance
 
-!!! info "Verification status"
-    All four implementations were re-checked on **22 November 2026**, against `3ba847f`,
-    `fe841f9` and `be0a1f0`, by reading every workflow that carries the `env:` block — eight
-    files, unchanged in number — and both production backends' `/v1/health`.
+A release number says which version is meant; it does not say which build is running. Deploys are path-filtered and
+can happen without a release, so two environments at the same version can run different code. Each CI build
+therefore stamps the commit SHA and the Actions run number into what it ships, the running application reports them,
+and the deploy waits until it does. Each release also commits a bill of materials (SBOM).
 
-    **The two columns that used to be the odd ones out no longer are.** Until
-    19 September 2026 the CPSV Editor and the Linked Data Explorer handed their build
-    to a vendor container, which put their `env:` block on a different step from the
-    RONL Business API's. All four now build on the runner, so the rule below has one
-    answer rather than two — and the reasoning that produced two is kept, because it
-    is what a repository adopting Static Web Apps will meet by default.
+## How it works
 
-*Answering "which build am I looking at?" from inside the running app*
-
-Every IOU application shows a version in its changelog. That version comes from
-`package.json` or `changelog.json` and is written by hand at release time, so it
-identifies a **release** — not a **build** of that release. Those are not the same
-thing, and the difference matters exactly when something is behaving oddly and the
-first question is whether the environment is even serving what you think it is.
-
-Three cases where a version string cannot answer that:
-
-- **Acceptance and production can serve different builds of the same version**,
-  because they deploy from different branches at different times.
-- **Redeploying unchanged code** produces a new artifact carrying an identical
-  version. Nothing in the running app distinguishes the two.
-- **A release can be rebuilt** after a workflow change, a dependency resolution
-  difference, or a re-run of a failed job — same source, different artifact.
-
-Shipped across three applications in September 2026, and to a fourth — the RONL
-public site — on 10 September 2026. All four have since been exercised in production,
-the last two on 12 September 2026.
-
----
-
-## What it looks like
-
-One recessive monospace line directly beneath the changelog heading:
-
-```
-build 570fd98 · #412
+```mermaid
+flowchart LR
+    C["commit on acc or main"] --> B["CI build stamps sha and run"]
+    B --> FE["frontend bundle: VITE_BUILD_SHA, VITE_BUILD_RUN"]
+    B --> BE["backend artifact: build-info.json"]
+    B --> IMG["CPRMV image: BUILD_SHA, BUILD_RUN, BUILD_RELEASE"]
+    IMG --> ATT["provenance and SBOM attestations in GHCR"]
+    FE --> LINE["build line in the app"]
+    BE --> H["backend health: build"]
+    IMG --> H2["CPRMV health: build, release, digest"]
+    H --> WAIT["deploy waits for build.sha"]
+    H2 --> WAIT
+    LINE --> SITE["this site's page header"]
+    H --> SITE
 ```
 
-The full 40-character SHA sits on the `title` attribute, so it can be copied for a
-lookup without cluttering the display. With nothing injected the line reads
-**`local build`**. It is never blank, and it never resembles a deployed artifact
-when it is not one.
+1. **Stamp.** The deploy workflows pass `github.sha` and `github.run_number` into the build: as `VITE_BUILD_SHA` and
+   `VITE_BUILD_RUN` for a Vite frontend, as a `build-info.json` (`sha`, `run`, `runId`) written into the backend's
+   deployment package, and as Docker build arguments for the CPRMV image.
+2. **Report.** The frontends print a build line, `build <sha7> · #<run>`, in their changelog panel or footer. The
+   backends and CPRMV return the build in their health response.
+3. **Verify the deploy.** The backend deploy workflows of the Linked Data Explorer and the RONL Business API poll the
+   health endpoint until `build.sha` equals the commit they deployed, and fail if it never does. CPRMV's `ci.yml`
+   smoke-tests the image's `/health` against the commit before and after pushing, then waits for the VM to report it.
+4. **Record.** CPRMV's published image carries a signed build-provenance attestation and a BuildKit SBOM attestation.
+   Every release commits a CycloneDX SBOM under `docs/sbom/`.
+5. **Show here.** This site's page header for a component prints the build recorded for it.
 
-### Why two values rather than one
+A build line counts as tracked only when both values are present (CPSV Editor: when the SHA is present). Anything
+else, such as a local development build, reads `local build`. A backend reads its `build-info.json` once, when the
+process starts, so a process that is still serving after a new package is unpacked reports its own build, not the new
+one.
 
-| Value | Answers |
-|---|---|
-| Commit SHA | *What source was built?* |
-| Run number | *Which build of that source is this?* |
+## Per repository
 
-The SHA alone is a **code id**, not a build id — two deployments of the identical
-commit share it. The run number is what makes the pair unique per artifact.
+| Component | Build line in the app | Health endpoint and its build field | Deploy waits for the SHA | Attestation | Release SBOM |
+|---|---|---|---|---|---|
+| CPSV Editor | changelog tab (`ChangelogTab.jsx`) | no backend | no | not in place | `docs/sbom/ttl-editor-<version>.cdx.json` |
+| Linked Data Explorer | frontend changelog (`Changelog.tsx`); the ROPA site has none | `/v1/health` → `build`: `sha`, `shortSha`, `run`, `isTracked`, `label` | yes, backend ACC and PROD (also waits for `shacl.complete`) | not in place | `docs/sbom/linked-data-explorer-<version>.cdx.json` |
+| RONL Business API | frontend changelog panel; public-site footer; the PA demo has none | `/v1/health` → `data.build`: `sha`, `run`, `runId`, or `null` when not recorded | yes, backend ACC and PROD | not in place | `docs/sbom/ronl-business-api-<version>.cdx.json` |
+| CPRMV | no frontend | `/health` → `version` (vocabulary), `release`, `environment`, `build.sha`, `build.run`, `image.digest` | yes, via `deploy-status.json` and `/health` | build provenance (`actions/attest-build-provenance`) and BuildKit SBOM, both stored with the image in GHCR | `docs/sbom/cprmv-api-<release>.cdx.json` |
+| Norm Editor | not found in source | not found in source | no deploy job | not in place | not in place |
 
-**In a called workflow the run number is the caller's.** Since the Linked Data Explorer
-(v2026.09.7) and the RONL Business API (v2026.09.10) deploy production through
-`promote-to-production.yml`, every production build id carries the *promotion's* run
-number, and every deploy in one promotion shares it: on 27 September 2026 the Linked
-Data Explorer's production frontend bundle and its backend's `/v1/health` both read
-`build 4148c9a · #2`, and the RONL Business API's public-site bundle and backend both
-read `2443adc` and `3` — Promote to Production runs #2 and #3. On 22 November 2026 the RONL
-Business API's backend read `1784a72` with run `18`, its latest promotion, of 18 November,
-which deployed the backend, the frontend and the PA demo and skipped the public site. The
-Linked Data Explorer's backend read `build 4e80c74 · #12`, its latest promotion, of that
-morning, which deployed the backend and the frontend and skipped the ROPA site. On 11 October the
-Linked Data Explorer's had read `build 03f48bd · #5`, not its latest promotion, #6 at
-`82f461f`, which carried only the SBOM fix, decided that nothing needed deploying, and
-skipped all three deploys. The pair is still unique
-per promotion, which is what it is for; it now names *which promotion* rather than
-*which execution of that deploy workflow*. Acceptance is unchanged — its workflows are
-not called — and so is the CPSV Editor, whose production workflow still triggers itself
-(its latest run, `Deploy PROD` #116, built `5d6345c` on 21 November 2026).
+The live health endpoints:
 
----
-
-## Half-configured counts as untracked
-
-A run number with no SHA renders `local build`, not `#412`: showing a run number
-with no commit behind it implies a provenance the bundle does not have. A SHA with
-no run number is equally untracked, because it cannot distinguish two builds of one
-commit.
-
-Blank and whitespace-only values are treated as absent, because Vite substitutes an
-empty string rather than `undefined` in some build configurations — without that
-rule the panel renders `build  · #`.
-
-!!! danger "Never derive the SHA from git at build time"
-    No `git rev-parse` in a build script. **A build id that silently fails to resolve is
-    worse than none — it lies.** The values are passed in from the workflow, where they
-    are always available.
-
-    This began as a necessity: until 19 September 2026 two of the applications built
-    inside a vendor container where neither `git` nor `.git` was guaranteed to exist. All
-    four now build on the runner, where `.git` is present — and **the rule stays
-    regardless**, because one source for the build id is the property worth keeping, not
-    the container that forced it. The CPSV Editor's workflow says exactly that in a
-    comment beside the `env:` block.
-
----
-
-## The same feature, four implementations
-
-The module and its tests ported unchanged. Everything else had to be re-derived per
-**deployable**, which is not the same as per repository — see the fourth column.
-
-| | CPSV Editor | RONL Business API (frontend) | RONL Business API (public site) | Linked Data Explorer |
-|---|---|---|---|---|
-| Language | JavaScript | TypeScript | TypeScript | TypeScript |
-| Tests | 5 | 8 | 8, plus 4 on the footer | 8 |
-| Monorepo | no | yes (`packages/frontend`) | yes (`packages/public-site`) | yes (`packages/frontend`) |
-| Surface | changelog tab | lazily-loaded changelog drawer | site footer — no changelog | changelog full page |
-| **Who builds** | **the runner** (Oryx, until 19 Sep 2026) | **the runner** | **the runner** | **the runner** (Oryx, until 19 Sep 2026) |
-| **`env:` goes on** | **build step** (deploy step, until 19 Sep 2026) | **build step** | **build step** | **build step** (deploy step, until 19 Sep 2026) |
-| String lands in | lazy chunk `ChangelogTab-*.js` | lazy chunk `ChangelogPanelContent-*.js` | main `index-*.js` | main `index-*.js` |
-
-The **Surface** row was called *Changelog UI* while every adopter had a changelog.
-The public site has none: it is a citizen-facing site whose foot already carried its
-origin and version, so the build id joins them on that line rather than acquiring a
-panel of its own. Step 4 of the checklist below — match the existing layout — is what
-decides this, and it is why the module ports but the markup never does.
-
-### Where the `env:` block goes, and why it moves
-
-This is the single most important difference, and getting it wrong produces a change
-that **passes every test and puts nothing in the artifact**.
-
-The rule is not per-repository preference, and it is not per-repository at all — it
-follows directly from *who runs the build*, which is a property of a **workflow**.
-RONL Business API is the proof: its frontend and its public site live in one
-repository, are built by two separate pairs of workflows, and could perfectly well
-have answered this question differently. They do not, but nothing about sharing a
-repository guaranteed that. Read `skip_app_build` in the workflow you are editing;
-do not infer it from a sibling package.
-
-**Where the runner builds, the variables go on the build step** — which, since
-19 September 2026, is all four. Each runs its build as a step of its own and passes
-`skip_app_build: true` to the Static Web Apps action, which then only uploads
-`dist/`:
-
-```yaml
-- name: Build frontend for ACC
-  working-directory: packages/frontend
-  env:
-    VITE_BUILD_SHA: ${{ github.sha }}
-    VITE_BUILD_RUN: ${{ github.run_number }}
-  run: npm run build:acc
-```
-
-**Where Oryx builds, they go on the deploy step instead.** No workflow in these
-repositories is in this shape any more — `app_build_command` appears nowhere in any of
-the three — but it is the default a new Static Web Apps workflow arrives in, and it is
-what the CPSV Editor and the Linked Data Explorer looked like until 19 September 2026.
-There is no build step at all; the action builds inside its own container and forwards
-the runner's environment into it:
-
-```yaml
-- name: Build And Deploy
-  uses: Azure/static-web-apps-deploy@<pinned-sha> # v1
-  env:
-    VITE_BUILD_SHA: ${{ github.sha }}
-    VITE_BUILD_RUN: ${{ github.run_number }}
-  with:
-    app_location: '/packages/frontend'
-    output_location: 'dist'
-    app_build_command: 'npm run build:acc'
-```
-
-Whether Oryx forwards the runner's environment into its container **could not be
-answered locally**. It was settled by a deployed preview.
-
-!!! note "`skip_app_build` is the tell, and it is the same flag that governs pinning"
-    A workflow that sets `skip_app_build: true` builds on the runner; one that
-    does not hands the build to Oryx. That single flag decides which step the `env:`
-    block belongs on — and it is the same flag that decides whether lockfile
-    integrity covers what ships or only what is tested. See
-    [Supply-Chain Pinning](supply-chain.md#what-this-does-not-protect), where it
-    appears for the second reason.
-
-    Read it in **the workflow you are editing**, not in a sibling and not in this page:
-    the Linked Data Explorer sets it in both frontend workflows and in neither
-    `ropa-site` workflow, which is correct — that package is static files with no build
-    and so no `env:` block to place.
-
-### Vite specifics
-
-The `VITE_` prefix is **not optional** — Vite exposes only variables carrying its
-`envPrefix` to `import.meta.env`, and anything else is invisible to the bundle. A
-Create React App project would need `REACT_APP_` and `process.env`; Next.js would
-need `NEXT_PUBLIC_`.
-
-Vite merges `VITE_`-prefixed variables from `process.env` **over** the mode file
-(`.env.acceptance`, `.env.production`). No env file needs editing, and none of the
-three repositories defines these variables in one — CI is deliberately the only
-source, so every local run falls through to `local build`.
-
----
-
-## Two implementation decisions worth keeping
-
-**A separate module, not logic in the component.** The fallback rules become
-testable without rendering anything; most of each test file exercises paths that
-would otherwise need a mounted component.
-
-**Read the environment *inside* the function, never at module scope.** This is the
-one that bites:
-
-```ts
-const SHA = import.meta.env.VITE_BUILD_SHA; // ← evaluated once, at import
-```
-
-A module-scope capture is evaluated a single time when the module is first imported
-and cannot be stubbed per test afterwards, which makes the fallback path untestable
-without `vi.resetModules` gymnastics. Reading inside the function lets `vi.stubEnv`
-and `vi.unstubAllEnvs` work cleanly.
-
----
-
-## Verifying it
-
-A build-time injection is precisely the kind of change that passes unit tests and
-ships an artifact containing nothing. **Unit tests alone are insufficient.**
-
-**Build both directions and grep the whole of `dist/`** — not just the entry bundle.
-In RONL Business API the changelog is deliberately code-split, so the string lands
-in a `ChangelogPanelContent-*.js` chunk; grepping only `index.js` returns nothing
-and looks exactly like failure. Confirm the chunk hash changes between the two
-builds — if it does not, the second build did not run.
-
-**The CPSV Editor joined it in v2026.09.2**, when its four heaviest tabs were
-lazy-loaded to cut the entry chunk from 685.71 to 392.74 kB. `ChangelogTab` is one of
-them and the only importer of the build-info module, so the string moved out of the main
-bundle into `ChangelogTab-*.js` — and this page's comparison table went on saying *main
-bundle* for two releases, because nothing about a correct build id changed. Confirmed on
-11 September 2026 with a marker build of v2026.09.4: the injected SHA and run number
-appear in `dist/assets/ChangelogTab-*.js` and nowhere else. **A code-splitting change
-elsewhere in the app moves where to grep**, which is one more reason to grep all of
-`dist/`.
-
-**Grep for the injected values, not the rendered label.** `build 570fd98 · #412` is
-assembled at runtime from `` `build ${shortSha} · #${run}` ``, so that string is in no
-artifact, however correct the build. What ships is the **full** SHA and the run
-number as two separate literals, next to the template. Searching for the label a
-user would read returns nothing on a perfectly good build and looks exactly like the
-failure this check exists to catch.
-
-**Check the exit code, not a grep of the output.** Grepping for `PASS`/`FAIL` misses
-failure modes the chosen pattern does not match. A command either succeeded or it
-did not, and no pattern can filter that away. Watch the same trap in shell chains: a
-failed `cd` in `cd dir && npm run lint` means lint never ran, and the non-zero exit
-is the `cd`. That produced a false "clean build" reading during development — the
-build never executed and the grep examined the *previous* build's `dist/`.
-
-**Then check the deployed preview.** Only that proves the workflow `env:` block
-reaches the builder; the local greps prove the code path and nothing more.
-
-### `github.sha` on a pull request is not a commit in your branch
-
-On a pull request, `github.sha` is **the merge commit GitHub synthesises**, not the
-head of the branch. The SHA shown on a preview deployment therefore matches no
-commit in the branch history and cannot be found with `git log`.
-
-This is correct — that synthesised commit is genuinely what got built — but it will
-be reported as a bug unless the pull request says so. On a push to an integration
-branch, `github.sha` is the real commit. Observed:
-
-| | Preview (synthesised) | After merge (real commit) |
+| Component | ACC | PROD |
 |---|---|---|
-| RONL Business API (frontend) | `build 1224298 · #265` | `build 66940d9 · #266` |
-| RONL Business API (public site) | `build 34002e8 · #76` | `build 0068444 · #77` |
-| Linked Data Explorer | `build b669689 · #186` | `build 9db0ab3 · #188` |
+| Linked Data Explorer | `https://acc.backend.linkeddata.open-regels.nl/v1/health` | `https://backend.linkeddata.open-regels.nl/v1/health` |
+| RONL Business API | `https://acc.api.open-regels.nl/v1/health` | `https://api.open-regels.nl/v1/health` |
+| CPRMV | `https://acc.cprmv.open-regels.nl/health` | `https://cprmv.open-regels.nl/health`, and `/deploy-status.json` |
 
-The public-site pair was **read out of the deployed bundles**, not derived from the
-workflow runs: fetch the page, follow its `/assets/index-*.js`, and the two injected
-literals sit next to the template that renders them. That is worth doing once per
-adopter, because it is the only check that distinguishes "the workflow ran green"
-from "the values reached the artifact".
+On the verified date each of these reported the pinned `acc` or `main` head as its `build.sha`.
 
----
+In production, the Linked Data Explorer and the RONL Business API deploy every part of a promotion as jobs of one
+`Promote to Production` run ([Branches & Promotion](branch-protection.md)), so the backend and the frontends report the
+same run number. The Linked Data Explorer's backend writes `runId` into `build-info.json` but does not return it.
 
-## Known gaps
+### CPRMV's image
 
-- **Production has now run in all four.** All eight workflow files carry the
-  `env:` block. Two applications promoted v2026.09.2 to `main` on 9 September 2026 and
-  both production workflows ran green:
+The `publish` job of `ci.yml` builds `ghcr.io/open-regels/cprmv-api` with `BUILD_SHA`, `BUILD_RUN` and `BUILD_RELEASE`
+(from `serve_api/RELEASE`), sets the OCI label `org.opencontainers.image.revision` to the SHA, and tags it
+`sha-<commit>` and `acc` or `stable`; on `main` also `:<vocabulary>` and `:vYYYY.MM.N`. It pushes with `sbom: true`,
+re-runs the `/health` smoke test against the pushed digest, and attests build provenance for that digest
+(`push-to-registry: true`). The VM's reconciler pulls `sha-<commit>`, resolves it to a digest, and passes the digest to
+the container as `CPRMV_IMAGE_DIGEST`, which `/health` returns. `deploy-status.json` reports the target and running
+SHA, the running digest and the last attempt.
 
-    | | Commit | Run | Changelog should read |
-    |---|---|--:|---|
-    | CPSV Editor (*Deploy PROD*) | `bbda389` | 88 | `build bbda389 · #88` |
-    | Linked Data Explorer | `007b350` | 39 | `build 007b350 · #39` |
+### Norm Editor
 
-    The CPSV Editor has promoted twice more since, both on 11 September: v2026.09.3 as
-    `build f7e127a · #92` and v2026.09.4 as **`build f5bae6a · #94`**, each from
-    *Deploy PROD (white-sky)*. Two more followed: v2026.09.5 on 15 September as
-    `build e1c482e · #97`, from the run, and v2026.09.6 on 19 September as
-    **`build 2723db1 · #100`** — read out of the deployed bundle, where the lazy
-    `ChangelogTab-*.js` chunk carries the full SHA and `100` as Vite emitted them,
-    template literals rather than quoted strings.
+`.gitlab-ci.yml` tags each of its six images with `CI_COMMIT_SHA` and `latest` in Azure Container Registry, on
+`main`, `develop` and tags. That is the only build identifier it records; no build line, health field, attestation or
+SBOM was found.
 
-    The Linked Data Explorer has promoted twice more since, both on 11 September:
-    v2026.09.3 as `build 35a44f8 · #41` and v2026.09.4 as **`build be6bc54 · #44`**,
-    each from *Deploy Frontend to Production*. The gaps in the run numbers are the
-    pull-request runs of the same workflow, which build previews rather than
-    production. v2026.09.4 is also the first promotion under the widened `paths:`
-    filter, where a change to the root lockfile alone redeploys the frontend.
+## Release SBOMs
 
-    Its v2026.09.5 promotion on 19 September 2026 is **`build ec4792f · #51`** — and
-    that one was read out of the deployed bundle rather than derived from the run: the
-    production `/assets/index-*.js` carries `"ec4792f09c289f8fee6c68da5184fd775a27ccc9"`
-    and `"51"` as the two injected literals.
+`sbom.yml` (`Release SBOM`) runs on a push to `main`, on demand, and on pull requests that touch the SBOM tooling or
+`docs/sbom/`. There are no git tags or GitHub Releases: the commit on `main` is the release.
 
-    Of those four strings, two were **read off the running application** — the CPSV
-    Editor's `build bbda389 · #88` and the Linked Data Explorer's `build 007b350 · #39`,
-    both confirmed by eye on 9 September. The later ones are derived from the workflow
-    runs, which is the weaker check: it distinguishes *the workflow ran green* from
-    nothing at all, where a glance at the application distinguishes it from *the values
-    reached the artifact*.
+| Step | What it checks |
+|---|---|
+| Release pull request (the one that changes this version's SBOM file) | the committed SBOM matches the lockfile exactly (`--check`) |
+| Promotion (push to `main`) | the SBOM for the released version exists; drift is a warning (`--verify-release`) |
+| Every run | generates the SBOM and uploads it as artifact `sbom-<sha>`, kept 90 days |
 
-    **The RONL Business API closed its own gap on 12 September 2026.** Its frontend
-    production workflow had last run on 17 July, before this feature existed, and its
-    public site had never had a production run at all. Its promotion of v2026.09.6 that
-    morning exercised both at once, and both were confirmed by eye rather than inferred:
+The committed file is the durable copy; the artifact is for a scanner to fetch without a checkout. The applications
+generate it with `scripts/write-sbom.mjs` (production dependencies, from the lockfile); CPRMV with
+`scripts/write-sbom.py` (the hash-locked `serve_api/requirements.txt`, via `cyclonedx-py`). CPRMV's Debian packages
+are in the BuildKit SBOM attestation, not in the committed file. `/bump-release` writes the file: `npm run sbom`, then
+`npm run sbom:check`, in the applications; `python scripts/write-sbom.py` in CPRMV.
 
-    | | Commit | Run | Read on the running application |
-    |---|---|--:|---|
-    | RONL Business API (frontend) | `04840ed` | 12 | `build 04840ed · #12` in the caseworker changelog |
-    | RONL Business API (public site) | `04840ed` | 2 | `publiek.open-regels.nl · v2026.09.6 · build 04840ed · #2` in the footer |
+## This site's header
 
-    Two details from that first run are worth carrying to the next adopter. **The same
-    commit produced two different run numbers**, 12 and 2, because the run number counts
-    executions of a workflow and not commits — which is exactly why the pair is a pair.
-    That was true of every deploy until the promotion workflows; since then the
-    production deploys of one promotion share its run number, as above.
-    And **the public site's footer is client-rendered**, so grepping the prerendered HTML
-    for the string finds nothing and reads as failure; the check is the rendered page, or
-    the injected literals inside `/assets/index-*.js`.
+`docs/repo-versions.json` may record, per component, a `build` object: `sha`, `run` and `run_url`, the build that was
+serving the recorded environment at the recorded commit. `hooks/repo_versions.py` loads the file at build time and
+`overrides/partials/doc-meta.html` prints it in the header of a component page as `build <sha> · #<run>`, linked to
+the run, beside the version (and, for CPRMV, the vocabulary version). A reader can compare it with the build line or
+health response of the running application. The recorded value is set when the documentation is synced; the site
+build does not query any endpoint.
 
-    The promotion of v2026.09.7 the same afternoon moved both on again, to run 13 and run
-    3 at `311d732`.
-- **The line describes the frontend bundle being viewed**, not the backend behind it.
-  A backend needs its own answer, and the Linked Data Explorer's backend has one since
-  v2026.09.5: `/v1/health` reports a `build` block with **the same shape and
-  semantics** as the frontend's `BuildInfo` — tracked only when both SHA and run are
-  present, `local build` otherwise, never affecting `status`. The identity travels in a
-  `deploy/build-info.json` both backend workflows write into the artifact, **not** in
-  an App Service setting, because settings persist across deploys and can describe a
-  build that is no longer the one running. The post-deploy check then waits until
-  `build.sha` equals the deployed commit, so a deploy that left the previous artifact
-  serving fails instead of passing. On 19 September 2026 production's backend reported
-  `build ec4792f · #19` — the same commit as its frontend, from a different workflow,
-  with a different run number, for the reason given above. The RONL Business API's
-  backend has had the same since v2026.09.10: `build-info.json` written by both backend
-  workflows (`sha`, `run`, `runId`), reported under `data.build` in its wrapped
-  `/v1/health`, and a post-deploy loop that fails unless `build.sha` equals the deployed
-  commit.
+Cross-cutting pages such as this one carry a `verified` stamp instead: the commit of each component the page was last
+checked against, linked to the repository where that component's CI runs (GitHub for all but the Norm Editor), where
+the deploy runs for that commit are listed.
 
----
+## What it does not cover
 
-## Adding this to another application
+- **No attestations for the three applications.** Their artifacts (Static Web App bundles, App Service packages) are
+  not signed or attested; the build line and `build-info.json` are unsigned values set by the workflow.
+- **Pull request builds stamp a synthetic SHA.** On a pull request `github.sha` is the merge commit GitHub creates,
+  not a commit on the branch.
+- **Not every surface has a build line**: the Linked Data Explorer's ROPA site and the RONL Business API's PA demo do
+  not stamp one.
+- **The CPSV Editor's deploy does not verify which build is serving.**
+- **The Norm Editor** records only the image tag.
+- **The application SBOMs cover npm dependencies**, not the runtime or the hosting platform.
 
-The fourth adopter, the RONL public site, followed these six steps exactly as they
-were written here and needed no deviation. Step 2 was again the one that decided
-everything, and step 4 was the one that produced a visibly different result.
+## Where it lives
 
-1. **Confirm the bundler first.** `VITE_` and `import.meta.env` are Vite-specific.
-2. **Find out who builds** — the runner, or a container the deploy action owns. This
-   decides which step the `env:` block belongs on, and it is the decision most likely
-   to be wrong. `skip_app_build` is the tell.
-3. **Port the `buildInfo` module and its tests unchanged.** This part genuinely
-   transfers.
-4. **Match the existing changelog layout** rather than importing another
-   application's markup.
-5. **Verify with real builds in both directions**, grepping all of `dist/`.
-6. **Confirm on the deployed preview.** Nothing local substitutes for it.
+| What | Where |
+|---|---|
+| Frontend build line | `src/utils/buildInfo.js` (CPSV Editor); `packages/frontend/src/utils/buildInfo.ts` (LDE, RBA); `packages/public-site/src/lib/buildInfo.ts` (RBA) |
+| Backend build | `packages/backend/src/utils/buildInfo.ts` and `routes/health.routes.ts` (LDE); `packages/backend/src/utils/build-info.ts` and `routes/health.routes.ts` (RBA) |
+| Stamping and the SHA wait | the `azure-*` deploy workflows: `VITE_BUILD_*` on the build step, "Prepare deployment package" writes `build-info.json` |
+| CPRMV | `.github/workflows/ci.yml`, `serve_api/Dockerfile`, `serve_api/src/serve.py` (`/health`), `scripts/smoke-health.sh`, `deployment/vm/reconciler/reconcile.sh` |
+| SBOMs | `.github/workflows/sbom.yml`, `scripts/write-sbom.mjs` or `scripts/write-sbom.py`, `docs/sbom/` |
+| This site | `docs/repo-versions.json`, `hooks/repo_versions.py`, `overrides/partials/doc-meta.html` |

@@ -2,7 +2,7 @@
 scope: cross-cutting
 ---
 
-# Controles in één oogopslag
+# Maatregelen in één oogopslag
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
@@ -15,12 +15,8 @@ scope: cross-cutting
 
 ---
 
-## Wat waar wordt afgedwongen
+## The matrix
 
-## Wat de rulesets daadwerkelijk vereisen
+## Legend
 
-## Waar ze verschillen, en waarom
-
-## De vierde en vijfde component
-
-## De pagina's achter de tabel
+## What none of these cover

@@ -594,7 +594,7 @@ at 98% branches, from 45.73% at v2026.09.1.
     80.55% on branches but **71.62% statements and 63.33% functions**;
     `App.jsx` reads 84.70% / 80.49% / **64.91%**. The uncovered code there is
     largely whole handlers no test calls. That asymmetry is why a functions floor
-    is [a separate decision](../../contributing/coverage-floor.md#a-functions-floor-is-a-separate-decision)
+    is [a separate decision](../../contributing/coverage-floor.md#coverage-floors)
     rather than a free companion setting.
 
 ---
