@@ -1,215 +1,104 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-22
+  date: 2026-11-28
   against:
-    CPSV Editor: "3ba847f"
-    Linked Data Explorer: "fe841f9"
-    RONL Business API: "be0a1f0"
+    CPSV Editor: "4ec37df"
+    Linked Data Explorer: "6ce7df8"
+    RONL Business API: "f267d7a"
+    CPRMV: "ebf7def"
+    Norm Editor: "fed2de3"
 ---
 
-# Contributing to IOU Architecture
+# Contributing
 
-The IOU Architecture Framework is an open-source project published under the
-[European Union Public Licence v1.2 (EUPL-1.2)](https://eupl.eu/1.2/en/). Contributions
-of any kind — documentation improvements, bug reports, feature suggestions, or code — are
-welcome from everyone.
+This section describes how the five IOU repositories are built, checked and released as they are now: which branch a
+change goes into, which checks must pass before it merges, how it reaches acceptance and production, and what each
+build records. Each mechanism has its own page; [Controls at a Glance](controls.md) shows all of them side by side.
 
----
+## The repositories
 
-## Code of Conduct
+| Component | Repository | CI runs on | Branches | Issues | Release numbering |
+|---|---|---|---|---|---|
+| CPSV Editor | [sgort/ttl-editor](https://github.com/sgort/ttl-editor) | GitHub Actions | `acc`, `main` | [GitHub](https://github.com/sgort/ttl-editor/issues) | CalVer `YYYY.MM.N` |
+| Linked Data Explorer | [sgort/linked-data-explorer](https://github.com/sgort/linked-data-explorer) | GitHub Actions | `acc`, `main` | [GitHub](https://github.com/sgort/linked-data-explorer/issues) | CalVer `YYYY.MM.N`, one sequence for all packages |
+| RONL Business API | [sgort/ronl-business-api](https://github.com/sgort/ronl-business-api) | GitHub Actions | `acc`, `main` | [GitHub](https://github.com/sgort/ronl-business-api/issues) | CalVer `YYYY.MM.N` |
+| CPRMV | [open-regels/cprmv](https://github.com/open-regels/cprmv) | GitHub Actions; GitLab CI publishes the ReSpec only | `acc`, `main` | [GitHub](https://github.com/open-regels/cprmv/issues) | release `vYYYY.MM.N` beside a vocabulary version |
+| Norm Editor | [regels/editor](https://git.open-regels.nl/regels/editor) (GitLab) | GitLab CI | `main` | [GitLab](https://git.open-regels.nl/regels/editor/-/issues) | git tags `YYYY.MM.N`, plus a SemVer version per service |
 
-This project adheres to the principles of the
-[Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
-By participating you agree to uphold these principles:
+`acc` is the default branch of the four GitHub repositories; `main` is production. The three applications and CPRMV
+keep a copy on `git.open-regels.nl` that is pushed by hand ([The GitLab Mirror](the-gitlab-mirror.md)); issues and
+pull requests go to GitHub. Every IOU component is moving to the `open-regels` GitHub organisation; CPRMV is there
+already.
 
-- **Be respectful and inclusive.** Treat all participants with dignity regardless of background,
-  experience level, gender, ethnicity, religion, or nationality.
-- **Assume good faith.** Interpret ambiguous contributions charitably and ask for clarification
-  before escalating concerns.
-- **Be constructive.** Feedback should focus on the work, not the person. Offer concrete
-  suggestions rather than criticism alone.
-- **Respect the scope.** Keep discussions on-topic for the project. Off-topic, harassing, or
-  abusive behaviour will not be tolerated.
+## How a change travels
 
-Violations can be reported confidentially to [steven.gort@ictu.nl](mailto:steven.gort@ictu.nl).
-All reports will be handled with discretion and care.
-
----
-
-## Repositories
-
-Each component of the IOU Architecture ecosystem lives in its own repository — but
-not all on the same host, and for the application repositories the difference
-decides where a contribution lands.
-
-| Component | Developed on | Mirror | Issues |
-|---|---|---|---|
-| IOU Architecture Docs | [sgort/iou-architectuur](https://github.com/sgort/iou-architectuur) — GitHub Actions | [showcases/iou-architectuur](https://git.open-regels.nl/showcases/iou-architectuur) | [Issues](https://github.com/sgort/iou-architectuur/issues) |
-| RONL Business API | [sgort/ronl-business-api](https://github.com/sgort/ronl-business-api) — GitHub Actions | [hosting/ronl-business-api](https://git.open-regels.nl/hosting/ronl-business-api) | [Issues](https://github.com/sgort/ronl-business-api/issues) |
-| Norm Editor | [regels/editor](https://git.open-regels.nl/regels/editor) — GitLab CI | — | [Issues](https://git.open-regels.nl/regels/editor/-/issues) |
-| CPSV Editor | [sgort/ttl-editor](https://github.com/sgort/ttl-editor) — GitHub Actions | [showcases/ttl-editor](https://git.open-regels.nl/showcases/ttl-editor) | [Issues](https://github.com/sgort/ttl-editor/issues) |
-| Linked Data Explorer | [sgort/linked-data-explorer](https://github.com/sgort/linked-data-explorer) — GitHub Actions | [hosting/linked-data-explorer](https://git.open-regels.nl/hosting/linked-data-explorer) | [Issues](https://github.com/sgort/linked-data-explorer/issues) |
-| CPRMV API | [standards/cprmv](https://git.open-regels.nl/standards/cprmv) — GitLab CI | — | [Issues](https://git.open-regels.nl/standards/cprmv/-/issues) |
-
-**All three application repositories are developed on GitHub** — pull
-requests, issues, and every CI gate described under
-[Code Standards](code-standards.md) and [Supply-Chain Pinning](supply-chain.md) run
-there — and are mirrored by hand to the
-[open-regels.nl GitLab instance](https://git.open-regels.nl). Open issues and pull
-requests on GitHub; the mirror has no CI and runs none of those gates. On 11
-September 2026 the CPSV Editor's and the Linked Data Explorer's GitHub trackers held 12
-and 10 issues, the GitLab ones 1 and 2; the RONL Business API's held 20 open issues on 12
-September 2026, and the issue numbers its changelog cites are GitHub's.
-
-**This site's issue tracker moved to GitHub on 12 September 2026**, so all four now keep
-issues and pull requests in the same place. The
-[GitLab tracker](https://git.open-regels.nl/showcases/iou-architectuur/-/issues) keeps the
-57 issues it held on 11 September and receives no new ones; open anything further on
-GitHub, beside the pull request that will close it. The split that preceded this — pull
-requests on one host, issues on the other — cost a decision its context every time.
-
-Since 12 September 2026 each of the three checks its mirror at every release, with
-`scripts/check-mirror.sh` called from `/bump-release`, and since 10 October 2026 the
-mirror is pushed at a release rather than after every merge, so between releases it lags.
-The check reports and never pushes — see
-[Supply-Chain Pinning — the GitLab mirror](the-gitlab-mirror.md).
-This site cuts no releases, so its own mirror does not wait for one: since
-15 November 2026 it is fast-forwarded at every housekeeping after a merged pull request,
-`acc` and `main` alike, and on 22 November both its branches matched GitHub's.
-The Norm Editor and the CPRMV API are developed on GitLab, where their pipelines run.
-
-For component-specific development setup, refer to each component's Developer Docs:
-
-- [RONL Business API — Local Development](../ronl-business-api/developer/local-development.md)
-- [Norm Editor — Local Development](../norm-editor/developer/local-development.md)
-- [CPSV Editor — Local Development](../cpsv-editor/developer/local-development.md)
-- [Linked Data Explorer — Local Development](../linked-data-explorer/developer/local-development.md)
-- [CPRMV API — Local Development](../cprmv-api/developer/local-development.md)
-
----
-
-## How to Contribute for Users
-
- [Submit a use case →](../../use-case-form.html){ .md-button .md-button--primary }
-
-## How to Contribute for Developers
-
-There are two equally valid routes into development, depending on the tooling you have
-to hand. **Maintainers and core contributors** working with the AI-assisted pipeline
-should follow the [Development Workflow](development-workflow/overview.md) subsection.
-**Contributors working from a fork** should use the fork-and-merge-request process
-below, which is the complete and correct route into the project regardless of which
-repository you're contributing to.
-
-### 1. Open an issue first
-
-Before starting any significant work, open an issue in the relevant repository to describe
-what you intend to do. This avoids duplicate effort and allows early feedback. For small
-corrections (typos, broken links, formatting) you can skip straight to the pull or merge
-request.
-
-**Open it where the repository lives**, which the table above gives per component: the
-three applications and this site take issues and pull requests on **GitHub**; the Norm
-Editor and the CPRMV API take issues and merge requests on **GitLab**. The steps below are
-the same on both hosts — where they say *merge request*, read *pull request* on GitHub.
-
-### 2. Fork the repository
-
-Fork the relevant repository to your own account or namespace on the host it lives on.
-
-### 3. Create a feature branch
-
-Always work on a dedicated branch, never directly on `main` or `acc`.
-
-```bash
-git checkout acc                          # start from the acceptance branch
-git pull origin acc                       # make sure it is up to date
-git checkout -b feature/your-topic-name  # create your feature branch
+```mermaid
+flowchart TD
+    A["Feature branch from acc"] --> B["Pull request into acc"]
+    B --> C{"Required checks green?"}
+    C -->|no| A
+    C -->|yes| D["Merge commit on acc"]
+    D --> E["ACC deploy"]
+    E --> F["Person checks the change on ACC"]
+    F --> G["Release pull request into acc (bump-release)"]
+    G --> H["Promotion pull request acc to main"]
+    F -.->|"promotion without a release"| H
+    H --> I{"audit and scan green?"}
+    I -->|yes| J["Merge commit on main"]
+    J --> K["PROD deploy"]
+    J --> L["GitLab mirror pushed, at a release"]
 ```
 
-Branch naming convention:
+1. **Feature branch.** Work starts on a branch from `acc`; nothing is committed to `acc` or `main` directly. See
+   [Branches & Promotion](branch-protection.md).
+2. **Pull request into `acc`.** A ruleset makes the pull request the only way in and names the checks that must pass:
+   the supply-chain `audit`, the Semgrep `scan`, the `lockfile-review` ([Pinning](supply-chain.md),
+   [Dependencies](dependency-scanning.md)) and the deploy workflows' build jobs, which run lint, type checks and the
+   unit suites under a per-file coverage floor ([Tests & Coverage Gates](coverage-floor.md),
+   [Code Standards & Hooks](code-standards.md)). CPRMV requires `audit`, `scan`, `test` and `build`. In the three
+   applications, git hooks run lint and format before the push.
+3. **ACC deploy.** The merge pushes `acc`, which fires the acceptance deploys. Each build stamps its commit and run
+   number, and the backend deploys wait until `/health` reports that commit ([Build Provenance](build-provenance.md)).
+4. **Check on ACC.** A person checks the change in the acceptance environment. No ruleset or workflow records that
+   check.
+5. **Release.** `/bump-release` sets the version, writes the release SBOM and lands both through another pull request
+   into `acc` ([Branches & Promotion](branch-protection.md#releases), [Build Provenance](build-provenance.md#release-sboms)).
+6. **Promotion pull request.** A pull request from `acc` into `main`, which requires `audit` and `scan` (CPRMV: also
+   `test` and `build`) ([Branches & Promotion](branch-protection.md#what-blocks-a-merge)).
+7. **PROD deploy.** The merge pushes `main`, which fires the production deploy; it runs lint and the suites again
+   before it builds ([Branches & Promotion](branch-protection.md#deploys-per-branch)).
+8. **GitLab mirror.** At a release, `acc` and `main` are fast-forwarded to GitLab by hand; for CPRMV the push of
+   `main` publishes the ReSpec ([The GitLab Mirror](the-gitlab-mirror.md)).
 
-| Prefix | Use for |
-|---|---|
-| `feature/` | New content or functionality |
-| `fix/` | Corrections and bug fixes |
-| `docs/` | Documentation-only changes |
-| `refactor/` | Restructuring without content change |
+In CPRMV, `/bump-release` runs steps 5 to 8 itself, opening each pull request for a person to merge. The Norm Editor
+has no `acc` branch: its pipeline runs tests and builds images on `main`, Maintainers can push to `main` directly, and
+no pipeline result blocks a merge ([Code Standards & Hooks](code-standards.md#the-norm-editor-is-shaped-differently)).
 
-### 4. Make your changes
+How a piece of work is designed, planned and handed over before step 1 is on
+[Development Workflow](development-workflow/overview.md).
 
-Run the documentation site locally while you work:
+## Where to read next
 
-```bash
-python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-mkdocs serve
-```
+1. [Controls at a Glance](controls.md): every control, per repository, in one matrix.
+2. [Branches & Promotion](branch-protection.md): rulesets, required checks, deploys and releases.
+3. [Pinning](supply-chain.md): actions, images, lockfiles and toolchains, and Renovate.
+4. [Dependencies](dependency-scanning.md): the lockfile review, the dependency register, audits, Semgrep.
+5. [Tests & Coverage Gates](coverage-floor.md): which suites run where, and the coverage floor.
+6. [Code Standards & Hooks](code-standards.md): lint, format, type checks and git hooks.
+7. [Build Provenance](build-provenance.md): build ids, `/health`, attestations and release SBOMs.
+8. [The GitLab Mirror](the-gitlab-mirror.md): which repositories mirror, and when.
+9. [ICTU Dependency Guideline](ictu-dependency-guideline.md): the eleven recommendations and today's scores.
+10. [Development Workflow](development-workflow/overview.md): from design to promotion.
+11. [Working with Claude Code](development-workflow/working-with-claude-code.md): plugins, skills and working
+    boundaries.
+12. [Documentation Architecture](doc-architecture/overview.md): how this site is built and deployed.
 
-The site is then available at `http://127.0.0.1:8000/`.
+## Licence and contact
 
-For every English page you add or change, also update the corresponding Dutch placeholder
-under `docs/nl/`. Dutch placeholders use an info admonition linking back to the English
-source — see any existing file under `docs/nl/` for the correct format.
+The IOU Architecture Framework is published under the
+[European Union Public Licence v1.2 (EUPL-1.2)](https://eupl.eu/1.2/en/), and participation follows the
+[Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/). Questions,
+and conduct reports in confidence, go to Steven Gort (ICTU), [steven.gort@ictu.nl](mailto:steven.gort@ictu.nl).
 
-### 5. Commit your changes
-
-Follow the
-[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification:
-
-```
-docs: add troubleshooting section to LDE user guide
-fix: correct broken link in CPSV Editor overview
-feat: add CPRMV API authentication reference page
-```
-
-### 6. Open a merge request
-
-Push your branch to your fork and open a merge request against the `acc` branch of the
-upstream repository.
-
-```bash
-git push origin feature/your-topic-name
-```
-
-In the merge request description:
-
-- Reference the related issue (`Closes #123`)
-- Briefly describe what changed and why
-- Note any follow-up work that is out of scope for this MR
-
-Merge requests are reviewed by the maintainer. Feedback is given directly in the MR thread.
-Once approved, the maintainer merges into `acc` and promotes to `main` as part of the regular
-release cycle.
-
-[Read Code Standards →](code-standards.md)
-
-!!! warning "`acc` is protected in all three applications"
-    In the CPSV Editor, the Linked Data Explorer and the RONL Business API, `acc` requires
-    a pull request with no bypass actors — a direct `git push origin acc` is rejected —
-    plus a passing `audit`, a passing `scan`, since 19 September 2026 that
-    repository's build and deploy checks, and since 6 October 2026 `lockfile-review`. In practice that means **a merge request whose
-    tests fail cannot be merged into `acc`**.
-
-    All three also gate `main` (the CPSV Editor since 30 September 2026), each with a
-    ruleset requiring a pull request plus `audit` and `scan`: **fewer** checks than `acc`,
-    not the same ones — no `main` requires a build or a test anywhere. In the Linked Data
-    Explorer and the RONL Business API, production is deployed by a promotion workflow on
-    the push to `main`, not on the pull request. See
-    [Branch Protection](branch-protection.md) for what each branch requires, and the
-    [controls index](controls.md) for where every control holds.
-
----
-
-## Contact
-
-For questions, feature requests, or anything else related to the IOU Architecture that does
-not fit an issue, you can reach the project maintainer directly:
-
-**Steven Gort — ICTU**  
-[steven.gort@ictu.nl](mailto:steven.gort@ictu.nl)
-
----
-
-*Licensed under [EUPL-1.2](https://eupl.eu/1.2/en/).*
+Not a developer? [Submit a use case →](../../use-case-form.html){ .md-button .md-button--primary }

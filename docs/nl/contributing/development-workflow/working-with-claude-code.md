@@ -15,14 +15,14 @@ scope: cross-cutting
 
 ---
 
-## The plugin set
+## Approval points
 
-## Session memory
+## Plugins
 
-## Inline versus superpowers
+## Project commands and skills
 
-## Subagent-driven development
+## Working boundaries
 
-## Red/green test-driven development
+## What it does not cover
 
-## What this means for a contributor
+## Where it lives

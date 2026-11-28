@@ -1283,6 +1283,14 @@ Then stop for approval, as in Stage 2.
 Apply the page corrections, the stamps (today's date, the three pinned heads,
 naming only components you actually re-checked on that page), the new entry, and
 the `last_patch` record (Stage 3 step 11).
+**Roll the narrative window on `contributing/ictu-dependency-guideline.md`:** its
+"What moved in the last two weeks" section keeps exactly the two most recent
+assessments (the user's decision, 28 November 2026). Add a subsection for this
+week from the new entry's `note` and `changes`, drop the oldest, and rewrite
+"Current scores" and "Why each score" to this entry. The charts are the only view
+of older weeks. **The contributing pages state current state only** (rewritten
+from scratch on 28 November 2026): correct a claim in place, never append a dated
+note, a "since", or a history paragraph.
 Then, on top of Stage 4's checks:
 
 ```bash

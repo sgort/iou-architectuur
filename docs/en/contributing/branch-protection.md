@@ -1,270 +1,153 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-22
+  date: 2026-11-28
   against:
-    CPSV Editor: "3ba847f"
-    Linked Data Explorer: "fe841f9"
-    RONL Business API: "be0a1f0"
+    CPSV Editor: "4ec37df"
+    Linked Data Explorer: "6ce7df8"
+    RONL Business API: "f267d7a"
+    CPRMV: "ebf7def"
+    Norm Editor: "fed2de3"
 ---
 
-# Branch Protection
+# Branches & Promotion
 
-*What blocks a merge, and what only reports*
+Every repository works with two long-lived branches: `acc`, which deploys to acceptance, and `main`, which deploys
+to production. On GitHub, a ruleset on each branch makes a pull request the only way in, with named checks that must
+pass and merge commits as the only merge method. A change reaches production in two pull requests: one into `acc`,
+then a promotion from `acc` into `main`.
 
-Running a check and being able to block on it are different things. This page covers the
-second: the branch rulesets, which checks each one requires, and the settings that decide
-how a merge is allowed to land. The checks themselves are documented on their own pages —
-[Supply-Chain Pinning](supply-chain.md), [Dependency Scanning](dependency-scanning.md) and
-the [Coverage Floor](coverage-floor.md) — and the
-[controls index](controls.md) is the one-page summary of where each holds.
+## How it works
 
-All three repositories' rulesets were read from the API again on 22 November 2026, and none has changed since 6 October. On
-19 September **all three `acc` rulesets** gained the build and deploy checks: each now
-requires the build and deploy
-checks alongside `audit` and `scan`, so a red test suite blocks a merge to `acc` rather
-than only stopping the deploy. What made that possible
-was not a ruleset edit alone — see
-[How a path-filtered workflow became requireable](#how-a-path-filtered-workflow-became-requireable).
-One thing moved since the read of 4 October: on 6 October 2026 all three `acc supply-chain
-gate` rulesets added **`lockfile-review`** to their required checks — the job that reads a
-pull request's lockfile diff (see
-[What the rulesets still do not require](#what-the-rulesets-still-do-not-require)).
-Between 27 September and 4 October, four things had moved:
+```mermaid
+sequenceDiagram
+    participant F as Feature branch
+    participant A as acc
+    participant AE as ACC environment
+    participant M as main
+    participant PE as PROD environment
+    F->>A: Pull request (required checks, merge commit)
+    A->>AE: Push to acc fires the ACC deploy workflows
+    Note over A: /bump-release lands a release through another PR into acc
+    A->>M: Promotion pull request acc to main (audit, scan)
+    M->>PE: Push to main fires the PROD deploy
+```
 
-- the RONL Business API's `main promotion gate` requires `scan` as well as `audit`, since
-  29 September 2026;
-- the CPSV Editor has a `main promotion gate` of its own, created on 30 September 2026;
-- the CPSV Editor's `acc` ruleset restricts merges to merge commits and blocks deletion
-  and non-fast-forward pushes, also since 30 September 2026;
-- classic branch protection is gone from all six branches — the protection API answers
-  404 for each — so the rulesets are the whole gate.
+1. **Branch from `acc`.** Work happens on a feature branch; nothing is committed to `acc` or `main` directly.
+2. **Pull request into `acc`.** The `acc` ruleset requires a pull request and a set of passing status checks (table
+   below). The deploy workflows run on the pull request too, so their build, lint and test jobs are among the required
+   checks. No approval count is required.
+3. **ACC deploy.** Merging pushes `acc`, and the push fires the acceptance deploy workflows (path-filtered, see
+   below). CPRMV's `ci.yml` publishes an image and waits for the acceptance VM to run it.
+4. **Release.** `/bump-release` sets the version, writes the release SBOM ([Build Provenance](build-provenance.md)) and
+   lands both through a pull request into `acc` like any other change.
+5. **Promotion pull request `acc` → `main`.** The `main` ruleset requires a pull request and passing `audit` and
+   `scan` (CPRMV: also `test` and `build`).
+6. **PROD deploy.** Merging pushes `main`. The Linked Data Explorer and the RONL Business API run one
+   `Promote to Production` workflow that deploys the backend first and the sites after it; the CPSV Editor runs its
+   PROD Static Web App workflow; CPRMV's stable VM pulls the new image.
 
 ## What blocks a merge
 
-Running a check and being able to block on it are different things, and until August
-2026 these repositories only did the first. **All three** now carry a branch ruleset
-named `acc supply-chain gate`, active on `refs/heads/acc` with **no bypass actors**.
-All three share the two rules that matter:
+Every ruleset is `active`, has **no bypass actors**, requires a pull request with **0 approvals**, allows the `merge`
+method only, blocks deletion and non-fast-forward pushes, and does not require the branch to be up to date with its
+base (`strict_required_status_checks_policy: false`).
 
-- `required_status_checks` → the `audit` context must pass, and since 19 September 2026
-  `scan` and each repository's build/deploy checks alongside it, and since 6 October 2026
-  `lockfile-review`
-- `pull_request` → a pull request is required (0 approvals; these repositories have a
-  single maintainer, and GitHub does not permit self-approval)
-
-Both rules are needed together — requiring the status check alone would still let a
-direct push to `acc` sail past it. The practical effect is that **`git push origin acc`
-is rejected outright** in all three repositories, including for releases and including
-for the repository owner. Linked Data Explorer adopted the same ruleset in v2026.08.7;
-all three are named `acc supply-chain gate` and carry zero bypass actors.
-
-They are not identical in shape. Read per ruleset from the API on 22 November 2026:
-
-| | `acc` | `main` |
+| Component | `acc` ruleset: required checks | `main` ruleset: required checks |
 |---|---|---|
-| CPSV Editor | pull request, `audit`, `scan`, `Build and deploy ACC`, `lockfile-review`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward — `main promotion gate`, since 30 September 2026 |
-| Linked Data Explorer | pull request, `audit`, `scan`, `deploy`, `Build and Deploy Frontend`, `Build and Deploy ROPA Site`, `lockfile-review`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward |
-| RONL Business API | pull request, `audit`, `scan`, `build`, `Build and Deploy ACC Frontend`, `Build and Deploy ACC PA Demo`, `Build and Deploy ACC Public Site`, `lockfile-review`, deletion, non-fast-forward | pull request, `audit`, `scan`, deletion, non-fast-forward |
+| CPSV Editor | `audit`, `scan`, `lockfile-review`, `Build and deploy ACC` | `audit`, `scan` |
+| Linked Data Explorer | `audit`, `scan`, `lockfile-review`, `deploy`, `Build and Deploy Frontend`, `Build and Deploy ROPA Site` | `audit`, `scan` |
+| RONL Business API | `audit`, `scan`, `lockfile-review`, `build`, `Build and Deploy ACC Frontend`, `Build and Deploy ACC PA Demo`, `Build and Deploy ACC Public Site` | `audit`, `scan` |
+| CPRMV | `audit`, `scan`, `test`, `build` | `audit`, `scan`, `test`, `build` |
+| Norm Editor | no `acc` branch | none: `main` is a protected branch on GitLab, but Maintainers may push to it directly and force-push is allowed, and a merge does not need a passing pipeline |
 
-**All three now gate `main`.** The Linked Data Explorer's `main promotion gate`
-came first, on 9 September 2026; the RONL Business API created its own on 12 September,
-before the promotion pull request was opened, layered over a classic protection under
-which an administrator could push to `main` directly — so the branch that deploys
-production had been the *less* protected of its two. The CPSV Editor followed on
-30 September 2026. No branch keeps a classic protection any more: the ones beneath the
-Linked Data Explorer's and the RONL Business API's `main` rulesets are gone, and the
-protection API answers 404 on all six branches. The rulesets' zero bypass actors and
-non-fast-forward rule are what close a direct push.
+Where the check names come from:
 
-**Each `main` ruleset used to mirror its `acc` twin, and no longer does.** Until
-19 September the two differed in exactly one parameter:
-`require_extra_approval_for_unattributed_changes` is `true` on `acc` and `false` on
-`main`, because a promotion carries commits under several author identities against a
-ruleset requiring zero approvals, and the flag would demand an approval nobody can give.
-That difference stands. What joined it is the build checks and, on 6 October 2026,
-`lockfile-review`, both added to `acc` only — so `acc` now requires strictly more than `main` does in all three. Read the
-table rather than assuming symmetry.
+| Check | Workflow | What it is documented on |
+|---|---|---|
+| `audit`, `lockfile-review` | `zizmor.yml` (Supply-chain audit) | [Pinning](supply-chain.md), [Dependencies](dependency-scanning.md) |
+| `scan` | `semgrep.yml` | [Dependencies](dependency-scanning.md) |
+| `Build and deploy ACC`, `deploy`, `build`, `Build and Deploy …` | the ACC deploy workflows | [Tests & Coverage Gates](coverage-floor.md) |
+| `test`, `build` (CPRMV) | `ci.yml` | [Tests & Coverage Gates](coverage-floor.md) |
 
-Until 30 September 2026 the CPSV Editor's `main` required a pull request but no status
-checks, by decision
-([ttl-editor#131](https://github.com/sgort/ttl-editor/issues/131)): `main` is promoted
-from `acc`, and its production deploy check is path-filtered, so requiring it would wedge
-a documentation-only promotion. Since then its `main` requires `audit` and `scan`, whose
-workflows run on every pull request with no path filter — #131's reasoning held for the
-deploy check, and still keeps that one off, but not for those two. See
-[Supply-Chain Pinning](supply-chain.md#adoption-status) for the argument on both sides.
+The merge method is also a repository setting. The three applications allow merge commits only and delete the head
+branch on merge. CPRMV's repository settings still allow squash and rebase, but both rulesets pin
+`allowed_merge_methods` to `merge`, so only a merge commit can land; head branches are not deleted on merge.
 
-**`scan` is now required on `acc` in all three.** The RONL Business API was the last
-holdout: its scan ran on every pull request while the baseline from its first
-authenticated scan was triaged, on the reasoning that a gate required before its baseline
-is triaged is a gate that gets bypassed in its first week. The triage finished, and the
-promotion was — as predicted — a ruleset edit that touched no file.
+### Path-filtered deploys as required checks
 
-Merge strategy is enforced by repository settings rather than by convention: all three
-disable squash and rebase merges, leaving merge commits only, with
-`delete_branch_on_merge` enabled. All six rulesets allow merge commits only as well — the
-last of them, the CPSV Editor's two, since 30 September 2026. Both alternatives rewrite commit hashes — rebase
-deceptively so, since it preserves the commit count — and a changelog entry that cites
-commits by SHA is orphaned either way.
+A required check must report on every pull request, or a pull request that does not touch the watched paths could
+never merge. So the ACC deploy workflows of the Linked Data Explorer and the RONL Business API put **no** path filter
+on `pull_request`: a first `changes` job compares the pull request's files with the workflow's paths, and the build
+job is skipped by its own `if:` when nothing relevant changed. A skipped job reports success. If `changes` fails, the
+build runs. The `push` trigger keeps its `paths:` filter, because nothing is required on a push.
 
-## What the rulesets still do not require
+The CPSV Editor's ACC workflow filters `push` with `paths-ignore` (`docs/**`, `.claude/**`, `**/*.md`) and has no path
+filter on `pull_request`. `zizmor.yml` and `semgrep.yml` have no branch or path filter on `pull_request` in any
+repository, so `audit` and `scan` report on every pull request, whatever its base.
 
-**A red suite now blocks a merge to `acc` in all three, and still does not block one to
-`main`.** This page said the opposite until 19 September 2026, and was right at the time:
-the builds and suites ran on every pull request, a red one stopped the deploy, and the
-only checks the rulesets named were `audit` and — in two of the three — `scan`. A
-dependency pull request whose build failed could be merged.
+## Deploys per branch
 
-That was not hypothetical. The RONL Business API's `axios` security update
-([#109](https://github.com/sgort/ronl-business-api/pull/109)) broke its backend build:
-`axios` 1.18 widened a header type, and one suite stopped compiling while 1,859 tests passed.
-It showed as a red check on the pull request — which is what running the suite before the
-merge buys — and with `audit` the only required check, nothing more: the pull request stayed
-mergeable until the fix landed in v2026.09.7.
+| Component | `acc` push deploys | `main` push deploys | Path filter on push |
+|---|---|---|---|
+| CPSV Editor | Azure Static Web App `orange-beach` (`Deploy ACC (orange-beach)`) | Azure Static Web App `white-sky` (`Deploy PROD (white-sky)`) | `paths-ignore`: docs, `.claude`, Markdown |
+| Linked Data Explorer | App Service `ronl-linkeddata-backend-acc`; Static Web Apps for the frontend and the ROPA site | `promote-to-production.yml`: backend (`ronl-linkeddata-backend-prod`), then frontend and ROPA site | ACC: `paths:` per workflow. PROD: none; `scripts/promotion-targets.mjs` decides which deploys run |
+| RONL Business API | App Service `ronl-business-api-acc`; Static Web Apps for the frontend, PA demo and public site | `promote-to-production.yml`: backend (`ronl-business-api-prod`), then frontend, PA demo and public site | ACC: `paths:` per workflow. PROD: none; `scripts/promotion-targets.sh` decides |
+| CPRMV | `ci.yml` pushes `ghcr.io/open-regels/cprmv-api` and waits for `acc.cprmv.open-regels.nl` to run the commit | the same, for `cprmv.open-regels.nl` (environment `stable`) | none |
+| Norm Editor | no `acc` branch | `.gitlab-ci.yml` builds and pushes six images to Azure Container Registry; no deploy job | none |
 
-What closed it is the build and deploy checks in the table above. Each of those jobs runs
-`npm ci`, the linter, the type check where one exists and the unit suites **before** it
-builds, so requiring the job requires everything in front of it. On `acc`, a pull request
-that breaks a test now has a red required check and no merge button. In the RONL
-Business API that holds for a lockfile-only pull request too since v2026.10.1, when the
-three site workflows' `changes` patterns gained the root lockfile; since v2026.11.4
-a lockfile-only *promotion* redeploys all four applications as well, because
-`scripts/promotion-targets.sh` now names the lockfile and `package.json` in every production
-pattern (`ffbc109`).
+CPRMV's VMs pull rather than receive: a reconciler (`deployment/vm/reconciler/reconcile.sh`, a systemd timer every 2
+minutes per tier) reads the head of its branch on GitHub, pulls the image tagged `sha-<commit>` by digest, starts it,
+checks `/health`, and restores the previous release if that fails. The `deploy` job in `ci.yml` waits on the VM's
+`deploy-status.json` until it reports the pushed commit.
 
-**No ruleset requires a branch to be up to date before merging**
-(`strict_required_status_checks_policy: false` in all six). Every required check is
-therefore green against the pull request's own base, not against the `acc` it merges
-into. On 25 September 2026 three RONL Business API dependency pull requests
-(#221–#223), each green, merged back to back into a lockfile that matched no
-`package.json`. The `audit` job's lockfile-sync step now names that failure on the next
-pull request; it cannot prevent it.
+The production promotions in the Linked Data Explorer and the RONL Business API call the individual production deploy
+workflows as reusable workflows (`workflow_call`); those workflows have no push trigger of their own. Each one has a
+`workflow_dispatch` trigger for deploying a single part by hand. In the Linked Data Explorer the `production`
+environment accepts deployments from `main` only; the other repositories' environments carry no protection rules.
 
-**On `main` a red suite is still advice.** All three `main promotion gate` rulesets
-require `audit` and `scan`, and nothing else: no build, no test. The deploy checks were deliberately not added
-there, and the reason now differs by repository. In the Linked Data Explorer and the RONL
-Business API, production deploys run from a push to `main` through
-`promote-to-production.yml`, not on the promotion pull request: the RONL Business API's
-four production workflows have no `pull_request` trigger at all, and the Linked Data
-Explorer's backend has none, so there is no check to require. The Linked Data Explorer's
-two production site workflows do build on a promotion pull request — a preview of the
-production site — but that trigger is still path-filtered, and a required check that
-never reports wedges the pull request permanently. The CPSV Editor's
-`Deploy PROD (white-sky)` keeps `paths-ignore` on its `pull_request` trigger for the same
-reason.
+## Releases
 
-ICTU's guideline asks for more than the check list — that **the entire pipeline** succeeds
-before an update merges, and that the transitive changes in a lockfile diff are reviewed on
-a risk basis: new runtime packages, new origins, downgrades and licence changes. The first
-half is met on `acc`, and since 6 October 2026 so is the tooling for the second: a
-`lockfile-review` job in each repository's `zizmor.yml`, required on `acc` in all three,
-compares the pull request's lockfile with its base. It fails on a package resolved from
-outside the npm registry or without an integrity hash, and posts new packages, licence
-changes, new install scripts and downgrades to the pull request as prompts for the
-reviewer — the risk-based judgement stays a person's. The work was tracked in
-[linked-data-explorer#248](https://github.com/sgort/linked-data-explorer/issues/248),
-closed on 6 October 2026. The scores are on
-[ICTU Dependency Guideline](ictu-dependency-guideline.md), recommendation R9; the
-assessment of 11 October 2026 puts the RONL Business API's R9 at 4.
+| Component | Release number | Where it is written | Tags |
+|---|---|---|---|
+| CPSV Editor | CalVer `YYYY.MM.N` (`2026.11.3`) | `package.json`, `package-lock.json`, `src/data/changelog.json` | none |
+| Linked Data Explorer | CalVer `YYYY.MM.N`, one sequence for all packages | the in-scope `package.json` files, the lockfile, the frontend's `changelog.json` | none |
+| RONL Business API | CalVer `YYYY.MM.N` | the in-scope `package.json` files, the lockfile, `changelog-data.ts` | none |
+| CPRMV | `vYYYY.MM.N` release beside a vocabulary version (`v2026.11.1`, vocabulary `0.4.3`) | `serve_api/RELEASE` (validated by `scripts/read-release.sh`); vocabulary in `serve_api/pyproject.toml` | image tags `:vYYYY.MM.N` and `:<vocabulary>` on stable; no git tags |
+| Norm Editor | git tags `YYYY.MM.N` (`2026.07.0`, `2026.07.1`) plus a SemVer version per service | tags; `versions.json`, set by `scripts/bump-version.mjs` | git tags; `scripts/generate-changelog.mjs` groups commits by tag |
 
-## How a path-filtered workflow became requireable
+The commit that cuts a release is `chore: bump release to v<version>`. This site prints every release with a `v`
+prefix.
 
-Requiring a build check looks like one ruleset edit and is not, because of a rule that
-only bites once the check is required:
+`/bump-release` in the three applications cuts the release on a working branch and opens the pull request into `acc`;
+it does not promote. The promotion is a separate pull request from `acc` into `main`, titled
+`chore: promote acc to main …` (CPSV Editor: `release: promote acc to main …`); a promotion without a release cut says
+so in its title. In CPRMV, `/bump-release` runs the whole path: the release pull request into `acc`, the promotion
+pull request into `main`, confirmation that stable runs the release, and the push of `main` to GitLab. In every
+repository the command opens pull requests and the user merges them.
 
-> A required status check must **report** on every pull request. A check that never
-> reports is not "skipped" — it is pending forever, and the pull request can never merge.
+## What it does not cover
 
-The deploy workflows were all path-filtered, so a pull request touching nothing they watch
-started no run and reported no check. Filtering at the trigger and requiring the check are
-therefore mutually exclusive — which is why this was open work for as long as it was.
+- **No review requirement.** Every ruleset requires 0 approvals; a pull request can be merged by its author once the
+  checks pass.
+- **`main` requires the scanners only.** For the three applications no build or test is a required check on the
+  promotion pull request. Some PROD workflows build a preview on that pull request (CPSV Editor, the Linked Data
+  Explorer's frontend and ROPA site), but none of them is required; the production build and its tests run after the
+  merge.
+- **No up-to-date requirement.** A pull request can merge with a base that has moved since its checks ran.
+- **The GitLab side is unprotected by these rulesets.** The mirrors are pushed by hand ([The GitLab Mirror](the-gitlab-mirror.md)).
+- **Norm Editor.** Its pipeline runs on GitLab on `main`, `develop` and tags; the test jobs run on every pipeline, and
+  nothing in `.gitlab-ci.yml` gates a merge. Branch protection on GitLab was not verified.
 
-The fix is to move the filter one level down, and it is worth copying verbatim:
+## Where it lives
 
-- **The trigger loses its `paths:` / `paths-ignore:` on `pull_request`.** The workflow now
-  starts for every pull request against its branch. `push` keeps its filter; nothing is
-  required on a push.
-- **A first job, `changes`, decides relevance.** It asks the API for the pull request's
-  changed files and matches them against the same pattern the `push` filter uses, kept in
-  step by hand — GitHub Actions has no YAML anchors, so the two copies are maintained
-  together. Renames count under both names, as GitHub's own filter does.
-- **The build job runs `needs: changes` with an `if:` instead.** A job skipped by its own
-  `if:` **reports success**, where a workflow filtered out at its trigger reports nothing
-  at all. That difference is the whole mechanism.
-- **The condition is fail-safe.** It reads
-  `!cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.relevant == 'true')`
-  — so the build runs whenever the lookup did *not* succeed, not only when it says
-  "relevant". An API failure or a rate limit means a full build, never a free pass.
-
-This landed in all three repositories on 19 September 2026, in the CPSV Editor's
-`Deploy ACC (orange-beach)`, the Linked Data Explorer's three `*-acc` workflows and the
-RONL Business API's four. Production workflows were left out: the CPSV Editor's is still
-filtered at its trigger, and in the other two a promotion workflow now calls them on the
-push rather than on the pull request. Their checks are un-required, which is why `main`
-is still ungated on builds.
-
-## What makes it enforcement
-
-A workflow that runs but cannot block is advice. The ruleset converts it into a
-gate. In all three adopting repositories the ruleset is named **`acc
-supply-chain gate`**, targets `refs/heads/acc`, and is `active` with **zero
-bypass actors**:
-
-- `required_status_checks` → context **`audit`**; **`scan`** as well, in the CPSV Editor
-  and the Linked Data Explorer since v2026.09.3 and in the RONL Business API since
-  19 September 2026; since the same date, each repository's **build and deploy
-  checks**; and since 6 October 2026 **`lockfile-review`** — the full list is in the table
-  above
-- `pull_request` → `required_approving_review_count: 0`
-
-All three have a twin, `main promotion gate`, on `main` — see [Adoption status](supply-chain.md#adoption-status).
-
-Both rules are needed *together*. Requiring the check alone would still let a
-direct push to `acc` bypass the gate entirely.
-
-**A required check is matched by its job name, and by nothing else.** Any job anywhere in
-the repository that reports under the same name satisfies — or blocks — it. The daily
-dependency audit was first named `audit`, the name of the supply-chain job every ruleset
-requires; the collision blocked `ronl-business-api#206`, and the job is now
-`dependency-audit`. The SBOM job is `release-sbom` for the same reason. The Linked Data
-Explorer's production site jobs were renamed from the shared *Build and Deploy Job* to
-*Build and Deploy Production Frontend* and *… ROPA Site* so that either could ever be
-required. Renaming a required job means editing the ruleset in the same change.
-
-Approvals are `0` because these repositories have a single maintainer and GitHub
-does not permit self-approval — requiring `1` would make `acc` unmergeable.
-Raise it when a second reviewer exists.
-
-## The merge method is a setting, not a rule
-
-A changelog entry names each commit by its SHA, so any merge strategy that
-rewrites hashes orphans every citation in it. The first version of this rule
-said *never squash* — and missed that **rebase-and-merge rewrites hashes just as
-thoroughly**, deceptively so, because it preserves the commit count while
-replacing every hash. That gap surfaced only when someone looked at the actual
-merge dropdown.
-
-All three repositories now disable squash and rebase at repository level
-(Settings → General → Pull Requests), leaving merge commits only, with
-`delete_branch_on_merge` enabled:
-
-```
-allow_merge_commit: true    allow_squash_merge: false
-allow_rebase_merge: false   delete_branch_on_merge: true
-```
-
-GitHub's default button is *Squash and merge*, so without the setting a single
-absent-minded click would orphan a release's entire entry. The failure is now
-impossible by construction rather than forbidden by prose — which is the general
-shape worth copying: **a rule that depends on remembering is a rule that
-eventually fails.**
-
-A side effect is that Renovate's dependency pull requests land as merge commits
-too. That costs nothing: `--no-merges` already excludes the merge commit from a
-changelog range, and the underlying update commit is what an entry should name.
-
-**A repository adopting this template must apply the setting too.** The rule
-without it is one click from failing.
-
----
+| What | Where |
+|---|---|
+| Rulesets | GitHub → Settings → Rules → Rulesets (`acc supply-chain gate`, `main promotion gate`); `gh api repos/<owner>/<repo>/rulesets` |
+| Merge methods, branch deletion | GitHub → Settings → General → Pull Requests |
+| Environments | GitHub → Settings → Environments |
+| ACC / PROD deploys | `.github/workflows/azure-*.yml`, `promote-to-production.yml` (LDE, RBA); `ci.yml` and `deployment/vm/` (CPRMV) |
+| Promotion targets | `scripts/promotion-targets.mjs` (LDE), `scripts/promotion-targets.sh` (RBA) |
+| Release command | `.claude/commands/bump-release.md` in each GitHub repository |
+| RBA promotion runbook | `docs/promote-ACC-to-PROD.md` in `ronl-business-api` |
+| Norm Editor pipeline | `.gitlab-ci.yml`, `versions.json`, `scripts/bump-version.mjs` in `regels/editor` |

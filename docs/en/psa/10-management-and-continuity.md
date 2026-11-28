@@ -82,5 +82,5 @@ has no test coverage or check gates yet.
 - [Overview of the controls](../contributing/controls.md)
 - [The development workflow](../contributing/development-workflow/overview.md)
 - [Build provenance: which build is running](../contributing/build-provenance.md)
-- [Two delivery tracks](../contributing/ci-posture-deck.md)
+- [Two delivery tracks](../ci-posture-deck.md)
 - [The GitLab mirror](../contributing/the-gitlab-mirror.md)

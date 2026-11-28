@@ -2,7 +2,7 @@
 scope: cross-cutting
 ---
 
-# Branchbeveiliging
+# Branches en promotie
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
@@ -15,8 +15,14 @@ scope: cross-cutting
 
 ---
 
-## Wat een merge blokkeert
+## How it works
 
-## Wat het tot handhaving maakt
+## What blocks a merge
 
-## De merge-methode is een instelling, geen regel
+## Deploys per branch
+
+## Releases
+
+## What it does not cover
+
+## Where it lives

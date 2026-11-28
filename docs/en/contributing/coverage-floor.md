@@ -1,477 +1,177 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-22
+  date: 2026-11-28
   against:
-    CPSV Editor: "3ba847f"
-    Linked Data Explorer: "fe841f9"
-    RONL Business API: "be0a1f0"
+    CPSV Editor: "4ec37df"
+    Linked Data Explorer: "6ce7df8"
+    RONL Business API: "f267d7a"
+    CPRMV: "ebf7def"
+    Norm Editor: "fed2de3"
 ---
 
-# The Coverage Floor
+# Tests & Coverage Gates
 
-!!! info "What was re-checked on 22 November 2026, and what was not"
-    The **CI and ruleset claims** on this page were re-checked on 22 November 2026
-    against `3ba847f`, `fe841f9` and `be0a1f0`: which workflows run the suites, on
-    which triggers, and which checks each branch requires. The floor has been blocking
-    on `acc` in all three since 19 September 2026. Every `main` now requires `audit`
-    and `scan`, and none requires a build or a test.
+This page answers two questions: where the test suites run on the way to production, and
+what makes a run fail. In the three applications, the unit suites run in each deploy
+workflow's build job, before the build. That job is a required check on `acc`, and the
+suites carry an 80% **branch** floor **per file**. No git hook runs a test. CPRMV runs
+its pytest and bats suites in a required `test` job. The Norm Editor runs its suites in
+GitLab CI, and nothing there blocks a merge on them.
 
-    **That re-check ran no suite**, and the coverage configurations are unchanged since
-    11 October 2026 in all three. The package-level figures below were measured on
-    12 September 2026 against `f5bae6a`, `be6bc54` and `311d732`, the RONL Business
-    API's by running all five suites with coverage rather than reading a record. The
-    per-file figures for the files nearest the floor come from the component syncs of
-    10–11 October 2026: the Linked Data Explorer at v2026.10.2 (measured 10 October),
-    the RONL Business API at v2026.10.2 (measured 11 October), and the CPSV Editor at
-    v2026.10.1 (measured 10 October, on its
-    [testing page](../cpsv-editor/developer/testing.md#coverage)). No file in any of
-    the three is below 80% branches. The 85% margin the RONL Business API recorded for
-    every file on 30 September no longer holds:
-    `CaseworkerDashboard/BesluitOverzichtSection.tsx` reads **80.43%** (37 of 46), one
-    uncovered branch from failing, and `components/process/phaseSet.ts` 83.33% (10 of
-    12). See its [coverage page](../ronl-business-api/developer/testing/coverage.md).
+## How it works
 
-*A per-file 80% branch-coverage floor, and what it took to enforce it in three
-repositories*
+```mermaid
+flowchart TD
+    A["git commit / git push"] --> B["Hooks: lint and format, no tests"]
+    B --> C["Pull request into acc"]
+    C --> D["Deploy workflow build job: lint, type check, unit suites with the floor"]
+    D -->|red| X["Required check fails: merge blocked"]
+    D -->|green| E["Merge into acc"]
+    E --> F["Same job again, then ACC deploy"]
+    F --> G["Promotion pull request into main"]
+    G --> H["Required: audit and scan only"]
+    H --> I["Merge into main"]
+    I --> J["PROD deploy job runs the suites again"]
+    J -->|red| Y["PROD deploy stops; the merge stands"]
+    J -->|green| K["PROD deploy"]
+```
 
-All three application repositories hold new and changed code to **80% branch
-coverage per file**. As of September 2026 all three enforce it **natively**, in
-their test runners' own configuration, with no exemptions and no custom script.
+1. **Locally.** `pre-commit` and `pre-push` run formatting, linting and (in the RONL
+   Business API) type checks. None of them runs `npm test`. See
+   [Code Standards & Hooks](code-standards.md).
+2. **Pull request into `acc`.** Each deploy workflow triggers on `pull_request` to `acc`.
+   Its build job runs `npm ci`, the linter, the type check where there is one and the unit
+   suites, and only then builds. The deploy steps are skipped on a pull request. The
+   rulesets name these jobs as required checks, so a red suite or a file under the floor
+   blocks the merge ([Branches & Promotion](branch-protection.md)).
+3. **Merge into `acc`.** The push runs the same job again and deploys to ACC.
+4. **Promotion into `main`.** The `main` ruleset requires `audit` and `scan` only. No test
+   job is required there.
+5. **Merge into `main`.** The PROD deploy (`promote-to-production.yml` in the Linked Data
+   Explorer and RONL Business API, the PROD Static Web Apps workflow in the CPSV Editor)
+   runs lint and the suites again before it builds. A red run stops that deploy, but it
+   cannot undo the merge.
 
-That uniformity is recent, and the route each took is more instructive than the
-destination.
+## Per repository
 
----
+| | Pre-push | PR into `acc` (required) | Before ACC deploy | PR into `main` | Before PROD deploy | End-to-end (Playwright) |
+|---|---|---|---|---|---|---|
+| **CPSV Editor** | no tests | `Build and deploy ACC`: `lint`, `test:ci` | same job | the PROD workflow runs `lint` and `test:ci` for its preview; not required | PROD workflow: `lint`, `test:ci` | `e2e/`, by hand only: needs the LDE backend and Operaton |
+| **Linked Data Explorer** | no tests | `deploy` (backend): `lint`, `lint:openapi`, `typecheck`, `npm test`; `Build and Deploy Frontend`: `lint`, `typecheck`, `npm test` | same jobs | the frontend PROD workflow runs for its preview; not required | `promote-to-production.yml` calls the PROD workflows, which run the same steps | none |
+| **RONL Business API** | no tests | `build` (backend): `lint`, `lint:openapi`, `npm test`, `tsc` build; `Build and Deploy ACC Frontend`: pa-cockpit and frontend suites, `test:perf`; `… PA Demo` and `… Public Site`: `lint`, `type-check`, `npm test`; PA Demo also its Playwright suite | same jobs | none | `promote-to-production.yml` calls the PROD workflows: the same steps, without the PA Demo end-to-end run | frontend: by hand, against a running stack; public-site: by hand; pa-demo: in the ACC job |
+| **CPRMV** | no hooks | `test`: `py_compile`, import check, `pytest`, shellcheck, bats; `build`: image smoke test | `test` and `build` on the push to `acc` | `test` and `build`, required | `test` and `build` on the push to `main` | none |
+| **Norm Editor** | no tests (hooks check commit messages) | no `acc` branch; the `test` stage runs on every pipeline | none | none required: `main` does not require a passing pipeline | `test` stage before `build` (images for `main`, `develop`, tags) | none |
 
-## Why per file, and why branches
+A few more checks run in CI as their own small tests. Each script's `*.test.mjs` file runs
+in the workflow that uses the script. Examples are `lockfile-diff` and the dependency gate
+in `lockfile-review`, `promotion-targets` in `audit` and in the promotion, and the SBOM
+generator in `sbom.yml`. CPRMV's `scripts/test/test_write_sbom.py` runs in `sbom.yml` on
+a push to `main` and on pull requests that touch the SBOM tooling.
 
-**Per file**, because a project average lets a well-tested utility pay for an
-untested component. The branches that matter are precisely the ones nobody has
-exercised, and an average is designed to hide them.
+## Coverage floors
 
-**Branches**, because statement and line coverage largely restate *"was this file
-imported"*, and function coverage rewards splitting code into more functions. A
-branch is a decision the code makes; an uncovered branch is a decision no test has
-ever checked.
+| Repository | Package | Runner | Config | Floor | Lines / functions / statements |
+|---|---|---|---|---|---|
+| CPSV Editor | (root) | Vitest, v8 | `vite.config.mjs` | branches 80, `perFile: true` | none |
+| Linked Data Explorer | backend | Jest | `packages/backend/jest.config.js` | branches 80, glob key `./src/**/*.ts` (per file) | none |
+| Linked Data Explorer | frontend | Vitest, v8 | `packages/frontend/vite.config.ts` | branches 80, `perFile: true` | none |
+| RONL Business API | backend | Jest | `packages/backend/jest.config.js` | branches 80, glob key `./src/**/*.ts` (per file), plus the conformance check | none |
+| RONL Business API | frontend, pa-cockpit, pa-demo, public-site | Vitest, v8 | each package's `vite.config.ts` (`vitest.config.ts` in pa-cockpit) | branches 80, `perFile: true` | none |
+| RONL Business API | shared | — | — | no tests; `check-shared` in `audit` fails on any function, class, conditional or loop in the package | — |
+| CPRMV | `serve_api` | pytest | none | no coverage measured (`pytest-cov` is installed, not invoked) | — |
+| Norm Editor | gui, backend, three Python APIs | Vitest, pytest | `vitest.config.js`, none | no coverage measured | — |
 
-| Repository | Mechanism | State |
-|---|---|---|
-| CPSV Editor (`ttl-editor`) | Native thresholds in one runner | Clean, no exemptions |
-| Linked Data Explorer | Native thresholds in both runners | Clean, no exemptions |
-| RONL Business API | Native thresholds in all five runners | Clean, no exemptions |
+**What the floor applies to.** Coverage reports every source file, not only the files a
+test imports: Jest uses `collectCoverageFrom`, Vitest uses `coverage.include`. An untested
+file therefore shows 0% and fails, instead of being left out. Test files, setup and
+fixture folders, `main.tsx`/`index.ts` entry points and type-only folders are excluded.
+The exact lists are in each config.
 
----
+**The RONL Business API's conformance check.** The backend's `npm test` is
+`jest --coverage && node scripts/check-conformance-coverage.cjs`. After the suite, the
+script fails if any operation in `openapi/openapi.json` was never compared against a
+real response through `expectToMatchOperation`. A filtered run writes no log, and the
+script skips it.
 
-## A functions floor is a separate decision
+**Which command carries the floor.** Thresholds apply only when coverage is collected.
+In the CPSV Editor that is `npm run test:ci` (`vitest run --coverage`). Plain `npm test`
+is Vitest in watch mode, without coverage. In the other two, every package's `npm test`
+collects coverage.
 
-**80% functions is not a safe companion setting**, and this was measured rather
-than assumed. In RONL Business API at the time the branch floor landed, adding a
-functions floor at the same number would have failed **31 files**:
+### Why branches, per file
 
-| Workspace | Files below 80% functions |
-|---|--:|
-| frontend | 11 |
-| pa-cockpit | 10 |
-| pa-demo | 7 |
-| public-site | 3 |
-| backend | 0 |
-
-`public-site/TopBar.tsx` is the illustration: **100% branches, 66% functions**.
-The two measure different things and are not interchangeable.
-
-That count is the one taken when the floor landed. Re-measured at v2026.09.9 on
-20 September 2026 it was **26** — the work since had closed five of them, without
-anyone setting out to — and the five runner configs now carry that figure in their own
-comments, *"measured 28 September 2026"*: frontend 10, pa-cockpit 8, pa-demo 5,
-public-site 3, backend 0 (`391b1a8`; the backend's `jest.config.js` states the total). The current figure, per workspace, is on the application's
-own [coverage page](../ronl-business-api/developer/testing/coverage.md); where the
-two disagree, the measured one wins.
-
-The asymmetry runs both ways. In the CPSV Editor, `ConceptsTab.jsx` reads 80.55%
-on branches but **71.62% on statements and 63.33% on functions**, and `App.jsx`
-reads 83.33% / 72.44% / **55.55%** at v2026.10.1 — the uncovered code there is largely
-branch-free, whole handlers no test calls, so a branch floor steps straight over
-it. Worth knowing what the column you gate on does not see.
-
----
-
-## Why one repository needed a script first
-
-**Vitest cannot express a partial rollout of this policy.** Its `thresholds`
-block accepts glob keys that look like per-file overrides, but they are
-**additive** rather than overriding — from Vitest's own source, *"Global
-threshold is for all files, even if they are included by glob patterns"*. A file
-matching `'src/App.jsx': { branches: 34 }` is still measured against the global 80
-as well, and the build fails anyway. `perFile: true` is all-or-nothing.
-
-The CPSV Editor was not at 80% everywhere, so it carried
-`scripts/check-branch-coverage.mjs` — a `DEBT` list working as a **ratchet that
-tightened from both ends**:
-
-| Condition | Result |
-|---|---|
-| Below its pin | Fail — a regression |
-| More than 10 points above its pin | Fail, asking for the pin to be raised |
-| At or above the floor | Fail, asking to be deleted |
-| Naming a file that no longer exists | Fail |
-
-The script's own header stated it was temporary and named its own deletion as the
-last step of the work rather than an afterthought. That is what closed
-[ttl-editor#103](https://github.com/sgort/ttl-editor/issues/103): `DMNTab.jsx`,
-1855 lines and the largest file in the repository, went from 45.73% to **98.34%**
-branch coverage, the last `DEBT` entry went with it, and the script was deleted in
-favour of four lines of config.
-
-Three things from that run are worth carrying:
-
-- **The ratchet's upper bound fired for real**, once. An increment took
-  `DMNTab.jsx` past its pin by more than the slack allowed, and the gate failed
-  naming the new value. *A ratchet that only catches regressions decays into an
-  exemption list* — this one did not.
-- **Measure in isolation *and* in the full suite.** Both readings were identical,
-  which is what proves no other file's tests were propping the number up. A
-  per-file floor read only from a full run cannot tell the difference.
-- **The last few branches are usually unreachable, and that is the honest place to
-  stop.** Seven remain, all guards the UI cannot reach — `if (!uploadedFile)`
-  under a button that only renders once a file exists, and three of the same
-  shape.
-
----
-
-## Reaching the floor has a load cost, and it lands somewhere else
-
-Not a threshold mechanic, but it surfaced on the same change and would surface in
-any repository pushed to this floor.
-
-Bringing one file to 80% meant 56 new tests, 680 → 736. The suite then began
-failing **intermittently, in unrelated files** — a different one each run, always
-passing in isolation. Not a defect in the new tests and not one in the old:
-Testing Library's `findBy*` gives up after one second by default, and under
-coverage instrumentation with every file running in parallel, a control that
-appears in tens of milliseconds on an idle machine can take longer than that on a
-saturated one.
-
-**Measured rather than assumed**, which is the only way to tell contention from a
-real order dependency: three consecutive full runs clean with the new files moved
-aside, one failure in three with them present.
-
-Fixed at its own boundary — `asyncUtilTimeout: 5000` and `testTimeout: 15000`,
-both commented as contention headroom. **Not by serialising the suite**, which
-would diverge from CI, cost real time on every run, and hide the order
-dependencies parallelism is good at exposing. Raising a wait is not a defect mask:
-an element that is genuinely never rendered still fails, only later.
-
-**The same shape at a much smaller dose.** The Linked Data Explorer added 31 tests
-(1042 → 1073) and saw exactly one parallel-only failure: a `ShaclValidator` test
-timing out at the 5000 ms default in a full run, passing **37 of 37 in isolation**,
-in a file the change had not touched. It did not recur, and no timeout was raised
-for it. Two readings, both worth carrying:
-
-- **The effect scales with how loaded the run is, not with how many tests you
-  added.** 31 was enough to surface it once.
-- **A parallel-only failure is not a finding until it fails in isolation.** That
-  one command is what separates contention from a real order dependency, and
-  changing code on the strength of a full-run failure alone is how a healthy suite
-  acquires defensive edits it never needed.
-
----
+- **Per file**, because a package average hides the file that matters. With averages
+  near 90%, one file falling to 40% barely moves the number.
+- **Branches**, because line and statement coverage mostly say "this file was imported",
+  and function coverage rewards splitting code into more functions. An uncovered branch
+  is a decision that no test has checked.
+- **Branches only.** No config sets a functions, lines or statements threshold. The RONL
+  Business API's configs say why: a functions floor at 80 would fail files across its four
+  Vitest packages. Measure before adding one.
 
 ## Raising coverage without writing hollow tests
 
-Writing tests *to raise a number* is the failure mode this whole policy exists to
-avoid. Three mechanics kept the Linked Data Explorer's twelve-file push honest,
-and all three transfer.
+A test written to raise a number can pass without being able to fail. Four habits help:
 
-### Mutation-check every test — one written after the code cannot fail on its own merits
+- **Break the branch first.** Disable the branch the new test targets in the source,
+  confirm the test fails, then restore the code. A test that stays green against broken
+  code covers nothing.
+- **An absence needs a throw-watcher.** In React, an error thrown inside an event handler
+  goes to `window`'s `error` event and does not reject the interaction. So "nothing was
+  saved" stays true when the handler crashes. Fail the test on any error raised during
+  the interaction.
+- **Leave unreachable branches uncovered.** For example, a guard behind a button already
+  disabled on the same condition. Reaching it means calling the handler directly, which
+  tests nothing a user can do. Say so in a comment.
+- **Test the new branch; do not lower the floor.** The Linked Data Explorer's `GraphView.tsx`
+  sits just above 80%. Its uncovered branches are inside d3 simulation and drag handlers,
+  and its config comment says the same thing.
 
-A test written against code that already exists **passes on its first run**, which
-proves nothing about whether it *can* fail. So each new test had the branch it
-targets deliberately broken in the production file, and had to fail before being
-kept — then the file was restored. Cheap to automate: a shell loop over `sed`
-one-liners, one file-scoped run each.
+To prove that a threshold bites, add a throwaway file with uncovered branches. The run
+should fail and name that file. A named file shows the check is per file, not a package
+average.
 
-**That caught five of the thirty-one passing vacuously**, which would otherwise
-have shipped as coverage with nothing behind it:
+## Running the suites locally
 
-- **Two guard tests** used a response fixture with no `data` field at all, so
-  `data ?? []` and the real `success && Array.isArray(data)` guard behaved
-  identically. The fixture had to carry a payload that *survives* the guard's
-  removal before the test could fail.
-- **Four component tests** asserted *"nothing was added"* / *"nothing was saved"* —
-  which stays true when the handler **throws** partway through.
+| Repository | Whole suite, with the floor | Serial run | Other scripts |
+|---|---|---|---|
+| CPSV Editor | `npm run test:ci` | none defined | `test:generator`, `test:roundtrip`, `test:app`, `test:p2` to `test:p6` (subsets, no coverage); `test:e2e`, `test:e2e:headed`, `test:e2e:ui` |
+| Linked Data Explorer | `npm test` (root, every workspace) | none defined | backend `test:contract`, `test:openapi-coverage`, `test:shacl-smoke`; root `test:scripts` |
+| RONL Business API | `npm test` (root, every workspace) | `npm run test:serial` (Jest `--runInBand`, Vitest `--no-file-parallelism`) | frontend `test:perf`; `test:e2e` in frontend, pa-demo, public-site; backend `test:contract`; root `test:stylelint` |
+| CPRMV | `pytest` from `serve_api/` | — | `bats scripts/test deployment/vm/reconciler/test` |
+| Norm Editor | `npm test` in `gui/` and `backend/`; `pytest` in each Python API | — | — |
 
-!!! danger "On any React codebase, \"nothing happened\" is not a safe assertion"
-    React surfaces an error thrown inside a click handler on `window`'s **`error`
-    event** rather than rejecting the click, so an assertion on the DOM sees a
-    successful no-op either way. The fix is a listener around the interaction that
-    fails the test if anything was raised.
+The RONL Business API's `*.perf.test.ts` files check wall-clock budgets. They are excluded
+from `npm test` and run through `vitest.perf.config.ts` with file parallelism off, as their
+own blocking CI step. Vitest test timeouts are raised to 15 s (CPSV Editor) and 20 s (RONL
+Business API) so that jsdom suites survive a busy machine.
 
-    This is the transferable one. A test that asserts an absence needs something
-    watching for the throw, or it passes for the wrong reason.
+## What it does not cover
 
-### Some branches are unreachable, and leaving them is the honest move
+- **No hook runs a test.** A clean push says nothing about the suites. Run them yourself,
+  or let the pull request run them.
+- **`main` does not require a test.** In the three applications, the promotion pull request
+  requires `audit` and `scan`. A red PROD deploy run stops the deploy after the merge.
+- **A path-filtered job reports without running.** The ACC deploy workflows start a
+  `changes` job on every pull request. When nothing relevant changed, the build job is skipped, and a
+  skipped job satisfies the required check.
+- **End-to-end runs mostly by hand.** Only the RONL Business API's PA Demo journey runs in
+  CI, in its ACC job. The CPSV Editor's journeys and the RONL Business API frontend and
+  public-site suites run by hand. Playwright runs do not feed the coverage figures.
+- **CPRMV and the Norm Editor measure no coverage.** The Norm Editor's `main` accepts a
+  merge with a failing pipeline (`only_allow_merge_if_pipeline_succeeds` is off), and
+  Maintainers can push to it directly.
+- **`@ronl/shared` is not measured.** `check-shared` keeps logic out of it instead.
 
-Three guards sat behind a submit button already `disabled` on exactly the same
-condition — `filename.trim() || chainName` under `disabled={!filename.trim()}`.
-Covering them would mean invoking the handler directly, which tests nothing a user
-can do, and is why two files stop at 98.08% and 94.44% rather than 100%.
+## Where it lives
 
-**This is the same finding the CPSV Editor recorded** about `DMNTab.jsx`'s seven
-remaining guards — reached independently, in a different codebase and a different
-framework. Taken together they suggest a rule: *a per-file floor in the high
-nineties is usually the ceiling, and the last few points are dead code asking to be
-documented rather than tested.*
-
-### Say which mutations a test does **not** catch
-
-Two branches are covered but **behaviour-preserving**: a pair of
-`if (!templates) return null` guards whose removal only produces a throw the
-surrounding `try/catch` already swallows, and a `?? ''` feeding an `Array.join`
-that coerces `undefined` anyway. Their mutations survive by construction. They are
-worth keeping — they assert the returned contract — but a reader deserves to know
-which mutations they do not catch, and the comments say so rather than implying
-more.
-
-### One file deliberately left at the bottom
-
-`GraphView.tsx` stays at 82.26% — **51 of 62 branches**. The eleven uncovered ones
-are inside d3's force-simulation tick and drag handlers: `d.x || 0` fallbacks that
-need a node at the origin, and `if (!event.active)` guards that need synthesised
-`D3DragEvent`s. Reaching them means standing up a d3 harness and asserting on d3's
-mechanics rather than on the component.
-
-It has **one branch of slack**, and that is worth stating numerically rather than
-as a feeling: a twelfth uncovered branch still reads 80.95% and passes; the
-thirteenth fails. The config comment records it, so whoever next meets the floor
-there knows **the answer is to test their new branch rather than lower the
-threshold**.
-
----
-
-## Runner mechanics
-
-- **Jest** takes a **glob key** (`'./src/**/*.ts'`), which it applies to each
-  matching file individually.
-- **Vitest** takes `thresholds: { branches: 80, perFile: true }`. It reports
-  *"global threshold"* in its failure message **even in per-file mode** — that is
-  its wording, not a misconfiguration. Naming the file rather than reporting the
-  package average is what demonstrates per-file behaviour.
-
-### How to verify a threshold actually bites
-
-**Do not trust a green run.** Add a temporary file with a few uncovered branches
-and confirm both that the run fails *and that it names the file*:
-
-```
-Jest:   ".../src/__threshold-probe.ts" coverage threshold for branches (80%) not met: 0%
-Vitest: ERROR: Coverage for branches (0%) does not meet global threshold (80%) for src/__threshold-probe.ts
-```
-
-Naming the file is the part that matters — it proves the threshold is per-file
-rather than being satisfied by a healthy package average. The CPSV Editor proved
-its native threshold the equivalent way, by raising it to 99 and watching it name
-eight files.
-
----
-
-## Margins differ sharply, and "clean" means different things
-
-All three were measured clean before enforcing. That word hides a lot:
-
-| | Files measured | Lowest branch coverage |
-|---|--:|---|
-| RONL Business API backend | not derived | comfortable — 92.31% across the package |
-| Linked Data Explorer backend | 38 of 44 | `sparql.service.ts` 82.85% |
-| Linked Data Explorer frontend | 68 of 78 | `ChainBuilder/TestCasePanel.tsx` exactly 80.00% — **since raised to 100%** |
-| CPSV Editor | 32 of 41 | `useDsoImport.js` 80.39% — **since raised to 92.15%** |
-
-The RONL Business API's five workspaces were re-measured on 12 September 2026 and
-every one passes the per-file floor, with these package averages on branches: backend
-**92.31%**, frontend **89.78%**, `pa-cockpit` **88.52%**, `pa-demo` **95.65%**,
-`public-site` **96.41%**. A package average is the number this page exists to distrust,
-so read them only as *how much room the package has*, not as evidence any file is
-covered; the floor is what speaks per file, and it passed in all five runners.
-
-*"Files measured" counts files carrying at least one branch* — 68 of the 78 in
-the Linked Data Explorer's frontend report, counted from `coverage-final.json`
-rather than from the printed table, which elides rows. A file with no branches
-cannot fail a branch threshold, so including it inflates the denominator without
-telling you anything.
-
-The Linked Data Explorer rows were re-measured at v2026.09.4. The frontend read
-**69 of 78**, one more file carrying a branch, with `GraphView.tsx` at 82.26% the
-only one under 85%. The backend read **38 of 44**, and its lowest file had not
-moved. At v2026.10.2 (10 October 2026) the frontend reads **85 of 96**, with two files
-under 85% — `GraphView.tsx`, still at 51 of 62, and `BpmnModeler/BpmnCanvas.tsx` at
-84.03% (200 of 238), which that release's phase panel took below — and the backend
-**55 of 61**, with `sparql.service.ts` still lowest at 82.85% and
-`dmn-validation.service.ts` at 84.97%. That backend row said **49** until 11 September 2026, copied from the comment
-`jest.config.js` carries — *"measured clean when this landed — 49 files"* — and 49
-is neither 38 nor the 44 files the report contains at all. It is the same class of
-figure as the frontend's 64: quoted from a record rather than recounted under the
-rule this table states. The CPSV Editor's row said **41**, which is the number of files
-in its report; 32 of them carry a branch. Its lowest file has not moved.
-
-!!! bug "This table named a file that does not exist, and the error travelled"
-    Until 9 September 2026 the Linked Data Explorer row here read
-    **`CaseworkerCasePanel.tsx`**. No such file has ever existed in that
-    repository — the one sitting at exactly 80.00% was
-    `ChainBuilder/TestCasePanel.tsx`. The wrong name reached a commit message, a
-    config comment and a cross-repository record before anyone checked whether the
-    file was real, and this page copied it from there rather than verifying it.
-
-    The count was wrong too: **64** is not reproducible from any report, which is
-    why the rule is now stated rather than the number quoted.
-
-    Worth keeping as a caution about this page's own method. A margins table reads
-    like measurement, so it invites transcription — but only the percentages had
-    been measured, and the file names beside them had not.
-
-Thresholds pass at `>= 80`, so a file at exactly 80.00% is green with **zero
-margin** — the first uncovered branch added to it turns CI red on an otherwise
-unrelated change.
-
-**The Linked Data Explorer closed that gap in v2026.09.2**: twelve files raised,
-package branches 90.59% → **92.88%**, files under 85% from fourteen to one, tests
-1042 → 1073. **No production code changed** — test files only, plus the config
-comment. The CPSV Editor has not yet, and arrived at the same position by a
-different route: at v2026.10.1 its three lowest files — `ConceptsTab.jsx` 80.55%,
-`ChangelogTab.jsx` 80.70%, `vocabularies.config.js` 81.13% — each pass by one covered
-branch, and the ratchet's pins that used to absorb a slip are gone.
-The RONL Business API closed it on 28 September 2026, when `391b1a8` took its three files
-at exactly 80.00% to 100%, and its 30 September reading had every file above 85%; on 3 October
-v2026.10.0 brought `BesluitOverzichtSection.tsx` in at 80.43%, and at v2026.10.2 it still
-reads that, with `phaseSet.ts` at 83.33%, as the note at the top of this page records.
-
-**The first uncovered branch added to any of them turns CI red on an otherwise
-unrelated change.** That is the floor working as designed, but it is worth meeting
-in a config comment rather than in a surprising failure.
-
----
-
-## A floor only gates where the tests run before the merge
-
-A threshold enforced after a merge is a report, not a gate. This is where the
-three diverge most:
-
-| Repository | Tests on a pull request |
+| What | Where |
 |---|---|
-| CPSV Editor | ✅ both Static Web Apps workflows run `npm run test:ci` on `push` **and** `pull_request` — and the `acc` one is a required check since 19 September 2026 |
-| Linked Data Explorer | ✅ backend and frontend, acc workflows — all three `acc` deploy checks required since 19 September 2026 |
-| RONL Business API | ✅ all five workspaces since v2026.09.7 — the four `acc` build and deploy checks required since 19 September 2026 |
-
-**All three now run their suites before the merge.** The RONL Business API was the last
-to close that gap, and it had two halves. Its backend workflow triggered on `push`
-alone, so its suite — 2008 tests at the time — ran only *after* a merge and its backend
-branch threshold gated nothing on a pull request
-([#87](https://github.com/sgort/ronl-business-api/issues/87)). And `@ronl/pa-cockpit`,
-a library with no deploy workflow of its own, **ran nowhere in CI at all** — its 476
-tests were measured only on a developer's machine; both frontend workflows now run its
-suite, placed before the frontend's own because the frontend imports it.
-
-The backend trigger proved itself on the pull request that carried it: an `axios` 1.18
-security bump broke the backend build there, with 1859 tests passing and one suite
-failing to compile on a widened header type. Before the trigger existed, that lands on
-`acc`.
-
-The Linked Data Explorer had the same gap and **closed it in v2026.09.2**: its
-backend suite — 1151 tests at v2026.09.4 — now runs on the pull request rather than
-only after the merge. It is the worked example, because it had already let a genuine
-defect sit on a pushed branch for days — no pull request ever ran the test that
-caught it.
-
-!!! success "Running before the merge became blocking it, on 19 September 2026"
-    The floor is now enforced at the merge on `acc` in all three. Each repository's
-    `acc` ruleset requires the build and deploy checks alongside `audit` and `scan`,
-    and those jobs run the suites — coverage thresholds included — before they build.
-    A pull request that drops a file below 80% turns a **required** check red, and the
-    merge button goes with it. Since v2026.10.1 that includes a lockfile-only pull
-    request in the RONL Business API, whose three site workflows used to skip one.
-    It has blocked a merge since, on new code rather than on a regression. On 12 November 2026 the
-    Linked Data Explorer's sign-in pull request
-    ([#331](https://github.com/sgort/linked-data-explorer/pull/331)) failed its required `deploy`
-    and `Build and Deploy Frontend` checks on three new files below the floor —
-    `testDeploy.service.ts` at 66.7%, `services/auth.ts` at 76.5% and `common/LocalOnly.tsx` at
-    75% — and merged once `9112835` had added their tests, with no threshold touched.
-
-    Until that date this said the opposite, correctly: the workflows that enforce the
-    floor were named by no ruleset, so a sub-80% file stopped the deploy and left the
-    merge button available. The obstacle was mechanical rather than political — a
-    required check must report on every pull request, and these workflows were filtered
-    at their trigger, so a pull request touching nothing they watched reported nothing
-    and would have hung forever. Moving the filter into a `changes` job, whose skip
-    *reports success*, is what made the ruleset edit possible; see
-    [how a path-filtered workflow became requireable](branch-protection.md#how-a-path-filtered-workflow-became-requireable).
-
-    **On `main` the old sentence still stands.** Every `main` ruleset now requires
-    `audit` and `scan` — the CPSV Editor's since 30 September 2026 — but none names a
-    build or a test, so a promotion carrying a coverage regression is stopped by the
-    deploy, not by the merge.
-
-!!! warning "The fix is not identical, and the difference matters before copying one into the other"
-    The Linked Data Explorer's backend workflow **deploys to Azure**, so its
-    `pull_request` trigger had to come with five deploy-side steps gated on the
-    event — arranged as per-step conditions rather than a job split, so the check
-    name stays stable and no ruleset entry changes.
-
-    RONL Business API's backend workflow did not deploy when its trigger landed in
-    v2026.09.7 — it ended at an uploaded artifact, so the change was the trigger
-    alone. Since v2026.09.10 it deploys too, over OIDC, and its four deploy-side
-    steps are gated on the event the same way: the two workflows have converged.
-
-!!! tip "A package outside the measurement is not covered — it is unmeasured"
-    `@ronl/shared` has no test runner, deliberately: it holds types, constant data and
-    re-exports, and there is nothing there to test. The consequence is sharper than an
-    exemption, though. A function placed in that package is not *under-tested*; it is
-    **outside the measurement entirely**, so no run fails and no reviewer sees a number
-    move. That happened once — v2026.09.4 moved a branching label helper out of the
-    package for exactly that reason, and it was caught by hand, by someone who happened
-    to look.
-
-    v2026.09.7 replaced the convention with a check
-    ([#84](https://github.com/sgort/ronl-business-api/issues/84)): `check-shared` fails
-    the `audit` job on a function, class, conditional or loop anywhere in the package.
-    It parses with the TypeScript compiler API rather than matching text, because an
-    arrow in an interface is a type and the same syntax assigned to a const is logic,
-    and no regular expression separates the two. It runs in `audit` rather than a
-    workspace suite because `audit` has no paths filter and is the required check — so
-    every pull request reaches it, including the one that first adds a function to a
-    package no filter yet watches.
-
-    The general rule this leaves: **where a package cannot be measured, enforce what
-    makes it unmeasurable** rather than measuring nothing and calling it covered.
-
-**Production backend workflows are deliberately excluded from that treatment.**
-`main` is promoted from `acc`, and those commits already ran the full suite on their
-own `acc` pull requests; a second pre-merge run would re-test the same commits. The
-Linked Data Explorer used to give a heavier reason first — its `production`
-environment required a reviewer, so a `pull_request` trigger would have put a human
-approval in front of the tests — and that reviewer was removed on 24 September 2026
-([#210](https://github.com/sgort/linked-data-explorer/issues/210)). Both repositories
-now exclude it on the promotion argument alone. The Linked Data Explorer's two
-production *site* workflows do build on a promotion pull request, as a preview.
-
----
-
-## Adopting this in a fourth application
-
-1. **Measure before enforcing.** Native thresholds are all-or-nothing per file. A
-   repository not yet at 80% everywhere needs the ratchet approach instead — and
-   should treat that script as temporary from the day it is written. The CPSV
-   Editor's carried one file and was deleted with it, which is the intended
-   lifespan.
-2. **Gate on branches only** until a functions floor has been measured
-   separately. It is not a free companion setting.
-3. **Check where the tests actually run.** A floor enforced only after the merge
-   is retrospective.
-4. **Prove the threshold by making it fail**, and confirm the failure names the
-   file.
-5. **Expect a load cost** when a large file is brought up, and fix it at its own
-   boundary rather than by serialising the suite.
-
----
-
-Related: [Supply-Chain Pinning](supply-chain.md) for what the `audit` job gates,
-and [Build Provenance](build-provenance.md) for identifying which build a running
-app is.
+| Floors | CPSV Editor `vite.config.mjs`; Linked Data Explorer `packages/backend/jest.config.js`, `packages/frontend/vite.config.ts`; RONL Business API `packages/backend/jest.config.js`, `packages/{frontend,pa-demo,public-site}/vite.config.ts`, `packages/pa-cockpit/vitest.config.ts` |
+| Conformance check | RONL Business API `packages/backend/scripts/check-conformance-coverage.cjs`, `src/openapi/testing/conformance.ts` |
+| Perf suite | RONL Business API `packages/frontend/vitest.perf.config.ts` |
+| Playwright | CPSV Editor `playwright.config.js`; RONL Business API `packages/{frontend,pa-demo,public-site}/e2e/playwright.config.ts` |
+| CI test steps | `.github/workflows/azure-*.yml` (CPSV Editor: `azure-static-web-apps-*.yml`); `promote-to-production.yml`; CPRMV `.github/workflows/ci.yml`, `sbom.yml`; Norm Editor `.gitlab-ci.yml` |
+| Required checks | GitHub rulesets `acc supply-chain gate` and `main promotion gate` in each repository |
+| Per-component test guides | [CPSV Editor](../cpsv-editor/developer/testing.md) · [Linked Data Explorer](../linked-data-explorer/developer/testing.md) · [RONL Business API](../ronl-business-api/developer/testing/overview.md) · [Norm Editor](../norm-editor/developer/testing.md) |

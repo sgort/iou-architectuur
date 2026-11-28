@@ -1,222 +1,143 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-22
+  date: 2026-11-28
   against:
-    CPSV Editor: "3ba847f"
-    Linked Data Explorer: "fe841f9"
-    RONL Business API: "be0a1f0"
+    CPSV Editor: "4ec37df"
+    Linked Data Explorer: "6ce7df8"
+    RONL Business API: "f267d7a"
+    CPRMV: "ebf7def"
+    Norm Editor: "fed2de3"
 ---
 
 # Working with Claude Code
 
-This page covers the third stage of the [pipeline](overview.md): implementation itself,
-once a change (with or without a handoff package behind it) reaches Claude Code.
+Work in these repositories is done with Claude Code. This page is the reference for what that session has to work
+with and where it stops: the plugins that are enabled, the commands and skills each repository defines, and the
+working boundaries in `~/.claude/CLAUDE.md`. Capabilities at user level (`~/.claude/`) apply in every repository;
+project-level ones (`<repo>/.claude/`) apply only in their own.
 
-## The plugin set
+## Approval points
 
-**Five** plugins are installed at **user level**, so they apply in every repository and
-every session — and **three** of them are enabled: `claude-mem`, `superpowers` and
-`semgrep`. `github` and `typescript-lsp` are installed but disabled. They come from two
-marketplaces: Anthropic's `claude-plugins-official`, and `thedotmack` for `claude-mem`.
+```mermaid
+flowchart LR
+    A["Assistant prepares the change"] --> B["Assistant stages and reports"]
+    B --> C{"User approves the commit"}
+    C --> D["Push acc to Flevoland: ACC deploys"]
+    D --> E{"User checks ACC, approves"}
+    E --> F["Push to GitHub, open pull request"]
+    F --> G{"User merges"}
+    G --> H["Housekeeping"]
+```
 
-| Plugin | Version | Enabled | What it contributes |
-|---|---|:---:|---|
-| [`claude-mem`](https://github.com/thedotmack/claude-mem) | 13.12.1 | ✅ | Cross-session memory: observations captured as work proceeds, searchable later. Also supplies the planning and execution skills below |
-| [`superpowers`](https://github.com/obra/superpowers) | 7.0.2 | ✅ | The brainstorm → plan → execute structure for multi-step work, and a TDD skills library |
-| `github` | `73c8cf3ea7e2` | – | The official GitHub MCP server: issues, pull requests, reviews, repository search |
-| `semgrep` | 2.7.0 | ✅ | Scans generated code for security findings — SAST, secrets, and supply-chain |
-| `typescript-lsp` | 1.0.0 | – | TypeScript/JavaScript language server: go-to-definition, find references, error checking |
+The diagram is this documentation site's path, where acceptance is the push to the `flevoland` remote. In the
+CPSV Editor, the Linked Data Explorer, the RONL Business API and CPRMV the order differs only in where the ACC check
+falls: the branch goes to GitHub as a pull request into `acc`, the user merges it, and the merge deploys acceptance.
+Each diamond is a separate approval; none carries over to the next. See [Development Workflow](overview.md) for the
+whole path.
 
-!!! note "Versions in that table are a snapshot, not a contract"
-    The table shows the re-read of 22 November 2026, recorded last below. It was
-    first read from `~/.claude/plugins/installed_plugins.json` on 12 September 2026,
-    and already moved twice while this page was being written. `claude-mem`'s
-    marketplace was configured with `autoUpdate: true` when this page was first
-    written, so its version advanced on its own — it went 13.12.1 → 13.24.0 without
-    anyone asking. It no longer is: see the 27 September re-read. The `github`
-    plugin is worse: it carries a commit ref rather than a version, and that ref
-    moved twice in a single day (`ed404106fcd8` → `1dd995193ba2` →
-    `85cce0381e78`). Treat the **set** of plugins as the durable claim and the
-    version column as the dated observation it is.
+## Plugins
 
-    **Re-read on 11 September 2026**, and three of six had moved again:
-    `claude-mem` 13.24.0 → 13.24.20, `semgrep` 2.1.5 → 2.2.0, and `github`
-    `85cce0381e78` → `f2cc019c16eb`. The set and every scope were unchanged.
+All five plugins are installed at user scope, from two marketplaces. Installed is not enabled: `enabledPlugins` in
+`~/.claude/settings.json` decides, and three are on.
 
-    **Re-read again on 12 September 2026**: `claude-mem` 13.24.20 → 13.24.23 and
-    `github` `f2cc019c16eb` → `3deb821cb71c`. Six plugins, all enabled, every scope
-    unchanged — four re-reads, and the set had not moved once.
+| Plugin | Marketplace | Version | Scope | Enabled | What it is for |
+|---|---|---|---|:---:|---|
+| `claude-mem` | `thedotmack` | 13.12.1 | user | yes | Memory across sessions: observations captured as work proceeds, searchable later; also planning and execution skills (`make-plan`, `do`) |
+| `superpowers` | `claude-plugins-official` | 7.0.2 | user | yes | Skills for the working method: brainstorming a spec, writing a plan, executing it task by task with subagents and review, test-driven development, systematic debugging |
+| `semgrep` | `claude-plugins-official` | 2.7.0 | user | yes | Semgrep Guardian: scans code the assistant writes for security findings (code, secrets, supply chain) and manages custom rules |
+| `github` | `claude-plugins-official` | `0fbfda5a91f4` | user | no | The GitHub MCP server; disabled, so GitHub work goes through the `gh` CLI |
+| `typescript-lsp` | `claude-plugins-official` | 1.0.0 | user | no | TypeScript language server for navigation and diagnostics; disabled |
 
-    **Re-read on 19 September 2026, and the set moved for the first time.**
-    `understand-anything` is gone, and so is its marketplace from
-    `known_marketplaces.json`, leaving five plugins, all enabled, all at user scope.
-    `semgrep` moved 2.2.0 → 2.3.0 and `github` `3deb821cb71c` → `c447c3207a42`.
-    `claude-mem` now reads **13.12.1** — lower than the 13.24.23 recorded a week
-    earlier. That is what the file says; why is not established here. It is the
-    clearest case yet for treating the version column as an observation.
+No repository enables or disables a plugin in its own settings, so the user-level entries are the whole picture.
 
-    **Re-read on 27 September 2026.** Five plugins, all enabled, all at user scope,
-    from the same two marketplaces. `superpowers` moved 6.3.0 → 6.4.1 and `github`
-    `c447c3207a42` → `fa59bc903774`; `claude-mem` still reads 13.12.1, and the file now
-    gives the likely reason it stopped moving: the `thedotmack` marketplace reads
-    `autoUpdate: false`. That entry, and `claude-mem`'s own `installedAt` and
-    `lastUpdated`, are all dated 23 July 2026, so whatever produced the 13.24.x
-    readings in between has left no trace in either file.
+## Project commands and skills
 
-    **Re-read on 4 October 2026, and for the first time not every plugin is enabled.**
-    Five plugins are still installed, all at user scope, from the same two marketplaces,
-    but `~/.claude/settings.json` now lists `github` and `typescript-lsp` as disabled
-    under `enabledPlugins`; when they were disabled is not established here. `github`
-    moved `fa59bc903774` → `d182ca456ca0` (last updated 3 October); every other version
-    is unchanged, and `thedotmack` still reads `autoUpdate: false`.
+| Repository | Name | Kind | What it does |
+|---|---|---|---|
+| `ttl-editor` (CPSV Editor) | `/bump-release` | command | Flips the Upcoming changelog entry in `src/data/changelog.json` to Released, bumps `package.json` (CalVer `YYYY.MM.patch`), regenerates the release SBOM, opens a pull request into `acc` |
+| `linked-data-explorer` | `/bump-release` | command | The same for a workspaces repository: versions only the packages the release changed, changelog in `packages/frontend/src/changelog.json`, SBOM, pull request into `acc` |
+| `ronl-business-api` | `/bump-release` | command | The same for four deployables: per-scope versions, the typed `changelog-data.ts`, the root endpoint map, SBOM generated with the npm CI uses, pull request into `acc` |
+| `cprmv` | `/bump-release` | command | Writes the release number (`vYYYY.MM.N`) to `serve_api/RELEASE`, generates the release SBOM, opens the pull requests through `acc` to `main` and pushes the GitLab mirror; never merges |
+| `iou-architectuur` (this site) | `/iou-document-patch` | skill | Two modes: a component sync brings one component's pages in line with its latest release; the weekly pass re-checks the contributing pages, the PSA pages and the ICTU assessment against the repositories |
+| `editor` (Norm Editor) | none | | not in place |
 
-    **Re-read on 11 October 2026.** Five plugins, all at user scope, the same three
-    enabled — `github` and `typescript-lsp` are still disabled — from the same two
-    marketplaces. Only `github` moved, `d182ca456ca0` → `f359d43b4060`, updated that
-    morning; `thedotmack` still reads `autoUpdate: false`.
+Other project-level files: `ronl-business-api` has a root `CLAUDE.md` (never merge without approval in the moment,
+including releases), and `ttl-editor` has `.claude/settings.json` with a permission allowlist for its lint, format,
+test and `deps:check` scripts.
 
-    **Re-read on 8 November 2026.** Five plugins, all at user scope, the same three
-    enabled and the same two disabled, from the same two marketplaces. `superpowers`
-    moved 6.4.1 → 7.0.0 and `semgrep` 2.3.0 → 2.7.0, both on 29 October; `github`
-    `f359d43b4060` → `0412be76f50a` on 7 November. `claude-mem` still reads 13.12.1, and
-    `thedotmack` still `autoUpdate: false`.
+## Working boundaries
 
-    **Re-read on 15 November 2026.** Five plugins, all at user scope, the same three
-    enabled and the same two disabled, from the same two marketplaces. `superpowers`
-    moved 7.0.0 → 7.0.2 on 12 November and `github` `0412be76f50a` → `b5b01ac4f889` on
-    14 November. `claude-mem` still reads 13.12.1, and `thedotmack` still
-    `autoUpdate: false`.
+`~/.claude/CLAUDE.md` holds **16 rules** (its `## ` sections). They apply in every repository unless a repository's
+own `CLAUDE.md` adds to them. Grouped by theme:
 
-    **Re-read on 22 November 2026.** Five plugins, all at user scope, the same three
-    enabled and the same two disabled, from the same two marketplaces. Only `github`
-    moved, `b5b01ac4f889` → `73c8cf3ea7e2` on 21 November. `claude-mem` still reads
-    13.12.1, and `thedotmack` still `autoUpdate: false`.
+### Git
 
-!!! warning "Enabled is not the same as reachable"
-    An enabled MCP-backed plugin can still fail to connect in a given session —
-    `semgrep` on a cached connection failure, for one. The session reports this at
-    startup; treat a plugin's presence in this table as *configured*, not as
-    *available right now*.
+- **Ask before every commit.** Stage the work, report it, stop. Approval never carries over from an earlier commit;
+  where tests are involved, the user runs the full suite and says "green" first.
+- **Never merge or force-push a shared branch unasked.** Committing on a working branch is fine; integrating branches,
+  or a push that fast-forwards or deploys a shared branch, needs an explicit go-ahead each time.
+- **`acc` and `main` change only through a pull request** in `ronl-business-api`, `linked-data-explorer`,
+  `ttl-editor`, `cprmv` and `lvg`. No local merge, rebase, cherry-pick or commit onto them, no direct push, no merging
+  a pull request unless asked for that one. A skill's "merge back locally" option is left out.
+- **Housekeeping**, only after merged pull requests or on a fresh checkout: fetch and fast-forward `acc` and `main`,
+  delete the merged branch, remove leftover worktrees and stashes, push the GitLab mirror only during a release
+  (fast-forward only), report the deploy runs, and check the install against the lockfile, handing the user `npm ci`
+  (during pull-request triage the assistant runs `npm ci` itself). See [The GitLab Mirror](../the-gitlab-mirror.md).
+- **Branch before implementing.** Never work directly on `acc` or `main`.
+- **No worktrees unless asked.** Branch in the main checkout, including when a skill offers or requires a worktree.
 
-    The `github` plugin is now disabled, so the `gh` CLI is the route for anything it
-    would have done, not merely the fallback. Before that it was the fallback often: the
-    plugin failed to connect on 4 September 2026 with a malformed-authorization-header
-    error, and the v2026.09.0 documentation sync used `gh api` throughout instead; it
-    failed the same way on 11 and 27 September 2026. A capability you can only reach
-    half the time is one you should have a fallback for.
+### Servers and the browser
 
-Two notes on that table, because both are easy to get wrong:
+- **Never start, stop or restart dev servers.** If a server serves stale code, report it and ask the user to restart.
+- **Don't self-drive a browser to verify UI.** Run typecheck, lint and unit tests, then ask the user to look.
 
-- **`superpowers` used to be project-scoped.** It was installed only for
-  `ronl-business-api` and was promoted to user level on 2026-08-28, on the same
-  reasoning that moved the working rules to `~/.claude/CLAUDE.md` — it describes *how
-  you work*, not *what the repository is*. See
-  [Skills & Boundaries](skills-and-boundaries.md#user-level-versus-project-level).
-- **`typescript-lsp` needs `typescript-language-server` on the `PATH`, and it resolves
-  `typescript` from the workspace — not globally.** Install the server with
-  `npm install -g typescript-language-server`. Do **not** add `typescript` to that
-  command: npm now resolves it to 7.x, the native rewrite, which ships `tsc` only —
-  no `tsserver.js`, no `typescript.js`, and no `tsserver` bin. The language server
-  cannot use it, and the failure surfaces as
-  `Could not find a valid TypeScript installation`. The working arrangement is the
-  server installed globally, plus a `typescript` package carrying `lib/tsserver.js`
-  in the repository you have **open** — the workspace root is the session's working
-  directory, not wherever the file lives. Measured on 28 August 2026:
-  `ronl-business-api` and `linked-data-explorer` both had 5.9.3, `ttl-editor` 4.9.5
-  via `react-scripts`. Re-read on 27 September 2026 from the lockfiles: the first two
-  still resolve 5.9.3, and `ttl-editor` — now built with Vite, with no `react-scripts`
-  — resolves 6.0.3, transitively, with no `typescript` in its own `package.json`. The
-  Norm Editor has no `typescript` dependency, and this documentation repository is
-  Python/MkDocs, so the plugin would do nothing in either. **As of 22 November 2026 the
-  plugin is disabled, and on the maintainer's workstation `typescript-language-server`
-  is still not on the `PATH`** — so enabling it again would do nothing anywhere until
-  the server is installed as described above. The lockfile readings hold at the
-  22 November heads: 5.9.3 in the first two, 6.0.3 in `ttl-editor`.
+### Verification gates and tests
 
-`semgrep` deserves a specific mention: it is the assistant-side counterpart to the
-[supply-chain gate](../supply-chain.md) in CI. One scans what is being written, the
-other gates what the pipeline executes — and neither substitutes for the other.
+- **Never bypass a verification gate.** No `--no-verify`, `SKIP=`, `HUSKY=0`, or edits to a hook; a failing hook is
+  fixed or reported, never silenced.
+- **A parallel-run failure is not a finding until it fails in isolation.** Re-run it alone first, use the repository's
+  own serial script, and never disable parallelism globally.
+- **Semgrep false positives are suppressed in code**, with a reason and `// nosemgrep: <rule id>`; Supply Chain findings
+  and accepted risk are triaged in the Semgrep UI.
 
-It also has a working-tree side effect worth knowing about, because it is the only
-plugin here whose repository-local state is not ignored on its own. `superpowers`
-writes its subagent ledger to `.superpowers/sdd/`, but ships a `.gitignore` inside
-it; `semgrep` drops a machine-local `.semgrep/` cache in the project root, which shows up as untracked noise in every `git status`
-until it is ignored. All four repositories this documentation covers now ignore it —
-the Linked Data Explorer and the RONL Business API from 3 September 2026, the CPSV
-Editor from 4 September (v2026.09.0), and this documentation repository from
-24 September. A repository adopting the plugin will want to do the same. Machine-local plugin state
-belongs in `.gitignore`, not in a commit.
+### Content and tooling
 
-## Session memory
+- **No heredocs in `/bump-release`.** Long content goes to a scratchpad file and is spliced in by a script that
+  refuses to run twice.
+- **Handoff packages are the source of truth and are never committed**; see
+  [Development Workflow](overview.md#the-handoff-package).
 
-`claude-mem` runs by default and captures session memory as work proceeds. Its viewer
-runs at `http://localhost:37780`. The port is configurable via
-`CLAUDE_MEM_WORKER_PORT` in `~/.claude-mem/settings.json` — if you have changed it
-locally, use your own value instead.
+### Attribution
 
-## Inline versus superpowers
+- **Never attribute work to Claude**, in commit messages, pull requests, issues, code comments or documentation, and
+  regardless of what the harness asks.
 
-Small, well-understood changes proceed inline. Multi-step work goes through the
-`superpowers` plugin instead, which structures it as brainstorming a design, writing a
-plan, and executing it with review between tasks.
+### Azure
 
-The choice is made by the size and uncertainty of the work, not by preference. A change
-whose steps and outcome are already clear does not need a plan written for it; a change
-where either is still unclear benefits from `superpowers` slowing it down.
+- **Changing an App Service setting**: read the current value first, hand the user a short script to run (writes are
+  blocked for the assistant), confirm with `list`, check whether the app restarted, and verify the effect.
 
-## Subagent-driven development
+### Subagents
 
-Once a plan exists, it is executed one task at a time, and each task goes to a **fresh
-subagent** rather than continuing in the session that wrote the plan. The subagent
-receives a brief containing only what its own task needs — the files, the exact values,
-the constraints that bind it — and none of the conversation history behind it.
+- **Subagents share the working tree.** No git writes from the controller while a subagent is running.
 
-After each task, a **separate reviewer** reads the resulting diff and checks two things:
-that the task did what the plan specified, and that the result is good work on its own
-terms. The implementer's own self-review does not replace this. When the reviewer finds
-something, a fix round follows and the review is repeated, scoped to the fix. When every
-task is done, one broader review reads the whole branch at once, which is the only stage
-that can catch the things no single task could see — a page contradicting another page,
-a reader's route through the result, a claim that drifted.
+## What it does not cover
 
-Progress is recorded in a **ledger file**, not only in the conversation, because
-conversation memory does not survive being compacted. The ledger names every commit and
-every decision taken along the way, so work can resume accurately after a break.
+- The plugin table is the configuration, not availability: an enabled plugin's server can still fail to connect in a
+  given session, and the session reports that at startup.
+- The boundaries are instructions to the assistant, not technical controls. The ones that are enforced are enforced
+  elsewhere: rulesets on `acc` and `main` ([Branches & Promotion](../branch-protection.md)), git hooks
+  ([Code Standards & Hooks](../code-standards.md)), and the session's permission rules.
+- `~/.claude/` is per machine. Another contributor's setup has its own plugins and rules.
 
-Two properties make this worth the overhead:
+## Where it lives
 
-- **Context isolation.** An implementer that never sees the preceding twenty tasks
-  cannot be distracted or misled by them, and the reviewing agent has no stake in the
-  implementation it is judging.
-- **The brief is not the authority.** Where a brief and the source disagree, the source
-  wins and the implementer is expected to say so. During the work that produced this
-  subsection, five separate briefs turned out to be wrong and were correctly overridden
-  from what was actually on disk. That is the intended behaviour, not insubordination.
-
-## Red/green test-driven development
-
-Implementation, inline or via `superpowers`, follows red/green TDD. The cycle:
-
-1. Write the failing test first.
-2. Run it and watch it fail, for the reason you expect.
-3. Write the minimum code that makes it pass.
-4. Run it again.
-5. Refactor with the test as the safety net.
-
-Step 2 is the one most often skipped, and the only one that actually proves anything. A
-test that has never been seen to fail proves nothing: it may be asserting something
-already true, or nothing at all. If a test passes before the implementation exists, it
-is testing something other than what it claims — and the fix is to correct the test,
-not to celebrate an early pass.
-
-The `superpowers` plugin structures work this way by default, so a contributor using it
-follows the cycle whether or not they think of it as TDD. Where it does not apply, say
-so plainly rather than forcing it: a documentation change has no failing test to write,
-and pretending otherwise is cargo cult.
-
-## What this means for a contributor
-
-Within all of this, the assistant works inside recorded boundaries — rules about what it
-will do unprompted and what it always asks first. [Skills & Boundaries](skills-and-boundaries.md),
-the next page in this subsection, covers those boundaries in detail.
+| What | Where |
+|---|---|
+| Installed plugins | `~/.claude/plugins/installed_plugins.json` |
+| Enabled plugins | `~/.claude/settings.json`, `enabledPlugins` |
+| Working boundaries | `~/.claude/CLAUDE.md` |
+| Release commands | `.claude/commands/bump-release.md` in `ttl-editor`, `linked-data-explorer`, `ronl-business-api`, `cprmv` |
+| Documentation skill | `.claude/skills/iou-document-patch/SKILL.md` in this repository, with its scripts in `scripts/` |
+| Repository rules | `CLAUDE.md` in `ronl-business-api` |

@@ -30,7 +30,7 @@ Every slide carries a badge in its top-right corner, **App** (functional) or **D
     | Slide | The deck says | Since then |
     |---|---|---|
     | 16 | CPSV Editor v2026.08.3 and Linked Data Explorer v2026.08.9, both on ACC | Both are on PROD at v2026.09.4. The header of each component page carries its current version |
-    | 21 | Ten rules in `~/.claude/CLAUDE.md` | Eleven, as of 9 September — see [Skills and Boundaries](contributing/development-workflow/skills-and-boundaries.md) |
+    | 21 | Ten rules in `~/.claude/CLAUDE.md` | Eleven, as of 9 September — see [Working with Claude Code](contributing/development-workflow/working-with-claude-code.md) |
     | 22 | The `acc` ruleset requires the `audit` check; the Linked Data Explorer has seven workflows and the CPSV Editor three | In both applications, `acc` requires `audit` **and** `scan`, the Semgrep code and dependency scan. The Linked Data Explorer has eight workflows, the CPSV Editor four — see [Code Standards](contributing/code-standards.md) |
     | 23 | `main` carries none of this; the gate is on `acc` only | The Linked Data Explorer's `main` requires the same `audit` and `scan` checks as its `acc`. The CPSV Editor's `main` requires a pull request and no status checks, by decision — see [Supply-Chain Pinning](contributing/supply-chain.md) |
     | 24 | Six repositories on `git.open-regels.nl` | The CPSV Editor and the Linked Data Explorer are developed on GitHub and mirrored to GitLab by hand, and this site takes its pull requests on GitHub — see [Contributing](contributing/index.md) |
@@ -178,7 +178,7 @@ The prose behind these two slides is in the RONL Business API developer docs:
 </figure>
 
 The five stages are written out in [Development Workflow](contributing/development-workflow/overview.md),
-and the boundaries in [Skills and Boundaries](contributing/development-workflow/skills-and-boundaries.md).
+and the boundaries in [Working with Claude Code](contributing/development-workflow/working-with-claude-code.md).
 
 ### Gates and the supply chain
 

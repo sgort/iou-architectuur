@@ -1,120 +1,134 @@
 ---
 scope: cross-cutting
 verified:
-  date: 2026-11-22
+  date: 2026-11-28
   against:
-    CPSV Editor: "3ba847f"
-    Linked Data Explorer: "fe841f9"
-    RONL Business API: "be0a1f0"
+    CPSV Editor: "4ec37df"
+    Linked Data Explorer: "6ce7df8"
+    RONL Business API: "f267d7a"
+    CPRMV: "ebf7def"
+    Norm Editor: "fed2de3"
 ---
 
 # Development Workflow
 
-This section describes how the maintainers actually build IOU Architecture features —
-day to day, AI-assisted, and distinct from the [human contribution process](../index.md)
-that outside contributors follow. If you read only one page in this subsection, read
-this one.
+This page follows one piece of work from idea to production in these repositories. Work is designed and planned in
+the repository, implemented on a feature branch, merged into `acc` through a pull request whose checks must pass,
+checked on acceptance by a person, and promoted to `main` through a second pull request. The assistant prepares each
+step; the user approves every commit, merge and promotion.
 
-The pipeline, stage by stage:
+## How it works
 
-## 1. Design
+```mermaid
+flowchart TD
+    A["Idea or issue"] --> B{"Open design question?"}
+    B -- yes --> C["Spec: docs/superpowers/specs"]
+    C --> H["Handoff package (if a design was made elsewhere)"]
+    H --> D["Plan: docs/superpowers/plans"]
+    B -- no --> E["Feature branch"]
+    D --> E
+    E --> F["Implement, test first"]
+    F --> G["User approves the commit"]
+    G --> P["Pull request into acc, required checks"]
+    P --> M["User merges, ACC deploys"]
+    M --> K["ACC check by a person"]
+    K --> R["Release: /bump-release pull request into acc"]
+    R --> Q["Promotion pull request acc to main, user merges"]
+    Q --> X["PROD deploys, then housekeeping"]
+```
 
-For medium-to-large features where fundamental UX is at stake, design comes first, in
-Claude Design. Small changes skip this stage entirely and go straight to implementation.
+1. **Design.** Work with an open design question starts as a written spec. Small, well-understood changes skip
+   straight to the feature branch.
+2. **Handoff.** When a design was produced outside the repository, it arrives as a handoff package (below).
+3. **Plan.** Multi-step work gets a written plan before any code. Specs and plans live in the repository, next to the
+   code they describe.
+4. **Implement.** On a feature branch in the main checkout, never on `acc` or `main`. Tests come first: write the
+   failing test, watch it fail, then write the code that makes it pass.
+5. **Pull request into `acc`.** The `acc` ruleset requires a pull request and a set of passing checks, with no bypass;
+   see [Branches & Promotion](../branch-protection.md). The checks behind it are on
+   [Dependencies](../dependency-scanning.md), [Tests & Coverage Gates](../coverage-floor.md) and
+   [Code Standards & Hooks](../code-standards.md).
+6. **ACC check.** Merging deploys acceptance. A person looks at the change there before it goes further.
+7. **Release and promotion.** `/bump-release` cuts a release as its own pull request into `acc`; a promotion pull
+   request from `acc` to `main` takes it to production. Both are merged by the user.
+8. **Housekeeping.** After the merges: sync the local branches, delete the merged branch, check the install against
+   the lockfile. The steps are listed on [Working with Claude Code](working-with-claude-code.md#git).
 
-## 2. Handoff
+## Specs and plans
 
-A design leaves Claude Design as a handoff package: the design itself, standalone HTML,
-screenshots, a README, and a PROMPT. The package is briefing material for the next
-stage, not something that enters the repository as-is.
+| Component | Specs | Plans | Release command |
+|---|---|---|---|
+| CPSV Editor | `docs/superpowers/specs/` | `docs/superpowers/plans/` | `.claude/commands/bump-release.md` |
+| Linked Data Explorer | `docs/superpowers/specs/` | `docs/superpowers/plans/` | `.claude/commands/bump-release.md` |
+| RONL Business API | `docs/superpowers/specs/` | `docs/superpowers/plans/` | `.claude/commands/bump-release.md` |
+| CPRMV | `docs/superpowers/specs/` | `docs/superpowers/plans/` | `.claude/commands/bump-release.md` |
+| Norm Editor | not in place | not in place | not in place |
 
-## 3. Implementation
+Specs are named `YYYY-MM-DD-<topic>-design.md` and plans `YYYY-MM-DD-<feature>.md`, and both are committed. The `superpowers` plugin's brainstorming and planning skills
+write them; see [Working with Claude Code](working-with-claude-code.md#plugins).
 
-Implementation happens in Claude Code, with `claude-mem` capturing session memory by
-default. Depending on the size of the change, work proceeds either inline or through the
-`superpowers` plugin. Either way it follows **red/green TDD**: the failing test comes
-first, then the minimum code needed to make it pass.
+## The handoff package
 
-## 4. Release
+A handoff package is a folder dropped into a repository as `docs/<feature>-handoff/`. It holds a ready-to-use prompt,
+architecture or design notes, and a `reference/` folder with the design's own source files; it often carries
+standalone HTML and screenshots of the design as well.
 
-A release is cut with `/bump-release`, a command defined per repository — each component
-keeps its own version, tailored to its own changelog format. It also regenerates the
-release's SBOM in all three repositories, and in the RONL Business API it runs the full
-test suite before the release commit, because a version bump is input to tests that
-read a `package.json`.
+- **Its files are the single source of truth** for that piece of work, not a same-named or similar-looking file
+  already in the application.
+- **The folder is never committed.** What it specifies is ported into the real source files; the folder stays
+  untracked, or is removed with `git rm` before the final commit.
 
-**A release lands through a pull request, not a local fast-forward.** The
-[supply-chain gate](../supply-chain.md) is in place in all three application
-repositories — the CPSV Editor and the RONL Business API from August 2026, the Linked
-Data Explorer since v2026.08.7 — so `acc` requires a pull request with no bypass actors,
-and the older flow of merging `acc` locally and pushing it is rejected outright: a
-locally created bump commit has never been through CI. Merging the pull request *is* the
-push, and triggers the acceptance deploy.
+| Component | Handoff folders in the tree | Format check skips them |
+|---|---|---|
+| CPSV Editor | none | not in place |
+| Linked Data Explorer | none | not in place |
+| RONL Business API | one: `docs/pa-demo-social-handoff/` is tracked | yes: `.prettierignore` lists `*-handoff/` |
+| CPRMV | none | not applicable (no Prettier) |
+| Norm Editor | none | not in place |
 
-Since 19 September 2026 that pull request must also pass the build and deploy checks, not
-only `audit` and `scan`, and since 6 October 2026 `lockfile-review`, which has a lockfile
-change to read in every release — so a release whose suite is red cannot be merged. Expect the
-release pull request to sit until CI is green rather than to be waved through.
+The tracked folder in the RONL Business API is the one exception to the rule; it is not a model to follow.
 
-A release pull request is **merged, never squashed and never rebased** — the changelog
-entry cites each commit by SHA, and both alternatives rewrite those hashes. Squashing
-collapses the commits into one new commit; rebasing replays them as new commits,
-deceptively, since it preserves the commit count while replacing every hash. Either
-orphans every citation in the entry.
+## Who decides what
 
-Since September 2026 that is enforced by repository settings rather than by
-remembering: all three repositories allow merge commits only, with
-`delete_branch_on_merge` enabled. GitHub's default button is *Squash and merge*, so
-without the setting one absent-minded click would orphan a release's entire entry. A
-side effect is that Renovate's dependency pull requests land as merge commits too,
-which costs nothing — the changelog range already excludes merge commits, and the
-underlying update commit is what an entry should name.
+| Step | The assistant | The user |
+|---|---|---|
+| Spec and plan | drafts them | approves the design before planning |
+| Branch and implementation | creates the branch, writes code and tests | reviews |
+| Commit | stages the work and reports what is staged | approves every commit |
+| Push and pull request | pushes the branch, opens the pull request | approves pushes that deploy a shared branch |
+| Merge into `acc` | waits for the checks | merges |
+| ACC check | asks | looks at the change on acceptance |
+| Release and promotion | runs `/bump-release`, opens the pull requests | merges both |
+| Housekeeping | runs it when asked, reports a stale install | runs `npm ci` and restarts dev servers |
 
-Production is a second pull request, `acc` → `main`, and what a push to `main` then
-does differs by repository. In the Linked Data Explorer (since v2026.09.7) and the RONL
-Business API (since v2026.09.10) it starts one ordered workflow, *Promote to
-Production*: a `changes` job decides which targets the promotion touches, the backend
-deploys first, and each site deploys only if the backend succeeded or was skipped.
-Since v2026.11.4 the RONL Business API's `changes` job counts a change to the root
-`package.json` or `package-lock.json` against all four targets, not only the backend.
-`/bump-release` always bumps the root `package.json`, so a promotion that carries a
-release now redeploys all four applications, and a lockfile-only promotion no longer
-deploys the backend alone. Since 17 November 2026 every production pattern matches its
-acceptance filter: the frontend's now includes `keycloak-themes/**` too, so a
-theme-only promotion runs the login theme's guard tests on `main` as they run on `acc`
-([ronl-business-api#457](https://github.com/sgort/ronl-business-api/issues/457)). The
-production deploy workflows no longer trigger on the push themselves; they are called
-by the promotion. The CPSV Editor has no backend and keeps a single *Deploy PROD*
-workflow that runs on the push to `main`. Since 21 November 2026 both its deploy
-workflows queue per branch (`concurrency`, `cancel-in-progress: false`): a deploy that
-has started always finishes, and a newer merge replaces only a run still waiting.
-Before that, merges minutes apart deployed in parallel, Azure cancelled the older
-upload, and the run turned red although nothing broke.
+Approval is per step and never carries over: an earlier "commit this" does not cover the next commit. The full set of
+boundaries is on [Working with Claude Code](working-with-claude-code.md#working-boundaries).
 
-## 5. Documentation
+## This documentation site
 
-Once a component has shipped, `/iou-document-patch` — defined once, in this
-documentation repository — brings that component's pages into sync with the new
-release. Its weekly pass re-checks these contributing pages and the Project Start
-Architecture against the repositories themselves, and adds the week's ICTU
-dependency-guideline assessment.
+The site follows the same path with two differences. It has no rulesets, and acceptance is a separate host: pushing
+`acc` to the `flevoland` remote (Azure DevOps) deploys the acceptance site through the root
+`azure-static-web-apps-pipeline.yml`, and that push is where the user checks the change. After the check, `acc` goes
+to GitHub and a promotion pull request into `main` deploys production through
+`.github/workflows/azure-static-web-apps-lively-water-0b8f0c003.yml`. The site cuts no releases. Keeping it in step
+with the components is the job of `/iou-document-patch`; see
+[Working with Claude Code](working-with-claude-code.md#project-commands-and-skills).
 
-## Where to go next
+## What it does not cover
 
-This page is a map, not the territory. The rest of the subsection covers each stage in
-more depth:
+- The Norm Editor keeps no specs, plans or project commands in its repository; its own release process is not
+  described here.
+- No check verifies that a spec or plan exists before implementation starts. The workflow relies on the assistant and
+  the user following it.
+- Tests-first is a working practice, not a gate: CI checks that tests pass and meet the coverage floor, not the order
+  in which they were written.
 
-- **[Design & Handoff](design-and-handoff.md)** — when a feature warrants Claude
-  Design, and what the handoff package contains
-- **[Working with Claude Code](working-with-claude-code.md)** — `claude-mem`, inline
-  work versus the `superpowers` plugin, and red/green TDD in practice
-- **[Skills & Boundaries](skills-and-boundaries.md)** — user-level versus
-  project-level capabilities, the plugin set, and the working rules every session
-  follows
-- **[Code Standards](../code-standards.md)** — what lint, format, hooks and CI
-  actually enforce, measured per repository
-- **[Supply-Chain Pinning](../supply-chain.md)** — what makes a CI check a *gate*,
-  and what the gate deliberately does not protect
+## Where it lives
 
-For the process outside contributors follow instead, see the
-[Contributing overview](../index.md).
+| What | Where |
+|---|---|
+| Specs and plans | `docs/superpowers/specs/`, `docs/superpowers/plans/` in each repository |
+| Release command | `.claude/commands/bump-release.md` in each repository that has one |
+| Rulesets on `acc` and `main` | GitHub repository settings, *Rules*; see [Branches & Promotion](../branch-protection.md) |
+| Handoff ignore | `.prettierignore` in the RONL Business API |
+| Working rules | `~/.claude/CLAUDE.md`; see [Working with Claude Code](working-with-claude-code.md) |

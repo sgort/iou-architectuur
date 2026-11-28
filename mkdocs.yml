@@ -399,26 +399,20 @@ nav:
 
   - 🤝 Contributing:
     - Overview: contributing/index.md
-    - Development Workflow:
-      - Overview: contributing/development-workflow/overview.md
-      - Design & Handoff: contributing/development-workflow/design-and-handoff.md
-      - Working with Claude Code: contributing/development-workflow/working-with-claude-code.md
-      - Skills & Boundaries: contributing/development-workflow/skills-and-boundaries.md
-    - Documentation Architecture:
-      - Overview: contributing/doc-architecture/overview.md
-      - Navigation Structure: contributing/doc-architecture/navigation.md
-      - Technology Stack: contributing/doc-architecture/technology-stack.md
-      - OpenAPI Rendering: contributing/doc-architecture/openapi-rendering.md
     - Controls at a Glance: contributing/controls.md
-    - Code Standards: contributing/code-standards.md
-    - Branch Protection: contributing/branch-protection.md
-    - Supply-Chain Pinning: contributing/supply-chain.md
-    - Dependency Scanning: contributing/dependency-scanning.md
-    - Coverage Floor: contributing/coverage-floor.md
+    - Branches & Promotion: contributing/branch-protection.md
+    - Pinning: contributing/supply-chain.md
+    - Dependencies: contributing/dependency-scanning.md
+    - Tests & Coverage Gates: contributing/coverage-floor.md
+    - Code Standards & Hooks: contributing/code-standards.md
     - Build Provenance: contributing/build-provenance.md
     - The GitLab Mirror: contributing/the-gitlab-mirror.md
     - ICTU Dependency Guideline: contributing/ictu-dependency-guideline.md
-    - CI Posture (slides): contributing/ci-posture-deck.md
+    - Development Workflow: contributing/development-workflow/overview.md
+    - Working with Claude Code: contributing/development-workflow/working-with-claude-code.md
+    - Documentation Architecture:
+      - Overview: contributing/doc-architecture/overview.md
+      - OpenAPI Rendering: contributing/doc-architecture/openapi-rendering.md
 
 # Markdown extensions
 markdown_extensions:
@@ -504,4 +498,5 @@ watch:
 not_in_nav: |
   includes/abbreviations.md
   iou-architecture-deck.md
+  ci-posture-deck.md
   nl/contributing/documentation-guide.md

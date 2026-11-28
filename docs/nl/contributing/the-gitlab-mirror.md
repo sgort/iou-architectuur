@@ -15,6 +15,10 @@ scope: cross-cutting
 
 ---
 
-## Achterlopen is niet hetzelfde als uiteenlopen
+## How it works
 
-## Wat de divergentie van de CPSV Editor bleek te zijn
+## Per repository
+
+## What it does not cover
+
+## Where it lives

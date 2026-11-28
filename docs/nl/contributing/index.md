@@ -15,28 +15,10 @@ scope: cross-cutting
 
 ---
 
-## How to Contribute
+## The repositories
 
----
+## How a change travels
 
-## Documentation
+## Where to read next
 
-### Reporting Issues
-
-### Suggesting Improvements
-
-### Making Changes
-
----
-
-## Code Contributions
-
-### RONL Business API
-
-### CPSV Editor
-
-### Linked Data Explorer
-
----
-
-## Standards
+## Licence and contact

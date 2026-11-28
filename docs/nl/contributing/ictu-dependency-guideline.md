@@ -2,7 +2,7 @@
 scope: cross-cutting
 ---
 
-# ICTU-richtlijn voor dependencies
+# ICTU-richtlijn voor afhankelijkheden
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
@@ -15,22 +15,16 @@ scope: cross-cutting
 
 ---
 
-## De elf aanbevelingen
+## The eleven recommendations
 
-## Voortgang
+## How a week is scored
 
-## Scores
+## Current scores
 
-## Wat er deze week is veranderd
+## Why each score
 
-## Hoe de eerdere weken zijn gereconstrueerd
+## What moved in the last two weeks
 
-## De eerst gerangschikte bevinding, en hoe die is opgelost
+## What the guideline does not measure
 
-## Het werk, en wat er nog openstaat
-
-## Wat de richtlijn niet meet
-
-## Wat is geverifieerd
-
-## Wat niet is geverifieerd
+## Where it lives

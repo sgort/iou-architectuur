@@ -2,7 +2,7 @@
 scope: cross-cutting
 ---
 
-# Dependencyscanning
+# Afhankelijkheden
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
@@ -15,14 +15,12 @@ scope: cross-cutting
 
 ---
 
-## Waarom de npm-boom een eigen gate nodig heeft
+## How a lockfile change is reviewed
 
-## De workflow, zoals de Linked Data Explorer die draait
+## When the scans run
 
-## De CPSV Editor, die ermee begon
+## Per repository
 
-## Onderdrukkingen staan in de code
+## What it does not cover
 
-## Renovate onderhoudt dependencies, niet de boom
-
-## Wat verplicht stellen kost
+## Where it lives

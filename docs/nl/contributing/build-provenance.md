@@ -2,7 +2,7 @@
 scope: cross-cutting
 ---
 
-# Build-herkomst
+# Herkomst van builds
 
 !!! info "Documentatie in ontwikkeling"
     De Nederlandse vertaling van deze pagina is nog niet beschikbaar.
@@ -15,16 +15,14 @@ scope: cross-cutting
 
 ---
 
-## What it looks like
+## How it works
 
-## Half-configured counts as untracked
+## Per repository
 
-## The same feature, four implementations
+## Release SBOMs
 
-## Two implementation decisions worth keeping
+## This site's header
 
-## Verifying it
+## What it does not cover
 
-## Known gaps
-
-## Adding this to another application
+## Where it lives
