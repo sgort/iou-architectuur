@@ -3,7 +3,7 @@
   "last_patch": {
     "date": "2026-11-28",
     "kind": "Component sync",
-    "summary": "CPSV Editor v2026.11.3, Linked Data Explorer v2026.11.4 and RONL Business API v2026.11.7, all in production: a new direct dependency now waits for an assessment in a dependency register and no package version younger than fourteen days enters a lockfile, in all three; the RONL Business API moves to Node 24 and npm 11.19 on both tiers; the CPSV Editor scales vendor logos; the RIP R2.1–R2.4 models link their eDOCS documents.",
+    "summary": "CPSV Editor v2026.11.3, Linked Data Explorer v2026.11.4 and RONL Business API v2026.11.7, all in production: a new direct dependency now waits for an assessment in a dependency register and no package version younger than fourteen days enters a lockfile, in all three; the RONL Business API moves to Node 24 and npm 11.19 on both tiers; the CPSV Editor scales vendor logos; the RIP R2.1–R2.4 models link their eDOCS documents; and CPRMV release v2026.11.1 (vocabulary 0.4.3): /ref no longer echoes request headers or redirects off-site, after the first Semgrep triage.",
     "previous": {
       "date": "2026-11-27",
       "kind": "Component sync",
@@ -83,17 +83,17 @@
     {
       "name": "CPRMV",
       "icon": "📜",
-      "version": "v2026.11.0",
+      "version": "v2026.11.1",
       "vocabulary": "0.4.3",
       "environment": "prod",
-      "commit": "502a351...",
+      "commit": "0c4d236...",
       "commit_date": "2026-11-27",
       "build": {
-        "sha": "502a351",
-        "run": 21,
-        "run_url": "https://github.com/open-regels/cprmv/actions/runs/45969250973"
+        "sha": "0c4d236",
+        "run": 50,
+        "run_url": "https://github.com/open-regels/cprmv/actions/runs/46040683051"
       },
-      "repo_url": "https://github.com/open-regels/cprmv/commit/502a3517f0c1d1f56aa4f57a42a37a42daf28657",
+      "repo_url": "https://github.com/open-regels/cprmv/commit/0c4d236b4f9a02eaf189610789a6b9e83d2c5c39",
       "ci_repo": "https://github.com/open-regels/cprmv"
     }
   ]

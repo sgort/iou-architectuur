@@ -11,7 +11,7 @@ Interactive documentation is available at the live environments:
 
 Responses from `/methods` and `/rules`, and errors from `/raw`, are plain text (`text/plain; charset=utf-8`) whatever the requested serialisation. Errors are reported in the body with HTTP status `200`, except where noted.
 
-`/rules`, `/raw` and `/ref` accept an optional `x-api-key` header. The API passes it on to a source that needs the caller's own key — today the DSO methods (see [Publication Repositories](../features/publication-repositories.md#dso-sttr)); the other sources need none.
+`/rules` and `/raw` accept an optional `x-api-key` header. The API passes it on to a source that needs the caller's own key — today the DSO methods (see [Publication Repositories](../features/publication-repositories.md#dso-sttr)); the other sources need none. `/ref` takes no key.
 
 ---
 
@@ -142,7 +142,7 @@ Resolves an external legal reference to a CPRMV API path and returns an HTTP red
 | ELI → Formex 4 on EU CELLAR | `http://data.europa.eu/eli/reg/2018/1805/oj` | the EU CELLAR item (language `NLD`, format `fmx4`) |
 | ELI for BWB / CVDR (experimental) | `https://wetten.overheid.nl/BWBR0015703/Artikel%2020/onderdeel%20a.` | a `/rules/` path |
 
-**Response:** `307 Temporary Redirect`, or `{"error": "not a valid or supported reference..."}` if no method resolves the reference. The redirect response carries the request's own headers back, the `x-api-key` included ([open-regels/cprmv#1](https://github.com/open-regels/cprmv/issues/1)). A malformed Juriconnect reference currently fails with `500 Internal Server Error` (see [Reference Resolution](../features/reference-resolution.md#juriconnect)).
+**Response:** `307 Temporary Redirect`, or `{"error": "not a valid or supported reference..."}` if no method resolves the reference. The redirect carries none of the request's headers; a client sends its own, the `x-api-key` included, to the new location. `/ref` redirects only to a path on this API (not `//host`) or to an `http` or `https` URL on `publications.europa.eu` without user info, and never to a target with a backslash or a control character; a reference that a method resolves to anywhere else gets the same *not a valid or supported reference* answer as one that no method resolves. So does a malformed Juriconnect reference (see [Reference Resolution](../features/reference-resolution.md#juriconnect)).
 
 **Supported reference types:** See [Reference Resolution](../features/reference-resolution.md).
 

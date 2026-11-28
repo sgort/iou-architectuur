@@ -1,3 +1,7 @@
+---
+component: CPRMV
+---
+
 # Referentie Resolutie
 
 !!! info "Documentatie in ontwikkeling"
@@ -28,4 +32,8 @@
 ---
 
 ## Reference method configuration
+
+---
+
+## Redirect targets
 

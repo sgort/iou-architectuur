@@ -98,7 +98,7 @@ See [Testing](testing.md) for the commands, what they cover and what CI runs.
 | `ciso8601` | 2.3.3 | ISO 8601 date parsing |
 | `fastmcp` | 4.1.8 | MCP server wiring (see [Architecture](architecture.md#mcp)) |
 
-Dev extras: `pytest`, `pytest-cov`, `httpx`, `pre-commit`. Tool extras: `bandit`, `black`, `mypy`, `ruff`, `safety`, `vulture`.
+Dev extras: `pytest`, `pytest-cov`, `httpx`, `pre-commit`. Tool extras: `bandit`, `black`, `mypy`, `ruff`, `vulture`.
 
 ---
 

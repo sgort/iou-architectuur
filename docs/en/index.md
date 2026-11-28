@@ -179,13 +179,13 @@ The IOU Architecture ecosystem is - apart from TriplyDB and eDOCS - built entire
 
     [:octicons-arrow-right-24: Full changelog](linked-data-explorer/developer/changelog-roadmap.md)
 
--   **📜 CPRMV API — v2026.11.0** · *vocabulary 0.4.3* · *November 2026*
+-   **📜 CPRMV API — v2026.11.1** · *vocabulary 0.4.3* · *November 2026*
 
     ---
 
     **Organisations, norms and the DSO as sources, and the original publication on request**
 
-    A RuleSet is now an FRBR Endeavor, so it can be a Work, an Expression, a Manifestation or an Item, and methods come in modules ([vocabulary](cprmv-api/reference/cprmv-vocabulary.md)). The API reads organisations from the Register van Overheidsorganisaties, norms from the IOU Norms API and STTR decision models from the DSO, which takes your own key ([sources](cprmv-api/features/publication-repositories.md)). `/raw` returns the original publication, `/methods` narrows to one method, and the EU CELLAR helpers are gone ([endpoints](cprmv-api/reference/api-endpoints.md)). The MCP server now answers at `/mcp/`, and the specification has new introductory chapters, a diagram per class and a PDF that builds again. Its seven [tests](cprmv-api/developer/testing.md) pass. Since 27 November production runs release v2026.11.0, the first with a release number beside vocabulary version 0.4.3: CPRMV is developed on GitHub, each tier runs on its own VM that deploys the head of its branch, rolls back when a deploy fails its check and reports the release it runs, and every release keeps a bill of materials ([releases](cprmv-api/developer/changelog-roadmap.md#releases), [VM deployment](cprmv-api/developer/vm-deployment.md)).
+    A RuleSet is now an FRBR Endeavor, so it can be a Work, an Expression, a Manifestation or an Item, and methods come in modules ([vocabulary](cprmv-api/reference/cprmv-vocabulary.md)). The API reads organisations from the Register van Overheidsorganisaties, norms from the IOU Norms API and STTR decision models from the DSO, which takes your own key ([sources](cprmv-api/features/publication-repositories.md)). `/raw` returns the original publication, `/methods` narrows to one method, and the EU CELLAR helpers are gone ([endpoints](cprmv-api/reference/api-endpoints.md)). The MCP server now answers at `/mcp/`, and the specification has new introductory chapters, a diagram per class and a PDF that builds again. Since 27 November production runs release v2026.11.1: `/ref` no longer sends your request headers back or redirects anywhere but this API and EU CELLAR, and its 26 [tests](cprmv-api/developer/testing.md) pass. Release v2026.11.0 was the first with a release number beside vocabulary version 0.4.3: CPRMV is developed on GitHub, each tier runs on its own VM that deploys the head of its branch, rolls back when a deploy fails its check and reports the release it runs, and every release keeps a bill of materials ([releases](cprmv-api/developer/changelog-roadmap.md#releases), [VM deployment](cprmv-api/developer/vm-deployment.md)).
 
     [:octicons-arrow-right-24: Full changelog](cprmv-api/developer/changelog-roadmap.md)
 

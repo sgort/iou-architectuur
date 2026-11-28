@@ -17,6 +17,8 @@ component: CPRMV
 
 ## Releases
 
+### v2026.11.1 — A Safe Reference Redirect and the First Semgrep Triage (November 2026)
+
 ### v2026.11.0 — Release Numbers, a Bill of Materials per Release, and CPRMV on GitHub (November 2026)
 
 ---

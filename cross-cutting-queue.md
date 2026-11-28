@@ -214,6 +214,25 @@ ICTU moves (R1 3 → 4 and R6 → 5 in all three); verify them here, at the pass
 10. **Not scored yet:** the same gate is to be ported to LVG and CPRMV (peer briefing, 28 November); work not started.
 11. **Findings filed:** ttl-editor#282, linked-data-explorer#372, ronl-business-api#511.
 
+### 28 November 2026 — CPRMV release v2026.11.1 (production, `0c4d236`; vocabulary still 0.4.3)
+
+Evidence: `serve_api/src/serve.py`, `serve_api/methods/{eli,core_web,frbr_sru}.py`, `SECURITY-PIPELINE.md`,
+`html/index.html`, `serve_api/pyproject.toml` at `0c4d236`; open-regels/cprmv#1 closed by a542dc0; live `/health`.
+
+1. **Semgrep triage practice** (be8a085): Code false positives are suppressed inline, a reason then
+   `# nosemgrep: <full rule id>`; everything else is triaged in the Semgrep UI and recorded in the
+   `SECURITY-PIPELINE.md` table ("Last triaged on 27 November 2026"). CPRMV now follows the rule the other
+   repositories follow; one accepted Code finding: the unversioned Logius `respec-nlgov.js` loaded without integrity.
+   Bears on `supply-chain.md` / `dependency-scanning.md` where they describe each repository's Semgrep practice.
+2. **SRI on the specification's mermaid script** (`html/index.html`), the Logius script still without. Bears on any
+   contributing or PSA statement about third-party scripts on the published specification.
+3. **`safety` dropped from the `tools` extra** (75e7662); five Renovate security updates (virtualenv ×2, filelock,
+   black) went through on 27 November. Bears on `dependency-scanning.md`'s CPRMV tooling list, if it names `safety`.
+4. **A finding closed:** open-regels/cprmv#1 (`/ref` echoed the API key) is fixed, together with an open redirect the
+   triage found on the same route. PSA chapter 8, if it carries a generic sentence about that gap, can now link #1
+   and drop it; check AB-20 / R-01-style wording. cprmv#2 stays open.
+5. **ICTU:** CPRMV is still not scored; the dependency-gate port to CPRMV has not started (peer briefing).
+
 ## Drained
 
 | Pass | Entries drained | Where they landed |

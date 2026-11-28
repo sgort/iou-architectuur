@@ -14,6 +14,19 @@ CPRMV has two version numbers ([why](ci-cd.md#two-version-numbers)). A **release
 
 Releases are numbered since 27 November 2026 and have no changelog of their own in the repository; each entry below is written from the release's pull requests.
 
+### v2026.11.1 — A Safe Reference Redirect and the First Semgrep Triage (November 2026)
+
+> What `/ref` answers: [GET /ref](../reference/api-endpoints.md#get-ref). How it resolves a reference: [Reference Resolution](../features/reference-resolution.md). Where scan decisions are recorded: [CI/CD](ci-cd.md#semgrep-semgrepyml). The tests: [Testing](testing.md).
+
+Vocabulary and API version **0.4.3**, unchanged. Production runs `0c4d236` since 27 November 2026, promoted by [#45](https://github.com/open-regels/cprmv/pull/45) after the release pull request [#44](https://github.com/open-regels/cprmv/pull/44) into `acc`.
+
+- **`/ref` no longer echoes the request's headers** ([#40](https://github.com/open-regels/cprmv/pull/40), closing [open-regels/cprmv#1](https://github.com/open-regels/cprmv/issues/1)). `/ref` takes no `x-api-key` header any more, and its `307` carries none of the request's headers: a client sends its own headers to the new location. `/rules` and `/raw` still pass the caller's `x-api-key` on to a source that needs it.
+- **`/ref` redirects only to this API or to EU CELLAR.** The Semgrep triage found an open redirect on the same route: the ELI method put the raw reference into its SPARQL query to CELLAR, so a crafted reference could rewrite the query and choose the item `/ref` redirected to. The ELI method now answers only a reference of URI-safe characters after `http://data.europa.eu/eli/` that matches its reference format, and returns nothing for any other, without querying CELLAR. `/ref` then redirects only to a path on this API (not `//host`) or to an `http` or `https` URL on `publications.europa.eu` without user info, never to a target with a backslash or a control character, and answers anything else as *not a valid or supported reference*. A malformed Juriconnect reference, which used to fall through to the CELLAR query and fail with `500`, gets that answer too.
+- **The first Semgrep triage** ([#39](https://github.com/open-regels/cprmv/pull/39)). Code findings that are false positives are suppressed inline, each with its reason above `# nosemgrep:` and the full rule id: the `urlopen` calls in `core_web.py`, `frbr_sru.py` and `eli.py`, the method loader's import in `serve.py`, and the `/ref` redirect. `SECURITY-PIPELINE.md` says where each kind of decision is recorded and records one accepted Code finding, the unversioned Logius `respec-nlgov.js` in `html/index.html`, which has no `integrity` hash because Logius replaces it in place. The `respec-mermaid` script on the same page now carries `integrity` and `crossorigin`.
+- **Dependencies.** In the image: `click` 8.5.1, `caio` 0.12.10 and `annotated-doc` 0.0.6. For development only: `virtualenv` 21.14.9 and 21.14.13, `filelock` 4 and `black` 26.10.1, all security fixes, and `distlib` 0.4.4. `safety` is no longer in the `tools` extra ([#36](https://github.com/open-regels/cprmv/pull/36)). The release's bill of materials is `docs/sbom/cprmv-api-v2026.11.1.cdx.json` (98 components), and the [Release SBOM run](https://github.com/open-regels/cprmv/actions/runs/46040682565) passed.
+- **Deployed.** CI [run 50](https://github.com/open-regels/cprmv/actions/runs/46040683051) published `0c4d236`, the stable VM reported it running at 17:22:38 UTC, and `deploy` passed.
+- **Tests.** pytest collects 26 tests, all passing in 6.99 s, measured on 28 November from a scratch export: 19 new in `serve_api/test/test_ref.py`, which run offline against a fake CELLAR, and the 7 of `test_serve.py`, whose reference test no longer reaches CELLAR. CI run 50 passed them and the 69 bats tests, unchanged. The SBOM script's 75 tests passed in the Release SBOM run; locally 74 passed and the one that runs the real CycloneDX tool was skipped, because the tool was not installed.
+
 ### v2026.11.0 — Release Numbers, a Bill of Materials per Release, and CPRMV on GitHub (November 2026)
 
 > How a release is cut: [CI/CD](ci-cd.md#releasing). What `/health` reports: [GET /health](../reference/api-endpoints.md#get-health). How each tier deploys itself: [VM Deployment](vm-deployment.md). The tests: [Testing](testing.md).
@@ -59,7 +72,7 @@ Note that CPRMV / CPRMV API still is highly subject to change.
 - The Docker image includes `serve_api/methods/`.
 - `test_get_root` expects `0.4.3`; nothing else in the tests changed. At `d597671` pytest collected 3 tests in `serve_api/test/test_serve.py` and 3 passed in 6.68 s, measured on 24 November from a scratch export on Windows with Python 3.14.3 (the pinned `requirements-dev.txt` without `uvloop`, plus `pywin32` and `colorama`); CI on Linux (pipeline #824) passed the same suite. Ten tests are still commented out; see [Testing](testing.md).
 
-**Found while documenting it.** The `/ref` redirect carries the request's own headers back to the caller, the `x-api-key` with them ([open-regels/cprmv#1](https://github.com/open-regels/cprmv/issues/1)). [open-regels/cprmv#2](https://github.com/open-regels/cprmv/issues/2) collects the rest: `/0.4.3/methods/{method_name}` and `method_name` return the whole graph for an unknown name or for `roo` and `dso`; `/mcp` redirects to plain `http://`; IOU Norms definitions arrive as the text of a Python dictionary in the 0.4.1 namespace, and their date goes out as `valid-on` where the Linked Data Explorer reads `valid_on`; the `frbr:` prefix lacks its `#`; `cprmv:Method` is labelled "Tool"; the `AgreementEchelon` → `NaturalEchelon` rename is not announced in the upstream changelog; and the Dockerfile comment, the `/ref` docstring and a mutable default argument in `cbd_cprmv_json` are stale or fragile.
+**Found while documenting it.** The `/ref` redirect carries the request's own headers back to the caller, the `x-api-key` with them ([open-regels/cprmv#1](https://github.com/open-regels/cprmv/issues/1)); fixed in [v2026.11.1](#v2026111-a-safe-reference-redirect-and-the-first-semgrep-triage-november-2026). [open-regels/cprmv#2](https://github.com/open-regels/cprmv/issues/2) collects the rest: `/0.4.3/methods/{method_name}` and `method_name` return the whole graph for an unknown name or for `roo` and `dso`; `/mcp` redirects to plain `http://`; IOU Norms definitions arrive as the text of a Python dictionary in the 0.4.1 namespace, and their date goes out as `valid-on` where the Linked Data Explorer reads `valid_on`; the `frbr:` prefix lacks its `#`; `cprmv:Method` is labelled "Tool"; the `AgreementEchelon` → `NaturalEchelon` rename is not announced in the upstream changelog; and the Dockerfile comment, the `/ref` docstring and a mutable default argument in `cbd_cprmv_json` are stale or fragile.
 
 ---
 
@@ -145,6 +158,7 @@ Note that CPRMV / CPRMV API still is highly subject to change.
 
 | Feature | Version |
 | ------- | ------- |
+| `/ref` without echoed headers or off-site redirects; the first Semgrep triage | v2026.11.1 |
 | Release numbers, a release SBOM, `/bump-release` | v2026.11.0 |
 | CPRMV / CPRMV API | v0.4.3  |
 | CPRMV / CPRMV API | v0.4.2  |
